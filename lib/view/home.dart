@@ -1,5 +1,6 @@
 import 'package:dpip/core/api.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool init = false;
 
@@ -23,8 +24,11 @@ class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (!init) {
-        var data = get("https://exptech.com.tw/api/v1/dpip/alert?code=${}");
+        var data = get(
+            "https://exptech.com.tw/api/v1/dpip/alert?code=${prefs.getString('setting-location') ?? 0}");
+        print(data);
       }
       init = true;
       _List_children = <Widget>[];
