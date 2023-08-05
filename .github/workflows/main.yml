@@ -1,0 +1,29 @@
+on:
+  push:
+    branches:
+      - main
+name: Test
+jobs:
+  android-release-build:
+    name: android-release-build
+    runs-on: ubuntu-latest
+    container: ghcr.io/niklaslehnfeld/flutter-essentials-docker:master
+    steps:
+      - uses: actions/checkout@v2
+      - uses: NiklasLehnfeld/flutter-android-build-action@v1
+        id: android-build
+        with:
+          release: true
+          keystore: ${{ secrets.KEYSTORE }}
+          keystore-pwd: "${{ secrets.KEYSTORE_PASSWORD }}"
+          key-pwd: "${{ secrets.KEY_PASSWORD }}"
+      - name: Archive APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-apk
+          path: ${{ steps.android-build.outputs.apk-path }}
+      - name: Archive AAB
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-aab
+          path: ${{ steps.android-build.outputs.aab-path }}
