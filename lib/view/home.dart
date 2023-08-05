@@ -50,8 +50,7 @@ class _HomePage extends State<HomePage> {
         ));
       } else {
         if (_page == 0) {
-          prefs.setInt('setting-loc', 1);
-          if (prefs.getInt('setting-loc') == null) {
+          if (prefs.getString('loc-town') == null) {
             _List_children.add(const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -69,14 +68,14 @@ class _HomePage extends State<HomePage> {
               ],
             ));
           } else {
-            _List_children.add(const Padding(
-              padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
+            _List_children.add(Padding(
+              padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "臺南市 歸仁區",
-                    style: TextStyle(
+                    "${prefs.getString("loc-city")} ${prefs.getString("loc-town")}",
+                    style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w100,
                         color: Colors.white),
