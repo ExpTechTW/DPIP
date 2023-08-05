@@ -136,9 +136,9 @@ class _HomePage extends State<HomePage> {
                     data["all"][i]["title"],
                     style: TextStyle(
                         fontSize: 20,
-                        color: (data["all"][i]["type"] == 3)
+                        color: (data["all"][i]["type"] == 2)
                             ? Colors.red
-                            : (data["all"][i]["type"] == 2)
+                            : (data["all"][i]["type"] == 1)
                                 ? Colors.amber
                                 : Colors.white,
                         fontWeight: FontWeight.w600),
