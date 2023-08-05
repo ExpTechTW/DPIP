@@ -29,7 +29,7 @@ class _HistoryPage extends State<HistoryPage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (!init) {
         data = await get(
-            "https://exptech.com.tw/api/v1/dpip/history?city=${prefs.getInt('loc-city')}&town=${prefs.getInt('loc-town')}");
+            "https://exptech.com.tw/api/v1/dpip/history?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
         if (data != false) init = true;
         print(data);
       }

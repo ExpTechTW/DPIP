@@ -28,7 +28,7 @@ class _HomePage extends State<HomePage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (!init) {
         data = await get(
-            "https://exptech.com.tw/api/v1/dpip/alert?city=${prefs.getInt('loc-city')}&town=${prefs.getInt('loc-town')}");
+            "https://exptech.com.tw/api/v1/dpip/alert?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
         if (data != false) init = true;
         print(data);
       }
