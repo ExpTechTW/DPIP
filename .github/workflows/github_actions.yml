@@ -21,10 +21,13 @@ jobs:
       - run: flutter pub get
       - run: flutter build apk
       - run: flutter build appbundle
-      - name: Upload Artifact
+      - name: Upload(apk)
         uses: actions/upload-artifact@master
         with:
-          name: "file"
-          path: |
-           build/app/outputs/flutter-apk/app-release.apk
-           build/app/outputs/bundle/release/app-release.aab
+          name: "DPIP.apk"
+          path: build/app/outputs/flutter-apk/*.apk
+      - name: Upload(aab)
+        uses: actions/upload-artifact@master
+        with:
+          name: "DPIP.aab"
+          path: build/app/outputs/bundle/release/*.aab
