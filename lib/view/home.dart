@@ -28,7 +28,7 @@ class _HomePage extends State<HomePage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (!init) {
         data = await get(
-            "https://exptech.com.tw/api/v1/dpip/alert?code=${prefs.getString('setting-loc') ?? 0}");
+            "https://exptech.com.tw/api/v1/dpip/alert?code=${prefs.getInt('setting-loc') ?? 0}");
         if (data != false) init = true;
         print(data);
       }
@@ -45,12 +45,13 @@ class _HomePage extends State<HomePage> {
             Text(
               "稍等片刻後重試 如持續異常 請回報開發人員",
               style: TextStyle(fontSize: 16, color: Colors.white),
-            )
+            ),
           ],
         ));
       } else {
         if (_page == 0) {
-          if (prefs.getString('setting-loc') == null) {
+          prefs.setInt('setting-loc', 1);
+          if (prefs.getInt('setting-loc') == null) {
             _List_children.add(const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -68,38 +69,6 @@ class _HomePage extends State<HomePage> {
               ],
             ));
           } else {
-            _List_children.add(Container(
-              // color: Colors.red,
-              height: 300,
-              child: const Padding(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SizedBox(width: double.infinity),
-                    Text(
-                      "2023年08月04日 10:00",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                    Text(
-                      "臺南市 歸仁區",
-                      style: TextStyle(fontSize: 24, color: Colors.white),
-                    ),
-                    Text(
-                      "32°C",
-                      style: TextStyle(
-                          fontSize: 42,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      "雨",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    )
-                  ],
-                ),
-              ),
-            ));
             _List_children.add(const Padding(
               padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
               child: Column(
@@ -115,45 +84,161 @@ class _HomePage extends State<HomePage> {
                 ],
               ),
             ));
+            _List_children.add(Padding(
+              padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white38,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sunny, color: Colors.white, size: 60),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                        child: Text(
+                          "40°C",
+                          style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white),
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            "降水量 0.0mm",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w100,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            "濕度 90%",
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w100,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ));
+            if (data["loc"].length == 0) {
+              _List_children.add(const Padding(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(width: double.infinity),
+                    Text(
+                      "暫無生效中的防災資訊",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    )
+                  ],
+                ),
+              ));
+            } else {
+              for (var i = 0; i < data["loc"].length; i++) {
+                DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                        data["all"][i]["time"],
+                        isUtc: true)
+                    .add(const Duration(hours: 8));
+                String formattedDate =
+                    '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
+                _List_children.add(Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: double.infinity),
+                      Text(
+                        data["all"][i]["title"],
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: (data["all"][i]["type"] == 2)
+                                ? Colors.red
+                                : (data["all"][i]["type"] == 1)
+                                    ? Colors.amber
+                                    : Colors.white,
+                            fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        formattedDate,
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      Text(
+                        data["all"][i]["body"],
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.white),
+                      )
+                    ],
+                  ),
+                ));
+              }
+            }
           }
         } else {
           _List_children.add(Image.network(
               "https://www.cwb.gov.tw/Data/satellite/TWI_VIS_TRGB_1375/TWI_VIS_TRGB_1375-2023-08-05-01-00.jpg"));
-          for (var i = 0; i < data["all"].length; i++) {
-            DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                    data["all"][i]["time"],
-                    isUtc: true)
-                .add(const Duration(hours: 8));
-            String formattedDate =
-                '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
-            _List_children.add(Padding(
-              padding: const EdgeInsets.all(10),
+          if (data["all"].length == 0) {
+            _List_children.add(const Padding(
+              padding: EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(width: double.infinity),
+                  SizedBox(width: double.infinity),
                   Text(
-                    data["all"][i]["title"],
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: (data["all"][i]["type"] == 2)
-                            ? Colors.red
-                            : (data["all"][i]["type"] == 1)
-                                ? Colors.amber
-                                : Colors.white,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    formattedDate,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Text(
-                    data["all"][i]["body"],
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                    "暫無生效中的防災資訊",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   )
                 ],
               ),
             ));
+          } else {
+            for (var i = 0; i < data["all"].length; i++) {
+              DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                      data["all"][i]["time"],
+                      isUtc: true)
+                  .add(const Duration(hours: 8));
+              String formattedDate =
+                  '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
+              _List_children.add(Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: double.infinity),
+                    Text(
+                      data["all"][i]["title"],
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: (data["all"][i]["type"] == 2)
+                              ? Colors.red
+                              : (data["all"][i]["type"] == 1)
+                                  ? Colors.amber
+                                  : Colors.white,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    Text(
+                      data["all"][i]["body"],
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    )
+                  ],
+                ),
+              ));
+            }
           }
         }
       }
