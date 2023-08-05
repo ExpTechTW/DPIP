@@ -1,6 +1,7 @@
 import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool init = false;
 
@@ -24,6 +25,7 @@ class _MePage extends State<MePage> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (!init) {
         loc_data = await get(
             "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
@@ -37,15 +39,18 @@ class _MePage extends State<MePage> {
               MaterialPageRoute(
                 builder: (context) => const SettingPage(),
                 settings: RouteSettings(
-                  arguments: {"data": loc_data.keys, "storage": "loc-city"},
+                  arguments: {
+                    "data": loc_data.keys.toList(),
+                    "storage": "loc-city"
+                  },
                 ),
               ));
         },
-        child: const Padding(
-          padding: EdgeInsets.all(5),
+        child: Padding(
+          padding: const EdgeInsets.all(5),
           child: Row(
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -60,12 +65,12 @@ class _MePage extends State<MePage> {
               ),
               Expanded(
                 child: Text(
-                  "臺南市",
-                  style: TextStyle(fontSize: 22, color: Colors.white),
+                  prefs.getString("loc-city") ?? "未設定",
+                  style: const TextStyle(fontSize: 22, color: Colors.white),
                   textAlign: TextAlign.end,
                 ),
               ),
-              Icon(Icons.arrow_forward_ios_outlined,
+              const Icon(Icons.arrow_forward_ios_outlined,
                   color: Colors.white, size: 20)
             ],
           ),
@@ -74,25 +79,26 @@ class _MePage extends State<MePage> {
       _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
       _List_children.add(GestureDetector(
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SettingPage(),
-                settings: RouteSettings(
-                  arguments: [
-                    {
-                      "text": "",
-                      "value": "",
-                    }
-                  ],
-                ),
-              ));
+          if (prefs.getString("loc-city") != null) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SettingPage(),
+                  settings: RouteSettings(
+                    arguments: {
+                      "data":
+                          loc_data[prefs.getString("loc-city")].keys.toList(),
+                      "storage": "loc-town"
+                    },
+                  ),
+                ));
+          }
         },
-        child: const Padding(
-          padding: EdgeInsets.all(5),
+        child: Padding(
+          padding: const EdgeInsets.all(5),
           child: Row(
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -107,18 +113,19 @@ class _MePage extends State<MePage> {
               ),
               Expanded(
                 child: Text(
-                  "歸仁區",
-                  style: TextStyle(fontSize: 22, color: Colors.white),
+                  prefs.getString("loc-town") ?? "未設定",
+                  style: const TextStyle(fontSize: 22, color: Colors.white),
                   textAlign: TextAlign.end,
                 ),
               ),
-              Icon(Icons.arrow_forward_ios_outlined,
+              const Icon(Icons.arrow_forward_ios_outlined,
                   color: Colors.white, size: 20)
             ],
           ),
         ),
       ));
       _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
+      if (!mounted) return;
       setState(() {});
     });
     return Scaffold(

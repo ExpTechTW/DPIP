@@ -29,7 +29,7 @@ class _HistoryPage extends State<HistoryPage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (!init) {
         data = await get(
-            "https://exptech.com.tw/api/v1/dpip/history?code=${prefs.getInt('setting-loc') ?? 0}");
+            "https://exptech.com.tw/api/v1/dpip/history?city=${prefs.getInt('loc-city')}&town=${prefs.getInt('loc-town')}");
         if (data != false) init = true;
         print(data);
       }
@@ -195,6 +195,7 @@ class _HistoryPage extends State<HistoryPage> {
           }
         }
       }
+      if (!mounted) return;
       setState(() {});
     });
     return Scaffold(

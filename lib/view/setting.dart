@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+bool init = false;
 
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -11,24 +14,33 @@ class _SettingPage extends State<SettingPage> {
   List<Widget> _List_children = <Widget>[];
 
   @override
+  void dispose() {
+    init = false;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     dynamic data = ModalRoute.of(context)!.settings.arguments;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (init) return;
+      init = true;
       print(data["data"]);
-      _List_children = <Widget>[];
       for (var i = 0; i < data["data"].length; i++) {
-        print(data["data"][i]);
         _List_children.add(GestureDetector(
           onTap: () {
-            print('Row is tapped!');
+            prefs.setString(data["storage"], data["data"][i]);
+            if (data["storage"] == "loc-city") prefs.remove("loc-town");
+            Navigator.pop(context);
           },
           child: Padding(
-            padding: EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
             child: Row(
               children: [
                 Text(
-                  data["data"][i].toString(),
+                  data["data"][i],
                   style: const TextStyle(fontSize: 22, color: Colors.white),
                   textAlign: TextAlign.end,
                 ),
@@ -41,6 +53,7 @@ class _SettingPage extends State<SettingPage> {
           thickness: 0.5,
         ));
       }
+      if (!mounted) return;
       setState(() {});
     });
     return Scaffold(
