@@ -1,7 +1,11 @@
 import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
+import 'package:dpip/view/version.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'about.dart';
 
 bool init = false;
 
@@ -32,6 +36,7 @@ class _MePage extends State<MePage> {
       }
       init = true;
       _List_children = <Widget>[];
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
       _List_children.add(GestureDetector(
         onTap: () {
           Navigator.push(
@@ -70,8 +75,10 @@ class _MePage extends State<MePage> {
                   textAlign: TextAlign.end,
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_outlined,
-                  color: Colors.white, size: 20)
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Icon(Icons.arrow_forward_ios_outlined,
+                      color: Colors.white, size: 20)),
             ],
           ),
         ),
@@ -118,8 +125,80 @@ class _MePage extends State<MePage> {
                   textAlign: TextAlign.end,
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_outlined,
-                  color: Colors.white, size: 20)
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Icon(Icons.arrow_forward_ios_outlined,
+                      color: Colors.white, size: 20)),
+            ],
+          ),
+        ),
+      ));
+      _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
+      _List_children.add(GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const VersionPage(),
+              ));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "版本",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Text(
+                  "${packageInfo.version} | ${(!packageInfo.version.endsWith("0")) ? "預覽版" : "穩定版"}",
+                  style: const TextStyle(fontSize: 22, color: Colors.white),
+                  textAlign: TextAlign.end,
+                ),
+              ),
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Icon(Icons.arrow_forward_ios_outlined,
+                      color: Colors.white, size: 20)),
+            ],
+          ),
+        ),
+      ));
+      _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
+      _List_children.add(GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AboutPage(),
+              ));
+        },
+        child: const Padding(
+          padding: EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "關於",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SizedBox(),
+              ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                  child: Icon(Icons.arrow_forward_ios_outlined,
+                      color: Colors.white, size: 20)),
             ],
           ),
         ),
