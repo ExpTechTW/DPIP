@@ -42,3 +42,8 @@ jobs:
         architecture: x64
     - run: flutter pub get
     - run: flutter build ios --release --no-codesign
+    - name: Upload(app)
+      uses: actions/upload-artifact@master
+      with:
+        name: "DPIP.app"
+        path: /Users/runner/work/DPIP/DPIP/build/ios/iphoneos/Runner.app.
