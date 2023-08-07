@@ -7,7 +7,7 @@ on:
     branches: [ "Release" ]
 
 jobs:
-  build:
+  Android:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,3 +31,14 @@ jobs:
         with:
           name: "DPIP.aab"
           path: build/app/outputs/bundle/release/*.aab
+
+  iOS:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        architecture: x64
+    - run: flutter pub get
+    - run: flutter build ios --release --no-codesign
