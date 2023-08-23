@@ -186,7 +186,7 @@ class _HomePage extends State<HomePage> {
           }
         } else {
           _List_children.add(Image.network(
-              "https://www.cwb.gov.tw/Data/satellite/TWI_VIS_TRGB_1375/TWI_VIS_TRGB_1375-2023-08-05-01-00.jpg"));
+              "https://exptech.com.tw/api/v1/weather/radar"));
           if (data["all"].length == 0) {
             _List_children.add(const Padding(
               padding: EdgeInsets.all(10),
