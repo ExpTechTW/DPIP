@@ -207,9 +207,8 @@ class _HistoryPage extends State<HistoryPage> {
               children: [
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: (_page == 1)
-                        ? Colors.blue[800]
-                        : Colors.transparent,
+                    backgroundColor:
+                        (_page == 1) ? Colors.blue[800] : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
@@ -227,9 +226,8 @@ class _HistoryPage extends State<HistoryPage> {
                 const SizedBox(width: 35),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: (_page == 0)
-                        ? Colors.blue[800]
-                        : Colors.transparent,
+                    backgroundColor:
+                        (_page == 0) ? Colors.blue[800] : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),

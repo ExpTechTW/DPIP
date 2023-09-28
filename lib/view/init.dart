@@ -1,5 +1,3 @@
-import 'package:dpip/main.dart';
-import 'package:dpip/view/map.dart';
 import 'package:flutter/material.dart';
 
 import 'history.dart';
@@ -16,7 +14,7 @@ class InitPage extends StatefulWidget {
 //  print(await get("https://exptech.com.tw/api/v1/earthquake/reports"));
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
-  final pages = [HomePage(), MyHomePage(title: ""), MePage()];
+  final pages = [HomePage(), HistoryPage(), MePage()];
 
   @override
   Widget build(BuildContext context) {

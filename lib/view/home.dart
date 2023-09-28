@@ -135,8 +135,9 @@ class _HomePage extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,  // 修改這裡
-                          textBaseline: TextBaseline.alphabetic,  // 添加這行
+                          crossAxisAlignment:
+                              CrossAxisAlignment.baseline, // 修改這裡
+                          textBaseline: TextBaseline.alphabetic, // 添加這行
                           children: [
                             Text(
                               "40",
