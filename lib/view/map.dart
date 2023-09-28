@@ -200,12 +200,11 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Container(
-        color: Colors.black, // 设置容器的背景色为黑色
+        color: Colors.black,
         child: FlutterMap(
           mapController: MapController(),
           options: MapOptions(
             center: const LatLng(45.993807, 14.483972),
-            //center: LatLng(45.720405218, 14.406593302),
             zoom: 14,
           ),
           children: [
