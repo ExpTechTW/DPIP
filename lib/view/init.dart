@@ -1,3 +1,5 @@
+import 'package:dpip/main.dart';
+import 'package:dpip/view/map.dart';
 import 'package:flutter/material.dart';
 
 import 'history.dart';
@@ -14,7 +16,7 @@ class InitPage extends StatefulWidget {
 //  print(await get("https://exptech.com.tw/api/v1/earthquake/reports"));
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
-  final pages = [HomePage(), HistoryPage(), MePage()];
+  final pages = [HomePage(), MyHomePage(title: ""), MePage()];
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class _InitPage extends State<InitPage> {
               icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
         ],
         currentIndex: _currentIndex,
-        fixedColor: Colors.blue,
+        fixedColor: Colors.blueAccent,
         onTap: _onItemClick,
         backgroundColor: Colors.transparent,
         elevation: 0,

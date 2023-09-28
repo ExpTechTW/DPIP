@@ -208,7 +208,7 @@ class _HistoryPage extends State<HistoryPage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: (_page == 1)
-                        ? Colors.deepPurpleAccent
+                        ? Colors.blueAccent
                         : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
@@ -224,11 +224,11 @@ class _HistoryPage extends State<HistoryPage> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 35),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: (_page == 0)
-                        ? Colors.deepPurpleAccent
+                        ? Colors.blueAccent
                         : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(

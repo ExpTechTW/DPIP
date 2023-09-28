@@ -185,8 +185,8 @@ class _HomePage extends State<HomePage> {
             }
           }
         } else {
-          _List_children.add(Image.network(
-              "https://exptech.com.tw/api/v1/weather/radar"));
+          _List_children.add(
+              Image.network("https://exptech.com.tw/api/v1/weather/radar"));
           if (data["all"].length == 0) {
             _List_children.add(const Padding(
               padding: EdgeInsets.all(10),
@@ -254,9 +254,8 @@ class _HomePage extends State<HomePage> {
               children: [
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: (_page == 1)
-                        ? Colors.deepPurpleAccent
-                        : Colors.transparent,
+                    backgroundColor:
+                        (_page == 1) ? Colors.blueAccent : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
@@ -271,12 +270,11 @@ class _HomePage extends State<HomePage> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 35),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: (_page == 0)
-                        ? Colors.deepPurpleAccent
-                        : Colors.transparent,
+                    backgroundColor:
+                        (_page == 0) ? Colors.blueAccent : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
