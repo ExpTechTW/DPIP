@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:dpip/core/api.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool init = false;
@@ -101,12 +97,24 @@ class _HomePage extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "${prefs.getString("loc-city")} ${prefs.getString("loc-town")}",
-                    style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w100,
-                        color: Colors.white),
+                  Row(
+                    children: [
+                      Text(
+                        prefs.getString("loc-city") ?? "",
+                        style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        prefs.getString("loc-town") ?? "",
+                        style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.grey),
+                      ),
+                    ],
                   )
                 ],
               ),
@@ -115,7 +123,7 @@ class _HomePage extends State<HomePage> {
               padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white38,
+                  color: const Color(0xff333439),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Padding(
@@ -123,30 +131,46 @@ class _HomePage extends State<HomePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.sunny, color: Colors.white, size: 60),
+                      Icon(Icons.sunny, color: Colors.white, size: 50),
                       Padding(
                         padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Text(
-                          "40°C",
-                          style: TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,  // 修改這裡
+                          textBaseline: TextBaseline.alphabetic,  // 添加這行
+                          children: [
+                            Text(
+                              "40",
+                              style: TextStyle(
+                                fontSize: 50,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              ".1°C",
+                              style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "降水量 0.0mm",
+                            "降雨機率 10%",
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w100,
                                 color: Colors.white),
                           ),
                           Text(
-                            "濕度 90%",
+                            "預估氣溫 28 ~ 36°C",
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w100,
                                 color: Colors.white),
                           ),
@@ -293,7 +317,7 @@ class _HomePage extends State<HomePage> {
                               style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.white,
-                                  fontWeight: FontWeight.w300),
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ),
