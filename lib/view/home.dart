@@ -26,7 +26,7 @@ class _HomePage extends State<HomePage> {
   Future<void> processData() async {
     var geojson_data = await get(
         "https://raw.githubusercontent.com/ExpTechTW/TREM-Lite/Release/src/resource/maps/tw.json");
-    myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
+    // myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
   }
 
   @override
@@ -213,24 +213,24 @@ class _HomePage extends State<HomePage> {
             }
           }
         } else {
-          _List_children.add(Container(
-            color: Colors.black,
-            child: FlutterMap(
-              mapController: MapController(),
-              options: MapOptions(
-                center: const LatLng(45.993807, 14.483972),
-                zoom: 14,
-              ),
-              children: [
-                PolygonLayer(
-                  polygons: myGeoJson.polygons,
-                ),
-                PolylineLayer(polylines: myGeoJson.polylines),
-              ],
-            ),
-          ));
-          // _List_children.add(
-          //     Image.network("https://exptech.com.tw/api/v1/weather/radar"));
+          // _List_children.add(Container(
+          //   color: Colors.black,
+          //   child: FlutterMap(
+          //     mapController: MapController(),
+          //     options: MapOptions(
+          //       center: const LatLng(45.993807, 14.483972),
+          //       zoom: 14,
+          //     ),
+          //     children: [
+          //       PolygonLayer(
+          //         polygons: myGeoJson.polygons,
+          //       ),
+          //       PolylineLayer(polylines: myGeoJson.polylines),
+          //     ],
+          //   ),
+          // ));
+          _List_children.add(
+              Image.network("https://exptech.com.tw/api/v1/weather/radar"));
           if (data["all"].length == 0) {
             _List_children.add(const Padding(
               padding: EdgeInsets.all(10),
@@ -259,25 +259,51 @@ class _HomePage extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(width: double.infinity),
-                    Text(
-                      data["all"][i]["title"],
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: (data["all"][i]["type"] == 2)
-                              ? Colors.red
-                              : (data["all"][i]["type"] == 1)
-                                  ? Colors.amber
-                                  : Colors.white,
-                          fontWeight: FontWeight.w600),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          data["all"][i]["title"],
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          formattedDate,
+                          style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
-                    Text(
-                      formattedDate,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red[900],
+                            borderRadius: BorderRadius.circular(5), // 設置圓角
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(3),
+                            child: Text(
+                              "最大震度 6強",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     Text(
                       data["all"][i]["body"],
-                      style: const TextStyle(fontSize: 16, color: Colors.white),
-                    )
+                      style:
+                          const TextStyle(fontSize: 18, color: Colors.white70),
+                    ),
                   ],
                 ),
               ));
@@ -299,7 +325,7 @@ class _HomePage extends State<HomePage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        (_page == 1) ? Colors.blueAccent : Colors.transparent,
+                        (_page == 1) ? Colors.blue[800] : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),
@@ -318,7 +344,7 @@ class _HomePage extends State<HomePage> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        (_page == 0) ? Colors.blueAccent : Colors.transparent,
+                        (_page == 0) ? Colors.blue[800] : Colors.transparent,
                     elevation: 20,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30)),

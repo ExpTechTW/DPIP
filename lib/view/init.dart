@@ -34,7 +34,7 @@ class _InitPage extends State<InitPage> {
               icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
         ],
         currentIndex: _currentIndex,
-        fixedColor: Colors.blueAccent,
+        fixedColor: Colors.blue[800],
         onTap: _onItemClick,
         backgroundColor: Colors.transparent,
         elevation: 0,
