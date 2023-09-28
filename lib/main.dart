@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 @pragma('vm:entry-point')
 Future<void> _BackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  print(message);
 }
 
 void main() async{
@@ -23,7 +24,7 @@ void main() async{
   );
   FirebaseMessaging.onBackgroundMessage(_BackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-
+  print(message);
   });
   print(await messaging.getToken());
   runApp(const MyApp());
