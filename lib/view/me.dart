@@ -1,3 +1,4 @@
+import 'package:clipboard/clipboard.dart';
 import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
 import 'package:dpip/view/version.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
 import 'about.dart';
 
 bool init = false;
@@ -191,6 +193,40 @@ class _MePage extends State<MePage> {
                   ),
                 ),
                 const Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child:
+                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+              ],
+            ),
+          ),
+        ),
+      ));
+      _List_children.add(const SizedBox(height: 10));
+      _List_children.add(Container(
+        color: Colors.white10,
+        child: GestureDetector(
+          onTap: () async {
+            FlutterClipboard.copy(await messaging.getToken() ?? "");
+            const snackBar = SnackBar(content: Text('已複製 FCM 令牌!'));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "令牌",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SizedBox(),
+                ),
+                Padding(
                     padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
                     child:
                         Icon(Icons.arrow_right, color: Colors.white, size: 30)),

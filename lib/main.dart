@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:clipboard/clipboard.dart';
 import 'package:dpip/view/init.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -140,7 +139,6 @@ void main() async {
     },
   );
   print(await messaging.getToken());
-  FlutterClipboard.copy(await messaging.getToken() ?? "");
   FirebaseMessaging.instance.subscribeToTopic("dpip");
   runApp(const MyApp());
 }
