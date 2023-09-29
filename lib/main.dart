@@ -139,7 +139,7 @@ void main() async {
     },
   );
   print(await messaging.getToken());
-  FirebaseMessaging.instance.subscribeToTopic("dpip");
+  FirebaseMessaging.instance.subscribeToTopic("DPIP");
   runApp(const MyApp());
 }
 

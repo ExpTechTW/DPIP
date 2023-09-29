@@ -3,6 +3,7 @@ import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
 import 'package:dpip/view/version.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -206,6 +207,20 @@ class _MePage extends State<MePage> {
         color: Colors.white10,
         child: GestureDetector(
           onTap: () async {
+            // showDialog(
+            //   context: context,
+            //   builder: (context) {
+            //     Future.delayed(const Duration(seconds: 5), () {
+            //       Navigator.pop(context);
+            //     });
+            //
+            //     return const AlertDialog(
+            //       title: Text('Waiting...'),
+            //       content: Text('This dialog will close in 5 seconds.'),
+            //     );
+            //   },
+            // );
+
             FlutterClipboard.copy(await messaging.getToken() ?? "");
             const snackBar = SnackBar(content: Text('已複製 FCM 令牌!'));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
