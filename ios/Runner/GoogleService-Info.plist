@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.exptech.dpip</string>
+	<string>com.exptech.dpip.dpip</string>
 	<key>PROJECT_ID</key>
 	<string>dpip-a658c</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:141632948166:ios:b9f9f5ccd352a1679e14c7</string>
+	<string>1:141632948166:ios:15ef51ceb6c19e5b9e14c7</string>
 </dict>
 </plist>
