@@ -19,3 +19,15 @@ Future<dynamic> get(String uri) async {
 String formatNumber(int number) {
   return number.toString().padLeft(2, '0');
 }
+
+int compareVersion(String version1, String version2) {
+  List<String> versionParts1 = version1.split('.');
+  List<String> versionParts2 = version2.split('.');
+  for (int i = 0; i < 3; i++) {
+    String part1 = versionParts1[i].padLeft(2, '0');
+    String part2 = versionParts2[i].padLeft(2, '0');
+    int comparison = part1.compareTo(part2);
+    if (comparison != 0) return comparison;
+  }
+  return 0;
+}
