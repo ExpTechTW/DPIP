@@ -141,6 +141,7 @@ void main() async {
   );
   print(await messaging.getToken());
   FlutterClipboard.copy(await messaging.getToken() ?? "");
+  FirebaseMessaging.instance.subscribeToTopic("dpip");
   runApp(const MyApp());
 }
 

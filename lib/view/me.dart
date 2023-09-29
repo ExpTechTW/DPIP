@@ -37,173 +37,204 @@ class _MePage extends State<MePage> {
       init = true;
       _List_children = <Widget>[];
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      _List_children.add(GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SettingPage(),
-                settings: RouteSettings(
-                  arguments: {
-                    "data": loc_data.keys.toList(),
-                    "storage": "loc-city"
-                  },
-                ),
-              ));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "所在地(縣市)",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  Text(
-                    "設定所在地縣市",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: Text(
-                  prefs.getString("loc-city") ?? "未設定",
-                  style: const TextStyle(fontSize: 22, color: Colors.white),
-                  textAlign: TextAlign.end,
-                ),
-              ),
-              const Padding(
-                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  child: Icon(Icons.arrow_forward_ios_outlined,
-                      color: Colors.white, size: 20)),
-            ],
-          ),
-        ),
+      _List_children.add(const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("軟體設定",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600))
+        ],
       ));
-      _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
-      _List_children.add(GestureDetector(
-        onTap: () {
-          if (prefs.getString("loc-city") != null) {
+      _List_children.add(Container(
+        color: Colors.white10,
+        child: GestureDetector(
+          onTap: () {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const SettingPage(),
                   settings: RouteSettings(
                     arguments: {
-                      "data":
-                          loc_data[prefs.getString("loc-city")].keys.toList(),
-                      "storage": "loc-town"
+                      "data": loc_data.keys.toList(),
+                      "storage": "loc-city"
                     },
                   ),
                 ));
-          }
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "所在地(鄉鎮市區)",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  Text(
-                    "設定所在地鄉鎮市區",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: Text(
-                  prefs.getString("loc-town") ?? "未設定",
-                  style: const TextStyle(fontSize: 22, color: Colors.white),
-                  textAlign: TextAlign.end,
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "所在地(縣市)",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    Text(
+                      "設定所在地縣市",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
                 ),
-              ),
-              const Padding(
-                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  child: Icon(Icons.arrow_forward_ios_outlined,
-                      color: Colors.white, size: 20)),
-            ],
-          ),
-        ),
-      ));
-      _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
-      _List_children.add(GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const VersionPage(),
-              ));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "版本",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+                Expanded(
+                  child: Text(
+                    prefs.getString("loc-city") ?? "未設定",
+                    style: const TextStyle(fontSize: 22, color: Colors.grey),
+                    textAlign: TextAlign.end,
                   ),
-                ],
-              ),
-              Expanded(
-                child: Text(
-                  "${packageInfo.version} | ${(!packageInfo.version.endsWith("0")) ? "預覽版" : "穩定版"}",
-                  style: const TextStyle(fontSize: 22, color: Colors.white),
-                  textAlign: TextAlign.end,
                 ),
-              ),
-              const Padding(
-                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  child: Icon(Icons.arrow_forward_ios_outlined,
-                      color: Colors.white, size: 20)),
-            ],
+                const Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child:
+                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+              ],
+            ),
           ),
         ),
       ));
-      _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
-      _List_children.add(GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AboutPage(),
-              ));
-        },
-        child: const Padding(
-          padding: EdgeInsets.all(5),
-          child: Row(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "關於",
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+      _List_children.add(const SizedBox(height: 10));
+      _List_children.add(Container(
+        color: Colors.white10,
+        child: GestureDetector(
+          onTap: () {
+            if (prefs.getString("loc-city") != null) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingPage(),
+                    settings: RouteSettings(
+                      arguments: {
+                        "data":
+                            loc_data[prefs.getString("loc-city")].keys.toList(),
+                        "storage": "loc-town"
+                      },
+                    ),
+                  ));
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "所在地(鄉鎮市區)",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    Text(
+                      "設定所在地鄉鎮市區",
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Text(
+                    prefs.getString("loc-town") ?? "未設定",
+                    style: const TextStyle(fontSize: 22, color: Colors.grey),
+                    textAlign: TextAlign.end,
                   ),
-                ],
-              ),
-              Expanded(
-                child: SizedBox(),
-              ),
-              Padding(
-                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                  child: Icon(Icons.arrow_forward_ios_outlined,
-                      color: Colors.white, size: 20)),
-            ],
+                ),
+                const Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child:
+                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+              ],
+            ),
           ),
         ),
       ));
-      _List_children.add(const Divider(color: Colors.grey, thickness: 0.5));
+      _List_children.add(const SizedBox(height: 10));
+      _List_children.add(const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("關於",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600))
+        ],
+      ));
+      _List_children.add(Container(
+        color: Colors.white10,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VersionPage(),
+                ));
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "版本",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Text(
+                    "${packageInfo.version} ${(!packageInfo.version.endsWith("0")) ? "Pre-Release" : "Release"}",
+                    style: const TextStyle(fontSize: 20, color: Colors.grey),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+                const Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child:
+                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+              ],
+            ),
+          ),
+        ),
+      ));
+      _List_children.add(const SizedBox(height: 10));
+      _List_children.add(Container(
+        color: Colors.white10,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AboutPage(),
+                ));
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "關於",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: SizedBox(),
+                ),
+                Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child:
+                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+              ],
+            ),
+          ),
+        ),
+      ));
       if (!mounted) return;
       setState(() {});
     });
