@@ -226,7 +226,7 @@ class _HomePage extends State<HomePage> {
                     Text(
                       "暫無生效中的防災資訊",
                       style: TextStyle(fontSize: 16, color: Colors.white),
-                    )
+                    ),
                   ],
                 ),
               ));
@@ -272,8 +272,6 @@ class _HomePage extends State<HomePage> {
             }
           }
         } else {
-          _List_children.add(
-              Image.network("https://exptech.com.tw/api/v1/weather/radar"));
           if (data["all"].length == 0) {
             _List_children.add(const Padding(
               padding: EdgeInsets.all(10),
@@ -383,7 +381,7 @@ class _HomePage extends State<HomePage> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-                const SizedBox(width: 35),
+                const SizedBox(width: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:

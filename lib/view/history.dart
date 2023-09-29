@@ -223,7 +223,7 @@ class _HistoryPage extends State<HistoryPage> {
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
-                const SizedBox(width: 35),
+                const SizedBox(width: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
