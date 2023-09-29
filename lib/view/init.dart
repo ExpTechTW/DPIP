@@ -15,7 +15,7 @@ class InitPage extends StatefulWidget {
 
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
-  final pages = [HomePage(), HistoryPage(), MePage()];
+  final pages = [const HomePage(), const HistoryPage(), const MePage()];
 
   @override
   Widget build(BuildContext context) {
