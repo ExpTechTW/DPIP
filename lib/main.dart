@@ -37,6 +37,7 @@ class ReceivedNotification {
 @pragma('vm:entry-point')
 Future<void> _BackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  print(message);
 }
 
 final List<DarwinNotificationCategory> darwinNotificationCategories =
