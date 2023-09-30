@@ -128,7 +128,8 @@ class _HomePage extends State<HomePage> {
     bounds = LatLngBounds(southWest, northEast);
 
     var radar_get = await get("https://api.exptech.com.tw/file/test.json");
-    radar_data = List.from((radar_get == false) ? [] : radar_get);
+    if (radar_get == false) return;
+    radar_data = List.from(radar_get);
     var startLat = 18.0;
     var startLon = 115.0;
     var contentIndex = 0;
@@ -230,7 +231,7 @@ class _HomePage extends State<HomePage> {
               mapController: mapController,
               options: MapOptions(
                 center: const LatLng(0, 0),
-                zoom: 7,
+                zoom: 0,
                 interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
               ),
               children: [
@@ -269,8 +270,8 @@ class _HomePage extends State<HomePage> {
             child: FlutterMap(
               mapController: mapController,
               options: MapOptions(
-                center: const LatLng(23.6, 120.1),
-                zoom: 7,
+                center: const LatLng(0, 0),
+                zoom: 0,
                 interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
               ),
               children: [
