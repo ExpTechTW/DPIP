@@ -568,8 +568,8 @@ class _HomePage extends State<HomePage> {
                               key: ValueKey(_page),
                               mapController: mapController,
                               options: MapOptions(
-                                center: const LatLng(23.6, 120.1),
-                                zoom: 7,
+                                center: const LatLng(23.4, 120.1),
+                                zoom: 6.5,
                                 interactiveFlags:
                                     InteractiveFlag.all - InteractiveFlag.all,
                               ),
