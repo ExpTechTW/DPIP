@@ -94,6 +94,7 @@ class _HomePage extends State<HomePage> {
         );
       }
     }
+    return null;
   }
 
   @override
@@ -154,7 +155,10 @@ class _HomePage extends State<HomePage> {
           if (prefs.getString('loc-city') != null &&
               prefs.getString('loc-town') != null) {
             focus_city = true;
-            mapController.fitBounds( _selectCity(prefs.getString('loc-city') ?? ""));
+            Future.delayed(const Duration(seconds: 1), () {
+              mapController
+                  .fitBounds(_selectCity(prefs.getString('loc-city') ?? ""));
+            });
           }
         }
       } else {
