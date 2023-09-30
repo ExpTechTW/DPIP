@@ -29,7 +29,7 @@ class _SettingPage extends State<SettingPage> {
       init = true;
       print(data["data"]);
       for (var i = 0; i < data["data"].length; i++) {
-        _List_children.add(GestureDetector(
+        _List_children.add(InkWell(
           onTap: () {
             prefs.setString(data["storage"], data["data"][i]);
             if (data["storage"] == "loc-city") prefs.remove("loc-town");

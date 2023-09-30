@@ -1,7 +1,6 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
-import 'package:dpip/view/version.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,7 +50,7 @@ class _MePage extends State<MePage> {
       ));
       _List_children.add(Container(
         color: Colors.white10,
-        child: GestureDetector(
+        child: InkWell(
           onTap: () {
             Navigator.push(
                 context,
@@ -101,7 +100,7 @@ class _MePage extends State<MePage> {
       _List_children.add(const SizedBox(height: 10));
       _List_children.add(Container(
         color: Colors.white10,
-        child: GestureDetector(
+        child: InkWell(
           onTap: () {
             if (prefs.getString("loc-city") != null) {
               Navigator.push(
@@ -164,14 +163,8 @@ class _MePage extends State<MePage> {
       ));
       _List_children.add(Container(
         color: Colors.white10,
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const VersionPage(),
-                ));
-          },
+        child:InkWell(
+          onTap: () {},
           child: Padding(
             padding: const EdgeInsets.all(5),
             child: Row(
@@ -195,7 +188,7 @@ class _MePage extends State<MePage> {
                 const Padding(
                     padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
                     child:
-                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+                        Icon(Icons.arrow_right, color: Colors.white10, size: 30)),
               ],
             ),
           ),
@@ -204,7 +197,7 @@ class _MePage extends State<MePage> {
       _List_children.add(const SizedBox(height: 10));
       _List_children.add(Container(
         color: Colors.white10,
-        child: GestureDetector(
+        child: InkWell(
           onTap: () async {
             // showDialog(
             //   context: context,
@@ -219,7 +212,6 @@ class _MePage extends State<MePage> {
             //     );
             //   },
             // );
-
             FlutterClipboard.copy(await messaging.getToken() ?? "");
             const snackBar = SnackBar(content: Text('已複製 FCM 令牌!'));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -252,7 +244,7 @@ class _MePage extends State<MePage> {
       _List_children.add(const SizedBox(height: 10));
       _List_children.add(Container(
         color: Colors.white10,
-        child: GestureDetector(
+        child: InkWell(
           onTap: () {
             Navigator.push(
                 context,
