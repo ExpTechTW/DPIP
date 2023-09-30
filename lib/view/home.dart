@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:dpip/core/api.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:latlong2/latlong.dart';
@@ -84,20 +87,6 @@ late GeoJsonParser myGeoJson = GeoJsonParser(
 bool loadingData = false;
 var geojson_data;
 
-dynamic convertIntsToDoubles(dynamic value) {
-  if (value is int) {
-    return value.toDouble();
-  } else if (value is List) {
-    return value.map(convertIntsToDoubles).toList();
-  } else if (value is Map) {
-    return value.map(
-      (key, value) => MapEntry(key, convertIntsToDoubles(value)),
-    );
-  } else {
-    return value;
-  }
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -113,23 +102,28 @@ class _HomePage extends State<HomePage> {
   MapController mapController = MapController();
 
   List<LatLng> _cityBounds = [];
+  final GlobalKey _globalKey = GlobalKey();
+  Uint8List? _pngBytes;
+
+  Future<void> _capturePng() async {
+    final boundary =
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    final image = await boundary.toImage(pixelRatio: 3.0);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final pngBytes = byteData!.buffer.asUint8List();
+    _pngBytes = pngBytes;
+  }
 
   Future<void> processData() async {
     geojson_data = await get(
         "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/tw.json");
     if (geojson_data != false) {
       myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
+      loadingData = false;
     }
   }
 
-  void radar_f(LatLngBounds? bounds) async {
-    polygons = [];
-    if (bounds != null) {
-      LatLng southWest = LatLng(bounds.south - 0.05, bounds.west - 0.05);
-      LatLng northEast = LatLng(bounds.north + 0.05, bounds.east + 0.05);
-      bounds = LatLngBounds(southWest, northEast);
-    }
-
+  void radar_f() async {
     var radar_get = await get("https://api.exptech.com.tw/file/test.json");
     if (radar_get == false) return;
     radar_data = List.from(radar_get);
@@ -148,7 +142,7 @@ class _HomePage extends State<HomePage> {
             LatLng(lat + 0.0125, lon + 0.0125),
             LatLng(lat, lon + 0.0125),
           ];
-          if (bounds != null && !isPolygonInBounds(loc, bounds)) continue;
+          // if (bounds != null && !isPolygonInBounds(loc, bounds)) continue;
           if (dBZ < 0) dBZ = 0;
           polygons.add(
             Polygon(
@@ -189,26 +183,10 @@ class _HomePage extends State<HomePage> {
     return null;
   }
 
-  bool isPolygonInBounds(List<LatLng> polygon, LatLngBounds bounds) {
-    return polygon.any((point) {
-      return isPointInBounds(point, bounds);
-    });
-  }
-
-  bool isPointInBounds(LatLng point, LatLngBounds bounds) {
-    return point.latitude >= bounds.south &&
-        point.latitude <= bounds.north &&
-        point.longitude >= bounds.west &&
-        point.longitude <= bounds.east;
-  }
-
   @override
   void initState() {
     loadingData = true;
-    processData().then((_) {
-      loadingData = false;
-      setState(() {});
-    });
+    processData();
     super.initState();
   }
 
@@ -222,34 +200,34 @@ class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _List_children = <Widget>[];
-      if (mounted) setState(() {});
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (_page == 0) {
-        if (!focus_city && !loadingData) {
-          if (prefs.getString('loc-city') != null &&
-              prefs.getString('loc-town') != null) {
-            focus_city = true;
-            LatLngBounds bounds =
-                _selectCity(prefs.getString('loc-city') ?? "");
-            if (mounted) {
-              mapController.fitBounds(bounds);
-              radar_f(bounds);
-            }
-          }
-        }
-      } else {
-        if (mounted && !focus_city) {
-          focus_city = true;
-          radar_f(null);
-          mapController.move(const LatLng(23.6, 120.1), 7);
-        }
-      }
+      _List_children = <Widget>[];
       if (!init) {
         data = await get(
             "https://exptech.com.tw/api/v1/dpip/alert?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
         if (data != false) init = true;
+        radar_f();
         print(data);
+      }
+      if (_pngBytes == null) {
+        if (_page == 0) {
+          if (!focus_city && !loadingData) {
+            if (prefs.getString('loc-city') != null &&
+                prefs.getString('loc-town') != null) {
+              LatLngBounds bounds =
+                  _selectCity(prefs.getString('loc-city') ?? "");
+              if (mounted) {
+                mapController.fitBounds(bounds);
+                focus_city = true;
+              }
+            }
+          }
+        } else {
+          if (mounted && !focus_city) {
+            mapController.move(const LatLng(23.6, 120.1), 7);
+            focus_city = true;
+          }
+        }
       }
       if (data == false) {
         for (var i = 0; i < 100; i++) {
@@ -517,6 +495,13 @@ class _HomePage extends State<HomePage> {
       }
       if (!mounted) return;
       setState(() {});
+      if (_pngBytes == null &&
+          radar_data != null &&
+          !loadingData &&
+          focus_city) {
+        _capturePng();
+        print("cut");
+      }
     });
     return Scaffold(
       backgroundColor: Colors.black,
@@ -542,6 +527,7 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
+                          _pngBytes = null;
                           focus_city = false;
                           _page = 1;
                           setState(() {});
@@ -563,6 +549,7 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
+                          _pngBytes = null;
                           focus_city = false;
                           _page = 0;
                           setState(() {});
@@ -575,29 +562,34 @@ class _HomePage extends State<HomePage> {
                     ],
                   ),
                   Expanded(
-                    child: FlutterMap(
-                      key: ValueKey(_page),
-                      mapController: mapController,
-                      options: MapOptions(
-                        center: const LatLng(23.6, 120.1),
-                        zoom: 7,
-                        interactiveFlags:
-                            InteractiveFlag.all - InteractiveFlag.all,
-                      ),
-                      children: [
-                        PolygonLayer(polygons: myGeoJson.polygons),
-                        PolylineLayer(polylines: myGeoJson.polylines),
-                        PolygonLayer(polygons: polygons),
-                        if (_page == 0)
-                          PolygonLayer(polygons: [
-                            Polygon(
-                              points: _cityBounds,
-                              borderColor: Colors.white,
-                              borderStrokeWidth: 2.0,
+                    child: (_pngBytes == null)
+                        ? RepaintBoundary(
+                            key: _globalKey,
+                            child: FlutterMap(
+                              key: ValueKey(_page),
+                              mapController: mapController,
+                              options: MapOptions(
+                                center: const LatLng(23.6, 120.1),
+                                zoom: 7,
+                                interactiveFlags:
+                                    InteractiveFlag.all - InteractiveFlag.all,
+                              ),
+                              children: [
+                                PolygonLayer(polygons: myGeoJson.polygons),
+                                PolylineLayer(polylines: myGeoJson.polylines),
+                                PolygonLayer(polygons: polygons),
+                                if (_page == 0)
+                                  PolygonLayer(polygons: [
+                                    Polygon(
+                                      points: _cityBounds,
+                                      borderColor: Colors.white,
+                                      borderStrokeWidth: 2.0,
+                                    ),
+                                  ]),
+                              ],
                             ),
-                          ]),
-                      ],
-                    ),
+                          )
+                        : Image.memory(_pngBytes!),
                   ),
                 ],
               ),
@@ -609,7 +601,7 @@ class _HomePage extends State<HomePage> {
               builder:
                   (BuildContext context, ScrollController scrollController) {
                 return Container(
-                  color: Colors.black.withOpacity(0.8),
+                  color: Colors.black.withOpacity(1),
                   child: ListView.builder(
                     controller: scrollController,
                     itemCount: _List_children.length,
