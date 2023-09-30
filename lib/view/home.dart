@@ -123,8 +123,8 @@ class _HomePage extends State<HomePage> {
   }
 
   void radar_f(LatLngBounds bounds) async {
-    LatLng southWest = LatLng(bounds.south - 0.1, bounds.west - 0.1);
-    LatLng northEast = LatLng(bounds.north + 0.1, bounds.east + 0.1);
+    LatLng southWest = LatLng(bounds.south - 0.05, bounds.west - 0.05);
+    LatLng northEast = LatLng(bounds.north + 0.05, bounds.east + 0.05);
     bounds = LatLngBounds(southWest, northEast);
 
     var radar_get = await get("https://api.exptech.com.tw/file/test.json");
@@ -137,7 +137,7 @@ class _HomePage extends State<HomePage> {
       var lat = startLat + y * 0.0125;
       for (var x = 0; x < 921; x++) {
         var lon = startLon + x * 0.0125;
-        var dBZ = radar_data[contentIndex++];
+        var dBZ = 10; // radar_data[contentIndex++];
         if (dBZ != 0) {
           List<LatLng> loc = [
             LatLng(lat, lon),
@@ -228,10 +228,11 @@ class _HomePage extends State<HomePage> {
           SizedBox(
             height: 400,
             child: FlutterMap(
+              key: ValueKey(_page),
               mapController: mapController,
               options: MapOptions(
-                center: const LatLng(0, 0),
-                zoom: 0,
+                center: const LatLng(23.6, 120.1),
+                zoom: 7,
                 interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
               ),
               children: [
@@ -249,6 +250,7 @@ class _HomePage extends State<HomePage> {
             ),
           ),
         );
+        print(focus_city);
         if (!focus_city && !loadingData) {
           if (prefs.getString('loc-city') != null &&
               prefs.getString('loc-town') != null) {
@@ -256,10 +258,8 @@ class _HomePage extends State<HomePage> {
             LatLngBounds bounds =
                 _selectCity(prefs.getString('loc-city') ?? "");
             if (mounted) {
-              mapController.rotate(0);
               mapController.fitBounds(bounds);
               radar_f(bounds);
-              setState(() {});
             }
           }
         }
@@ -268,10 +268,11 @@ class _HomePage extends State<HomePage> {
           SizedBox(
             height: 400,
             child: FlutterMap(
+              key: ValueKey(_page),
               mapController: mapController,
               options: MapOptions(
-                center: const LatLng(0, 0),
-                zoom: 0,
+                center: const LatLng(23.6, 120.1),
+                zoom: 7,
                 interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
               ),
               children: [
@@ -282,10 +283,6 @@ class _HomePage extends State<HomePage> {
             ),
           ),
         );
-        if (!focus_city && !loadingData) {
-          focus_city = true;
-          if (mounted) mapController.move(const LatLng(23.6, 120.1), 7);
-        }
       }
       if (!init) {
         data = await get(
@@ -294,20 +291,24 @@ class _HomePage extends State<HomePage> {
         print(data);
       }
       if (data == false) {
-        _List_children.add(const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "服務異常",
-              style: TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
-            ),
-            Text(
-              "稍等片刻後重試 如持續異常 請回報開發人員",
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ],
-        ));
+        for (var i = 0; i < 100; i++) {
+          _List_children.add(const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "服務異常",
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w100,
+                    color: Colors.red),
+              ),
+              Text(
+                "稍等片刻後重試 如持續異常 請回報開發人員",
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ],
+          ));
+        }
       } else {
         if (_page == 0) {
           if (prefs.getString('loc-town') == null) {
