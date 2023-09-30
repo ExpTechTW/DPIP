@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool init = false;
+bool focus_city = false;
 
 dynamic convertIntsToDoubles(dynamic value) {
   if (value is int) {
@@ -23,6 +24,26 @@ dynamic convertIntsToDoubles(dynamic value) {
   }
 }
 
+LatLng _calculateCenter(List<LatLng> coordinates) {
+  double minLat = coordinates[0].latitude;
+  double maxLat = coordinates[0].latitude;
+  double minLng = coordinates[0].longitude;
+  double maxLng = coordinates[0].longitude;
+  for (var coord in coordinates) {
+    if (coord.latitude < minLat) {
+      minLat = coord.latitude;
+    } else if (coord.latitude > maxLat) {
+      maxLat = coord.latitude;
+    }
+    if (coord.longitude < minLng) {
+      minLng = coord.longitude;
+    } else if (coord.longitude > maxLng) {
+      maxLng = coord.longitude;
+    }
+  }
+  return LatLng((maxLat + minLat) / 2, (maxLng + minLng) / 2);
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -35,24 +56,55 @@ class _HomePage extends State<HomePage> {
   List<Widget> _List_children = <Widget>[];
   var data;
   late GeoJsonParser myGeoJson = GeoJsonParser(
-      defaultPolygonBorderColor: Colors.white,
+      defaultPolygonBorderColor: Colors.grey,
       defaultPolygonFillColor: const Color(0xff3F4045));
   bool loadingData = false;
+  var geojson_data;
+  final MapController mapController = MapController();
+
+  List<LatLng> _cityBounds = [];
+  var _cityCenter;
 
   Future<void> processData() async {
-    var geojson_data = await get(
-        "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@master/src/resource/maps/tw.json");
-    myGeoJson
-        .parseGeoJsonAsString(jsonEncode(convertIntsToDoubles(geojson_data)));
+    geojson_data = await get(
+        "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/tw.json");
+    myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
+  }
+
+  void _selectCity(String cityName) {
+    for (var feature in geojson_data["features"]) {
+      if (feature['properties']['COUNTYNAME'] == cityName) {
+        List coordinates = feature['geometry']['coordinates'][0];
+        _cityBounds =
+            coordinates.map((coord) => LatLng(coord[1], coord[0])).toList();
+        _cityCenter = _calculateCenter(_cityBounds);
+        double minLat = _cityBounds
+            .map((e) => e.latitude)
+            .reduce((value, element) => value < element ? value : element);
+        double maxLat = _cityBounds
+            .map((e) => e.latitude)
+            .reduce((value, element) => value > element ? value : element);
+        double minLng = _cityBounds
+            .map((e) => e.longitude)
+            .reduce((value, element) => value < element ? value : element);
+        double maxLng = _cityBounds
+            .map((e) => e.longitude)
+            .reduce((value, element) => value > element ? value : element);
+        _cityCenter = LatLngBounds(
+          LatLng(minLat - 0.05, minLng - 0.05),
+          LatLng(maxLat + 0.05, maxLng + 0.05),
+        );
+        break;
+      }
+    }
   }
 
   @override
   void initState() {
     loadingData = true;
     processData().then((_) {
-      setState(() {
-        loadingData = false;
-      });
+      loadingData = false;
+      setState(() {});
     });
     super.initState();
   }
@@ -60,6 +112,7 @@ class _HomePage extends State<HomePage> {
   @override
   void dispose() {
     init = false;
+    focus_city = false;
     super.dispose();
   }
 
@@ -74,23 +127,64 @@ class _HomePage extends State<HomePage> {
         print(data);
       }
       _List_children = <Widget>[];
-      _List_children.add(
-        SizedBox(
-          height: 400,
-          child: FlutterMap(
-            mapController: MapController(),
-            options: MapOptions(
-              center: const LatLng(23.6, 120.1),
-              zoom: 7,
-              interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
+      if (_page == 0) {
+        _List_children.add(
+          SizedBox(
+            height: 400,
+            child: FlutterMap(
+              mapController: mapController,
+              options: MapOptions(
+                center: const LatLng(23.6, 120.1),
+                zoom: 7,
+                minZoom: 6,
+                maxZoom: 10,
+              ),
+              children: [
+                PolygonLayer(polygons: myGeoJson.polygons),
+                PolylineLayer(polylines: myGeoJson.polylines),
+                PolygonLayer(polygons: [
+                  Polygon(
+                    points: _cityBounds,
+                    borderColor: Colors.white,
+                    borderStrokeWidth: 2.0,
+                  ),
+                ]),
+              ],
             ),
-            children: [
-              PolygonLayer(polygons: myGeoJson.polygons),
-              PolylineLayer(polylines: myGeoJson.polylines),
-            ],
           ),
-        ),
-      );
+        );
+        if (!focus_city && !loadingData) {
+          if (prefs.getString('loc-city') != null &&
+              prefs.getString('loc-town') != null) {
+            _selectCity(prefs.getString('loc-city') ?? "");
+            focus_city = true;
+            mapController.fitBounds(_cityCenter);
+          }
+        }
+      } else {
+        _List_children.add(
+          SizedBox(
+            height: 400,
+            child: FlutterMap(
+              mapController: mapController,
+              options: MapOptions(
+                center: const LatLng(23.6, 120.1),
+                zoom: 7,
+                minZoom: 6,
+                maxZoom: 10,
+              ),
+              children: [
+                PolygonLayer(polygons: myGeoJson.polygons),
+                PolylineLayer(polylines: myGeoJson.polylines),
+              ],
+            ),
+          ),
+        );
+        if (!focus_city) {
+          focus_city = true;
+          mapController.move(const LatLng(23.6, 120.1), 7);
+        }
+      }
       if (data == false) {
         _List_children.add(const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,9 +263,8 @@ class _HomePage extends State<HomePage> {
                       Padding(
                         padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: Row(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.baseline, // 修改這裡
-                          textBaseline: TextBaseline.alphabetic, // 添加這行
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
                           children: [
                             Text(
                               "40",
@@ -373,6 +466,7 @@ class _HomePage extends State<HomePage> {
                   ),
                   onPressed: () {
                     setState(() {
+                      focus_city = false;
                       _page = 1;
                     });
                   },
@@ -392,6 +486,7 @@ class _HomePage extends State<HomePage> {
                   ),
                   onPressed: () {
                     setState(() {
+                      focus_city = false;
                       _page = 0;
                     });
                   },

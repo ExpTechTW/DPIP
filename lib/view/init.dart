@@ -56,6 +56,7 @@ class _InitPage extends State<InitPage> {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    init = false;
                     setState(() {});
                   },
                   style: TextButton.styleFrom(
@@ -162,6 +163,7 @@ class _InitPage extends State<InitPage> {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
+                    init = false;
                     setState(() {});
                   },
                   style: TextButton.styleFrom(

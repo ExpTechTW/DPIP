@@ -3,7 +3,6 @@ import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
 import 'package:dpip/view/version.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
