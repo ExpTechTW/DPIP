@@ -175,8 +175,8 @@ class _HomePage extends State<HomePage> {
             .map((e) => e.longitude)
             .reduce((value, element) => value > element ? value : element);
         return LatLngBounds(
-          LatLng(minLat - 0.05, minLng - 0.05),
-          LatLng(maxLat + 0.05, maxLng + 0.05),
+          LatLng(minLat - 0.08, minLng - 0.08),
+          LatLng(maxLat + 0.08, maxLng + 0.08),
         );
       }
     }
@@ -224,7 +224,7 @@ class _HomePage extends State<HomePage> {
           }
         } else {
           if (mounted && !focus_city) {
-            mapController.move(const LatLng(23.6, 120.1), 7);
+            mapController.move(const LatLng(23.4, 120.1), 6.5);
             focus_city = true;
           }
         }
