@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/core/api.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -18,10 +19,63 @@ class InitPage extends StatefulWidget {
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
   final pages = [const HomePage(), const HistoryPage(), const MePage()];
+  bool loaded = false;
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.none) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+              backgroundColor: Colors.grey[850],
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.wifi_off_outlined,
+                    color: Colors.orangeAccent,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    '無網路連接',
+                    style: TextStyle(color: Colors.orangeAccent),
+                  ),
+                ],
+              ),
+              content: Text(
+                '您的設備目前沒有網路連接。請檢查您的網絡設置，然後重試。',
+                style: TextStyle(color: Colors.white),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {});
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                  child: const Text(
+                    '重試',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
       if (init) return;
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
@@ -77,7 +131,59 @@ class _InitPage extends State<InitPage> {
             },
           );
         }
+      } else {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
+              backgroundColor: Colors.grey[850],
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: Colors.redAccent,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    '伺服器異常',
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
+                ],
+              ),
+              content: Text(
+                '無法連接到伺服器。伺服器可能正在經歷大量請求，或發生異常。目前正在全力維修中，請稍後重試。',
+                style: TextStyle(color: Colors.white),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    setState(() {});
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                  ),
+                  child: const Text(
+                    '重試',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       }
+      loaded = true;
+      if (!mounted) return;
+      setState(() {});
     });
     return Scaffold(
       backgroundColor: Colors.black,
@@ -94,7 +200,7 @@ class _InitPage extends State<InitPage> {
         ],
         currentIndex: _currentIndex,
         fixedColor: Colors.blue[800],
-        onTap: _onItemClick,
+        onTap: (!loaded) ? null : _onItemClick,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
