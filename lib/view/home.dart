@@ -500,7 +500,6 @@ class _HomePage extends State<HomePage> {
           !loadingData &&
           focus_city) {
         _capturePng();
-        print("cut");
       }
     });
     return Scaffold(
