@@ -122,10 +122,13 @@ class _HomePage extends State<HomePage> {
     }
   }
 
-  void radar_f(LatLngBounds bounds) async {
-    LatLng southWest = LatLng(bounds.south - 0.05, bounds.west - 0.05);
-    LatLng northEast = LatLng(bounds.north + 0.05, bounds.east + 0.05);
-    bounds = LatLngBounds(southWest, northEast);
+  void radar_f(LatLngBounds? bounds) async {
+    polygons = [];
+    if (bounds != null) {
+      LatLng southWest = LatLng(bounds.south - 0.05, bounds.west - 0.05);
+      LatLng northEast = LatLng(bounds.north + 0.05, bounds.east + 0.05);
+      bounds = LatLngBounds(southWest, northEast);
+    }
 
     var radar_get = await get("https://api.exptech.com.tw/file/test.json");
     if (radar_get == false) return;
@@ -137,7 +140,7 @@ class _HomePage extends State<HomePage> {
       var lat = startLat + y * 0.0125;
       for (var x = 0; x < 921; x++) {
         var lon = startLon + x * 0.0125;
-        var dBZ = 10; // radar_data[contentIndex++];
+        var dBZ = radar_data[contentIndex++];
         if (dBZ != 0) {
           List<LatLng> loc = [
             LatLng(lat, lon),
@@ -145,8 +148,7 @@ class _HomePage extends State<HomePage> {
             LatLng(lat + 0.0125, lon + 0.0125),
             LatLng(lat, lon + 0.0125),
           ];
-          if (!isPolygonInBounds(loc, bounds))
-            continue; // 使用 continue 而不是 return
+          if (bounds != null && !isPolygonInBounds(loc, bounds)) continue;
           if (dBZ < 0) dBZ = 0;
           polygons.add(
             Polygon(
@@ -224,33 +226,6 @@ class _HomePage extends State<HomePage> {
       if (mounted) setState(() {});
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (_page == 0) {
-        _List_children.add(
-          SizedBox(
-            height: 400,
-            child: FlutterMap(
-              key: ValueKey(_page),
-              mapController: mapController,
-              options: MapOptions(
-                center: const LatLng(23.6, 120.1),
-                zoom: 7,
-                interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
-              ),
-              children: [
-                PolygonLayer(polygons: myGeoJson.polygons),
-                PolylineLayer(polylines: myGeoJson.polylines),
-                PolygonLayer(polygons: polygons),
-                PolygonLayer(polygons: [
-                  Polygon(
-                    points: _cityBounds,
-                    borderColor: Colors.white,
-                    borderStrokeWidth: 2.0,
-                  )
-                ]),
-              ],
-            ),
-          ),
-        );
-        print(focus_city);
         if (!focus_city && !loadingData) {
           if (prefs.getString('loc-city') != null &&
               prefs.getString('loc-town') != null) {
@@ -264,25 +239,11 @@ class _HomePage extends State<HomePage> {
           }
         }
       } else {
-        _List_children.add(
-          SizedBox(
-            height: 400,
-            child: FlutterMap(
-              key: ValueKey(_page),
-              mapController: mapController,
-              options: MapOptions(
-                center: const LatLng(23.6, 120.1),
-                zoom: 7,
-                interactiveFlags: InteractiveFlag.all - InteractiveFlag.all,
-              ),
-              children: [
-                PolygonLayer(polygons: myGeoJson.polygons),
-                PolylineLayer(polylines: myGeoJson.polylines),
-                PolygonLayer(polygons: polygons),
-              ],
-            ),
-          ),
-        );
+        if (mounted && !focus_city) {
+          focus_city = true;
+          radar_f(null);
+          mapController.move(const LatLng(23.6, 120.1), 7);
+        }
       }
       if (!init) {
         data = await get(
@@ -560,54 +521,104 @@ class _HomePage extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        (_page == 1) ? Colors.blue[800] : Colors.transparent,
-                    elevation: 20,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
+            SizedBox(
+              height: MediaQuery.of(context).size.height /
+                  2, // upper half of the screen
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: (_page == 1)
+                              ? Colors.blue[800]
+                              : Colors.transparent,
+                          elevation: 20,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        onPressed: () {
+                          focus_city = false;
+                          _page = 1;
+                          setState(() {});
+                        },
+                        child: const Text(
+                          "全國",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: (_page == 0)
+                              ? Colors.blue[800]
+                              : Colors.transparent,
+                          elevation: 20,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        onPressed: () {
+                          focus_city = false;
+                          _page = 0;
+                          setState(() {});
+                        },
+                        child: const Text(
+                          "所在地",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
-                  onPressed: () {
-                    focus_city = false;
-                    _page = 1;
-                    setState(() {});
-                  },
-                  child: const Text(
-                    "全國",
-                    style: TextStyle(color: Colors.white),
+                  Expanded(
+                    child: FlutterMap(
+                      key: ValueKey(_page),
+                      mapController: mapController,
+                      options: MapOptions(
+                        center: const LatLng(23.6, 120.1),
+                        zoom: 7,
+                        interactiveFlags:
+                            InteractiveFlag.all - InteractiveFlag.all,
+                      ),
+                      children: [
+                        PolygonLayer(polygons: myGeoJson.polygons),
+                        PolylineLayer(polylines: myGeoJson.polylines),
+                        PolygonLayer(polygons: polygons),
+                        if (_page == 0)
+                          PolygonLayer(polygons: [
+                            Polygon(
+                              points: _cityBounds,
+                              borderColor: Colors.white,
+                              borderStrokeWidth: 2.0,
+                            ),
+                          ]),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        (_page == 0) ? Colors.blue[800] : Colors.transparent,
-                    elevation: 20,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  onPressed: () {
-                    focus_city = false;
-                    _page = 0;
-                    setState(() {});
-                  },
-                  child: const Text(
-                    "所在地",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-            Expanded(
-              child: ListView(
-                  padding: const EdgeInsets.all(0),
-                  children: _List_children.toList()),
+            DraggableScrollableSheet(
+              initialChildSize: 0.45,
+              minChildSize: 0.45,
+              maxChildSize: 1.0,
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
+                return Container(
+                  color: Colors.black.withOpacity(0.8),
+                  child: ListView.builder(
+                    controller: scrollController,
+                    itemCount: _List_children.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return _List_children[index];
+                    },
+                  ),
+                );
+              },
             ),
           ],
         ),
