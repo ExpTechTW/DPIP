@@ -63,7 +63,6 @@ class _HomePage extends State<HomePage> {
   final MapController mapController = MapController();
 
   List<LatLng> _cityBounds = [];
-  var _cityCenter;
 
   Future<void> processData() async {
     geojson_data = await get(
@@ -71,13 +70,12 @@ class _HomePage extends State<HomePage> {
     myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
   }
 
-  void _selectCity(String cityName) {
+  _selectCity(String cityName) {
     for (var feature in geojson_data["features"]) {
       if (feature['properties']['COUNTYNAME'] == cityName) {
         List coordinates = feature['geometry']['coordinates'][0];
         _cityBounds =
             coordinates.map((coord) => LatLng(coord[1], coord[0])).toList();
-        _cityCenter = _calculateCenter(_cityBounds);
         double minLat = _cityBounds
             .map((e) => e.latitude)
             .reduce((value, element) => value < element ? value : element);
@@ -90,11 +88,10 @@ class _HomePage extends State<HomePage> {
         double maxLng = _cityBounds
             .map((e) => e.longitude)
             .reduce((value, element) => value > element ? value : element);
-        _cityCenter = LatLngBounds(
+        return LatLngBounds(
           LatLng(minLat - 0.05, minLng - 0.05),
           LatLng(maxLat + 0.05, maxLng + 0.05),
         );
-        break;
       }
     }
   }
@@ -156,9 +153,8 @@ class _HomePage extends State<HomePage> {
         if (!focus_city && !loadingData) {
           if (prefs.getString('loc-city') != null &&
               prefs.getString('loc-town') != null) {
-            _selectCity(prefs.getString('loc-city') ?? "");
             focus_city = true;
-            mapController.fitBounds(_cityCenter);
+            mapController.fitBounds( _selectCity(prefs.getString('loc-city') ?? ""));
           }
         }
       } else {
