@@ -238,25 +238,22 @@ class _HomePage extends State<HomePage> {
           }
         }
       }
-      if (data == false) {
-        for (var i = 0; i < 100; i++) {
-          _List_children.add(const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "服務異常",
-                style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w100,
-                    color: Colors.red),
-              ),
-              Text(
-                "稍等片刻後重試 如持續異常 請回報開發人員",
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            ],
-          ));
-        }
+      if (data == false || data["info"] == null) {
+        focus_city = true;
+        _List_children.add(const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "服務異常",
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
+            ),
+            Text(
+              "稍等片刻後重試 如持續異常 請回報開發人員",
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
+        ));
       } else {
         if (_page == 0) {
           if (prefs.getString('loc-town') == null) {
@@ -622,12 +619,19 @@ class _HomePage extends State<HomePage> {
                   (BuildContext context, ScrollController scrollController) {
                 return Container(
                   color: Colors.black.withOpacity(1),
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: _List_children.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return _List_children[index];
-                    },
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(overscroll: false),
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: _List_children.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return _List_children[index];
+                        },
+                      ),
+                    ),
                   ),
                 );
               },
