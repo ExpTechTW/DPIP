@@ -79,7 +79,6 @@ List<Color> radar_color = const [
   Color(0xFFab00ff),
   Color(0xFF9600ff)
 ];
-List<Polygon> polygons = [];
 late GeoJsonParser myGeoJson = GeoJsonParser(
     defaultPolygonBorderColor: Colors.grey,
     defaultPolygonFillColor: const Color(0xff3F4045));
@@ -99,27 +98,11 @@ class _HomePage extends State<HomePage> {
   var data;
   var radar_data;
   MapController mapController = MapController();
-  var pic_0;
-  var pic_1;
   var loc_data;
   var loc_gps;
 
   List<Polygon> _cityBounds = [];
   final GlobalKey _globalKey = GlobalKey();
-
-  Future<void> _capturePng() async {
-    if (_globalKey.currentContext == null) return;
-    final boundary =
-        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    final image = await boundary.toImage(pixelRatio: 3.0);
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    final pngBytes = byteData!.buffer.asUint8List();
-    if (_page == 0) {
-      pic_0 = Image.memory(pngBytes);
-    } else {
-      pic_1 = Image.memory(pngBytes);
-    }
-  }
 
   Future<void> processData() async {
     geojson_data = await get(
@@ -127,39 +110,6 @@ class _HomePage extends State<HomePage> {
     if (geojson_data != false) {
       myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
       loadingData = false;
-    }
-  }
-
-  void radar_f() async {
-    var radar_get = await get("https://api.exptech.com.tw/file/test.json");
-    if (radar_get == false) return;
-    radar_data = List.from(radar_get);
-    var startLat = 18.0;
-    var startLon = 115.0;
-    var contentIndex = 0;
-    for (var y = 0; y < 881; y++) {
-      var lat = startLat + y * 0.0125;
-      for (var x = 0; x < 921; x++) {
-        var lon = startLon + x * 0.0125;
-        var dBZ = radar_data[contentIndex++];
-        if (dBZ != 0) {
-          List<LatLng> loc = [
-            LatLng(lat, lon),
-            LatLng(lat + 0.0125, lon),
-            LatLng(lat + 0.0125, lon + 0.0125),
-            LatLng(lat, lon + 0.0125),
-          ];
-          // if (bounds != null && !isPolygonInBounds(loc, bounds)) continue;
-          if (dBZ < 0) dBZ = 0;
-          polygons.add(
-            Polygon(
-              points: loc,
-              color: radar_color[int.parse(dBZ.toStringAsFixed(0))],
-              isFilled: true,
-            ),
-          );
-        }
-      }
     }
   }
 
@@ -188,7 +138,7 @@ class _HomePage extends State<HomePage> {
               _cityBounds.add(Polygon(
                 points: _bounds,
                 borderColor: Colors.white,
-                borderStrokeWidth: 2.0,
+                borderStrokeWidth: 3,
               ));
             }
           }
@@ -224,8 +174,6 @@ class _HomePage extends State<HomePage> {
   void dispose() {
     init = false;
     focus_city = false;
-    pic_0 = null;
-    pic_1 = null;
     super.dispose();
   }
 
@@ -243,26 +191,21 @@ class _HomePage extends State<HomePage> {
         data = await get(
             "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
         if (data != false) init = true;
-        radar_f();
         print(data);
       }
       if (_page == 0) {
-        if (pic_0 == null) {
-          if (!focus_city && !loadingData) {
-            LatLngBounds bounds =
-                _selectCity(prefs.getString('loc-city') ?? "臺南市");
-            if (mounted) {
-              mapController.fitBounds(bounds);
-              focus_city = true;
-            }
+        if (!focus_city && !loadingData) {
+          LatLngBounds bounds =
+              _selectCity(prefs.getString('loc-city') ?? "臺南市");
+          if (mounted) {
+            mapController.fitBounds(bounds);
+            focus_city = true;
           }
         }
       } else {
-        if (pic_1 == null) {
-          if (mounted && !focus_city) {
-            mapController.move(const LatLng(23.4, 120.1), 6.5);
-            focus_city = true;
-          }
+        if (mounted && !focus_city) {
+          mapController.move(const LatLng(23.4, 120.1), 6.5);
+          focus_city = true;
         }
       }
       if (data == null || data == false || data["info"] == null) {
@@ -539,12 +482,6 @@ class _HomePage extends State<HomePage> {
       }
       if (!mounted) return;
       setState(() {});
-      if ((pic_0 == null || pic_1 == null) &&
-          radar_data != null &&
-          !loadingData &&
-          focus_city) {
-        _capturePng();
-      }
     });
     return Scaffold(
       backgroundColor: Colors.black,
@@ -620,46 +557,52 @@ class _HomePage extends State<HomePage> {
                       ],
                     ),
                     Expanded(
-                      child: ((_page == 0 && pic_0 == null) ||
-                              _page == 1 && pic_1 == null)
-                          ? RepaintBoundary(
-                              key: _globalKey,
-                              child: FlutterMap(
-                                key: ValueKey(_page),
-                                mapController: mapController,
-                                options: MapOptions(
-                                  center: const LatLng(23.4, 120.1),
-                                  zoom: 6.5,
-                                  interactiveFlags:
-                                      InteractiveFlag.all - InteractiveFlag.all,
-                                ),
-                                children: [
-                                  PolygonLayer(polygons: myGeoJson.polygons),
-                                  PolylineLayer(polylines: myGeoJson.polylines),
-                                  if (_page == 0)
-                                    PolygonLayer(polygons: _cityBounds),
-                                  PolygonLayer(polygons: polygons),
-                                  if (loc_gps != null)
-                                    MarkerLayer(
-                                      markers: [
-                                        Marker(
-                                          width: 15,
-                                          height: 15,
-                                          point: loc_gps,
-                                          builder: (ctx) => const Icon(
-                                            Icons.gps_fixed_outlined,
-                                            size: 15,
-                                            color: Colors.pinkAccent,
-                                          ),
-                                        ),
-                                      ],
+                      child: RepaintBoundary(
+                        key: _globalKey,
+                        child: FlutterMap(
+                          key: ValueKey(_page),
+                          mapController: mapController,
+                          options: MapOptions(
+                            center: const LatLng(23.4, 120.1),
+                            zoom: 6.5,
+                            minZoom: 6,
+                            maxZoom: 10,
+                          ),
+                          children: [
+                            PolygonLayer(polygons: myGeoJson.polygons),
+                            PolylineLayer(polylines: myGeoJson.polylines),
+                            if (_page == 0) PolygonLayer(polygons: _cityBounds),
+                            if (loc_gps != null)
+                              MarkerLayer(
+                                markers: [
+                                  Marker(
+                                    width: 15,
+                                    height: 15,
+                                    point: loc_gps,
+                                    builder: (ctx) => const Icon(
+                                      Icons.gps_fixed_outlined,
+                                      size: 15,
+                                      color: Colors.pinkAccent,
                                     ),
+                                  ),
                                 ],
                               ),
-                            )
-                          : (_page == 0)
-                              ? pic_0
-                              : pic_1,
+                            OverlayImageLayer(
+                              overlayImages: [
+                                OverlayImage(
+                                  bounds: LatLngBounds(
+                                    const LatLng(17.88, 115),
+                                    const LatLng(28.8925, 126.5125),
+                                  ),
+                                  imageProvider: NetworkImage(
+                                    'https://api.exptech.com.tw/file/radar1.png',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
