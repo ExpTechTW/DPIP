@@ -103,7 +103,7 @@ class _HomePage extends State<HomePage> {
   var loc_data;
   var loc_gps;
 
-  List<LatLng> _cityBounds = [];
+  List<Polygon> _cityBounds = [];
   final GlobalKey _globalKey = GlobalKey();
 
   Future<void> _capturePng() async {
@@ -160,20 +160,45 @@ class _HomePage extends State<HomePage> {
   _selectCity(String cityName) {
     for (var feature in geojson_data["features"]) {
       if (feature['properties']['COUNTYNAME'] == cityName) {
-        List coordinates = feature['geometry']['coordinates'][0];
-        _cityBounds =
+        List Coord = feature['geometry']['coordinates'];
+        List coordinates = [];
+        for (var i = 0; i < Coord.length; i++) {
+          for (var I = 0; I < Coord[i].length; I++) {
+            if(Coord[i][I].length==2){
+              coordinates.add(Coord[i][I]);
+              List<LatLng> _bounds = List<LatLng>.from(
+                  Coord[i].map((coord) => LatLng(coord[1], coord[0]))
+              );
+              _cityBounds.add(Polygon(
+                points: _bounds,
+                borderColor: Colors.white,
+                borderStrokeWidth: 2.0,
+              ));
+            }else{
+              for (var _I = 0; _I < Coord[i][I].length; _I++) {
+                coordinates.add(Coord[i][I][_I]);
+              }
+              List<LatLng> _bounds = List<LatLng>.from(
+                  Coord[i][I].map((coord) => LatLng(coord[1], coord[0]))
+              );
+              _cityBounds.add(Polygon(
+                points: _bounds,
+                borderColor: Colors.white,
+                borderStrokeWidth: 2.0,
+              ));
+            }
+          }
+        }
+
+        var _Bounds =
             coordinates.map((coord) => LatLng(coord[1], coord[0])).toList();
-        double minLat = _cityBounds
-            .map((e) => e.latitude)
+        double minLat = _Bounds.map((e) => e.latitude)
             .reduce((value, element) => value < element ? value : element);
-        double maxLat = _cityBounds
-            .map((e) => e.latitude)
+        double maxLat = _Bounds.map((e) => e.latitude)
             .reduce((value, element) => value > element ? value : element);
-        double minLng = _cityBounds
-            .map((e) => e.longitude)
+        double minLng = _Bounds.map((e) => e.longitude)
             .reduce((value, element) => value < element ? value : element);
-        double maxLng = _cityBounds
-            .map((e) => e.longitude)
+        double maxLng = _Bounds.map((e) => e.longitude)
             .reduce((value, element) => value > element ? value : element);
         return LatLngBounds(
           LatLng(minLat - 0.08, minLng - 0.08),
@@ -206,13 +231,11 @@ class _HomePage extends State<HomePage> {
       if (!init) {
         loc_data = await get(
             "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
-        if (prefs.getString("loc-city") != null) {
-          var loc_info = loc_data[prefs.getString("loc-city")]
-              [prefs.getString("loc-town")];
-          loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
-        }
+        var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
+            [prefs.getString("loc-town") ?? "歸仁區"];
+        loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
         data = await get(
-            "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
+            "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
         if (data != false) init = true;
         radar_f();
         print(data);
@@ -220,14 +243,11 @@ class _HomePage extends State<HomePage> {
       if (pic == null) {
         if (_page == 0) {
           if (!focus_city && !loadingData) {
-            if (prefs.getString('loc-city') != null &&
-                prefs.getString('loc-town') != null) {
-              LatLngBounds bounds =
-                  _selectCity(prefs.getString('loc-city') ?? "");
-              if (mounted) {
-                mapController.fitBounds(bounds);
-                focus_city = true;
-              }
+            LatLngBounds bounds =
+                _selectCity(prefs.getString('loc-city') ?? "臺南市");
+            if (mounted) {
+              mapController.fitBounds(bounds);
+              focus_city = true;
             }
           }
         } else {
@@ -255,198 +275,177 @@ class _HomePage extends State<HomePage> {
         ));
       } else {
         if (_page == 0) {
-          if (prefs.getString('loc-town') == null) {
-            _List_children.add(const Column(
+          _List_children.add(Padding(
+            padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "服務區域外",
-                  style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w100,
-                      color: Colors.white),
-                ),
-                Text(
-                  "無法取得相關資訊 可能是因為尚未設定所在地位置",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      prefs.getString("loc-city") ?? "臺南市",
+                      style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      prefs.getString("loc-town") ?? "歸仁區",
+                      style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.grey),
+                    ),
+                    const SizedBox(width: 15),
+                    Text(
+                      data["info"]["str"],
+                      style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.grey),
+                    ),
+                  ],
                 )
               ],
-            ));
-          } else {
-            _List_children.add(Padding(
-              padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        prefs.getString("loc-city") ?? "",
-                        style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white),
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        prefs.getString("loc-town") ?? "",
-                        style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.grey),
-                      ),
-                      const SizedBox(width: 15),
-                      Text(
-                        data["info"]["str"],
-                        style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.grey),
-                      ),
-                    ],
-                  )
-                ],
+            ),
+          ));
+          _List_children.add(Padding(
+            padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xff333439),
+                borderRadius: BorderRadius.circular(10),
               ),
-            ));
-            _List_children.add(Padding(
-              padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xff333439),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                          (data["info"]["icon"] == 0)
-                              ? Icons.sunny
-                              : (data["info"]["icon"] == 1)
-                                  ? Icons.cloudy_snowing
-                                  : (data["info"]["icon"] == 2)
-                                      ? Icons.sunny_snowing
-                                      : Icons.cloud,
-                          color: Colors.white,
-                          size: 50),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              data["info"]["temp"].split(".")[0],
-                              style: const TextStyle(
-                                fontSize: 50,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              ".${data["info"]["temp"].split(".")[1]}°C",
-                              style: const TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                        (data["info"]["icon"] == 0)
+                            ? Icons.sunny
+                            : (data["info"]["icon"] == 1)
+                                ? Icons.cloudy_snowing
+                                : (data["info"]["icon"] == 2)
+                                    ? Icons.sunny_snowing
+                                    : Icons.cloud,
+                        color: Colors.white,
+                        size: 50),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
                         children: [
                           Text(
-                            "降雨機率 ${data["info"]["cor"]}%",
+                            data["info"]["temp"].split(".")[0],
                             style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                              fontSize: 50,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white,
+                            ),
                           ),
                           Text(
-                            "預估氣溫 ${data["info"]["temp_l"]} ~ ${data["info"]["temp_h"]}°C",
+                            ".${data["info"]["temp"].split(".")[1]}°C",
                             style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                              fontSize: 30,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.white,
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ));
-            if (data["loc"].length == 0) {
-              _List_children.add(const Padding(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(width: double.infinity),
-                    Text(
-                      "暫無生效中的防災資訊",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "降雨機率 ${data["info"]["cor"]}%",
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w100,
+                              color: Colors.white),
+                        ),
+                        Text(
+                          "預估氣溫 ${data["info"]["temp_l"]} ~ ${data["info"]["temp_h"]}°C",
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w100,
+                              color: Colors.white),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ));
-            } else {
-              for (var i = 0; i < data["loc"].length; i++) {
-                DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                        data["loc"][i]["time"],
-                        isUtc: true)
-                    .add(const Duration(hours: 8));
-                String formattedDate =
-                    '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
-                _List_children.add(Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(width: double.infinity),
-                      Row(
-                        children: [
-                          Icon(
-                            (data["loc"][i]["type"] == 2)
-                                ? Icons.warning_amber_outlined
-                                : (data["loc"][i]["type"] == 1)
-                                    ? Icons.doorbell_outlined
-                                    : Icons.speaker_notes_outlined,
-                            color: (data["loc"][i]["type"] == 2)
-                                ? Colors.red
-                                : (data["loc"][i]["type"] == 1)
-                                    ? Colors.amber
-                                    : Colors.white,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            data["loc"][i]["title"],
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        formattedDate,
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                      Text(
-                        data["loc"][i]["body"],
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.white),
-                      )
-                    ],
+              ),
+            ),
+          ));
+          if (data["loc"].length == 0) {
+            _List_children.add(const Padding(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: double.infinity),
+                  Text(
+                    "暫無生效中的防災資訊",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
-                ));
-              }
+                ],
+              ),
+            ));
+          } else {
+            for (var i = 0; i < data["loc"].length; i++) {
+              DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                      data["loc"][i]["time"],
+                      isUtc: true)
+                  .add(const Duration(hours: 8));
+              String formattedDate =
+                  '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
+              _List_children.add(Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: double.infinity),
+                    Row(
+                      children: [
+                        Icon(
+                          (data["loc"][i]["type"] == 2)
+                              ? Icons.warning_amber_outlined
+                              : (data["loc"][i]["type"] == 1)
+                                  ? Icons.doorbell_outlined
+                                  : Icons.speaker_notes_outlined,
+                          color: (data["loc"][i]["type"] == 2)
+                              ? Colors.red
+                              : (data["loc"][i]["type"] == 1)
+                                  ? Colors.amber
+                                  : Colors.white,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          data["loc"][i]["title"],
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    Text(
+                      data["loc"][i]["body"],
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    )
+                  ],
+                ),
+              ));
             }
           }
         } else {
@@ -542,8 +541,7 @@ class _HomePage extends State<HomePage> {
         child: Stack(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height /
-                  2, // upper half of the screen
+              height: MediaQuery.of(context).size.height / 2,
               child: Column(
                 children: [
                   Row(
@@ -613,13 +611,7 @@ class _HomePage extends State<HomePage> {
                                 PolygonLayer(polygons: myGeoJson.polygons),
                                 PolylineLayer(polylines: myGeoJson.polylines),
                                 if (_page == 0)
-                                  PolygonLayer(polygons: [
-                                    Polygon(
-                                      points: _cityBounds,
-                                      borderColor: Colors.white,
-                                      borderStrokeWidth: 2.0,
-                                    ),
-                                  ]),
+                                  PolygonLayer(polygons: _cityBounds),
                                 PolygonLayer(polygons: polygons),
                                 if (loc_gps != null)
                                   MarkerLayer(
@@ -653,7 +645,7 @@ class _HomePage extends State<HomePage> {
                 return Container(
                   color: Colors.black.withOpacity(1),
                   child: Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     child: ScrollConfiguration(
                       behavior: ScrollConfiguration.of(context)
                           .copyWith(overscroll: false),

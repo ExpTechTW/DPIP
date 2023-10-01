@@ -27,12 +27,15 @@ class _SettingPage extends State<SettingPage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (init) return;
       init = true;
-      print(data["data"]);
       for (var i = 0; i < data["data"].length; i++) {
         _List_children.add(InkWell(
           onTap: () {
             prefs.setString(data["storage"], data["data"][i]);
-            if (data["storage"] == "loc-city") prefs.remove("loc-town");
+            print(data["data"]);
+            if (data["storage"] == "loc-city") {
+              prefs.setString("loc-town",
+                  data["loc_data"][data["data"][i]].keys.toList()[0]);
+            }
             Navigator.pop(context);
           },
           child: Padding(
@@ -56,6 +59,7 @@ class _SettingPage extends State<SettingPage> {
       if (!mounted) return;
       setState(() {});
     });
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(

@@ -59,6 +59,7 @@ class _MePage extends State<MePage> {
                   settings: RouteSettings(
                     arguments: {
                       "data": loc_data.keys.toList(),
+                      "loc_data": loc_data,
                       "storage": "loc-city"
                     },
                   ),
@@ -83,7 +84,7 @@ class _MePage extends State<MePage> {
                 ),
                 Expanded(
                   child: Text(
-                    prefs.getString("loc-city") ?? "未設定",
+                    prefs.getString("loc-city") ?? "臺南市",
                     style: const TextStyle(fontSize: 22, color: Colors.grey),
                     textAlign: TextAlign.end,
                   ),
@@ -111,6 +112,7 @@ class _MePage extends State<MePage> {
                       arguments: {
                         "data":
                             loc_data[prefs.getString("loc-city")].keys.toList(),
+                        "loc_data": loc_data,
                         "storage": "loc-town"
                       },
                     ),
@@ -136,7 +138,7 @@ class _MePage extends State<MePage> {
                 ),
                 Expanded(
                   child: Text(
-                    prefs.getString("loc-town") ?? "未設定",
+                    prefs.getString("loc-town") ?? "歸仁區",
                     style: const TextStyle(fontSize: 22, color: Colors.grey),
                     textAlign: TextAlign.end,
                   ),
