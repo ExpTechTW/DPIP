@@ -115,7 +115,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
+  connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   Firebase: 66043bd4579e5b73811f96829c694c7af8d67435
   firebase_core: 77172d0a9d8d19d07606e24406e4c2fc14d3265b
   firebase_messaging: 6aff54d420b7ce7080c26dd131b08bc632666852
