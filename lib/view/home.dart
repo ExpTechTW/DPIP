@@ -549,131 +549,148 @@ class _HomePage extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Stack(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height / 2,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: (_page == 1)
-                              ? Colors.blue[800]
-                              : Colors.transparent,
-                          elevation: 20,
-                          splashFactory: NoSplash.splashFactory,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          focus_city = false;
-                          _page = 1;
-                          setState(() {});
-                        },
-                        child: const Text(
-                          "全國",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: (_page == 0)
-                              ? Colors.blue[800]
-                              : Colors.transparent,
-                          elevation: 20,
-                          splashFactory: NoSplash.splashFactory,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          focus_city = false;
-                          _page = 0;
-                          setState(() {});
-                        },
-                        child: const Text(
-                          "所在地",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: ((_page == 0 && pic_0 == null) ||
-                            _page == 1 && pic_1 == null)
-                        ? RepaintBoundary(
-                            key: _globalKey,
-                            child: FlutterMap(
-                              key: ValueKey(_page),
-                              mapController: mapController,
-                              options: MapOptions(
-                                center: const LatLng(23.4, 120.1),
-                                zoom: 6.5,
-                                interactiveFlags:
-                                    InteractiveFlag.all - InteractiveFlag.all,
-                              ),
-                              children: [
-                                PolygonLayer(polygons: myGeoJson.polygons),
-                                PolylineLayer(polylines: myGeoJson.polylines),
-                                if (_page == 0)
-                                  PolygonLayer(polygons: _cityBounds),
-                                PolygonLayer(polygons: polygons),
-                                if (loc_gps != null)
-                                  MarkerLayer(
-                                    markers: [
-                                      Marker(
-                                        width: 15,
-                                        height: 15,
-                                        point: loc_gps,
-                                        builder: (ctx) => const Icon(
-                                          Icons.gps_fixed_outlined,
-                                          size: 15,
-                                          color: Colors.pinkAccent,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                              ],
+        child: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity! > 0) {
+              if (_page == 0) {
+                focus_city = false;
+                _page = 1;
+                setState(() {});
+              }
+            } else if (details.primaryVelocity! < 0) {
+              if (_page == 1) {
+                focus_city = false;
+                _page = 0;
+                setState(() {});
+              }
+            }
+          },
+          child: Stack(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (_page == 1)
+                                ? Colors.blue[800]
+                                : Colors.transparent,
+                            elevation: 20,
+                            splashFactory: NoSplash.splashFactory,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                          )
-                        : (_page == 0)
-                            ? pic_0
-                            : pic_1,
-                  ),
-                ],
+                          ),
+                          onPressed: () {
+                            focus_city = false;
+                            _page = 1;
+                            setState(() {});
+                          },
+                          child: const Text(
+                            "全國",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: (_page == 0)
+                                ? Colors.blue[800]
+                                : Colors.transparent,
+                            elevation: 20,
+                            splashFactory: NoSplash.splashFactory,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          onPressed: () {
+                            focus_city = false;
+                            _page = 0;
+                            setState(() {});
+                          },
+                          child: const Text(
+                            "所在地",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: ((_page == 0 && pic_0 == null) ||
+                              _page == 1 && pic_1 == null)
+                          ? RepaintBoundary(
+                              key: _globalKey,
+                              child: FlutterMap(
+                                key: ValueKey(_page),
+                                mapController: mapController,
+                                options: MapOptions(
+                                  center: const LatLng(23.4, 120.1),
+                                  zoom: 6.5,
+                                  interactiveFlags:
+                                      InteractiveFlag.all - InteractiveFlag.all,
+                                ),
+                                children: [
+                                  PolygonLayer(polygons: myGeoJson.polygons),
+                                  PolylineLayer(polylines: myGeoJson.polylines),
+                                  if (_page == 0)
+                                    PolygonLayer(polygons: _cityBounds),
+                                  PolygonLayer(polygons: polygons),
+                                  if (loc_gps != null)
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          width: 15,
+                                          height: 15,
+                                          point: loc_gps,
+                                          builder: (ctx) => const Icon(
+                                            Icons.gps_fixed_outlined,
+                                            size: 15,
+                                            color: Colors.pinkAccent,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            )
+                          : (_page == 0)
+                              ? pic_0
+                              : pic_1,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            DraggableScrollableSheet(
-              initialChildSize: 0.45,
-              minChildSize: 0.45,
-              maxChildSize: 1.0,
-              builder:
-                  (BuildContext context, ScrollController scrollController) {
-                return Container(
-                  color: Colors.black.withOpacity(1),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(overscroll: false),
-                      child: ListView.builder(
-                        controller: scrollController,
-                        itemCount: _List_children.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return _List_children[index];
-                        },
+              DraggableScrollableSheet(
+                initialChildSize: 0.45,
+                minChildSize: 0.45,
+                maxChildSize: 1.0,
+                builder:
+                    (BuildContext context, ScrollController scrollController) {
+                  return Container(
+                    color: Colors.black.withOpacity(1),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: ScrollConfiguration(
+                        behavior: ScrollConfiguration.of(context)
+                            .copyWith(overscroll: false),
+                        child: ListView.builder(
+                          controller: scrollController,
+                          itemCount: _List_children.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return _List_children[index];
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
