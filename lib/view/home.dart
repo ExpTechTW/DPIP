@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dpip/core/api.dart';
@@ -302,7 +301,7 @@ class _HomePage extends State<HomePage> {
                       Text(
                         data["info"]["str"],
                         style: const TextStyle(
-                            fontSize:12,
+                            fontSize: 12,
                             fontWeight: FontWeight.w300,
                             color: Colors.grey),
                       ),
@@ -399,7 +398,7 @@ class _HomePage extends State<HomePage> {
             } else {
               for (var i = 0; i < data["loc"].length; i++) {
                 DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                        data["all"][i]["time"],
+                        data["loc"][i]["time"],
                         isUtc: true)
                     .add(const Duration(hours: 8));
                 String formattedDate =
@@ -410,16 +409,29 @@ class _HomePage extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(width: double.infinity),
-                      Text(
-                        data["all"][i]["title"],
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: (data["all"][i]["type"] == 2)
+                      Row(
+                        children: [
+                          Icon(
+                            (data["loc"][i]["type"] == 2)
+                                ? Icons.warning_amber_outlined
+                                : (data["loc"][i]["type"] == 1)
+                                    ? Icons.doorbell_outlined
+                                    : Icons.speaker_notes_outlined,
+                            color: (data["loc"][i]["type"] == 2)
                                 ? Colors.red
-                                : (data["all"][i]["type"] == 1)
+                                : (data["loc"][i]["type"] == 1)
                                     ? Colors.amber
                                     : Colors.white,
-                            fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            data["loc"][i]["title"],
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
                       ),
                       Text(
                         formattedDate,
@@ -427,7 +439,7 @@ class _HomePage extends State<HomePage> {
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       Text(
-                        data["all"][i]["body"],
+                        data["loc"][i]["body"],
                         style:
                             const TextStyle(fontSize: 16, color: Colors.white),
                       )
@@ -543,6 +555,7 @@ class _HomePage extends State<HomePage> {
                               ? Colors.blue[800]
                               : Colors.transparent,
                           elevation: 20,
+                          splashFactory: NoSplash.splashFactory,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),
@@ -565,6 +578,7 @@ class _HomePage extends State<HomePage> {
                               ? Colors.blue[800]
                               : Colors.transparent,
                           elevation: 20,
+                          splashFactory: NoSplash.splashFactory,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),

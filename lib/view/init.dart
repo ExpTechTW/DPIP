@@ -190,21 +190,28 @@ class _InitPage extends State<InitPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: '首頁'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.history_outlined), label: '歷史'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
-        ],
-        currentIndex: _currentIndex,
-        fixedColor: Colors.blue[800],
-        onTap: (!loaded) ? null : _onItemClick,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+        ),
+        child: BottomNavigationBar(
+          unselectedItemColor: Colors.grey,
+          type: BottomNavigationBarType.fixed,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined), label: '首頁'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.history_outlined), label: '歷史'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
+          ],
+          currentIndex: _currentIndex,
+          fixedColor: Colors.blue[800],
+          onTap: (!loaded) ? null : _onItemClick,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
       ),
     );
   }

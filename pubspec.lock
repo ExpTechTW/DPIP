@@ -262,14 +262,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.3"
-  flutter_markdown:
-    dependency: "direct main"
-    description:
-      name: flutter_markdown
-      sha256: a10979814c5f4ddbe2b6143fba25d927599e21e3ba65b3862995960606fae78f
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.17+3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
