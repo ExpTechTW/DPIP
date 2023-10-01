@@ -265,7 +265,7 @@ class _HomePage extends State<HomePage> {
           }
         }
       }
-      if (data == false || data["info"] == null) {
+      if (data == null || data == false || data["info"] == null) {
         focus_city = true;
         _List_children.add(const Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -34,7 +34,7 @@ class _HistoryPage extends State<HistoryPage> {
         print(data);
       }
       _List_children = <Widget>[];
-      if (data == false) {
+      if (data == null || data == false) {
         _List_children.add(const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -200,56 +200,71 @@ class _HistoryPage extends State<HistoryPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        (_page == 1) ? Colors.blue[800] : Colors.transparent,
-                    elevation: 20,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
+        child: GestureDetector(
+          onHorizontalDragEnd: (details) {
+            if (details.primaryVelocity! > 0) {
+              if (_page == 0) {
+                _page = 1;
+                setState(() {});
+              }
+            } else if (details.primaryVelocity! < 0) {
+              if (_page == 1) {
+                _page = 0;
+                setState(() {});
+              }
+            }
+          },
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          (_page == 1) ? Colors.blue[800] : Colors.transparent,
+                      elevation: 20,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _page = 1;
+                      });
+                    },
+                    child: const Text(
+                      "全國",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _page = 1;
-                    });
-                  },
-                  child: const Text(
-                    "全國",
-                    style: TextStyle(color: Colors.white),
+                  const SizedBox(width: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          (_page == 0) ? Colors.blue[800] : Colors.transparent,
+                      elevation: 20,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _page = 0;
+                      });
+                    },
+                    child: const Text(
+                      "所在地",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        (_page == 0) ? Colors.blue[800] : Colors.transparent,
-                    elevation: 20,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _page = 0;
-                    });
-                  },
-                  child: const Text(
-                    "所在地",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView(
-                  padding: const EdgeInsets.all(0),
-                  children: _List_children.toList()),
-            ),
-          ],
+                ],
+              ),
+              Expanded(
+                child: ListView(
+                    padding: const EdgeInsets.all(0),
+                    children: _List_children.toList()),
+              ),
+            ],
+          ),
         ),
       ),
     );
