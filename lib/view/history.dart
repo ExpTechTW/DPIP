@@ -224,6 +224,7 @@ class _HistoryPage extends State<HistoryPage> {
                       backgroundColor:
                           (_page == 1) ? Colors.blue[800] : Colors.transparent,
                       elevation: 20,
+                      splashFactory: NoSplash.splashFactory,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30)),
                     ),
@@ -243,6 +244,7 @@ class _HistoryPage extends State<HistoryPage> {
                       backgroundColor:
                           (_page == 0) ? Colors.blue[800] : Colors.transparent,
                       elevation: 20,
+                      splashFactory: NoSplash.splashFactory,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30)),
                     ),
