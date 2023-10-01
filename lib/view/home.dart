@@ -100,10 +100,12 @@ class _HomePage extends State<HomePage> {
   var data;
   var radar_data;
   MapController mapController = MapController();
+  var pic;
+  var loc_data;
+  var loc_gps;
 
   List<LatLng> _cityBounds = [];
   final GlobalKey _globalKey = GlobalKey();
-  Uint8List? _pngBytes;
 
   Future<void> _capturePng() async {
     final boundary =
@@ -111,7 +113,7 @@ class _HomePage extends State<HomePage> {
     final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
-    _pngBytes = pngBytes;
+    pic = Image.memory(pngBytes);
   }
 
   Future<void> processData() async {
@@ -203,13 +205,20 @@ class _HomePage extends State<HomePage> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       _List_children = <Widget>[];
       if (!init) {
+        loc_data = await get(
+            "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
+        if (prefs.getString("loc-city") != null) {
+          var loc_info = loc_data[prefs.getString("loc-city")]
+              [prefs.getString("loc-town")];
+          loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
+        }
         data = await get(
             "https://exptech.com.tw/api/v1/dpip/alert?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
         if (data != false) init = true;
         radar_f();
         print(data);
       }
-      if (_pngBytes == null) {
+      if (pic == null) {
         if (_page == 0) {
           if (!focus_city && !loadingData) {
             if (prefs.getString('loc-city') != null &&
@@ -495,10 +504,7 @@ class _HomePage extends State<HomePage> {
       }
       if (!mounted) return;
       setState(() {});
-      if (_pngBytes == null &&
-          radar_data != null &&
-          !loadingData &&
-          focus_city) {
+      if (pic == null && radar_data != null && !loadingData && focus_city) {
         _capturePng();
       }
     });
@@ -526,7 +532,7 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
-                          _pngBytes = null;
+                          pic = null;
                           focus_city = false;
                           _page = 1;
                           setState(() {});
@@ -548,7 +554,7 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
-                          _pngBytes = null;
+                          pic = null;
                           focus_city = false;
                           _page = 0;
                           setState(() {});
@@ -561,7 +567,7 @@ class _HomePage extends State<HomePage> {
                     ],
                   ),
                   Expanded(
-                    child: (_pngBytes == null)
+                    child: (pic == null)
                         ? RepaintBoundary(
                             key: _globalKey,
                             child: FlutterMap(
@@ -576,7 +582,6 @@ class _HomePage extends State<HomePage> {
                               children: [
                                 PolygonLayer(polygons: myGeoJson.polygons),
                                 PolylineLayer(polylines: myGeoJson.polylines),
-                                PolygonLayer(polygons: polygons),
                                 if (_page == 0)
                                   PolygonLayer(polygons: [
                                     Polygon(
@@ -585,10 +590,26 @@ class _HomePage extends State<HomePage> {
                                       borderStrokeWidth: 2.0,
                                     ),
                                   ]),
+                                PolygonLayer(polygons: polygons),
+                                if (loc_gps != null)
+                                  MarkerLayer(
+                                    markers: [
+                                      Marker(
+                                        width: 15,
+                                        height: 15,
+                                        point: loc_gps,
+                                        builder: (ctx) => const Icon(
+                                          Icons.gps_fixed_outlined,
+                                          size: 15,
+                                          color: Colors.pinkAccent,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
                           )
-                        : Image.memory(_pngBytes!),
+                        : pic,
                   ),
                 ],
               ),
