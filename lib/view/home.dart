@@ -99,7 +99,8 @@ class _HomePage extends State<HomePage> {
   var data;
   var radar_data;
   MapController mapController = MapController();
-  var pic;
+  var pic_0;
+  var pic_1;
   var loc_data;
   var loc_gps;
 
@@ -107,12 +108,17 @@ class _HomePage extends State<HomePage> {
   final GlobalKey _globalKey = GlobalKey();
 
   Future<void> _capturePng() async {
+    if (_globalKey.currentContext == null) return;
     final boundary =
         _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
     final image = await boundary.toImage(pixelRatio: 3.0);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final pngBytes = byteData!.buffer.asUint8List();
-    pic = Image.memory(pngBytes);
+    if (_page == 0) {
+      pic_0 = Image.memory(pngBytes);
+    } else {
+      pic_1 = Image.memory(pngBytes);
+    }
   }
 
   Future<void> processData() async {
@@ -164,23 +170,21 @@ class _HomePage extends State<HomePage> {
         List coordinates = [];
         for (var i = 0; i < Coord.length; i++) {
           for (var I = 0; I < Coord[i].length; I++) {
-            if(Coord[i][I].length==2){
+            if (Coord[i][I].length == 2) {
               coordinates.add(Coord[i][I]);
               List<LatLng> _bounds = List<LatLng>.from(
-                  Coord[i].map((coord) => LatLng(coord[1], coord[0]))
-              );
+                  Coord[i].map((coord) => LatLng(coord[1], coord[0])));
               _cityBounds.add(Polygon(
                 points: _bounds,
                 borderColor: Colors.white,
                 borderStrokeWidth: 2.0,
               ));
-            }else{
+            } else {
               for (var _I = 0; _I < Coord[i][I].length; _I++) {
                 coordinates.add(Coord[i][I][_I]);
               }
               List<LatLng> _bounds = List<LatLng>.from(
-                  Coord[i][I].map((coord) => LatLng(coord[1], coord[0]))
-              );
+                  Coord[i][I].map((coord) => LatLng(coord[1], coord[0])));
               _cityBounds.add(Polygon(
                 points: _bounds,
                 borderColor: Colors.white,
@@ -220,6 +224,8 @@ class _HomePage extends State<HomePage> {
   void dispose() {
     init = false;
     focus_city = false;
+    pic_0 = null;
+    pic_1 = null;
     super.dispose();
   }
 
@@ -240,8 +246,8 @@ class _HomePage extends State<HomePage> {
         radar_f();
         print(data);
       }
-      if (pic == null) {
-        if (_page == 0) {
+      if (_page == 0) {
+        if (pic_0 == null) {
           if (!focus_city && !loadingData) {
             LatLngBounds bounds =
                 _selectCity(prefs.getString('loc-city') ?? "臺南市");
@@ -250,7 +256,9 @@ class _HomePage extends State<HomePage> {
               focus_city = true;
             }
           }
-        } else {
+        }
+      } else {
+        if (pic_1 == null) {
           if (mounted && !focus_city) {
             mapController.move(const LatLng(23.4, 120.1), 6.5);
             focus_city = true;
@@ -531,7 +539,10 @@ class _HomePage extends State<HomePage> {
       }
       if (!mounted) return;
       setState(() {});
-      if (pic == null && radar_data != null && !loadingData && focus_city) {
+      if ((pic_0 == null || pic_1 == null) &&
+          radar_data != null &&
+          !loadingData &&
+          focus_city) {
         _capturePng();
       }
     });
@@ -559,7 +570,6 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
-                          pic = null;
                           focus_city = false;
                           _page = 1;
                           setState(() {});
@@ -582,7 +592,6 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         onPressed: () {
-                          pic = null;
                           focus_city = false;
                           _page = 0;
                           setState(() {});
@@ -595,7 +604,8 @@ class _HomePage extends State<HomePage> {
                     ],
                   ),
                   Expanded(
-                    child: (pic == null)
+                    child: ((_page == 0 && pic_0 == null) ||
+                            _page == 1 && pic_1 == null)
                         ? RepaintBoundary(
                             key: _globalKey,
                             child: FlutterMap(
@@ -631,7 +641,9 @@ class _HomePage extends State<HomePage> {
                               ],
                             ),
                           )
-                        : pic,
+                        : (_page == 0)
+                            ? pic_0
+                            : pic_1,
                   ),
                 ],
               ),
