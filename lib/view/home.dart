@@ -213,7 +213,7 @@ class _HomePage extends State<HomePage> {
           loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
         }
         data = await get(
-            "https://exptech.com.tw/api/v1/dpip/alert?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
+            "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city')}&town=${prefs.getString('loc-town')}");
         if (data != false) init = true;
         radar_f();
         print(data);
@@ -280,6 +280,8 @@ class _HomePage extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
                       Text(
                         prefs.getString("loc-city") ?? "",
@@ -296,6 +298,14 @@ class _HomePage extends State<HomePage> {
                             fontWeight: FontWeight.w900,
                             color: Colors.grey),
                       ),
+                      const SizedBox(width: 15),
+                      Text(
+                        data["info"]["str"],
+                        style: const TextStyle(
+                            fontSize:12,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.grey),
+                      ),
                     ],
                   )
                 ],
@@ -308,29 +318,38 @@ class _HomePage extends State<HomePage> {
                   color: const Color(0xff333439),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.sunny, color: Colors.white, size: 50),
+                      Icon(
+                          (data["info"]["icon"] == 0)
+                              ? Icons.sunny
+                              : (data["info"]["icon"] == 1)
+                                  ? Icons.cloudy_snowing
+                                  : (data["info"]["icon"] == 2)
+                                      ? Icons.sunny_snowing
+                                      : Icons.cloud,
+                          color: Colors.white,
+                          size: 50),
                       Padding(
-                        padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.baseline,
                           textBaseline: TextBaseline.alphabetic,
                           children: [
                             Text(
-                              "40",
-                              style: TextStyle(
+                              data["info"]["temp"].split(".")[0],
+                              style: const TextStyle(
                                 fontSize: 50,
                                 fontWeight: FontWeight.w300,
                                 color: Colors.white,
                               ),
                             ),
                             Text(
-                              ".1°C",
-                              style: TextStyle(
+                              ".${data["info"]["temp"].split(".")[1]}°C",
+                              style: const TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w300,
                                 color: Colors.white,
@@ -343,15 +362,15 @@ class _HomePage extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "降雨機率 10%",
-                            style: TextStyle(
+                            "降雨機率 ${data["info"]["cor"]}%",
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w100,
                                 color: Colors.white),
                           ),
                           Text(
-                            "預估氣溫 28 ~ 36°C",
-                            style: TextStyle(
+                            "預估氣溫 ${data["info"]["temp_l"]} ~ ${data["info"]["temp_h"]}°C",
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w100,
                                 color: Colors.white),
