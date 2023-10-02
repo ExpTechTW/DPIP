@@ -272,7 +272,7 @@ class _HomePage extends State<HomePage> {
             ),
           ));
           _List_children.add(Padding(
-            padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+            padding: const EdgeInsets.all(5),
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xff333439),
@@ -281,7 +281,7 @@ class _HomePage extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Icon(
                         (data["info"]["icon"] == 0)
@@ -292,9 +292,9 @@ class _HomePage extends State<HomePage> {
                                     ? Icons.sunny_snowing
                                     : Icons.cloud,
                         color: Colors.white,
-                        size: 50),
+                        size: 45),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
