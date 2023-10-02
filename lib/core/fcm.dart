@@ -37,6 +37,11 @@ Future<void> messageHandler(RemoteMessage message) async {
                     ? '重要通知'
                     : '有立即危險',
             icon: android?.smallIcon,
+            importance: (data["level"] == 0)
+                ? Importance.low
+                : (data["level"] == 1)
+                    ? Importance.defaultImportance
+                    : Importance.max,
           ),
           iOS: iosNotificationDetails,
         ));
