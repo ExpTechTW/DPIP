@@ -191,7 +191,7 @@ class _EarthquakePage extends State<EarthquakePage> {
               ),
               Expanded(
                 child: ListView(
-                    padding: const EdgeInsets.all(0),
+                    physics: const ClampingScrollPhysics(),
                     children: _List_children.toList()),
               ),
             ],

@@ -315,7 +315,6 @@ class _HistoryPage extends State<HistoryPage> {
               Expanded(
                 child: ListView(
                     physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.all(0),
                     children: _List_children.toList()),
               ),
             ],

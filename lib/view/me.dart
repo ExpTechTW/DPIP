@@ -43,8 +43,8 @@ class _MePage extends State<MePage> {
     _List_children.add(Container(
       color: Colors.white10,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const SettingPage(),
@@ -56,6 +56,7 @@ class _MePage extends State<MePage> {
                   },
                 ),
               ));
+          if (result != null && result == 'refresh') render();
         },
         child: Padding(
           padding: const EdgeInsets.all(5),
@@ -94,22 +95,22 @@ class _MePage extends State<MePage> {
     _List_children.add(Container(
       color: Colors.white10,
       child: InkWell(
-        onTap: () {
-          if (prefs.getString("loc-city") != null) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingPage(),
-                  settings: RouteSettings(
-                    arguments: {
-                      "data":
-                          loc_data[prefs.getString("loc-city")].keys.toList(),
-                      "loc_data": loc_data,
-                      "storage": "loc-town"
-                    },
-                  ),
-                ));
-          }
+        onTap: () async {
+          final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingPage(),
+                settings: RouteSettings(
+                  arguments: {
+                    "data": loc_data[prefs.getString("loc-city") ?? "臺南市"]
+                        .keys
+                        .toList(),
+                    "loc_data": loc_data,
+                    "storage": "loc-town"
+                  },
+                ),
+              ));
+          if (result != null && result == 'refresh') render();
         },
         child: Padding(
           padding: const EdgeInsets.all(5),
@@ -224,12 +225,13 @@ class _MePage extends State<MePage> {
     _List_children.add(Container(
       color: Colors.white10,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const AboutPage(),
               ));
+          if (result != null && result == 'refresh') render();
         },
         child: const Padding(
           padding: EdgeInsets.all(5),
@@ -265,6 +267,7 @@ class _MePage extends State<MePage> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: ListView(
+          physics: const ClampingScrollPhysics(),
           children: _List_children.toList(),
         ),
       ),
