@@ -198,13 +198,21 @@ class _HomePage extends State<HomePage> {
           LatLngBounds bounds =
               _selectCity(prefs.getString('loc-city') ?? "臺南市");
           if (mounted) {
-            mapController.fitBounds(bounds);
+            mapController.fitBounds(
+              bounds,
+              options: FitBoundsOptions(
+                padding: EdgeInsets.only(bottom: 350),
+              ),
+            );
             focus_city = true;
           }
         }
       } else {
         if (mounted && !focus_city) {
-          mapController.move(const LatLng(23.4, 120.1), 6.5);
+          mapController.move(
+            const LatLng(21.6, 120.1),
+            6.5,
+          );
           focus_city = true;
         }
       }
@@ -505,7 +513,7 @@ class _HomePage extends State<HomePage> {
           child: Stack(
             children: [
               SizedBox(
-                height: MediaQuery.of(context).size.height / 2,
+                height: MediaQuery.of(context).size.height,
                 child: Column(
                   children: [
                     Row(
@@ -614,7 +622,7 @@ class _HomePage extends State<HomePage> {
                 builder:
                     (BuildContext context, ScrollController scrollController) {
                   return Container(
-                    color: Colors.black.withOpacity(1),
+                    color: Colors.black.withOpacity(0.8),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: ScrollConfiguration(
