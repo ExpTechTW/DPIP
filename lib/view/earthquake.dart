@@ -13,6 +13,8 @@ class EarthquakePage extends StatefulWidget {
   _EarthquakePage createState() => _EarthquakePage();
 }
 
+var data;
+
 class _EarthquakePage extends State<EarthquakePage> {
   String url = 'https://exptech.com.tw/api/v1/trem/rts-image';
   late Widget _pic = Image.network(
@@ -27,7 +29,6 @@ class _EarthquakePage extends State<EarthquakePage> {
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
   String reports_url = "https://exptech.com.tw/api/v3/earthquake/reports";
-  var data;
 
   @override
   void initState() {
@@ -64,7 +65,7 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   _updateReportsWidget() async {
     try {
-      data = await get(reports_url);
+      data ??= await post(reports_url, { "list" : {} });
     } on TimeoutException catch (e) {
       return;
     } catch (e) {
@@ -111,18 +112,22 @@ class _EarthquakePage extends State<EarthquakePage> {
           ));
         } else {
           print(data);
-          _List_children.add(Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "規模M " + data[0]["magnitudeValue"].toString(),
-                style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w100,
-                    color: Colors.white),
-              )
-            ],
-          ));
+          if (data is! bool) {
+            for (var i = 0; i < data.length; i++) {
+              _List_children.add(Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "規模M " + data[i]["magnitudeValue"].toStringAsFixed(1),
+                    style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w100,
+                        color: Colors.white),
+                  )
+                ],
+              ));
+            }
+          }
         }
       }
     });
