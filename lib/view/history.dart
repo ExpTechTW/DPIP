@@ -74,12 +74,26 @@ class _HistoryPage extends State<HistoryPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "${prefs.getString("loc-city")} ${prefs.getString("loc-town")}",
-                    style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w100,
-                        color: Colors.white),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        prefs.getString("loc-city") ?? "臺南市",
+                        style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        prefs.getString("loc-town") ?? "歸仁區",
+                        style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.grey),
+                      ),
+                    ],
                   )
                 ],
               ),
@@ -92,7 +106,7 @@ class _HistoryPage extends State<HistoryPage> {
                   children: [
                     SizedBox(width: double.infinity),
                     Text(
-                      "暫無生效中的防災資訊",
+                      "過去 72小時 暫無防災資訊",
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     )
                   ],
@@ -101,7 +115,7 @@ class _HistoryPage extends State<HistoryPage> {
             } else {
               for (var i = 0; i < data["loc"].length; i++) {
                 DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                        data["all"][i]["time"],
+                        data["loc"][i]["time"],
                         isUtc: true)
                     .add(const Duration(hours: 8));
                 String formattedDate =
@@ -112,26 +126,37 @@ class _HistoryPage extends State<HistoryPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(width: double.infinity),
-                      Text(
-                        data["all"][i]["title"],
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: (data["all"][i]["type"] == 2)
+                      Row(
+                        children: [
+                          Icon(
+                            (data["loc"][i]["type"] == 2)
+                                ? Icons.warning_amber_outlined
+                                : (data["loc"][i]["type"] == 1)
+                                ? Icons.doorbell_outlined
+                                : Icons.speaker_notes_outlined,
+                            color: (data["loc"][i]["type"] == 2)
                                 ? Colors.red
-                                : (data["all"][i]["type"] == 1)
-                                    ? Colors.amber
-                                    : Colors.white,
-                            fontWeight: FontWeight.w600),
+                                : (data["loc"][i]["type"] == 1)
+                                ? Colors.amber
+                                : Colors.white,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            data["loc"][i]["title"],
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
                       ),
                       Text(
                         formattedDate,
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       Text(
-                        data["all"][i]["body"],
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.white),
+                        data["loc"][i]["body"],
+                        style: const TextStyle(fontSize: 16, color: Colors.white),
                       )
                     ],
                   ),
@@ -140,6 +165,27 @@ class _HistoryPage extends State<HistoryPage> {
             }
           }
         } else {
+          _List_children.add(const Padding(
+            padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "全國",
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ));
           if (data["all"].length == 0) {
             _List_children.add(const Padding(
               padding: EdgeInsets.all(10),
@@ -148,7 +194,7 @@ class _HistoryPage extends State<HistoryPage> {
                 children: [
                   SizedBox(width: double.infinity),
                   Text(
-                    "暫無生效中的防災資訊",
+                    "過去 72小時 暫無防災資訊",
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   )
                 ],
@@ -168,16 +214,29 @@ class _HistoryPage extends State<HistoryPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(width: double.infinity),
-                    Text(
-                      data["all"][i]["title"],
-                      style: TextStyle(
-                          fontSize: 20,
+                    Row(
+                      children: [
+                        Icon(
+                          (data["all"][i]["type"] == 2)
+                              ? Icons.warning_amber_outlined
+                              : (data["all"][i]["type"] == 1)
+                              ? Icons.doorbell_outlined
+                              : Icons.speaker_notes_outlined,
                           color: (data["all"][i]["type"] == 2)
                               ? Colors.red
                               : (data["all"][i]["type"] == 1)
-                                  ? Colors.amber
-                                  : Colors.white,
-                          fontWeight: FontWeight.w600),
+                              ? Colors.amber
+                              : Colors.white,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          data["all"][i]["title"],
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
                     Text(
                       formattedDate,

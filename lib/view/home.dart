@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:ui' as ui;
 
 import 'package:dpip/core/api.dart';
+import 'package:dpip/view/history.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:latlong2/latlong.dart';
@@ -200,7 +199,7 @@ class _HomePage extends State<HomePage> {
           if (mounted) {
             mapController.fitBounds(
               bounds,
-              options: FitBoundsOptions(
+              options: const FitBoundsOptions(
                 padding: EdgeInsets.only(bottom: 350),
               ),
             );
@@ -394,7 +393,7 @@ class _HomePage extends State<HomePage> {
                 children: [
                   SizedBox(width: double.infinity),
                   Text(
-                    "暫無生效中的防災資訊",
+                    "暫無 生效中的 防災資訊",
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ],
@@ -452,6 +451,27 @@ class _HomePage extends State<HomePage> {
             }
           }
         } else {
+          _List_children.add(const Padding(
+            padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      "全國",
+                      style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ));
           if (data["all"].length == 0) {
             _List_children.add(const Padding(
               padding: EdgeInsets.all(10),
@@ -460,7 +480,7 @@ class _HomePage extends State<HomePage> {
                 children: [
                   SizedBox(width: double.infinity),
                   Text(
-                    "暫無生效中的防災資訊",
+                    "暫無 生效中的 防災資訊",
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   )
                 ],
@@ -481,50 +501,37 @@ class _HomePage extends State<HomePage> {
                   children: [
                     const SizedBox(width: double.infinity),
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        Icon(
+                          (data["all"][i]["type"] == 2)
+                              ? Icons.warning_amber_outlined
+                              : (data["all"][i]["type"] == 1)
+                              ? Icons.doorbell_outlined
+                              : Icons.speaker_notes_outlined,
+                          color: (data["all"][i]["type"] == 2)
+                              ? Colors.red
+                              : (data["all"][i]["type"] == 1)
+                              ? Colors.amber
+                              : Colors.white,
+                        ),
+                        const SizedBox(width: 5),
                         Text(
                           data["all"][i]["title"],
                           style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          formattedDate,
-                          style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
+                              fontSize: 20,
                               fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.red[900],
-                            borderRadius: BorderRadius.circular(5), // 設置圓角
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(3),
-                            child: Text(
-                              "最大震度 6強",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      formattedDate,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     Text(
                       data["all"][i]["body"],
-                      style:
-                          const TextStyle(fontSize: 18, color: Colors.white70),
-                    ),
+                      style: const TextStyle(fontSize: 16, color: Colors.white),
+                    )
                   ],
                 ),
               ));

@@ -22,7 +22,7 @@ class _AboutPage extends State<AboutPage> {
       if (!mounted) return;
       setState(() {});
     });
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Column(
