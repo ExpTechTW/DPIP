@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 import 'about.dart';
 
-bool init = false;
+var loc_data;
 
 class MePage extends StatefulWidget {
   const MePage({Key? key}) : super(key: key);
@@ -19,269 +19,248 @@ class MePage extends StatefulWidget {
 
 class _MePage extends State<MePage> {
   List<Widget> _List_children = <Widget>[];
-  var loc_data;
 
   @override
-  void dispose() {
-    init = false;
-    super.dispose();
+  void initState() {
+    render();
+    super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      if (!init) {
-        loc_data = await get(
-            "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
-      }
-      init = true;
-      _List_children = <Widget>[];
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      _List_children.add(const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("軟體設定",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600))
-        ],
-      ));
-      _List_children.add(Container(
-        color: Colors.white10,
-        child: InkWell(
-          onTap: () {
+  void render() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    loc_data ??= await get(
+        "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
+    _List_children = <Widget>[];
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    _List_children.add(const Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("軟體設定",
+            style: TextStyle(
+                color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600))
+      ],
+    ));
+    _List_children.add(Container(
+      color: Colors.white10,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingPage(),
+                settings: RouteSettings(
+                  arguments: {
+                    "data": loc_data.keys.toList(),
+                    "loc_data": loc_data,
+                    "storage": "loc-city"
+                  },
+                ),
+              ));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "所在地(縣市)",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  Text(
+                    "設定所在地縣市",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Text(
+                  prefs.getString("loc-city") ?? "臺南市",
+                  style: const TextStyle(fontSize: 22, color: Colors.grey),
+                  textAlign: TextAlign.end,
+                ),
+              ),
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child:
+                      Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+            ],
+          ),
+        ),
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(Container(
+      color: Colors.white10,
+      child: InkWell(
+        onTap: () {
+          if (prefs.getString("loc-city") != null) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const SettingPage(),
                   settings: RouteSettings(
                     arguments: {
-                      "data": loc_data.keys.toList(),
+                      "data":
+                          loc_data[prefs.getString("loc-city")].keys.toList(),
                       "loc_data": loc_data,
-                      "storage": "loc-city"
+                      "storage": "loc-town"
                     },
                   ),
                 ));
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "所在地(縣市)",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                    Text(
-                      "設定所在地縣市",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Text(
-                    prefs.getString("loc-city") ?? "臺南市",
-                    style: const TextStyle(fontSize: 22, color: Colors.grey),
-                    textAlign: TextAlign.end,
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "所在地(鄉鎮市區)",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
-                ),
-                const Padding(
-                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    child:
-                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
-              ],
-            ),
-          ),
-        ),
-      ));
-      _List_children.add(const SizedBox(height: 10));
-      _List_children.add(Container(
-        color: Colors.white10,
-        child: InkWell(
-          onTap: () {
-            if (prefs.getString("loc-city") != null) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingPage(),
-                    settings: RouteSettings(
-                      arguments: {
-                        "data":
-                            loc_data[prefs.getString("loc-city")].keys.toList(),
-                        "loc_data": loc_data,
-                        "storage": "loc-town"
-                      },
-                    ),
-                  ));
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "所在地(鄉鎮市區)",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                    Text(
-                      "設定所在地鄉鎮市區",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Text(
-                    prefs.getString("loc-town") ?? "歸仁區",
-                    style: const TextStyle(fontSize: 22, color: Colors.grey),
-                    textAlign: TextAlign.end,
+                  Text(
+                    "設定所在地鄉鎮市區",
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
+                ],
+              ),
+              Expanded(
+                child: Text(
+                  prefs.getString("loc-town") ?? "歸仁區",
+                  style: const TextStyle(fontSize: 22, color: Colors.grey),
+                  textAlign: TextAlign.end,
                 ),
-                const Padding(
-                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    child:
-                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
-              ],
-            ),
+              ),
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child:
+                      Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+            ],
           ),
         ),
-      ));
-      _List_children.add(const SizedBox(height: 10));
-      _List_children.add(const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("關於",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600))
-        ],
-      ));
-      _List_children.add(Container(
-        color: Colors.white10,
-        child: InkWell(
-          onTap: () {},
-          child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "版本",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: Text(
-                    "${packageInfo.version} ${(!packageInfo.version.endsWith("0")) ? "Pre-Release" : "Release"}",
-                    style: const TextStyle(fontSize: 20, color: Colors.grey),
-                    textAlign: TextAlign.end,
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("關於",
+            style: TextStyle(
+                color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600))
+      ],
+    ));
+    _List_children.add(Container(
+      color: Colors.white10,
+      child: InkWell(
+        onTap: () {},
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "版本",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
                   ),
+                ],
+              ),
+              Expanded(
+                child: Text(
+                  "${packageInfo.version} ${(!packageInfo.version.endsWith("0")) ? "Pre-Release" : "Release"}",
+                  style: const TextStyle(fontSize: 20, color: Colors.grey),
+                  textAlign: TextAlign.end,
                 ),
-                const Padding(
-                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    child: Icon(Icons.arrow_right,
-                        color: Colors.white10, size: 30)),
-              ],
-            ),
+              ),
+              const Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child:
+                      Icon(Icons.arrow_right, color: Colors.white10, size: 30)),
+            ],
           ),
         ),
-      ));
-      _List_children.add(const SizedBox(height: 10));
-      _List_children.add(Container(
-        color: Colors.white10,
-        child: InkWell(
-          onTap: () async {
-            // showDialog(
-            //   context: context,
-            //   builder: (context) {
-            //     Future.delayed(const Duration(seconds: 5), () {
-            //       Navigator.pop(context);
-            //     });
-            //
-            //     return const AlertDialog(
-            //       title: Text('Waiting...'),
-            //       content: Text('This dialog will close in 5 seconds.'),
-            //     );
-            //   },
-            // );
-            FlutterClipboard.copy(await messaging.getToken() ?? "");
-            const snackBar = SnackBar(content: Text('已複製 FCM 令牌!'));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          },
-          child: const Padding(
-            padding: EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "令牌",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: SizedBox(),
-                ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    child:
-                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
-              ],
-            ),
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(Container(
+      color: Colors.white10,
+      child: InkWell(
+        onTap: () async {
+          FlutterClipboard.copy(await messaging.getToken() ?? "");
+          const snackBar = SnackBar(content: Text('已複製 FCM 令牌!'));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
+        child: const Padding(
+          padding: EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "令牌",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SizedBox(),
+              ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child:
+                      Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+            ],
           ),
         ),
-      ));
-      _List_children.add(const SizedBox(height: 10));
-      _List_children.add(Container(
-        color: Colors.white10,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AboutPage(),
-                ));
-          },
-          child: const Padding(
-            padding: EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "關於",
-                      style: TextStyle(fontSize: 20, color: Colors.white),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: SizedBox(),
-                ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                    child:
-                        Icon(Icons.arrow_right, color: Colors.white, size: 30)),
-              ],
-            ),
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(Container(
+      color: Colors.white10,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AboutPage(),
+              ));
+        },
+        child: const Padding(
+          padding: EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "關於",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SizedBox(),
+              ),
+              Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
+                  child:
+                      Icon(Icons.arrow_right, color: Colors.white, size: 30)),
+            ],
           ),
         ),
-      ));
-      if (!mounted) return;
-      setState(() {});
-    });
+      ),
+    ));
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(

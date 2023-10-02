@@ -18,76 +18,7 @@ var prefs;
 var loc_data;
 var loc_gps;
 var data;
-var radar;
 bool focus_map = false;
-List<String> color_list = [
-  "00ffff",
-  "00ecff",
-  "00daff",
-  "00c8ff",
-  "00b6ff",
-  "00a3ff",
-  "0091ff",
-  "007fff",
-  "006dff",
-  "005bff",
-  "0048ff",
-  "0036ff",
-  "0024ff",
-  "0012ff",
-  "0000ff",
-  "00ff00",
-  "00f400",
-  "00e900",
-  "00de00",
-  "00d300",
-  "00c800",
-  "00be00",
-  "00b400",
-  "00aa00",
-  "00a000",
-  "009600",
-  "33ab00",
-  "66c000",
-  "99d500",
-  "ccea00",
-  "ffff00",
-  "fff400",
-  "ffe900",
-  "ffde00",
-  "ffd300",
-  "ffc800",
-  "ffb800",
-  "ffa800",
-  "ff9800",
-  "ff8800",
-  "ff7800",
-  "ff6000",
-  "ff4800",
-  "ff3000",
-  "ff1800",
-  "ff0000",
-  "f40000",
-  "e90000",
-  "de0000",
-  "d30000",
-  "c80000",
-  "be0000",
-  "b40000",
-  "aa0000",
-  "a00000",
-  "960000",
-  "ab0033",
-  "c00066",
-  "d50099",
-  "ea00cc",
-  "ff00ff",
-  "ea00ff",
-  "d500ff",
-  "c000ff",
-  "ab00ff",
-  "9600ff"
-];
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -100,89 +31,22 @@ class _HomePage extends State<HomePage> {
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
   MapController mapController = MapController();
-  List<Polygon> _cityBounds = [];
-  List<Polygon> _radarBounds = [];
   final GlobalKey _globalKey = GlobalKey();
-
-  _selectCity(String cityName) {
-    _radarBounds = [];
-    var startLat = 18.0;
-    var startLon = 115.0;
-    var contentIndex = 0;
-    for (var y = 0; y < 881; y++) {
-      var lat = startLat + y * 0.0125;
-      for (var x = 0; x < 921; x++) {
-        var lon = startLon + x * 0.0125;
-        var dBZ = radar[contentIndex++];
-        dBZ = dBZ.round();
-        if (dBZ <= 0) continue;
-        if (dBZ > 65) dBZ = 65;
-        _radarBounds.add(Polygon(
-          points: [
-            LatLng(lat, lon),
-            LatLng(lat + 0.0125, lon),
-            LatLng(lat + 0.0125, lon + 0.0125),
-            LatLng(lat, lon + 0.0125)
-          ],
-          color: Color(int.parse("0xff${color_list[dBZ]}")),
-          isFilled: true,
-        ));
-      }
-    }
-    _cityBounds = [];
-    for (var feature in geojson_data["features"]) {
-      if (feature['properties']['COUNTYNAME'] == cityName) {
-        List Coord = feature['geometry']['coordinates'];
-        List coordinates = [];
-        for (var i = 0; i < Coord.length; i++) {
-          for (var I = 0; I < Coord[i].length; I++) {
-            if (Coord[i][I].length == 2) {
-              coordinates.add(Coord[i][I]);
-              List<LatLng> _bounds = List<LatLng>.from(
-                  Coord[i].map((coord) => LatLng(coord[1], coord[0])));
-              _cityBounds.add(Polygon(
-                points: _bounds,
-                borderColor: Colors.white,
-                borderStrokeWidth: 2.0,
-              ));
-            } else {
-              for (var _I = 0; _I < Coord[i][I].length; _I++) {
-                coordinates.add(Coord[i][I][_I]);
-              }
-              List<LatLng> _bounds = List<LatLng>.from(
-                  Coord[i][I].map((coord) => LatLng(coord[1], coord[0])));
-              _cityBounds.add(Polygon(
-                points: _bounds,
-                borderColor: Colors.white,
-                borderStrokeWidth: 3,
-              ));
-            }
-          }
-        }
-
-        var _Bounds =
-            coordinates.map((coord) => LatLng(coord[1], coord[0])).toList();
-        double minLat = _Bounds.map((e) => e.latitude)
-            .reduce((value, element) => value < element ? value : element);
-        double maxLat = _Bounds.map((e) => e.latitude)
-            .reduce((value, element) => value > element ? value : element);
-        double minLng = _Bounds.map((e) => e.longitude)
-            .reduce((value, element) => value < element ? value : element);
-        double maxLng = _Bounds.map((e) => e.longitude)
-            .reduce((value, element) => value > element ? value : element);
-        return LatLngBounds(
-          LatLng(minLat - 0.08, minLng - 0.08),
-          LatLng(maxLat + 0.08, maxLng + 0.08),
-        );
-      }
-    }
-    return null;
-  }
 
   @override
   void initState() {
     render();
     super.initState();
+  }
+
+  LatLng offsetLatLng(LatLng original, double offset) {
+    double newLatitude = original.latitude + offset;
+    if (newLatitude > 90) {
+      newLatitude = 90;
+    } else if (newLatitude < -90) {
+      newLatitude = -90;
+    }
+    return LatLng(newLatitude, original.longitude);
   }
 
   void render() async {
@@ -193,7 +57,6 @@ class _HomePage extends State<HomePage> {
         "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
     data ??= await get(
         "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
-    radar ??= await get("https://api.exptech.com.tw/file/test.json");
     if (geojson_data == false || data == false || loc_data == false) {
       await Future.delayed(const Duration(seconds: 2));
       render();
@@ -534,17 +397,13 @@ class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!focus_map && geojson_data != null) {
+      if (!focus_map && loc_gps != null) {
         focus_map = true;
         if (mounted) {
           if (_page == 0) {
-            LatLngBounds bounds =
-                _selectCity(prefs.getString('loc-city') ?? "臺南市");
-            mapController.fitBounds(
-              bounds,
-              options: const FitBoundsOptions(
-                padding: EdgeInsets.only(bottom: 350),
-              ),
+            mapController.move(
+              offsetLatLng(loc_gps, -0.5),
+              9,
             );
           } else {
             mapController.move(
@@ -642,7 +501,6 @@ class _HomePage extends State<HomePage> {
                           children: [
                             PolygonLayer(polygons: myGeoJson.polygons),
                             PolylineLayer(polylines: myGeoJson.polylines),
-                            if (_page == 0) PolygonLayer(polygons: _cityBounds),
                             if (loc_gps != null)
                               MarkerLayer(
                                 markers: [
@@ -658,7 +516,19 @@ class _HomePage extends State<HomePage> {
                                   ),
                                 ],
                               ),
-                            PolygonLayer(polygons: _radarBounds),
+                            OverlayImageLayer(
+                              overlayImages: [
+                                OverlayImage(
+                                  bounds: LatLngBounds(
+                                    const LatLng(17.88, 115),
+                                    const LatLng(28.8925, 126.5125),
+                                  ),
+                                  imageProvider: NetworkImage(
+                                    'https://api.exptech.com.tw/file/radar1.png',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),

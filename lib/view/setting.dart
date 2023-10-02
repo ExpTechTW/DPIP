@@ -14,19 +14,12 @@ class _SettingPage extends State<SettingPage> {
   List<Widget> _List_children = <Widget>[];
 
   @override
-  void dispose() {
-    init = false;
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     dynamic data = ModalRoute.of(context)!.settings.arguments;
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (init) return;
       init = true;
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
       for (var i = 0; i < data["data"].length; i++) {
         _List_children.add(InkWell(
           onTap: () {
@@ -56,10 +49,8 @@ class _SettingPage extends State<SettingPage> {
           thickness: 0.5,
         ));
       }
-      if (!mounted) return;
-      setState(() {});
+      if (mounted) setState(() {});
     });
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
