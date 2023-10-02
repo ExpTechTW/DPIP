@@ -8,8 +8,6 @@ import 'history.dart';
 import 'home.dart';
 import 'me.dart';
 
-bool init = false;
-
 class InitPage extends StatefulWidget {
   const InitPage({super.key});
 
@@ -28,149 +26,99 @@ class _InitPage extends State<InitPage> {
   bool loaded = false;
 
   @override
-  Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final connectivityResult = await (Connectivity().checkConnectivity());
-      if (connectivityResult == ConnectivityResult.none) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-              backgroundColor: Colors.grey[850],
-              title: Row(
-                children: [
-                  Icon(
-                    Icons.wifi_off_outlined,
-                    color: Colors.orangeAccent,
-                  ),
-                  SizedBox(width: 10),
-                  Text(
-                    '無網路連接',
-                    style: TextStyle(color: Colors.orangeAccent),
-                  ),
-                ],
-              ),
-              content: Text(
-                '您的設備目前沒有網路連接。請檢查您的網絡設置，然後重試。',
-                style: TextStyle(color: Colors.white),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    init = false;
-                    setState(() {});
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                  child: const Text(
-                    '重試',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+  void initState() {
+    render();
+    super.initState();
+  }
+
+  void render() async {
+    final connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            backgroundColor: Colors.grey[850],
+            title: Row(
+              children: [
+                Icon(
+                  Icons.wifi_off_outlined,
+                  color: Colors.orangeAccent,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  '無網路連接',
+                  style: TextStyle(color: Colors.orangeAccent),
                 ),
               ],
-            );
-          },
-        );
-        return;
-      }
-      if (init) return;
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
-      if (data != false) {
-        init = true;
-        if (compareVersion(data["ver"], packageInfo.version) == 1) {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                backgroundColor: Colors.grey[850],
-                title: const Row(
-                  children: [
-                    Icon(Icons.system_update, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text(
-                      '發現新版本!',
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                  ],
-                ),
-                content: Container(
-                  height: 200,
-                  child: SingleChildScrollView(
-                    child: Text(
-                      data["note"],
-                      style: TextStyle(color: Colors.grey[300]),
-                    ),
+            ),
+            content: Text(
+              '您的設備目前沒有網路連接。請檢查您的網絡設置，然後重試。',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  render();
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    child: const Text(
-                      '知道了',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ],
-              );
-            },
+                child: const Text(
+                  '重試',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
           );
-        }
-      } else {
+        },
+      );
+      return;
+    }
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
+    if (data != false) {
+      if (compareVersion(data["ver"], packageInfo.version) == 1) {
         showDialog(
           context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
+          builder: (context) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),
               backgroundColor: Colors.grey[850],
-              title: Row(
+              title: const Row(
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    color: Colors.redAccent,
-                  ),
+                  Icon(Icons.system_update, color: Colors.white),
                   SizedBox(width: 10),
                   Text(
-                    '伺服器異常',
-                    style: TextStyle(color: Colors.redAccent),
+                    '發現新版本!',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ],
               ),
-              content: Text(
-                '無法連接到伺服器。伺服器可能正在經歷大量請求，或發生異常。目前正在全力維修中，請稍後重試。',
-                style: TextStyle(color: Colors.white),
+              content: Container(
+                height: 200,
+                child: SingleChildScrollView(
+                  child: Text(
+                    data["note"],
+                    style: TextStyle(color: Colors.grey[300]),
+                  ),
+                ),
               ),
-              actions: <Widget>[
+              actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    init = false;
-                    setState(() {});
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
@@ -180,7 +128,7 @@ class _InitPage extends State<InitPage> {
                     ),
                   ),
                   child: const Text(
-                    '重試',
+                    '知道了',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
@@ -189,10 +137,63 @@ class _InitPage extends State<InitPage> {
           },
         );
       }
-      loaded = true;
-      if (!mounted) return;
-      setState(() {});
-    });
+    } else {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            backgroundColor: Colors.grey[850],
+            title: Row(
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.redAccent,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  '伺服器異常',
+                  style: TextStyle(color: Colors.redAccent),
+                ),
+              ],
+            ),
+            content: Text(
+              '無法連接到伺服器。伺服器可能正在經歷大量請求，或發生異常。目前正在全力維修中，請稍後重試。',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  render();
+                },
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                ),
+                child: const Text(
+                  '重試',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    loaded = true;
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: pages[_currentIndex],
