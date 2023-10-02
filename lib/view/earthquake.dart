@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as HTTP;
+
 import '../core/api.dart';
 
 class EarthquakePage extends StatefulWidget {
@@ -22,7 +22,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   late final Widget _int = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
   int replay = 0;
-  late Timer clock,reports_clock;
+  late Timer clock, reports_clock;
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
@@ -100,24 +100,26 @@ class _EarthquakePage extends State<EarthquakePage> {
       } else {
         if (_page == 0) {
           _List_children.add(Padding(
-              padding: const EdgeInsets.all(15),
-              child: Stack(
+            padding: const EdgeInsets.all(15),
+            child: Stack(
                 alignment: Alignment.center, // 对齐到中心
                 children: [
                   _taiwan,
                   _pic,
                   _int,
                 ]),
-              ));
+          ));
         } else {
           print(data);
           _List_children.add(Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "規模M "+data[0]["magnitudeValue"].toString(),
+                "規模M " + data[0]["magnitudeValue"].toString(),
                 style: TextStyle(
-                    fontSize: 32, fontWeight: FontWeight.w100, color: Colors.white),
+                    fontSize: 32,
+                    fontWeight: FontWeight.w100,
+                    color: Colors.white),
               )
             ],
           ));

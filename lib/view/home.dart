@@ -8,6 +8,8 @@ import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+GlobalKey<_HomePage> homePageKey = GlobalKey();
+
 GeoJsonParser myGeoJson = GeoJsonParser(
     defaultPolygonBorderColor: Colors.grey,
     defaultPolygonFillColor: const Color(0xff3F4045));
@@ -31,22 +33,6 @@ class _HomePage extends State<HomePage> {
   MapController mapController = MapController();
   List<Polygon> _cityBounds = [];
   final GlobalKey _globalKey = GlobalKey();
-
-  Future<void> processData() async {
-    prefs ??= await SharedPreferences.getInstance();
-    geojson_data = await get(
-        "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/tw.json");
-    if (geojson_data != false) {
-      myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
-    }
-    loc_data = await get(
-        "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
-    var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
-        [prefs.getString("loc-town") ?? "歸仁區"];
-    loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
-    data = await get(
-        "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
-  }
 
   _selectCity(String cityName) {
     _cityBounds = [];
@@ -101,11 +87,27 @@ class _HomePage extends State<HomePage> {
 
   @override
   void initState() {
-    processData().then((value) => render());
+    render();
     super.initState();
   }
 
   void render() async {
+    prefs ??= await SharedPreferences.getInstance();
+    geojson_data ??= await get(
+        "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/tw.json");
+    loc_data ??= await get(
+        "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
+    data ??= await get(
+        "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
+    if (geojson_data == false || data == false || loc_data == false) {
+      await Future.delayed(const Duration(seconds: 2));
+      render();
+      return;
+    }
+    var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
+        [prefs.getString("loc-town") ?? "歸仁區"];
+    loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
+    myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
     focus_map = false;
     _List_children = <Widget>[];
     if (data == null || data == false || data["info"] == null) {

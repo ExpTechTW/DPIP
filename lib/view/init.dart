@@ -17,12 +17,13 @@ class InitPage extends StatefulWidget {
 
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
-  final pages = [
+  var pages = [
     const HomePage(),
     const HistoryPage(),
     const EarthquakePage(),
     const MePage()
   ];
+
   bool loaded = false;
 
   @override
@@ -188,8 +189,7 @@ class _InitPage extends State<InitPage> {
       );
     }
     loaded = true;
-    if (!mounted) return;
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override
