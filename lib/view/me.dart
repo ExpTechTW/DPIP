@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import 'about.dart';
+import 'notify.dart';
 
 var loc_data;
 
@@ -140,7 +141,13 @@ class _MePage extends State<MePage> {
         child: Column(
           children: [
             ListTile(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NotifyPage(),
+                    ));
+              },
               title: const Text(
                 "通知",
                 style: TextStyle(fontSize: 20, color: Colors.white),
@@ -205,13 +212,12 @@ class _MePage extends State<MePage> {
           const Divider(
               color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           ListTile(
-            onTap: () async {
-              final result = await Navigator.push(
+            onTap: () {
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const AboutPage(),
                   ));
-              if (result != null && result == 'refresh') render();
             },
             title: const Text(
               "關於",

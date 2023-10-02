@@ -65,7 +65,7 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   _updateReportsWidget() async {
     try {
-      data ??= await post(reports_url, { "list" : {} });
+      data ??= await post(reports_url, {"list": {}});
     } on TimeoutException catch (e) {
       return;
     } catch (e) {

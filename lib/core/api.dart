@@ -21,8 +21,10 @@ Future<dynamic> post(String uri, Map<String, dynamic> body) async {
     final headers = {'Content-Type': 'application/json'};
     String jsonBody = json.encode(body);
     final encoding = Encoding.getByName('utf-8');
-    var response =
-        await http.post(Uri.parse(uri), headers: headers, body: jsonBody, encoding: encoding).timeout(const Duration(seconds: 2));
+    var response = await http
+        .post(Uri.parse(uri),
+            headers: headers, body: jsonBody, encoding: encoding)
+        .timeout(const Duration(seconds: 2));
     print(response.statusCode);
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
