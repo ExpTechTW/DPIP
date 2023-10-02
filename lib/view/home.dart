@@ -294,7 +294,7 @@ class _HomePage extends State<HomePage> {
                         color: Colors.white,
                         size: 45),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
@@ -318,22 +318,66 @@ class _HomePage extends State<HomePage> {
                         ],
                       ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(
-                          "降雨機率 ${data["info"]["cor"]}%",
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w100,
-                              color: Colors.white),
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "降水量",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w100,
+                                  color: Colors.white),
+                            ),
+                            Text(
+                              "濕度",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w100,
+                                  color: Colors.white),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "預估氣溫 ${data["info"]["temp_l"]} ~ ${data["info"]["temp_h"]}°C",
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w100,
-                              color: Colors.white),
+                        const SizedBox(width: 5),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${data["info"]["rainfall"]}",
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),
+                            Text(
+                              "${data["info"]["humidity"]}",
+                              style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 5),
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "mm",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w100,
+                                  color: Colors.white),
+                            ),
+                            Text(
+                              "%",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w100,
+                                  color: Colors.white),
+                            ),
+                          ],
                         ),
                       ],
                     ),
