@@ -431,11 +431,7 @@ class _HomePage extends State<HomePage> {
         }
       }
     }
-    if (mounted) {
-      setState(() {
-        print("set");
-      });
-    }
+    if (mounted) setState(() {});
   }
 
   @override
@@ -460,7 +456,6 @@ class _HomePage extends State<HomePage> {
             );
           }
           setState(() {});
-          print("move");
         }
       }
     });
