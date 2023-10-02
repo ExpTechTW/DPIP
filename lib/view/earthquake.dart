@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as HTTP;
+import '../core/api.dart';
 
 class EarthquakePage extends StatefulWidget {
   const EarthquakePage({Key? key}) : super(key: key);
@@ -20,10 +22,12 @@ class _EarthquakePage extends State<EarthquakePage> {
   late final Widget _int = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
   int replay = 0;
-  late Timer clock;
+  late Timer clock,reports_clock;
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
+  String reports_url = "https://exptech.com.tw/api/v3/earthquake/reports";
+  var data;
 
   @override
   void initState() {
@@ -34,6 +38,13 @@ class _EarthquakePage extends State<EarthquakePage> {
         setState(() {});
       }
     });
+    reports_clock = Timer.periodic(const Duration(seconds: 600), (timer) async {
+      await _updateReportsWidget();
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    _updateReportsWidget();
     super.initState();
   }
 
@@ -51,6 +62,16 @@ class _EarthquakePage extends State<EarthquakePage> {
     }
   }
 
+  _updateReportsWidget() async {
+    try {
+      data = await get(reports_url);
+    } on TimeoutException catch (e) {
+      return;
+    } catch (e) {
+      return;
+    }
+  }
+
   @override
   void dispose() {
     clock.cancel();
@@ -61,7 +82,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _List_children = <Widget>[];
-      if (_taiwan == null || _pic == null || _int == null) {
+      if (_taiwan == null || _pic == null || _int == null || data == null) {
         _List_children.add(const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -78,16 +99,28 @@ class _EarthquakePage extends State<EarthquakePage> {
         ));
       } else {
         if (_page == 0) {
-          _List_children.add(const Padding(
+          _List_children.add(Padding(
               padding: const EdgeInsets.all(15),
               child: Stack(
                 alignment: Alignment.center, // 对齐到中心
-                // children: [
-                //   _taiwan,
-                //   _pic,
-                //   _int,
-                // ]),
-              )));
+                children: [
+                  _taiwan,
+                  _pic,
+                  _int,
+                ]),
+              ));
+        } else {
+          print(data);
+          _List_children.add(Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "規模M "+data[0]["magnitudeValue"].toString(),
+                style: TextStyle(
+                    fontSize: 32, fontWeight: FontWeight.w100, color: Colors.white),
+              )
+            ],
+          ));
         }
       }
     });
