@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/core/api.dart';
+import 'package:dpip/view/earthquake.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -18,7 +19,12 @@ class InitPage extends StatefulWidget {
 
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
-  final pages = [const HomePage(), const HistoryPage(), const MePage()];
+  final pages = [
+    const HomePage(),
+    const HistoryPage(),
+    const EarthquakePage(),
+    const MePage()
+  ];
   bool loaded = false;
 
   @override
@@ -203,6 +209,8 @@ class _InitPage extends State<InitPage> {
                 icon: Icon(Icons.home_outlined), label: '首頁'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.history_outlined), label: '歷史'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.heart_broken_outlined), label: '地震'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
           ],

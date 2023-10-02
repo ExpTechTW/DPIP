@@ -132,13 +132,13 @@ class _HistoryPage extends State<HistoryPage> {
                             (data["loc"][i]["type"] == 2)
                                 ? Icons.warning_amber_outlined
                                 : (data["loc"][i]["type"] == 1)
-                                ? Icons.doorbell_outlined
-                                : Icons.speaker_notes_outlined,
+                                    ? Icons.doorbell_outlined
+                                    : Icons.speaker_notes_outlined,
                             color: (data["loc"][i]["type"] == 2)
                                 ? Colors.red
                                 : (data["loc"][i]["type"] == 1)
-                                ? Colors.amber
-                                : Colors.white,
+                                    ? Colors.amber
+                                    : Colors.white,
                           ),
                           const SizedBox(width: 5),
                           Text(
@@ -152,11 +152,13 @@ class _HistoryPage extends State<HistoryPage> {
                       ),
                       Text(
                         formattedDate,
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       Text(
                         data["loc"][i]["body"],
-                        style: const TextStyle(fontSize: 16, color: Colors.white),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.white),
                       )
                     ],
                   ),
@@ -220,13 +222,13 @@ class _HistoryPage extends State<HistoryPage> {
                           (data["all"][i]["type"] == 2)
                               ? Icons.warning_amber_outlined
                               : (data["all"][i]["type"] == 1)
-                              ? Icons.doorbell_outlined
-                              : Icons.speaker_notes_outlined,
+                                  ? Icons.doorbell_outlined
+                                  : Icons.speaker_notes_outlined,
                           color: (data["all"][i]["type"] == 2)
                               ? Colors.red
                               : (data["all"][i]["type"] == 1)
-                              ? Colors.amber
-                              : Colors.white,
+                                  ? Colors.amber
+                                  : Colors.white,
                         ),
                         const SizedBox(width: 5),
                         Text(

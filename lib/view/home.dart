@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dpip/core/api.dart';
-import 'package:dpip/view/history.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
@@ -506,13 +505,13 @@ class _HomePage extends State<HomePage> {
                           (data["all"][i]["type"] == 2)
                               ? Icons.warning_amber_outlined
                               : (data["all"][i]["type"] == 1)
-                              ? Icons.doorbell_outlined
-                              : Icons.speaker_notes_outlined,
+                                  ? Icons.doorbell_outlined
+                                  : Icons.speaker_notes_outlined,
                           color: (data["all"][i]["type"] == 2)
                               ? Colors.red
                               : (data["all"][i]["type"] == 1)
-                              ? Colors.amber
-                              : Colors.white,
+                                  ? Colors.amber
+                                  : Colors.white,
                         ),
                         const SizedBox(width: 5),
                         Text(
