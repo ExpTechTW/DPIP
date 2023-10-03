@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:clipboard/clipboard.dart';
-import 'package:dpip/core/api.dart';
 import 'package:dpip/view/setting.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,8 +31,7 @@ class _MePage extends State<MePage> {
 
   void render() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    loc_data ??= await get(
-        "https://cdn.jsdelivr.net/gh/ExpTechTW/TREM-Lite@Release/src/resource/data/region.json");
+    loc_data ??= json.decode(await rootBundle.loadString('assets/region.json'));
     _List_children = <Widget>[const SizedBox(height: 10)];
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     _List_children.add(const Row(
