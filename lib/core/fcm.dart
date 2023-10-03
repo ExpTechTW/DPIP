@@ -11,8 +11,6 @@ Future<void> messageHandler(RemoteMessage message) async {
   final AndroidNotification? android = message.notification?.android;
   if (notification != null) {
     var data = message.data;
-    Map<String, dynamic>? payload = message.data;
-    String? soundName = payload['sound'] ?? 'default';
     flutterLocalNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
@@ -41,14 +39,14 @@ Future<void> messageHandler(RemoteMessage message) async {
                 : (data["level"] == 1)
                     ? Priority.defaultPriority
                     : Priority.max,
-            sound: android?.channelId != null
-                ? RawResourceAndroidNotificationSound(android?.channelId)
+            sound: data["sound"] != null
+                ? RawResourceAndroidNotificationSound(data["sound"])
                 : null,
           ),
           iOS: DarwinNotificationDetails(
             categoryIdentifier: darwinNotificationCategoryPlain,
-            sound: soundName,
-            interruptionLevel: InterruptionLevel.critical,
+            sound: data["sound"] ?? "default",
+            interruptionLevel: InterruptionLevel.timeSensitive,
           ),
         ));
     if (data["level"] != 0) {
