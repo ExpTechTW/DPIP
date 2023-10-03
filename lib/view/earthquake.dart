@@ -14,6 +14,28 @@ class EarthquakePage extends StatefulWidget {
 }
 
 var data;
+List<Color> intensity_back = const [
+  Color(0xff6B7878),
+  Color(0xff1E6EE6),
+  Color(0xff32B464),
+  Color(0xffFFE05D),
+  Color(0xffFFAA13),
+  Color(0xffEF700F),
+  Color(0xffE60000),
+  Color(0xffA00000),
+  Color(0xff5D0090),
+];
+List<Color> intensity_font = [
+  Colors.white,
+  Colors.white,
+  Colors.white,
+  Colors.black,
+  Colors.black,
+  Colors.black,
+  Colors.white,
+  Colors.white,
+  Colors.white,
+];
 
 class _EarthquakePage extends State<EarthquakePage> {
   String url = 'https://exptech.com.tw/api/v1/trem/rts-image';
@@ -98,76 +120,88 @@ class _EarthquakePage extends State<EarthquakePage> {
       } else {
         if (data is! bool) {
           for (var i = 0; i < data.length; i++) {
-            _List_children.add(Padding(
-              padding: const EdgeInsets.all(5),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xff333439),
-                  borderRadius: BorderRadius.circular(10),
+            int level = data[i]["data"][0]["areaIntensity"];
+            String Lv_str = (level == 5)
+                ? "5⁻"
+                : (level == 6)
+                    ? "5⁺"
+                    : (level == 7)
+                        ? "6⁻"
+                        : (level == 8)
+                            ? "6⁺"
+                            : (level == 9)
+                                ? "7"
+                                : level.toString();
+            _List_children.add(
+              Card(
+                color: const Color(0xff333439),
+                margin: const EdgeInsets.all(5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        data[i]["data"][0]["areaIntensity"].toString(),
-                        style: const TextStyle(
-                          fontSize: 50,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.white,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 65,
+                        height: 65,
+                        decoration: BoxDecoration(
+                          color: intensity_back[level - 1],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            Lv_str,
+                            style: TextStyle(
+                              fontSize: 50,
+                              fontWeight: FontWeight.w600,
+                              color: intensity_font[level - 1],
+                            ),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Row(
+                    ),
+                    ListTile(
+                      contentPadding:
+                          const EdgeInsets.only(left: 80, right: 15),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                data[i]["location"]
-                                    .substring(
-                                        data[i]["location"].indexOf("(") + 1,
-                                        data[i]["location"].indexOf(")"))
-                                    .replaceAll("位於", ""),
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w100,
-                                    color: Colors.white),
-                              ),
-                              Text(
-                                data[i]["originTime"],
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w100,
-                                    color: Colors.white),
-                              ),
-                            ],
+                          Text(
+                            data[i]["location"]
+                                .substring(data[i]["location"].indexOf("(") + 1,
+                                    data[i]["location"].indexOf(")"))
+                                .replaceAll("位於", ""),
+                            style: const TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            data[i]["originTime"].toString().substring(0, 16),
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.grey),
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
-                              style: const TextStyle(
-                                fontSize: 50,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                      trailing: Text(
+                        "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ));
+            );
           }
         }
       }
