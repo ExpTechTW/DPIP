@@ -81,10 +81,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   }
 
   Future<void> _handleRefresh() async {
-    data = [];
-    print(data);
     data = await post(reports_url, {"list": {}});
-    print(data);
     await _updateReportsWidget();
     setState(() {});
   }
@@ -121,7 +118,6 @@ class _EarthquakePage extends State<EarthquakePage> {
                 ]),
           ));
         } else {
-          print(data);
           if (data is! bool) {
             for (var i = 0; i < data.length; i++) {
               _List_children.add(Padding(
