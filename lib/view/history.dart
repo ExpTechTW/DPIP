@@ -25,7 +25,7 @@ class _HistoryPage extends State<HistoryPage> {
   void render() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     data ??= await get(
-        "https://exptech.com.tw/api/v1/dpip/history?city=${prefs.getString('loc-city')??"臺南市"}&town=${prefs.getString('loc-town')??"歸仁區"}");
+        "https://api.exptech.com.tw/api/v1/dpip/history?city=${prefs.getString('loc-city')??"臺南市"}&town=${prefs.getString('loc-town')??"歸仁區"}");
     _List_children = <Widget>[];
     if (data == null || data == false) {
       _List_children.add(const Column(
