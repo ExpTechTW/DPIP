@@ -135,7 +135,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 10),
                         Row(
                           children: [
                             Column(
@@ -163,7 +163,6 @@ class _EarthquakePage extends State<EarthquakePage> {
                             ),
                           ],
                         ),
-                        const SizedBox(width: 60),
                         Padding(
                           padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                           child: Row(
