@@ -80,6 +80,15 @@ class _EarthquakePage extends State<EarthquakePage> {
     super.dispose();
   }
 
+  Future<void> _handleRefresh() async {
+    data = [];
+    print(data);
+    data = await post(reports_url, {"list": {}});
+    print(data);
+    await _updateReportsWidget();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -264,9 +273,12 @@ class _EarthquakePage extends State<EarthquakePage> {
                 ],
               ),
               Expanded(
-                child: ListView(
-                    physics: const ClampingScrollPhysics(),
-                    children: _List_children.toList()),
+                child: RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: ListView(
+                      physics: const ClampingScrollPhysics(),
+                      children: _List_children.toList()),
+                ),
               ),
             ],
           ),
