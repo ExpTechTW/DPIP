@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dpip/view/init.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'core/fcm.dart';
@@ -132,6 +134,9 @@ void main() async {
       }
     },
   );
+  String jsonString = await rootBundle.loadString('assets/region.json');
+  final jsonResponse = json.decode(jsonString);
+  print(jsonResponse);
   print(await messaging.getToken());
   FirebaseMessaging.instance.subscribeToTopic("DPIP");
   runApp(const MyApp());
