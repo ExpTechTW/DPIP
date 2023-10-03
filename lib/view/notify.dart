@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
 class NotifyPage extends StatefulWidget {
@@ -41,23 +42,17 @@ class _NotifyPage extends State<NotifyPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            onTap: () {},
+            onTap: () async {
+
+            },
             title: const Text(
               "強震即時警報",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
-            trailing: Switch(
-              value: n_alert,
-              onChanged: (bool value) {
-                setState(() {
-                  n_alert = value;
-                });
-                render();
-              },
-              activeColor: Colors.blue[800],
-              inactiveThumbColor: Colors.grey,
-              inactiveTrackColor: Colors.grey[300],
-              activeTrackColor: Colors.blue[200],
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue[800],
+              size: 24.0,
             ),
           ),
           const Padding(
