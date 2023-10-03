@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dpip/core/api.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<Map<String, dynamic>> FCM(Map data) async {
   print(data);
@@ -17,6 +18,9 @@ Future<Map<String, dynamic>> FCM(Map data) async {
       json.decode(await rootBundle.loadString('assets/region.json'));
   var eq = jsonDecode(data["data"]);
   if (data["type"] == "eew") {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String loc_name =
+        "${prefs.getString('loc-city') ?? "臺南市"} ${prefs.getString('loc-town') ?? "歸仁區"}";
     List<String> loc_alert = [];
     var eew_loc = eewIntensity(eq["eq"], loc_data);
     if (pgaToIntensity(eew_loc["max_pga"]) > 4) {
@@ -29,16 +33,18 @@ Future<Map<String, dynamic>> FCM(Map data) async {
           }
         }
       }
+      int LV = pgaToIntensity(eew_loc[loc_name]["pga"]);
+      print(LV);
+      print(loc_name);
       ans["title"] = "《強震即時警報（警報）》";
-      ans["channel"] = "eew-alert";
-      ans["sound"] = "eew_alert";
-      ans["level"] = 2;
+      ans["channel"] = (LV > 3) ? "eew_alert" : "eew_warn";
+      ans["sound"] = (LV > 3) ? "eew_alert" : "eew_warn";
+      ans["level"] = (LV > 3) ? 2 : 1;
       ans["body"] =
           "${eq["eq"]["loc"]}發生地震　慎防強烈搖晃\n〈預估強烈搖晃區域〉\n${loc_alert.join("　")}";
     } else {
       ans["title"] = "地震速報（注意）";
     }
   }
-
   return ans;
 }
