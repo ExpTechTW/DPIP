@@ -24,7 +24,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   late final Widget _int = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
   int replay = 0;
-  late Timer clock, reports_clock;
+  var clock;
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
@@ -33,20 +33,7 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   @override
   void initState() {
-    _updateImgWidget();
-    clock = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      await _updateImgWidget();
-      if (mounted) {
-        setState(() {});
-      }
-    });
-    reports_clock = Timer.periodic(const Duration(seconds: 600), (timer) async {
-      await _updateReportsWidget();
-      if (mounted) {
-        setState(() {});
-      }
-    });
-    _updateReportsWidget();
+    render();
     super.initState();
   }
 
@@ -64,147 +51,133 @@ class _EarthquakePage extends State<EarthquakePage> {
     }
   }
 
-  _updateReportsWidget() async {
-    try {
-      data ??= await post(reports_url, {"list": {}});
-    } on TimeoutException catch (e) {
-      return;
-    } catch (e) {
-      return;
-    }
-  }
-
   @override
   void dispose() {
-    clock.cancel();
+    if (clock != null) clock.cancel();
     super.dispose();
   }
 
-  Future<void> _handleRefresh() async {
-    data = await post(reports_url, {"list": {}});
-    await _updateReportsWidget();
-    setState(() {});
+  Future<void> render() async {
+    if (clock != null && _page != 0) {
+      clock.cancel();
+      clock = null;
+    }
+    if (_page == 0 && clock == null) {
+      clock = Timer.periodic(const Duration(seconds: 1), (timer) async {
+        await _updateImgWidget();
+        render();
+      });
+    }
+    data ??= await post(reports_url, {"list": {}});
+    _List_children = <Widget>[];
+    if (data == null) {
+      _List_children.add(const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "服務異常",
+            style: TextStyle(
+                fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
+          ),
+          Text(
+            "稍等片刻後重試 如持續異常 請回報開發人員",
+            style: TextStyle(fontSize: 16, color: Colors.white),
+          )
+        ],
+      ));
+    } else {
+      if (_page == 0) {
+        _List_children.add(Padding(
+          padding: const EdgeInsets.all(15),
+          child: Stack(alignment: Alignment.center, children: [
+            _taiwan,
+            _pic,
+            _int,
+          ]),
+        ));
+      } else {
+        if (data is! bool) {
+          for (var i = 0; i < data.length; i++) {
+            _List_children.add(Padding(
+              padding: const EdgeInsets.all(5),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xff333439),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        data[i]["data"][0]["areaIntensity"].toString(),
+                        style: const TextStyle(
+                          fontSize: 50,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Row(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data[i]["location"]
+                                    .substring(
+                                        data[i]["location"].indexOf("(") + 1,
+                                        data[i]["location"].indexOf(")"))
+                                    .replaceAll("位於", ""),
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w100,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                data[i]["originTime"],
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w100,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
+                              style: const TextStyle(
+                                fontSize: 50,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ));
+          }
+        }
+      }
+    }
+    if (mounted) setState(() {});
+    return Future.value();
   }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _List_children = <Widget>[];
-      if (_taiwan == null || _pic == null || _int == null || data == null) {
-        _List_children.add(const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "服務異常",
-              style: TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
-            ),
-            Text(
-              "稍等片刻後重試 如持續異常 請回報開發人員",
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            )
-          ],
-        ));
-      } else {
-        if (_page == 0) {
-          _List_children.add(Padding(
-            padding: const EdgeInsets.all(15),
-            child: Stack(
-                alignment: Alignment.center, // 对齐到中心
-                children: [
-                  _taiwan,
-                  _pic,
-                  _int,
-                ]),
-          ));
-        } else {
-          if (data is! bool) {
-            for (var i = 0; i < data.length; i++) {
-              _List_children.add(Padding(
-                padding: EdgeInsets.all(5),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xff333439),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          data[i]["data"][0]["areaIntensity"].toString(),
-                          style: TextStyle(
-                            fontSize: 50,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Row(
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data[i]["location"]
-                                      .substring(
-                                          data[i]["location"].indexOf("(") + 1,
-                                          data[i]["location"].indexOf(")"))
-                                      .replaceAll("位於", ""),
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w100,
-                                      color: Colors.white),
-                                ),
-                                Text(
-                                  data[i]["originTime"],
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w100,
-                                      color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(
-                                "M " +
-                                    data[i]["magnitudeValue"]
-                                        .toStringAsFixed(1),
-                                style: TextStyle(
-                                  fontSize: 50,
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              // Text(
-                              //   ".${data["info"]["temp"].split(".")[1]}°C",
-                              //   style: const TextStyle(
-                              //     fontSize: 30,
-                              //     fontWeight: FontWeight.w300,
-                              //     color: Colors.white,
-                              //   ),
-                              // ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ));
-            }
-          }
-        }
-      }
-    });
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -213,12 +186,12 @@ class _EarthquakePage extends State<EarthquakePage> {
             if (details.primaryVelocity! > 0) {
               if (_page == 0) {
                 _page = 1;
-                setState(() {});
+                render();
               }
             } else if (details.primaryVelocity! < 0) {
               if (_page == 1) {
                 _page = 0;
-                setState(() {});
+                render();
               }
             }
           },
@@ -237,9 +210,8 @@ class _EarthquakePage extends State<EarthquakePage> {
                           borderRadius: BorderRadius.circular(30)),
                     ),
                     onPressed: () {
-                      setState(() {
-                        _page = 1;
-                      });
+                      _page = 1;
+                      render();
                     },
                     child: const Text(
                       "地震報告",
@@ -257,9 +229,8 @@ class _EarthquakePage extends State<EarthquakePage> {
                           borderRadius: BorderRadius.circular(30)),
                     ),
                     onPressed: () {
-                      setState(() {
-                        _page = 0;
-                      });
+                      _page = 0;
+                      render();
                     },
                     child: const Text(
                       "即時測站",
@@ -270,7 +241,10 @@ class _EarthquakePage extends State<EarthquakePage> {
               ),
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: _handleRefresh,
+                  onRefresh: () async {
+                    data = null;
+                    await render();
+                  },
                   child: ListView(
                       physics: const ClampingScrollPhysics(),
                       children: _List_children.toList()),
