@@ -6,6 +6,7 @@ import 'background.dart';
 
 Future<void> messageHandler(RemoteMessage message) async {
   var ans = await FCM(message.data);
+  if (ans["cancel"] != null) return;
   flutterLocalNotificationsPlugin.show(
       ans["code"],
       ans["title"],

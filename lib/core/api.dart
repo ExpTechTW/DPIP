@@ -81,7 +81,7 @@ Map<String, dynamic> eewIntensity(
 }
 
 double pgaToFloat(double pga) {
-  return 2 * log(pga) + 0.7;
+  return 2 * (log(pga) / log(10)) + 0.7;
 }
 
 int pgaToIntensity(double pga) {
@@ -104,4 +104,72 @@ int intensityFloatToInt(double floatValue) {
   } else {
     return 9;
   }
+}
+
+String int_to_str_en(level) {
+  return (level == 5)
+      ? "5⁻"
+      : (level == 6)
+          ? "5⁺"
+          : (level == 7)
+              ? "6⁻"
+              : (level == 8)
+                  ? "6⁺"
+                  : (level == 9)
+                      ? "7"
+                      : level.toString();
+}
+
+String int_to_str_zh(level) {
+  return (level == 5)
+      ? "5弱"
+      : (level == 6)
+          ? "5強"
+          : (level == 7)
+              ? "6弱"
+              : (level == 8)
+                  ? "6強"
+                  : (level == 9)
+                      ? "7級"
+                      : "$level級";
+}
+
+Map<String, double> speed(double depth, double distance) {
+  final double Za = 1 * depth;
+  double G0, G;
+  final double Xb = distance;
+  if (depth <= 40) {
+    G0 = 5.10298;
+    G = 0.06659;
+  } else {
+    G0 = 7.804799;
+    G = 0.004573;
+  }
+  final double Zc = -1 * (G0 / G);
+  final double Xc = (pow(Xb, 2) - 2 * (G0 / G) * Za - pow(Za, 2)) / (2 * Xb);
+  double Theta_A = atan((Za - Zc) / Xc);
+  if (Theta_A < 0) {
+    Theta_A = Theta_A + pi;
+  }
+  Theta_A = pi - Theta_A;
+  final double Theta_B = atan(-1 * Zc / (Xb - Xc));
+  double Ptime = (1 / G) * log(tan((Theta_A / 2)) / tan((Theta_B / 2)));
+  final double G0_ = G0 / sqrt(3);
+  final double G_ = G / sqrt(3);
+  final double Zc_ = -1 * (G0_ / G_);
+  final double Xc_ = (pow(Xb, 2) - 2 * (G0_ / G_) * Za - pow(Za, 2)) / (2 * Xb);
+  double Theta_A_ = atan((Za - Zc_) / Xc_);
+  if (Theta_A_ < 0) {
+    Theta_A_ = Theta_A_ + pi;
+  }
+  Theta_A_ = pi - Theta_A_;
+  final double Theta_B_ = atan(-1 * Zc_ / (Xb - Xc_));
+  double Stime = (1 / G_) * log(tan(Theta_A_ / 2) / tan(Theta_B_ / 2));
+  if (distance / Ptime > 7) {
+    Ptime = distance / 7;
+  }
+  if (distance / Stime > 4) {
+    Stime = distance / 4;
+  }
+  return {'Ptime': Ptime, 'Stime': Stime};
 }

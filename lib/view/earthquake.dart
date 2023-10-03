@@ -121,17 +121,7 @@ class _EarthquakePage extends State<EarthquakePage> {
         if (data is! bool) {
           for (var i = 0; i < data.length; i++) {
             int level = data[i]["data"][0]["areaIntensity"];
-            String Lv_str = (level == 5)
-                ? "5⁻"
-                : (level == 6)
-                    ? "5⁺"
-                    : (level == 7)
-                        ? "6⁻"
-                        : (level == 8)
-                            ? "6⁺"
-                            : (level == 9)
-                                ? "7"
-                                : level.toString();
+            String Lv_str = int_to_str_en(level);
             _List_children.add(
               Card(
                 color: const Color(0xff333439),
