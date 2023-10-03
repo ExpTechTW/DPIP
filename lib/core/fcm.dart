@@ -5,17 +5,14 @@ import 'package:vibration/vibration.dart';
 import '../main.dart';
 import 'background.dart';
 
-const DarwinNotificationDetails iosNotificationDetails =
-    DarwinNotificationDetails(
-  categoryIdentifier: darwinNotificationCategoryPlain,
-);
-
 Future<void> messageHandler(RemoteMessage message) async {
   FCM(message.data);
   final RemoteNotification? notification = message.notification;
   final AndroidNotification? android = message.notification?.android;
   if (notification != null) {
     var data = message.data;
+    Map<String, dynamic>? payload = message.data;
+    String? soundName = payload['sound'] ?? 'default';
     flutterLocalNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
@@ -48,7 +45,11 @@ Future<void> messageHandler(RemoteMessage message) async {
                 ? RawResourceAndroidNotificationSound(android?.channelId)
                 : null,
           ),
-          iOS: iosNotificationDetails,
+          iOS: DarwinNotificationDetails(
+            categoryIdentifier: darwinNotificationCategoryPlain,
+            sound: soundName,
+            interruptionLevel: InterruptionLevel.critical,
+          ),
         ));
     if (data["level"] != 0) {
       bool? vibration = await Vibration.hasVibrator();
