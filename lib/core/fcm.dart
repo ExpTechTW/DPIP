@@ -36,6 +36,7 @@ Future<void> messageHandler(RemoteMessage message) async {
           sound: ans["sound"] != "default"
               ? RawResourceAndroidNotificationSound(ans["sound"])
               : null,
+          styleInformation: const BigTextStyleInformation(''),
         ),
         iOS: DarwinNotificationDetails(
           categoryIdentifier: darwinNotificationCategoryPlain,

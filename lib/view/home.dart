@@ -52,16 +52,15 @@ class _HomePage extends State<HomePage> {
 
   void render() async {
     prefs ??= await SharedPreferences.getInstance();
-    geojson_data ??= await get(
-        "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/tw.json");
     data ??= await get(
         "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
-    if (geojson_data == false || data == false) {
+    if (data == false) {
       await Future.delayed(const Duration(seconds: 2));
       render();
       return;
     }
     loc_data ??= json.decode(await rootBundle.loadString('assets/region.json'));
+    geojson_data ??= json.decode(await rootBundle.loadString('assets/tw.json'));
     var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
         [prefs.getString("loc-town") ?? "歸仁區"];
     loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
