@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:vibration/vibration.dart';
 
 import '../main.dart';
 import 'background.dart';
@@ -15,17 +16,14 @@ Future<void> messageHandler(RemoteMessage message) async {
   final AndroidNotification? android = message.notification?.android;
   if (notification != null) {
     var data = message.data;
+    print(android?.sound);
     flutterLocalNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
-            (data["level"] == 0)
-                ? 'low'
-                : (data["level"] == 1)
-                    ? 'middle'
-                    : 'high',
+            android?.channelId ?? "default",
             (data["level"] == 0)
                 ? '一般訊息'
                 : (data["level"] == 1)
@@ -42,8 +40,30 @@ Future<void> messageHandler(RemoteMessage message) async {
                 : (data["level"] == 1)
                     ? Importance.defaultImportance
                     : Importance.max,
+            priority: (data["level"] == 0)
+                ? Priority.low
+                : (data["level"] == 1)
+                    ? Priority.defaultPriority
+                    : Priority.max,
+            sound: android?.channelId != null
+                ? RawResourceAndroidNotificationSound(android?.channelId)
+                : null,
           ),
           iOS: iosNotificationDetails,
         ));
+    if (data["level"] != 0) {
+      bool? vibration = await Vibration.hasVibrator();
+      bool? hasCustom = await Vibration.hasCustomVibrationsSupport();
+      if (vibration != null && vibration) {
+        if (hasCustom != null && hasCustom) {
+          Vibration.vibrate(duration: (data["level"] == 2) ? 5000 : 2000);
+        } else {
+          Vibration.vibrate();
+          await Future.delayed(
+              Duration(milliseconds: (data["level"] == 2) ? 5000 : 2000));
+          Vibration.vibrate();
+        }
+      }
+    }
   }
 }
