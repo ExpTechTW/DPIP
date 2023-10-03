@@ -16,7 +16,6 @@ Future<void> messageHandler(RemoteMessage message) async {
   final AndroidNotification? android = message.notification?.android;
   if (notification != null) {
     var data = message.data;
-    print(android?.sound);
     flutterLocalNotificationsPlugin.show(
         notification.hashCode,
         notification.title,
