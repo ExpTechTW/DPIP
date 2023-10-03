@@ -156,7 +156,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                           child: Text(
                             Lv_str,
                             style: TextStyle(
-                              fontSize: 50,
+                              fontSize: 45,
                               fontWeight: FontWeight.w600,
                               color: intensity_font[level - 1],
                             ),
@@ -176,14 +176,14 @@ class _EarthquakePage extends State<EarthquakePage> {
                                     data[i]["location"].indexOf(")"))
                                 .replaceAll("位於", ""),
                             style: const TextStyle(
-                                fontSize: 25,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white),
                           ),
                           Text(
                             data[i]["originTime"].toString().substring(0, 16),
                             style: const TextStyle(
-                                fontSize: 18,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w300,
                                 color: Colors.grey),
                           ),
@@ -192,8 +192,8 @@ class _EarthquakePage extends State<EarthquakePage> {
                       trailing: Text(
                         "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
                         style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w900,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
                       ),
