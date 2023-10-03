@@ -1,45 +1,46 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../main.dart';
 import 'background.dart';
 
 Future<void> messageHandler(RemoteMessage message) async {
-  FCM(message.data);
-  // flutterLocalNotificationsPlugin.show(
-  //     notification.hashCode,
-  //     notification.title,
-  //     notification.body,
-  //     NotificationDetails(
-  //       android: AndroidNotificationDetails(
-  //         android?.channelId ?? "default",
-  //         (data["level"] == 0)
-  //             ? '一般訊息'
-  //             : (data["level"] == 1)
-  //                 ? '警訊通知'
-  //                 : '緊急警報',
-  //         channelDescription: (data["level"] == 0)
-  //             ? '一般通知'
-  //             : (data["level"] == 1)
-  //                 ? '重要通知'
-  //                 : '有立即危險',
-  //         icon: android?.smallIcon,
-  //         importance: (data["level"] == 0)
-  //             ? Importance.low
-  //             : (data["level"] == 1)
-  //                 ? Importance.defaultImportance
-  //                 : Importance.max,
-  //         priority: (data["level"] == 0)
-  //             ? Priority.low
-  //             : (data["level"] == 1)
-  //                 ? Priority.defaultPriority
-  //                 : Priority.max,
-  //         sound: data["sound"] != null
-  //             ? RawResourceAndroidNotificationSound(data["sound"])
-  //             : null,
-  //       ),
-  //       iOS: DarwinNotificationDetails(
-  //         categoryIdentifier: darwinNotificationCategoryPlain,
-  //         sound: "${data["sound"]}.wav" ?? "default",
-  //         interruptionLevel: InterruptionLevel.timeSensitive,
-  //       ),
-  //     ));
+  var ans = await FCM(message.data);
+  flutterLocalNotificationsPlugin.show(
+      ans["code"],
+      ans["title"],
+      ans["body"],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          ans["channel"]!,
+          (ans["level"] == 0)
+              ? '一般訊息'
+              : (ans["level"] == 1)
+                  ? '警訊通知'
+                  : '緊急警報',
+          channelDescription: (ans["level"] == 0)
+              ? '一般通知'
+              : (ans["level"] == 1)
+                  ? '重要通知'
+                  : '有立即危險',
+          importance: (ans["level"] == 0)
+              ? Importance.low
+              : (ans["level"] == 1)
+                  ? Importance.defaultImportance
+                  : Importance.max,
+          priority: (ans["level"] == 0)
+              ? Priority.low
+              : (ans["level"] == 1)
+                  ? Priority.defaultPriority
+                  : Priority.max,
+          sound: ans["sound"] != "default"
+              ? RawResourceAndroidNotificationSound(ans["sound"])
+              : null,
+        ),
+        iOS: DarwinNotificationDetails(
+          categoryIdentifier: darwinNotificationCategoryPlain,
+          sound: "${ans["sound"]}.wav",
+          interruptionLevel: InterruptionLevel.timeSensitive,
+        ),
+      ));
 }
