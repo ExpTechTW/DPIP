@@ -28,7 +28,8 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
-  String reports_url = "https://exptech.com.tw/api/v3/earthquake/reports";
+  String reports_url =
+      "https://yayacat.exptech.com.tw/api/v3/earthquake/reports";
 
   @override
   void initState() {
