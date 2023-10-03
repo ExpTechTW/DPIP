@@ -129,17 +129,23 @@ class _EarthquakePage extends State<EarthquakePage> {
                         Text(
                           data[i]["data"][0]["areaIntensity"].toString(),
                           style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w100,
-                              color: Colors.white),
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white,
+                          ),
                         ),
+                        const SizedBox(width: 5),
                         Row(
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  data[i]["location"].substring(data[i]["location"].indexOf("(") + 1, data[i]["location"].indexOf(")")).replaceAll("位於", ""),
+                                  data[i]["location"]
+                                      .substring(
+                                          data[i]["location"].indexOf("(") + 1,
+                                          data[i]["location"].indexOf(")"))
+                                      .replaceAll("位於", ""),
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w100,
@@ -156,6 +162,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                             ),
                           ],
                         ),
+                        const SizedBox(width: 60),
                         Padding(
                           padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                           child: Row(
@@ -163,7 +170,9 @@ class _EarthquakePage extends State<EarthquakePage> {
                             textBaseline: TextBaseline.alphabetic,
                             children: [
                               Text(
-                                "M " + data[i]["magnitudeValue"].toStringAsFixed(1),
+                                "M " +
+                                    data[i]["magnitudeValue"]
+                                        .toStringAsFixed(1),
                                 style: TextStyle(
                                   fontSize: 50,
                                   fontWeight: FontWeight.w300,
