@@ -28,7 +28,8 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
-  String reports_url = "https://exptech.com.tw/api/v3/earthquake/reports";
+  String reports_url =
+      "https://yayacat.exptech.com.tw/api/v3/earthquake/reports";
 
   @override
   void initState() {
@@ -79,6 +80,12 @@ class _EarthquakePage extends State<EarthquakePage> {
     super.dispose();
   }
 
+  Future<void> _handleRefresh() async {
+    data = await post(reports_url, {"list": {}});
+    await _updateReportsWidget();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -111,7 +118,6 @@ class _EarthquakePage extends State<EarthquakePage> {
                 ]),
           ));
         } else {
-          print(data);
           if (data is! bool) {
             for (var i = 0; i < data.length; i++) {
               _List_children.add(Padding(
@@ -129,17 +135,23 @@ class _EarthquakePage extends State<EarthquakePage> {
                         Text(
                           data[i]["data"][0]["areaIntensity"].toString(),
                           style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.w100,
-                              color: Colors.white),
+                            fontSize: 50,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white,
+                          ),
                         ),
+                        const SizedBox(width: 10),
                         Row(
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  data[i]["location"].substring(data[i]["location"].indexOf("(") + 1, data[i]["location"].indexOf(")")).replaceAll("位於", ""),
+                                  data[i]["location"]
+                                      .substring(
+                                          data[i]["location"].indexOf("(") + 1,
+                                          data[i]["location"].indexOf(")"))
+                                      .replaceAll("位於", ""),
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w100,
@@ -163,7 +175,9 @@ class _EarthquakePage extends State<EarthquakePage> {
                             textBaseline: TextBaseline.alphabetic,
                             children: [
                               Text(
-                                "M " + data[i]["magnitudeValue"].toStringAsFixed(1),
+                                "M " +
+                                    data[i]["magnitudeValue"]
+                                        .toStringAsFixed(1),
                                 style: TextStyle(
                                   fontSize: 50,
                                   fontWeight: FontWeight.w300,
@@ -255,9 +269,12 @@ class _EarthquakePage extends State<EarthquakePage> {
                 ],
               ),
               Expanded(
-                child: ListView(
-                    physics: const ClampingScrollPhysics(),
-                    children: _List_children.toList()),
+                child: RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: ListView(
+                      physics: const ClampingScrollPhysics(),
+                      children: _List_children.toList()),
+                ),
               ),
             ],
           ),
