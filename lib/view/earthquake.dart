@@ -110,7 +110,7 @@ class _EarthquakePage extends State<EarthquakePage> {
     } else {
       if (_page == 0) {
         _List_children.add(Padding(
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(5),
           child: Stack(alignment: Alignment.center, children: [
             _taiwan,
             _pic,
@@ -215,76 +215,81 @@ class _EarthquakePage extends State<EarthquakePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: GestureDetector(
-          onHorizontalDragEnd: (details) {
-            if (details.primaryVelocity! > 0) {
-              if (_page == 0) {
-                _page = 1;
-                render();
+        child: Padding(
+          padding: EdgeInsets.all(5),
+          child: GestureDetector(
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! > 0) {
+                if (_page == 0) {
+                  _page = 1;
+                  render();
+                }
+              } else if (details.primaryVelocity! < 0) {
+                if (_page == 1) {
+                  _page = 0;
+                  render();
+                }
               }
-            } else if (details.primaryVelocity! < 0) {
-              if (_page == 1) {
-                _page = 0;
-                render();
-              }
-            }
-          },
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          (_page == 1) ? Colors.blue[800] : Colors.transparent,
-                      elevation: 20,
-                      splashFactory: NoSplash.splashFactory,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
+            },
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: (_page == 1)
+                            ? Colors.blue[800]
+                            : Colors.transparent,
+                        elevation: 20,
+                        splashFactory: NoSplash.splashFactory,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                      onPressed: () {
+                        _page = 1;
+                        render();
+                      },
+                      child: const Text(
+                        "地震報告",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                    onPressed: () {
-                      _page = 1;
-                      render();
-                    },
-                    child: const Text(
-                      "地震報告",
-                      style: TextStyle(color: Colors.white),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: (_page == 0)
+                            ? Colors.blue[800]
+                            : Colors.transparent,
+                        elevation: 20,
+                        splashFactory: NoSplash.splashFactory,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                      onPressed: () {
+                        _page = 0;
+                        render();
+                      },
+                      child: const Text(
+                        "即時測站",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          (_page == 0) ? Colors.blue[800] : Colors.transparent,
-                      elevation: 20,
-                      splashFactory: NoSplash.splashFactory,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                    ),
-                    onPressed: () {
-                      _page = 0;
-                      render();
-                    },
-                    child: const Text(
-                      "即時測站",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    data = null;
-                    await render();
-                  },
-                  child: ListView(
-                      physics: const ClampingScrollPhysics(),
-                      children: _List_children.toList()),
+                  ],
                 ),
-              ),
-            ],
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      data = null;
+                      await render();
+                    },
+                    child: ListView(
+                        physics: const ClampingScrollPhysics(),
+                        children: _List_children.toList()),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
