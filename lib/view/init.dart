@@ -21,6 +21,7 @@ class _InitPage extends State<InitPage> {
     const HomePage(),
     const HistoryPage(),
     const EarthquakePage(),
+    const MePage(), //TODO 更多
     const MePage()
   ];
 
@@ -212,6 +213,8 @@ class _InitPage extends State<InitPage> {
                 icon: Icon(Icons.history_outlined), label: '歷史'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.heart_broken_outlined), label: '地震'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.playlist_add_outlined), label: '更多'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
           ],
