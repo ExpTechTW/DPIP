@@ -1,5 +1,6 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
+import 'dart:io';
 
 class NotifyPage extends StatefulWidget {
   const NotifyPage({Key? key}) : super(key: key);
@@ -18,18 +19,41 @@ class _NotifyPage extends State<NotifyPage> {
     super.initState();
   }
 
+  void play(String name) async {
+    final audioPlayer = AudioPlayer();
+    if (Platform.isAndroid) {
+      await audioPlayer.setAudioSource(
+        AudioSource.uri(
+            Uri.parse('android.resource://com.exptech.dpip/raw/$name')),
+      );
+    } else if (Platform.isIOS) {
+      await audioPlayer.setAudioSource(
+        AudioSource.uri(Uri.parse('$name.wav')),
+      );
+    }
+    await audioPlayer.play();
+  }
+
   void render() async {
     _List_children = <Widget>[const SizedBox(height: 10)];
-    _List_children.add(const Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.warning_amber_outlined, color: Colors.red),
-        SizedBox(width: 5),
-        Text("緊急警報",
-            style: TextStyle(
-                color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600))
-      ],
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("強震即時警報（警報）",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+          SizedBox(width: 5),
+          Text("預估最大震度 5弱 以上",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300))
+        ],
+      ),
     ));
     _List_children.add(Container(
       decoration: BoxDecoration(
@@ -42,42 +66,117 @@ class _NotifyPage extends State<NotifyPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            onTap: () async {
-
+            onTap: () {
+              play("eew_alert");
             },
             title: const Text(
-              "強震即時警報",
+              "所在地 預估震度 4級 以上",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
+            ),
+          ),
+          const Divider(
+              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          ListTile(
+            onTap: () {
+              play("eew_warn");
+            },
+            title: const Text(
+              "所在地 預估震度 4級 以下",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("地震速報（注意）",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+          SizedBox(width: 5),
+          Text("預估最大震度 5弱 以下",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300))
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            onTap: () {
+              play("eew_warn");
+            },
+            title: const Text(
+              "所在地 預估震度 3級 以上",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
+            ),
+          ),
+          const Divider(
+              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const ListTile(
+            title: Text(
+              "所在地 預估震度 3級 以下",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             trailing: Icon(
               Icons.play_circle_fill,
-              color: Colors.blue[800],
-              size: 24.0,
+              color: Colors.grey,
+              size: 30,
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
-            child: Text(
-              "啟用或關閉強震即時警報。此功能將在強震發生時為您發送即時通知。",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-          ),
-          const Divider(
-              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
         ],
       ),
     ));
     _List_children.add(const SizedBox(height: 10));
-    _List_children.add(const Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.doorbell_outlined, color: Colors.amber),
-        SizedBox(width: 5),
-        Text("警訊通知",
-            style: TextStyle(
-                color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600))
-      ],
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("震度速報",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+          SizedBox(width: 5),
+          Text("地震觀測網自動觀測結果",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300))
+        ],
+      ),
     ));
     _List_children.add(Container(
       decoration: BoxDecoration(
@@ -90,48 +189,54 @@ class _NotifyPage extends State<NotifyPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            onTap: () {},
+            onTap: () {
+              play("warn");
+            },
             title: const Text(
-              "強震即時警報",
+              "所在地 實測震度 3級 以上",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
-            trailing: Switch(
-              value: n_alert,
-              onChanged: (bool value) {
-                setState(() {
-                  n_alert = value;
-                });
-                render();
-              },
-              activeColor: Colors.blue[800],
-              inactiveThumbColor: Colors.grey,
-              inactiveTrackColor: Colors.grey[300],
-              activeTrackColor: Colors.blue[200],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
-            child: Text(
-              "啟用或關閉強震即時警報。此功能將在強震發生時為您發送即時通知。",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
             ),
           ),
           const Divider(
               color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const ListTile(
+            title: Text(
+              "所在地 實測震度 3級 以下",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
         ],
       ),
     ));
     _List_children.add(const SizedBox(height: 10));
-    _List_children.add(const Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.speaker_notes_outlined, color: Colors.white),
-        SizedBox(width: 5),
-        Text("一般訊息",
-            style: TextStyle(
-                color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600))
-      ],
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("地震報告",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+          SizedBox(width: 5),
+          Text("中央氣象署 地震報告",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300))
+        ],
+      ),
     ));
     _List_children.add(Container(
       decoration: BoxDecoration(
@@ -144,34 +249,307 @@ class _NotifyPage extends State<NotifyPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            onTap: () {},
+            onTap: () {
+              play("warn");
+            },
             title: const Text(
-              "強震即時警報",
+              "所在地 實測震度 3級 以上",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
-            trailing: Switch(
-              value: n_alert,
-              onChanged: (bool value) {
-                setState(() {
-                  n_alert = value;
-                });
-                render();
-              },
-              activeColor: Colors.blue[800],
-              inactiveThumbColor: Colors.grey,
-              inactiveTrackColor: Colors.grey[300],
-              activeTrackColor: Colors.blue[200],
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 15.0, right: 15.0, bottom: 10.0),
-            child: Text(
-              "啟用或關閉強震即時警報。此功能將在強震發生時為您發送即時通知。",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
             ),
           ),
           const Divider(
               color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const ListTile(
+            title: Text(
+              "所在地 實測震度 3級 以下",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("大雷雨即時訊息",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            onTap: () {
+              play("warn");
+            },
+            title: const Text(
+              "所在地 發布 大雷雨即時訊息",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("豪雨特報",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            onTap: () {
+              play("warn");
+            },
+            title: const Text(
+              "所在地 發布 豪雨特報",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("大雨特報",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            onTap: () {
+              play("warn");
+            },
+            title: const Text(
+              "所在地 發布 大雨特報",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: const Icon(
+              Icons.play_circle_fill,
+              color: Colors.blue,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("高溫資訊",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            title: Text(
+              "所在地 發布 高溫資訊",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("陸上強風特報",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            title: Text(
+              "所在地 發布 陸上強風特報",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("停班停課資訊",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            title: Text(
+              "所在地 發布 停班停課資訊",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    ));
+    _List_children.add(const SizedBox(height: 10));
+    _List_children.add(const Padding(
+      padding: EdgeInsets.all(6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("海上陸上颱風警報",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600)),
+        ],
+      ),
+    ));
+    _List_children.add(Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff333439),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            title: Text(
+              "發布 海上陸上颱風警報",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            trailing: Icon(
+              Icons.play_circle_fill,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
         ],
       ),
     ));
