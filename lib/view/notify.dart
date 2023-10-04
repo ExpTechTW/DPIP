@@ -35,7 +35,24 @@ class _NotifyPage extends State<NotifyPage> {
   }
 
   void render() async {
-    _List_children = <Widget>[const SizedBox(height: 10)];
+    _List_children = <Widget>[
+      Padding(
+        padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
+        child: Row(
+          children: [
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon:
+                  const Icon(Icons.arrow_back, color: Colors.white70, size: 24),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      )
+    ];
     _List_children.add(const Padding(
       padding: EdgeInsets.all(6),
       child: Column(
