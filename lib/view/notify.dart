@@ -13,6 +13,8 @@ class NotifyPage extends StatefulWidget {
 class _NotifyPage extends State<NotifyPage> {
   List<Widget> _List_children = <Widget>[const SizedBox(height: 10)];
   bool n_alert = false;
+  bool play_alert = false;
+  final audioPlayer = AudioPlayer();
 
   @override
   void initState() {
@@ -21,18 +23,24 @@ class _NotifyPage extends State<NotifyPage> {
   }
 
   void play(String name) async {
-    final audioPlayer = AudioPlayer();
-    if (Platform.isAndroid) {
-      await audioPlayer.setAudioSource(
-        AudioSource.uri(
-            Uri.parse('android.resource://com.exptech.dpip/raw/$name')),
-      );
-    } else if (Platform.isIOS) {
-      await audioPlayer.setAudioSource(
-        AudioSource.uri(Uri.parse('$name.wav')),
-      );
+    if (!play_alert) {
+      play_alert = true;
+      if (Platform.isAndroid) {
+          await audioPlayer.setAudioSource(
+            AudioSource.uri(
+                Uri.parse('android.resource://com.exptech.dpip/raw/$name')),
+          );
+      } else if (Platform.isIOS) {
+        await audioPlayer.setAudioSource(
+          AudioSource.uri(Uri.parse('$name.wav')),
+        );
+      }
+      await audioPlayer.play();
+    } else {
+      play_alert = false;
+      await audioPlayer.stop();
+      play(name);
     }
-    await audioPlayer.play();
   }
 
   void render() async {
