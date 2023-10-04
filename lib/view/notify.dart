@@ -23,7 +23,7 @@ class _NotifyPage extends State<NotifyPage> {
 
   void play(String name) async {
     if (Platform.isAndroid) {
-      await player.setSource(AssetSource(name));
+      await player.setSource(AssetSource("$name.wav"));
     } else if (Platform.isIOS) {}
     player.resume();
   }
