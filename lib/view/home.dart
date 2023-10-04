@@ -417,8 +417,8 @@ class HomePageState extends State<HomePage> {
       }
     });
     if (img == null) {
-      final tempImg =
-          NetworkImage('https://api.exptech.com.tw/file/radar1.png');
+      const tempImg =
+          NetworkImage('https://api.exptech.com.tw/api/v1/dpip/radar');
       precacheImage(tempImg, context).then((_) {
         img = tempImg;
         render();
