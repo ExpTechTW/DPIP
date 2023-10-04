@@ -22,6 +22,12 @@ class _HistoryPage extends State<HistoryPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    data = null;
+    super.dispose();
+  }
+
   void render() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     data ??= await get(

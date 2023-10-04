@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:dpip/core/api.dart';
@@ -9,7 +8,7 @@ import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-GlobalKey<_HomePage> homePageKey = GlobalKey();
+GlobalKey<HomePageState> homePageKey = GlobalKey();
 
 GeoJsonParser myGeoJson = GeoJsonParser(
     defaultPolygonBorderColor: Colors.grey,
@@ -20,19 +19,27 @@ var loc_data;
 var loc_gps;
 var data;
 bool focus_map = false;
+var img;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePage createState() => _HomePage();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePage extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
   MapController mapController = MapController();
   final GlobalKey _globalKey = GlobalKey();
+
+  @override
+  void dispose() {
+    data = null;
+    img = null;
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -54,11 +61,6 @@ class _HomePage extends State<HomePage> {
     prefs ??= await SharedPreferences.getInstance();
     data ??= await get(
         "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
-    if (data == false) {
-      await Future.delayed(const Duration(seconds: 2));
-      render();
-      return;
-    }
     loc_data ??= json.decode(await rootBundle.loadString('assets/region.json'));
     geojson_data ??= json.decode(await rootBundle.loadString('assets/tw.json'));
     var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
@@ -414,6 +416,14 @@ class _HomePage extends State<HomePage> {
         }
       }
     });
+    if (img == null) {
+      final tempImg =
+          NetworkImage('https://api.exptech.com.tw/file/radar1.png');
+      precacheImage(tempImg, context).then((_) {
+        img = tempImg;
+        render();
+      }).catchError((error) {});
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -515,19 +525,18 @@ class _HomePage extends State<HomePage> {
                                   ),
                                 ],
                               ),
-                            OverlayImageLayer(
-                              overlayImages: [
-                                OverlayImage(
-                                  bounds: LatLngBounds(
-                                    const LatLng(17.88, 115),
-                                    const LatLng(28.8925, 126.5125),
+                            if (img != null)
+                              OverlayImageLayer(
+                                overlayImages: [
+                                  OverlayImage(
+                                    bounds: LatLngBounds(
+                                      const LatLng(17.88, 115),
+                                      const LatLng(28.8925, 126.5125),
+                                    ),
+                                    imageProvider: img,
                                   ),
-                                  imageProvider: NetworkImage(
-                                    'https://api.exptech.com.tw/file/radar1.png',
-                                  ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                           ],
                         ),
                       ),

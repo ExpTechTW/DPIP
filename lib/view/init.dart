@@ -18,7 +18,7 @@ class InitPage extends StatefulWidget {
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
   var pages = [
-    const HomePage(),
+    HomePage(),
     const HistoryPage(),
     const EarthquakePage(),
     const MePage(), //TODO 更多
@@ -65,8 +65,12 @@ class _InitPage extends State<InitPage> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  render();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InitPage(), // 這裡是當前頁面的類型
+                    ),
+                  );
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
@@ -169,8 +173,12 @@ class _InitPage extends State<InitPage> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  render();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => InitPage(), // 這裡是當前頁面的類型
+                    ),
+                  );
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
