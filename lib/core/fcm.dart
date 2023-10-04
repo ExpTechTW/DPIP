@@ -41,7 +41,7 @@ Future<void> messageHandler(RemoteMessage message) async {
         ),
         iOS: DarwinNotificationDetails(
           categoryIdentifier: darwinNotificationCategoryPlain,
-          sound: "${ans["sound"]}.wav",
+          sound: ans["sound"] != "default" ? "${ans["sound"]}.wav" : "default",
           interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       ));
