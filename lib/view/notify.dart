@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 
 class NotifyPage extends StatefulWidget {
   const NotifyPage({Key? key}) : super(key: key);
@@ -13,8 +13,7 @@ class NotifyPage extends StatefulWidget {
 class _NotifyPage extends State<NotifyPage> {
   List<Widget> _List_children = <Widget>[const SizedBox(height: 10)];
   bool n_alert = false;
-  bool play_alert = false;
-  final audioPlayer = AudioPlayer();
+  final player = AudioPlayer();
 
   @override
   void initState() {
@@ -23,24 +22,10 @@ class _NotifyPage extends State<NotifyPage> {
   }
 
   void play(String name) async {
-    if (!play_alert) {
-      play_alert = true;
-      if (Platform.isAndroid) {
-          await audioPlayer.setAudioSource(
-            AudioSource.uri(
-                Uri.parse('android.resource://com.exptech.dpip/raw/$name')),
-          );
-      } else if (Platform.isIOS) {
-        await audioPlayer.setAudioSource(
-          AudioSource.uri(Uri.parse('$name.wav')),
-        );
-      }
-      await audioPlayer.play();
-    } else {
-      play_alert = false;
-      await audioPlayer.stop();
-      play(name);
-    }
+    if (Platform.isAndroid) {
+      await player.setSource(AssetSource(name));
+    } else if (Platform.isIOS) {}
+    player.resume();
   }
 
   void render() async {
