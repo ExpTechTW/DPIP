@@ -1,6 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'dart:io';
 
 class NotifyPage extends StatefulWidget {
   const NotifyPage({Key? key}) : super(key: key);
@@ -103,7 +104,7 @@ class _NotifyPage extends State<NotifyPage> {
               play("eew_warn");
             },
             title: const Text(
-              "所在地 預估震度 4級 以下",
+              "所在地 預估震度 3級 以下",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             trailing: const Icon(
@@ -163,7 +164,7 @@ class _NotifyPage extends State<NotifyPage> {
               color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           const ListTile(
             title: Text(
-              "所在地 預估震度 3級 以下",
+              "所在地 預估震度 2級 以下",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             trailing: Icon(
@@ -223,7 +224,7 @@ class _NotifyPage extends State<NotifyPage> {
               color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           const ListTile(
             title: Text(
-              "所在地 實測震度 3級 以下",
+              "所在地 實測震度 2級 以下",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             trailing: Icon(
@@ -283,7 +284,7 @@ class _NotifyPage extends State<NotifyPage> {
               color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           const ListTile(
             title: Text(
-              "所在地 實測震度 3級 以下",
+              "所在地 實測震度 2級 以下",
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             trailing: Icon(
