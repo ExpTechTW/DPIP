@@ -156,7 +156,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                     ),
                     ListTile(
                       contentPadding:
-                          const EdgeInsets.only(left: 80, right: 15),
+                          const EdgeInsets.only(left: 75, right: 15),
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
