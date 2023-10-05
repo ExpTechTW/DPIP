@@ -4,6 +4,7 @@ import 'package:dpip/view/earthquake.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../main.dart';
 import 'history.dart';
 import 'home.dart';
 import 'me.dart';
@@ -91,7 +92,10 @@ class _InitPage extends State<InitPage> {
       return;
     }
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
+    String token = await messaging.getToken() ?? "";
+    print(token);
+    var data = await get(
+        "https://api.exptech.com.tw/api/v1/dpip/info?token=$token&city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
     if (data != false) {
       if (compareVersion(data["ver"], packageInfo.version) == 1) {
         showDialog(

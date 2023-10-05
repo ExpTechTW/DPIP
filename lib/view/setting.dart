@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/api.dart';
+import '../main.dart';
+
 class SettingPage extends StatefulWidget {
   const SettingPage({Key? key}) : super(key: key);
 
@@ -25,12 +28,15 @@ class _SettingPage extends State<SettingPage> {
             color: const Color(0xff333439), // 更改卡片顏色
             margin: const EdgeInsets.all(5), // 增加一些外邊距
             child: ListTile(
-              onTap: () {
+              onTap: () async {
                 prefs.setString(data["storage"], data["data"][i]);
                 if (data["storage"] == "loc-city") {
                   prefs.setString("loc-town",
                       data["loc_data"][data["data"][i]].keys.toList()[0]);
                 }
+                String token = await messaging.getToken() ?? "";
+                await get(
+                    "https://api.exptech.com.tw/api/v1/dpip/info?token=$token&city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
                 Navigator.pop(context, 'refresh');
               },
               title: Text(

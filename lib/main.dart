@@ -132,8 +132,6 @@ void main() async {
       }
     },
   );
-  print(await messaging.getToken());
-  FirebaseMessaging.instance.subscribeToTopic("DPIP");
   runApp(const MyApp());
 }
 
