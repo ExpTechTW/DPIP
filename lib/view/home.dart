@@ -193,7 +193,7 @@ class HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(width: 5),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             "${data["info"]["rainfall"]}",
