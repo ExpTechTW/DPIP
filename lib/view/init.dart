@@ -92,10 +92,7 @@ class _InitPage extends State<InitPage> {
       return;
     }
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String token = await messaging.getToken() ?? "";
-    print(token);
-    var data = await get(
-        "https://api.exptech.com.tw/api/v1/dpip/info?token=$token&city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
+    var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
     await messaging.subscribeToTopic(
         safeBase64Encode(prefs.getString('loc-city') ?? "臺南市"));
     await messaging.subscribeToTopic(safeBase64Encode(

@@ -51,9 +51,6 @@ class _SettingPage extends State<SettingPage> {
                       "${prefs.getString('loc-city') ?? "臺南市"}${prefs.getString('loc-town') ?? "歸仁區"}");
                 }
                 prefs.setString(data["storage"], data["data"][i]);
-                String token = await messaging.getToken() ?? "";
-                await get(
-                    "https://api.exptech.com.tw/api/v1/dpip/info?token=$token&city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
                 Navigator.pop(context, 'refresh');
               },
               title: Text(
