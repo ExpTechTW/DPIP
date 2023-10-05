@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:clipboard/clipboard.dart';
-import 'package:dpip/view/setting.dart';
+import 'package:dpip/view/loc-set.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';

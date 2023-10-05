@@ -15,6 +15,15 @@ class _SettingPage extends State<SettingPage> {
   final List<Widget> _List_children = <Widget>[const SizedBox(height: 10)];
   bool init = false;
 
+  void subscribeToTopic(String newTopic, String currentTopic) async {
+    String encode_newTopic = safeBase64Encode(newTopic);
+    String encode_currentTopic = safeBase64Encode(currentTopic);
+    print(
+        "unsubscribe $currentTopic >> $encode_currentTopic | subscribe $newTopic $encode_newTopic");
+    await messaging.unsubscribeFromTopic(encode_currentTopic);
+    await messaging.subscribeToTopic(encode_newTopic);
+  }
+
   @override
   Widget build(BuildContext context) {
     dynamic data = ModalRoute.of(context)!.settings.arguments;
@@ -29,11 +38,19 @@ class _SettingPage extends State<SettingPage> {
             margin: const EdgeInsets.all(5), // 增加一些外邊距
             child: ListTile(
               onTap: () async {
-                prefs.setString(data["storage"], data["data"][i]);
                 if (data["storage"] == "loc-city") {
-                  prefs.setString("loc-town",
-                      data["loc_data"][data["data"][i]].keys.toList()[0]);
+                  String town =
+                      data["loc_data"][data["data"][i]].keys.toList()[0];
+                  subscribeToTopic(
+                      data["data"][i], prefs.getString('loc-city') ?? "臺南市");
+                  subscribeToTopic(data["data"][i] + town,
+                      "${prefs.getString('loc-city') ?? "臺南市"}${prefs.getString('loc-town') ?? "歸仁區"}");
+                  prefs.setString("loc-town", town);
+                } else if (data["storage"] == "loc-town") {
+                  subscribeToTopic(data["data"][i] + data["data"][i],
+                      "${prefs.getString('loc-city') ?? "臺南市"}${prefs.getString('loc-town') ?? "歸仁區"}");
                 }
+                prefs.setString(data["storage"], data["data"][i]);
                 String token = await messaging.getToken() ?? "";
                 await get(
                     "https://api.exptech.com.tw/api/v1/dpip/info?token=$token&city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");

@@ -173,3 +173,8 @@ Map<String, double> speed(double depth, double distance) {
   }
   return {'Ptime': Ptime, 'Stime': Stime};
 }
+
+String safeBase64Encode(String input) {
+  String encoded = base64Encode(utf8.encode(input));
+  return encoded.replaceAll('+', '_').replaceAll('/', '-').replaceAll('=', '');
+}

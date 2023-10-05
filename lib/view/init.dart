@@ -96,6 +96,10 @@ class _InitPage extends State<InitPage> {
     print(token);
     var data = await get(
         "https://api.exptech.com.tw/api/v1/dpip/info?token=$token&city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
+    await messaging.subscribeToTopic(
+        safeBase64Encode(prefs.getString('loc-city') ?? "臺南市"));
+    await messaging.subscribeToTopic(safeBase64Encode(
+        "${prefs.getString('loc-city') ?? "臺南市"}${prefs.getString('loc-town') ?? "歸仁區"}"));
     if (data != false) {
       if (compareVersion(data["ver"], packageInfo.version) == 1) {
         showDialog(
@@ -177,12 +181,7 @@ class _InitPage extends State<InitPage> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => InitPage(), // 這裡是當前頁面的類型
-                    ),
-                  );
+                  Navigator.pop(context);
                 },
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.blueAccent,
@@ -192,7 +191,7 @@ class _InitPage extends State<InitPage> {
                   ),
                 ),
                 child: const Text(
-                  '重試',
+                  '知道了',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
