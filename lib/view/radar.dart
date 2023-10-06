@@ -47,7 +47,6 @@ class _RadarState extends State<Radar> {
     for (int i = 0; i <= 11; i++) {
       String suffix = i.toString().padLeft(2, '0');
       String newUrl = url.replaceAll("f00", "f$suffix");
-      print(newUrl);
       precacheImage(CachedNetworkImageProvider(newUrl), context);
     }
 
@@ -56,7 +55,6 @@ class _RadarState extends State<Radar> {
       String time_str = formatToUTC(init_time);
       String newUrl =
           "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/obs_$time_str.png";
-      print(newUrl);
       precacheImage(CachedNetworkImageProvider(newUrl), context);
       init_time = subtractTenMinutes(init_time);
     }
@@ -161,7 +159,6 @@ class _RadarState extends State<Radar> {
                     url =
                         "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/obs_$time_str.png";
                     select_color = Colors.blueAccent;
-                    print(url);
                   } else {
                     if (selectedIndex == 0 ||
                         compareTimeOfDay(times[index], TimeOfDay.now()) < 0) {
@@ -169,12 +166,10 @@ class _RadarState extends State<Radar> {
                     } else {
                       select_color = Colors.purpleAccent;
                     }
-                    print(select_index);
                     String time_str =
                         formatToUTC(adjustTime(TimeOfDay.now(), 10));
                     url =
                         "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/$time_str/nowcast_${time_str}_f${select_index.toString().padLeft(2, "0")}.png";
-                    print(url);
                   }
                   setState(() {
                     selectedIndex = index;
