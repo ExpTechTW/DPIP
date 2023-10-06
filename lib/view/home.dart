@@ -28,6 +28,7 @@ class HomePageState extends State<HomePage> {
   List<Widget> _List_children = <Widget>[];
   MapController mapController = MapController();
   final GlobalKey _globalKey = GlobalKey();
+  String url = "";
 
   @override
   void dispose() {
@@ -409,16 +410,12 @@ class HomePageState extends State<HomePage> {
         }
       }
     });
-    if (img == null) {
+    if (url == "") {
       String time_str = formatToUTC(adjustTime(TimeOfDay.now(), 10));
-      String url =
+      url =
           "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/$time_str/nowcast_${time_str}_f00.png";
       if (TimeOfDay.now().minute % 10 > 5) url = url.replaceAll("f00", "f01");
-      var tempImg = NetworkImage(url);
-      precacheImage(tempImg, context).then((_) {
-        img = tempImg;
-        render();
-      }).catchError((error) {});
+      render();
     }
     return Scaffold(
       backgroundColor: Colors.black,
@@ -504,7 +501,7 @@ class HomePageState extends State<HomePage> {
                                 InteractiveFlag.all - InteractiveFlag.rotate,
                           ),
                           children: [
-                            if (img != null)
+                            if (url != "")
                               OverlayImageLayer(
                                 overlayImages: [
                                   OverlayImage(
@@ -512,7 +509,7 @@ class HomePageState extends State<HomePage> {
                                       const LatLng(21.2646, 117.1595),
                                       const LatLng(26.5353, 123.9804),
                                     ),
-                                    imageProvider: img,
+                                    imageProvider: NetworkImage(url),
                                   ),
                                 ],
                               ),
