@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 Future<dynamic> get(String uri) async {
@@ -177,4 +178,35 @@ Map<String, double> speed(double depth, double distance) {
 String safeBase64Encode(String input) {
   String encoded = base64Encode(utf8.encode(input));
   return encoded.replaceAll('+', '_').replaceAll('/', '-').replaceAll('=', '');
+}
+
+String formatToUTC(TimeOfDay time) {
+  final now = DateTime.now()
+      .toUtc()
+      .add(const Duration(hours: 8)); // Current time in UTC+8
+  DateTime dateWithTime = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    time.hour,
+    time.minute,
+  );
+  if (time.hour * 60 + time.minute > now.hour * 60 + now.minute) {
+    dateWithTime = dateWithTime.subtract(const Duration(days: 1));
+  }
+  final utcDate = dateWithTime.toUtc();
+  return '${utcDate.year}${utcDate.month.toString().padLeft(2, '0')}${utcDate.day.toString().padLeft(2, '0')}${utcDate.hour.toString().padLeft(2, '0')}${utcDate.minute.toString().padLeft(2, '0')}';
+}
+
+TimeOfDay adjustTime(TimeOfDay time, int offset) {
+  int adjustedMinute = (time.minute ~/ 10) * 10 - offset;
+  int hour = time.hour;
+  if (adjustedMinute < 0) {
+    adjustedMinute += 60;
+    hour--;
+  }
+  if (hour < 0) {
+    hour += 24;
+  }
+  return TimeOfDay(hour: hour, minute: adjustedMinute);
 }

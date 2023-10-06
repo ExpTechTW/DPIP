@@ -4,16 +4,11 @@ import 'package:dpip/core/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 GlobalKey<HomePageState> homePageKey = GlobalKey();
 
-GeoJsonParser myGeoJson = GeoJsonParser(
-    defaultPolygonBorderColor: Colors.grey,
-    defaultPolygonFillColor: const Color(0xff3F4045));
-var geojson_data;
 var prefs;
 var loc_data;
 var loc_gps;
@@ -62,11 +57,9 @@ class HomePageState extends State<HomePage> {
     data ??= await get(
         "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
     loc_data ??= json.decode(await rootBundle.loadString('assets/region.json'));
-    geojson_data ??= json.decode(await rootBundle.loadString('assets/tw.json'));
     var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
         [prefs.getString("loc-town") ?? "歸仁區"];
     loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
-    myGeoJson.parseGeoJsonAsString(jsonEncode(geojson_data));
     focus_map = false;
     _List_children = <Widget>[];
     if (data == null || data == false || data["info"] == null) {
@@ -408,8 +401,8 @@ class HomePageState extends State<HomePage> {
             );
           } else {
             mapController.move(
-              const LatLng(19.5, 120.5),
-              6,
+              const LatLng(22, 120.5),
+              7,
             );
           }
           setState(() {});
@@ -417,8 +410,11 @@ class HomePageState extends State<HomePage> {
       }
     });
     if (img == null) {
-      const tempImg =
-          NetworkImage('https://api.exptech.com.tw/api/v1/dpip/radar');
+      String time_str = formatToUTC(adjustTime(TimeOfDay.now(), 10));
+      String url =
+          "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/$time_str/nowcast_${time_str}_f00.png";
+      if (TimeOfDay.now().minute % 10 > 5) url = url.replaceAll("f00", "f01");
+      var tempImg = NetworkImage(url);
       precacheImage(tempImg, context).then((_) {
         img = tempImg;
         render();
@@ -501,15 +497,25 @@ class HomePageState extends State<HomePage> {
                           mapController: mapController,
                           options: MapOptions(
                             center: const LatLng(23.4, 120.1),
-                            zoom: 6.5,
-                            minZoom: 6,
-                            maxZoom: 10,
+                            zoom: 7,
+                            minZoom: 7,
+                            maxZoom: 9,
                             interactiveFlags:
                                 InteractiveFlag.all - InteractiveFlag.rotate,
                           ),
                           children: [
-                            PolygonLayer(polygons: myGeoJson.polygons),
-                            PolylineLayer(polylines: myGeoJson.polylines),
+                            if (img != null)
+                              OverlayImageLayer(
+                                overlayImages: [
+                                  OverlayImage(
+                                    bounds: LatLngBounds(
+                                      const LatLng(21.2646, 117.1595),
+                                      const LatLng(26.5353, 123.9804),
+                                    ),
+                                    imageProvider: img,
+                                  ),
+                                ],
+                              ),
                             if (loc_gps != null)
                               MarkerLayer(
                                 markers: [
@@ -525,18 +531,6 @@ class HomePageState extends State<HomePage> {
                                   ),
                                 ],
                               ),
-                            if (img != null)
-                              OverlayImageLayer(
-                                overlayImages: [
-                                  OverlayImage(
-                                    bounds: LatLngBounds(
-                                      const LatLng(17.88, 115),
-                                      const LatLng(28.8925, 126.5125),
-                                    ),
-                                    imageProvider: img,
-                                  ),
-                                ],
-                              ),
                           ],
                         ),
                       ),
@@ -545,8 +539,8 @@ class HomePageState extends State<HomePage> {
                 ),
               ),
               DraggableScrollableSheet(
-                initialChildSize: 0.45,
-                minChildSize: 0.45,
+                initialChildSize: 0.4,
+                minChildSize: 0.2,
                 maxChildSize: 1.0,
                 builder:
                     (BuildContext context, ScrollController scrollController) {

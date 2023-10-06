@@ -55,22 +55,22 @@ android {
         multiDexEnabled true
     }
 
-//    signingConfigs {
-//        release {
-//            def keystorePropsFile = rootProject.file("key.properties")
-//            def keystoreProps = new Properties()
-//            keystoreProps.load(new FileInputStream(keystorePropsFile))
-//
-//            keyAlias keystoreProps['keyAlias']
-//            keyPassword keystoreProps['keyPassword']
-//            storeFile file(keystoreProps['storeFile'])
-//            storePassword keystoreProps['storePassword']
-//        }
-//    }
+    signingConfigs {
+        release {
+            def keystorePropsFile = rootProject.file("key.properties")
+            def keystoreProps = new Properties()
+            keystoreProps.load(new FileInputStream(keystorePropsFile))
+
+            keyAlias keystoreProps['keyAlias']
+            keyPassword keystoreProps['keyPassword']
+            storeFile file(keystoreProps['storeFile'])
+            storePassword keystoreProps['storePassword']
+        }
+    }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled true
         }
     }

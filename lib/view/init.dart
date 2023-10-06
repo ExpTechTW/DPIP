@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/core/api.dart';
 import 'package:dpip/view/earthquake.dart';
+import 'package:dpip/view/radar.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -19,10 +20,10 @@ class InitPage extends StatefulWidget {
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
   var pages = [
-    HomePage(),
+    const HomePage(),
     const HistoryPage(),
     const EarthquakePage(),
-    const MePage(), //TODO 更多
+    const Radar(), //TODO 更多
     const MePage()
   ];
 
