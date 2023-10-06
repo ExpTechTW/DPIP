@@ -188,7 +188,7 @@ class _MePage extends State<MePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "${packageInfo.version} ${(packageInfo.version.endsWith("0")) ? "Release" : "Pre-Release"}",
+                  "${packageInfo.version} ${(packageInfo.version.split(".")[2] == "0") ? "Release" : "Pre-Release"}",
                   style: const TextStyle(fontSize: 20, color: Colors.grey),
                 ),
                 const Icon(Icons.arrow_right, color: Colors.white, size: 30),
