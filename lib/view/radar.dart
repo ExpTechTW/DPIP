@@ -153,15 +153,16 @@ class _RadarState extends State<Radar> {
                     FixedExtentScrollController(initialItem: selectedIndex),
                 itemExtent: 32.0, // 每個項目的高度
                 onSelectedItemChanged: (index) {
-                  if (index < default_selectedIndex &&
-                      SecondsEarlier(times[index], 1215)) {
+                  int select_index = (default_selectedIndex - index - 1) * -1;
+                  if (select_index < 0 ||
+                      (index < default_selectedIndex &&
+                          SecondsEarlier(times[index], 1200))) {
                     String time_str = formatToUTC(times[index]);
                     url =
                         "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/obs_$time_str.png";
                     select_color = Colors.blueAccent;
                     print(url);
                   } else {
-                    int select_index = (default_selectedIndex - index - 1) * -1;
                     if (selectedIndex == 0 ||
                         compareTimeOfDay(times[index], TimeOfDay.now()) < 0) {
                       select_color = Colors.blueAccent;
