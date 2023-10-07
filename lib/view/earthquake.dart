@@ -38,7 +38,8 @@ List<Color> intensity_font = [
 ];
 
 class _EarthquakePage extends State<EarthquakePage> {
-  String url = 'https://exptech.com.tw/api/v1/trem/rts-image';
+  String url = 'https://api.exptech.com.tw/api/v1/trem/rts-image';
+  String eew_url = "https://api.exptech.com.tw/api/v1/eq/eew";
   late Widget _pic = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/rts.png");
   late final Widget _taiwan = Image.network(
@@ -64,10 +65,8 @@ class _EarthquakePage extends State<EarthquakePage> {
       if (replay != 0) replay += 1000;
       Uint8List bytes = await HTTP
           .readBytes(Uri.parse(url + ((replay != 0) ? "?time=$replay" : "")))
-          .timeout(const Duration(seconds: 5)); // 设置5秒的超时时间
+          .timeout(const Duration(seconds: 2));
       _pic = Image.memory(bytes, gaplessPlayback: true);
-    } on TimeoutException catch (e) {
-      return;
     } catch (e) {
       return;
     }
@@ -92,109 +91,164 @@ class _EarthquakePage extends State<EarthquakePage> {
     }
     data ??= await post(reports_url, {"list": {}});
     _List_children = <Widget>[];
-    if (data == null) {
-      _List_children.add(const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "服務異常",
-            style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
-          ),
-          Text(
-            "稍等片刻後重試 如持續異常 請回報開發人員",
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          )
-        ],
+    if (_page == 0) {
+      _List_children.add(Padding(
+        padding: const EdgeInsets.all(5),
+        child: Stack(alignment: Alignment.center, children: [
+          _taiwan,
+          _pic,
+          _int,
+        ]),
       ));
-    } else {
-      if (_page == 0) {
-        _List_children.add(Padding(
-          padding: const EdgeInsets.all(5),
-          child: Stack(alignment: Alignment.center, children: [
-            _taiwan,
-            _pic,
-            _int,
-          ]),
+    } else if (_page == 1) {
+      if (data == null) {
+        _List_children.add(const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "服務異常",
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
+            ),
+            Text(
+              "稍等片刻後重試 如持續異常 請回報開發人員",
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            )
+          ],
         ));
       } else {
-        if (data is! bool) {
-          for (var i = 0; i < data.length; i++) {
-            int level = data[i]["data"][0]["areaIntensity"];
-            String Lv_str = int_to_str_en(level);
-            _List_children.add(
-              Card(
-                color: const Color(0xff333439),
-                margin: const EdgeInsets.all(5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: 65,
-                        height: 65,
-                        decoration: BoxDecoration(
-                          color: intensity_back[level - 1],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: Center(
-                          child: Text(
-                            Lv_str,
-                            style: TextStyle(
-                              fontSize: 45,
-                              fontWeight: FontWeight.w600,
-                              color: intensity_font[level - 1],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    ListTile(
-                      contentPadding:
-                          const EdgeInsets.only(left: 75, right: 15),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            data[i]["location"]
-                                .substring(data[i]["location"].indexOf("(") + 1,
-                                    data[i]["location"].indexOf(")"))
-                                .replaceAll("位於", ""),
-                            style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white),
-                          ),
-                          Text(
-                            data[i]["originTime"].toString().substring(0, 16),
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                      trailing: Text(
-                        "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        for (var i = 0; i < data.length; i++) {
+          int level = data[i]["data"][0]["areaIntensity"];
+          String Lv_str = int_to_str_en(level);
+          _List_children.add(
+            Card(
+              color: const Color(0xff333439),
+              margin: const EdgeInsets.all(5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
               ),
-            );
-          }
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 65,
+                      height: 65,
+                      decoration: BoxDecoration(
+                        color: intensity_back[level - 1],
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          Lv_str,
+                          style: TextStyle(
+                            fontSize: 45,
+                            fontWeight: FontWeight.w600,
+                            color: intensity_font[level - 1],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    contentPadding: const EdgeInsets.only(left: 75, right: 15),
+                    title: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data[i]["location"]
+                              .substring(data[i]["location"].indexOf("(") + 1,
+                                  data[i]["location"].indexOf(")"))
+                              .replaceAll("位於", ""),
+                          style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white),
+                        ),
+                        Text(
+                          data[i]["originTime"].toString().substring(0, 16),
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    trailing: Text(
+                      "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
         }
       }
+    } else {
+      _List_children.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "關於強震監視器",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "強震監視器是由 TREM(臺灣即時地震監測) 觀測到 全臺 現在的震動 做為即時震度顯示的功能。",
+                style: TextStyle(color: Colors.grey[300], fontSize: 20),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "· 地震發生當下，可以透過站點顏色變化，觀察地震波傳播情形。",
+                style: TextStyle(color: Colors.grey[500], fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "· 中央氣象署 發布 強震即時警報(地震速報) 後，圖層上會顯示出 P波(藍色) S波(紅色) 的預估地震波傳播狀況。",
+                style: TextStyle(color: Colors.grey[500], fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "· 顯示的實時震度不是 中央氣象署 所提供的資料，因此可能與 中央氣象署 觀測到的震度不一致，應以 中央氣象署 公布之資訊為主。",
+                style: TextStyle(color: Colors.grey[500], fontSize: 18),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "· 由於 日常雜訊(汽車、工廠、施工等) 影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。",
+                style: TextStyle(color: Colors.grey[500], fontSize: 18),
+              ),
+              const SizedBox(height: 40),
+              const Text(
+                "關於 TREM-Net",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "2022年6月初 開始於全臺各地部署站點，TREM-Net(TREM地震觀測網) 由兩個觀測網組成，分別為SE-Net(強震觀測網「加速度儀」)及MS-Net(微震觀測網「速度儀」)，共同紀錄地震時的各項數據。",
+                style: TextStyle(color: Colors.grey[300], fontSize: 20),
+              ),
+            ],
+          ),
+        ),
+      );
     }
     if (mounted) setState(() {});
     return Future.value();
@@ -261,7 +315,27 @@ class _EarthquakePage extends State<EarthquakePage> {
                         render();
                       },
                       child: const Text(
-                        "即時測站",
+                        "強震監視器",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: (_page == 2)
+                            ? Colors.blue[800]
+                            : Colors.transparent,
+                        elevation: 20,
+                        splashFactory: NoSplash.splashFactory,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                      ),
+                      onPressed: () {
+                        _page = 2;
+                        render();
+                      },
+                      child: const Text(
+                        "關於",
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
