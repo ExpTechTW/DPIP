@@ -122,7 +122,7 @@ class HomePageState extends State<HomePage> {
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xff333439),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: Padding(
               padding: const EdgeInsets.all(10),

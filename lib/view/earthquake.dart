@@ -100,6 +100,197 @@ class _EarthquakePage extends State<EarthquakePage> {
           _int,
         ]),
       ));
+      _List_children.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "強震即時警報",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          "2023年10月15日 10:15 發震",
+                          style: TextStyle(
+                            color: Colors.grey[400], // Slightly brighter
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    margin: const EdgeInsets.all(5), // Added margin
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD90000), // Slightly adjusted color
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                        child: Text(
+                          "慎防強烈搖晃",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      _List_children.add(Padding(
+        padding: const EdgeInsets.all(10),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFEA0000),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Text("預估本地震度",
+                          style: TextStyle(color: Colors.white, fontSize: 18)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text("4",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 45,
+                                  fontWeight: FontWeight.w900)),
+                          Text("級",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 60, // Adjust as needed
+                  width: 1,
+                  color: Colors.white,
+                  margin: const EdgeInsets.only(left: 10, right: 10),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      Text("剩餘抵達時間",
+                          style: TextStyle(color: Colors.white, fontSize: 18)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text("10",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 45)),
+                          Text(".1 秒",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ));
+      _List_children.add(
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xff333439),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  title: Text(
+                    "震央位置",
+                    style: const TextStyle(
+                        fontSize: 22,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Text(
+                    "臺灣東部海域",
+                    style: TextStyle(fontSize: 22, color: Colors.grey[300]),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    "規模",
+                    style: const TextStyle(
+                        fontSize: 22,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Text(
+                    "M7.4",
+                    style: TextStyle(fontSize: 22, color: Colors.grey[300]),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    "深度",
+                    style: const TextStyle(
+                        fontSize: 22,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  trailing: Text(
+                    "10km",
+                    style: TextStyle(fontSize: 22, color: Colors.grey[300]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
     } else if (_page == 1) {
       if (data == null) {
         _List_children.add(const Column(

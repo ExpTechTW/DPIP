@@ -34,8 +34,8 @@ class _SettingPage extends State<SettingPage> {
       for (var i = 0; i < data["data"].length; i++) {
         _List_children.add(
           Card(
-            color: const Color(0xff333439), // 更改卡片顏色
-            margin: const EdgeInsets.all(5), // 增加一些外邊距
+            color: const Color(0xff333439),
+            margin: const EdgeInsets.all(5),
             child: ListTile(
               onTap: () async {
                 if (data["storage"] == "loc-city") {
