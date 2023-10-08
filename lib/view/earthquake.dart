@@ -458,10 +458,16 @@ class _EarthquakePage extends State<EarthquakePage> {
                 if (_page == 0) {
                   _page = 1;
                   render();
+                } else if (_page == 2) {
+                  _page = 0;
+                  render();
                 }
               } else if (details.primaryVelocity! < 0) {
                 if (_page == 1) {
                   _page = 0;
+                  render();
+                } else if (_page == 0) {
+                  _page = 2;
                   render();
                 }
               }
