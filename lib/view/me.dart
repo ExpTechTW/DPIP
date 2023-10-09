@@ -194,7 +194,7 @@ class _MePage extends State<MePage> {
                       color: (packageInfo.version.split(".")[2] == "0")
                           ? Colors.green
                           : Colors.red,
-                      fontWeight: FontWeight.w900),
+                      fontWeight: FontWeight.w600),
                 ),
                 const Icon(Icons.arrow_right, color: Colors.white, size: 30),
               ],
