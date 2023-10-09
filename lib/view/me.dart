@@ -188,8 +188,13 @@ class _MePage extends State<MePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "${packageInfo.version} ${(packageInfo.version.split(".")[2] == "0") ? "Release" : "Pre-Release"}",
-                  style: const TextStyle(fontSize: 20, color: Colors.grey),
+                  "${packageInfo.version} ${(packageInfo.version.split(".")[2] == "0") ? "Release" : "Alpha"}",
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: (packageInfo.version.split(".")[2] == "0")
+                          ? Colors.green
+                          : Colors.red,
+                      fontWeight: FontWeight.w900),
                 ),
                 const Icon(Icons.arrow_right, color: Colors.white, size: 30),
               ],
