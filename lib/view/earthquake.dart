@@ -46,20 +46,20 @@ class _EarthquakePage extends State<EarthquakePage> {
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/taiwan.png");
   late final Widget _int = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
-  int time = 0;
+  int replay = 0;
   var clock;
   var ntp_clock;
+  int time_ntp = 0;
+  int time_local = 0;
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
 
   void ntp() async {
-    var t = DateTime.now().microsecondsSinceEpoch;
     var ans = await get("https://api.exptech.com.tw/api/v1/ntp");
     if (ans != false) {
-      time = ans["time"] + (DateTime.now().microsecondsSinceEpoch - t) / 2;
-    } else {
-      time = DateTime.now().microsecondsSinceEpoch;
+      time_ntp = ans["time"];
+      time_local = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
@@ -75,10 +75,19 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   _updateImgWidget() async {
     try {
-      time += 1000;
-      DateTime now = DateTime.fromMillisecondsSinceEpoch(time)
-          .toUtc()
-          .add(const Duration(hours: 8));
+      if (replay != 0) replay += 1000;
+      DateTime now = (replay != 0)
+          ? DateTime.fromMillisecondsSinceEpoch(replay)
+              .toUtc()
+              .add(const Duration(hours: 8))
+          : DateTime.fromMillisecondsSinceEpoch(((time_ntp +
+                          (DateTime.now().millisecondsSinceEpoch -
+                              time_local -
+                              1000)) ~/
+                      1000) *
+                  1000)
+              .toUtc()
+              .add(const Duration(hours: 8));
 
       String YYYY = now.year.toString();
       String MM = now.month.toString().padLeft(2, '0');
@@ -89,9 +98,11 @@ class _EarthquakePage extends State<EarthquakePage> {
 
       String Now = '$YYYY$MM$DD$hh$mm$ss';
 
+      print(Now);
+
       Uint8List bytes = await HTTP
           .readBytes(Uri.parse(url + Now))
-          .timeout(const Duration(seconds: 2));
+          .timeout(const Duration(seconds: 1));
       _pic = Image.memory(bytes, gaplessPlayback: true);
     } catch (e) {
       return;
