@@ -38,8 +38,8 @@ List<Color> intensity_font = [
 ];
 
 class _EarthquakePage extends State<EarthquakePage> {
-  String url = 'https://api.exptech.com.tw/api/v1/trem/rts-image';
-  String eew_url = "https://api.exptech.com.tw/api/v1/eq/eew";
+  String url = 'https://api.exptech.com.tw/api/v1/trem/rts-image/';
+  String eew_url = "https://api.exptech.com.tw/api/v1/eq/eew/";
   late Widget _pic = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/rts.png");
   late final Widget _taiwan = Image.network(
@@ -62,9 +62,21 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   _updateImgWidget() async {
     try {
-      if (replay != 0) replay += 1000;
+      if (replay != 0) replay++;
+      DateTime now = (replay != 0)
+          ? DateTime.fromMillisecondsSinceEpoch(replay * 1000)
+          : DateTime.now();
+      String YYYY = now.year.toString();
+      String MM = now.month.toString().padLeft(2, '0');
+      String DD = now.day.toString().padLeft(2, '0');
+      String hh = now.hour.toString().padLeft(2, '0');
+      String mm = now.minute.toString().padLeft(2, '0');
+      String ss = now.second.toString().padLeft(2, '0');
+
+      String Now = '$YYYY$MM$DD$hh$mm$ss';
+
       Uint8List bytes = await HTTP
-          .readBytes(Uri.parse(url + ((replay != 0) ? "?time=$replay" : "")))
+          .readBytes(Uri.parse(url + Now))
           .timeout(const Duration(seconds: 2));
       _pic = Image.memory(bytes, gaplessPlayback: true);
     } catch (e) {
@@ -451,7 +463,7 @@ class _EarthquakePage extends State<EarthquakePage> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(5),
+          padding: const EdgeInsets.all(5),
           child: GestureDetector(
             onHorizontalDragEnd: (details) {
               if (details.primaryVelocity! > 0) {
