@@ -51,8 +51,6 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
-  String reports_url =
-      "https://yayacat.exptech.com.tw/api/v3/earthquake/reports";
 
   @override
   void initState() {
@@ -104,7 +102,7 @@ class _EarthquakePage extends State<EarthquakePage> {
         render();
       });
     }
-    data ??= await post(reports_url, {"list": {}});
+    data ??= await get("https://exptech.com.tw/api/v1/earthquake/reports?limit=50");
     _List_children = <Widget>[];
     if (_page == 0) {
       _List_children.add(Padding(
