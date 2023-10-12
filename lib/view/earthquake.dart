@@ -65,7 +65,10 @@ class _EarthquakePage extends State<EarthquakePage> {
       if (replay != 0) replay++;
       DateTime now = (replay != 0)
           ? DateTime.fromMillisecondsSinceEpoch(replay * 1000)
-          : DateTime.now();
+              .toUtc()
+              .add(const Duration(hours: 8))
+          : DateTime.now().toUtc().add(const Duration(hours: 8));
+
       String YYYY = now.year.toString();
       String MM = now.month.toString().padLeft(2, '0');
       String DD = now.day.toString().padLeft(2, '0');
