@@ -46,26 +46,38 @@ class _EarthquakePage extends State<EarthquakePage> {
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/taiwan.png");
   late final Widget _int = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
-  int replay = 0;
+  int time = 0;
   var clock;
+  var ntp_clock;
 
   int _page = 0;
   List<Widget> _List_children = <Widget>[];
 
+  void ntp() async {
+    var ans = await get("https://api.exptech.com.tw/api/v1/ntp");
+    if (ans != false) {
+      time = ans["time"];
+    } else {
+      time = DateTime.now().microsecondsSinceEpoch;
+    }
+  }
+
   @override
   void initState() {
+    ntp();
+    ntp_clock = Timer.periodic(const Duration(seconds: 60), (timer) {
+      ntp();
+    });
     render();
     super.initState();
   }
 
   _updateImgWidget() async {
     try {
-      if (replay != 0) replay++;
-      DateTime now = (replay != 0)
-          ? DateTime.fromMillisecondsSinceEpoch(replay * 1000)
-              .toUtc()
-              .add(const Duration(hours: 8))
-          : DateTime.now().toUtc().add(const Duration(hours: 8));
+      time += 1000;
+      DateTime now = DateTime.fromMillisecondsSinceEpoch(time)
+          .toUtc()
+          .add(const Duration(hours: 8));
 
       String YYYY = now.year.toString();
       String MM = now.month.toString().padLeft(2, '0');
@@ -88,6 +100,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   @override
   void dispose() {
     if (clock != null) clock.cancel();
+    if (ntp_clock != null) ntp_clock.cancel();
     super.dispose();
   }
 
@@ -102,7 +115,8 @@ class _EarthquakePage extends State<EarthquakePage> {
         render();
       });
     }
-    data ??= await get("https://exptech.com.tw/api/v1/earthquake/reports?limit=50");
+    data ??=
+        await get("https://exptech.com.tw/api/v1/earthquake/reports?limit=50");
     _List_children = <Widget>[];
     if (_page == 0) {
       _List_children.add(Padding(
