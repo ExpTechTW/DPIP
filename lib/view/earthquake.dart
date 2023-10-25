@@ -58,7 +58,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   void ntp() async {
     var ans = await get("https://api.exptech.com.tw/api/v1/ntp");
     if (ans != false) {
-      time_ntp = ans["time"];
+      time_ntp = ans["time"] - 1000;
       time_local = DateTime.now().millisecondsSinceEpoch;
     }
   }

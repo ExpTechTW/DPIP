@@ -2,6 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/core/api.dart';
 import 'package:dpip/view/earthquake.dart';
 import 'package:dpip/view/radar.dart';
+import 'package:dpip/view/report.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -23,7 +24,7 @@ class _InitPage extends State<InitPage> {
     const HomePage(),
     const HistoryPage(),
     const EarthquakePage(),
-    const Radar(), //TODO 更多
+    const ReportPage(), //TODO 更多
     const MePage()
   ];
 
