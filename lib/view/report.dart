@@ -71,14 +71,33 @@ class _ReportPage extends State<ReportPage> {
                       child: ListView(
                         controller: scrollController,
                         children: [
-                          Center(
-                            child: Text(
-                              "顯著有感地震",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "顯著有感地震",
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white),
+                                ),
+                                Text(
+                                  "112106",
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFFF4C31C)),
+                                ),
+                                Text(
+                                  "最大震度",
+                                  style: TextStyle(
+                                      fontSize: 21,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFFBABABA)),
+                                ),
+                              ],
                             ),
                           ),
                           Padding(
