@@ -83,6 +83,16 @@ class _ReportPage extends State<ReportPage> {
                       child: ListView(
                         controller: scrollController,
                         children: [
+                          Center(
+                            child: Container(
+                              width: 40,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[600],
+                                borderRadius: BorderRadius.circular(2.5),
+                              ),
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(10),
                             child: Row(
@@ -125,7 +135,8 @@ class _ReportPage extends State<ReportPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "發生時間: ",
@@ -146,7 +157,8 @@ class _ReportPage extends State<ReportPage> {
                                       ],
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "震央位置: ",
@@ -170,7 +182,8 @@ class _ReportPage extends State<ReportPage> {
                                       ],
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "規模: ",
@@ -191,7 +204,8 @@ class _ReportPage extends State<ReportPage> {
                                       ],
                                     ),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           "深度: ",
@@ -214,6 +228,21 @@ class _ReportPage extends State<ReportPage> {
                                   ],
                                 ),
                               ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "各地震度",
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white),
+                                ),
+                              ],
                             ),
                           ),
                         ],
