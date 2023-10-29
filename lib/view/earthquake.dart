@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as HTTP;
 
 import '../core/api.dart';
+import 'report.dart';
 
 class EarthquakePage extends StatefulWidget {
   const EarthquakePage({Key? key}) : super(key: key);
@@ -357,66 +358,77 @@ class _EarthquakePage extends State<EarthquakePage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 65,
-                      height: 65,
-                      decoration: BoxDecoration(
-                        color: intensity_back[level - 1],
-                        borderRadius: BorderRadius.circular(5),
+              child: InkWell(
+                onTap: () {
+                  ReportPage.data = data[i];
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReportPage(),
                       ),
-                      child: Center(
-                        child: Text(
-                          Lv_str,
-                          style: TextStyle(
-                            fontSize: 45,
-                            fontWeight: FontWeight.w600,
-                            color: intensity_font[level - 1],
+                  );
+                },
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        width: 65,
+                        height: 65,
+                        decoration: BoxDecoration(
+                          color: intensity_back[level - 1],
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            Lv_str,
+                            style: TextStyle(
+                              fontSize: 45,
+                              fontWeight: FontWeight.w600,
+                              color: intensity_font[level - 1],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  ListTile(
-                    contentPadding: const EdgeInsets.only(left: 75, right: 15),
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          data[i]["location"]
-                              .substring(data[i]["location"].indexOf("(") + 1,
-                                  data[i]["location"].indexOf(")"))
-                              .replaceAll("位於", ""),
-                          style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white),
+                    ListTile(
+                      contentPadding: const EdgeInsets.only(left: 75, right: 15),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            data[i]["location"]
+                                .substring(data[i]["location"].indexOf("(") + 1,
+                                    data[i]["location"].indexOf(")"))
+                                .replaceAll("位於", ""),
+                            style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            data[i]["originTime"].toString().substring(0, 16),
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300,
+                                color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                      trailing: Text(
+                        "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
-                        Text(
-                          data[i]["originTime"].toString().substring(0, 16),
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w300,
-                              color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                    trailing: Text(
-                      "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              )
             ),
           );
         }

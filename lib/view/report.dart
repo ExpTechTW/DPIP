@@ -5,11 +5,23 @@ import 'package:latlong2/latlong.dart';
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
 
+  static Map<String, dynamic> data = {};
+
   @override
   _ReportPage createState() => _ReportPage();
 }
 
+var data;
+
 class _ReportPage extends State<ReportPage> {
+
+  @override
+  void initState() {
+    data = ReportPage.data;
+    print(data);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +96,7 @@ class _ReportPage extends State<ReportPage> {
                                       color: Colors.white),
                                 ),
                                 Text(
-                                  "112106",
+                                  "${data["earthquakeNo"].toStringAsFixed(0)}",
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.w800,
@@ -124,7 +136,7 @@ class _ReportPage extends State<ReportPage> {
                                           ),
                                         ),
                                         Text(
-                                          "2023年9月27日 19:33:27",
+                                          data["originTime"].toString().substring(0, 16),
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,
@@ -145,7 +157,10 @@ class _ReportPage extends State<ReportPage> {
                                           ),
                                         ),
                                         Text(
-                                          "花蓮近海",
+                                          data["location"]
+                                            .substring(data["location"].indexOf("(") + 1,
+                                                data["location"].indexOf(")"))
+                                            .replaceAll("位於", ""),
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,
@@ -166,7 +181,7 @@ class _ReportPage extends State<ReportPage> {
                                           ),
                                         ),
                                         Text(
-                                          "M7.4",
+                                          "M ${data["magnitudeValue"].toStringAsFixed(1)}",
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,
@@ -187,7 +202,7 @@ class _ReportPage extends State<ReportPage> {
                                           ),
                                         ),
                                         Text(
-                                          "14.7KM",
+                                          "${data["depth"].toStringAsFixed(1)} KM",
                                           style: TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.w600,

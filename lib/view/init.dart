@@ -24,7 +24,7 @@ class _InitPage extends State<InitPage> {
     const HomePage(),
     const HistoryPage(),
     const EarthquakePage(),
-    const ReportPage(), //TODO 更多
+    const Radar(), //TODO 更多
     const MePage()
   ];
 
