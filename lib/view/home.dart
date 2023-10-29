@@ -64,9 +64,19 @@ class HomePageState extends State<HomePage> {
     focus_map = false;
     _List_children = <Widget>[];
     if (data == null || data == false || data["info"] == null) {
-      _List_children.add(const Column(
+      _List_children.add(Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Center(
+              //滑動標示
+              child: Container(
+            width: 40,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.grey[600],
+              borderRadius: BorderRadius.circular(2.5),
+            ),
+          )),
           Text(
             "服務異常",
             style: TextStyle(
@@ -85,6 +95,16 @@ class HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(//滑動標示
+                child: Container(
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[600],
+                    borderRadius: BorderRadius.circular(2.5),
+                  ),
+                ),
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
@@ -298,11 +318,21 @@ class HomePageState extends State<HomePage> {
           }
         }
       } else {
-        _List_children.add(const Padding(
+        _List_children.add(Padding(
           padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                  //滑動標示
+                  child: Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(2.5),
+                ),
+              )),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
@@ -319,6 +349,7 @@ class HomePageState extends State<HomePage> {
             ],
           ),
         ));
+
         if (data["all"].length == 0) {
           _List_children.add(const Padding(
             padding: EdgeInsets.all(10),
