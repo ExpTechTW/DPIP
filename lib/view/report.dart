@@ -45,11 +45,48 @@ class _ReportPage extends State<ReportPage> {
     level = data["data"][0]["areaIntensity"];
     Lv_str = int_to_str_en(level);
 
+    Marker marker = Marker(
+      point: LatLng(data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
+      builder: (ctx) => Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            Icons.close,
+            color: Colors.red,
+            size: 24,
+          ),
+        ],
+      ),
+    );
+
+    markers.add(marker);
+
     data["data"].forEach((area) {
       area["eqStation"].forEach((station) {
+        var station_level = station["stationIntensity"];
+        var st_Lv_str = int_to_str_en(station_level);
         Marker marker = Marker(
           point: LatLng(station["stationLat"].toDouble(), station["stationLon"].toDouble()),
-          builder: (ctx) => Icon(Icons.location_on, size: 20),
+          builder: (ctx) => Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 15,
+                height: 15,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: intensity_back[station_level - 1],
+                ),
+              ),
+              Text(
+                st_Lv_str,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
         );
 
         markers.add(marker);
@@ -73,7 +110,7 @@ class _ReportPage extends State<ReportPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "地震報告",
+                      "詳細地震報告",
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
