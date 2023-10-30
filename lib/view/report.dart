@@ -14,6 +14,7 @@ class ReportPage extends StatefulWidget {
 var data,earthquakeNo = "",earthquakeNo_text = "";
 
 class _ReportPage extends State<ReportPage> {
+  final List<Marker> markers = [];
 
   @override
   void initState() {
@@ -27,6 +28,18 @@ class _ReportPage extends State<ReportPage> {
       earthquakeNo_text = "小區域有感地震";
       earthquakeNo = "";
     }
+
+    data["data"].forEach((area) {
+      area["eqStation"].forEach((station) {
+        Marker marker = Marker(
+          point: LatLng(station["stationLat"].toDouble(), station["stationLon"].toDouble()),
+          builder: (ctx) => Icon(Icons.location_on, size: 20),
+        );
+
+        markers.add(marker);
+
+      });
+    });
     print(data);
     super.initState();
   }
@@ -70,6 +83,9 @@ class _ReportPage extends State<ReportPage> {
                       TileLayer(
                         urlTemplate:
                             "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
+                      ),
+                      MarkerLayer(
+                        markers: markers,
                       ),
                     ],
                   ),
