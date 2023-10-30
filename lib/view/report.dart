@@ -11,13 +11,22 @@ class ReportPage extends StatefulWidget {
   _ReportPage createState() => _ReportPage();
 }
 
-var data;
+var data,earthquakeNo = "",earthquakeNo_text = "";
 
 class _ReportPage extends State<ReportPage> {
 
   @override
   void initState() {
     data = ReportPage.data;
+    earthquakeNo = data["earthquakeNo"].toStringAsFixed(0);
+    var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
+
+    if(last3 != '000') {
+      earthquakeNo_text = "顯著有感地震";
+    } else {
+      earthquakeNo_text = "小區域有感地震";
+      earthquakeNo = "";
+    }
     print(data);
     super.initState();
   }
@@ -99,14 +108,14 @@ class _ReportPage extends State<ReportPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "顯著有感地震",
+                                  earthquakeNo_text,
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.w800,
                                       color: Colors.white),
                                 ),
                                 Text(
-                                  "${data["earthquakeNo"].toStringAsFixed(0)}",
+                                  earthquakeNo,
                                   style: TextStyle(
                                       fontSize: 25,
                                       fontWeight: FontWeight.w800,

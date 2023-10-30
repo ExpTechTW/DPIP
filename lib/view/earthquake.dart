@@ -365,7 +365,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ReportPage(),
-                      ),
+                    ),
                   );
                 },
                 child: Stack(
