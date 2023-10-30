@@ -83,12 +83,12 @@ class _ReportPage extends State<ReportPage> {
                   ],
                 ),
                 SizedBox(
-                  height: 450,
+                  height: 400,
                   child: FlutterMap(
                     // key: ValueKey(_page),
                     // mapController: mapController,
                     options: MapOptions(
-                      center: const LatLng(23.4, 120.1),
+                      center: const LatLng(23.8, 120.1),
                       zoom: 7,
                       minZoom: 7,
                       maxZoom: 9,
@@ -109,8 +109,8 @@ class _ReportPage extends State<ReportPage> {
               ],
             ),
             DraggableScrollableSheet(
-              initialChildSize: 0.3,
-              minChildSize: 0.2,
+              initialChildSize: 0.5,
+              minChildSize: 0.4,
               maxChildSize: 1.0,
               builder:
                   (BuildContext context, ScrollController scrollController) {
