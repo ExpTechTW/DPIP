@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../core/api.dart';
+
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
 
@@ -11,7 +13,18 @@ class ReportPage extends StatefulWidget {
   _ReportPage createState() => _ReportPage();
 }
 
-var data,earthquakeNo = "",earthquakeNo_text = "";
+var data,earthquakeNo = "",earthquakeNo_text = "",level = 0,Lv_str = "";
+List<Color> intensity_back = const [
+  Color(0xff6B7878),
+  Color(0xff1E6EE6),
+  Color(0xff32B464),
+  Color(0xffFFE05D),
+  Color(0xffFFAA13),
+  Color(0xffEF700F),
+  Color(0xffE60000),
+  Color(0xffA00000),
+  Color(0xff5D0090),
+];
 
 class _ReportPage extends State<ReportPage> {
   final List<Marker> markers = [];
@@ -28,6 +41,9 @@ class _ReportPage extends State<ReportPage> {
       earthquakeNo_text = "小區域有感地震";
       earthquakeNo = "";
     }
+
+    level = data["data"][0]["areaIntensity"];
+    Lv_str = int_to_str_en(level);
 
     data["data"].forEach((area) {
       area["eqStation"].forEach((station) {
@@ -143,6 +159,14 @@ class _ReportPage extends State<ReportPage> {
                                       fontSize: 21,
                                       fontWeight: FontWeight.w800,
                                       color: Color(0xFFBABABA)),
+                                ),
+                                Text(
+                                  Lv_str,
+                                  style: TextStyle(
+                                    fontSize: 45,
+                                    fontWeight: FontWeight.w600,
+                                    color: intensity_back[level - 1],
+                                  ),
                                 ),
                               ],
                             ),
