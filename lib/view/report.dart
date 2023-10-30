@@ -135,43 +135,6 @@ class _ReportPage extends State<ReportPage> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  earthquakeNo_text,
-                                  style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white),
-                                ),
-                                Text(
-                                  earthquakeNo,
-                                  style: TextStyle(
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFFF4C31C)),
-                                ),
-                                Text(
-                                  "最大震度",
-                                  style: TextStyle(
-                                      fontSize: 21,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFFBABABA)),
-                                ),
-                                Text(
-                                  Lv_str,
-                                  style: TextStyle(
-                                    fontSize: 45,
-                                    fontWeight: FontWeight.w600,
-                                    color: intensity_back[level - 1],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
                             padding: const EdgeInsets.all(5),
                             child: Container(
                               decoration: BoxDecoration(
@@ -183,6 +146,50 @@ class _ReportPage extends State<ReportPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          earthquakeNo_text,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          earthquakeNo,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFFF4C31C),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "最大震度: ",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          Lv_str,
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            color: intensity_back[level - 1],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
