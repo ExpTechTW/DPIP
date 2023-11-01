@@ -13,7 +13,7 @@ class ReportPage extends StatefulWidget {
   _ReportPage createState() => _ReportPage();
 }
 
-var data,earthquakeNo = "",earthquakeNo_text = "",level = 0,Lv_str = "";
+var data, earthquakeNo = "", earthquakeNo_text = "", level = 0, Lv_str = "";
 List<Color> intensity_back = const [
   Color(0xff6B7878),
   Color(0xff1E6EE6),
@@ -36,7 +36,7 @@ class _ReportPage extends State<ReportPage> {
     earthquakeNo = data["earthquakeNo"].toStringAsFixed(0);
     var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
 
-    if(last3 != '000') {
+    if (last3 != '000') {
       earthquakeNo_text = "顯著有感地震";
     } else {
       earthquakeNo_text = "小區域有感地震";
@@ -47,7 +47,8 @@ class _ReportPage extends State<ReportPage> {
     Lv_str = int_to_str_en(level);
 
     Marker ep_marker = Marker(
-      point: LatLng(data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
+      point: LatLng(
+          data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
       builder: (ctx) => Stack(
         alignment: Alignment.center,
         children: [
@@ -89,8 +90,7 @@ class _ReportPage extends State<ReportPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       earthquakeNo_text,
@@ -111,8 +111,7 @@ class _ReportPage extends State<ReportPage> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "最大震度: ",
@@ -133,8 +132,7 @@ class _ReportPage extends State<ReportPage> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "發生時間: ",
@@ -155,8 +153,7 @@ class _ReportPage extends State<ReportPage> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "震央位置: ",
@@ -168,9 +165,9 @@ class _ReportPage extends State<ReportPage> {
                     ),
                     Text(
                       data["location"]
-                        .substring(data["location"].indexOf("(") + 1,
-                            data["location"].indexOf(")"))
-                        .replaceAll("位於", ""),
+                          .substring(data["location"].indexOf("(") + 1,
+                              data["location"].indexOf(")"))
+                          .replaceAll("位於", ""),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -180,8 +177,7 @@ class _ReportPage extends State<ReportPage> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "規模: ",
@@ -202,8 +198,7 @@ class _ReportPage extends State<ReportPage> {
                   ],
                 ),
                 Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       "深度: ",
@@ -252,7 +247,8 @@ class _ReportPage extends State<ReportPage> {
         var station_level = station["stationIntensity"];
         var st_Lv_str = int_to_str_en(station_level);
         Marker marker = Marker(
-          point: LatLng(station["stationLat"].toDouble(), station["stationLon"].toDouble()),
+          point: LatLng(station["stationLat"].toDouble(),
+              station["stationLon"].toDouble()),
           builder: (ctx) => Stack(
             alignment: Alignment.center,
             children: [
@@ -291,8 +287,7 @@ class _ReportPage extends State<ReportPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           "${area["areaName"]} ${station["stationName"]}",
@@ -334,17 +329,29 @@ class _ReportPage extends State<ReportPage> {
           children: [
             Column(
               children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Stack(
                   children: [
-                    Text(
-                      "詳細地震報告",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                    // 中央的文本
+                    Center(
+                      child: Text(
+                        "詳細地震報告",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
                       ),
-                    )
+                    ),
+                    // 左側的返回箭頭按鈕
+                    Positioned(
+                      left: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                        onPressed: () {
+                          Navigator.pop(context); // 返回上一頁
+                        },
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(
