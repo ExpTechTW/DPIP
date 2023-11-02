@@ -247,13 +247,11 @@ class _ReportPage extends State<ReportPage> {
     data["data"].forEach((area) {
       _expanded.add(false);
       List<Widget> areaChildren = [];
-      var st_Lv_str;
-      var station_level;
       var maxStationLevel = 0;
-      
+
       area["eqStation"].forEach((station) {
-        station_level = station["stationIntensity"];
-        st_Lv_str = int_to_str_en(station_level);
+        var station_level = station["stationIntensity"];
+        var st_Lv_str = int_to_str_en(station_level);
         if (station_level > maxStationLevel) {
           maxStationLevel = station_level;
         }
@@ -282,7 +280,7 @@ class _ReportPage extends State<ReportPage> {
           ),
         );
         markers.add(marker);
-        
+
         areaChildren.add(
           Padding(
             padding: const EdgeInsets.all(5),
@@ -290,7 +288,7 @@ class _ReportPage extends State<ReportPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
-                  crossAxisAlignment: 
+                  crossAxisAlignment:
                   CrossAxisAlignment.start,
                   children: [
                     Text(
