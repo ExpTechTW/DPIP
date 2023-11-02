@@ -29,6 +29,7 @@ List<Widget> _List_children = <Widget>[];
 
 class _ReportPage extends State<ReportPage> {
   final List<Marker> markers = [];
+  List<bool> _expanded = [];
 
   @override
   void initState() {
@@ -45,10 +46,11 @@ class _ReportPage extends State<ReportPage> {
 
     level = data["data"][0]["areaIntensity"];
     Lv_str = int_to_str_en(level);
+    _expanded = List<bool>.generate(data["data"].length, (index) => false);
 
     Marker ep_marker = Marker(
       point: LatLng(
-          data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
+        data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
       builder: (ctx) => Stack(
         alignment: Alignment.center,
         children: [
@@ -166,7 +168,7 @@ class _ReportPage extends State<ReportPage> {
                     Text(
                       data["location"]
                           .substring(data["location"].indexOf("(") + 1,
-                              data["location"].indexOf(")"))
+                            data["location"].indexOf(")"))
                           .replaceAll("位於", ""),
                       style: TextStyle(
                         fontSize: 20,
@@ -243,12 +245,21 @@ class _ReportPage extends State<ReportPage> {
     );
 
     data["data"].forEach((area) {
+      _expanded.add(false);
+      List<Widget> areaChildren = [];
+      var st_Lv_str;
+      var station_level;
+      var maxStationLevel = 0;
+      
       area["eqStation"].forEach((station) {
-        var station_level = station["stationIntensity"];
-        var st_Lv_str = int_to_str_en(station_level);
+        station_level = station["stationIntensity"];
+        st_Lv_str = int_to_str_en(station_level);
+        if (station_level > maxStationLevel) {
+          maxStationLevel = station_level;
+        }
         Marker marker = Marker(
           point: LatLng(station["stationLat"].toDouble(),
-              station["stationLon"].toDouble()),
+          station["stationLon"].toDouble()),
           builder: (ctx) => Stack(
             alignment: Alignment.center,
             children: [
@@ -270,50 +281,84 @@ class _ReportPage extends State<ReportPage> {
             ],
           ),
         );
-
         markers.add(marker);
-
-        _List_children.add(
+        
+        areaChildren.add(
           Padding(
             padding: const EdgeInsets.all(5),
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xff333439),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: 
+                  CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Text(
+                      "${station["stationName"]}",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                       ),
+                    ),
+                    Text(
+                      st_Lv_str,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: intensity_back[station_level - 1],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+
+      _List_children.add(
+        Padding(
+          padding: const EdgeInsets.all(5),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xff333439),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: ExpansionTile(
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${area["areaName"]} ${station["stationName"]}",
+                          "${area["areaName"]}",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          st_Lv_str,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: intensity_back[station_level - 1],
-                          ),
-                        ),
                       ],
+                    ),
+                    Text(
+                      int_to_str_en(maxStationLevel),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: intensity_back[maxStationLevel - 1],
+                      ),
                     ),
                   ],
                 ),
+                children: areaChildren,
               ),
             ),
           ),
-        );
-      });
+        ),
+      );
     });
 
     print(data);
