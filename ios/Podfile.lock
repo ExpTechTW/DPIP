@@ -5,18 +5,18 @@ PODS:
     - Flutter
     - ReachabilitySwift
   - Firebase/CoreOnly (10.16.0):
-    - FirebaseCore (= 10.15.0)
-  - Firebase/Messaging (10.15.0):
+    - FirebaseCore (= 10.16.0)
+  - Firebase/Messaging (10.16.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 10.15.0)
+    - FirebaseMessaging (~> 10.16.0)
   - firebase_core (2.21.0):
     - Firebase/CoreOnly (= 10.16.0)
     - Flutter
   - firebase_messaging (14.7.3):
-    - Firebase/Messaging (= 10.15.0)
+    - Firebase/Messaging (= 10.16.0)
     - firebase_core
     - Flutter
-  - FirebaseCore (10.15.0):
+  - FirebaseCore (10.16.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/Logger (~> 7.8)
@@ -27,7 +27,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
-  - FirebaseMessaging (10.15.0):
+  - FirebaseMessaging (10.16.0):
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
     - GoogleDataTransport (~> 9.2)
