@@ -81,8 +81,11 @@ class _ReportPage extends State<ReportPage> {
     _List_children.add(
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center, // 修改此處以置中
+        child: Wrap(
+          alignment: WrapAlignment.center, // 用於水平置中Wrap中的子部件
+          crossAxisAlignment: WrapCrossAlignment.center, // 用於垂直置中Wrap中的子部件
+          spacing: 20, // 水平間隔
+          runSpacing: 20, // 垂直間隔，當換行時使用
           children: [
             Text(
               earthquakeNo_text,
@@ -92,8 +95,6 @@ class _ReportPage extends State<ReportPage> {
                 color: Colors.white,
               ),
             ),
-            SizedBox(width: 30), // 添加一個固定寬度的空間，或者使用下面的全形空格
-            // Text("　　"), // 兩個全形空白，如果需要的話
             Text(
               earthquakeNo,
               style: TextStyle(
@@ -101,6 +102,30 @@ class _ReportPage extends State<ReportPage> {
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFF4C31C),
               ),
+            ),
+            Wrap(
+              alignment: WrapAlignment.center, // 用於水平置中Wrap中的子部件
+              crossAxisAlignment: WrapCrossAlignment.center, // 用於垂直置中Wrap中的子部件
+              spacing: 20, // 水平間隔
+              runSpacing: 20, // 垂直間隔，當換行時使用
+              children: [
+                Text(
+                  "最大震度: ",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  Lv_str,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: intensity_back[level - 1],
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -119,27 +144,6 @@ class _ReportPage extends State<ReportPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "最大震度: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      Lv_str,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: intensity_back[level - 1],
-                      ),
-                    ),
-                  ],
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
