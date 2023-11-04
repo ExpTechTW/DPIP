@@ -189,48 +189,66 @@ class _ReportPage extends State<ReportPage> {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "規模: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      "M ${data["magnitudeValue"].toStringAsFixed(1)}",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    // 檢查可用寬度是否足以容納標籤和值
+                    // 這裡的 200 是 Text("深度: ") 和 Text("${data["depth"].toStringAsFixed(1)} KM") 結合後的估計寬度
+                    // 這個值可能需要根據實際內容和樣式進行調整
+                    bool canFit = constraints.maxWidth > 200;
+
+                    if (canFit) {
+                      // 如果可以容納，則保持在同一行
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "規模: \u3000 M ${data["magnitudeValue"].toStringAsFixed(1)}",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "深度: \u3000 ${data["depth"].toStringAsFixed(1)} KM",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      // 如果不能容納，則將 "深度" 組合換行
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "規模: \u3000 M ${data["magnitudeValue"].toStringAsFixed(1)}",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "深度: \u3000 ${data["depth"].toStringAsFixed(1)} KM",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "深度: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      "${data["depth"].toStringAsFixed(1)} KM",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+
+
               ],
             ),
           ),
