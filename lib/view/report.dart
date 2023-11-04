@@ -247,14 +247,12 @@ class _ReportPage extends State<ReportPage> {
                     }
                   },
                 ),
-
-
               ],
             ),
           ),
         ),
       ),
-    );
+    ); //2023/11/4進度，以上暫定已修改完畢
     _List_children.add(
       Padding(
         padding: const EdgeInsets.all(10),
