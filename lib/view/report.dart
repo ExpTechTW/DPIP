@@ -50,7 +50,7 @@ class _ReportPage extends State<ReportPage> {
 
     Marker ep_marker = Marker(
       point: LatLng(
-        data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
+          data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
       builder: (ctx) => Stack(
         alignment: Alignment.center,
         children: [
@@ -80,6 +80,34 @@ class _ReportPage extends State<ReportPage> {
     );
     _List_children.add(
       Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center, // 修改此處以置中
+          children: [
+            Text(
+              earthquakeNo_text,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: 30), // 添加一個固定寬度的空間，或者使用下面的全形空格
+            // Text("　　"), // 兩個全形空白，如果需要的話
+            Text(
+              earthquakeNo,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFF4C31C),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    _List_children.add(
+      Padding(
         padding: const EdgeInsets.all(5),
         child: Container(
           decoration: BoxDecoration(
@@ -91,27 +119,6 @@ class _ReportPage extends State<ReportPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      earthquakeNo_text,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      earthquakeNo,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFF4C31C),
-                      ),
-                    ),
-                  ],
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -168,7 +175,7 @@ class _ReportPage extends State<ReportPage> {
                     Text(
                       data["location"]
                           .substring(data["location"].indexOf("(") + 1,
-                            data["location"].indexOf(")"))
+                              data["location"].indexOf(")"))
                           .replaceAll("位於", ""),
                       style: TextStyle(
                         fontSize: 20,
@@ -257,7 +264,7 @@ class _ReportPage extends State<ReportPage> {
         }
         Marker marker = Marker(
           point: LatLng(station["stationLat"].toDouble(),
-          station["stationLon"].toDouble()),
+              station["stationLon"].toDouble()),
           builder: (ctx) => Stack(
             alignment: Alignment.center,
             children: [
@@ -288,8 +295,7 @@ class _ReportPage extends State<ReportPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "${station["stationName"]}",
@@ -297,7 +303,7 @@ class _ReportPage extends State<ReportPage> {
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
-                       ),
+                      ),
                     ),
                     Text(
                       st_Lv_str,
@@ -389,7 +395,8 @@ class _ReportPage extends State<ReportPage> {
                     Positioned(
                       left: 0,
                       child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                        icon:
+                            Icon(Icons.arrow_back_ios_new, color: Colors.white),
                         onPressed: () {
                           Navigator.pop(context); // 返回上一頁
                         },
