@@ -129,7 +129,7 @@ class _EarthquakePage extends State<EarthquakePage> {
       });
     }
     data ??=
-        await get("https://exptech.com.tw/api/v1/earthquake/reports?limit=50");
+        await get("https://data.exptech.com.tw/api/v1/eq/report?limit=50");
     _List_children = <Widget>[];
     if (_page == 0) {
       _List_children.add(Padding(
