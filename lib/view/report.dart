@@ -50,7 +50,7 @@ class _ReportPage extends State<ReportPage> {
 
     Marker ep_marker = Marker(
       point: LatLng(
-        data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
+          data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
       builder: (ctx) => Stack(
         alignment: Alignment.center,
         children: [
@@ -80,6 +80,59 @@ class _ReportPage extends State<ReportPage> {
     );
     _List_children.add(
       Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+        child: Wrap(
+          alignment: WrapAlignment.center, // 用於水平置中Wrap中的子部件
+          crossAxisAlignment: WrapCrossAlignment.center, // 用於垂直置中Wrap中的子部件
+          spacing: 20, // 水平間隔
+          runSpacing: 20, // 垂直間隔，當換行時使用
+          children: [
+            Text(
+              earthquakeNo_text,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              earthquakeNo,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFF4C31C),
+              ),
+            ),
+            Wrap(
+              alignment: WrapAlignment.center, // 用於水平置中Wrap中的子部件
+              crossAxisAlignment: WrapCrossAlignment.center, // 用於垂直置中Wrap中的子部件
+              spacing: 20, // 水平間隔
+              runSpacing: 20, // 垂直間隔，當換行時使用
+              children: [
+                Text(
+                  "最大震度: ",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  Lv_str,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: intensity_back[level - 1],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    _List_children.add(
+      Padding(
         padding: const EdgeInsets.all(5),
         child: Container(
           decoration: BoxDecoration(
@@ -91,48 +144,6 @@ class _ReportPage extends State<ReportPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      earthquakeNo_text,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      earthquakeNo,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFF4C31C),
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "最大震度: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      Lv_str,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: intensity_back[level - 1],
-                      ),
-                    ),
-                  ],
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -168,7 +179,7 @@ class _ReportPage extends State<ReportPage> {
                     Text(
                       data["location"]
                           .substring(data["location"].indexOf("(") + 1,
-                            data["location"].indexOf(")"))
+                              data["location"].indexOf(")"))
                           .replaceAll("位於", ""),
                       style: TextStyle(
                         fontSize: 20,
@@ -178,54 +189,70 @@ class _ReportPage extends State<ReportPage> {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "規模: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      "M ${data["magnitudeValue"].toStringAsFixed(1)}",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "深度: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      "${data["depth"].toStringAsFixed(1)} KM",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    // 檢查可用寬度是否足以容納標籤和值
+                    // 這裡的 200 是 Text("深度: ") 和 Text("${data["depth"].toStringAsFixed(1)} KM") 結合後的估計寬度
+                    // 這個值可能需要根據實際內容和樣式進行調整
+                    bool canFit = constraints.maxWidth > 200;
+
+                    if (canFit) {
+                      // 如果可以容納，則保持在同一行
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "規模: \u3000 M ${data["magnitudeValue"].toStringAsFixed(1)}",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "深度: \u3000 ${data["depth"].toStringAsFixed(1)} KM",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      // 如果不能容納，則將 "深度" 組合換行
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "規模: \u3000 M ${data["magnitudeValue"].toStringAsFixed(1)}",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            "深度: \u3000 ${data["depth"].toStringAsFixed(1)} KM",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
               ],
             ),
           ),
         ),
       ),
-    );
+    ); //2023/11/4進度，以上暫定已修改完畢
     _List_children.add(
       Padding(
         padding: const EdgeInsets.all(10),
@@ -257,7 +284,7 @@ class _ReportPage extends State<ReportPage> {
         }
         Marker marker = Marker(
           point: LatLng(station["stationLat"].toDouble(),
-          station["stationLon"].toDouble()),
+              station["stationLon"].toDouble()),
           builder: (ctx) => Stack(
             alignment: Alignment.center,
             children: [
@@ -288,8 +315,7 @@ class _ReportPage extends State<ReportPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "${station["stationName"]}",
@@ -297,7 +323,7 @@ class _ReportPage extends State<ReportPage> {
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
-                       ),
+                      ),
                     ),
                     Text(
                       st_Lv_str,
@@ -389,7 +415,8 @@ class _ReportPage extends State<ReportPage> {
                     Positioned(
                       left: 0,
                       child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                        icon:
+                            Icon(Icons.arrow_back_ios_new, color: Colors.white),
                         onPressed: () {
                           Navigator.pop(context); // 返回上一頁
                         },
