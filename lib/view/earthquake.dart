@@ -349,8 +349,13 @@ class _EarthquakePage extends State<EarthquakePage> {
         ));
       } else {
         for (var i = 0; i < data.length; i++) {
-          int level = data[i]["data"][0]["areaIntensity"];
+          var keys = data[i]["list"].keys.toList();
+          int level = data[i]["list"][keys[0]]["int"];
           String Lv_str = int_to_str_en(level);
+          var dateTime = DateTime.fromMillisecondsSinceEpoch(data[i]["time"]);
+          var dateStr = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+          var timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+          var formatted = "$dateStr $timeStr";
           _List_children.add(
             Card(
               color: const Color(0xff333439),
@@ -399,9 +404,9 @@ class _EarthquakePage extends State<EarthquakePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            data[i]["location"]
-                                .substring(data[i]["location"].indexOf("(") + 1,
-                                    data[i]["location"].indexOf(")"))
+                            data[i]["loc"]
+                                .substring(data[i]["loc"].indexOf("(") + 1,
+                                    data[i]["loc"].indexOf(")"))
                                 .replaceAll("位於", ""),
                             style: const TextStyle(
                                 fontSize: 22,
@@ -409,7 +414,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                                 color: Colors.white),
                           ),
                           Text(
-                            data[i]["originTime"].toString().substring(0, 16),
+                            formatted,
                             style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w300,
@@ -418,7 +423,7 @@ class _EarthquakePage extends State<EarthquakePage> {
                         ],
                       ),
                       trailing: Text(
-                        "M ${data[i]["magnitudeValue"].toStringAsFixed(1)}",
+                        "M ${data[i]["mag"].toStringAsFixed(1)}",
                         style: const TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w600,

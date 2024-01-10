@@ -34,7 +34,7 @@ class _ReportPage extends State<ReportPage> {
   @override
   void initState() {
     data = ReportPage.data;
-    earthquakeNo = data["earthquakeNo"].toStringAsFixed(0);
+    earthquakeNo = data["no"].toStringAsFixed(0);
     var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
 
     if (last3 != '000') {
@@ -44,13 +44,19 @@ class _ReportPage extends State<ReportPage> {
       earthquakeNo = "";
     }
 
-    level = data["data"][0]["areaIntensity"];
+    var keys = data["list"].keys.toList();
+    level = data["list"][keys[0]]["int"];
     Lv_str = int_to_str_en(level);
-    _expanded = List<bool>.generate(data["data"].length, (index) => false);
+    _expanded = List<bool>.generate(data["list"].length, (index) => false);
+
+    var dateTime = DateTime.fromMillisecondsSinceEpoch(data["time"]);
+    var dateStr = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+    var timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+    var formatted = "$dateStr $timeStr";
 
     Marker ep_marker = Marker(
       point: LatLng(
-          data["epicenterLat"].toDouble(), data["epicenterLon"].toDouble()),
+          data["lat"].toDouble(), data["lon"].toDouble()),
       builder: (ctx) => Stack(
         alignment: Alignment.center,
         children: [
@@ -156,7 +162,7 @@ class _ReportPage extends State<ReportPage> {
                       ),
                     ),
                     Text(
-                      data["originTime"].toString().substring(0, 16),
+                      formatted,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -177,9 +183,9 @@ class _ReportPage extends State<ReportPage> {
                       ),
                     ),
                     Text(
-                      data["location"]
-                          .substring(data["location"].indexOf("(") + 1,
-                              data["location"].indexOf(")"))
+                      data["loc"]
+                          .substring(data["loc"].indexOf("(") + 1,
+                              data["loc"].indexOf(")"))
                           .replaceAll("位於", ""),
                       style: TextStyle(
                         fontSize: 20,
@@ -203,7 +209,7 @@ class _ReportPage extends State<ReportPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              "規模: \u3000 M ${data["magnitudeValue"].toStringAsFixed(1)}",
+                              "規模: \u3000 M ${data["mag"].toStringAsFixed(1)}",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -227,7 +233,7 @@ class _ReportPage extends State<ReportPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "規模: \u3000 M ${data["magnitudeValue"].toStringAsFixed(1)}",
+                            "規模: \u3000 M ${data["mag"].toStringAsFixed(1)}",
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -271,20 +277,20 @@ class _ReportPage extends State<ReportPage> {
       ),
     );
 
-    data["data"].forEach((area) {
+    data["list"].keys.forEach((area) {
       _expanded.add(false);
       List<Widget> areaChildren = [];
       var maxStationLevel = 0;
 
-      area["eqStation"].forEach((station) {
-        var station_level = station["stationIntensity"];
+      data["list"][area]["town"].keys.forEach((station) {
+        var station_level = data["list"][area]["town"][station]["int"];
         var st_Lv_str = int_to_str_en(station_level);
         if (station_level > maxStationLevel) {
           maxStationLevel = station_level;
         }
         Marker marker = Marker(
-          point: LatLng(station["stationLat"].toDouble(),
-              station["stationLon"].toDouble()),
+          point: LatLng(data["list"][area]["town"][station]["lat"].toDouble(),
+              data["list"][area]["town"][station]["lon"].toDouble()),
           builder: (ctx) => Stack(
             alignment: Alignment.center,
             children: [
@@ -318,7 +324,7 @@ class _ReportPage extends State<ReportPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${station["stationName"]}",
+                      "${station}",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -358,7 +364,7 @@ class _ReportPage extends State<ReportPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${area["areaName"]}",
+                          "${area}",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
