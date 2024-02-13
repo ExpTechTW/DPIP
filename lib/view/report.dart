@@ -4,6 +4,8 @@ import 'package:latlong2/latlong.dart';
 
 import '../core/api.dart';
 
+import 'dart:math';
+
 class ReportPage extends StatefulWidget {
   const ReportPage({Key? key}) : super(key: key);
 
@@ -31,10 +33,20 @@ class _ReportPage extends State<ReportPage> {
   final List<Marker> markers = [];
   List<bool> _expanded = [];
 
-  @override
+  int randomNum(int max) {
+    return Random().nextInt(max) + 1;
+  }
+
+   @override
   void initState() {
-    data = ReportPage.data;
-    earthquakeNo = data["no"].toStringAsFixed(0);
+    render();
+    super.initState();
+  }
+
+  Future<void> render() async {
+    data ??=
+        await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report/${ReportPage.data["id"]}");
+    earthquakeNo = data['id'].substring(0, 6);
     var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
 
     if (last3 != '000') {
@@ -392,7 +404,8 @@ class _ReportPage extends State<ReportPage> {
     });
 
     print(data);
-    super.initState();
+    if (mounted) setState(() {});
+    return Future.value();
   }
 
   @override
