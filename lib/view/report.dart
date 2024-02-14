@@ -44,8 +44,7 @@ class _ReportPage extends State<ReportPage> {
   }
 
   Future<void> render() async {
-    data ??=
-        await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report/${ReportPage.data["id"]}");
+    data = await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report/${ReportPage.data["id"]}");
     earthquakeNo = data['id'].substring(0, 6);
     var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
 
