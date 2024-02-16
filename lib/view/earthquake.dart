@@ -6,6 +6,7 @@ import 'package:http/http.dart' as HTTP;
 
 import '../core/api.dart';
 import 'report.dart';
+import 'dart:math';
 
 class EarthquakePage extends StatefulWidget {
   const EarthquakePage({Key? key}) : super(key: key);
@@ -117,6 +118,10 @@ class _EarthquakePage extends State<EarthquakePage> {
     super.dispose();
   }
 
+  int randomNum(int max) {
+    return Random().nextInt(max) + 1;
+  }
+
   Future<void> render() async {
     if (clock != null && _page != 0) {
       clock.cancel();
@@ -129,7 +134,7 @@ class _EarthquakePage extends State<EarthquakePage> {
       });
     }
     data ??=
-        await get("https://data.exptech.com.tw/api/v1/eq/report?limit=50");
+        await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report?limit=50");
     _List_children = <Widget>[];
     if (_page == 0) {
       _List_children.add(Padding(
@@ -349,8 +354,7 @@ class _EarthquakePage extends State<EarthquakePage> {
         ));
       } else {
         for (var i = 0; i < data.length; i++) {
-          var keys = data[i]["list"].keys.toList();
-          int level = data[i]["list"][keys[0]]["int"];
+          int level = data[i]["int"];
           String Lv_str = int_to_str_en(level);
           var dateTime = DateTime.fromMillisecondsSinceEpoch(data[i]["time"]);
           var dateStr = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
