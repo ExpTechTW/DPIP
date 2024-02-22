@@ -5,6 +5,7 @@ import 'package:dpip/view/radar.dart';
 import 'package:dpip/view/report.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import 'history.dart';
@@ -21,10 +22,10 @@ class InitPage extends StatefulWidget {
 class _InitPage extends State<InitPage> {
   int _currentIndex = 0;
   var pages = [
-    const HomePage(),
-    const HistoryPage(),
+    // const HomePage(),
+    // const HistoryPage(),
     const EarthquakePage(),
-    const Radar(), //TODO 更多
+    // const Radar(), //TODO 更多
     const MePage()
   ];
 
@@ -95,6 +96,7 @@ class _InitPage extends State<InitPage> {
     }
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await messaging.subscribeToTopic(
         safeBase64Encode(prefs.getString('loc-city') ?? "臺南市"));
     await messaging.subscribeToTopic(safeBase64Encode(
@@ -217,14 +219,14 @@ class _InitPage extends State<InitPage> {
           unselectedItemColor: Colors.grey,
           type: BottomNavigationBarType.fixed,
           items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Icon(Icons.home_outlined), label: '首頁'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.history_outlined), label: '歷史'),
+            // BottomNavigationBarItem(
+            //     icon: Icon(Icons.home_outlined), label: '首頁'),
+            // BottomNavigationBarItem(
+            //     icon: Icon(Icons.history_outlined), label: '歷史'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.heart_broken_outlined), label: '地震'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.playlist_add_outlined), label: '更多'),
+            // BottomNavigationBarItem(
+            //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
           ],

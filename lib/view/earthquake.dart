@@ -40,8 +40,8 @@ List<Color> intensity_font = [
 ];
 
 class _EarthquakePage extends State<EarthquakePage> {
-  String url = 'https://api.exptech.com.tw/api/v1/trem/rts-image/';
-  String eew_url = "https://api.exptech.com.tw/api/v1/eq/eew/";
+  String url = 'https://lb-1.exptech.com.tw/api/v1/trem/rts-image';
+  String eew_url = "https://lb-1.exptech.com.tw/api/v1/eq/eew/";
   late Widget _pic = Image.network(
       "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/rts.png");
   late final Widget _taiwan = Image.network(
@@ -58,9 +58,9 @@ class _EarthquakePage extends State<EarthquakePage> {
   List<Widget> _List_children = <Widget>[];
 
   void ntp() async {
-    var ans = await get("https://api.exptech.com.tw/api/v1/ntp");
+    var ans = await get("https://api.exptech.com.tw/ntp");
     if (ans != false) {
-      time_ntp = ans["time"] - 1000;
+      time_ntp = ans - 1000;
       time_local = DateTime.now().millisecondsSinceEpoch;
     }
   }
@@ -78,32 +78,12 @@ class _EarthquakePage extends State<EarthquakePage> {
   _updateImgWidget() async {
     try {
       if (replay != 0) replay += 1000;
-      DateTime now = (replay != 0)
-          ? DateTime.fromMillisecondsSinceEpoch(replay)
-              .toUtc()
-              .add(const Duration(hours: 8))
-          : DateTime.fromMillisecondsSinceEpoch(((time_ntp +
-                          (DateTime.now().millisecondsSinceEpoch -
-                              time_local -
-                              1000)) ~/
-                      1000) *
-                  1000)
-              .toUtc()
-              .add(const Duration(hours: 8));
-
-      String YYYY = now.year.toString();
-      String MM = now.month.toString().padLeft(2, '0');
-      String DD = now.day.toString().padLeft(2, '0');
-      String hh = now.hour.toString().padLeft(2, '0');
-      String mm = now.minute.toString().padLeft(2, '0');
-      String ss = now.second.toString().padLeft(2, '0');
-
-      String Now = '$YYYY$MM$DD$hh$mm$ss';
-
-      print(Now);
 
       Uint8List bytes = await HTTP
-          .readBytes(Uri.parse(url + Now))
+          .readBytes(Uri.parse(url +
+              ((replay != 0)
+                  ? "/${DateTime.fromMillisecondsSinceEpoch(replay).millisecondsSinceEpoch}"
+                  : "?time=${DateTime.now().millisecondsSinceEpoch}")))
           .timeout(const Duration(seconds: 1));
       _pic = Image.memory(bytes, gaplessPlayback: true);
     } catch (e) {
@@ -133,8 +113,8 @@ class _EarthquakePage extends State<EarthquakePage> {
         render();
       });
     }
-    data ??=
-        await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report?limit=50");
+    data ??= await get(
+        "https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report?limit=50");
     _List_children = <Widget>[];
     if (_page == 0) {
       _List_children.add(Padding(
@@ -145,197 +125,197 @@ class _EarthquakePage extends State<EarthquakePage> {
           _int,
         ]),
       ));
-      _List_children.add(
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "強震即時警報",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        Text(
-                          "2023年10月15日 10:15 發震",
-                          style: TextStyle(
-                            color: Colors.grey[400], // Slightly brighter
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Container(
-                    margin: const EdgeInsets.all(5), // Added margin
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD90000), // Slightly adjusted color
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Center(
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                        child: Text(
-                          "慎防強烈搖晃",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-      _List_children.add(Padding(
-        padding: const EdgeInsets.all(10),
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFEA0000),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    children: [
-                      Text("預估本地震度",
-                          style: TextStyle(color: Colors.white, fontSize: 18)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text("4",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 45,
-                                  fontWeight: FontWeight.w900)),
-                          Text("級",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 60, // Adjust as needed
-                  width: 1,
-                  color: Colors.white,
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Column(
-                    children: [
-                      Text("剩餘抵達時間",
-                          style: TextStyle(color: Colors.white, fontSize: 18)),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text("10",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 45)),
-                          Text(".1 秒",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ));
-      _List_children.add(
-        Padding(
-          padding: const EdgeInsets.all(10),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xff333439),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Column(
-              children: [
-                ListTile(
-                  title: Text(
-                    "震央位置",
-                    style: const TextStyle(
-                        fontSize: 22,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Text(
-                    "臺灣東部海域",
-                    style: TextStyle(fontSize: 22, color: Colors.grey[300]),
-                  ),
-                ),
-                ListTile(
-                  title: Text(
-                    "規模",
-                    style: const TextStyle(
-                        fontSize: 22,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Text(
-                    "M7.4",
-                    style: TextStyle(fontSize: 22, color: Colors.grey[300]),
-                  ),
-                ),
-                ListTile(
-                  title: Text(
-                    "深度",
-                    style: const TextStyle(
-                        fontSize: 22,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  trailing: Text(
-                    "10km",
-                    style: TextStyle(fontSize: 22, color: Colors.grey[300]),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      // _List_children.add(
+      //   Padding(
+      //     padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+      //     child: Container(
+      //       decoration: BoxDecoration(
+      //         borderRadius: BorderRadius.circular(10),
+      //       ),
+      //       child: Row(
+      //         children: [
+      //           Expanded(
+      //             flex: 3,
+      //             child: Padding(
+      //               padding: const EdgeInsets.all(10),
+      //               child: Column(
+      //                 crossAxisAlignment: CrossAxisAlignment.start,
+      //                 children: [
+      //                   Text(
+      //                     "強震即時警報",
+      //                     style: TextStyle(
+      //                       color: Colors.white,
+      //                       fontSize: 24,
+      //                       fontWeight: FontWeight.w900,
+      //                     ),
+      //                   ),
+      //                   Text(
+      //                     "2023年10月15日 10:15 發震",
+      //                     style: TextStyle(
+      //                       color: Colors.grey[400], // Slightly brighter
+      //                       fontSize: 14,
+      //                       fontWeight: FontWeight.w500,
+      //                     ),
+      //                   ),
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //           Expanded(
+      //             flex: 2,
+      //             child: Container(
+      //               margin: const EdgeInsets.all(5), // Added margin
+      //               decoration: BoxDecoration(
+      //                 color: const Color(0xFFD90000), // Slightly adjusted color
+      //                 borderRadius: BorderRadius.circular(5),
+      //               ),
+      //               child: Center(
+      //                 child: Padding(
+      //                   padding:
+      //                       EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      //                   child: Text(
+      //                     "慎防強烈搖晃",
+      //                     style: TextStyle(
+      //                       color: Colors.white,
+      //                       fontSize: 16,
+      //                       fontWeight: FontWeight.w600,
+      //                     ),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // );
+      // _List_children.add(Padding(
+      //   padding: const EdgeInsets.all(10),
+      //   child: Container(
+      //     decoration: BoxDecoration(
+      //       color: const Color(0xFFEA0000),
+      //       borderRadius: BorderRadius.circular(5),
+      //     ),
+      //     child: Padding(
+      //       padding: const EdgeInsets.all(10),
+      //       child: Row(
+      //         children: [
+      //           Expanded(
+      //             flex: 2,
+      //             child: Column(
+      //               children: [
+      //                 Text("預估本地震度",
+      //                     style: TextStyle(color: Colors.white, fontSize: 18)),
+      //                 Row(
+      //                   mainAxisAlignment: MainAxisAlignment.center,
+      //                   crossAxisAlignment: CrossAxisAlignment.baseline,
+      //                   textBaseline: TextBaseline.alphabetic,
+      //                   children: [
+      //                     Text("4",
+      //                         style: TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 45,
+      //                             fontWeight: FontWeight.w900)),
+      //                     Text("級",
+      //                         style: TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 22,
+      //                             fontWeight: FontWeight.w500)),
+      //                   ],
+      //                 ),
+      //               ],
+      //             ),
+      //           ),
+      //           Container(
+      //             height: 60, // Adjust as needed
+      //             width: 1,
+      //             color: Colors.white,
+      //             margin: const EdgeInsets.only(left: 10, right: 10),
+      //           ),
+      //           Expanded(
+      //             flex: 3,
+      //             child: Column(
+      //               children: [
+      //                 Text("剩餘抵達時間",
+      //                     style: TextStyle(color: Colors.white, fontSize: 18)),
+      //                 Row(
+      //                   mainAxisAlignment: MainAxisAlignment.center,
+      //                   crossAxisAlignment: CrossAxisAlignment.baseline,
+      //                   textBaseline: TextBaseline.alphabetic,
+      //                   children: [
+      //                     Text("10",
+      //                         style:
+      //                             TextStyle(color: Colors.white, fontSize: 45)),
+      //                     Text(".1 秒",
+      //                         style: TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 22,
+      //                             fontWeight: FontWeight.w500)),
+      //                   ],
+      //                 ),
+      //               ],
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ));
+      // _List_children.add(
+      //   Padding(
+      //     padding: const EdgeInsets.all(10),
+      //     child: Container(
+      //       decoration: BoxDecoration(
+      //         color: const Color(0xff333439),
+      //         borderRadius: BorderRadius.circular(5),
+      //       ),
+      //       child: Column(
+      //         children: [
+      //           ListTile(
+      //             title: Text(
+      //               "震央位置",
+      //               style: const TextStyle(
+      //                   fontSize: 22,
+      //                   color: Colors.white,
+      //                   fontWeight: FontWeight.bold),
+      //             ),
+      //             trailing: Text(
+      //               "臺灣東部海域",
+      //               style: TextStyle(fontSize: 22, color: Colors.grey[300]),
+      //             ),
+      //           ),
+      //           ListTile(
+      //             title: Text(
+      //               "規模",
+      //               style: const TextStyle(
+      //                   fontSize: 22,
+      //                   color: Colors.white,
+      //                   fontWeight: FontWeight.bold),
+      //             ),
+      //             trailing: Text(
+      //               "M7.4",
+      //               style: TextStyle(fontSize: 22, color: Colors.grey[300]),
+      //             ),
+      //           ),
+      //           ListTile(
+      //             title: Text(
+      //               "深度",
+      //               style: const TextStyle(
+      //                   fontSize: 22,
+      //                   color: Colors.white,
+      //                   fontWeight: FontWeight.bold),
+      //             ),
+      //             trailing: Text(
+      //               "10km",
+      //               style: TextStyle(fontSize: 22, color: Colors.grey[300]),
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // );
     } else if (_page == 1) {
       if (data == null) {
         _List_children.add(const Column(
@@ -357,88 +337,89 @@ class _EarthquakePage extends State<EarthquakePage> {
           int level = data[i]["int"];
           String Lv_str = int_to_str_en(level);
           var dateTime = DateTime.fromMillisecondsSinceEpoch(data[i]["time"]);
-          var dateStr = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
-          var timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+          var dateStr =
+              "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+          var timeStr =
+              "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
           var formatted = "$dateStr $timeStr";
           _List_children.add(
             Card(
-              color: const Color(0xff333439),
-              margin: const EdgeInsets.all(5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: InkWell(
-                onTap: () {
-                  ReportPage.data = data[i];
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReportPage(),
-                    ),
-                  );
-                },
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: 65,
-                        height: 65,
-                        decoration: BoxDecoration(
-                          color: intensity_back[level - 1],
-                          borderRadius: BorderRadius.circular(5),
+                color: const Color(0xff333439),
+                margin: const EdgeInsets.all(5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: InkWell(
+                    onTap: () {
+                      ReportPage.data = data[i];
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ReportPage(),
                         ),
-                        child: Center(
-                          child: Text(
-                            Lv_str,
-                            style: TextStyle(
-                              fontSize: 45,
-                              fontWeight: FontWeight.w600,
-                              color: intensity_font[level - 1],
+                      );
+                    },
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: 0,
+                          top: 0,
+                          bottom: 0,
+                          child: Container(
+                            width: 65,
+                            height: 65,
+                            decoration: BoxDecoration(
+                              color: intensity_back[level - 1],
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Center(
+                              child: Text(
+                                Lv_str,
+                                style: TextStyle(
+                                  fontSize: 45,
+                                  fontWeight: FontWeight.w600,
+                                  color: intensity_font[level - 1],
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    ListTile(
-                      contentPadding: const EdgeInsets.only(left: 75, right: 15),
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            data[i]["loc"]
-                                .substring(data[i]["loc"].indexOf("(") + 1,
-                                    data[i]["loc"].indexOf(")"))
-                                .replaceAll("位於", ""),
-                            style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white),
+                        ListTile(
+                          contentPadding:
+                              const EdgeInsets.only(left: 75, right: 15),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data[i]["loc"]
+                                    .substring(data[i]["loc"].indexOf("(") + 1,
+                                        data[i]["loc"].indexOf(")"))
+                                    .replaceAll("位於", ""),
+                                style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white),
+                              ),
+                              Text(
+                                formatted,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w300,
+                                    color: Colors.grey),
+                              ),
+                            ],
                           ),
-                          Text(
-                            formatted,
+                          trailing: Text(
+                            "M ${data[i]["mag"].toStringAsFixed(1)}",
                             style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                                color: Colors.grey),
+                              fontSize: 26,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
-                        ],
-                      ),
-                      trailing: Text(
-                        "M ${data[i]["mag"].toStringAsFixed(1)}",
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
                         ),
-                      ),
-                    ),
-                  ],
-                )
-              )
-            ),
+                      ],
+                    ))),
           );
         }
       }
