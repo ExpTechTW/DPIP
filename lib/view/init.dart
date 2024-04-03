@@ -1,30 +1,29 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dpip/core/api.dart';
+import 'package:dpip/core/utils.dart';
+import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/earthquake.dart';
-import 'package:dpip/view/radar.dart';
-import 'package:dpip/view/report.dart';
+import 'package:dpip/view/report_list.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
-import 'history.dart';
-import 'home.dart';
 import 'me.dart';
 
 class InitPage extends StatefulWidget {
   const InitPage({super.key});
 
   @override
-  _InitPage createState() => _InitPage();
+  State<InitPage> createState() => _InitPageState();
 }
 
-class _InitPage extends State<InitPage> {
+class _InitPageState extends State<InitPage> {
   int _currentIndex = 0;
   var pages = [
     // const HomePage(),
     // const HistoryPage(),
     const EarthquakePage(),
+    const ReportList(),
     // const Radar(), //TODO 更多
     const MePage()
   ];
@@ -45,22 +44,13 @@ class _InitPage extends State<InitPage> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+            icon: Icon(
+              Icons.wifi_off_outlined,
+              color: Colors.orangeAccent,
             ),
-            backgroundColor: Colors.grey[850],
-            title: Row(
-              children: [
-                Icon(
-                  Icons.wifi_off_outlined,
-                  color: Colors.orangeAccent,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  '無網路連接',
-                  style: TextStyle(color: Colors.orangeAccent),
-                ),
-              ],
+            title: Text(
+              '無網路連接',
+              style: TextStyle(color: Colors.orangeAccent),
             ),
             content: Text(
               '您的設備目前沒有網路連接。請檢查您的網絡設置，然後重試。',
@@ -101,6 +91,7 @@ class _InitPage extends State<InitPage> {
         safeBase64Encode(prefs.getString('loc-city') ?? "臺南市"));
     await messaging.subscribeToTopic(safeBase64Encode(
         "${prefs.getString('loc-city') ?? "臺南市"}${prefs.getString('loc-town') ?? "歸仁區"}"));
+
     if (data != false) {
       if (compareVersion(data["ver"], packageInfo.version) == 1) {
         showDialog(
@@ -152,48 +143,33 @@ class _InitPage extends State<InitPage> {
           },
         );
       }
-    } else {
+    }
+    /*
+     else {
       showDialog(
         context: context,
-        barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+            icon: Icon(
+              Icons.cloud_off_rounded,
+              size: 32,
+              color: context.colors.error,
             ),
-            backgroundColor: Colors.grey[850],
-            title: Row(
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Colors.redAccent,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  '伺服器異常',
-                  style: TextStyle(color: Colors.redAccent),
-                ),
-              ],
+            title: Text(
+              '無法連接到伺服器',
+              style: TextStyle(color: context.colors.error),
             ),
-            content: Text(
-              '無法連接到伺服器。伺服器可能正在經歷大量請求，或發生異常。目前正在全力維修中，請稍後重試。',
-              style: TextStyle(color: Colors.white),
+            content: const Text(
+              '伺服器可能正在經歷大量請求，或發生異常。目前正在全力維修中，請稍後重試。',
+              textAlign: TextAlign.center,
             ),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                ),
                 child: const Text(
                   '知道了',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ],
@@ -201,6 +177,8 @@ class _InitPage extends State<InitPage> {
         },
       );
     }
+    */
+
     loaded = true;
     if (mounted) setState(() {});
   }
@@ -208,41 +186,38 @@ class _InitPage extends State<InitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: pages[_currentIndex],
-      bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: BottomNavigationBar(
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-          items: const <BottomNavigationBarItem>[
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.home_outlined), label: '首頁'),
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.history_outlined), label: '歷史'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.heart_broken_outlined), label: '地震'),
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.supervised_user_circle_outlined), label: '我的'),
-          ],
-          currentIndex: _currentIndex,
-          fixedColor: Colors.blue[800],
-          onTap: (!loaded) ? null : _onItemClick,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const <NavigationDestination>[
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.home_outlined), label: '首頁'),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.history_outlined), label: '歷史'),
+          NavigationDestination(
+            icon: Icon(Icons.heart_broken_outlined),
+            selectedIcon: Icon(Icons.heart_broken),
+            label: '監視器',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.analytics_outlined),
+            selectedIcon: Icon(Icons.analytics_rounded),
+            label: '地震報告',
+          ),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
+          NavigationDestination(
+            icon: Icon(Icons.supervised_user_circle_outlined),
+            selectedIcon: Icon(Icons.supervised_user_circle),
+            label: '我',
+          ),
+        ],
       ),
     );
-  }
-
-  void _onItemClick(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
   }
 }

@@ -5,29 +5,30 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../core/api.dart';
+import '../core/utils.dart';
 
 class Radar extends StatefulWidget {
   const Radar({Key? key}) : super(key: key);
 
   @override
   _RadarState createState() => _RadarState();
+  State<Radar> createState() => _RadarState();
 }
 
 class _RadarState extends State<Radar> {
   late List<TimeOfDay> times;
   int selectedIndex = 0;
-  int default_selectedIndex = 0;
   late ScrollController _scrollController;
-  Color select_color = Colors.blueAccent;
+  int defaultSelectedIndex = 0;
+  Color selectColor = Colors.blueAccent;
   String url = "";
 
   @override
   void initState() {
     super.initState();
-    String time_str = formatToUTC(adjustTime(TimeOfDay.now(), 10));
+    String timeString = formatToUTC(adjustTime(TimeOfDay.now(), 10));
     url =
-        "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/$time_str/nowcast_${time_str}_f00.png";
+        "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${timeString.substring(0, 6)}/${timeString.substring(0, 8)}/$timeString/nowcast_${timeString}_f00.png";
     DefaultCacheManager().emptyCache();
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     generateTimeList(now);
@@ -36,7 +37,7 @@ class _RadarState extends State<Radar> {
         .where((time) => time.hour * 60 + time.minute <= currentTimeInMinutes)
         .toList();
     selectedIndex = times.indexOf(pastTimes.last);
-    default_selectedIndex = selectedIndex;
+    defaultSelectedIndex = selectedIndex;
     _scrollController =
         ScrollController(initialScrollOffset: selectedIndex * 75);
   }
@@ -50,13 +51,13 @@ class _RadarState extends State<Radar> {
       precacheImage(CachedNetworkImageProvider(newUrl), context);
     }
 
-    TimeOfDay init_time = adjustTime(TimeOfDay.now(), 20);
+    TimeOfDay initTime = adjustTime(TimeOfDay.now(), 20);
     for (int i = 0; i <= 14; i++) {
-      String time_str = formatToUTC(init_time);
+      String timeString = formatToUTC(initTime);
       String newUrl =
-          "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/obs_$time_str.png";
+          "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${timeString.substring(0, 6)}/${timeString.substring(0, 8)}/obs_$timeString.png";
       precacheImage(CachedNetworkImageProvider(newUrl), context);
-      init_time = subtractTenMinutes(init_time);
+      initTime = subtractTenMinutes(initTime);
     }
   }
 
@@ -94,7 +95,7 @@ class _RadarState extends State<Radar> {
     });
   }
 
-  bool SecondsEarlier(TimeOfDay checkTime, int sec) {
+  bool secondsEarlier(TimeOfDay checkTime, int sec) {
     final now = DateTime.now();
     final currentTimeOfDay = TimeOfDay.now();
     final currentDateTime = DateTime(now.year, now.month, now.day,
@@ -121,13 +122,16 @@ class _RadarState extends State<Radar> {
           children: [
             Expanded(
               child: FlutterMap(
-                options: MapOptions(
-                  center: const LatLng(23.6, 120.9),
-                  zoom: 7.8,
+                options: const MapOptions(
+                  initialCenter: LatLng(23.6, 120.9),
+                  initialZoom: 7.8,
                   minZoom: 6,
                   maxZoom: 10,
-                  interactiveFlags:
-                      InteractiveFlag.all - InteractiveFlag.rotate,
+                  interactionOptions: InteractionOptions(
+                    flags: InteractiveFlag.drag |
+                        InteractiveFlag.pinchMove |
+                        InteractiveFlag.pinchZoom,
+                  ),
                 ),
                 children: [
                   TileLayer(
@@ -155,25 +159,25 @@ class _RadarState extends State<Radar> {
                     FixedExtentScrollController(initialItem: selectedIndex),
                 itemExtent: 32.0, // 每個項目的高度
                 onSelectedItemChanged: (index) {
-                  int select_index = (default_selectedIndex - index - 1) * -1;
-                  if (select_index < 0 ||
-                      (index < default_selectedIndex &&
-                          SecondsEarlier(times[index], 1200))) {
-                    String time_str = formatToUTC(times[index]);
+                  int selectIndex = (defaultSelectedIndex - index - 1) * -1;
+                  if (selectIndex < 0 ||
+                      (index < defaultSelectedIndex &&
+                          secondsEarlier(times[index], 1200))) {
+                    String timeString = formatToUTC(times[index]);
                     url =
-                        "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/obs_$time_str.png";
-                    select_color = Colors.blueAccent;
+                        "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${timeString.substring(0, 6)}/${timeString.substring(0, 8)}/obs_$timeString.png";
+                    selectColor = Colors.blueAccent;
                   } else {
                     if (selectedIndex == 0 ||
                         compareTimeOfDay(times[index], TimeOfDay.now()) < 0) {
-                      select_color = Colors.blueAccent;
+                      selectColor = Colors.blueAccent;
                     } else {
-                      select_color = Colors.purpleAccent;
+                      selectColor = Colors.purpleAccent;
                     }
-                    String time_str =
+                    String timeString =
                         formatToUTC(adjustTime(TimeOfDay.now(), 10));
                     url =
-                        "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${time_str.substring(0, 6)}/${time_str.substring(0, 8)}/$time_str/nowcast_${time_str}_f${select_index.toString().padLeft(2, "0")}.png";
+                        "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${timeString.substring(0, 6)}/${timeString.substring(0, 8)}/$timeString/nowcast_${timeString}_f${selectIndex.toString().padLeft(2, "0")}.png";
                   }
                   setState(() {
                     selectedIndex = index;
@@ -186,7 +190,7 @@ class _RadarState extends State<Radar> {
                       style: TextStyle(
                           fontSize: 24,
                           color: index == selectedIndex
-                              ? select_color
+                              ? selectColor
                               : Colors.grey),
                     ),
                   );

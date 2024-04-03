@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dpip/core/api.dart';
+import 'package:dpip/core/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -95,7 +95,8 @@ class HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(//滑動標示
+              Center(
+                //滑動標示
                 child: Container(
                   width: 40,
                   height: 5,
@@ -555,7 +556,7 @@ class HomePageState extends State<HomePage> {
                                     width: 15,
                                     height: 15,
                                     point: loc_gps,
-                                    builder: (ctx) => const Icon(
+                                    child: const Icon(
                                       Icons.gps_fixed_outlined,
                                       size: 15,
                                       color: Colors.pinkAccent,

@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:dpip/global.dart';
 import 'package:dpip/view/init.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'core/fcm.dart';
+import 'model/received_notification.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -19,20 +22,6 @@ final StreamController<String?> selectNotificationStream =
 const String darwinNotificationCategoryText = 'textCategory';
 const String navigationActionId = 'id_3';
 const String darwinNotificationCategoryPlain = 'plainCategory';
-
-class ReceivedNotification {
-  ReceivedNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.payload,
-  });
-
-  final int id;
-  final String? title;
-  final String? body;
-  final String? payload;
-}
 
 final List<DarwinNotificationCategory> darwinNotificationCategories =
     <DarwinNotificationCategory>[
@@ -81,6 +70,7 @@ final List<DarwinNotificationCategory> darwinNotificationCategories =
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Global.init();
   await Firebase.initializeApp();
   await messaging.requestPermission(
     alert: true,
@@ -140,10 +130,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: "DPIP",
-      home: InitPage(),
-      debugShowCheckedModeBanner: false,
+    return DynamicColorBuilder(
+      builder: (lightColorScheme, darkColorScheme) => MaterialApp(
+        title: "DPIP",
+        theme: ThemeData(
+          colorScheme: lightColorScheme,
+          brightness: Brightness.light,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: darkColorScheme,
+          brightness: Brightness.dark,
+        ),
+        themeMode: ThemeMode.system,
+        home: const InitPage(),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

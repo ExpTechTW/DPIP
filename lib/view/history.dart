@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core/api.dart';
+import '../core/utils.dart';
 
 var data;
 

@@ -1,21 +1,27 @@
+import 'dart:async';
+
+import 'package:dpip/global.dart';
+import 'package:dpip/model/earthquake_report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:dpip/model/partial_earthquake_report.dart';
 
-import '../core/api.dart';
+import '../core/utils.dart';
 
 import 'dart:math';
 
 class ReportPage extends StatefulWidget {
-  const ReportPage({Key? key}) : super(key: key);
+  final PartialEarthquakeReport report;
 
-  static Map<String, dynamic> data = {};
+  const ReportPage({super.key, required this.report});
 
   @override
-  _ReportPage createState() => _ReportPage();
+  State<ReportPage> createState() => _ReportPage();
 }
 
-var data, earthquakeNo = "", earthquakeNo_text = "", level = 0, Lv_str = "";
+var earthquakeNo = "", earthquakeType = "", level = 0, Lv_str = "";
 List<Color> intensity_back = const [
   Color(0xff6B7878),
   Color(0xff1E6EE6),
@@ -30,6 +36,7 @@ List<Color> intensity_back = const [
 List<Widget> _List_children = <Widget>[];
 
 class _ReportPage extends State<ReportPage> {
+  final report = Completer<EarthquakeReport>();
   final List<Marker> markers = [];
   List<bool> _expanded = [];
 
@@ -37,38 +44,31 @@ class _ReportPage extends State<ReportPage> {
     return Random().nextInt(max) + 1;
   }
 
-   @override
+  @override
   void initState() {
     render();
     super.initState();
   }
 
   Future<void> render() async {
-    data = await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report/${ReportPage.data["id"]}");
-    earthquakeNo = data['id'].substring(0, 6);
+    final data = await Global.api.getReport(widget.report.id);
+    earthquakeNo = data.id.substring(0, 6);
     var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
 
-    if (last3 != '000') {
-      earthquakeNo_text = "顯著有感地震";
-    } else {
-      earthquakeNo_text = "小區域有感地震";
-      earthquakeNo = "";
-    }
+    earthquakeType =
+        data.getNumber() != null ? "第 ${data.getNumber()!} 號顯著有感地震" : "小區域有感地震";
 
-    var keys = data["list"].keys.toList();
-    level = data["list"][keys[0]]["int"];
+    var keys = data.list.keys.toList();
+    level = data.list[keys[0]]!.intensity;
     Lv_str = int_to_str_en(level);
-    _expanded = List<bool>.generate(data["list"].length, (index) => false);
+    _expanded = List<bool>.generate(data.list.length, (index) => false);
 
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(data["time"]);
-    var dateStr = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
-    var timeStr = "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
-    var formatted = "$dateStr $timeStr";
+    final formatted = DateFormat("yyyy/MM/dd HH:mm:ss")
+        .format(DateTime.fromMicrosecondsSinceEpoch(data.time));
 
-    Marker ep_marker = Marker(
-      point: LatLng(
-          data["lat"].toDouble(), data["lon"].toDouble()),
-      builder: (ctx) => Stack(
+    Marker epMarker = Marker(
+      point: LatLng(data.lat, data.lon),
+      child: const Stack(
         alignment: Alignment.center,
         children: [
           Icon(
@@ -80,7 +80,7 @@ class _ReportPage extends State<ReportPage> {
       ),
     );
 
-    markers.add(ep_marker);
+    markers.add(epMarker);
 
     _List_children = <Widget>[];
     _List_children.add(
@@ -105,8 +105,8 @@ class _ReportPage extends State<ReportPage> {
           runSpacing: 20, // 垂直間隔，當換行時使用
           children: [
             Text(
-              earthquakeNo_text,
-              style: TextStyle(
+              earthquakeType,
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -114,7 +114,7 @@ class _ReportPage extends State<ReportPage> {
             ),
             Text(
               earthquakeNo,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFFF4C31C),
@@ -126,7 +126,7 @@ class _ReportPage extends State<ReportPage> {
               spacing: 20, // 水平間隔
               runSpacing: 20, // 垂直間隔，當換行時使用
               children: [
-                Text(
+                const Text(
                   "最大震度: ",
                   style: TextStyle(
                     fontSize: 20,
@@ -164,7 +164,7 @@ class _ReportPage extends State<ReportPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       "發生時間: ",
                       style: TextStyle(
                         fontSize: 20,
@@ -174,7 +174,7 @@ class _ReportPage extends State<ReportPage> {
                     ),
                     Text(
                       formatted,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -185,7 +185,7 @@ class _ReportPage extends State<ReportPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       "震央位置: ",
                       style: TextStyle(
                         fontSize: 20,
@@ -194,11 +194,8 @@ class _ReportPage extends State<ReportPage> {
                       ),
                     ),
                     Text(
-                      data["loc"]
-                          .substring(data["loc"].indexOf("(") + 1,
-                              data["loc"].indexOf(")"))
-                          .replaceAll("位於", ""),
-                      style: TextStyle(
+                      data.getLocation(),
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -220,8 +217,8 @@ class _ReportPage extends State<ReportPage> {
                         children: [
                           Expanded(
                             child: Text(
-                              "規模: \u3000 M ${data["mag"].toStringAsFixed(1)}",
-                              style: TextStyle(
+                              "規模: \u3000 M ${data.mag.toStringAsFixed(1)}",
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
@@ -229,8 +226,8 @@ class _ReportPage extends State<ReportPage> {
                             ),
                           ),
                           Text(
-                            "深度: \u3000 ${data["depth"].toStringAsFixed(1)} KM",
-                            style: TextStyle(
+                            "深度: \u3000 ${data.depth.toStringAsFixed(1)} KM",
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -244,16 +241,16 @@ class _ReportPage extends State<ReportPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "規模: \u3000 M ${data["mag"].toStringAsFixed(1)}",
-                            style: TextStyle(
+                            "規模: \u3000 M ${data.mag.toStringAsFixed(1)}",
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
                           ),
                           Text(
-                            "深度: \u3000 ${data["depth"].toStringAsFixed(1)} KM",
-                            style: TextStyle(
+                            "深度: \u3000 ${data.depth.toStringAsFixed(1)} KM",
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
@@ -271,8 +268,8 @@ class _ReportPage extends State<ReportPage> {
       ),
     ); //2023/11/4進度，以上暫定已修改完畢
     _List_children.add(
-      Padding(
-        padding: const EdgeInsets.all(10),
+      const Padding(
+        padding: EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -288,21 +285,21 @@ class _ReportPage extends State<ReportPage> {
       ),
     );
 
-    data["list"].keys.forEach((area) {
+    for (String area in data.list.keys) {
       _expanded.add(false);
       List<Widget> areaChildren = [];
       var maxStationLevel = 0;
 
-      data["list"][area]["town"].keys.forEach((station) {
-        var station_level = data["list"][area]["town"][station]["int"];
-        var st_Lv_str = int_to_str_en(station_level);
-        if (station_level > maxStationLevel) {
-          maxStationLevel = station_level;
+      for (String station in data.list[area]!.town.keys) {
+        var stationIntensity = data.list[area]!.town[station]!.intensity;
+        var st_Lv_str = int_to_str_en(stationIntensity);
+        if (stationIntensity > maxStationLevel) {
+          maxStationLevel = stationIntensity;
         }
         Marker marker = Marker(
-          point: LatLng(data["list"][area]["town"][station]["lat"].toDouble(),
-              data["list"][area]["town"][station]["lon"].toDouble()),
-          builder: (ctx) => Stack(
+          point: LatLng(data.list[area]!.town[station]!.lat,
+              data.list[area]!.town[station]!.lon),
+          child: Stack(
             alignment: Alignment.center,
             children: [
               Container(
@@ -310,12 +307,12 @@ class _ReportPage extends State<ReportPage> {
                 height: 15,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: intensity_back[station_level - 1],
+                  color: intensity_back[stationIntensity - 1],
                 ),
               ),
               Text(
                 st_Lv_str,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                 ),
@@ -346,7 +343,7 @@ class _ReportPage extends State<ReportPage> {
                       st_Lv_str,
                       style: TextStyle(
                         fontSize: 20,
-                        color: intensity_back[station_level - 1],
+                        color: intensity_back[stationIntensity - 1],
                       ),
                     ),
                   ],
@@ -355,7 +352,7 @@ class _ReportPage extends State<ReportPage> {
             ),
           ),
         );
-      });
+      }
 
       _List_children.add(
         Padding(
@@ -400,7 +397,7 @@ class _ReportPage extends State<ReportPage> {
           ),
         ),
       );
-    });
+    }
 
     print(data);
     if (mounted) setState(() {});
@@ -410,61 +407,34 @@ class _ReportPage extends State<ReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text(earthquakeType),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Stack(
           children: [
-            Column(
-              children: [
-                Stack(
-                  children: [
-                    // 中央的文本
-                    Center(
-                      child: Text(
-                        "詳細地震報告",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    // 左側的返回箭頭按鈕
-                    Positioned(
-                      left: 0,
-                      child: IconButton(
-                        icon:
-                            Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                        onPressed: () {
-                          Navigator.pop(context); // 返回上一頁
-                        },
-                      ),
-                    ),
-                  ],
+            FlutterMap(
+              // key: ValueKey(_page),
+              // mapController: mapController,
+              options: const MapOptions(
+                initialCenter: LatLng(23.8, 120.1),
+                initialZoom: 7,
+                minZoom: 7,
+                maxZoom: 9,
+                interactionOptions: InteractionOptions(
+                  flags: InteractiveFlag.drag |
+                      InteractiveFlag.pinchMove |
+                      InteractiveFlag.pinchZoom,
                 ),
-                SizedBox(
-                  height: 400,
-                  child: FlutterMap(
-                    // key: ValueKey(_page),
-                    // mapController: mapController,
-                    options: MapOptions(
-                      center: const LatLng(23.8, 120.1),
-                      zoom: 7,
-                      minZoom: 7,
-                      maxZoom: 9,
-                      interactiveFlags:
-                          InteractiveFlag.all - InteractiveFlag.rotate,
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
-                      ),
-                      MarkerLayer(
-                        markers: markers,
-                      ),
-                    ],
-                  ),
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
+                ),
+                MarkerLayer(
+                  markers: markers,
                 ),
               ],
             ),
