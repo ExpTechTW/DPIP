@@ -7,45 +7,66 @@ on:
     branches: ["Release"]
 
 jobs:
-  Android:
-    runs-on: ubuntu-latest
+  build-app:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+
+      # Setup Environment
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
           distribution: "zulu"
           java-version: "17"
-      - uses: subosito/flutter-action@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           flutter-version: "3.19.3"
-      - run: flutter pub get
-      - run: dart run build_runner build
-      - run: flutter build apk
-      - run: flutter build appbundle
-      - name: Upload(apk)
+
+      - name: Flutter get
+        run: flutter pub get --no-example
+
+      # Build
+
+      - name: Prebuild
+        run: dart run build_runner build
+
+      - name: Build Android application (apk, aab)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          flutter build apk
+          flutter build appbundle
+
+      - name: Build iOS application (app)
+        if: matrix.platform == 'macos-latest'
+        run: flutter build ios --release --no-codesign
+
+      # Upload Artifacts
+
+      - name: Upload (apk)
+        if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@master
         with:
           name: "DPIP.apk"
           path: build/app/outputs/flutter-apk/*.apk
-      - name: Upload(aab)
+
+      - name: Upload (aab)
+        if: matrix.platform == 'ubuntu-latest'
         uses: actions/upload-artifact@master
         with:
           name: "DPIP.aab"
           path: build/app/outputs/bundle/release/*.aab
 
-  iOS:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.13.0"
-          architecture: x64
-      - run: flutter pub get
-      - run: dart run build_runner build
-      - run: flutter build ios --release --no-codesign
-      - name: Upload(app)
+      - name: Upload (app)
+        if: matrix.platform == 'macos-latest'
         uses: actions/upload-artifact@master
         with:
           name: "DPIP.app"
