@@ -8,7 +8,7 @@ PODS:
     - FirebaseCore (= 10.22.0)
   - Firebase/Messaging (10.22.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 10.16.0)
+    - FirebaseMessaging (~> 10.22.0)
   - firebase_core (2.24.2):
     - Firebase/CoreOnly (= 10.22.0)
     - Flutter
@@ -27,7 +27,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
-  - FirebaseMessaging (10.16.0):
+  - FirebaseMessaging (10.22.0):
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
     - GoogleDataTransport (~> 9.3)
