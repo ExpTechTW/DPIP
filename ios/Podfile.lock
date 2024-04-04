@@ -4,9 +4,9 @@ PODS:
   - connectivity_plus (0.0.1):
     - Flutter
     - ReachabilitySwift
-  - Firebase/CoreOnly (10.16.0):
-    - FirebaseCore (= 10.16.0)
-  - Firebase/Messaging (10.16.0):
+  - Firebase/CoreOnly (10.22.0):
+    - FirebaseCore (= 10.22.0)
+  - Firebase/Messaging (10.22.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 10.16.0)
   - firebase_core (2.24.2):
