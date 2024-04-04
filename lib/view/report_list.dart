@@ -50,6 +50,12 @@ class _ReportListState extends State<ReportList> {
               child: ListView.builder(
                 itemCount: reports.length,
                 itemBuilder: (context, index) => ListTile(
+                  leading: Icon(reports[index].getNumber() != null
+                      ? Icons.tag_rounded
+                      : Icons.info_outline_rounded),
+                  iconColor: reports[index].getNumber() != null
+                      ? context.colors.onSurfaceVariant
+                      : context.colors.outline,
                   title: Text(reports[index].getLocation()),
                   subtitle: Text(
                     DateFormat("yyyy/MM/dd HH:mm:ss").format(
