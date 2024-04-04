@@ -107,7 +107,7 @@ int intensityFloatToInt(double floatValue) {
   }
 }
 
-String int_to_str_en(level) {
+String intensityToNumberString(int level) {
   return (level == 5)
       ? "5⁻"
       : (level == 6)
@@ -121,18 +121,18 @@ String int_to_str_en(level) {
                       : level.toString();
 }
 
-String int_to_str_zh(level) {
+String intensityToString(level) {
   return (level == 5)
-      ? "5弱"
+      ? "5 弱"
       : (level == 6)
-          ? "5強"
+          ? "5 強"
           : (level == 7)
-              ? "6弱"
+              ? "6 弱"
               : (level == 8)
-                  ? "6強"
+                  ? "6 強"
                   : (level == 9)
-                      ? "7級"
-                      : "$level級";
+                      ? "7 級"
+                      : "$level 級";
 }
 
 Map<String, double> speed(double depth, double distance) {

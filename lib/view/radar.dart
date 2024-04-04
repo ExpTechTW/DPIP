@@ -11,7 +11,6 @@ class Radar extends StatefulWidget {
   const Radar({Key? key}) : super(key: key);
 
   @override
-  _RadarState createState() => _RadarState();
   State<Radar> createState() => _RadarState();
 }
 

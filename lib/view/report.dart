@@ -60,7 +60,7 @@ class _ReportPage extends State<ReportPage> {
 
     var keys = data.list.keys.toList();
     level = data.list[keys[0]]!.intensity;
-    Lv_str = int_to_str_en(level);
+    Lv_str = intensityToNumberString(level);
     _expanded = List<bool>.generate(data.list.length, (index) => false);
 
     final formatted = DateFormat("yyyy/MM/dd HH:mm:ss")
@@ -292,7 +292,7 @@ class _ReportPage extends State<ReportPage> {
 
       for (String station in data.list[area]!.town.keys) {
         var stationIntensity = data.list[area]!.town[station]!.intensity;
-        var st_Lv_str = int_to_str_en(stationIntensity);
+        var st_Lv_str = intensityToNumberString(stationIntensity);
         if (stationIntensity > maxStationLevel) {
           maxStationLevel = stationIntensity;
         }
@@ -382,7 +382,7 @@ class _ReportPage extends State<ReportPage> {
                       ],
                     ),
                     Text(
-                      int_to_str_en(maxStationLevel),
+                      intensityToNumberString(maxStationLevel),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,

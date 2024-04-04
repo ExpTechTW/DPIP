@@ -7,19 +7,22 @@
     {
       "name": "DPIP",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "preLaunchTask": "build"
     },
     {
       "name": "DPIP (profile mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile"
+      "flutterMode": "profile",
+      "preLaunchTask": "build"
     },
     {
       "name": "DPIP (release mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "release",
+      "preLaunchTask": "build"
     }
   ]
 }

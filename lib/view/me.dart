@@ -16,6 +16,9 @@ class MePage extends StatefulWidget {
 }
 
 class _MePageState extends State<MePage> {
+  String currentTown = Global.preference.getString("loc-town") ?? "";
+  String currentCity = Global.preference.getString("loc-city") ?? "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,16 +39,92 @@ class _MePageState extends State<MePage> {
                 ListTile(
                   title: const Text('縣市'),
                   subtitle: Text(
-                    Global.preference.getString("loc-city") ?? "尚未設定",
+                    currentCity.isNotEmpty ? currentCity : "尚未設定",
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    List<String> cityList = Global.region.keys.toList();
+
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("縣市"),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 0, vertical: 16.0),
+                        content: SizedBox(
+                          width: double.minPositive,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: cityList.length,
+                            itemBuilder: (context, index) => RadioListTile(
+                              value: cityList[index],
+                              groupValue: currentCity,
+                              title: Text(cityList[index]),
+                              onChanged: (value) {
+                                setState(() {
+                                  currentCity = value ?? "";
+                                  Global.preference
+                                      .setString("loc-city", value!);
+                                });
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("取消"))
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 ListTile(
                   title: const Text('鄉鎮市區'),
                   subtitle: Text(
-                    Global.preference.getString("loc-town") ?? "尚未設定",
+                    currentTown.isNotEmpty ? currentTown : "尚未設定",
                   ),
-                  onTap: () {},
+                  enabled: currentCity.isNotEmpty,
+                  onTap: () {
+                    if (currentCity.isNotEmpty) {
+                      List<String> townList =
+                          Global.region[currentCity]!.keys.toList();
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('鄉鎮市區'),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 0, vertical: 16.0),
+                          content: SizedBox(
+                            width: double.minPositive,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: townList.length,
+                              itemBuilder: (context, index) => RadioListTile(
+                                value: townList[index],
+                                groupValue: currentTown,
+                                title: Text(townList[index]),
+                                onChanged: (value) {
+                                  setState(() {
+                                    currentTown = value ?? "";
+                                    Global.preference
+                                        .setString("loc-town", value ?? "");
+                                  });
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("取消"))
+                          ],
+                        ),
+                      );
+                    }
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
@@ -56,7 +135,7 @@ class _MePageState extends State<MePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.notifications_rounded),
-                  title: const Text('通知'),
+                  title: const Text('通知音效'),
                   onTap: () {
                     Navigator.push(
                         context,
@@ -64,29 +143,6 @@ class _MePageState extends State<MePage> {
                           builder: (context) => const NotifyPage(),
                         ));
                   },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline_rounded),
-                  title: const Text("版本"),
-                  subtitle: Row(
-                    children: [
-                      Text(Global.packageInfo.version),
-                      const SizedBox(width: 4),
-                      if (Global.packageInfo.version.split(".")[2] != "0")
-                        Badge(
-                          label: const Text("ALPHA"),
-                          largeSize: 20,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          textColor: context.colors.onSurfaceVariant,
-                          textStyle: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          backgroundColor: context.colors.surfaceVariant,
-                        ),
-                    ],
-                  ),
-                  onTap: () {},
                 ),
                 const AboutListTile(
                   icon: Icon(Icons.info_outline_rounded),
@@ -97,6 +153,30 @@ class _MePageState extends State<MePage> {
                     "除錯",
                     style: TextStyle(color: context.colors.onSurfaceVariant),
                   ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.bug_report_rounded),
+                  title: const Text("版本"),
+                  trailing: Text(
+                    Global.packageInfo.version,
+                    style: TextStyle(
+                      color: context.colors.outline,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.bug_report_rounded),
+                  title: const Text("建置號碼"),
+                  trailing: Text(
+                    Global.packageInfo.buildNumber,
+                    style: TextStyle(
+                      color: context.colors.outline,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onTap: () {},
                 ),
                 ListTile(
                   leading: const Icon(Icons.bug_report_rounded),

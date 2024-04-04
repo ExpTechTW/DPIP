@@ -1,3 +1,4 @@
+import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/util/extension.dart';
@@ -66,7 +67,7 @@ class _ReportListState extends State<ReportList> {
                     ),
                     child: Center(
                       child: Text(
-                        reports[index].intensity.toString(),
+                        intensityToNumberString(reports[index].intensity),
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
