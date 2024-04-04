@@ -2,7 +2,12 @@ import 'dart:async';
 
 import 'package:dpip/global.dart';
 import 'package:dpip/model/earthquake_report.dart';
+import 'package:dpip/util/extension.dart';
+import 'package:dpip/util/intensity_color.dart';
+import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
@@ -33,9 +38,9 @@ List<Color> intensity_back = const [
   Color(0xffA00000),
   Color(0xff5D0090),
 ];
-List<Widget> _List_children = <Widget>[];
 
 class _ReportPage extends State<ReportPage> {
+  final mapController = MapController();
   final report = Completer<EarthquakeReport>();
   final List<Marker> markers = [];
   List<bool> _expanded = [];
@@ -52,8 +57,9 @@ class _ReportPage extends State<ReportPage> {
 
   Future<void> render() async {
     final data = await Global.api.getReport(widget.report.id);
+    report.complete(data);
+
     earthquakeNo = data.id.substring(0, 6);
-    var last3 = earthquakeNo.substring(earthquakeNo.length - 3);
 
     earthquakeType =
         data.getNumber() != null ? "第 ${data.getNumber()!} 號顯著有感地震" : "小區域有感地震";
@@ -62,9 +68,6 @@ class _ReportPage extends State<ReportPage> {
     level = data.list[keys[0]]!.intensity;
     Lv_str = intensityToNumberString(level);
     _expanded = List<bool>.generate(data.list.length, (index) => false);
-
-    final formatted = DateFormat("yyyy/MM/dd HH:mm:ss")
-        .format(DateTime.fromMillisecondsSinceEpoch(data.time));
 
     Marker epMarker = Marker(
       point: LatLng(data.lat, data.lon),
@@ -82,239 +85,43 @@ class _ReportPage extends State<ReportPage> {
 
     markers.add(epMarker);
 
-    _List_children = <Widget>[];
-    _List_children.add(
-      Center(
-        child: Container(
-          width: 40,
-          height: 5,
-          decoration: BoxDecoration(
-            color: Colors.grey[600],
-            borderRadius: BorderRadius.circular(2.5),
-          ),
-        ),
-      ),
-    );
-    _List_children.add(
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
-        child: Wrap(
-          alignment: WrapAlignment.center, // 用於水平置中Wrap中的子部件
-          crossAxisAlignment: WrapCrossAlignment.center, // 用於垂直置中Wrap中的子部件
-          spacing: 20, // 水平間隔
-          runSpacing: 20, // 垂直間隔，當換行時使用
-          children: [
-            Text(
-              earthquakeType,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              earthquakeNo,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFFF4C31C),
-              ),
-            ),
-            Wrap(
-              alignment: WrapAlignment.center, // 用於水平置中Wrap中的子部件
-              crossAxisAlignment: WrapCrossAlignment.center, // 用於垂直置中Wrap中的子部件
-              spacing: 20, // 水平間隔
-              runSpacing: 20, // 垂直間隔，當換行時使用
-              children: [
-                const Text(
-                  "最大震度: ",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  Lv_str,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: intensity_back[level - 1],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-    _List_children.add(
-      Padding(
-        padding: const EdgeInsets.all(5),
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xff333439),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "發生時間: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      formatted,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "震央位置: ",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      data.getLocation(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    // 檢查可用寬度是否足以容納標籤和值
-                    // 這裡的 200 是 Text("深度: ") 和 Text("${data["depth"].toStringAsFixed(1)} KM") 結合後的估計寬度
-                    // 這個值可能需要根據實際內容和樣式進行調整
-                    bool canFit = constraints.maxWidth > 200;
+    for (String areaName in data.list.keys) {
+      final area = data.list[areaName]!;
 
-                    if (canFit) {
-                      // 如果可以容納，則保持在同一行
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              "規模: \u3000 M ${data.mag.toStringAsFixed(1)}",
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            "深度: \u3000 ${data.depth.toStringAsFixed(1)} KM",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      // 如果不能容納，則將 "深度" 組合換行
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "規模: \u3000 M ${data.mag.toStringAsFixed(1)}",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            "深度: \u3000 ${data.depth.toStringAsFixed(1)} KM",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ); //2023/11/4進度，以上暫定已修改完畢
-    _List_children.add(
-      const Padding(
-        padding: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "各地震度",
-              style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    for (String area in data.list.keys) {
       _expanded.add(false);
       List<Widget> areaChildren = [];
       var maxStationLevel = 0;
 
-      for (String station in data.list[area]!.town.keys) {
-        var stationIntensity = data.list[area]!.town[station]!.intensity;
+      for (String stationName in area.town.keys) {
+        final station = data.list[areaName]!.town[stationName]!;
+
+        var stationIntensity = station.intensity;
         var st_Lv_str = intensityToNumberString(stationIntensity);
         if (stationIntensity > maxStationLevel) {
           maxStationLevel = stationIntensity;
         }
+
         Marker marker = Marker(
-          point: LatLng(data.list[area]!.town[station]!.lat,
-              data.list[area]!.town[station]!.lon),
+          point: LatLng(station.lat, station.lon),
           child: Stack(
             alignment: Alignment.center,
             children: [
               Container(
-                width: 15,
-                height: 15,
+                width: 16,
+                height: 16,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: intensity_back[stationIntensity - 1],
+                  color: context.colors.intensity(stationIntensity),
                 ),
-              ),
-              Text(
-                st_Lv_str,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
+                child: Center(
+                  child: Text(
+                    st_Lv_str,
+                    style: TextStyle(
+                      height: 1,
+                      color: context.colors.onIntensity(stationIntensity),
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -332,8 +139,8 @@ class _ReportPage extends State<ReportPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${station}",
-                      style: TextStyle(
+                      stationName,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -353,53 +160,8 @@ class _ReportPage extends State<ReportPage> {
           ),
         );
       }
-
-      _List_children.add(
-        Padding(
-          padding: const EdgeInsets.all(5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xff333439),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: ExpansionTile(
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${area}",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      intensityToNumberString(maxStationLevel),
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: intensity_back[maxStationLevel - 1],
-                      ),
-                    ),
-                  ],
-                ),
-                children: areaChildren,
-              ),
-            ),
-          ),
-        ),
-      );
     }
 
-    print(data);
     if (mounted) setState(() {});
     return Future.value();
   }
@@ -415,8 +177,7 @@ class _ReportPage extends State<ReportPage> {
         child: Stack(
           children: [
             FlutterMap(
-              // key: ValueKey(_page),
-              // mapController: mapController,
+              mapController: mapController,
               options: const MapOptions(
                 initialCenter: LatLng(23.8, 120.1),
                 initialZoom: 7,
@@ -439,26 +200,277 @@ class _ReportPage extends State<ReportPage> {
               ],
             ),
             DraggableScrollableSheet(
-              initialChildSize: 0.5,
-              minChildSize: 0.4,
+              initialChildSize: 0.4,
+              minChildSize: 0.16,
               maxChildSize: 1.0,
+              snap: true,
+              snapSizes: const [0.4],
               builder:
-                  (BuildContext context, ScrollController scrollController) {
-                return Container(
-                  color: Colors.black.withOpacity(0.8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: ScrollConfiguration(
-                      behavior: ScrollConfiguration.of(context)
-                          .copyWith(overscroll: false),
-                      child: ListView(
-                        controller: scrollController,
-                        children: _List_children.toList(),
+                  (BuildContext context, ScrollController scrollController) =>
+                      Card(
+                elevation: 3,
+                margin: EdgeInsets.zero,
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context)
+                      .copyWith(overscroll: false),
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            height: 4,
+                            width: 32,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: context.colors.onSurfaceVariant
+                                    .withOpacity(0.4)),
+                          ),
+                        ],
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 20,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.report.getLocation(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(widget.report.getNumber() != null
+                                    ? "第 ${widget.report.getNumber()} 號"
+                                    : "小區域有感地震"),
+                              ],
+                            ),
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                color: context.colors
+                                    .intensity(widget.report.intensity),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  widget.report.intensity.toString(),
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: context.colors
+                                        .onIntensity(widget.report.intensity),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.schedule_rounded),
+                        title: const Text("發生時間"),
+                        subtitle: Text(
+                          DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                              DateTime.fromMillisecondsSinceEpoch(
+                                  widget.report.time)),
+                          style: TextStyle(
+                            color: context.colors.outline,
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.pin_drop_rounded),
+                        title: const Text("震央地點"),
+                        subtitle: Text(
+                          widget.report.loc.replaceFirst("(", "\n("),
+                          style: TextStyle(
+                            color: context.colors.outline,
+                          ),
+                        ),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.gps_fixed_rounded),
+                        title: const Text("震央座標"),
+                        subtitle: Text(
+                          "${widget.report.lat}ºN ${widget.report.lon}ºE",
+                          style: TextStyle(
+                            color: context.colors.outline,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Flexible(
+                              flex: 1,
+                              child: ListTile(
+                                leading: const Icon(Icons.speed_rounded),
+                                title: const Text("規模"),
+                                subtitle: Text(
+                                  "M ${widget.report.mag}",
+                                  style: TextStyle(
+                                    color: context.colors.outline,
+                                  ),
+                                ),
+                              )),
+                          Flexible(
+                            flex: 1,
+                            child: ListTile(
+                              leading: const Icon(
+                                  Icons.keyboard_double_arrow_down_rounded),
+                              title: const Text("深度"),
+                              subtitle: Text(
+                                "${widget.report.depth} km",
+                                style: TextStyle(
+                                  color: context.colors.outline,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "各地最大震度",
+                              style: TextStyle(
+                                color: context.colors.onSurface,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            FutureBuilder(
+                              future: report.future,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  List<Widget> city = [];
+
+                                  snapshot.data!.list.forEach(
+                                    (cityName, value) {
+                                      List<Widget> town = [];
+
+                                      value.town.forEach((townName, value) {
+                                        town.add(
+                                          Card(
+                                            surfaceTintColor: context.colors
+                                                .intensity(value.intensity),
+                                            shadowColor: Colors.transparent,
+                                            elevation: 16,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              side: BorderSide(
+                                                color: context.colors
+                                                    .intensity(value.intensity),
+                                              ),
+                                            ),
+                                            margin: EdgeInsets.zero,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  height: 30,
+                                                  width: 30,
+                                                  decoration: BoxDecoration(
+                                                    color: context.colors
+                                                        .intensity(
+                                                            value.intensity),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      intensityToNumberString(
+                                                          value.intensity),
+                                                      style: TextStyle(
+                                                          color: context.colors
+                                                              .onIntensity(value
+                                                                  .intensity),
+                                                          height: 1,
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.fromLTRB(
+                                                          6, 6, 12, 6),
+                                                  child: Text(
+                                                    townName,
+                                                    style: TextStyle(
+                                                      color: context.colors
+                                                          .onSurfaceVariant
+                                                          .harmonizeWith(context
+                                                              .colors
+                                                              .intensity(value
+                                                                  .intensity)),
+                                                      height: 1,
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      });
+
+                                      city.add(
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            Text(
+                                              cityName,
+                                              style: TextStyle(
+                                                  color:
+                                                      context.colors.outline),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Wrap(
+                                              spacing: 8,
+                                              runSpacing: 8,
+                                              children: town,
+                                            ),
+                                            const SizedBox(height: 16),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+
+                                  return Column(
+                                    children: city,
+                                  );
+                                } else {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ],
         ),
