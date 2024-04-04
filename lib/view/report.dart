@@ -64,7 +64,7 @@ class _ReportPage extends State<ReportPage> {
     _expanded = List<bool>.generate(data.list.length, (index) => false);
 
     final formatted = DateFormat("yyyy/MM/dd HH:mm:ss")
-        .format(DateTime.fromMicrosecondsSinceEpoch(data.time));
+        .format(DateTime.fromMillisecondsSinceEpoch(data.time));
 
     Marker epMarker = Marker(
       point: LatLng(data.lat, data.lon),
