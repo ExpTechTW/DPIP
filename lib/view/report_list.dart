@@ -18,7 +18,7 @@ class _ReportListState extends State<ReportList> {
   List<PartialEarthquakeReport> reports = [];
 
   Future<void> refreshReports() async {
-    Global.api.getReportList().then((value) {
+    Global.api.getReportList(limit: 50).then((value) {
       setState(() {
         reports = value;
       });
