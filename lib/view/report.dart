@@ -55,6 +55,16 @@ class _ReportPage extends State<ReportPage> {
     super.initState();
   }
 
+  void _calculateMapFocus() {
+    final latitudes = markers.map((m) => m.point.latitude).toList();
+    final longitudes = markers.map((m) => m.point.longitude).toList();
+    final centerLat = latitudes.reduce((a, b) => a + b) / latitudes.length;
+    final centerLng = longitudes.reduce((a, b) => a + b) / longitudes.length;
+    final centerPoint = LatLng(centerLat, centerLng);
+
+    mapController.move(centerPoint, 8);
+  }
+
   Future<void> render() async {
     final data = await Global.api.getReport(widget.report.id);
     report.complete(data);
@@ -162,6 +172,8 @@ class _ReportPage extends State<ReportPage> {
       }
     }
 
+    _calculateMapFocus();
+
     if (mounted) setState(() {});
     return Future.value();
   }
@@ -200,11 +212,11 @@ class _ReportPage extends State<ReportPage> {
               ],
             ),
             DraggableScrollableSheet(
-              initialChildSize: 0.4,
+              initialChildSize: 0.2,
               minChildSize: 0.16,
               maxChildSize: 1.0,
               snap: true,
-              snapSizes: const [0.4],
+              snapSizes: const [0.2],
               builder:
                   (BuildContext context, ScrollController scrollController) =>
                       Card(
