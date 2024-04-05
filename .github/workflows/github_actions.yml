@@ -42,12 +42,12 @@ jobs:
       - name: Build Android application (apk, aab)
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          flutter build apk
-          flutter build appbundle
+          flutter build apk --debug
+          flutter build appbundle --debug
 
       - name: Build iOS application (app)
         if: matrix.platform == 'macos-latest'
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --debug --no-codesign
 
       # Upload Artifacts
 

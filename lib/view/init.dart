@@ -1,9 +1,12 @@
+import 'dart:io' show Platform;
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/earthquake.dart';
 import 'package:dpip/view/report_list.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,62 +32,52 @@ class _InitPageState extends State<InitPage> {
   ];
 
   bool loaded = false;
+  bool isInternetConnected = true;
 
   @override
   void initState() {
     render();
+
+    if (Platform.isAndroid) {
+      checkForUpdate();
+    }
+
     super.initState();
   }
 
+  Future<void> checkForUpdate() async {
+    InAppUpdate.checkForUpdate().then((info) {
+      setState(() {
+        if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+          if (info.immediateUpdateAllowed) {
+            InAppUpdate.performImmediateUpdate();
+          } else if (info.flexibleUpdateAllowed) {
+            InAppUpdate.startFlexibleUpdate().then((updateResult) {
+              if (updateResult == AppUpdateResult.success) {
+                InAppUpdate.completeFlexibleUpdate();
+              }
+            });
+          }
+        }
+      });
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
   void render() async {
-    final connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            icon: const Icon(
-              Icons.wifi_off_outlined,
-              color: Colors.orangeAccent,
-            ),
-            title: const Text(
-              '無網路連接',
-              style: TextStyle(color: Colors.orangeAccent),
-            ),
-            content: const Text(
-              '您的設備目前沒有網路連接。請檢查您的網絡設置，然後重試。',
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => InitPage(), // 這裡是當前頁面的類型
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                ),
-                child: const Text(
-                  '重試',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
+    Connectivity().onConnectivityChanged.listen((event) {
+      setState(() {
+        if (event.contains(ConnectivityResult.none)) {
+          isInternetConnected = false;
+        } else {
+          isInternetConnected = true;
+        }
+      });
+    });
+
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
     var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await messaging.subscribeToTopic(
@@ -217,6 +210,20 @@ class _InitPageState extends State<InitPage> {
             label: '我',
           ),
         ],
+      ),
+      bottomSheet: Visibility(
+        visible: !isInternetConnected,
+        child: Container(
+          width: double.maxFinite,
+          color: context.colors.errorContainer,
+          child: Text(
+            "無網際網路連線",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: context.colors.error,
+            ),
+          ),
+        ),
       ),
     );
   }

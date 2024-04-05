@@ -122,11 +122,44 @@ void main() async {
       }
     },
   );
-  runApp(const MyApp());
+  runApp(const MainApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
+
+  @override
+  State<StatefulWidget> createState() => MainAppState();
+
+  static MainAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<MainAppState>();
+}
+
+class MainAppState extends State<MainApp> {
+  ThemeMode _themeMode = {
+        "light": ThemeMode.light,
+        "dark": ThemeMode.dark,
+        "system": ThemeMode.system
+      }[Global.preference.getString('theme')] ??
+      ThemeMode.system;
+
+  void changeTheme(String themeMode) {
+    setState(() {
+      switch (themeMode) {
+        case "light":
+          _themeMode = ThemeMode.light;
+          break;
+        case "dark":
+          _themeMode = ThemeMode.dark;
+          break;
+        case "system":
+          _themeMode = ThemeMode.system;
+          break;
+        default:
+          break;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +174,7 @@ class MyApp extends StatelessWidget {
           colorScheme: darkColorScheme,
           brightness: Brightness.dark,
         ),
-        themeMode: ThemeMode.system,
+        themeMode: _themeMode,
         home: const InitPage(),
         debugShowCheckedModeBanner: false,
       ),

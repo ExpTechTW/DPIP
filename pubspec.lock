@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.4.1"
+  app_settings:
+    dependency: "direct main"
+    description:
+      name: app_settings
+      sha256: "09bc7fe0313a507087bec1a3baf555f0576e816a760cbb31813a88890a09d9e5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.1"
   args:
     dependency: transitive
     description:
@@ -329,30 +337,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
-  firebase_analytics:
-    dependency: "direct main"
-    description:
-      name: firebase_analytics
-      sha256: "4305265c5a60a9a7187e2d7cac7f2f4a367317ab43d137c75398df6645655bee"
-      url: "https://pub.dev"
-    source: hosted
-    version: "10.10.0"
-  firebase_analytics_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_analytics_platform_interface
-      sha256: "1549287521873d2fe72baac610ba99a598bc1c804cfa18bf6267dc77e16ff361"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.10.1"
-  firebase_analytics_web:
-    dependency: transitive
-    description:
-      name: firebase_analytics_web
-      sha256: "95289aff7dc024c767774af7ceb4444e822f60d1555000beff8c5c9fe84f1a69"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.7"
   firebase_core:
     dependency: "direct main"
     description:
@@ -536,6 +520,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  in_app_update:
+    dependency: "direct main"
+    description:
+      name: in_app_update
+      sha256: b6ccb757281a96a4b18536f68fe2567aeca865134218719364212da8fe94615c
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.2"
   intl:
     dependency: "direct main"
     description:
@@ -944,6 +936,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  simple_icons:
+    dependency: "direct main"
+    description:
+      name: simple_icons
+      sha256: "30067d70a9d72923fbc80e142e17fa46085dfa970e66bc4bede3be4819d05901"
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.1.3"
   sky_engine:
     dependency: transitive
     description: flutter
