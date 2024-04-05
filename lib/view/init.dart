@@ -44,15 +44,15 @@ class _InitPageState extends State<InitPage> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return AlertDialog(
-            icon: Icon(
+            icon: const Icon(
               Icons.wifi_off_outlined,
               color: Colors.orangeAccent,
             ),
-            title: Text(
+            title: const Text(
               '無網路連接',
               style: TextStyle(color: Colors.orangeAccent),
             ),
-            content: Text(
+            content: const Text(
               '您的設備目前沒有網路連接。請檢查您的網絡設置，然後重試。',
               style: TextStyle(color: Colors.white),
             ),
