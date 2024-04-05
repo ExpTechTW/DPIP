@@ -27,7 +27,7 @@ class ReportPage extends StatefulWidget {
   State<ReportPage> createState() => _ReportPage();
 }
 
-var earthquakeNo = "", earthquakeType = "", level = 0, Lv_str = "";
+var earthquakeType = "", level = 0, Lv_str = "";
 List<Color> intensity_back = const [
   Color(0xff6B7878),
   Color(0xff1E6EE6),
@@ -46,7 +46,6 @@ class _ReportPage extends State<ReportPage> {
   final _sheetController = DraggableScrollableController();
   final report = Completer<EarthquakeReport>();
   final List<Marker> markers = [];
-  List<bool> _expanded = [];
 
   DraggableScrollableSheet get sheet =>
       (_sheet.currentWidget as DraggableScrollableSheet);
@@ -61,93 +60,75 @@ class _ReportPage extends State<ReportPage> {
     super.initState();
   }
 
-  void _calculateMapFocus() {
-    final latitudes = markers.map((m) => m.point.latitude).toList();
-    final longitudes = markers.map((m) => m.point.longitude).toList();
-    final centerLat = latitudes.reduce((a, b) => a + b) / latitudes.length;
-    final centerLng = longitudes.reduce((a, b) => a + b) / longitudes.length;
-    final centerPoint = LatLng(centerLat, centerLng);
+  Future<void> render() {
+    return Global.api.getReport(widget.report.id).then((data) {
+      report.complete(data);
 
-    mapController.move(centerPoint, 8);
-  }
+      earthquakeType = data.getNumber() != null
+          ? "第 ${data.getNumber()!} 號顯著有感地震"
+          : "小區域有感地震";
 
-  Future<void> render() async {
-    final data = await Global.api.getReport(widget.report.id);
-    report.complete(data);
+      var keys = data.list.keys.toList();
+      level = data.list[keys[0]]!.intensity;
+      Lv_str = intensityToNumberString(level);
 
-    earthquakeNo = data.id.substring(0, 6);
+      final points = <LatLng>[LatLng(data.lat, data.lon)];
 
-    earthquakeType =
-        data.getNumber() != null ? "第 ${data.getNumber()!} 號顯著有感地震" : "小區域有感地震";
+      for (String areaName in data.list.keys) {
+        final area = data.list[areaName]!;
 
-    var keys = data.list.keys.toList();
-    level = data.list[keys[0]]!.intensity;
-    Lv_str = intensityToNumberString(level);
-    _expanded = List<bool>.generate(data.list.length, (index) => false);
+        for (String stationName in area.town.keys) {
+          final station = data.list[areaName]!.town[stationName]!;
 
-    Marker epMarker = Marker(
-      point: LatLng(data.lat, data.lon),
-      child: const Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(
-            Icons.close,
-            color: Colors.red,
-            size: 24,
-          ),
-        ],
-      ),
-    );
+          points.add(LatLng(station.lat, station.lon));
 
-    markers.add(epMarker);
-
-    for (String areaName in data.list.keys) {
-      final area = data.list[areaName]!;
-
-      _expanded.add(false);
-      var maxStationLevel = 0;
-
-      for (String stationName in area.town.keys) {
-        final station = data.list[areaName]!.town[stationName]!;
-
-        var stationIntensity = station.intensity;
-        if (stationIntensity > maxStationLevel) {
-          maxStationLevel = stationIntensity;
-        }
-
-        markers.add(
-          Marker(
-            height: 20,
-            width: 20,
-            point: LatLng(station.lat, station.lon),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.white,
+          markers.add(
+            Marker(
+              height: 20,
+              width: 20,
+              point: LatLng(station.lat, station.lon),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.white,
+                  ),
+                  color: context.colors.intensity(station.intensity),
                 ),
-                color: context.colors.intensity(stationIntensity),
-              ),
-              child: Center(
-                child: Text(
-                  intensityToNumberString(stationIntensity),
-                  style: TextStyle(
-                    height: 1,
-                    color: context.colors.onIntensity(stationIntensity),
-                    fontSize: 14,
+                child: Center(
+                  child: Text(
+                    intensityToNumberString(station.intensity),
+                    style: TextStyle(
+                      height: 1,
+                      color: context.colors.onIntensity(station.intensity),
+                      fontSize: 14,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+
+          markers.add(
+            Marker(
+              height: 42,
+              width: 42,
+              point: LatLng(data.lat, data.lon),
+              child: const Image(
+                image: AssetImage("assets/cross.png"),
+              ),
+            ),
+          );
+        }
       }
-    }
 
-    _calculateMapFocus();
-
-    if (mounted) setState(() {});
-    return Future.value();
+      mapController.fitCamera(
+        CameraFit.bounds(
+          bounds: LatLngBounds.fromPoints(points),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 240),
+        ),
+      );
+    });
   }
 
   @override
