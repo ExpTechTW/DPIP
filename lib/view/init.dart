@@ -2,13 +2,12 @@ import 'dart:io' show Platform;
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/core/utils.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/earthquake.dart';
 import 'package:dpip/view/report_list.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../main.dart';
 import 'me.dart';
@@ -76,67 +75,10 @@ class _InitPageState extends State<InitPage> {
       });
     });
 
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-    var data = await get("https://api.exptech.com.tw/api/v1/dpip/info");
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await messaging.subscribeToTopic(
-        safeBase64Encode(prefs.getString('loc-city') ?? "臺南市"));
+        safeBase64Encode(Global.preference.getString('loc-city') ?? "臺南市"));
     await messaging.subscribeToTopic(safeBase64Encode(
-        "${prefs.getString('loc-city') ?? "臺南市"}${prefs.getString('loc-town') ?? "歸仁區"}"));
-
-    if (data != false) {
-      if (compareVersion(data["ver"], packageInfo.version) == 1) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-              backgroundColor: Colors.grey[850],
-              title: const Row(
-                children: [
-                  Icon(Icons.system_update, color: Colors.white),
-                  SizedBox(width: 10),
-                  Text(
-                    '發現新版本!',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ],
-              ),
-              content: Container(
-                height: 200,
-                child: SingleChildScrollView(
-                  child: Text(
-                    data["note"],
-                    style: TextStyle(color: Colors.grey[300]),
-                  ),
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                  ),
-                  child: const Text(
-                    '知道了',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
+        "${Global.preference.getString('loc-city') ?? "臺南市"}${Global.preference.getString('loc-town') ?? "歸仁區"}"));
     /*
      else {
       showDialog(
