@@ -6,6 +6,7 @@ import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/view/report.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart';
 
 class ReportList extends StatefulWidget {
   const ReportList({super.key});
@@ -59,7 +60,8 @@ class _ReportListState extends State<ReportList> {
                   title: Text(reports[index].getLocation()),
                   subtitle: Text(
                     DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                      DateTime.fromMillisecondsSinceEpoch(
+                      TZDateTime.fromMillisecondsSinceEpoch(
+                        getLocation("Asia/Taipei"),
                         reports[index].time,
                       ),
                     ),

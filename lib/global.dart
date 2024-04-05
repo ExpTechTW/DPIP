@@ -5,6 +5,7 @@ import 'package:dpip/model/town.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/data/latest_10y.dart';
 
 class Global {
   static late ExpTechApi api;
@@ -17,6 +18,8 @@ class Global {
     api = ExpTechApi();
     preference = await SharedPreferences.getInstance();
     packageInfo = await PackageInfo.fromPlatform();
+
+    initializeTimeZones();
 
     // src: assets/json/region.json
     Map<String, dynamic> regionRaw =

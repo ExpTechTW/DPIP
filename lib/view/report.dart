@@ -1,22 +1,20 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:dpip/global.dart';
 import 'package:dpip/model/earthquake_report.dart';
+import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:dpip/model/partial_earthquake_report.dart';
+import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/utils.dart';
-
-import 'dart:math';
 
 class ReportPage extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -153,6 +151,7 @@ class _ReportPage extends State<ReportPage> {
                       InteractiveFlag.pinchMove |
                       InteractiveFlag.pinchZoom,
                 ),
+                backgroundColor: Colors.transparent,
                 onPointerDown: (event, point) {
                   _sheetController.animateTo(
                     sheet.minChildSize,
@@ -282,8 +281,11 @@ class _ReportPage extends State<ReportPage> {
                             title: const Text("發生時間"),
                             subtitle: Text(
                               DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      widget.report.time)),
+                                TZDateTime.fromMillisecondsSinceEpoch(
+                                  getLocation("Asia/Taipei"),
+                                  widget.report.time,
+                                ),
+                              ),
                               style: TextStyle(
                                 color: context.colors.outline,
                               ),
