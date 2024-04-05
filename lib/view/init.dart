@@ -215,12 +215,12 @@ class _InitPageState extends State<InitPage> {
         visible: !isInternetConnected,
         child: Container(
           width: double.maxFinite,
-          color: context.colors.errorContainer,
+          color: context.colors.surfaceVariant,
           child: Text(
             "無網際網路連線",
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: context.colors.error,
+              color: context.colors.onSurfaceVariant,
             ),
           ),
         ),

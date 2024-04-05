@@ -122,8 +122,20 @@ class _EarthquakePage extends State<EarthquakePage> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Center(child: stack),
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              const Text(
+                "即時資料僅供參考\n實際請以中央氣象署的資料為主",
+                textAlign: TextAlign.center,
+              ),
+              Flexible(
+                flex: 1,
+                child: Center(child: stack),
+              ),
+            ],
+          ),
         ),
       ),
     );

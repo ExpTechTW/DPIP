@@ -56,8 +56,8 @@ class _ReportPage extends State<ReportPage> {
 
   @override
   void initState() {
-    render();
     super.initState();
+    render();
   }
 
   Future<void> render() {
