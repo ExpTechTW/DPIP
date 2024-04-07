@@ -18,15 +18,13 @@ class EarthquakePage extends StatefulWidget {
 
 dynamic data;
 
-class _EarthquakePage extends State<EarthquakePage> {
+class _EarthquakePage extends State<EarthquakePage> with WidgetsBindingObserver {
+  AppLifecycleState? _notification;
   String url = 'https://lb-1.exptech.com.tw/api/v1/trem/rts-image';
   String eewUrl = "https://lb-1.exptech.com.tw/api/v1/eq/eew/";
-  Widget _pic = Image.network(
-      "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/rts.png");
-  final Widget _taiwan = Image.network(
-      "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/taiwan.png");
-  final Widget _int = Image.network(
-      "https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
+  Widget _pic = Image.network("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/rts.png");
+  final Widget _taiwan = Image.network("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/taiwan.png");
+  final Widget _int = Image.network("https://cdn.jsdelivr.net/gh/ExpTechTW/API@master/resource/int.png");
   late Timer clock;
   late Timer ntpClock;
   int replay = 0;
@@ -50,6 +48,7 @@ class _EarthquakePage extends State<EarthquakePage> {
   Future<void> updateImage() async {
     try {
       if (replay != 0) replay += 1000;
+      if (_notification != null && _notification != AppLifecycleState.resumed) return;
 
       Uint8List bytes = await http
           .readBytes(Uri.parse(url +
@@ -60,8 +59,7 @@ class _EarthquakePage extends State<EarthquakePage> {
 
       _pic = Image.memory(bytes, gaplessPlayback: true);
 
-      data ??= await get(
-          "https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report?limit=50");
+      data ??= await get("https://lb-${randomNum(4)}.exptech.com.tw/api/v2/eq/report?limit=50");
 
       setState(() {
         stack = Stack(
@@ -80,6 +78,9 @@ class _EarthquakePage extends State<EarthquakePage> {
 
   @override
   void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
     ntp();
     ntpClock = Timer.periodic(const Duration(seconds: 60), (timer) {
       ntp();
@@ -88,14 +89,20 @@ class _EarthquakePage extends State<EarthquakePage> {
     clock = Timer.periodic(const Duration(seconds: 1), (timer) async {
       updateImage();
     });
+  }
 
-    super.initState();
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      _notification = state;
+    });
   }
 
   @override
   void dispose() {
     clock.cancel();
     ntpClock.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
