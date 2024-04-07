@@ -4,6 +4,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -60,8 +61,7 @@ class _MePageState extends State<MePage> {
                       context: context,
                       builder: (context) => AlertDialog(
                         title: const Text("縣市"),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 0, vertical: 16.0),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
                         content: SizedBox(
                           width: double.minPositive,
                           child: ListView.builder(
@@ -74,19 +74,15 @@ class _MePageState extends State<MePage> {
                               onChanged: (value) {
                                 setState(() {
                                   currentCity = value ?? "";
-                                  Global.preference
-                                      .setString("loc-city", value!);
+                                  currentTown = value != null ? Global.region[value]!.keys.first : "";
+                                  Global.preference.setString("loc-city", value!);
                                 });
                                 Navigator.pop(context);
                               },
                             ),
                           ),
                         ),
-                        actions: [
-                          TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("取消"))
-                        ],
+                        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("取消"))],
                       ),
                     );
                   },
@@ -100,15 +96,13 @@ class _MePageState extends State<MePage> {
                   enabled: currentCity.isNotEmpty,
                   onTap: () {
                     if (currentCity.isNotEmpty) {
-                      List<String> townList =
-                          Global.region[currentCity]!.keys.toList();
+                      List<String> townList = Global.region[currentCity]!.keys.toList();
 
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('鄉鎮市區'),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 0, vertical: 16.0),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
                           content: SizedBox(
                             width: double.minPositive,
                             child: ListView.builder(
@@ -121,8 +115,7 @@ class _MePageState extends State<MePage> {
                                 onChanged: (value) {
                                   setState(() {
                                     currentTown = value ?? "";
-                                    Global.preference
-                                        .setString("loc-town", value ?? "");
+                                    Global.preference.setString("loc-town", value ?? "");
                                   });
                                   Navigator.pop(context);
                                 },
@@ -149,12 +142,12 @@ class _MePageState extends State<MePage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.dark_mode_rounded),
-                  title: Text("主題"),
+                  title: const Text("主題"),
                   subtitle: Text(themeOptions[_theme]!),
                   onTap: () => showDialog<String>(
                     context: context,
                     builder: (BuildContext context) => SimpleDialog(
-                      title: Text("主題"),
+                      title: const Text("主題"),
                       children: [
                         ...themeOptions.entries.map(
                           (e) => RadioListTile(
@@ -193,8 +186,7 @@ class _MePageState extends State<MePage> {
                   leading: const Icon(Icons.notifications_rounded),
                   title: const Text('通知'),
                   onTap: () {
-                    AppSettings.openAppSettings(
-                        type: AppSettingsType.notification);
+                    AppSettings.openAppSettings(type: AppSettingsType.notification);
                   },
                 ),
                 ListTile(
