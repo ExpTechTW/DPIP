@@ -302,30 +302,17 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                     widget.report.time,
                                   ),
                                 ),
-                                style: TextStyle(
-                                  color: context.colors.outline,
-                                ),
                               ),
                             ),
                             ListTile(
                               leading: const Icon(Icons.pin_drop_rounded),
                               title: const Text("震央地點"),
-                              subtitle: Text(
-                                widget.report.loc.replaceFirst("(", "\n("),
-                                style: TextStyle(
-                                  color: context.colors.outline,
-                                ),
-                              ),
+                              subtitle: Text(widget.report.loc.replaceFirst("(", "\n(")),
                             ),
                             ListTile(
                               leading: const Icon(Icons.gps_fixed_rounded),
                               title: const Text("震央座標"),
-                              subtitle: Text(
-                                "${widget.report.lat}ºN ${widget.report.lon}ºE",
-                                style: TextStyle(
-                                  color: context.colors.outline,
-                                ),
-                              ),
+                              subtitle: Text("${widget.report.lat}ºN ${widget.report.lon}ºE"),
                             ),
                             Row(
                               children: [
@@ -334,24 +321,14 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                     child: ListTile(
                                       leading: const Icon(Icons.speed_rounded),
                                       title: const Text("規模"),
-                                      subtitle: Text(
-                                        "M ${widget.report.mag}",
-                                        style: TextStyle(
-                                          color: context.colors.outline,
-                                        ),
-                                      ),
+                                      subtitle: Text("M ${widget.report.mag}"),
                                     )),
                                 Flexible(
                                   flex: 1,
                                   child: ListTile(
                                     leading: const Icon(Icons.keyboard_double_arrow_down_rounded),
                                     title: const Text("深度"),
-                                    subtitle: Text(
-                                      "${widget.report.depth} km",
-                                      style: TextStyle(
-                                        color: context.colors.outline,
-                                      ),
-                                    ),
+                                    subtitle: Text("${widget.report.depth} km"),
                                   ),
                                 )
                               ],
