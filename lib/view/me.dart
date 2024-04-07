@@ -221,7 +221,7 @@ class _MePageState extends State<MePage> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
                   child: Text(
-                    "ExpTech 探索科技",
+                    "ExpTech Studio 探索科技",
                     style: TextStyle(color: context.colors.onSurfaceVariant),
                   ),
                 ),
