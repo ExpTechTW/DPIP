@@ -1,5 +1,6 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:flutter/material.dart';
@@ -73,9 +74,15 @@ class _MePageState extends State<MePage> {
                               title: Text(cityList[index]),
                               onChanged: (value) {
                                 setState(() {
-                                  currentCity = value ?? "";
-                                  currentTown = value != null ? Global.region[value]!.keys.first : "";
-                                  Global.preference.setString("loc-city", value!);
+                                  if (value != null) {
+                                    messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
+                                    messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+                                    currentCity = value;
+                                    currentTown = Global.region[value]!.keys.first;
+                                    Global.preference.setString("loc-city", value);
+                                    messaging.subscribeToTopic(safeBase64Encode(currentCity));
+                                    messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+                                  }
                                 });
                                 Navigator.pop(context);
                               },
@@ -114,8 +121,14 @@ class _MePageState extends State<MePage> {
                                 title: Text(townList[index]),
                                 onChanged: (value) {
                                   setState(() {
-                                    currentTown = value ?? "";
-                                    Global.preference.setString("loc-town", value ?? "");
+                                    if (value != null) {
+                                      print("unsubscribe topic: $currentCity$currentTown");
+                                      messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+                                      currentTown = value;
+                                      Global.preference.setString("loc-town", value);
+                                      print("subscribe topic: $currentCity$currentTown");
+                                      messaging.subscribeToTopic(safeBase64Encode(currentTown));
+                                    }
                                   });
                                   Navigator.pop(context);
                                 },
