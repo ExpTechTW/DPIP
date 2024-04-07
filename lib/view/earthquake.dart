@@ -110,6 +110,7 @@ class _EarthquakePage extends State<EarthquakePage> {
             icon: const Icon(
               Icons.help_outline_rounded,
             ),
+            tooltip: "幫助",
             color: context.colors.onSurfaceVariant,
             onPressed: () {
               Navigator.push(
