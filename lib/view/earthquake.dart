@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/about_rts.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -31,7 +33,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   int timeNtp = 0;
   int timeLocal = 0;
 
-  Widget stack = const CircularProgressIndicator();
+  Widget stack = Platform.isAndroid ? const CupertinoActivityIndicator() : const CircularProgressIndicator();
 
   void ntp() async {
     var ans = await get("https://api.exptech.com.tw/ntp");
@@ -113,27 +115,11 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("強震監視器"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.help_outline_rounded,
-            ),
-            tooltip: "幫助",
-            color: context.colors.onSurfaceVariant,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AboutRts()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
+    if (Platform.isIOS) {
+      return CupertinoPageScaffold(
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text("強震監視器"),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: Column(
@@ -150,7 +136,47 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
             ],
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("強震監視器"),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.help_outline_rounded,
+              ),
+              tooltip: "幫助",
+              color: context.colors.onSurfaceVariant,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AboutRts()),
+                );
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Text(
+                  "即時資料僅供參考\n實際請以中央氣象署的資料為主",
+                  textAlign: TextAlign.center,
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Center(child: stack),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

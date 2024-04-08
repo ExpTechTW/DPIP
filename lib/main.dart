@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/global.dart';
 import 'package:dpip/view/init.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -159,21 +162,34 @@ class MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(
-      builder: (lightColorScheme, darkColorScheme) => MaterialApp(
-        title: "DPIP",
-        theme: ThemeData(
-          colorScheme: lightColorScheme,
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: darkColorScheme,
-          brightness: Brightness.dark,
-        ),
-        themeMode: _themeMode,
+    if (Platform.isIOS) {
+      return CupertinoApp(
         home: const InitPage(),
-        debugShowCheckedModeBanner: false,
-      ),
-    );
+        theme: CupertinoThemeData(
+          brightness: _themeMode == ThemeMode.system
+              ? SchedulerBinding.instance.platformDispatcher.platformBrightness
+              : _themeMode == ThemeMode.light
+                  ? Brightness.light
+                  : Brightness.dark,
+        ),
+      );
+    } else {
+      return DynamicColorBuilder(
+        builder: (lightColorScheme, darkColorScheme) => MaterialApp(
+          title: "DPIP",
+          theme: ThemeData(
+            colorScheme: lightColorScheme,
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: darkColorScheme,
+            brightness: Brightness.dark,
+          ),
+          themeMode: _themeMode,
+          home: const InitPage(),
+          debugShowCheckedModeBanner: false,
+        ),
+      );
+    }
   }
 }
