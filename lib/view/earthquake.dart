@@ -33,7 +33,8 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   int timeNtp = 0;
   int timeLocal = 0;
 
-  Widget stack = Platform.isAndroid ? const CupertinoActivityIndicator() : const CircularProgressIndicator();
+  bool loading = true;
+  Widget? stack;
 
   void ntp() async {
     var ans = await get("https://api.exptech.com.tw/ntp");
@@ -169,12 +170,18 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                   textAlign: TextAlign.center,
                 ),
                 Expanded(
-                  child: ClipRRect(
-                    child: InteractiveViewer(
-                      clipBehavior: Clip.none,
-                      maxScale: 10,
-                      child: stack,
-                    ),
+                  child: Center(
+                    child: stack != null
+                        ? ClipRRect(
+                            child: InteractiveViewer(
+                              clipBehavior: Clip.none,
+                              maxScale: 10,
+                              child: stack!,
+                            ),
+                          )
+                        : Platform.isIOS
+                            ? const CupertinoActivityIndicator()
+                            : const CircularProgressIndicator(),
                   ),
                 ),
               ],
