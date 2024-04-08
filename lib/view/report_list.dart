@@ -15,7 +15,7 @@ class ReportList extends StatefulWidget {
   State<StatefulWidget> createState() => _ReportListState();
 }
 
-class _ReportListState extends State<ReportList> {
+class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMixin<ReportList> {
   List<PartialEarthquakeReport> reports = [];
 
   Future<void> refreshReports() async {
@@ -33,6 +33,9 @@ class _ReportListState extends State<ReportList> {
   }
 
   @override
+  get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     refreshReports();
@@ -40,23 +43,28 @@ class _ReportListState extends State<ReportList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("地震報告"),
-        centerTitle: true,
-      ),
+    super.build(context);
+
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        return [
+          SliverAppBar(
+            title: const Text("地震報告"),
+            centerTitle: true,
+            floating: true,
+            snap: true,
+          )
+        ];
+      },
       body: reports.isNotEmpty
           ? RefreshIndicator(
               onRefresh: refreshReports,
               child: ListView.builder(
                 itemCount: reports.length,
                 itemBuilder: (context, index) => ListTile(
-                  leading: Icon(reports[index].getNumber() != null
-                      ? Icons.tag_rounded
-                      : Icons.info_outline_rounded),
-                  iconColor: reports[index].getNumber() != null
-                      ? context.colors.onSurfaceVariant
-                      : context.colors.outline,
+                  leading: Icon(reports[index].getNumber() != null ? Icons.tag_rounded : Icons.info_outline_rounded),
+                  iconColor:
+                      reports[index].getNumber() != null ? context.colors.onSurfaceVariant : context.colors.outline,
                   title: Text(reports[index].getLocation()),
                   subtitle: Text(
                     DateFormat("yyyy/MM/dd HH:mm:ss").format(
@@ -79,8 +87,7 @@ class _ReportListState extends State<ReportList> {
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: context.colors
-                              .onIntensity(reports[index].intensity),
+                          color: context.colors.onIntensity(reports[index].intensity),
                         ),
                       ),
                     ),
@@ -89,8 +96,7 @@ class _ReportListState extends State<ReportList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            ReportPage(report: reports[index]),
+                        builder: (context) => ReportPage(report: reports[index]),
                       ),
                     );
                   },

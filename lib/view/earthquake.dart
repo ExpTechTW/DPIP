@@ -18,7 +18,7 @@ class EarthquakePage extends StatefulWidget {
 
 dynamic data;
 
-class _EarthquakePage extends State<EarthquakePage> with WidgetsBindingObserver {
+class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   AppLifecycleState? _notification;
   String url = 'https://lb-1.exptech.com.tw/api/v1/trem/rts-image';
   String eewUrl = "https://lb-1.exptech.com.tw/api/v1/eq/eew/";
@@ -77,6 +77,9 @@ class _EarthquakePage extends State<EarthquakePage> with WidgetsBindingObserver 
   }
 
   @override
+  get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
@@ -108,6 +111,8 @@ class _EarthquakePage extends State<EarthquakePage> with WidgetsBindingObserver 
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("強震監視器"),

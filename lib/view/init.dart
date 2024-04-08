@@ -20,8 +20,9 @@ class InitPage extends StatefulWidget {
 }
 
 class _InitPageState extends State<InitPage> {
-  int _currentIndex = 0;
-  var pages = [
+  int currentPageIndex = 0;
+  late PageController _pageController;
+  List<Widget> bodyPages = [
     // const HomePage(),
     // const HistoryPage(),
     const EarthquakePage(),
@@ -32,17 +33,6 @@ class _InitPageState extends State<InitPage> {
 
   bool loaded = false;
   bool isInternetConnected = true;
-
-  @override
-  void initState() {
-    render();
-
-    if (Platform.isAndroid) {
-      checkForUpdate();
-    }
-
-    super.initState();
-  }
 
   Future<void> checkForUpdate() async {
     InAppUpdate.checkForUpdate().then((info) {
@@ -64,6 +54,24 @@ class _InitPageState extends State<InitPage> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: currentPageIndex);
+    render();
+
+    if (Platform.isAndroid) {
+      checkForUpdate();
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+
+    super.dispose();
+  }
+
   void render() async {
     Connectivity().onConnectivityChanged.listen((event) {
       setState(() {
@@ -75,8 +83,7 @@ class _InitPageState extends State<InitPage> {
       });
     });
 
-    await messaging.subscribeToTopic(
-        safeBase64Encode(Global.preference.getString('loc-city') ?? "臺南市"));
+    await messaging.subscribeToTopic(safeBase64Encode(Global.preference.getString('loc-city') ?? "臺南市"));
     await messaging.subscribeToTopic(safeBase64Encode(
         "${Global.preference.getString('loc-city') ?? "臺南市"}${Global.preference.getString('loc-town') ?? "歸仁區"}"));
     /*
@@ -121,12 +128,12 @@ class _InitPageState extends State<InitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[_currentIndex],
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
+        selectedIndex: currentPageIndex,
         onDestinationSelected: (index) {
           setState(() {
-            _currentIndex = index;
+            currentPageIndex = index;
+            _pageController.jumpToPage(currentPageIndex);
           });
         },
         destinations: const <NavigationDestination>[
@@ -166,6 +173,11 @@ class _InitPageState extends State<InitPage> {
             ),
           ),
         ),
+      ),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: bodyPages,
       ),
     );
   }

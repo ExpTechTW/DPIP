@@ -5,14 +5,11 @@ import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
 import 'notify.dart';
-
-var loc_data;
 
 final themeOptions = {
   "light": "淺色",
@@ -122,11 +119,9 @@ class _MePageState extends State<MePage> {
                                 onChanged: (value) {
                                   setState(() {
                                     if (value != null) {
-                                      print("unsubscribe topic: $currentCity$currentTown");
                                       messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
                                       currentTown = value;
                                       Global.preference.setString("loc-town", value);
-                                      print("subscribe topic: $currentCity$currentTown");
                                       messaging.subscribeToTopic(safeBase64Encode(currentTown));
                                     }
                                   });

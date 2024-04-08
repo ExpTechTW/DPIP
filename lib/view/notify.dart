@@ -33,8 +33,7 @@ class _NotifyPage extends State<NotifyPage> {
             IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
-              icon:
-                  const Icon(Icons.arrow_back, color: Colors.white70, size: 24),
+              icon: const Icon(Icons.arrow_back, color: Colors.white70, size: 24),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -48,17 +47,9 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("強震即時警報（警報）",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("強震即時警報（警報）", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
           SizedBox(width: 5),
-          Text("預估最大震度 5弱 以上",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300))
+          Text("預估最大震度 5弱 以上", style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w300))
         ],
       ),
     ));
@@ -86,8 +77,7 @@ class _NotifyPage extends State<NotifyPage> {
               size: 30,
             ),
           ),
-          const Divider(
-              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const Divider(color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           ListTile(
             onTap: () {
               play("eew_warn");
@@ -111,17 +101,9 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("地震速報（注意）",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("地震速報（注意）", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
           SizedBox(width: 5),
-          Text("預估最大震度 5弱 以下",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300))
+          Text("預估最大震度 5弱 以下", style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w300))
         ],
       ),
     ));
@@ -149,8 +131,7 @@ class _NotifyPage extends State<NotifyPage> {
               size: 30,
             ),
           ),
-          const Divider(
-              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const Divider(color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           const ListTile(
             title: Text(
               "所在地 預估震度 2級 以下",
@@ -171,17 +152,9 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("震度速報",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("震度速報", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
           SizedBox(width: 5),
-          Text("地震觀測網自動觀測結果",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300))
+          Text("地震觀測網自動觀測結果", style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w300))
         ],
       ),
     ));
@@ -209,8 +182,7 @@ class _NotifyPage extends State<NotifyPage> {
               size: 30,
             ),
           ),
-          const Divider(
-              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const Divider(color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           const ListTile(
             title: Text(
               "所在地 實測震度 2級 以下",
@@ -231,17 +203,9 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("地震報告",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("地震報告", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
           SizedBox(width: 5),
-          Text("中央氣象署 地震報告",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300))
+          Text("中央氣象署 地震報告", style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.w300))
         ],
       ),
     ));
@@ -269,8 +233,7 @@ class _NotifyPage extends State<NotifyPage> {
               size: 30,
             ),
           ),
-          const Divider(
-              color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
+          const Divider(color: Colors.grey, thickness: 0.5, indent: 20, endIndent: 20),
           const ListTile(
             title: Text(
               "所在地 實測震度 2級 以下",
@@ -291,11 +254,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("大雷雨即時訊息",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("大雷雨即時訊息", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));
@@ -332,11 +291,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("豪雨特報",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("豪雨特報", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));
@@ -373,11 +328,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("大雨特報",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("大雨特報", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));
@@ -414,11 +365,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("高溫資訊",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("高溫資訊", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));
@@ -452,11 +399,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("陸上強風特報",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("陸上強風特報", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));
@@ -490,11 +433,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("停班停課資訊",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("停班停課資訊", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));
@@ -528,11 +467,7 @@ class _NotifyPage extends State<NotifyPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("海上陸上颱風警報",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600)),
+          Text("海上陸上颱風警報", style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
         ],
       ),
     ));

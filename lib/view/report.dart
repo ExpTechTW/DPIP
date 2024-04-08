@@ -6,6 +6,7 @@ import 'package:dpip/model/earthquake_report.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
+import 'package:dpip/widget/drag_handle.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -155,7 +156,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(earthquakeType),
+        title: Text(widget.report.getNumber() != null ? "第 ${widget.report.getNumber()} 號" : "小區域有感地震"),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -215,19 +216,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                         child: ListView(
                           controller: scrollController,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 10),
-                                  height: 4,
-                                  width: 32,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: context.colors.onSurfaceVariant.withOpacity(0.4)),
-                                ),
-                              ],
-                            ),
+                            const DragHandleDecoration(),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 vertical: 8,
