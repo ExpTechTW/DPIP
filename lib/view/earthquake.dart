@@ -168,9 +168,14 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                   "即時資料僅供參考\n實際請以中央氣象署的資料為主",
                   textAlign: TextAlign.center,
                 ),
-                Flexible(
-                  flex: 1,
-                  child: Center(child: stack),
+                Expanded(
+                  child: ClipRRect(
+                    child: InteractiveViewer(
+                      clipBehavior: Clip.none,
+                      maxScale: 10,
+                      child: stack,
+                    ),
+                  ),
                 ),
               ],
             ),
