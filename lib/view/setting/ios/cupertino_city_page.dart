@@ -28,11 +28,17 @@ class _CupertinoCityPageState extends State<CupertinoCityPage> {
                 if (e != widget.city) {
                   return CupertinoListTile(
                     title: Text(e),
+                    onTap: () {
+                      Navigator.pop(context, e);
+                    },
                   );
                 } else {
                   return CupertinoListTile(
                     title: Text(e),
                     trailing: const Icon(CupertinoIcons.check_mark),
+                    onTap: () {
+                      Navigator.pop(context, e);
+                    },
                   );
                 }
               }).toList(),
