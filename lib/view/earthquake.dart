@@ -118,8 +118,22 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
 
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
-          middle: Text("強震監視器"),
+        navigationBar: CupertinoNavigationBar(
+          middle: const Text("強震監視器"),
+          trailing: CupertinoButton(
+            padding: EdgeInsets.zero,
+            child: const Icon(CupertinoIcons.question_circle),
+            onPressed: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) {
+                    return const AboutRts();
+                  },
+                ),
+              );
+            },
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(4),
