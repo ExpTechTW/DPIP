@@ -35,6 +35,58 @@ class _MePageState extends State<MePage> {
   String currentCity = Global.preference.getString("loc-city") ?? "";
   String _theme = Global.preference.getString("theme") ?? "system";
 
+  unsubscribeAllTopics() {
+    Navigator.pop(context);
+
+    double? progress;
+    String status = "取得資料中...";
+
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(value: progress),
+              Text(status),
+            ],
+          ),
+        );
+      },
+    );
+
+    messaging.getToken().then((fcmToken) {
+      if (fcmToken == null) {
+        Navigator.pop(context);
+
+        context.scaffoldMessenger.showSnackBar(
+          const SnackBar(content: Text("重置 FCM 主題訂閱時發生錯誤：無法取得已訂閱主題列表")),
+        );
+
+        return;
+      }
+
+      Global.api.getNotificationTopics(fcmToken).then((topics) async {
+        setState(() {
+          progress = 0;
+          status = "0/${topics.length} 解除訂閱中...";
+        });
+
+        for (int i = 0; i < topics.length; i++) {
+          await messaging.unsubscribeFromTopic(topics[i]).catchError((e) {
+            print(e);
+          });
+
+          setState(() {
+            progress = (i + 1) / topics.length;
+            status = "${i + 1}/${topics.length} 解除訂閱中...";
+          });
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
@@ -544,6 +596,29 @@ class _MePageState extends State<MePage> {
                           ),
                         );
                       });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.bug_report_rounded),
+                    title: const Text("重置 FCM 主題訂閱"),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text("重置 FCM 主題訂閱"),
+                            content: Text("重置主題訂閱後將需要再次設定所在地才能接收到區域通知\n重置可能會需要一點時間"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text("取消")),
+                              FilledButton(onPressed: unsubscribeAllTopics, child: const Text("繼續"))
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                 ],
