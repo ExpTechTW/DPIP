@@ -58,7 +58,9 @@ class _InitPageState extends State<InitPage> {
   @override
   void initState() {
     super.initState();
+
     _pageController = PageController(initialPage: currentPageIndex);
+
     render();
 
     if (Platform.isAndroid) {
