@@ -36,30 +36,62 @@ class _MePageState extends State<MePage> {
   String _theme = Global.preference.getString("theme") ?? "system";
 
   unsubscribeAllTopics() {
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) {
-        return const AlertDialog(
-          contentPadding: EdgeInsets.all(24),
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 24),
-              Text("解除通知主題訂閱中..."),
-            ],
-          ),
-        );
-      },
-    );
+    if (Platform.isIOS) {
+      showCupertinoDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const CupertinoAlertDialog(
+            content: Row(
+              children: [
+                CupertinoActivityIndicator(),
+                SizedBox(width: 24),
+                Text("解除通知主題訂閱中..."),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const AlertDialog(
+            contentPadding: EdgeInsets.all(24),
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 24),
+                Text("解除通知主題訂閱中..."),
+              ],
+            ),
+          );
+        },
+      );
+    }
 
     messaging.getToken().then((fcmToken) {
       if (fcmToken == null) {
         Navigator.pop(context);
 
-        context.scaffoldMessenger.showSnackBar(
-          const SnackBar(content: Text("重置 FCM 主題訂閱時發生錯誤：無法取得已訂閱主題列表")),
-        );
+        if (Platform.isIOS) {
+          showCupertinoDialog(
+            barrierDismissible: true,
+            context: context,
+            builder: (context) {
+              return const CupertinoAlertDialog(
+                title: Text("重置時發生錯誤"),
+                content: Text("無法取得已訂閱主題列表"),
+                actions: [CupertinoDialogAction(child: Text("確定"))],
+              );
+            },
+          );
+        } else {
+          context.scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text("重置 FCM 主題訂閱時發生錯誤：無法取得已訂閱主題列表")),
+          );
+        }
 
         return;
       }
@@ -84,9 +116,22 @@ class _MePageState extends State<MePage> {
         ).then((value) {
           messaging.subscribeToTopic("DPIP");
 
-          context.scaffoldMessenger.showSnackBar(
-            const SnackBar(content: Text("已重置 FCM 主題訂閱")),
-          );
+          if (Platform.isIOS) {
+            showCupertinoDialog(
+              barrierDismissible: true,
+              context: context,
+              builder: (context) {
+                return const CupertinoAlertDialog(
+                  content: Text("已重置 FCM 主題訂閱"),
+                  actions: [CupertinoDialogAction(child: Text("確定"))],
+                );
+              },
+            );
+          } else {
+            context.scaffoldMessenger.showSnackBar(
+              const SnackBar(content: Text("已重置 FCM 主題訂閱")),
+            );
+          }
 
           Navigator.of(context).pop();
         });
