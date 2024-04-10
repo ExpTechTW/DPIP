@@ -35,44 +35,48 @@ class _MePageState extends State<MePage> {
   String currentCity = Global.preference.getString("loc-city") ?? "";
   String _theme = Global.preference.getString("theme") ?? "system";
 
-  unsubscribeAllTopics() {
-    if (Platform.isIOS) {
-      showCupertinoDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return const CupertinoAlertDialog(
-            content: Row(
-              children: [
-                CupertinoActivityIndicator(),
-                SizedBox(width: 24),
-                Text("解除通知主題訂閱中..."),
-              ],
-            ),
-          );
-        },
-      );
-    } else {
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return const AlertDialog(
-            contentPadding: EdgeInsets.all(24),
-            content: Row(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 24),
-                Text("解除通知主題訂閱中..."),
-              ],
-            ),
-          );
-        },
-      );
-    }
+  Future<void> unsubscribeAllTopics() async {
+    try {
+      if (Platform.isIOS) {
+        showCupertinoDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return const CupertinoAlertDialog(
+              content: Row(
+                children: [
+                  CupertinoActivityIndicator(),
+                  SizedBox(width: 24),
+                  Text("解除通知主題訂閱中..."),
+                ],
+              ),
+            );
+          },
+        );
+      } else {
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return const AlertDialog(
+              contentPadding: EdgeInsets.all(24),
+              content: Row(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(width: 24),
+                  Text("解除通知主題訂閱中..."),
+                ],
+              ),
+            );
+          },
+        );
+      }
 
-    messaging.getToken().then((fcmToken) {
+      final fcmToken = await messaging.getToken();
+
       if (fcmToken == null) {
+        if (!mounted) return;
+
         Navigator.pop(context);
 
         if (Platform.isIOS) {
@@ -80,10 +84,21 @@ class _MePageState extends State<MePage> {
             barrierDismissible: true,
             context: context,
             builder: (context) {
-              return const CupertinoAlertDialog(
-                title: Text("重置時發生錯誤"),
-                content: Text("無法取得已訂閱主題列表"),
-                actions: [CupertinoDialogAction(child: Text("確定"))],
+              return CupertinoAlertDialog(
+                title: const Text("重置時發生錯誤"),
+                content: const Text(
+                  "無法取得已訂閱主題列表",
+                  style: TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    child: const Text("確定"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
               );
             },
           );
@@ -96,47 +111,91 @@ class _MePageState extends State<MePage> {
         return;
       }
 
-      Global.api.getNotificationTopics(fcmToken).then((topics) async {
-        final topicKeepList = ["DPIP"];
+      final topics = await Global.api.getNotificationTopics(fcmToken);
+      final topicKeepList = ["DPIP"];
 
-        if (Global.preference.getString("loc-city") != null) {
-          final city = Global.preference.getString("loc-city")!;
-          topicKeepList.add(safeBase64Encode(city));
-          if (Global.preference.getString("loc-town") != null) {
-            final town = Global.preference.getString("loc-town")!;
-            topicKeepList.add(safeBase64Encode("$city$town"));
-          }
+      if (Global.preference.getString("loc-city") != null) {
+        final city = Global.preference.getString("loc-city")!;
+        topicKeepList.add(safeBase64Encode(city));
+        if (Global.preference.getString("loc-town") != null) {
+          final town = Global.preference.getString("loc-town")!;
+          topicKeepList.add(safeBase64Encode("$city$town"));
         }
+      }
 
-        topics.removeWhere((topic) => topicKeepList.contains(topic));
+      topics.removeWhere((topic) => topicKeepList.contains(topic));
 
-        Future.forEach(
-          topics,
-          (topic) async => messaging.unsubscribeFromTopic(topic).catchError(print),
-        ).then((value) {
-          messaging.subscribeToTopic("DPIP");
+      Future.forEach(
+        topics,
+        (topic) => messaging.unsubscribeFromTopic(topic).catchError(print),
+      ).then((value) {
+        messaging.subscribeToTopic("DPIP");
 
-          if (Platform.isIOS) {
-            showCupertinoDialog(
-              barrierDismissible: true,
-              context: context,
-              builder: (context) {
-                return const CupertinoAlertDialog(
-                  content: Text("已重置 FCM 主題訂閱"),
-                  actions: [CupertinoDialogAction(child: Text("確定"))],
-                );
-              },
-            );
-          } else {
-            context.scaffoldMessenger.showSnackBar(
-              const SnackBar(content: Text("已重置 FCM 主題訂閱")),
-            );
-          }
+        Navigator.of(context).pop();
 
-          Navigator.of(context).pop();
-        });
+        if (Platform.isIOS) {
+          showCupertinoDialog(
+            barrierDismissible: true,
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                content: const Text(
+                  "已重置 FCM 主題訂閱",
+                  style: TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    child: const Text("確定"),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              );
+            },
+          );
+        } else {
+          context.scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text("已重置 FCM 主題訂閱")),
+          );
+        }
       });
-    });
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context);
+
+      if (Platform.isIOS) {
+        showCupertinoDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: const Text("重置時發生錯誤"),
+              content: Text(
+                e.toString(),
+                style: const TextStyle(fontSize: 16),
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: const Text("確定"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          },
+        );
+      } else {
+        context.scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text("重置 FCM 主題訂閱時發生錯誤：${e.toString()}"),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -327,6 +386,10 @@ class _MePageState extends State<MePage> {
                             );
                           });
                         },
+                      ),
+                      CupertinoListTile(
+                        title: const Text("重置 FCM 主題訂閱"),
+                        onTap: unsubscribeAllTopics,
                       ),
                     ],
                   ),
