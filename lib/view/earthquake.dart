@@ -135,20 +135,37 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
             },
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const Text(
-                "即時資料僅供參考\n實際請以中央氣象署的資料為主",
-                textAlign: TextAlign.center,
-              ),
-              Flexible(
-                flex: 1,
-                child: Center(child: stack),
-              ),
-            ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "即時資料僅供參考\n實際請以中央氣象署的資料為主",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: stack != null
+                      ? ClipRRect(
+                          child: InteractiveViewer(
+                            clipBehavior: Clip.none,
+                            maxScale: 10,
+                            child: stack!,
+                          ),
+                        )
+                      : const Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -183,20 +200,20 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                   "即時資料僅供參考\n實際請以中央氣象署的資料為主",
                   textAlign: TextAlign.center,
                 ),
-                Expanded(
-                  child: Center(
-                    child: stack != null
-                        ? ClipRRect(
-                            child: InteractiveViewer(
-                              clipBehavior: Clip.none,
-                              maxScale: 10,
-                              child: stack!,
-                            ),
-                          )
-                        : Platform.isIOS
-                            ? const CupertinoActivityIndicator()
-                            : const CircularProgressIndicator(),
-                  ),
+                Flexible(
+                  flex: 1,
+                  fit: FlexFit.tight,
+                  child: stack != null
+                      ? ClipRRect(
+                          child: InteractiveViewer(
+                            clipBehavior: Clip.none,
+                            maxScale: 10,
+                            child: stack!,
+                          ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        ),
                 ),
               ],
             ),
