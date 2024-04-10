@@ -36,20 +36,17 @@ class _MePageState extends State<MePage> {
   String _theme = Global.preference.getString("theme") ?? "system";
 
   unsubscribeAllTopics() {
-    Navigator.pop(context);
-
-    double? progress;
-    String status = "取得資料中...";
-
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (context) {
-        return AlertDialog(
+        return const AlertDialog(
+          contentPadding: EdgeInsets.all(24),
           content: Row(
             children: [
-              CircularProgressIndicator(value: progress),
-              Text(status),
+              CircularProgressIndicator(),
+              SizedBox(width: 24),
+              Text("解除訂閱中..."),
             ],
           ),
         );
@@ -68,21 +65,31 @@ class _MePageState extends State<MePage> {
       }
 
       Global.api.getNotificationTopics(fcmToken).then((topics) async {
-        setState(() {
-          progress = 0;
-          status = "0/${topics.length} 解除訂閱中...";
-        });
+        final topicKeepList = ["DPIP"];
 
-        for (int i = 0; i < topics.length; i++) {
-          await messaging.unsubscribeFromTopic(topics[i]).catchError((e) {
-            print(e);
-          });
-
-          setState(() {
-            progress = (i + 1) / topics.length;
-            status = "${i + 1}/${topics.length} 解除訂閱中...";
-          });
+        if (Global.preference.getString("loc-city") != null) {
+          final city = Global.preference.getString("loc-city")!;
+          topicKeepList.add(safeBase64Encode(city));
+          if (Global.preference.getString("loc-town") != null) {
+            final town = Global.preference.getString("loc-town")!;
+            topicKeepList.add(safeBase64Encode("$city$town"));
+          }
         }
+
+        topics.removeWhere((topic) => topicKeepList.contains(topic));
+
+        Future.forEach(
+          topics,
+          (topic) async => messaging.unsubscribeFromTopic(topic).catchError(print),
+        ).then((value) {
+          messaging.subscribeToTopic("DPIP");
+
+          context.scaffoldMessenger.showSnackBar(
+            const SnackBar(content: Text("已重置 FCM 主題訂閱")),
+          );
+
+          Navigator.of(context).pop();
+        });
       });
     });
   }
@@ -148,7 +155,7 @@ class _MePageState extends State<MePage> {
                                 messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
                                 currentTown = value;
                                 Global.preference.setString("loc-town", value);
-                                messaging.subscribeToTopic(safeBase64Encode(currentTown));
+                                messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
                               });
                             }
                           });
@@ -372,7 +379,7 @@ class _MePageState extends State<MePage> {
                                         messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
                                         currentTown = value;
                                         Global.preference.setString("loc-town", value);
-                                        messaging.subscribeToTopic(safeBase64Encode(currentTown));
+                                        messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
                                       }
                                     });
                                     Navigator.pop(context);
@@ -601,25 +608,7 @@ class _MePageState extends State<MePage> {
                   ListTile(
                     leading: const Icon(Icons.bug_report_rounded),
                     title: const Text("重置 FCM 主題訂閱"),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("重置 FCM 主題訂閱"),
-                            content: Text("重置主題訂閱後將需要再次設定所在地才能接收到區域通知\n重置可能會需要一點時間"),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("取消")),
-                              FilledButton(onPressed: unsubscribeAllTopics, child: const Text("繼續"))
-                            ],
-                          );
-                        },
-                      );
-                    },
+                    onTap: unsubscribeAllTopics,
                   ),
                 ],
               )

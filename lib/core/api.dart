@@ -33,7 +33,7 @@ class ExpTechApi {
     final response = await http.get(Uri.parse('https://api-2.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body) as List<String>;
+      return List<String>.from(jsonDecode(response.body) as List);
     } else {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
