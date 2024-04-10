@@ -6,7 +6,6 @@ import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/about_rts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 
 import '../core/utils.dart';
