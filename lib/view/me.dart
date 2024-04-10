@@ -46,7 +46,7 @@ class _MePageState extends State<MePage> {
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 24),
-              Text("解除訂閱中..."),
+              Text("解除通知主題訂閱中..."),
             ],
           ),
         );
