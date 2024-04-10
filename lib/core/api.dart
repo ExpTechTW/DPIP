@@ -30,7 +30,7 @@ class ExpTechApi {
   }
 
   Future<List<String>> getNotificationTopics(String fcmToken) async {
-    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/dpip/$fcmToken/topics'));
+    final response = await http.get(Uri.parse('https://api-2.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as List<String>;
