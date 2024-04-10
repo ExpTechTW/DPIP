@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dpip/model/earthquake_report.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
@@ -10,7 +11,8 @@ class ExpTechApi {
   ExpTechApi({this.apikey});
 
   Future<List<PartialEarthquakeReport>> getReportList({int limit = 20}) async {
-    final response = await http.get(Uri.parse('https://lb-3.exptech.com.tw/api/v2/eq/report?limit=$limit'));
+    final response = await http
+        .get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/eq/report?limit=$limit'));
 
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>).map((e) => PartialEarthquakeReport.fromJson(e)).toList();
@@ -20,7 +22,8 @@ class ExpTechApi {
   }
 
   Future<EarthquakeReport> getReport(String id) async {
-    final response = await http.get(Uri.parse('https://lb-3.exptech.com.tw/api/v2/eq/report/$id'));
+    final response =
+        await http.get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/eq/report/$id'));
 
     if (response.statusCode == 200) {
       return EarthquakeReport.fromJson(jsonDecode(response.body));
@@ -30,7 +33,8 @@ class ExpTechApi {
   }
 
   Future<List<String>> getNotificationTopics(String fcmToken) async {
-    final response = await http.get(Uri.parse('https://api-2.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
+    final response = await http
+        .get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
 
     if (response.statusCode == 200) {
       return List<String>.from(jsonDecode(response.body) as List);
