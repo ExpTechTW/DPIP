@@ -62,7 +62,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: context.colors.mag(report.mag),
+                color: getMagnitudeColor(report.mag),
               ),
               child: Center(
                 child: Text(
@@ -70,7 +70,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: context.colors.onmag(report.mag),
+                    color: context.colors.onIntensity(report.intensity),
                   ),
                 ),
               ),
@@ -126,7 +126,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: context.colors.mag(report.mag), // 使用地震規模顏色
+                color: getMagnitudeColor(report.mag), // 使用地震規模顏色
               ),
               child: Center(
                 child: Text(
@@ -134,7 +134,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: context.colors.onmag(report.mag),
+                    color: context.colors.onIntensity(report.intensity),
                   ),
                 ),
               ),
@@ -150,6 +150,19 @@ class EarthquakeReportListTile extends StatelessWidget {
           );
         },
       );
+    }
+  }
+
+  Color getMagnitudeColor(double magnitude) {
+    // 根据地震规模返回颜色
+    if (magnitude > 6.5) {
+      return Colors.red;
+    } else if (magnitude > 6.0) {
+      return Colors.orange;
+    } else if (magnitude > 5.5) {
+      return Colors.yellow;
+    } else {
+      return Colors.green;
     }
   }
 }
