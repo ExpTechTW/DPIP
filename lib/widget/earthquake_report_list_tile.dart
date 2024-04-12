@@ -51,7 +51,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: getMagnitudeColor(report.mag),
+                    color: context.colors.onIntensity(report.intensity),
                   ),
                 ),
               ),
@@ -115,7 +115,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: getMagnitudeColor(report.mag),
+                    color: context.colors.onIntensity(report.intensity),
                   ),
                 ),
               ),
@@ -153,13 +153,13 @@ class EarthquakeReportListTile extends StatelessWidget {
     }
   }
 
-  Color getMagnitudeColor(double magnitude) {
+  Color getMagnitudeColor(double mag) {
     // 根据地震规模返回颜色
-    if (magnitude > 6.5) {
+    if (mag > 6.5) {
       return Colors.red;
-    } else if (magnitude > 6.0) {
+    } else if (mag > 6.0) {
       return Colors.orange;
-    } else if (magnitude > 5.5) {
+    } else if (mag > 5.5) {
       return Colors.yellow;
     } else {
       return Colors.green;
