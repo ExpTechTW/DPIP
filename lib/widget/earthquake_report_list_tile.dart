@@ -43,15 +43,15 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: context.colors.intensity(report.intensity),
+                color: getMagnitudeColor(report.mag),
               ),
               child: Center(
                 child: Text(
-                  intensityToNumberString(report.intensity),
+                  "7.2", // 顯示地震規模
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: context.colors.onIntensity(report.intensity),
+                    color: getMagnitudeColor(report.mag),
                   ),
                 ),
               ),
@@ -62,11 +62,11 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: getMagnitudeColor(report.mag),
+                color: context.colors.intensity(report.intensity),
               ),
               child: Center(
                 child: Text(
-                  "4", // 顯示地震規模
+                  intensityToNumberString(report.intensity),
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -107,15 +107,15 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: context.colors.intensity(report.intensity),
+                color: getMagnitudeColor(report.mag),
               ),
               child: Center(
                 child: Text(
-                  intensityToNumberString(report.intensity),
+                  "7.2", // 顯示地震規模
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: context.colors.onIntensity(report.intensity),
+                    color: getMagnitudeColor(report.mag),
                   ),
                 ),
               ),
@@ -126,11 +126,11 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: getMagnitudeColor(report.mag), // 使用地震規模顏色
+                color: context.colors.intensity(report.intensity),
               ),
               child: Center(
                 child: Text(
-                  "4", // 顯示地震規模
+                  intensityToNumberString(report.intensity),
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
