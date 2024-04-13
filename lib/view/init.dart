@@ -86,9 +86,6 @@ class _InitPageState extends State<InitPage> {
       });
     });
 
-    await messaging.subscribeToTopic(safeBase64Encode(Global.preference.getString('loc-city') ?? "臺南市"));
-    await messaging.subscribeToTopic(safeBase64Encode(
-        "${Global.preference.getString('loc-city') ?? "臺南市"}${Global.preference.getString('loc-town') ?? "歸仁區"}"));
     /*
      else {
       showDialog(
