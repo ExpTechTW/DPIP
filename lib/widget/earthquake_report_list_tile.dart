@@ -47,7 +47,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  "7.2", // 顯示地震規模
+                  "${report.mag}", // 顯示地震規模
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 child: Text(
                   intensityToNumberString(report.intensity),
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: context.colors.onIntensity(report.intensity),
                   ),
@@ -111,7 +111,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  "7.2", // 顯示地震規模
+                  "${report.mag}", // 顯示地震規模
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -132,7 +132,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 child: Text(
                   intensityToNumberString(report.intensity),
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: context.colors.onIntensity(report.intensity),
                   ),
