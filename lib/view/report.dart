@@ -60,61 +60,56 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   initMapMarkers() {
     final points = <LatLng>[LatLng(report.lat, report.lon)];
+    final list = report.list.entries.expand((city) => city.value.town.entries.map((town) => town.value)).toList();
 
-    for (String areaName in report.list.keys) {
-      final area = report.list[areaName]!;
+    list.sort((a, b) => a.intensity - b.intensity);
 
-      for (String stationName in area.town.keys) {
-        final station = report.list[areaName]!.town[stationName]!;
+    for (var station in list) {
+      points.add(LatLng(station.lat, station.lon));
 
-        points.add(LatLng(station.lat, station.lon));
-
-        markers.add(
-          Marker(
-            height: 20,
-            width: 20,
-            point: LatLng(station.lat, station.lon),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: Colors.white,
-                ),
-                color: context.colors.intensity(station.intensity),
+      markers.add(
+        Marker(
+          height: 20,
+          width: 20,
+          point: LatLng(station.lat, station.lon),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Colors.white,
               ),
-              child: Center(
-                child: Text(
-                  intensityToNumberString(station.intensity),
-                  style: TextStyle(
-                    height: 1,
-                    color: context.colors.onIntensity(station.intensity),
-                    fontSize: 14,
-                  ),
+              color: context.colors.intensity(station.intensity),
+            ),
+            child: Center(
+              child: Text(
+                intensityToNumberString(station.intensity),
+                style: TextStyle(
+                  height: 1,
+                  color: context.colors.onIntensity(station.intensity),
+                  fontSize: 14,
                 ),
               ),
             ),
           ),
-        );
-
-        markers.add(
-          Marker(
-            height: 42,
-            width: 42,
-            point: LatLng(report.lat, report.lon),
-            child: const Image(
-              image: AssetImage("assets/cross.png"),
-            ),
-          ),
-        );
-      }
+        ),
+      );
     }
 
-    mapController.fitCamera(
-      CameraFit.bounds(
-        bounds: LatLngBounds.fromPoints(points),
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 240),
+    markers.add(
+      Marker(
+        height: 42,
+        width: 42,
+        point: LatLng(report.lat, report.lon),
+        child: const Image(
+          image: AssetImage("assets/cross.png"),
+        ),
       ),
     );
+
+    mapController.fitCamera(CameraFit.bounds(
+      bounds: LatLngBounds.fromPoints(points),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 192),
+    ));
   }
 
   fillIntensityCapsule() {
