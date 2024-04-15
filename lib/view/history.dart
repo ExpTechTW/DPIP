@@ -39,8 +39,7 @@ class _HistoryPage extends State<HistoryPage> {
         children: [
           Text(
             "服務異常",
-            style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
           ),
           Text(
             "稍等片刻後重試 如持續異常 請回報開發人員",
@@ -61,18 +60,12 @@ class _HistoryPage extends State<HistoryPage> {
                 children: [
                   Text(
                     prefs.getString("loc-city") ?? "臺南市",
-                    style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white),
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     prefs.getString("loc-town") ?? "歸仁區",
-                    style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.grey),
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.grey),
                   ),
                 ],
               )
@@ -95,10 +88,8 @@ class _HistoryPage extends State<HistoryPage> {
           ));
         } else {
           for (var i = 0; i < data["loc"].length; i++) {
-            DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                    data["loc"][i]["time"],
-                    isUtc: true)
-                .add(const Duration(hours: 8));
+            DateTime dateTime =
+                DateTime.fromMillisecondsSinceEpoch(data["loc"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
             _List_children.add(Padding(
@@ -124,10 +115,7 @@ class _HistoryPage extends State<HistoryPage> {
                       const SizedBox(width: 5),
                       Text(
                         data["loc"][i]["title"],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -156,10 +144,7 @@ class _HistoryPage extends State<HistoryPage> {
                 children: [
                   Text(
                     "全國",
-                    style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
                   ),
                 ],
               )
@@ -182,10 +167,8 @@ class _HistoryPage extends State<HistoryPage> {
           ));
         } else {
           for (var i = 0; i < data["all"].length; i++) {
-            DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                    data["all"][i]["time"],
-                    isUtc: true)
-                .add(const Duration(hours: 8));
+            DateTime dateTime =
+                DateTime.fromMillisecondsSinceEpoch(data["all"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
             _List_children.add(Padding(
@@ -211,10 +194,7 @@ class _HistoryPage extends State<HistoryPage> {
                       const SizedBox(width: 5),
                       Text(
                         data["all"][i]["title"],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -262,12 +242,10 @@ class _HistoryPage extends State<HistoryPage> {
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          (_page == 1) ? Colors.blue[800] : Colors.transparent,
+                      backgroundColor: (_page == 1) ? Colors.blue[800] : Colors.transparent,
                       elevation: 20,
                       splashFactory: NoSplash.splashFactory,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     ),
                     onPressed: () {
                       _page = 1;
@@ -281,12 +259,10 @@ class _HistoryPage extends State<HistoryPage> {
                   const SizedBox(width: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          (_page == 0) ? Colors.blue[800] : Colors.transparent,
+                      backgroundColor: (_page == 0) ? Colors.blue[800] : Colors.transparent,
                       elevation: 20,
                       splashFactory: NoSplash.splashFactory,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     ),
                     onPressed: () {
                       _page = 0;
@@ -300,9 +276,7 @@ class _HistoryPage extends State<HistoryPage> {
                 ],
               ),
               Expanded(
-                child: ListView(
-                    physics: const ClampingScrollPhysics(),
-                    children: _List_children.toList()),
+                child: ListView(physics: const ClampingScrollPhysics(), children: _List_children.toList()),
               ),
             ],
           ),

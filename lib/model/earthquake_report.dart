@@ -1,5 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
 import 'package:dpip/model/area_intensity.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'earthquake_report.g.dart';
 
@@ -26,16 +26,14 @@ class EarthquakeReport {
       required this.time,
       required this.trem});
 
-  factory EarthquakeReport.fromJson(Map<String, dynamic> json) =>
-      _$EarthquakeReportFromJson(json);
+  factory EarthquakeReport.fromJson(Map<String, dynamic> json) => _$EarthquakeReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$EarthquakeReportToJson(this);
 
   Uri get cwaUrl {
     final arr = id.split("-");
     arr.removeAt(1);
-    return Uri.parse(
-        "https://www.cwa.gov.tw/V8/C/E/EQ/EQ${arr.join('-')}.html");
+    return Uri.parse("https://www.cwa.gov.tw/V8/C/E/EQ/EQ${arr.join('-')}.html");
   }
 
   String? getNumber() {

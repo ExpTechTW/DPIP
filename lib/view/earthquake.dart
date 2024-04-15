@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dpip/util/extension.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../core/utils.dart';
-import 'dart:math';
 
 class EarthquakePage extends StatefulWidget {
   const EarthquakePage({super.key});

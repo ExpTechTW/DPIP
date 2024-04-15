@@ -32,13 +32,10 @@ class _RadarState extends State<Radar> {
     final now = DateTime.now().toUtc().add(const Duration(hours: 8));
     generateTimeList(now);
     final currentTimeInMinutes = now.hour * 60 + now.minute;
-    final pastTimes = times
-        .where((time) => time.hour * 60 + time.minute <= currentTimeInMinutes)
-        .toList();
+    final pastTimes = times.where((time) => time.hour * 60 + time.minute <= currentTimeInMinutes).toList();
     selectedIndex = times.indexOf(pastTimes.last);
     defaultSelectedIndex = selectedIndex;
-    _scrollController =
-        ScrollController(initialScrollOffset: selectedIndex * 75);
+    _scrollController = ScrollController(initialScrollOffset: selectedIndex * 75);
   }
 
   @override
@@ -62,8 +59,7 @@ class _RadarState extends State<Radar> {
 
   TimeOfDay subtractTenMinutes(TimeOfDay time) {
     DateTime now = DateTime.now();
-    DateTime dateTime =
-        DateTime(now.year, now.month, now.day, time.hour, time.minute);
+    DateTime dateTime = DateTime(now.year, now.month, now.day, time.hour, time.minute);
     DateTime newDateTime = dateTime.subtract(const Duration(minutes: 10));
     return TimeOfDay.fromDateTime(newDateTime);
   }
@@ -85,8 +81,7 @@ class _RadarState extends State<Radar> {
         minutesToAdd = (index - pastItemCount + 1) * 10;
       }
 
-      final totalMinutes =
-          currentTime.hour * 60 + currentTime.minute + minutesToAdd;
+      final totalMinutes = currentTime.hour * 60 + currentTime.minute + minutesToAdd;
       final roundedMinutes = (totalMinutes / 10).round() * 10;
       final newHour = roundedMinutes ~/ 60;
       final newMinute = roundedMinutes % 60;
@@ -97,10 +92,8 @@ class _RadarState extends State<Radar> {
   bool secondsEarlier(TimeOfDay checkTime, int sec) {
     final now = DateTime.now();
     final currentTimeOfDay = TimeOfDay.now();
-    final currentDateTime = DateTime(now.year, now.month, now.day,
-        currentTimeOfDay.hour, currentTimeOfDay.minute);
-    final checkDateTime = DateTime(
-        now.year, now.month, now.day, checkTime.hour, checkTime.minute);
+    final currentDateTime = DateTime(now.year, now.month, now.day, currentTimeOfDay.hour, currentTimeOfDay.minute);
+    final checkDateTime = DateTime(now.year, now.month, now.day, checkTime.hour, checkTime.minute);
     final difference = currentDateTime.difference(checkDateTime);
     return difference.inSeconds >= sec;
   }
@@ -127,9 +120,7 @@ class _RadarState extends State<Radar> {
                   minZoom: 6,
                   maxZoom: 10,
                   interactionOptions: InteractionOptions(
-                    flags: InteractiveFlag.drag |
-                        InteractiveFlag.pinchMove |
-                        InteractiveFlag.pinchZoom,
+                    flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
                   ),
                 ),
                 children: [
@@ -154,27 +145,22 @@ class _RadarState extends State<Radar> {
             SizedBox(
               height: 100, // 可以調整這個高度以獲得所需的顯示效果
               child: CupertinoPicker(
-                scrollController:
-                    FixedExtentScrollController(initialItem: selectedIndex),
+                scrollController: FixedExtentScrollController(initialItem: selectedIndex),
                 itemExtent: 32.0, // 每個項目的高度
                 onSelectedItemChanged: (index) {
                   int selectIndex = (defaultSelectedIndex - index - 1) * -1;
-                  if (selectIndex < 0 ||
-                      (index < defaultSelectedIndex &&
-                          secondsEarlier(times[index], 1200))) {
+                  if (selectIndex < 0 || (index < defaultSelectedIndex && secondsEarlier(times[index], 1200))) {
                     String timeString = formatToUTC(times[index]);
                     url =
                         "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/OBS/${timeString.substring(0, 6)}/${timeString.substring(0, 8)}/obs_$timeString.png";
                     selectColor = Colors.blueAccent;
                   } else {
-                    if (selectedIndex == 0 ||
-                        compareTimeOfDay(times[index], TimeOfDay.now()) < 0) {
+                    if (selectedIndex == 0 || compareTimeOfDay(times[index], TimeOfDay.now()) < 0) {
                       selectColor = Colors.blueAccent;
                     } else {
                       selectColor = Colors.purpleAccent;
                     }
-                    String timeString =
-                        formatToUTC(adjustTime(TimeOfDay.now(), 10));
+                    String timeString = formatToUTC(adjustTime(TimeOfDay.now(), 10));
                     url =
                         "https://watch.ncdr.nat.gov.tw/00_Wxmap/7F13_NOWCAST/${timeString.substring(0, 6)}/${timeString.substring(0, 8)}/$timeString/nowcast_${timeString}_f${selectIndex.toString().padLeft(2, "0")}.png";
                   }
@@ -186,11 +172,7 @@ class _RadarState extends State<Radar> {
                   return Center(
                     child: Text(
                       times[index].format(context),
-                      style: TextStyle(
-                          fontSize: 24,
-                          color: index == selectedIndex
-                              ? selectColor
-                              : Colors.grey),
+                      style: TextStyle(fontSize: 24, color: index == selectedIndex ? selectColor : Colors.grey),
                     ),
                   );
                 }),

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class DragHandleDecoration extends StatelessWidget {
   const DragHandleDecoration({super.key});
