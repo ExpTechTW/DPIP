@@ -1,20 +1,21 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
-extension MagnitudeColorExtension on double {
-  Color getMagnitudeColor() {
-    if (this > 6.0) {
-      return Colors.red;
-    } else if (this >= 5.0 && this < 6.0) {
-      return Colors.orange;
-    } else if (this >= 4.0 && this < 5.0) {
-      return Colors.yellow;
+extension MagnitudeColorExtension on ColorScheme {
+  Color magnitude(double mag) {
+    if (mag > 6.0) {
+      return Colors.red.harmonizeWith(primary);
+    } else if (mag >= 5.0 && mag < 6.0) {
+      return Colors.orange.harmonizeWith(primary);
+    } else if (mag >= 4.0 && mag < 5.0) {
+      return Colors.yellow.harmonizeWith(primary);
     } else {
-      return Colors.green;
+      return Colors.green.harmonizeWith(primary);
     }
   }
 
-  Color getMagColor() {
-    if (this >= 4.0) {
+  Color onMagnitude(double mag) {
+    if (mag >= 4.0) {
       return Colors.black;
     } else {
       return Colors.white;

@@ -43,7 +43,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 42,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: report.mag.getMagnitudeColor(),
+                color: context.colors.magnitude(report.mag),
               ),
               child: Center(
                 child: Text(
@@ -51,7 +51,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: report.mag.getMagColor(),
+                    color: context.colors.onMagnitude(report.mag),
                   ),
                 ),
               ),
@@ -107,7 +107,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               height: 50,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
-                color: report.mag.getMagnitudeColor(),
+                color: context.colors.magnitude(report.mag),
               ),
               child: Center(
                 child: Text(
@@ -115,7 +115,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: report.mag.getMagColor(),
+                    color: context.colors.onMagnitude(report.mag),
                   ),
                 ),
               ),
