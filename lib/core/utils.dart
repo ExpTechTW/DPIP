@@ -51,27 +51,53 @@ int compareVersion(String version1, String version2) {
   return 0;
 }
 
-Map<String, dynamic> eewIntensity(Map<String, dynamic> data, Map<String, dynamic> region) {
+Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag, Map<String, dynamic> region) {
   Map<String, dynamic> json = {};
-  double eewMaxPga = 0;
+  double eewMaxI = 0.0;
 
-  region.forEach((city, cityData) {
-    cityData.forEach((town, info) {
-      double distSurface = sqrt(pow((data['lat'] - info['lat']) * 111, 2) + pow((data['lon'] - info['lon']) * 101, 2));
-      double dist = sqrt(pow(distSurface, 2) + pow(data['depth'], 2));
-      double pga = 1.657 * pow(exp(1), (1.533 * data['mag'])) * pow(dist, -1.607) * (info['site'] ?? 1);
-      if (pga > eewMaxPga) {
-        eewMaxPga = pga;
+  region.forEach((city, towns) {
+    towns.forEach((town, info) {
+      double distSurface = distance(lat, lon, info['lat'], info['lon']);
+      double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
+      double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
+      double i = pgaToFloat(pga);
+      if (i >= 4.5) {
+        i = eewAreaPgv([lat, lon], [info['lat'], info['lon']], depth, mag);
       }
-      json['$city $town'] = {
-        'dist': dist,
-        'pga': pga,
-      };
+      if (i > eewMaxI) {
+        eewMaxI = i;
+      }
+      json['$city $town'] = {'dist': dist, 'i': i};
     });
   });
 
-  json['max_pga'] = eewMaxPga;
+  json['max_i'] = eewMaxI;
   return json;
+}
+
+double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, double depth, double magW) {
+  double long = pow(10, 0.5 * magW - 1.85) / 2;
+  double epicenterDistance = distance(epicenterLocation[0], epicenterLocation[1], pointLocation[0], pointLocation[1]);
+  double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
+  double x = max(hypocenterDistance, 3);
+  num gpv600 = pow(10, 0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) - 0.002 * x);
+  double pgv400 = gpv600 * 1.31;
+  double pgv = pgv400 * 1.0;
+  return 2.68 + 1.72 * log(pgv) / ln10;
+}
+
+double distance(double latA, double lngA, double latB, double lngB) {
+  latA = latA * pi / 180;
+  lngA = lngA * pi / 180;
+  latB = latB * pi / 180;
+  lngB = lngB * pi / 180;
+
+  double sinLatA = sin(atan(tan(latA)));
+  double sinLatB = sin(atan(tan(latB)));
+  double cosLatA = cos(atan(tan(latA)));
+  double cosLatB = cos(atan(tan(latB)));
+
+  return acos(sinLatA * sinLatB + cosLatA * cosLatB * cos(lngA - lngB)) * 6371.008;
 }
 
 double pgaToFloat(double pga) {
