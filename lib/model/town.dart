@@ -13,13 +13,7 @@ class Town {
   @JsonKey(name: "site_d")
   final double? siteD;
 
-  Town(
-      {required this.code,
-      required this.lon,
-      required this.lat,
-      this.site,
-      this.siteS,
-      this.siteD});
+  Town({required this.code, required this.lon, required this.lat, this.site, this.siteS, this.siteD});
 
   factory Town.fromJson(Map<String, dynamic> json) => _$TownFromJson(json);
 

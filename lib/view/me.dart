@@ -230,11 +230,16 @@ class _MePageState extends State<MePage> {
                           ).then((value) {
                             if (value != null) {
                               setState(() {
-                                messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
-                                messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+                                if (currentCity.isNotEmpty) {
+                                  messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
+                                  if (currentTown.isNotEmpty) {
+                                    messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+                                  }
+                                }
                                 currentCity = value;
                                 currentTown = Global.region[value]!.keys.first;
-                                Global.preference.setString("loc-city", value);
+                                Global.preference.setString("loc-city", currentCity);
+                                Global.preference.setString("loc-town", currentTown);
                                 messaging.subscribeToTopic(safeBase64Encode(currentCity));
                                 messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
                               });
@@ -258,7 +263,7 @@ class _MePageState extends State<MePage> {
                               setState(() {
                                 messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
                                 currentTown = value;
-                                Global.preference.setString("loc-town", value);
+                                Global.preference.setString("loc-town", currentTown);
                                 messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
                               });
                             }
@@ -439,11 +444,16 @@ class _MePageState extends State<MePage> {
                                 onChanged: (value) {
                                   setState(() {
                                     if (value != null) {
-                                      messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
-                                      messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+                                      if (currentCity.isNotEmpty) {
+                                        messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
+                                        if (currentTown.isNotEmpty) {
+                                          messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+                                        }
+                                      }
                                       currentCity = value;
                                       currentTown = Global.region[value]!.keys.first;
-                                      Global.preference.setString("loc-city", value);
+                                      Global.preference.setString("loc-city", currentCity);
+                                      Global.preference.setString("loc-town", currentTown);
                                       messaging.subscribeToTopic(safeBase64Encode(currentCity));
                                       messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
                                     }
@@ -486,7 +496,7 @@ class _MePageState extends State<MePage> {
                                       if (value != null) {
                                         messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
                                         currentTown = value;
-                                        Global.preference.setString("loc-town", value);
+                                        Global.preference.setString("loc-town", currentTown);
                                         messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
                                       }
                                     });

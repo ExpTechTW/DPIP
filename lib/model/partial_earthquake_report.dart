@@ -29,16 +29,14 @@ class PartialEarthquakeReport {
       required this.trem,
       required this.md5});
 
-  factory PartialEarthquakeReport.fromJson(Map<String, dynamic> json) =>
-      _$PartialEarthquakeReportFromJson(json);
+  factory PartialEarthquakeReport.fromJson(Map<String, dynamic> json) => _$PartialEarthquakeReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$PartialEarthquakeReportToJson(this);
 
   Uri get cwaUrl {
     final arr = id.split("-");
     arr.removeAt(1);
-    return Uri.parse(
-        "https://www.cwa.gov.tw/V8/C/E/EQ/EQ${arr.join('-')}.html");
+    return Uri.parse("https://www.cwa.gov.tw/V8/C/E/EQ/EQ${arr.join('-')}.html");
   }
 
   String? getNumber() {

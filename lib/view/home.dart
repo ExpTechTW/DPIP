@@ -58,8 +58,7 @@ class HomePageState extends State<HomePage> {
     data ??= await get(
         "https://api.exptech.com.tw/api/v1/dpip/home?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
     loc_data ??= json.decode(await rootBundle.loadString('assets/region.json'));
-    var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"]
-        [prefs.getString("loc-town") ?? "歸仁區"];
+    var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"][prefs.getString("loc-town") ?? "歸仁區"];
     loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
     focus_map = false;
     _List_children = <Widget>[];
@@ -79,8 +78,7 @@ class HomePageState extends State<HomePage> {
           )),
           Text(
             "服務異常",
-            style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
           ),
           Text(
             "稍等片刻後重試 如持續異常 請回報開發人員",
@@ -112,26 +110,17 @@ class HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     prefs.getString("loc-city") ?? "臺南市",
-                    style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white),
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     prefs.getString("loc-town") ?? "歸仁區",
-                    style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.grey),
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.grey),
                   ),
                   const SizedBox(width: 15),
                   Text(
                     data["info"]["str"],
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.grey),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w300, color: Colors.grey),
                   ),
                 ],
               )
@@ -192,17 +181,11 @@ class HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             "降水量",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w100, color: Colors.white),
                           ),
                           Text(
                             "濕度",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w100, color: Colors.white),
                           ),
                         ],
                       ),
@@ -212,17 +195,11 @@ class HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             "${data["info"]["rainfall"]}",
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
                           ),
                           Text(
                             "${data["info"]["humidity"]}",
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white),
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
                           ),
                         ],
                       ),
@@ -232,17 +209,11 @@ class HomePageState extends State<HomePage> {
                         children: [
                           Text(
                             "mm",
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100, color: Colors.white),
                           ),
                           Text(
                             "%",
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w100,
-                                color: Colors.white),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w100, color: Colors.white),
                           ),
                         ],
                       ),
@@ -269,10 +240,8 @@ class HomePageState extends State<HomePage> {
           ));
         } else {
           for (var i = 0; i < data["loc"].length; i++) {
-            DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                    data["loc"][i]["time"],
-                    isUtc: true)
-                .add(const Duration(hours: 8));
+            DateTime dateTime =
+                DateTime.fromMillisecondsSinceEpoch(data["loc"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
             _List_children.add(Padding(
@@ -298,10 +267,7 @@ class HomePageState extends State<HomePage> {
                       const SizedBox(width: 5),
                       Text(
                         data["loc"][i]["title"],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -340,10 +306,7 @@ class HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     "全國",
-                    style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
                   ),
                 ],
               )
@@ -367,10 +330,8 @@ class HomePageState extends State<HomePage> {
           ));
         } else {
           for (var i = 0; i < data["all"].length; i++) {
-            DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
-                    data["all"][i]["time"],
-                    isUtc: true)
-                .add(const Duration(hours: 8));
+            DateTime dateTime =
+                DateTime.fromMillisecondsSinceEpoch(data["all"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
             _List_children.add(Padding(
@@ -396,10 +357,7 @@ class HomePageState extends State<HomePage> {
                       const SizedBox(width: 5),
                       Text(
                         data["all"][i]["title"],
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -477,9 +435,7 @@ class HomePageState extends State<HomePage> {
                       children: [
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: (_page == 1)
-                                ? Colors.blue[800]
-                                : Colors.transparent,
+                            backgroundColor: (_page == 1) ? Colors.blue[800] : Colors.transparent,
                             elevation: 20,
                             splashFactory: NoSplash.splashFactory,
                             shape: RoundedRectangleBorder(
@@ -498,9 +454,7 @@ class HomePageState extends State<HomePage> {
                         const SizedBox(width: 20),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: (_page == 0)
-                                ? Colors.blue[800]
-                                : Colors.transparent,
+                            backgroundColor: (_page == 0) ? Colors.blue[800] : Colors.transparent,
                             elevation: 20,
                             splashFactory: NoSplash.splashFactory,
                             shape: RoundedRectangleBorder(
@@ -529,8 +483,7 @@ class HomePageState extends State<HomePage> {
                             zoom: 7,
                             minZoom: 7,
                             maxZoom: 9,
-                            interactiveFlags:
-                                InteractiveFlag.all - InteractiveFlag.rotate,
+                            interactiveFlags: InteractiveFlag.all - InteractiveFlag.rotate,
                           ),
                           children: [
                             TileLayer(
@@ -575,15 +528,13 @@ class HomePageState extends State<HomePage> {
                 initialChildSize: 0.4,
                 minChildSize: 0.2,
                 maxChildSize: 1.0,
-                builder:
-                    (BuildContext context, ScrollController scrollController) {
+                builder: (BuildContext context, ScrollController scrollController) {
                   return Container(
                     color: Colors.black.withOpacity(0.8),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(context)
-                            .copyWith(overscroll: false),
+                        behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
                         child: ListView.builder(
                           controller: scrollController,
                           itemCount: _List_children.length,
