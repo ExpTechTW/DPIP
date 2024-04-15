@@ -21,8 +21,8 @@ class EarthquakeReportListTile extends StatelessWidget {
       return CupertinoListTile(
         padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
         leading: Icon(
-          report.getNumber() != null ? CupertinoIcons.tag : CupertinoIcons.info_circle,
-          color: report.getNumber() != null
+          report.hasNumber ? CupertinoIcons.tag : CupertinoIcons.info_circle,
+          color: report.hasNumber
               ? CupertinoColors.label.resolveFrom(context)
               : CupertinoColors.secondaryLabel.resolveFrom(context),
         ),
@@ -64,8 +64,8 @@ class EarthquakeReportListTile extends StatelessWidget {
       );
     } else {
       return ListTile(
-        leading: Icon(report.getNumber() != null ? Icons.tag_rounded : Icons.info_outline_rounded),
-        iconColor: report.getNumber() != null ? context.colors.onSurfaceVariant : context.colors.outline,
+        leading: Icon(report.hasNumber ? Icons.tag_rounded : Icons.info_outline_rounded),
+        iconColor: report.hasNumber ? context.colors.onSurfaceVariant : context.colors.outline,
         title: Text(report.getLocation()),
         subtitle: Text(
           DateFormat("yyyy/MM/dd HH:mm:ss").format(
