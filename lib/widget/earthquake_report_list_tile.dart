@@ -4,7 +4,6 @@ import 'package:dpip/core/utils.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
-import 'package:dpip/util/mag_color.dart';
 import 'package:dpip/view/report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,15 +50,15 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: context.colors.onIntensity(report.intensity),
+                    color: getMagColor(report.mag),
                   ),
                 ),
               ),
             ),
             SizedBox(width: 8),
             Container(
-              width: 48,
-              height: 48,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
                 color: context.colors.intensity(report.intensity),
@@ -68,7 +67,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 child: Text(
                   intensityToNumberString(report.intensity),
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: context.colors.onIntensity(report.intensity),
                   ),
@@ -115,15 +114,15 @@ class EarthquakeReportListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: context.colors.onIntensity(report.intensity),
+                    color: getMagColor(report.mag),
                   ),
                 ),
               ),
             ),
             SizedBox(width: 8),
             Container(
-              width: 56,
-              height: 56,
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.0),
                 color: context.colors.intensity(report.intensity),
@@ -132,7 +131,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 child: Text(
                   intensityToNumberString(report.intensity),
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: context.colors.onIntensity(report.intensity),
                   ),
@@ -155,14 +154,22 @@ class EarthquakeReportListTile extends StatelessWidget {
 
   Color getMagnitudeColor(double mag) {
     // 根据地震规模返回颜色
-    if (mag > 6.5) {
+    if (mag > 6.0) {
       return Colors.red;
-    } else if (mag > 6.0) {
+    } else if (mag >= 5.0 && mag < 6.0) {
       return Colors.orange;
-    } else if (mag > 5.5) {
+    } else if (mag >= 4.0 && mag < 5.0) {
       return Colors.yellow;
     } else {
       return Colors.green;
+    }
+  }
+  Color getMagColor(double mag) {
+    // 根据地震规模返回颜色
+    if (mag >= 4.0) {
+      return Colors.black;
+    } else {
+      return Colors.white;
     }
   }
 }
