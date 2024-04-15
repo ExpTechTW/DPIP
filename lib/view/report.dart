@@ -117,52 +117,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     for (var city in report.list.entries) {
       List<Widget> townList = [];
       for (var town in city.value.town.entries) {
-        townList.add(
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: context.colors.intensity(town.value.intensity),
-              ),
-              color: context.colors.intensity(town.value.intensity).withOpacity(0.08),
-            ),
-            margin: EdgeInsets.zero,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 30,
-                  width: 30,
-                  decoration: BoxDecoration(
-                    color: context.colors.intensity(town.value.intensity),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text(
-                      intensityToNumberString(town.value.intensity),
-                      style: TextStyle(
-                          color: context.colors.onIntensity(town.value.intensity),
-                          height: 1,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
-                  child: Text(
-                    town.key,
-                    style: TextStyle(
-                      color: CupertinoColors.label.resolveFrom(context),
-                      height: 1,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+        townList.add(IntensityCapsule(townName: town.key, intensity: town.value.intensity));
       }
 
       cityList.add(
