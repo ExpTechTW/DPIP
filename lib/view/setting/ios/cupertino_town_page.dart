@@ -3,9 +3,9 @@ import 'package:flutter/cupertino.dart';
 
 class CupertinoTownPage extends StatefulWidget {
   final String city;
-  final String town;
+  final String? town;
 
-  const CupertinoTownPage({super.key, required this.city, required this.town});
+  const CupertinoTownPage({super.key, required this.city, this.town});
 
   @override
   State<CupertinoTownPage> createState() => _CupertinoTownPageState();

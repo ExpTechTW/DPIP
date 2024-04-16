@@ -32,15 +32,12 @@ Future<void> messageHandler(RemoteMessage message) async {
               : (data["level"] == "1")
                   ? Priority.defaultPriority
                   : Priority.max,
-          sound: data["sound"] != "default"
-              ? RawResourceAndroidNotificationSound(data["sound"])
-              : null,
+          sound: data["sound"] != "default" ? RawResourceAndroidNotificationSound(data["sound"]) : null,
           styleInformation: const BigTextStyleInformation(''),
         ),
         iOS: DarwinNotificationDetails(
           categoryIdentifier: darwinNotificationCategoryPlain,
-          sound:
-              data["sound"] != "default" ? "${data["sound"]}.wav" : "default",
+          sound: data["sound"] != "default" ? "${data["sound"]}.wav" : "default",
           interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       ));

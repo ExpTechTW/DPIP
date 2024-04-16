@@ -1,8 +1,6 @@
 import 'dart:io' show Platform;
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dpip/core/utils.dart';
-import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/earthquake.dart';
 import 'package:dpip/view/report_list.dart';
@@ -10,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 
-import '../main.dart';
 import 'me.dart';
 
 class InitPage extends StatefulWidget {

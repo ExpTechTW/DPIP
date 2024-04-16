@@ -1,6 +1,5 @@
 import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class CupertinoCityPage extends StatefulWidget {
   final String city;

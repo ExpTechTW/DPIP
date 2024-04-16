@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -8,7 +7,8 @@ import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/widget/drag_handle.dart';
-import 'package:dynamic_color/dynamic_color.dart';
+import 'package:dpip/widget/report/image_field.dart';
+import 'package:dpip/widget/report/intensity_capsule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -28,19 +28,6 @@ class ReportPage extends StatefulWidget {
   State<ReportPage> createState() => _ReportPage();
 }
 
-var earthquakeType = "", level = 0, Lv_str = "";
-List<Color> intensity_back = const [
-  Color(0xff6B7878),
-  Color(0xff1E6EE6),
-  Color(0xff32B464),
-  Color(0xffFFE05D),
-  Color(0xffFFAA13),
-  Color(0xffEF700F),
-  Color(0xffE60000),
-  Color(0xffA00000),
-  Color(0xff5D0090),
-];
-
 class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin {
   final mapController = MapController();
   final _sheet = GlobalKey();
@@ -52,8 +39,9 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     end: BorderRadius.zero,
   );
 
-  final report = Completer<EarthquakeReport>();
+  List<Widget> maxIntensities = [];
   final List<Marker> markers = [];
+  late EarthquakeReport report;
 
   DraggableScrollableSheet get sheet => (_sheet.currentWidget as DraggableScrollableSheet);
 
@@ -61,79 +49,107 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     return Random().nextInt(max) + 1;
   }
 
-  Future<void> render() {
-    return Global.api.getReport(widget.report.id).then((data) {
-      report.complete(data);
+  void fetchFullReport() async {
+    final data = await Global.api.getReport(widget.report.id);
 
-      earthquakeType = data.getNumber() != null ? "第 ${data.getNumber()!} 號顯著有感地震" : "小區域有感地震";
+    setState(() => report = data);
+    initMapMarkers();
+    fillIntensityCapsule();
+    setState(() {});
+  }
 
-      var keys = data.list.keys.toList();
-      level = data.list[keys[0]]!.intensity;
-      Lv_str = intensityToNumberString(level);
+  initMapMarkers() {
+    final points = <LatLng>[LatLng(report.lat, report.lon)];
+    final list = report.list.entries.expand((city) => city.value.town.entries.map((town) => town.value)).toList();
 
-      final points = <LatLng>[LatLng(data.lat, data.lon)];
+    list.sort((a, b) => a.intensity - b.intensity);
 
-      for (String areaName in data.list.keys) {
-        final area = data.list[areaName]!;
+    for (var station in list) {
+      points.add(LatLng(station.lat, station.lon));
 
-        for (String stationName in area.town.keys) {
-          final station = data.list[areaName]!.town[stationName]!;
-
-          points.add(LatLng(station.lat, station.lon));
-
-          markers.add(
-            Marker(
-              height: 20,
-              width: 20,
-              point: LatLng(station.lat, station.lon),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.white,
-                  ),
-                  color: context.colors.intensity(station.intensity),
-                ),
-                child: Center(
-                  child: Text(
-                    intensityToNumberString(station.intensity),
-                    style: TextStyle(
-                      height: 1,
-                      color: context.colors.onIntensity(station.intensity),
-                      fontSize: 14,
-                    ),
-                  ),
+      markers.add(
+        Marker(
+          height: 20,
+          width: 20,
+          point: LatLng(station.lat, station.lon),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Colors.white,
+              ),
+              color: context.colors.intensity(station.intensity),
+            ),
+            child: Center(
+              child: Text(
+                intensityToNumberString(station.intensity),
+                style: TextStyle(
+                  height: 1,
+                  color: context.colors.onIntensity(station.intensity),
+                  fontSize: 14,
                 ),
               ),
             ),
-          );
-
-          markers.add(
-            Marker(
-              height: 42,
-              width: 42,
-              point: LatLng(data.lat, data.lon),
-              child: const Image(
-                image: AssetImage("assets/cross.png"),
-              ),
-            ),
-          );
-        }
-      }
-
-      mapController.fitCamera(
-        CameraFit.bounds(
-          bounds: LatLngBounds.fromPoints(points),
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 240),
+          ),
         ),
       );
-    });
+    }
+
+    markers.add(
+      Marker(
+        height: 42,
+        width: 42,
+        point: LatLng(report.lat, report.lon),
+        child: const Image(
+          image: AssetImage("assets/cross.png"),
+        ),
+      ),
+    );
+
+    mapController.fitCamera(CameraFit.bounds(
+      bounds: LatLngBounds.fromPoints(points),
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 192),
+    ));
+  }
+
+  fillIntensityCapsule() {
+    List<Widget> cityList = [];
+    for (var city in report.list.entries) {
+      List<Widget> townList = [];
+      for (var town in city.value.town.entries) {
+        townList.add(IntensityCapsule(townName: town.key, intensity: town.value.intensity));
+      }
+
+      cityList.add(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              city.key,
+              style: TextStyle(
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: townList,
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      );
+    }
+
+    maxIntensities = cityList;
   }
 
   @override
   void initState() {
     super.initState();
-    render();
+    fetchFullReport();
 
     _animationController = AnimationController(
       vsync: this,
@@ -159,7 +175,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          middle: Text(widget.report.getNumber() != null ? "第 ${widget.report.getNumber()} 號" : "小區域有感地震"),
+          middle: Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
         ),
         child: SafeArea(
           child: Stack(
@@ -170,7 +186,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                   initialCenter: const LatLng(23.8, 120.1),
                   initialZoom: 7,
                   minZoom: 7,
-                  maxZoom: 9,
+                  maxZoom: 12,
                   interactionOptions: const InteractionOptions(
                     flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
                   ),
@@ -235,9 +251,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Text(widget.report.getNumber() != null
-                                          ? "第 ${widget.report.getNumber()} 號"
-                                          : "小區域有感地震"),
+                                      Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
                                     ],
                                   ),
                                   Container(
@@ -328,99 +342,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  FutureBuilder(
-                                    future: report.future,
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        List<Widget> city = [];
-
-                                        snapshot.data!.list.forEach(
-                                          (cityName, value) {
-                                            List<Widget> town = [];
-
-                                            value.town.forEach((townName, value) {
-                                              town.add(
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(16),
-                                                    border: Border.all(
-                                                      color: context.colors.intensity(value.intensity),
-                                                    ),
-                                                    color: context.colors.intensity(value.intensity).withOpacity(0.08),
-                                                  ),
-                                                  margin: EdgeInsets.zero,
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Container(
-                                                        height: 30,
-                                                        width: 30,
-                                                        decoration: BoxDecoration(
-                                                          color: context.colors.intensity(value.intensity),
-                                                          borderRadius: BorderRadius.circular(16),
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            intensityToNumberString(value.intensity),
-                                                            style: TextStyle(
-                                                                color: context.colors.onIntensity(value.intensity),
-                                                                height: 1,
-                                                                fontSize: 16,
-                                                                fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                        padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
-                                                        child: Text(
-                                                          townName,
-                                                          style: TextStyle(
-                                                            color: CupertinoColors.label.resolveFrom(context),
-                                                            height: 1,
-                                                            fontSize: 14,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              );
-                                            });
-
-                                            city.add(
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  Text(
-                                                    cityName,
-                                                    style: TextStyle(
-                                                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                                                      fontSize: 14,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 8),
-                                                  Wrap(
-                                                    spacing: 8,
-                                                    runSpacing: 8,
-                                                    children: town,
-                                                  ),
-                                                  const SizedBox(height: 16),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        );
-
-                                        return Column(
-                                          children: city,
-                                        );
-                                      } else {
-                                        return const Center(
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      }
-                                    },
-                                  ),
+                                  Column(children: maxIntensities),
                                 ],
                               ),
                             )
@@ -438,7 +360,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(widget.report.getNumber() != null ? "第 ${widget.report.getNumber()} 號" : "小區域有感地震"),
+          title: Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
           centerTitle: true,
         ),
         body: SafeArea(
@@ -450,7 +372,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                   initialCenter: const LatLng(23.8, 120.1),
                   initialZoom: 7,
                   minZoom: 7,
-                  maxZoom: 9,
+                  maxZoom: 12,
                   interactionOptions: const InteractionOptions(
                     flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
                   ),
@@ -514,13 +436,19 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                         Text(
                                           widget.report.getLocation(),
                                           style: const TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 22,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        Text(widget.report.getNumber() != null
-                                            ? "第 ${widget.report.getNumber()} 號"
-                                            : "小區域有感地震"),
+                                        Text(
+                                          DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                                            TZDateTime.fromMillisecondsSinceEpoch(
+                                              getLocation("Asia/Taipei"),
+                                              widget.report.time,
+                                            ),
+                                          ),
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
                                       ],
                                     ),
                                     Container(
@@ -561,18 +489,6 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                       },
                                     ),
                                   ],
-                                ),
-                              ),
-                              ListTile(
-                                leading: const Icon(Icons.schedule_rounded),
-                                title: const Text("發生時間"),
-                                subtitle: Text(
-                                  DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                                    TZDateTime.fromMillisecondsSinceEpoch(
-                                      getLocation("Asia/Taipei"),
-                                      widget.report.time,
-                                    ),
-                                  ),
                                 ),
                               ),
                               ListTile(
@@ -617,101 +533,41 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    FutureBuilder(
-                                      future: report.future,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.hasData) {
-                                          List<Widget> city = [];
-
-                                          snapshot.data!.list.forEach(
-                                            (cityName, value) {
-                                              List<Widget> town = [];
-
-                                              value.town.forEach((townName, value) {
-                                                town.add(
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(16),
-                                                      border: Border.all(
-                                                        color: context.colors.intensity(value.intensity),
-                                                      ),
-                                                      color:
-                                                          context.colors.intensity(value.intensity).withOpacity(0.08),
-                                                    ),
-                                                    margin: EdgeInsets.zero,
-                                                    child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        Container(
-                                                          height: 30,
-                                                          width: 30,
-                                                          decoration: BoxDecoration(
-                                                            color: context.colors.intensity(value.intensity),
-                                                            borderRadius: BorderRadius.circular(16),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              intensityToNumberString(value.intensity),
-                                                              style: TextStyle(
-                                                                  color: context.colors.onIntensity(value.intensity),
-                                                                  height: 1,
-                                                                  fontSize: 16,
-                                                                  fontWeight: FontWeight.bold),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.fromLTRB(6, 6, 12, 6),
-                                                          child: Text(
-                                                            townName,
-                                                            style: TextStyle(
-                                                              color: context.colors.onSurfaceVariant.harmonizeWith(
-                                                                  context.colors.intensity(value.intensity)),
-                                                              height: 1,
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              });
-
-                                              city.add(
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                  children: [
-                                                    Text(
-                                                      cityName,
-                                                      style: TextStyle(color: context.colors.outline),
-                                                    ),
-                                                    const SizedBox(height: 8),
-                                                    Wrap(
-                                                      spacing: 8,
-                                                      runSpacing: 8,
-                                                      children: town,
-                                                    ),
-                                                    const SizedBox(height: 16),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          );
-
-                                          return Column(
-                                            children: city,
-                                          );
-                                        } else {
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                      },
-                                    ),
+                                    Column(children: maxIntensities),
                                   ],
                                 ),
-                              )
+                              ),
+                              ImageField(
+                                title: "地震報告圖",
+                                heroTag: "report_image_${widget.report.id}",
+                                aspectRatio: 4 / 3,
+                                imageUrl: widget.report.reportImageUrl,
+                                imageName: widget.report.reportImageName,
+                              ),
+                              if (widget.report.hasNumber)
+                                ImageField(
+                                  title: "震度圖",
+                                  heroTag: "intensity_map_image_${widget.report.id}",
+                                  aspectRatio: 2334 / 2977,
+                                  imageUrl: widget.report.intensityMapImageUrl!,
+                                  imageName: widget.report.intensityMapImageName!,
+                                ),
+                              if (widget.report.hasNumber)
+                                ImageField(
+                                  title: "最大地動加速度圖",
+                                  heroTag: "pga_map_image_${widget.report.id}",
+                                  aspectRatio: 2334 / 2977,
+                                  imageUrl: widget.report.pgaMapImageUrl!,
+                                  imageName: widget.report.pgaMapImageName!,
+                                ),
+                              if (widget.report.hasNumber)
+                                ImageField(
+                                  title: "最大地動速度圖",
+                                  heroTag: "pgv_map_image_${widget.report.id}",
+                                  aspectRatio: 2334 / 2977,
+                                  imageUrl: widget.report.pgvMapImageUrl!,
+                                  imageName: widget.report.pgvMapImageName!,
+                                ),
                             ],
                           ),
                         );

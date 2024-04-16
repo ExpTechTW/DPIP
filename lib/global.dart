@@ -22,8 +22,7 @@ class Global {
     initializeTimeZones();
 
     // src: assets/json/region.json
-    Map<String, dynamic> regionRaw =
-        jsonDecode(await rootBundle.loadString("assets/region.json"));
+    Map<String, dynamic> regionRaw = jsonDecode(await rootBundle.loadString("assets/region.json"));
 
     regionRaw.forEach((cityName, city) {
       region[cityName] = <String, Town>{};

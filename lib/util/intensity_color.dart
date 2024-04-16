@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 extension IntensityColor on ColorScheme {
+  static const intensity0 = Colors.grey;
   static const intensity1 = Color(0xff003264);
   static const intensity2 = Color(0xff0064c8);
   static const intensity3 = Color(0xff1e9632);
@@ -14,6 +15,8 @@ extension IntensityColor on ColorScheme {
 
   Color intensity(int intensity) {
     switch (intensity) {
+      case 0:
+        return IntensityColor.intensity0.harmonizeWith(primary);
       case 1:
         return IntensityColor.intensity1.harmonizeWith(primary);
       case 2:
