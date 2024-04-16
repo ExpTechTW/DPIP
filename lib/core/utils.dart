@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:dpip/model/town.dart';
+import 'package:dpip/model/wave_time.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -51,18 +53,19 @@ int compareVersion(String version1, String version2) {
   return 0;
 }
 
-Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag, Map<String, dynamic> region) {
+Map<String, dynamic> eewAreaPga(
+    double lat, double lon, double depth, double mag, Map<String, Map<String, Town>> region) {
   Map<String, dynamic> json = {};
   double eewMaxI = 0.0;
 
   region.forEach((city, towns) {
     towns.forEach((town, info) {
-      double distSurface = distance(lat, lon, info['lat'], info['lon']);
+      double distSurface = distance(lat, lon, info.lat, info.lon);
       double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
       double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
       double i = pgaToFloat(pga);
       if (i >= 4.5) {
-        i = eewAreaPgv([lat, lon], [info['lat'], info['lon']], depth, mag);
+        i = eewAreaPgv([lat, lon], [info.lat, info.lon], depth, mag);
       }
       if (i > eewMaxI) {
         eewMaxI = i;
@@ -154,7 +157,7 @@ String intensityToString(level) {
                       : "$level 級";
 }
 
-Map<String, double> speed(double depth, double distance) {
+WaveTime calculateWaveTime(double depth, double distance) {
   final double Za = 1 * depth;
   double G0, G;
   final double Xb = distance;
@@ -191,7 +194,7 @@ Map<String, double> speed(double depth, double distance) {
   if (distance / Stime > 4) {
     Stime = distance / 4;
   }
-  return {'Ptime': Ptime, 'Stime': Stime};
+  return WaveTime(p: Ptime, s: Stime);
 }
 
 String safeBase64Encode(String input) {

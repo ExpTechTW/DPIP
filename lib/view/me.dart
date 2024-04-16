@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:app_settings/app_settings.dart';
@@ -31,8 +32,8 @@ class MePage extends StatefulWidget {
 }
 
 class _MePageState extends State<MePage> {
-  String currentTown = Global.preference.getString("loc-town") ?? "";
-  String currentCity = Global.preference.getString("loc-city") ?? "";
+  String? currentTown = Global.preference.getString("loc-town");
+  String? currentCity = Global.preference.getString("loc-city");
   String _theme = Global.preference.getString("theme") ?? "system";
 
   Future<void> unsubscribeAllTopics() async {
@@ -198,6 +199,42 @@ class _MePageState extends State<MePage> {
     }
   }
 
+  Future<void> setCityLocation(String? value) async {
+    if (value == null) return;
+    // unsubscribe old location topic
+    if (currentCity != null) {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
+      if (currentTown != null) {
+        await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+      }
+    }
+
+    setState(() {
+      currentCity = value;
+      currentTown = Global.region[value]!.keys.first;
+    });
+
+    await Global.preference.setString("loc-city", currentCity!);
+    await Global.preference.setString("loc-town", currentTown!);
+
+    // subscribe new location topic
+    await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
+    await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+  }
+
+  Future<void> setTownLocation(String? value) async {
+    if (value == null) return;
+
+    setState(() {
+      if (currentTown != null) {
+        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+      }
+      currentTown = value;
+      Global.preference.setString("loc-town", currentTown!);
+      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
@@ -219,56 +256,32 @@ class _MePageState extends State<MePage> {
                       CupertinoListTile(
                         leading: const Icon(CupertinoIcons.building_2_fill),
                         title: const Text('縣市'),
-                        additionalInfo: Text(currentCity.isNotEmpty ? currentCity : "尚未設定"),
+                        additionalInfo: Text(currentCity ?? "尚未設定"),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () {
                           Navigator.push<String>(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => CupertinoCityPage(city: currentCity),
+                              builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
                             ),
-                          ).then((value) {
-                            if (value != null) {
-                              setState(() {
-                                if (currentCity.isNotEmpty) {
-                                  messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
-                                  if (currentTown.isNotEmpty) {
-                                    messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-                                  }
-                                }
-                                currentCity = value;
-                                currentTown = Global.region[value]!.keys.first;
-                                Global.preference.setString("loc-city", currentCity);
-                                Global.preference.setString("loc-town", currentTown);
-                                messaging.subscribeToTopic(safeBase64Encode(currentCity));
-                                messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-                              });
-                            }
-                          });
+                          ).then(setCityLocation);
                         },
                       ),
                       CupertinoListTile(
                         leading: const Icon(CupertinoIcons.tree),
                         title: const Text('鄉鎮市區'),
-                        additionalInfo: Text(currentTown.isNotEmpty ? currentTown : "尚未設定"),
+                        additionalInfo: Text(currentTown ?? "尚未設定"),
                         trailing: const CupertinoListTileChevron(),
-                        onTap: () {
-                          Navigator.push<String>(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => CupertinoTownPage(city: currentCity, town: currentTown),
-                            ),
-                          ).then((value) {
-                            if (value != null) {
-                              setState(() {
-                                messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-                                currentTown = value;
-                                Global.preference.setString("loc-town", currentTown);
-                                messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-                              });
-                            }
-                          });
-                        },
+                        onTap: currentCity != null
+                            ? () {
+                                Navigator.push<String>(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
+                                  ),
+                                ).then(setTownLocation);
+                              }
+                            : null,
                       ),
                     ],
                   ),
@@ -423,7 +436,7 @@ class _MePageState extends State<MePage> {
                   ListTile(
                     leading: const Icon(Icons.location_city_rounded),
                     title: const Text('縣市'),
-                    subtitle: Text(currentCity.isNotEmpty ? currentCity : "尚未設定"),
+                    subtitle: Text(currentCity ?? "尚未設定"),
                     onTap: () {
                       List<String> cityList = Global.region.keys.toList();
 
@@ -442,22 +455,7 @@ class _MePageState extends State<MePage> {
                                 groupValue: currentCity,
                                 title: Text(cityList[index]),
                                 onChanged: (value) {
-                                  setState(() {
-                                    if (value != null) {
-                                      if (currentCity.isNotEmpty) {
-                                        messaging.unsubscribeFromTopic(safeBase64Encode(currentCity));
-                                        if (currentTown.isNotEmpty) {
-                                          messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-                                        }
-                                      }
-                                      currentCity = value;
-                                      currentTown = Global.region[value]!.keys.first;
-                                      Global.preference.setString("loc-city", currentCity);
-                                      Global.preference.setString("loc-town", currentTown);
-                                      messaging.subscribeToTopic(safeBase64Encode(currentCity));
-                                      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-                                    }
-                                  });
+                                  setCityLocation(value);
                                   Navigator.pop(context);
                                 },
                               ),
@@ -471,49 +469,40 @@ class _MePageState extends State<MePage> {
                   ListTile(
                     leading: const Icon(Icons.forest_rounded),
                     title: const Text('鄉鎮市區'),
-                    subtitle: Text(currentTown.isNotEmpty ? currentTown : "尚未設定"),
-                    enabled: currentCity.isNotEmpty,
+                    subtitle: Text(currentTown ?? "尚未設定"),
+                    enabled: currentCity != null,
                     onTap: () {
-                      if (currentCity.isNotEmpty) {
-                        List<String> townList = Global.region[currentCity]!.keys.toList();
+                      List<String> townList = Global.region[currentCity]!.keys.toList();
 
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('鄉鎮市區'),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
-                            content: SizedBox(
-                              width: double.minPositive,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: townList.length,
-                                itemBuilder: (context, index) => RadioListTile(
-                                  value: townList[index],
-                                  groupValue: currentTown,
-                                  title: Text(townList[index]),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value != null) {
-                                        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-                                        currentTown = value;
-                                        Global.preference.setString("loc-town", currentTown);
-                                        messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-                                      }
-                                    });
-                                    Navigator.pop(context);
-                                  },
-                                ),
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('鄉鎮市區'),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
+                          content: SizedBox(
+                            width: double.minPositive,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: townList.length,
+                              itemBuilder: (context, index) => RadioListTile(
+                                value: townList[index],
+                                groupValue: currentTown,
+                                title: Text(townList[index]),
+                                onChanged: (value) {
+                                  setTownLocation(value);
+                                  Navigator.pop(context);
+                                },
                               ),
                             ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("取消"),
-                              )
-                            ],
                           ),
-                        );
-                      }
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text("取消"),
+                            )
+                          ],
+                        ),
+                      );
                     },
                   ),
                   Padding(
