@@ -6,6 +6,7 @@ import 'package:dpip/util/extension.dart';
 import 'package:dpip/widget/earthquake_report_list_tile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ReportList extends StatefulWidget {
   const ReportList({super.key});
@@ -15,9 +16,11 @@ class ReportList extends StatefulWidget {
 }
 
 class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMixin<ReportList> {
+  final ScrollController _controller = ScrollController();
   List<PartialEarthquakeReport> reports = [];
   bool showRetryButton = false;
   bool refreshing = false;
+  bool _isScrollToTopVisible = false;
 
   Future<void> refreshReports() async {
     setState(() {
@@ -45,6 +48,14 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
     });
   }
 
+  void _scrollToTop() {
+    _controller.animateTo(
+      0,
+      duration: const Duration(seconds: 1),
+      curve: Easing.standard,
+    );
+  }
+
   @override
   get wantKeepAlive => true;
 
@@ -52,6 +63,18 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
   void initState() {
     super.initState();
     refreshReports();
+
+    _controller.addListener(() {
+      if (_controller.position.pixels == _controller.position.minScrollExtent) {
+        setState(() {
+          _isScrollToTopVisible = false;
+        });
+      } else {
+        setState(() {
+          _isScrollToTopVisible = true;
+        });
+      }
+    });
   }
 
   @override
@@ -115,17 +138,19 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
         ),
       );
     } else {
-      return NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            const SliverAppBar(
-              title: Text("地震報告"),
-              centerTitle: true,
-              floating: true,
-              snap: true,
-            )
-          ];
-        },
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("地震報告"),
+          centerTitle: true,
+        ),
+        floatingActionButton: AnimatedScale(
+          scale: _isScrollToTopVisible ? 1 : 0,
+          duration: const Duration(milliseconds: 200),
+          child: FloatingActionButton.small(
+            onPressed: _scrollToTop,
+            child: const Icon(Symbols.vertical_align_top_rounded),
+          ),
+        ),
         body: SafeArea(
           child: reports.isEmpty && showRetryButton
               ? Center(
@@ -154,6 +179,7 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                   ? RefreshIndicator(
                       onRefresh: refreshReports,
                       child: ListView.builder(
+                        controller: _controller,
                         itemCount: reports.length,
                         itemBuilder: (context, index) {
                           return EarthquakeReportListTile(report: reports[index]);
