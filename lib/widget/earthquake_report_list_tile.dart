@@ -9,6 +9,7 @@ import 'package:dpip/view/report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 
 class EarthquakeReportListTile extends StatelessWidget {
@@ -88,16 +89,24 @@ class EarthquakeReportListTile extends StatelessWidget {
       );
     } else {
       return ListTile(
-        leading: Icon(report.hasNumber ? Icons.tag_rounded : Icons.info_outline_rounded),
+        isThreeLine: true,
+        titleAlignment: ListTileTitleAlignment.center,
+        leading: Icon(
+          report.hasNumber ? Symbols.sell_rounded : Symbols.info_rounded,
+          weight: report.hasNumber ? 700 : 400,
+        ),
         iconColor: report.hasNumber ? context.colors.onSurfaceVariant : context.colors.outline,
-        title: Text(report.getLocation()),
+        title: Text(
+          report.hasNumber ? "第 ${report.number!.substring(3)} 號有感地震" : report.getLocation(),
+          style: TextStyle(fontWeight: report.hasNumber ? FontWeight.bold : FontWeight.normal),
+        ),
         subtitle: Text(
-          DateFormat("yyyy/MM/dd HH:mm:ss").format(
+          "${DateFormat("yyyy/MM/dd HH:mm:ss").format(
             TZDateTime.fromMillisecondsSinceEpoch(
               getLocation("Asia/Taipei"),
               report.time,
             ),
-          ),
+          )}\n規模 ${report.mag}  深度 ${report.depth} km",
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
