@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
@@ -48,7 +50,9 @@ class IntensityCapsule extends StatelessWidget {
             child: Text(
               townName,
               style: TextStyle(
-                color: context.colors.onSurfaceVariant.harmonizeWith(context.colors.intensity(intensity)),
+                color: Platform.isIOS
+                    ? CupertinoColors.label.resolveFrom(context)
+                    : context.colors.onSurfaceVariant.harmonizeWith(context.colors.intensity(intensity)),
                 height: 1,
                 fontSize: 14,
               ),
