@@ -7,6 +7,8 @@ import 'package:dpip/view/report_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'me.dart';
 
@@ -15,6 +17,90 @@ class InitPage extends StatefulWidget {
 
   @override
   State<InitPage> createState() => _InitPageState();
+}
+
+class UpdateChecker extends StatefulWidget {
+  @override
+  _UpdateCheckerState createState() => _UpdateCheckerState();
+}
+
+class _UpdateCheckerState extends State<UpdateChecker> {
+  String _currentVersion = '';
+  String _latestVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForUpdate();
+  }
+
+  Future<void> _checkForUpdate() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _currentVersion = packageInfo.version;
+    });
+
+    // Assume _getLatestVersion() fetches the latest version from your backend
+    _getLatestVersion().then((latestVersion) {
+      setState(() {
+        _latestVersion = latestVersion;
+      });
+
+      if (_latestVersion != '' && _latestVersion != _currentVersion) {
+        _showUpdateDialog();
+      }
+    }).catchError((error) {
+      print('取得最新版本時錯誤: $error');
+    });
+  }
+
+  Future<String> _getLatestVersion() async {
+    // Implement logic to fetch latest version from your backend
+    // This is just a placeholder, replace it with your actual implementation
+    return '1.2.1';
+  }
+
+  void _showUpdateDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('新版本可用'),
+          content: Text('一個新版本的應用程式可用。請更新到版本 $_latestVersion。'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                _launchAppStore();
+              },
+              child: Text('更新'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('稍後'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _launchAppStore() async {
+    const url =
+        'https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw '無法打開App Store URL';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Your widget build logic
+    return Container(); // Placeholder, replace it with your actual UI
+  }
 }
 
 class _InitPageState extends State<InitPage> {
