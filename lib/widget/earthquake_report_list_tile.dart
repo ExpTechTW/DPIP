@@ -57,7 +57,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Container(
               width: 44,
               height: 44,
@@ -129,7 +129,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Container(
               width: 50,
               height: 50,
