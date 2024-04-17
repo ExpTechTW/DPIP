@@ -101,7 +101,7 @@ class CheckUpdate: NSObject {
         // You should pay attention on the country that your app is located, in my case I put Brazil */br/*
         // Você deve prestar atenção em que país o app está disponível, no meu caso eu coloquei Brasil */br/*
         let testflightURL = "https://api.appstoreconnect.apple.com/v1/apps/\(CheckUpdate.appStoreId)/builds"
-        let appStoreURL = "http://itunes.apple.com/br/lookup?bundleId=\(identifier)"
+        let appStoreURL = "http://itunes.apple.com/tw/lookup?bundleId=\(identifier)"
 
         return isTestFlight ? testflightURL : appStoreURL
     }
