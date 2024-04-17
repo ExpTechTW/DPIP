@@ -20,8 +20,10 @@ class InitPage extends StatefulWidget {
 }
 
 class UpdateChecker extends StatefulWidget {
+  const UpdateChecker({super.key});
+
   @override
-  _UpdateCheckerState createState() => _UpdateCheckerState();
+  State<UpdateChecker> createState() => _UpdateCheckerState();
 }
 
 class _UpdateCheckerState extends State<UpdateChecker> {
@@ -65,20 +67,20 @@ class _UpdateCheckerState extends State<UpdateChecker> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('新版本可用'),
+          title: const Text('新版本可用'),
           content: Text('一個新版本的應用程式可用。請更新到版本 $_latestVersion。'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 _launchAppStore();
               },
-              child: Text('更新'),
+              child: const Text('更新'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('稍後'),
+              child: const Text('稍後'),
             ),
           ],
         );
@@ -89,8 +91,8 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   Future<void> _launchAppStore() async {
     const url =
         'https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362';
-    if (await canLaunch(url)) {
-      await launch(url);
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw '無法打開App Store URL';
     }
