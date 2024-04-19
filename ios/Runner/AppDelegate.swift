@@ -1,4 +1,5 @@
 import UIKit
+import Siren
 import Flutter
 import Firebase
 import flutter_local_notifications
@@ -19,6 +20,7 @@ import flutter_local_notifications
       UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
     }
     GeneratedPluginRegistrant.register(with: self)
+    Siren.shared.wail() // line 2
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
