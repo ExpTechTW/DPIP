@@ -20,16 +20,15 @@ import flutter_local_notifications
             UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
         }
         GeneratedPluginRegistrant.register(with: self)
-        minimalCustomizationPresentationExample()
-        // hyperCriticalRulesExample()
+        // minimalCustomizationPresentationExample()
+        hyperCriticalRulesExample()
         Siren.shared.wail() // line 2
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-    
-    func minimalCustomizationPresentationExample() {
+        
+    func hyperCriticalRulesExample() {
         let siren = Siren.shared
-        siren.rulesManager = RulesManager(globalRules: .critical)
-        siren.presentationManager = PresentationManager(alertTintColor: .purple, appName: "DPIP")
+        siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 1)
         siren.wail {results in
             switch results {
             case .success(let updateResults):
@@ -39,22 +38,6 @@ import flutter_local_notifications
                 print("UPdateType ", updateResults.updateType)
             case.failure(let error):
                 print(error.localizedDescription)
-            }
-        }
-        
-        func hyperCriticalRulesExample() {
-            let siren = Siren.shared
-            siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 1)
-            siren.wail {results in
-                switch results {
-                case .success(let updateResults):
-                    print("AlerAction ", updateResults.alertAction)
-                    print("Localization ", updateResults.localization)
-                    print("Model ", updateResults.model)
-                    print("UPdateType ", updateResults.updateType)
-                case.failure(let error):
-                    print(error.localizedDescription)
-                }
             }
         }
     }
