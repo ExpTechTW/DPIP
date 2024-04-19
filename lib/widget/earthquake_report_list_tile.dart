@@ -4,7 +4,7 @@ import 'package:dpip/core/utils.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
-import 'package:dpip/util/mag_color.dart';
+import 'package:dpip/util/magnitude_color.dart';
 import 'package:dpip/view/report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
