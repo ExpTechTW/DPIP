@@ -3,22 +3,26 @@ import 'package:flutter/material.dart';
 
 extension MagnitudeColorExtension on ColorScheme {
   Color magnitude(double mag) {
-    if (mag > 6.0) {
-      return Colors.red.harmonizeWith(primary);
-    } else if (mag >= 5.0 && mag < 6.0) {
-      return Colors.orange.harmonizeWith(primary);
-    } else if (mag >= 4.0 && mag < 5.0) {
-      return Colors.yellow.harmonizeWith(primary);
+    if (this.brightness == Brightness.light) {
+      if (mag > 6.0) {
+        return Colors.red[800]!;
+      } else if (mag >= 5.0 && mag < 6.0) {
+        return Colors.orange[800]!;
+      } else if (mag >= 4.0 && mag < 5.0) {
+        return Colors.yellow[800]!;
+      } else {
+        return Colors.green[800]!;
+      }
     } else {
-      return Colors.green.harmonizeWith(primary);
-    }
-  }
-
-  Color onMagnitude(double mag) {
-    if (mag >= 4.0) {
-      return Colors.black;
-    } else {
-      return Colors.white;
+      if (mag > 6.0) {
+        return Colors.red[400]!;
+      } else if (mag >= 5.0 && mag < 6.0) {
+        return Colors.orange[400]!;
+      } else if (mag >= 4.0 && mag < 5.0) {
+        return Colors.yellow[400]!;
+      } else {
+        return Colors.green[400]!;
+      }
     }
   }
 }

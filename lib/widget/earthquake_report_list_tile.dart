@@ -39,22 +39,11 @@ class EarthquakeReportListTile extends StatelessWidget {
         ),
         additionalInfo: Row(
           children: [
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
+            Text(
+              "M ${report.mag}", // 顯示地震規模
+              style: TextStyle(
+                fontSize: 20,
                 color: context.colors.magnitude(report.mag),
-              ),
-              child: Center(
-                child: Text(
-                  "${report.mag}", // 顯示地震規模
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.onMagnitude(report.mag),
-                  ),
-                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -111,25 +100,14 @@ class EarthquakeReportListTile extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
+            Text(
+              "M ${report.mag}", // 顯示地震規模
+              style: TextStyle(
+                fontSize: 20,
                 color: context.colors.magnitude(report.mag),
               ),
-              child: Center(
-                child: Text(
-                  "${report.mag}", // 顯示地震規模
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.onMagnitude(report.mag),
-                  ),
-                ),
-              ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 16),
             Container(
               width: 50,
               height: 50,
