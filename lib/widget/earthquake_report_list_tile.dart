@@ -47,20 +47,22 @@ class EarthquakeReportListTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                color: context.colors.intensity(report.intensity),
-              ),
-              child: Center(
-                child: Text(
-                  intensityToNumberString(report.intensity),
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.onIntensity(report.intensity),
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  color: context.colors.intensity(report.intensity),
+                ),
+                child: Center(
+                  child: Text(
+                    intensityToNumberString(report.intensity),
+                    style: TextStyle(
+                      height: 1,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: context.colors.onIntensity(report.intensity),
+                    ),
                   ),
                 ),
               ),
@@ -108,20 +110,22 @@ class EarthquakeReportListTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                color: context.colors.intensity(report.intensity),
-              ),
-              child: Center(
-                child: Text(
-                  intensityToNumberString(report.intensity),
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.onIntensity(report.intensity),
+            AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  color: context.colors.intensity(report.intensity),
+                ),
+                child: Center(
+                  child: Text(
+                    intensityToNumberString(report.intensity),
+                    style: TextStyle(
+                      height: 1,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: context.colors.onIntensity(report.intensity),
+                    ),
                   ),
                 ),
               ),
