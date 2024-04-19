@@ -29,8 +29,8 @@ class ExpTechApi {
   ExpTechApi({this.apikey});
 
   Future<List<PartialEarthquakeReport>> getReportList({int limit = 20}) async {
-    final response = await http
-        .get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/eq/report?limit=$limit'));
+    final response =
+        await http.get(Uri.parse('https://lb-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/eq/report?limit=$limit'));
 
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>).map((e) => PartialEarthquakeReport.fromJson(e)).toList();
@@ -41,7 +41,7 @@ class ExpTechApi {
 
   Future<EarthquakeReport> getReport(String id) async {
     final response =
-        await http.get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/eq/report/$id'));
+        await http.get(Uri.parse('https://lb-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/eq/report/$id'));
 
     if (response.statusCode == 200) {
       return EarthquakeReport.fromJson(jsonDecode(response.body));
@@ -52,7 +52,7 @@ class ExpTechApi {
 
   Future<List<String>> getNotificationTopics(String fcmToken) async {
     final response = await http
-        .get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
+        .get(Uri.parse('https://lb-${Random().nextInt(2) + 1}.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
 
     if (response.statusCode == 200) {
       return List<String>.from(jsonDecode(response.body) as List);
@@ -63,7 +63,7 @@ class ExpTechApi {
 
   Future<List<Eew>> getEew(EewSource source) async {
     final response = await http
-        .get(Uri.parse('https://api-${Random().nextInt(2) + 1}.exptech.com.tw/api/v1/eq/eew?type=${source.name}'));
+        .get(Uri.parse('https://lb-${Random().nextInt(2) + 1}.exptech.com.tw/api/v1/eq/eew?type=${source.name}'));
 
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>).map((e) => Eew.fromJson(e)).toList();
