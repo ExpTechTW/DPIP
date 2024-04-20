@@ -43,7 +43,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               "M ${report.mag}", // 顯示地震規模
               style: TextStyle(
                 fontSize: 20,
-                color: context.colors.magnitude(report.mag),
+                color: context.colors.magnitude(context, report.mag),
               ),
             ),
             const SizedBox(width: 8),
@@ -106,7 +106,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               "M ${report.mag}", // 顯示地震規模
               style: TextStyle(
                 fontSize: 20,
-                color: context.colors.magnitude(report.mag),
+                color: context.colors.magnitude(context, report.mag),
               ),
             ),
             const SizedBox(width: 16),
