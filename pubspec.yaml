@@ -36,6 +36,7 @@ dependencies:
   material_symbols_icons: ^4.2719.3
   path_provider: ^2.1.3
   fluttertoast: ^8.2.5
+  wear_plus: ^1.2.0
 
 dev_dependencies:
   flutter_test:
