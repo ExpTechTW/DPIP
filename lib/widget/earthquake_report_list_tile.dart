@@ -21,7 +21,7 @@ class EarthquakeReportListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
       return CupertinoListTile(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
         leading: Icon(
           report.hasNumber ? CupertinoIcons.tag : CupertinoIcons.info_circle,
           color: report.hasNumber
@@ -47,9 +47,10 @@ class EarthquakeReportListTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            AspectRatio(
-              aspectRatio: 1,
+            SizedBox.square(
               child: Container(
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
                   color: context.colors.intensity(report.intensity),
@@ -58,7 +59,6 @@ class EarthquakeReportListTile extends StatelessWidget {
                   child: Text(
                     intensityToNumberString(report.intensity),
                     style: TextStyle(
-                      height: 1,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: context.colors.onIntensity(report.intensity),

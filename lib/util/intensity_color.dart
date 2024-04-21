@@ -1,4 +1,3 @@
-import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 
 extension IntensityColor on ColorScheme {
@@ -16,25 +15,25 @@ extension IntensityColor on ColorScheme {
   Color intensity(int intensity) {
     switch (intensity) {
       case 0:
-        return IntensityColor.intensity0.harmonizeWith(primary);
+        return IntensityColor.intensity0;
       case 1:
-        return IntensityColor.intensity1.harmonizeWith(primary);
+        return IntensityColor.intensity1;
       case 2:
-        return IntensityColor.intensity2.harmonizeWith(primary);
+        return IntensityColor.intensity2;
       case 3:
-        return IntensityColor.intensity3.harmonizeWith(primary);
+        return IntensityColor.intensity3;
       case 4:
-        return IntensityColor.intensity4.harmonizeWith(primary);
+        return IntensityColor.intensity4;
       case 5:
-        return IntensityColor.intensity5.harmonizeWith(primary);
+        return IntensityColor.intensity5;
       case 6:
-        return IntensityColor.intensity6.harmonizeWith(primary);
+        return IntensityColor.intensity6;
       case 7:
-        return IntensityColor.intensity7.harmonizeWith(primary);
+        return IntensityColor.intensity7;
       case 8:
-        return IntensityColor.intensity8.harmonizeWith(primary);
+        return IntensityColor.intensity8;
       case 9:
-        return IntensityColor.intensity9.harmonizeWith(primary);
+        return IntensityColor.intensity9;
       default:
         throw "Intensity index out of range. Range: 0..9, Received: $intensity";
     }
