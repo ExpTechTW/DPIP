@@ -1,4 +1,4 @@
-<img alt="Logo" src="" width="128px" height="128px" align="left"/>
+<img alt="Logo" src="https://github.com/ExpTechTW/DPIP/blob/master/assets/app_icon.png" width="128px" height="128px" align="left"/>
 
 # Disaster Prevention Information Platform
 防災資訊平台
@@ -8,6 +8,9 @@
 
 ## 關於 DPIP
 DPIP 是一款開源防災資訊軟體，提供給您即時的防災資訊
+
+## 強震即時警報來源
+* [交通部中央氣象署](https://www.cwa.gov.tw/)
 
 ## 注意事項
 1. 使用過程中，請務必謹慎閱讀提示和注意事項
@@ -21,10 +24,12 @@ DPIP 是一款開源防災資訊軟體，提供給您即時的防災資訊
 9. 本程式內資源均由網際網路收集而來， 當權利人發現在本程式所提供的內容侵犯其著作權時，**請聯繫我們並請權利人提供相關文件連結**， 本站將依法採取措施移除相關內容或斷開相關鏈接
 
 ## 載點
-- [Android](https://github.com/ExpTechTW/DPIP/actions)
+- [web](https://exptech.com.tw/dpip)
 
 ## 貢獻者
 - whes1015 `程式開發` `文檔`
+- kamiya10 `程式開發` `介面設計`
+- yayacat `程式開發`
 
 ## 如何貢獻
 點擊 [Repo](https://github.com/ExpTechTW/TREM) 主頁右上角的 Code 按鈕後點擊 Download ZIP 來下載原始碼壓縮檔\
