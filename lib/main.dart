@@ -71,6 +71,12 @@ final List<DarwinNotificationCategory> darwinNotificationCategories = <DarwinNot
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // 讓導覽列透明
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+    ),
+  );
   await Global.init();
   await Firebase.initializeApp();
   await messaging.requestPermission(
@@ -121,6 +127,8 @@ void main() async {
     },
   );
 
+  // 讓 flutter 繪製在導覽列後面
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MainApp());
 }
