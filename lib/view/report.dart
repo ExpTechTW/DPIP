@@ -263,7 +263,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                     ),
                                     child: Center(
                                       child: Text(
-                                        widget.report.intensity.toString(),
+                                        intensityToNumberString(widget.report.intensity),
                                         style: TextStyle(
                                           fontSize: 28,
                                           fontWeight: FontWeight.bold,
@@ -460,7 +460,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                       ),
                                       child: Center(
                                         child: Text(
-                                          widget.report.intensity.toString(),
+                                          intensityToNumberString(widget.report.intensity),
                                           style: TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,

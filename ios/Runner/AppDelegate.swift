@@ -28,7 +28,7 @@ import flutter_local_notifications
         
     func hyperCriticalRulesExample() {
         let siren = Siren.shared
-        siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 1)
+        siren.rulesManager = RulesManager(globalRules: .annoying, showAlertAfterCurrentVersionHasBeenReleasedForDays: 1)
         siren.wail {results in
             switch results {
             case .success(let updateResults):
