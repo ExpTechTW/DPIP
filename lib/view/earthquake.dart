@@ -298,7 +298,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 8),
                           ],
                         )
                       ],
