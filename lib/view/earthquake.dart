@@ -243,7 +243,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                             )
                           ],
                         ),
-                        const SizedBox(height: 4),
                         Row(
                           children: [
                             Flexible(
@@ -256,7 +255,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                         eewList.first.eq.loc,
                                         style: TextStyle(
                                           color: CupertinoColors.label.resolveFrom(context),
-                                          fontSize: 24,
+                                          fontSize: 23,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -264,10 +263,28 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                         "M ${eewList.first.eq.mag}",
                                         style: TextStyle(
                                           color: CupertinoColors.label.resolveFrom(context),
-                                          fontSize: 24,
+                                          fontSize: 23,
                                           fontWeight: FontWeight.bold,
                                         ),
-                                      )
+                                      ),
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12.0),
+                                          color: context.colors.intensity(eewList.first.eq.max),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            intensityToNumberString(eewList.first.eq.max),
+                                            style: TextStyle(
+                                              fontSize: 36,
+                                              fontWeight: FontWeight.bold,
+                                              color: context.colors.onIntensity(eewList.first.eq.max),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   Row(
@@ -278,25 +295,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                     ],
                                   )
                                 ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              width: 54,
-                              height: 54,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: context.colors.intensity(eewList.first.eq.max),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  intensityToNumberString(eewList.first.eq.max),
-                                  style: TextStyle(
-                                    fontSize: 38,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.colors.onIntensity(eewList.first.eq.max),
-                                  ),
-                                ),
                               ),
                             ),
                           ],
@@ -535,7 +533,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                             )
                           ],
                         ),
-                        const SizedBox(height: 4),
                         Row(
                           children: [
                             Flexible(
@@ -545,9 +542,27 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(eewList.first.eq.loc,
-                                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                          style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
                                       Text("M ${eewList.first.eq.mag}",
-                                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold))
+                                          style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+                                      Container(
+                                        width: 52,
+                                        height: 52,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12.0),
+                                          color: context.colors.intensity(eewList.first.eq.max),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            intensityToNumberString(eewList.first.eq.max),
+                                            style: TextStyle(
+                                              fontSize: 36,
+                                              fontWeight: FontWeight.bold,
+                                              color: context.colors.onIntensity(eewList.first.eq.max),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   Row(
@@ -558,25 +573,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                     ],
                                   )
                                 ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Container(
-                              width: 54,
-                              height: 54,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: context.colors.intensity(eewList.first.eq.max),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  intensityToNumberString(eewList.first.eq.max),
-                                  style: TextStyle(
-                                    fontSize: 38,
-                                    fontWeight: FontWeight.bold,
-                                    color: context.colors.onIntensity(eewList.first.eq.max),
-                                  ),
-                                ),
                               ),
                             ),
                           ],
