@@ -661,6 +661,22 @@ class _MePageState extends State<MePage> {
                       );
                     },
                   ),
+                  ListTile(
+                    leading: const Icon(SimpleIcons.githubsponsors),
+                    title: const Text("贊助我們"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://exptech.com.tw/donate"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://exptech.com.tw/donate",
+                        ),
+                      );
+                    },
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
                     child: Text(
