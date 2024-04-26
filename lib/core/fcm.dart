@@ -1,44 +1,42 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../global.dart';
 import '../main.dart';
 
 Future<void> messageHandler(RemoteMessage message) async {
+  late SharedPreferences preference;
+
   var data = message.data;
-  flutterLocalNotificationsPlugin.show(
-      message.notification.hashCode,
-      message.notification?.title,
-      message.notification?.body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          data["channel"]!,
-          (data["level"] == "0")
-              ? '一般訊息'
-              : (data["level"] == "1")
-                  ? '警訊通知'
-                  : '緊急警報',
-          channelDescription: (data["level"] == "0")
-              ? '一般通知'
-              : (data["level"] == "1")
-                  ? '重要通知'
-                  : '有立即危險',
-          importance: (data["level"] == "0")
-              ? Importance.low
-              : (data["level"] == "1")
-                  ? Importance.defaultImportance
-                  : Importance.max,
-          priority: (data["level"] == "0")
-              ? Priority.low
-              : (data["level"] == "1")
-                  ? Priority.defaultPriority
-                  : Priority.max,
-          sound: data["sound"] != "default" ? RawResourceAndroidNotificationSound(data["sound"]) : null,
-          styleInformation: const BigTextStyleInformation(''),
-        ),
-        iOS: DarwinNotificationDetails(
-          categoryIdentifier: darwinNotificationCategoryPlain,
-          sound: data["sound"] != "default" ? "${data["sound"]}.wav" : "default",
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
-      ));
+  String type = data["type"];
+  String title = data["title"];
+  String body = data["body"];
+
+  print(data);
+
+  preference = await SharedPreferences.getInstance();
+
+  if (type == "rts" && (preference.getBool("notification:monitor") ?? true)) {
+    flutterLocalNotificationsPlugin.show(
+        DateTime.now().millisecondsSinceEpoch.remainder(1000000),
+        title,
+        body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            "rts",
+            "強震監視器",
+            channelDescription: "顯示檢測到晃動的地區",
+            importance: Importance.max,
+            priority: Priority.max,
+            sound: RawResourceAndroidNotificationSound("warn"),
+            styleInformation: BigTextStyleInformation(''),
+          ),
+          iOS: DarwinNotificationDetails(
+            categoryIdentifier: darwinNotificationCategoryPlain,
+            sound: "warn.wav",
+            interruptionLevel: InterruptionLevel.timeSensitive,
+          ),
+        ));
+  }
 }
