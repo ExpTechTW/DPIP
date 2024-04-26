@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:app_settings/app_settings.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:dpip/constants.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
@@ -23,11 +23,11 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("通知"),
+      return CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          middle: const Text('通知'),
         ),
-        body: CupertinoScrollbar(
+        child: CupertinoScrollbar(
           child: ListView(
             children: [
               ListTile(
