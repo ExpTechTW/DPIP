@@ -268,8 +268,13 @@ class _MePageState extends State<MePage> {
                       CupertinoListTile(
                         leading: const Icon(CupertinoIcons.bell_fill),
                         title: const Text('通知'),
-                        onTap: () {
-                          AppSettings.openAppSettings(type: AppSettingsType.notification);
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationSettingsPage(),
+                            ),
+                          );
                         },
                       ),
                       CupertinoListTile(
