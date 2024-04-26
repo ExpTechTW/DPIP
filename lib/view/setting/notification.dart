@@ -117,6 +117,25 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
             child: Text(
+              "強震監視器",
+              style: TextStyle(color: context.colors.onSurfaceVariant),
+            ),
+          ),
+          ListTile(
+            title: const Text("接收強震監視器通知"),
+            subtitle: const Text("選擇是否要接收強震監視器通知"),
+            trailing: Switch(
+              value: Global.preference.getBool("notification:monitor") ?? true,
+              onChanged: (value) {
+                setState(() {
+                  Global.preference.setBool("notification:monitor", value);
+                });
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+            child: Text(
               "震度速報",
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
