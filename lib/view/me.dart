@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:app_settings/app_settings.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
