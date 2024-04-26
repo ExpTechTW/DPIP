@@ -33,10 +33,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             },
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+            padding: const EdgeInsets.fromLTRB(16, 24, 0, 8),
             child: Text(
               "緊急地震速報",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
+              style: TextStyle(color: context.colors.outline),
             ),
           ),
           ListTile(
@@ -59,7 +59,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 Text(
                   eewIntensityThreshold != null ? IntensityList[eewIntensityThreshold! - 1].name : '無所在地震度門檻',
                   style: TextStyle(
-                    color: context.colors.intensity(eewIntensityThreshold ?? 0),
+                    color: Global.preference.getBool("notification:eew") ?? true
+                        ? context.colors.intensity(eewIntensityThreshold ?? 0)
+                        : context.colors.intensity(eewIntensityThreshold ?? 0).withOpacity(0.4),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -99,8 +101,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       child: const Text("清除門檻"),
                       onPressed: () {
                         setState(() {
-                          intensityThreshold = null;
-                          Global.preference.remove('notification:intensity_intensity');
+                          eewIntensityThreshold = null;
+                          Global.preference.remove('notification:eew_intensity');
                         });
                         Navigator.pop(context);
                       },
@@ -115,10 +117,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             },
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+            padding: const EdgeInsets.fromLTRB(16, 24, 0, 8),
             child: Text(
               "強震監視器",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
+              style: TextStyle(color: context.colors.outline),
             ),
           ),
           ListTile(
@@ -134,10 +136,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+            padding: const EdgeInsets.fromLTRB(16, 24, 0, 8),
             child: Text(
               "震度速報",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
+              style: TextStyle(color: context.colors.outline),
             ),
           ),
           ListTile(
@@ -160,7 +162,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 Text(
                   intensityThreshold != null ? IntensityList[intensityThreshold! - 1].name : '無所在地震度門檻',
                   style: TextStyle(
-                    color: context.colors.intensity(intensityThreshold ?? 0),
+                    color: Global.preference.getBool("notification:intensity") ?? true
+                        ? context.colors.intensity(intensityThreshold ?? 0)
+                        : context.colors.intensity(intensityThreshold ?? 0).withOpacity(0.4),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -216,10 +220,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             },
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+            padding: const EdgeInsets.fromLTRB(16, 24, 0, 8),
             child: Text(
               "地震報告",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
+              style: TextStyle(color: context.colors.outline),
             ),
           ),
           ListTile(
@@ -257,7 +261,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 Text(
                   reportIntensityThreshold != null ? IntensityList[reportIntensityThreshold! - 1].name : '無所在地震度門檻',
                   style: TextStyle(
-                    color: context.colors.intensity(reportIntensityThreshold ?? 0),
+                    color: Global.preference.getBool("notification:report") ?? true
+                        ? context.colors.intensity(reportIntensityThreshold ?? 0)
+                        : context.colors.intensity(reportIntensityThreshold ?? 0).withOpacity(0.4),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
