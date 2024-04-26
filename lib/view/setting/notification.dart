@@ -30,8 +30,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         child: CupertinoScrollbar(
           child: ListView(
             children: [
-              ListTile(
-                leading: const Icon(Icons.notifications_rounded),
+              CupertinoListTile(
+                leading: const Icon(CupertinoIcons.bell),
                 title: const Text('系統通知設定'),
                 onTap: () {
                   AppSettings.openAppSettings(type: AppSettingsType.notification);
@@ -44,10 +44,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   style: TextStyle(color: context.colors.outline),
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("接收緊急地震速報通知"),
                 subtitle: const Text("選擇是否要接收緊急地震速報通知"),
-                trailing: Switch(
+                trailing: CupertinoSwitch(
                   value: Global.preference.getBool("notification:eew") ?? true,
                   onChanged: (value) {
                     setState(() {
@@ -56,7 +56,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   },
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("所在地震度門檻"),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,7 +73,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     const Text("當緊急地震速報預估所在地震度達設定門檻時才會收到通知"),
                   ],
                 ),
-                enabled: Global.preference.getBool("notification:eew") ?? true,
                 onTap: () {
                   showDialog(
                     context: context,
@@ -127,10 +126,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   style: TextStyle(color: context.colors.outline),
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("接收強震監視器通知"),
                 subtitle: const Text("選擇是否要接收強震監視器通知"),
-                trailing: Switch(
+                trailing: CupertinoSwitch(
                   value: Global.preference.getBool("notification:monitor") ?? true,
                   onChanged: (value) {
                     setState(() {
@@ -146,10 +145,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   style: TextStyle(color: context.colors.outline),
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("接收震度速報通知"),
                 subtitle: const Text("選擇是否要接收震度速報通知"),
-                trailing: Switch(
+                trailing: CupertinoSwitch(
                   value: Global.preference.getBool("notification:intensity") ?? true,
                   onChanged: (value) {
                     setState(() {
@@ -158,7 +157,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   },
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("所在地震度門檻"),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -175,7 +174,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     const Text("當震度速報所在地震度達設定門檻時才會收到通知"),
                   ],
                 ),
-                enabled: Global.preference.getBool("notification:intensity") ?? true,
                 onTap: () {
                   showDialog(
                     context: context,
@@ -229,10 +227,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   style: TextStyle(color: context.colors.outline),
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("接收地震報告通知"),
                 subtitle: const Text("選擇是否要接收地震報告通知"),
-                trailing: Switch(
+                trailing: CupertinoSwitch(
                   value: Global.preference.getBool("notification:report") ?? true,
                   onChanged: (value) {
                     setState(() {
@@ -241,10 +239,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   },
                 ),
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("編號地震報告"),
                 subtitle: const Text("選擇是否只接收有編號地震報告通知"),
-                trailing: Switch(
+                trailing: CupertinoSwitch(
                   value: Global.preference.getBool("notification:report_numbered") ?? true,
                   onChanged: Global.preference.getBool("notification:report") ?? true
                       ? (value) {
@@ -254,9 +252,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         }
                       : null,
                 ),
-                enabled: Global.preference.getBool("notification:report") ?? true,
               ),
-              ListTile(
+              CupertinoListTile(
                 title: const Text("所在地震度門檻"),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -273,7 +270,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     const Text("當地震報告所在地震度達設定門檻時才會收到通知"),
                   ],
                 ),
-                enabled: Global.preference.getBool("notification:report") ?? true,
                 onTap: () {
                   showDialog(
                     context: context,
