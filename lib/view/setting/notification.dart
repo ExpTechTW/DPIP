@@ -24,8 +24,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: const Text('通知'),
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text('通知'),
         ),
         child: CupertinoScrollbar(
           child: ListView(
@@ -74,33 +74,32 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showDialog(
+                  showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
-                      content: SizedBox(
+                      message: SizedBox(
                         width: double.minPositive,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => RadioListTile(
-                            value: IntensityList[index].value,
-                            groupValue: eewIntensityThreshold,
-                            title: Text(IntensityList[index].name),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  eewIntensityThreshold = value;
-                                  Global.preference.setInt('notification:eew_intensity', value);
-                                });
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                        child: Column(
+                          children: IntensityList.map((intensity) {
+                            return CupertinoRadio(
+                              value: intensity.value,
+                              groupValue: eewIntensityThreshold,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    eewIntensityThreshold = value;
+                                    Global.preference.setInt('notification:eew_intensity', value);
+                                  });
+                                }
+                                Navigator.pop(context);
+                              },
+                            );
+                          }).toList(),
                         ),
                       ),
                       actions: [
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("清除門檻"),
                           onPressed: () {
                             setState(() {
@@ -110,7 +109,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             Navigator.pop(context);
                           },
                         ),
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("取消"),
                           onPressed: () => Navigator.pop(context),
                         ),
@@ -175,19 +174,18 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showDialog(
+                  showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
-                      content: SizedBox(
+                      message: SizedBox(
                         width: double.minPositive,
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => RadioListTile(
+                          itemBuilder: (context, index) => CupertinoRadio(
                             value: IntensityList[index].value,
                             groupValue: intensityThreshold,
-                            title: Text(IntensityList[index].name),
                             onChanged: (value) {
                               if (value != null) {
                                 setState(() {
@@ -201,7 +199,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         ),
                       ),
                       actions: [
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("清除門檻"),
                           onPressed: () {
                             setState(() {
@@ -211,7 +209,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             Navigator.pop(context);
                           },
                         ),
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("取消"),
                           onPressed: () => Navigator.pop(context),
                         ),
@@ -271,19 +269,18 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showDialog(
+                  showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
-                      content: SizedBox(
+                      message: SizedBox(
                         width: double.minPositive,
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => RadioListTile(
+                          itemBuilder: (context, index) => CupertinoRadio(
                             value: IntensityList[index].value,
                             groupValue: reportIntensityThreshold,
-                            title: Text(IntensityList[index].name),
                             onChanged: (value) {
                               if (value != null) {
                                 setState(() {
@@ -297,7 +294,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                         ),
                       ),
                       actions: [
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("清除門檻"),
                           onPressed: () {
                             setState(() {
@@ -307,7 +304,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             Navigator.pop(context);
                           },
                         ),
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("取消"),
                           onPressed: () => Navigator.pop(context),
                         ),
