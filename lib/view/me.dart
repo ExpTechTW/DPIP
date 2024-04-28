@@ -371,6 +371,15 @@ class _MePageState extends State<MePage> {
                           );
                         },
                       ),
+                      CupertinoListTile(
+                        leading: const Icon(SimpleIcons.githubsponsors),
+                        title: const Text("贊助我們"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://exptech.com.tw/donate"),
+                          );
+                        },
+                      ),
                     ],
                   ),
                   CupertinoListSection(
@@ -657,6 +666,22 @@ class _MePageState extends State<MePage> {
                       Clipboard.setData(
                         const ClipboardData(
                           text: "https://www.youtube.com/@exptechtw/live",
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(SimpleIcons.githubsponsors),
+                    title: const Text("贊助我們"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://exptech.com.tw/donate"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://exptech.com.tw/donate",
                         ),
                       );
                     },
