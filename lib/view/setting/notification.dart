@@ -19,6 +19,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   int? eewIntensityThreshold = Global.preference.getInt('notification:eew_intensity');
   int? intensityThreshold = Global.preference.getInt('notification:intensity_intensity');
   int? reportIntensityThreshold = Global.preference.getInt('notification:report_intensity');
+  Widget? actionSheetBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -74,27 +75,22 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) => CupertinoActionSheet(
+                  int selectedIndex = 2;
+                  actionSheetBuilder = CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
                       message: SizedBox(
-                        width: double.minPositive,
-                        child: Column(
+                        height: 200,
+                        child: CupertinoPicker(
+                          itemExtent: 32,
+                          scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              eewIntensityThreshold = IntensityList[index].value;
+                              Global.preference.setInt('notification:eew_intensity', eewIntensityThreshold ?? 0);
+                            });
+                          },
                           children: IntensityList.map((intensity) {
-                            return CupertinoRadio(
-                              value: intensity.value,
-                              groupValue: eewIntensityThreshold,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    eewIntensityThreshold = value;
-                                    Global.preference.setInt('notification:eew_intensity', value);
-                                  });
-                                }
-                                Navigator.pop(context);
-                              },
-                            );
+                            return Text(intensity.name);
                           }).toList(),
                         ),
                       ),
@@ -108,13 +104,12 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             });
                             Navigator.pop(context);
                           },
-                        ),
-                        CupertinoActionSheetAction(
-                          child: const Text("取消"),
-                          onPressed: () => Navigator.pop(context),
-                        ),
+                        )
                       ],
-                    ),
+                    );
+                  showCupertinoModalPopup(
+                  context: context,
+                  builder: (context) => actionSheetBuilder!,
                   );
                 },
               ),
@@ -174,28 +169,26 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
+                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == intensityThreshold);
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
                       message: SizedBox(
-                        width: double.minPositive,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => CupertinoRadio(
-                            value: IntensityList[index].value,
-                            groupValue: intensityThreshold,
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  intensityThreshold = value;
-                                  Global.preference.setInt('notification:intensity_intensity', value);
-                                });
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                        width: double.infinity,
+                        height: 200,
+                        child: CupertinoPicker(
+                          itemExtent: 32,
+                          scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              intensityThreshold = IntensityList[index].value;
+                              Global.preference.setInt('notification:intensity_intensity', intensityThreshold ?? 0);
+                            });
+                          },
+                          children: IntensityList.map((intensity) {
+                            return Center(child: Text(intensity.name));
+                          }).toList(),
                         ),
                       ),
                       actions: [
@@ -208,10 +201,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             });
                             Navigator.pop(context);
                           },
-                        ),
-                        CupertinoActionSheetAction(
-                          child: const Text("取消"),
-                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
@@ -269,28 +258,26 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
+                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == reportIntensityThreshold);
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
                       message: SizedBox(
-                        width: double.minPositive,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => CupertinoRadio(
-                            value: IntensityList[index].value,
-                            groupValue: reportIntensityThreshold,
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  reportIntensityThreshold = value;
-                                  Global.preference.setInt('notification:report_intensity', value);
-                                });
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                        width: double.infinity,
+                        height: 200,
+                        child: CupertinoPicker(
+                          itemExtent: 32,
+                          scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              reportIntensityThreshold = IntensityList[index].value;
+                              Global.preference.setInt('notification:report_intensity', reportIntensityThreshold ?? 0);
+                            });
+                          },
+                          children: IntensityList.map((intensity) {
+                            return Center(child: Text(intensity.name));
+                          }).toList(),
                         ),
                       ),
                       actions: [
@@ -303,10 +290,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             });
                             Navigator.pop(context);
                           },
-                        ),
-                        CupertinoActionSheetAction(
-                          child: const Text("取消"),
-                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
