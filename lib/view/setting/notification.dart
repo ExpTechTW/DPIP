@@ -75,8 +75,10 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  int selectedIndex = 2;
-                  actionSheetBuilder = CupertinoActionSheet(
+                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == eewIntensityThreshold);
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
                       message: SizedBox(
                         height: 200,
@@ -106,10 +108,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                           },
                         )
                       ],
-                    );
-                  showCupertinoModalPopup(
-                  context: context,
-                  builder: (context) => actionSheetBuilder!,
+                    ),
                   );
                 },
               ),
