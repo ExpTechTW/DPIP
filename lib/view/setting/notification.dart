@@ -19,13 +19,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   int? eewIntensityThreshold = Global.preference.getInt('notification:eew_intensity');
   int? intensityThreshold = Global.preference.getInt('notification:intensity_intensity');
   int? reportIntensityThreshold = Global.preference.getInt('notification:report_intensity');
+  Widget? actionSheetBuilder;
 
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: const Text('通知'),
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text('通知'),
         ),
         child: CupertinoScrollbar(
           child: ListView(
@@ -74,33 +75,29 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showDialog(
+                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == eewIntensityThreshold);
+                  showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
-                      content: SizedBox(
-                        width: double.minPositive,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => RadioListTile(
-                            value: IntensityList[index].value,
-                            groupValue: eewIntensityThreshold,
-                            title: Text(IntensityList[index].name),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  eewIntensityThreshold = value;
-                                  Global.preference.setInt('notification:eew_intensity', value);
-                                });
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                      message: SizedBox(
+                        height: 200,
+                        child: CupertinoPicker(
+                          itemExtent: 32,
+                          scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              eewIntensityThreshold = IntensityList[index].value;
+                              Global.preference.setInt('notification:eew_intensity', eewIntensityThreshold ?? 0);
+                            });
+                          },
+                          children: IntensityList.map((intensity) {
+                            return Text(intensity.name);
+                          }).toList(),
                         ),
                       ),
                       actions: [
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("清除門檻"),
                           onPressed: () {
                             setState(() {
@@ -109,11 +106,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             });
                             Navigator.pop(context);
                           },
-                        ),
-                        CupertinoDialogAction(
-                          child: const Text("取消"),
-                          onPressed: () => Navigator.pop(context),
-                        ),
+                        )
                       ],
                     ),
                   );
@@ -175,33 +168,30 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showDialog(
+                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == intensityThreshold);
+                  showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
-                      content: SizedBox(
-                        width: double.minPositive,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => RadioListTile(
-                            value: IntensityList[index].value,
-                            groupValue: intensityThreshold,
-                            title: Text(IntensityList[index].name),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  intensityThreshold = value;
-                                  Global.preference.setInt('notification:intensity_intensity', value);
-                                });
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                      message: SizedBox(
+                        width: double.infinity,
+                        height: 200,
+                        child: CupertinoPicker(
+                          itemExtent: 32,
+                          scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              intensityThreshold = IntensityList[index].value;
+                              Global.preference.setInt('notification:intensity_intensity', intensityThreshold ?? 0);
+                            });
+                          },
+                          children: IntensityList.map((intensity) {
+                            return Center(child: Text(intensity.name));
+                          }).toList(),
                         ),
                       ),
                       actions: [
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("清除門檻"),
                           onPressed: () {
                             setState(() {
@@ -210,10 +200,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             });
                             Navigator.pop(context);
                           },
-                        ),
-                        CupertinoDialogAction(
-                          child: const Text("取消"),
-                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
@@ -271,33 +257,30 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  showDialog(
+                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == reportIntensityThreshold);
+                  showCupertinoModalPopup(
                     context: context,
-                    builder: (context) => CupertinoAlertDialog(
+                    builder: (context) => CupertinoActionSheet(
                       title: const Text("所在地震度門檻"),
-                      content: SizedBox(
-                        width: double.minPositive,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: IntensityList.length,
-                          itemBuilder: (context, index) => RadioListTile(
-                            value: IntensityList[index].value,
-                            groupValue: reportIntensityThreshold,
-                            title: Text(IntensityList[index].name),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  reportIntensityThreshold = value;
-                                  Global.preference.setInt('notification:report_intensity', value);
-                                });
-                              }
-                              Navigator.pop(context);
-                            },
-                          ),
+                      message: SizedBox(
+                        width: double.infinity,
+                        height: 200,
+                        child: CupertinoPicker(
+                          itemExtent: 32,
+                          scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              reportIntensityThreshold = IntensityList[index].value;
+                              Global.preference.setInt('notification:report_intensity', reportIntensityThreshold ?? 0);
+                            });
+                          },
+                          children: IntensityList.map((intensity) {
+                            return Center(child: Text(intensity.name));
+                          }).toList(),
                         ),
                       ),
                       actions: [
-                        CupertinoDialogAction(
+                        CupertinoActionSheetAction(
                           child: const Text("清除門檻"),
                           onPressed: () {
                             setState(() {
@@ -306,10 +289,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                             });
                             Navigator.pop(context);
                           },
-                        ),
-                        CupertinoDialogAction(
-                          child: const Text("取消"),
-                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
