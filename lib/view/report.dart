@@ -42,6 +42,8 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   final mapController = MapController();
   final _sheet = GlobalKey();
   final _sheetController = DraggableScrollableController();
+  late String baseMap;
+  int selectedMapIndex = 0;
 
   late AnimationController _animationController;
   final borderRadius = BorderRadiusTween(
@@ -49,7 +51,6 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     end: BorderRadius.zero,
   );
 
-  int selectedMapIndex = 0;
   List<Widget> maxIntensities = [];
   final List<Marker> markers = [];
   late EarthquakeReport report;
@@ -160,6 +161,8 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   @override
   void initState() {
     super.initState();
+    baseMap = Global.preference.getString("base_map") ?? "geojson";
+    selectedMapIndex = baseMapOptions.keys.toList().indexOf(baseMap);
     fetchFullReport();
 
     _animationController = AnimationController(
