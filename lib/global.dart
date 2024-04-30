@@ -11,6 +11,7 @@ class Global {
   static late ExpTechApi api;
   static late SharedPreferences preference;
   static late PackageInfo packageInfo;
+  static late String taiwanGeojsonString;
 
   static Map<String, Map<String, Town>> region = {};
 
@@ -32,5 +33,7 @@ class Global {
         });
       }
     });
+
+    taiwanGeojsonString = await rootBundle.loadString("assets/tw_city.geojson");
   }
 }

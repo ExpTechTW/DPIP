@@ -12,12 +12,22 @@ import 'package:dpip/widget/report/intensity_capsule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/utils.dart';
+
+final baseMapOptions = {
+  "geojson": "GeoJson",
+  "googlemap": "Google 地圖",
+  "googletrain": "Google 路線地圖",
+  "googlesatellite": "Google 衛星影象",
+  "openstreetmap": "OpenStreetMap"
+};
 
 class ReportPage extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -39,6 +49,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     end: BorderRadius.zero,
   );
 
+  int selectedMapIndex = 0;
   List<Widget> maxIntensities = [];
   final List<Marker> markers = [];
   late EarthquakeReport report;
@@ -172,43 +183,112 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
+    final geojson = Platform.isIOS
+        ? GeoJsonParser(
+            defaultPolygonFillColor: CupertinoColors.tertiarySystemBackground.resolveFrom(context),
+            defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
+          )
+        : GeoJsonParser(
+            defaultPolygonFillColor: context.colors.surfaceVariant,
+            defaultPolygonBorderColor: context.colors.outline,
+          );
+
+    String baseMap = Global.preference.getString("base_map") ?? "geojson";
+
+    if (baseMap == "geojson") {
+      geojson.parseGeoJsonAsString(Global.taiwanGeojsonString);
+    }
+
+    var flutterMap = FlutterMap(
+      mapController: mapController,
+      options: MapOptions(
+        initialCenter: const LatLng(23.8, 120.1),
+        initialZoom: 7,
+        minZoom: 7,
+        maxZoom: 12,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
+        ),
+        backgroundColor: Colors.transparent,
+        onPointerDown: (event, point) {
+          _sheetController.animateTo(
+            sheet.minChildSize,
+            duration: const Duration(milliseconds: 200),
+            curve: Easing.standard,
+          );
+        },
+      ),
+      children: [
+        baseMap == "geojson"
+            ? PolygonLayer(
+                polygons: geojson.polygons,
+                polygonCulling: true,
+                polygonLabels: false,
+              )
+            : TileLayer(
+                urlTemplate: {
+                  "googlemap": "http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+                  "googletrain": "http://mt1.google.com/vt/lyrs=r@221097413,bike,transit&x={x}&y={y}&z={z}",
+                  "googlesatellite": "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                  "openstreetmap": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                }[baseMap],
+                userAgentPackageName: 'com.exptech.dpip.dpip',
+              ),
+        MarkerLayer(
+          markers: markers,
+        ),
+      ],
+    );
+
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           middle: Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: const Icon(CupertinoIcons.location_solid),
+                onPressed: () {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) => CupertinoAlertDialog(
+                      title: const Text("地圖底圖"),
+                      content: SizedBox(
+                        height: 150,
+                        child: CupertinoPicker(
+                          itemExtent: 35,
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              selectedMapIndex = index;
+                              baseMap = baseMapOptions.entries.elementAt(index).key;
+                              Global.preference.setString("base_map", baseMap);
+                            });
+                          },
+                          scrollController: FixedExtentScrollController(initialItem: selectedMapIndex),
+                          children: baseMapOptions.entries.map((e) => Text(e.value)).toList(),
+                        ),
+                      ),
+                      actions: [
+                        CupertinoDialogAction(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("確定"),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         child: SafeArea(
           child: Stack(
             children: [
-              FlutterMap(
-                mapController: mapController,
-                options: MapOptions(
-                  initialCenter: const LatLng(23.8, 120.1),
-                  initialZoom: 7,
-                  minZoom: 7,
-                  maxZoom: 12,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
-                  ),
-                  backgroundColor: Colors.transparent,
-                  onPointerDown: (event, point) {
-                    _sheetController.animateTo(
-                      sheet.minChildSize,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Easing.standard,
-                    );
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
-                  ),
-                  MarkerLayer(
-                    markers: markers,
-                  ),
-                ],
-              ),
+              flutterMap,
               LayoutBuilder(
                 builder: (context, constraints) {
                   return DraggableScrollableSheet(
@@ -362,39 +442,55 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
         appBar: AppBar(
           title: Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Symbols.map_rounded),
+              onPressed: () {
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text("地圖底圖"),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
+                    content: SizedBox(
+                      width: double.minPositive,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: baseMapOptions.entries
+                            .map(
+                              (e) => RadioListTile(
+                                value: e.key,
+                                groupValue: baseMap,
+                                title: Text(e.value),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      baseMap = value;
+                                      Global.preference.setString("base_map", value);
+                                      Navigator.pop(context);
+                                    });
+                                  }
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("取消"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: SafeArea(
           child: Stack(
             children: [
-              FlutterMap(
-                mapController: mapController,
-                options: MapOptions(
-                  initialCenter: const LatLng(23.8, 120.1),
-                  initialZoom: 7,
-                  minZoom: 7,
-                  maxZoom: 12,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
-                  ),
-                  backgroundColor: Colors.transparent,
-                  onPointerDown: (event, point) {
-                    _sheetController.animateTo(
-                      sheet.minChildSize,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Easing.standard,
-                    );
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
-                  ),
-                  MarkerLayer(
-                    markers: markers,
-                  ),
-                ],
-              ),
+              flutterMap,
               LayoutBuilder(builder: (context, constraints) {
                 return DraggableScrollableSheet(
                   key: _sheet,
