@@ -15,10 +15,19 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/utils.dart';
+
+final baseMapOptions = {
+  "geojson": "GeoJson",
+  "googlemap": "Google 地圖",
+  "googletrain": "Google 路線地圖",
+  "googlesatellite": "Google 衛星影象",
+  "openstreetmap": "OpenStreetMap"
+};
 
 class ReportPage extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -183,7 +192,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
             defaultPolygonBorderColor: context.colors.outline,
           );
 
-    final baseMap = Global.preference.getString("base_map") ?? "geojson";
+    String baseMap = Global.preference.getString("base_map") ?? "geojson";
 
     if (baseMap == "geojson") {
       geojson.parseGeoJsonAsString(Global.taiwanGeojsonString);
@@ -392,6 +401,50 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
         appBar: AppBar(
           title: Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Symbols.map_rounded),
+              onPressed: () {
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text("地圖底圖"),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
+                    content: SizedBox(
+                      width: double.minPositive,
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: baseMapOptions.entries
+                            .map(
+                              (e) => RadioListTile(
+                                value: e.key,
+                                groupValue: baseMap,
+                                title: Text(e.value),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      baseMap = value;
+                                      Global.preference.setString("base_map", value);
+                                      Navigator.pop(context);
+                                    });
+                                  }
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("取消"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         body: SafeArea(
           child: Stack(
