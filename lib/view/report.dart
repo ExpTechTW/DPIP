@@ -12,6 +12,7 @@ import 'package:dpip/widget/report/intensity_capsule.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:timezone/timezone.dart';
@@ -172,6 +173,63 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
+    final geojson = Platform.isIOS
+        ? GeoJsonParser(
+            defaultPolygonFillColor: CupertinoColors.tertiarySystemBackground.resolveFrom(context),
+            defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
+          )
+        : GeoJsonParser(
+            defaultPolygonFillColor: context.colors.surfaceVariant,
+            defaultPolygonBorderColor: context.colors.outline,
+          );
+
+    final baseMap = Global.preference.getString("base_map") ?? "geojson";
+
+    if (baseMap == "geojson") {
+      geojson.parseGeoJsonAsString(Global.taiwanGeojsonString);
+    }
+
+    var flutterMap = FlutterMap(
+      mapController: mapController,
+      options: MapOptions(
+        initialCenter: const LatLng(23.8, 120.1),
+        initialZoom: 7,
+        minZoom: 7,
+        maxZoom: 12,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
+        ),
+        backgroundColor: Colors.transparent,
+        onPointerDown: (event, point) {
+          _sheetController.animateTo(
+            sheet.minChildSize,
+            duration: const Duration(milliseconds: 200),
+            curve: Easing.standard,
+          );
+        },
+      ),
+      children: [
+        baseMap == "geojson"
+            ? PolygonLayer(
+                polygons: geojson.polygons,
+                polygonCulling: true,
+                polygonLabels: false,
+              )
+            : TileLayer(
+                urlTemplate: {
+                  "googlemap": "http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+                  "googletrain": "http://mt1.google.com/vt/lyrs=r@221097413,bike,transit&x={x}&y={y}&z={z}",
+                  "googlesatellite": "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                  "openstreetmap": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                }[baseMap],
+                userAgentPackageName: 'app.kamiya.pocket_quake',
+              ),
+        MarkerLayer(
+          markers: markers,
+        ),
+      ],
+    );
+
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
@@ -180,35 +238,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
         child: SafeArea(
           child: Stack(
             children: [
-              FlutterMap(
-                mapController: mapController,
-                options: MapOptions(
-                  initialCenter: const LatLng(23.8, 120.1),
-                  initialZoom: 7,
-                  minZoom: 7,
-                  maxZoom: 12,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
-                  ),
-                  backgroundColor: Colors.transparent,
-                  onPointerDown: (event, point) {
-                    _sheetController.animateTo(
-                      sheet.minChildSize,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Easing.standard,
-                    );
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
-                  ),
-                  MarkerLayer(
-                    markers: markers,
-                  ),
-                ],
-              ),
+              flutterMap,
               LayoutBuilder(
                 builder: (context, constraints) {
                   return DraggableScrollableSheet(
@@ -366,35 +396,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
         body: SafeArea(
           child: Stack(
             children: [
-              FlutterMap(
-                mapController: mapController,
-                options: MapOptions(
-                  initialCenter: const LatLng(23.8, 120.1),
-                  initialZoom: 7,
-                  minZoom: 7,
-                  maxZoom: 12,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.drag | InteractiveFlag.pinchMove | InteractiveFlag.pinchZoom,
-                  ),
-                  backgroundColor: Colors.transparent,
-                  onPointerDown: (event, point) {
-                    _sheetController.animateTo(
-                      sheet.minChildSize,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Easing.standard,
-                    );
-                  },
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        "https://api.mapbox.com/styles/v1/whes1015/clne7f5m500jd01re1psi1cd2/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlczEwMTUiLCJhIjoiY2xuZTRhbmhxMGIzczJtazN5Mzg0M2JscCJ9.BHkuZTYbP7Bg1U9SfLE-Cg",
-                  ),
-                  MarkerLayer(
-                    markers: markers,
-                  ),
-                ],
-              ),
+              flutterMap,
               LayoutBuilder(builder: (context, constraints) {
                 return DraggableScrollableSheet(
                   key: _sheet,
