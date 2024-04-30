@@ -231,7 +231,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                   "googlesatellite": "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
                   "openstreetmap": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                 }[baseMap],
-                userAgentPackageName: 'app.kamiya.pocket_quake',
+                userAgentPackageName: 'com.exptech.dpip.dpip',
               ),
         MarkerLayer(
           markers: markers,
