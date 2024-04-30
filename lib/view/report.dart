@@ -275,7 +275,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text("取消"),
+                          child: const Text("確定"),
                         ),
                       ],
                     ),
