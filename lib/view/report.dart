@@ -49,6 +49,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     end: BorderRadius.zero,
   );
 
+  int selectedMapIndex = 0;
   List<Widget> maxIntensities = [];
   final List<Marker> markers = [];
   late EarthquakeReport report;
@@ -243,6 +244,46 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           middle: Text(widget.report.hasNumber ? "第 ${widget.report.number} 號" : "小區域有感地震"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CupertinoButton(
+                padding: EdgeInsets.zero,
+                child: const Icon(CupertinoIcons.location_solid),
+                onPressed: () {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) => CupertinoAlertDialog(
+                      title: const Text("地圖底圖"),
+                      content: SizedBox(
+                        height: 150,
+                        child: CupertinoPicker(
+                          itemExtent: 35,
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              selectedMapIndex = index;
+                              baseMap = baseMapOptions.entries.elementAt(index).key;
+                              Global.preference.setString("base_map", baseMap);
+                            });
+                          },
+                          scrollController: FixedExtentScrollController(initialItem: selectedMapIndex),
+                          children: baseMapOptions.entries.map((e) => Text(e.value)).toList(),
+                        ),
+                      ),
+                      actions: [
+                        CupertinoDialogAction(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("取消"),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         child: SafeArea(
           child: Stack(
