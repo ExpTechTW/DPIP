@@ -30,12 +30,14 @@ class EarthquakeReportListTile extends StatelessWidget {
         ),
         title: Text(report.getLocation()),
         subtitle: Text(
-          DateFormat("yyyy/MM/dd HH:mm:ss").format(
+          "${DateFormat("yyyy/MM/dd HH:mm:ss").format(
             TZDateTime.fromMillisecondsSinceEpoch(
               getLocation("Asia/Taipei"),
               report.time,
             ),
-          ),
+          )}\n規模 ${report.mag}  深度 ${report.depth} km",
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
         ),
         additionalInfo: Row(
           children: [
