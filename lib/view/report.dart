@@ -252,7 +252,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
             children: [
               CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: const Icon(CupertinoIcons.location_solid),
+                child: const Icon(CupertinoIcons.map_fill),
                 onPressed: () {
                   showCupertinoModalPopup(
                     context: context,
