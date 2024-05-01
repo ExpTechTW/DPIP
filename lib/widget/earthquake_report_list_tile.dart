@@ -21,7 +21,7 @@ class EarthquakeReportListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
       return CupertinoListTile(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
         leading: Icon(
           report.hasNumber ? CupertinoIcons.tag : CupertinoIcons.info_circle,
           color: report.hasNumber
