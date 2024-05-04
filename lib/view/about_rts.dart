@@ -71,6 +71,30 @@ class AboutRts extends StatelessWidget {
                 ));
               },
             ),
+            CupertinoListTile(
+              title: const Text("什麼是P波與S波?又分別是代表什麼?"),
+              trailing: const CupertinoListTileChevron(),
+              onTap: () {
+                Navigator.push(context, CupertinoPageRoute(
+                  builder: (context) {
+                    return CupertinoPageScaffold(
+                      navigationBar: const CupertinoNavigationBar(
+                        middle: Text("什麼是P波與S波?又分別是代表什麼?"),
+                      ),
+                      child: SafeArea(
+                        child: ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: const [
+                            Text(
+                                "地震發生時因 干涉 或 疊加 會產生 P波 S波 兩種震動波，P波(上下) 傳遞速度較快 破壞力較小，S波(前後左右) 傳遞速度較慢 破壞力大 通常是導致災害的的關鍵"),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ));
+              },
+            ),
           ],
         ),
       );
@@ -117,6 +141,26 @@ class AboutRts extends StatelessWidget {
               children: [
                 Text(
                   "2022 年 6 月初開始於全臺各地部署站點， TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
+                  style: TextStyle(color: context.colors.onSurface, fontSize: 16),
+                ),
+              ],
+            ),
+            ExpansionTile(
+              title: const Text("什麼是P波與S波?又分別是代表什麼?"),
+              childrenPadding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  "地震發生時因 干涉 或 疊加 會產生 P波 S波 兩種震動波，P波(上下) 傳遞速度較快 破壞力較小，S波(前後左右) 傳遞速度較慢 破壞力大 通常是導致災害的的關鍵",
+                  style: TextStyle(color: context.colors.onSurface, fontSize: 16),
+                ),
+              ],
+            ),
+            ExpansionTile(
+              title: const Text("TOS服務條款"),
+              childrenPadding: const EdgeInsets.all(16),
+              children: [
+                Text(
+                  "地震發生時因 干涉 或 疊加 會產生 P波 S波 兩種震動波，P波(上下) 傳遞速度較快 破壞力較小，S波(前後左右) 傳遞速度較慢 破壞力大 通常是導致災害的的關鍵",
                   style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                 ),
               ],
