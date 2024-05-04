@@ -370,6 +370,86 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   );
                 },
               ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 24, 0, 8),
+                child: Text(
+                  "天氣警特報",
+                  style: TextStyle(color: context.colors.outline),
+                ),
+              ),
+              CupertinoListTile(
+                title: const Text("大雷雨即時訊息"),
+                subtitle: const Text("選擇是否要接收大雷雨即時訊息"),
+                trailing: CupertinoSwitch(
+                  value: Global.preference.getBool("notification:thunderstorm") ?? true,
+                  onChanged: (value) {
+                    setState(() {
+                      Global.preference.setBool("notification:thunderstorm", value);
+                    });
+                  },
+                ),
+              ),
+              CupertinoListTile(
+                title: const Text("豪大雨特報"),
+                subtitle: const Text("選擇是否要接收豪雨特報訊息"),
+                trailing: CupertinoSwitch(
+                  value: Global.preference.getBool("notification:rainfall") ?? true,
+                  onChanged: (value) {
+                    setState(() {
+                      Global.preference.setBool("notification:rainfall", value);
+                    });
+                  },
+                ),
+              ),
+              CupertinoListTile(
+                title: const Text("高溫資訊"),
+                subtitle: const Text("選擇是否要接收高溫資訊"),
+                trailing: CupertinoSwitch(
+                  value: Global.preference.getBool("notification:heat") ?? true,
+                  onChanged: (value) {
+                    setState(() {
+                      Global.preference.setBool("notification:heat", value);
+                    });
+                  },
+                ),
+              ),
+              CupertinoListTile(
+                title: const Text("陸上強風特報"),
+                subtitle: const Text("選擇是否要接收陸上強風特報"),
+                trailing: CupertinoSwitch(
+                  value: Global.preference.getBool("notification:wind") ?? true,
+                  onChanged: (value) {
+                    setState(() {
+                      Global.preference.setBool("notification:wind", value);
+                    });
+                  },
+                ),
+              ),
+              CupertinoListTile(
+                title: const Text("停班停課資訊"),
+                subtitle: const Text("選擇是否要接收停班停課資訊"),
+                trailing: CupertinoSwitch(
+                  value: Global.preference.getBool("notification:work-and-class-status") ?? true,
+                  onChanged: (value) {
+                    setState(() {
+                      Global.preference.setBool("notification:work-and-class-status", value);
+                    });
+                  },
+                ),
+              ),
+              CupertinoListTile(
+                title: const Text("海上陸上颱風警報"),
+                subtitle: const Text("選擇是否要接收海上陸上颱風警報"),
+                trailing: CupertinoSwitch(
+                  value: Global.preference.getBool("notification:typhoon") ?? true,
+                  onChanged: (value) {
+                    notify_typhoon(value);
+                    setState(() {
+                      Global.preference.setBool("notification:typhoon", value);
+                    });
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -727,7 +807,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
             ListTile(
               title: const Text("停班停課資訊"),
-              subtitle: const Text("停班停課資訊"),
+              subtitle: const Text("選擇是否要接收停班停課資訊"),
               trailing: Switch(
                 value: Global.preference.getBool("notification:work-and-class-status") ?? true,
                 onChanged: (value) {
@@ -739,7 +819,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
             ),
             ListTile(
               title: const Text("海上陸上颱風警報"),
-              subtitle: const Text("海上陸上颱風警報"),
+              subtitle: const Text("選擇是否要接收海上陸上颱風警報"),
               trailing: Switch(
                 value: Global.preference.getBool("notification:typhoon") ?? true,
                 onChanged: (value) {
