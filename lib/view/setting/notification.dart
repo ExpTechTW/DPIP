@@ -8,6 +8,9 @@ import 'package:dpip/util/intensity_color.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../core/utils.dart';
+import '../../main.dart';
+
 class NotificationSettingsPage extends StatefulWidget {
   const NotificationSettingsPage({super.key});
 
@@ -19,7 +22,20 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   int? eewIntensityThreshold = Global.preference.getInt('notification:eew_intensity');
   int? intensityThreshold = Global.preference.getInt('notification:intensity_intensity');
   int? reportIntensityThreshold = Global.preference.getInt('notification:report_intensity');
+  String? currentTown = Global.preference.getString("loc-town");
+  String? currentCity = Global.preference.getString("loc-city");
   Widget? actionSheetBuilder;
+
+  Future<void> notify_eew(bool value,String topic) async{
+    if(value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+    setState(() {
+      Global.preference.setBool("notification:eew", value);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +66,9 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 subtitle: const Text("選擇是否要接收緊急地震速報通知"),
                 trailing: CupertinoSwitch(
                   value: Global.preference.getBool("notification:eew") ?? true,
-                  onChanged: (value) {
+                  onChanged: (value) async {
+                    //subscribeToTopic << 訂閱主題
+                    // await messaging.subscribeToTopic(safeBase64Encode("$currentCity-$currentTown"));
                     setState(() {
                       Global.preference.setBool("notification:eew", value);
                     });
@@ -325,10 +343,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               subtitle: const Text("選擇是否要接收緊急地震速報通知"),
               trailing: Switch(
                 value: Global.preference.getBool("notification:eew") ?? true,
-                onChanged: (value) {
-                  setState(() {
-                    Global.preference.setBool("notification:eew", value);
-                  });
+                onChanged: (value) async {
+                  notify_eew(value,"$currentCity-${currentTown}_eew-warn_{level}");
                 },
               ),
             ),
@@ -598,6 +614,86 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ),
                 );
               },
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 0, 8),
+              child: Text(
+                "天氣警特報",
+                style: TextStyle(color: context.colors.outline),
+              ),
+            ),
+
+            ListTile(
+              title: const Text("大雷雨即時訊息"),
+              subtitle: const Text("選擇是否要接收大雷雨即時訊息"),
+              trailing: Switch(
+                value: Global.preference.getBool("notification:thunderstorm") ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    Global.preference.setBool("notification:thunderstorm", value);
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("豪（大）雨特報(大雨、豪雨、大豪雨、超大豪雨)"),
+              subtitle: const Text("選擇是否要接收豪雨特報訊息"),
+              trailing: Switch(
+                value: Global.preference.getBool("notification:rainfall") ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    Global.preference.setBool("notification:rainfall", value);
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("高溫資訊"),
+              subtitle: const Text("選擇是否要接收高溫資訊"),
+              trailing: Switch(
+                value: Global.preference.getBool("notification:heat") ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    Global.preference.setBool("notification:heat", value);
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("陸上強風特報"),
+              subtitle: const Text("選擇是否要接收陸上強風特報"),
+              trailing: Switch(
+                value: Global.preference.getBool("notification:wind") ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    Global.preference.setBool("notification:wind", value);
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("停班停課資訊"),
+              subtitle: const Text("停班停課資訊"),
+              trailing: Switch(
+                value: Global.preference.getBool("notification:work-and-class-status") ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    Global.preference.setBool("notification:work-and-class-status", value);
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text("海上陸上颱風警報"),
+              subtitle: const Text("海上陸上颱風警報"),
+              trailing: Switch(
+                value: Global.preference.getBool("notification:typhoon") ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    Global.preference.setBool("notification:typhoon", value);
+                  });
+                },
+              ),
             ),
           ],
         ),
