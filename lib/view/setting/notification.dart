@@ -26,16 +26,72 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   String? currentCity = Global.preference.getString("loc-city");
   Widget? actionSheetBuilder;
 
-  Future<void> notify_eew(bool value,String topic) async{
-    if(value) {
+
+
+  Future<void> notify_rts(bool value) async {
+    String topic = "$currentCity-${currentTown}_rts";
+    if (value) {
       await messaging.subscribeToTopic(safeBase64Encode(topic));
     } else {
       await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
     }
-    setState(() {
-      Global.preference.setBool("notification:eew", value);
-    });
   }
+
+  Future<void> notify_thunderstorm(bool value) async {
+    String topic = "$currentCity-${currentTown}_thunderstorm";
+    if (value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+  }
+
+  Future<void> notify_rainfall(bool value) async {
+    String topic = "$currentCity-${currentTown}_rainfall";
+    if (value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+  }
+
+  Future<void> notify_heat(bool value) async {
+    String topic = "$currentCity-${currentTown}_heat";
+    if (value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+  }
+
+  Future<void> notify_wind(bool value) async {
+    String topic = "$currentCity-${currentTown}_wind";
+    if (value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+  }
+
+  Future<void> notify_work_and_class_status(bool value) async {
+    String topic = "$currentCity-${currentTown}_notify_work_and_class_status";
+    if (value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+  }
+
+  Future<void> notify_typhoon(bool value) async {
+    String topic = "$currentCity-${currentTown}_typhoon";
+    if (value) {
+      await messaging.subscribeToTopic(safeBase64Encode(topic));
+    } else {
+      await messaging.unsubscribeFromTopic(safeBase64Encode(topic));
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -275,7 +331,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                   ],
                 ),
                 onTap: () {
-                  int selectedIndex = IntensityList.indexWhere((intensity) => intensity.value == reportIntensityThreshold);
+                  int selectedIndex =
+                      IntensityList.indexWhere((intensity) => intensity.value == reportIntensityThreshold);
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) => CupertinoActionSheet(
@@ -343,9 +400,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               subtitle: const Text("選擇是否要接收緊急地震速報通知"),
               trailing: Switch(
                 value: Global.preference.getBool("notification:eew") ?? true,
-                onChanged: (value) async {
-                  notify_eew(value,"$currentCity-${currentTown}_eew-warn_{level}");
-                },
+                onChanged: (value) async {},
               ),
             ),
             ListTile(
@@ -622,7 +677,6 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                 style: TextStyle(color: context.colors.outline),
               ),
             ),
-
             ListTile(
               title: const Text("大雷雨即時訊息"),
               subtitle: const Text("選擇是否要接收大雷雨即時訊息"),
@@ -689,6 +743,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               trailing: Switch(
                 value: Global.preference.getBool("notification:typhoon") ?? true,
                 onChanged: (value) {
+                  notify_typhoon(value);
                   setState(() {
                     Global.preference.setBool("notification:typhoon", value);
                   });

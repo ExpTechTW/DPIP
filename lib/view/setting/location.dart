@@ -22,11 +22,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> setCityLocation(String? value) async {
     if (value == null) return;
-    // unsubscribe old location topic
+
     if (currentCity != null) {
-      await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
       if (currentTown != null) {
-        await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+        unsubscribe("$currentCity-$currentTown");
       }
     }
 
@@ -41,19 +40,40 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     // subscribe new location topic
     await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
     await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+    subscribe("$currentCity-$currentTown");
   }
 
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
-
+    if (currentTown != null) {
+      await unsubscribe("$currentCity-$currentTown");
+    }
     setState(() {
-      if (currentTown != null) {
-        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
       currentTown = value;
-      Global.preference.setString("loc-town", currentTown!);
-      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
     });
+
+    await Global.preference.setString("loc-town", currentTown!);
+    subscribe("$currentCity-$currentTown");
+  }
+
+  Future<void> unsubscribe(String location) async {
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_typhoon"));
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_notify_work_and_class_status"));
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_wind"));
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_heat"));
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_rainfall"));
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_thunderstorm"));
+    await messaging.unsubscribeFromTopic(safeBase64Encode("${location}_rts"));
+  }
+
+  Future<void> subscribe(String location) async {
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_typhoon"));
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_notify_work_and_class_status"));
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_wind"));
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_heat"));
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_rainfall"));
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_thunderstorm"));
+    await messaging.subscribeToTopic(safeBase64Encode("${location}_rts"));
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
