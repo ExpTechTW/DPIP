@@ -20,7 +20,6 @@ import flutter_local_notifications
             UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
         }
         GeneratedPluginRegistrant.register(with: self)
-        // minimalCustomizationPresentationExample()
         hyperCriticalRulesExample()
         Siren.shared.wail() // line 2
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -28,7 +27,7 @@ import flutter_local_notifications
         
     func hyperCriticalRulesExample() {
         let siren = Siren.shared
-        siren.rulesManager = RulesManager(globalRules: .annoying, showAlertAfterCurrentVersionHasBeenReleasedForDays: 1)
+        siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 3)
         siren.wail {results in
             switch results {
             case .success(let updateResults):
