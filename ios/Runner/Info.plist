@@ -30,6 +30,7 @@
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
+	    <string>critical-alerts</string>
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
