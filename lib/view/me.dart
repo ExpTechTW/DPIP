@@ -6,12 +6,12 @@ import 'package:clipboard/clipboard.dart';
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension.dart';
-import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
+import 'package:dpip/view/setting/location.dart';
 import 'package:dpip/view/setting/ios/cupertino_theme_mode_page.dart';
-import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -199,39 +199,10 @@ class _MePageState extends State<MePage> {
     }
   }
 
-  Future<void> setCityLocation(String? value) async {
-    if (value == null) return;
-    // unsubscribe old location topic
-    if (currentCity != null) {
-      await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
-      if (currentTown != null) {
-        await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
-    }
-
+  void updateCurrentLocationSettings() {
     setState(() {
-      currentCity = value;
-      currentTown = Global.region[value]!.keys.first;
-    });
-
-    await Global.preference.setString("loc-city", currentCity!);
-    await Global.preference.setString("loc-town", currentTown!);
-
-    // subscribe new location topic
-    await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
-    await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-  }
-
-  Future<void> setTownLocation(String? value) async {
-    if (value == null) return;
-
-    setState(() {
-      if (currentTown != null) {
-        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
-      currentTown = value;
-      Global.preference.setString("loc-town", currentTown!);
-      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+      currentCity = Global.preference.getString("loc-city");
+      currentTown = Global.preference.getString("loc-town");
     });
   }
 
@@ -251,66 +222,48 @@ class _MePageState extends State<MePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CupertinoListSection(
-                    header: const Text("所在地"),
+                    header: const Text("一般"),
                     children: [
                       CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.building_2_fill),
-                        title: const Text('縣市'),
-                        additionalInfo: Text(currentCity ?? "尚未設定"),
+                        leading: const Icon(CupertinoIcons.location_solid),
+                        title: const Text("所在地"),
+                        additionalInfo: Text(currentTown != null ? "$currentCity $currentTown" : "未設定"),
+                        trailing: const CupertinoListTileChevron(),
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const LocationSettingsPage(),
+                            ),
+                          );
+
+                          updateCurrentLocationSettings();
+                        },
+                      ),
+                      CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.moon_fill),
+                        title: const Text("主題"),
+                        additionalInfo: Text(themeOptions[_theme]!),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () {
                           Navigator.push<String>(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
+                              builder: (context) => CupertinoThemeModePage(
+                                themeMode: _theme,
+                              ),
                             ),
-                          ).then(setCityLocation);
+                          ).then((value) {
+                            if (value != null) {
+                              setState(() {
+                                _theme = value;
+                                Global.preference.setString("theme", value);
+                                MainApp.of(context)!.changeTheme(_theme);
+                              });
+                            }
+                          });
                         },
                       ),
-                      CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.tree),
-                        title: const Text('鄉鎮市區'),
-                        additionalInfo: Text(currentTown ?? "尚未設定"),
-                        trailing: const CupertinoListTileChevron(),
-                        onTap: currentCity != null
-                            ? () {
-                                Navigator.push<String>(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
-                                  ),
-                                ).then(setTownLocation);
-                              }
-                            : null,
-                      ),
-                    ],
-                  ),
-                  CupertinoListSection(
-                    header: const Text("一般"),
-                    children: [
-                      CupertinoListTile(
-                          leading: const Icon(CupertinoIcons.moon_fill),
-                          title: const Text("主題"),
-                          additionalInfo: Text(themeOptions[_theme]!),
-                          trailing: const CupertinoListTileChevron(),
-                          onTap: () {
-                            Navigator.push<String>(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => CupertinoThemeModePage(
-                                  themeMode: _theme,
-                                ),
-                              ),
-                            ).then((value) {
-                              if (value != null) {
-                                setState(() {
-                                  _theme = value;
-                                  Global.preference.setString("theme", value);
-                                  MainApp.of(context)!.changeTheme(_theme);
-                                });
-                              }
-                            });
-                          }),
                       CupertinoListTile(
                         leading: const Icon(CupertinoIcons.bell_fill),
                         title: const Text('通知'),
@@ -438,88 +391,26 @@ class _MePageState extends State<MePage> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
                     child: Text(
-                      "所在地",
-                      style: TextStyle(color: context.colors.onSurfaceVariant),
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.location_city_rounded),
-                    title: const Text('縣市'),
-                    subtitle: Text(currentCity ?? "尚未設定"),
-                    onTap: () {
-                      List<String> cityList = Global.region.keys.toList();
-
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("縣市"),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
-                          content: SizedBox(
-                            width: double.minPositive,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: cityList.length,
-                              itemBuilder: (context, index) => RadioListTile(
-                                value: cityList[index],
-                                groupValue: currentCity,
-                                title: Text(cityList[index]),
-                                onChanged: (value) {
-                                  setCityLocation(value);
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ),
-                          ),
-                          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("取消"))],
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.forest_rounded),
-                    title: const Text('鄉鎮市區'),
-                    subtitle: Text(currentTown ?? "尚未設定"),
-                    enabled: currentCity != null,
-                    onTap: () {
-                      List<String> townList = Global.region[currentCity]!.keys.toList();
-
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('鄉鎮市區'),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 16.0),
-                          content: SizedBox(
-                            width: double.minPositive,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: townList.length,
-                              itemBuilder: (context, index) => RadioListTile(
-                                value: townList[index],
-                                groupValue: currentTown,
-                                title: Text(townList[index]),
-                                onChanged: (value) {
-                                  setTownLocation(value);
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("取消"),
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
-                    child: Text(
                       "一般",
                       style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Symbols.location_pin_rounded),
+                    title: const Text("所在地"),
+                    subtitle: Text(
+                      currentTown != null ? "$currentCity $currentTown" : "未設定",
+                    ),
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LocationSettingsPage(),
+                        ),
+                      );
+
+                      updateCurrentLocationSettings();
+                    },
                   ),
                   ListTile(
                     leading: const Icon(Icons.dark_mode_rounded),
