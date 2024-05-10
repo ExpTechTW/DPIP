@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 extension MagnitudeColorExtension on ColorScheme {
   Color magnitude(BuildContext context, double mag) {
