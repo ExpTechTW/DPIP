@@ -22,7 +22,7 @@ class _NotifyPage extends State<NotifyPage> {
   }
 
   void play(String name) async {
-    await player.setSource(AssetSource("$name.wav"));
+    await player.setSource(AssetSource("$name"));
     player.resume();
   }
 
