@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>DPIP 會使用你的所在地位置，幫助根據位置預估震度通知</string>
+	<string>DPIP 將利用你的位置資訊，用以預估震度並提供通知。</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>DPIP 將利用你的位置資訊，用以預估震度並提供通知。</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
