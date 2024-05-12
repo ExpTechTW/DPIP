@@ -27,6 +27,7 @@ Future<void> messageHandler(RemoteMessage message) async {
           channelDescription: "顯示檢測到晃動的地區",
           importance: Importance.max,
           priority: Priority.max,
+          playSound: true,
           sound: RawResourceAndroidNotificationSound("warn"),
           styleInformation: BigTextStyleInformation(''),
         ),

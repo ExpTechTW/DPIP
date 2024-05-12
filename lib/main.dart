@@ -69,6 +69,56 @@ final List<DarwinNotificationCategory> darwinNotificationCategories = <DarwinNot
   )
 ];
 
+void ignoreErrors(_) {}
+
+void setupAndroidNotificationChannels() {
+  AndroidFlutterLocalNotificationsPlugin? plugin =
+      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+  if (plugin == null) return;
+
+  const report = AndroidNotificationChannel(
+    "report",
+    "地震報告",
+    groupId: "earthquake",
+    description: "地震發生後接收的地震報告。",
+    importance: Importance.defaultImportance,
+  );
+
+  const intensity = AndroidNotificationChannel(
+    "intensity",
+    "震度速報",
+    groupId: "earthquake",
+    description: "地震發生後接收的各地地震的最大震度通知。",
+    importance: Importance.high,
+  );
+
+  const eew = AndroidNotificationChannel(
+    "eew",
+    "地震速報",
+    groupId: "earthquake",
+    description: "在地震發生時接收中央氣象署發布的強震即時警報。",
+    importance: Importance.max,
+    enableLights: true,
+    enableVibration: true,
+    playSound: true,
+    sound: RawResourceAndroidNotificationSound("eew_alert.wav"),
+  );
+
+  const monitor = AndroidNotificationChannel(
+    "monitor",
+    "強震監視器",
+    groupId: "earthquake",
+    description: "當 TREM 在全臺部署的測站中，離所在地最近的測站觸發時接收的通知。",
+    importance: Importance.high,
+  );
+
+  plugin.createNotificationChannel(report).catchError(ignoreErrors);
+  plugin.createNotificationChannel(intensity).catchError(ignoreErrors);
+  plugin.createNotificationChannel(eew).catchError(ignoreErrors);
+  plugin.createNotificationChannel(monitor).catchError(ignoreErrors);
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
@@ -110,6 +160,7 @@ void main() async {
     android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
     iOS: initializationSettingsDarwin,
   );
+
   flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
@@ -125,6 +176,10 @@ void main() async {
       }
     },
   );
+
+  if (Platform.isAndroid) {
+    setupAndroidNotificationChannels();
+  }
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
