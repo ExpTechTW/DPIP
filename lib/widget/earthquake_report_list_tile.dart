@@ -114,7 +114,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               getLocation("Asia/Taipei"),
               report.time,
             ),
-          )}\n規模 ${report.mag}  深度 ${report.depth} km",
+          )}\n深度 ${report.depth} km",
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
