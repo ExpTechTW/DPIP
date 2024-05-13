@@ -417,7 +417,8 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                   Text(
                                     "各地最大震度",
                                     style: TextStyle(
-                                      color: context.colors.onSurface,
+                                      color: CupertinoTheme.of(context).brightness == Brightness.light
+                                          ? CupertinoColors.black : CupertinoColors.white,
                                       fontSize: 16,
                                     ),
                                   ),
