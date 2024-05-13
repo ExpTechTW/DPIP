@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
@@ -141,6 +142,8 @@ class MainApp extends StatefulWidget {
 }
 
 class MainAppState extends State<MainApp> {
+  String? currentLocation;
+  late Stream<Position> positionStream;
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
@@ -164,6 +167,33 @@ class MainAppState extends State<MainApp> {
           break;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startListening();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopListening();
+  }
+
+  void startListening() {
+    positionStream = Geolocator.getPositionStream();
+    positionStream.listen((Position position) {
+      setState(() {
+        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+      });
+    }, onError: (dynamic error) {
+      setState(() {
+        currentLocation = 'Could not get location: $error';
+      });
+    });
+  }
+  void stopListening() {
   }
 
   @override
