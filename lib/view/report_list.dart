@@ -83,19 +83,8 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
 
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: const Text("地震報告"),
-          trailing: Visibility(
-            visible: reports.isNotEmpty,
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: refreshing ? const CupertinoActivityIndicator() : const Icon(CupertinoIcons.refresh),
-              onPressed: () {
-                if (refreshing) return;
-                refreshReports();
-              },
-            ),
-          ),
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text("地震報告"),
         ),
         child: SafeArea(
           child: showRetryButton
