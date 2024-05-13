@@ -118,21 +118,21 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                   ),
                 )
               : reports.isNotEmpty
-                  /*
-            RefreshIndicator.adaptive(
-                onRefresh: refreshReports,
-                child: ListView.builder(
-                  itemCount: reports.length,
-                  itemBuilder: (context, index) {
-                    return EarthquakeReportListTile(report: reports[index]);
-                  },
-                ),
-              )*/
-                  ? ListView.builder(
-                      itemCount: reports.length,
-                      itemBuilder: (context, index) {
-                        return EarthquakeReportListTile(report: reports[index]);
-                      },
+                  ? CustomScrollView(
+                      controller: _controller,
+                      slivers: [
+                        CupertinoSliverRefreshControl(
+                          onRefresh: refreshReports,
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return EarthquakeReportListTile(report: reports[index]);
+                            },
+                            childCount: reports.length,
+                          ),
+                        ),
+                      ],
                     )
                   : const Center(child: CupertinoActivityIndicator()),
         ),
