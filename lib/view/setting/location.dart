@@ -7,6 +7,7 @@ import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -18,6 +19,7 @@ class LocationSettingsPage extends StatefulWidget {
 class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
+  String? currentLocation;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
   Future<void> setCityLocation(String? value) async {
@@ -56,9 +58,28 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
+  Future<void> getLocation() async {
+    if (!isLocationAutoSetEnabled) return;
+    try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      setState(() {
+        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+      });
+    } catch (e) {
+      print('Could not get location: $e');
+    }
+  }
+
   Future<void> toggleLocationAutoSet(bool value) async {
     setState(() {
       isLocationAutoSetEnabled = value;
+      getLocation();
     });
   }
 
@@ -71,6 +92,22 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
           ),
           child: ListView(
             children: [
+              CupertinoListTile(
+                title: const Text("自動設定"),
+                subtitle: const Text("使用手機定位自動設定所在地"),
+                trailing: CupertinoSwitch(
+                  value: isLocationAutoSetEnabled,
+                  onChanged: toggleLocationAutoSet,
+                ),
+                onTap: () {
+                  setState(() {
+                    isLocationAutoSetEnabled = !isLocationAutoSetEnabled;
+                    if (isLocationAutoSetEnabled) {
+                      getLocation();
+                    }
+                  });
+                },
+              ),
               CupertinoListSection(
                 header: const Text("所在地"),
                 children: [
@@ -120,7 +157,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
               trailing: Switch(
                 value: isLocationAutoSetEnabled,
-                onChanged: null,
+                onChanged: toggleLocationAutoSet,
               ),
               enabled: false,
             ),
