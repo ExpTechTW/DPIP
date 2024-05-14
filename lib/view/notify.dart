@@ -29,7 +29,7 @@ class _NotifyPage extends State<NotifyPage> {
   void render() {
     _listChildren = <Widget>[
       const SizedBox(height: 20),
-      _buildHeader("僅為音效試聽，並非設定", null),
+      _buildHeader("僅為音效試聽，並非設定通知分類", null),
       _buildDivider(),
       _buildHeader("強震即時警報（警報）", "預估最大震度 5弱 以上"),
       _buildAlertItem("所在地 預估震度 4級 以上", "eew_alert"),
