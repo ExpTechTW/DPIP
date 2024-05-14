@@ -143,7 +143,7 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   String? currentLocation;
-  late Stream<Position> positionStream;
+  late StreamSubscription<Position> positionStreamSubscription;
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
@@ -182,8 +182,7 @@ class MainAppState extends State<MainApp> {
   }
 
   void startListening() {
-    positionStream = Geolocator.getPositionStream();
-    positionStream.listen((Position position) {
+    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
       setState(() {
         currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
       });
@@ -194,6 +193,7 @@ class MainAppState extends State<MainApp> {
     });
   }
   void stopListening() {
+    positionStreamSubscription.cancel();
   }
 
   @override
