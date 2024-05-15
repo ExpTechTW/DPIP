@@ -87,8 +87,23 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
           middle: Text("地震報告"),
         ),
         child: SafeArea(
-          child: showRetryButton
-              ? Center(
+          child: CustomScrollView(
+            controller: _controller,
+            slivers: [
+              CupertinoSliverRefreshControl(
+                onRefresh: refreshReports,
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                    return EarthquakeReportListTile(report: reports[index]);
+                  },
+                  childCount: reports.length,
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: showRetryButton
+                    ? Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -97,7 +112,6 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                         child: const Text("再試一次"),
                         onPressed: () {
                           refreshReports();
-
                           setState(() {
                             showRetryButton = false;
                           });
@@ -106,24 +120,10 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                     ],
                   ),
                 )
-              : reports.isNotEmpty
-                  ? CustomScrollView(
-                      controller: _controller,
-                      slivers: [
-                        CupertinoSliverRefreshControl(
-                          onRefresh: refreshReports,
-                        ),
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              return EarthquakeReportListTile(report: reports[index]);
-                            },
-                            childCount: reports.length,
-                          ),
-                        ),
-                      ],
-                    )
-                  : const Center(child: CupertinoActivityIndicator()),
+                    : const SizedBox(),
+              ),
+            ],
+          ),
         ),
       );
     } else {
