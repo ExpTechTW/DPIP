@@ -33,5 +33,7 @@
                 android:name="flutterEmbedding"
                 android:value="2"/>
     </application>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <service
+        android:name="com.amap.api.location.APSService"
+        android:foregroundServiceType="location" />
 </manifest>
