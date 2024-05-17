@@ -24,10 +24,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     print(value);
     if (value == null) return;
 
-    if (currentCity != null) {
-      if (currentTown != null) {
-        unsubscribe("$currentCity-$currentTown");
-      }
+    if (currentCity != null && currentTown != null) {
+      await unsubscribe("$currentCity-$currentTown");
     }
 
     setState(() {
@@ -41,7 +39,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     // subscribe new location topic
     await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
     await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-    subscribe("$currentCity-$currentTown");
+    await subscribe("$currentCity-$currentTown");
   }
 
   Future<void> setTownLocation(String? value) async {
@@ -49,12 +47,13 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     if (currentTown != null) {
       await unsubscribe("$currentCity-$currentTown");
     }
+
     setState(() {
       currentTown = value;
     });
 
     await Global.preference.setString("loc-town", currentTown!);
-    subscribe("$currentCity-$currentTown");
+    await subscribe("$currentCity-$currentTown");
   }
 
   Future<void> unsubscribe(String location) async {
