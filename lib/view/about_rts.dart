@@ -109,7 +109,7 @@ class AboutRts extends StatelessWidget {
                           padding: const EdgeInsets.all(16),
                           children: const [
                             Text(
-                                "1. 通過使用服務，用戶被視為已同意使用條款\n2. 禁止未經允許的再分發\n3. 禁止轉售，TREM提供之資訊\n4. 禁止違反法律法規或違反公共秩序和道德的行為\n5. 任何資訊均以CWA中央氣象署發布資訊為準"),
+                                "1. 透過使用服務，用戶被視為已同意使用條款\n2. 禁止未經允許的再分發\n3. 禁止轉售，TREM提供之資訊\n4. 禁止違反法律法規或違反公共秩序和道德的行為\n5. 任何資訊均以CWA中央氣象署發布資訊為準"),
                           ],
                         ),
                       ),
@@ -186,7 +186,7 @@ class AboutRts extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start, // 靠左對齊
                   children: [
                     Text(
-                      "1. 通過使用服務，用戶被視為已同意使用條款",
+                      "1. 透過使用服務，用戶被視為已同意使用條款",
                       style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                     ),
                   ],
