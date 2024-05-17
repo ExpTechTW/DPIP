@@ -40,9 +40,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 ),
               ),
               style: TextStyle(
-                color: CupertinoTheme.of(context).brightness == Brightness.light
-                    ? CupertinoColors.black
-                    : CupertinoColors.white,
+                color: CupertinoColors.label.resolveFrom(context),
                 fontSize: 13,
               ),
             ),

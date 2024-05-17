@@ -95,15 +95,15 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
+                  (context, index) {
                     return EarthquakeReportListTile(report: reports[index]);
                   },
                   childCount: reports.length,
                 ),
               ),
-              SliverToBoxAdapter(
-                child: showRetryButton
-                    ? Center(
+              if (showRetryButton)
+                SliverToBoxAdapter(
+                    child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -119,9 +119,7 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                       )
                     ],
                   ),
-                )
-                    : const SizedBox(),
-              ),
+                )),
             ],
           ),
         ),
