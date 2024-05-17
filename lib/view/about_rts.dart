@@ -85,8 +85,31 @@ class AboutRts extends StatelessWidget {
                         child: ListView(
                           padding: const EdgeInsets.all(16),
                           children: const [
+                            Text("地震發生時因 干涉 或 疊加 會產生 P波 S波 兩種震動波，P波(上下) 傳遞速度較快 破壞力較小，S波(前後左右) 傳遞速度較慢 破壞力大 通常是導致災害的的關鍵"),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ));
+              },
+            ),
+            CupertinoListTile(
+              title: const Text("TOS服務條款"),
+              trailing: const CupertinoListTileChevron(),
+              onTap: () {
+                Navigator.push(context, CupertinoPageRoute(
+                  builder: (context) {
+                    return CupertinoPageScaffold(
+                      navigationBar: const CupertinoNavigationBar(
+                        middle: Text("TOS服務條款"),
+                      ),
+                      child: SafeArea(
+                        child: ListView(
+                          padding: const EdgeInsets.all(16),
+                          children: const [
                             Text(
-                                "地震發生時因 干涉 或 疊加 會產生 P波 S波 兩種震動波，P波(上下) 傳遞速度較快 破壞力較小，S波(前後左右) 傳遞速度較慢 破壞力大 通常是導致災害的的關鍵"),
+                                "1. 通過使用服務，用戶被視為已同意使用條款\n2. 禁止未經允許的再分發\n3. 禁止轉售，TREM提供之資訊\n4. 禁止違反法律法規或違反公共秩序和道德的行為\n5. 任何資訊均以CWA中央氣象署發布資訊為準"),
                           ],
                         ),
                       ),
@@ -163,7 +186,7 @@ class AboutRts extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start, // 靠左對齊
                   children: [
                     Text(
-                      "1.通過使用服務，用戶被視為已同意使用條款",
+                      "1. 通過使用服務，用戶被視為已同意使用條款",
                       style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                     ),
                   ],
@@ -172,7 +195,7 @@ class AboutRts extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      "2.禁止未經允許的再分發",
+                      "2. 禁止未經允許的再分發",
                       style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                     ),
                   ],
