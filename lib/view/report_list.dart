@@ -83,23 +83,27 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
 
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(
-          middle: const Text("地震報告"),
-          trailing: Visibility(
-            visible: reports.isNotEmpty,
-            child: CupertinoButton(
-              padding: EdgeInsets.zero,
-              child: refreshing ? const CupertinoActivityIndicator() : const Icon(CupertinoIcons.refresh),
-              onPressed: () {
-                if (refreshing) return;
-                refreshReports();
-              },
-            ),
-          ),
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text("地震報告"),
         ),
         child: SafeArea(
-          child: showRetryButton
-              ? Center(
+          child: CustomScrollView(
+            controller: _controller,
+            slivers: [
+              CupertinoSliverRefreshControl(
+                onRefresh: refreshReports,
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return EarthquakeReportListTile(report: reports[index]);
+                  },
+                  childCount: reports.length,
+                ),
+              ),
+              if (showRetryButton)
+                SliverToBoxAdapter(
+                    child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -108,7 +112,6 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                         child: const Text("再試一次"),
                         onPressed: () {
                           refreshReports();
-
                           setState(() {
                             showRetryButton = false;
                           });
@@ -116,25 +119,9 @@ class _ReportListState extends State<ReportList> with AutomaticKeepAliveClientMi
                       )
                     ],
                   ),
-                )
-              : reports.isNotEmpty
-                  /*
-            RefreshIndicator.adaptive(
-                onRefresh: refreshReports,
-                child: ListView.builder(
-                  itemCount: reports.length,
-                  itemBuilder: (context, index) {
-                    return EarthquakeReportListTile(report: reports[index]);
-                  },
-                ),
-              )*/
-                  ? ListView.builder(
-                      itemCount: reports.length,
-                      itemBuilder: (context, index) {
-                        return EarthquakeReportListTile(report: reports[index]);
-                      },
-                    )
-                  : const Center(child: CupertinoActivityIndicator()),
+                )),
+            ],
+          ),
         ),
       );
     } else {

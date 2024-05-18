@@ -29,15 +29,28 @@ class EarthquakeReportListTile extends StatelessWidget {
               : CupertinoColors.secondaryLabel.resolveFrom(context),
         ),
         title: Text(report.getLocation()),
-        subtitle: Text(
-          "${DateFormat("yyyy/MM/dd HH:mm:ss").format(
-            TZDateTime.fromMillisecondsSinceEpoch(
-              getLocation("Asia/Taipei"),
-              report.time,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                TZDateTime.fromMillisecondsSinceEpoch(
+                  getLocation("Asia/Taipei"),
+                  report.time,
+                ),
+              ),
+              style: TextStyle(
+                color: CupertinoColors.label.resolveFrom(context),
+                fontSize: 13,
+              ),
             ),
-          )}\n規模 ${report.mag}  深度 ${report.depth} km",
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
+            Text(
+              "深度 ${report.depth} km",
+              style: const TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
         additionalInfo: Row(
           children: [
@@ -99,7 +112,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               getLocation("Asia/Taipei"),
               report.time,
             ),
-          )}\n規模 ${report.mag}  深度 ${report.depth} km",
+          )}\n深度 ${report.depth} km",
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
