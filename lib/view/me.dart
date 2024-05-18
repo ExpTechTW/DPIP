@@ -334,7 +334,7 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       CupertinoListTile(
-                        leading: const Icon(SimpleIcons.githubsponsors),
+                        leading: const Icon(Icons.pending),
                         title: const Text("服務條款"),
                         onTap: () {
                           launchUrl(
