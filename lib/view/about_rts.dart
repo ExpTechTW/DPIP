@@ -11,7 +11,6 @@ class AboutRts extends StatefulWidget {
   _AboutRtsState createState() => _AboutRtsState();
 }
 
-
 class _AboutRtsState extends State<AboutRts> {
   bool isExpanded1 = false;
   bool isExpanded2 = false;
@@ -29,7 +28,11 @@ class _AboutRtsState extends State<AboutRts> {
           children: [
             CupertinoListTile(
               title: const Text("什麼是強震監視器？"),
-              trailing: const Icon(CupertinoIcons.right_chevron),
+              trailing: AnimatedRotation(
+                turns: isExpanded1 ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: const Icon(CupertinoIcons.right_chevron),
+              ),
               onTap: () {
                 setState(() {
                   isExpanded1 = !isExpanded1;
@@ -56,9 +59,14 @@ class _AboutRtsState extends State<AboutRts> {
                 ),
               ),
             ),
+            const Divider(),
             CupertinoListTile(
               title: const Text("關於 TREM-Net"),
-              trailing: const Icon(CupertinoIcons.right_chevron),
+              trailing: AnimatedRotation(
+                turns: isExpanded2 ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: const Icon(CupertinoIcons.right_chevron),
+              ),
               onTap: () {
                 setState(() {
                   isExpanded2 = !isExpanded2;
@@ -78,9 +86,14 @@ class _AboutRtsState extends State<AboutRts> {
                 ),
               ),
             ),
+            const Divider(),
             CupertinoListTile(
-              title: const Text("什麼是P波與S波?又分別是代表什麼?"),
-              trailing: const Icon(CupertinoIcons.right_chevron),
+              title: const Text("什麼是P波與S波？又分別是代表什麼？"),
+              trailing: AnimatedRotation(
+                turns: isExpanded3 ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: const Icon(CupertinoIcons.right_chevron),
+              ),
               onTap: () {
                 setState(() {
                   isExpanded3 = !isExpanded3;
@@ -96,9 +109,14 @@ class _AboutRtsState extends State<AboutRts> {
                 ),
               ),
             ),
+            const Divider(),
             CupertinoListTile(
               title: const Text("TOS服務條款"),
-              trailing: const Icon(CupertinoIcons.right_chevron),
+              trailing: AnimatedRotation(
+                turns: isExpanded4 ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: const Icon(CupertinoIcons.right_chevron),
+              ),
               onTap: () {
                 setState(() {
                   isExpanded4 = !isExpanded4;
