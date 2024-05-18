@@ -77,12 +77,8 @@ class _AboutRtsState extends State<AboutRts> {
               visible: isExpanded2,
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        "2022 年 6 月初開始於全臺各地部署站點， TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"),
-                  ],
+                child: Text(
+                  ("2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"),
                 ),
               ),
             ),
@@ -105,30 +101,8 @@ class _AboutRtsState extends State<AboutRts> {
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
-                  ("地震發生時因 干涉 或 疊加 會產生 P波 S波 兩種震動波，P波(上下) 傳遞速度較快 破壞力較小，S波(前後左右) 傳遞速度較慢 破壞力大 通常是導致災害的的關鍵"),
+                  ("地震發生時因干涉或疊加會產生P波、S波兩種震動波，P波(上下)傳遞速度較快破壞力較小，S波(前後左右) 傳遞速度較慢破壞力大通常是導致災害的的關鍵。"),
                 ),
-              ),
-            ),
-            const Divider(),
-            CupertinoListTile(
-              title: const Text("TOS服務條款"),
-              trailing: AnimatedRotation(
-                turns: isExpanded4 ? 0.25 : 0,
-                duration: const Duration(milliseconds: 200),
-                child: const Icon(CupertinoIcons.right_chevron),
-              ),
-              onTap: () {
-                setState(() {
-                  isExpanded4 = !isExpanded4;
-                });
-              },
-            ),
-            Visibility(
-              visible: isExpanded4,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                    "1. 透過使用服務，用戶被視為已同意使用條款\n2. 禁止未經允許的再分發\n3. 禁止轉售，TREM提供之資訊\n4. 禁止違反法律法規或違反公共秩序和道德的行為\n5. 任何資訊均以CWA中央氣象署發布資訊為準"),
               ),
             ),
           ],
@@ -186,7 +160,7 @@ class _AboutRtsState extends State<AboutRts> {
               childrenPadding: const EdgeInsets.all(16),
               children: [
                 Text(
-                  "地震發生時因干涉或疊加會產生P波、S波 兩種震動波，P波(上下) 傳遞速度較快破壞力較小，S波(前後左右)傳遞速度較慢破壞力大通常是導致災害的的關鍵。",
+                  "地震發生時因干涉或疊加會產生P波、S波兩種震動波，P波(上下) 傳遞速度較快破壞力較小，S波(前後左右)傳遞速度較慢破壞力大通常是導致災害的的關鍵。",
                   style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                 ),
               ],

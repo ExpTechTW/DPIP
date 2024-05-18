@@ -380,6 +380,15 @@ class _MePageState extends State<MePage> {
                           );
                         },
                       ),
+                      CupertinoListTile(
+                        leading: const Icon(SimpleIcons.githubsponsors),
+                        title: const Text("服務條款"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://exptech.com.tw/tos"),
+                          );
+                        },
+                      ),
                     ],
                   ),
                   CupertinoListSection(
@@ -688,7 +697,7 @@ class _MePageState extends State<MePage> {
                   ),
                   ListTile(
                     leading: const Icon(Icons.pending),
-                    title: const Text("我們的服務條款"),
+                    title: const Text("服務條款"),
                     onTap: () {
                       launchUrl(
                         Uri.parse("https://exptech.com.tw/tos"),
