@@ -182,7 +182,7 @@ class _AboutRtsState extends State<AboutRts> {
               ],
             ),
             ExpansionTile(
-              title: const Text("什麼是P波與S波?又分別是代表什麼?"),
+              title: const Text("什麼是P波與S波？又分別是代表什麼？"),
               childrenPadding: const EdgeInsets.all(16),
               children: [
                 Text(
