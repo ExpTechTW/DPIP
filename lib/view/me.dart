@@ -686,6 +686,22 @@ class _MePageState extends State<MePage> {
                       );
                     },
                   ),
+                  ListTile(
+                    leading: const Icon(Icons.pending),
+                    title: const Text("我們的服務條款"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://exptech.com.tw/tos"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://exptech.com.tw/tos",
+                        ),
+                      );
+                    },
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
                     child: Text(
