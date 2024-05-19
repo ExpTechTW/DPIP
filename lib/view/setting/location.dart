@@ -47,20 +47,16 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> openLocationSettings() async {
-    // Platform-specific URLs for opening location settings
     const urlAndroid = 'package:com.android.settings';
     const urlIOS = 'app-settings:';
 
-    // Determine platform and open settings accordingly
     if (Platform.isAndroid) {
-      // For Android, open app settings
       if (await canLaunchUrl(Uri.parse(urlAndroid))) {
         await launchUrl(Uri.parse(urlAndroid));
       } else {
         throw 'Could not launch $urlAndroid';
       }
     } else if (Platform.isIOS) {
-      // For iOS, open app settings
       if (await canLaunchUrl(Uri.parse(urlIOS))) {
         await launchUrl(Uri.parse(urlIOS));
       } else {
@@ -190,11 +186,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             ListTile(
               title: const Text("自動設定"),
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
-              trailing: Switch(
-                value: isLocationAutoSetEnabled,
-                onChanged: toggleLocationAutoSet,
-              ),
-              enabled: false,
+              onTap: () {
+                openLocationSettings();
+              },
             ),
             ListTile(
               title: const Text('縣市'),
