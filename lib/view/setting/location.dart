@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -105,6 +106,20 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks.first;
+        String? city = placemark.subAdministrativeArea;
+        String? town = placemark.locality;
+
+        setState(() {
+          currentCity = city;
+          currentTown = town;
+        });
+        await Global.preference.setString("loc-city", currentCity!);
+        await Global.preference.setString("loc-town", currentTown!);
+      }
+
       setState(() {
         currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
       });
