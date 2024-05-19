@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
+import 'package:dpip/view/about_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +13,7 @@ class AboutRts extends StatefulWidget {
 }
 
 class _AboutRtsState extends State<AboutRts> {
-  bool isExpanded1 = false;
-  bool isExpanded2 = false;
-  bool isExpanded3 = false;
-  bool isExpanded4 = false;
+  final RtsState rtsState = RtsState();
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +27,18 @@ class _AboutRtsState extends State<AboutRts> {
             CupertinoListTile(
               title: const Text("什麼是強震監視器？"),
               trailing: AnimatedRotation(
-                turns: isExpanded1 ? 0.25 : 0,
+                turns: rtsState.isExpanded1 ? 0.25 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: const Icon(CupertinoIcons.right_chevron),
               ),
               onTap: () {
                 setState(() {
-                  isExpanded1 = !isExpanded1;
+                  rtsState.toggleExpansion(1);
                 });
               },
             ),
             Visibility(
-              visible: isExpanded1,
+              visible: rtsState.isExpanded1,
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
@@ -63,18 +61,18 @@ class _AboutRtsState extends State<AboutRts> {
             CupertinoListTile(
               title: const Text("關於 TREM-Net"),
               trailing: AnimatedRotation(
-                turns: isExpanded2 ? 0.25 : 0,
+                turns: rtsState.isExpanded2 ? 0.25 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: const Icon(CupertinoIcons.right_chevron),
               ),
               onTap: () {
                 setState(() {
-                  isExpanded2 = !isExpanded2;
+                  rtsState.toggleExpansion(2);
                 });
               },
             ),
             Visibility(
-              visible: isExpanded2,
+              visible: rtsState.isExpanded2,
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
@@ -86,18 +84,18 @@ class _AboutRtsState extends State<AboutRts> {
             CupertinoListTile(
               title: const Text("什麼是P波與S波？又分別是代表什麼？"),
               trailing: AnimatedRotation(
-                turns: isExpanded3 ? 0.25 : 0,
+                turns: rtsState.isExpanded3 ? 0.25 : 0,
                 duration: const Duration(milliseconds: 200),
                 child: const Icon(CupertinoIcons.right_chevron),
               ),
               onTap: () {
                 setState(() {
-                  isExpanded3 = !isExpanded3;
+                  rtsState.toggleExpansion(3);
                 });
               },
             ),
             Visibility(
-              visible: isExpanded3,
+              visible: rtsState.isExpanded3,
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
