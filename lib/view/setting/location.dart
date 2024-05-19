@@ -47,6 +47,19 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
   }
 
+  Future<void> setTownLocation(String? value) async {
+    if (value == null) return;
+
+    setState(() {
+      if (currentTown != null) {
+        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+      }
+      currentTown = value;
+      Global.preference.setString("loc-town", currentTown!);
+      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+    });
+  }
+
   Future<void> openLocationSettings() async {
     const urlAndroid = 'package:com.android.settings';
     const urlIOS = 'app-settings:';
@@ -64,19 +77,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         throw 'Could not launch $urlIOS';
       }
     }
-  }
-
-  Future<void> setTownLocation(String? value) async {
-    if (value == null) return;
-
-    setState(() {
-      if (currentTown != null) {
-        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
-      currentTown = value;
-      Global.preference.setString("loc-town", currentTown!);
-      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-    });
   }
 
   @override
