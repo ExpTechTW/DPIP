@@ -7,6 +7,7 @@ import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationSettingsPage extends StatefulWidget {
@@ -45,6 +46,29 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
   }
 
+  Future<void> openLocationSettings() async {
+    // Platform-specific URLs for opening location settings
+    const urlAndroid = 'package:com.android.settings';
+    const urlIOS = 'app-settings:';
+
+    // Determine platform and open settings accordingly
+    if (Platform.isAndroid) {
+      // For Android, open app settings
+      if (await canLaunchUrl(Uri.parse(urlAndroid))) {
+        await launchUrl(Uri.parse(urlAndroid));
+      } else {
+        throw 'Could not launch $urlAndroid';
+      }
+    } else if (Platform.isIOS) {
+      // For iOS, open app settings
+      if (await canLaunchUrl(Uri.parse(urlIOS))) {
+        await launchUrl(Uri.parse(urlIOS));
+      } else {
+        throw 'Could not launch $urlIOS';
+      }
+    }
+  }
+
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
 
@@ -61,26 +85,46 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   @override
   void initState() {
     super.initState();
+    checkLocationPermissionAndSyncSwitchState();
     getLocation();
+  }
+
+  Future<void> checkLocationPermissionAndSyncSwitchState() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    bool isEnabled = permission == LocationPermission.whileInUse || permission == LocationPermission.always;
+    setState(() {
+      isLocationAutoSetEnabled = isEnabled;
+    });
   }
 
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) return;
     try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return;
+        }
+      }
+
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
       setState(() {
         currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
       });
     } catch (e) {
-      print('Could not get location: $e');
+      print('無法取得位置: $e');
     }
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
     setState(() {
       isLocationAutoSetEnabled = value;
-      getLocation();
+      if (isLocationAutoSetEnabled) {
+        getLocation();
+      }
     });
+    await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
 
   @override
@@ -95,17 +139,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               CupertinoListTile(
                 title: const Text("自動設定"),
                 subtitle: const Text("使用手機定位自動設定所在地"),
-                trailing: CupertinoSwitch(
-                  value: isLocationAutoSetEnabled,
-                  onChanged: toggleLocationAutoSet,
-                ),
                 onTap: () {
-                  setState(() {
-                    isLocationAutoSetEnabled = !isLocationAutoSetEnabled;
-                    if (isLocationAutoSetEnabled) {
-                      getLocation();
-                    }
-                  });
+                  openLocationSettings();
                 },
               ),
               CupertinoListSection(
