@@ -24,6 +24,15 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentLocation;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
+  @override
+  void initState() {
+    super.initState();
+    checkLocationPermissionAndSyncSwitchState();
+    if (isLocationAutoSetEnabled) {
+      getLocation();
+    }
+  }
+
   Future<void> setCityLocation(String? value) async {
     if (value == null) return;
     // unsubscribe old location topic
@@ -36,7 +45,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
     setState(() {
       currentCity = value;
-      currentTown = Global.region[value]!.keys.first;
+      currentTown = Global.region[value]?.keys.first;
     });
 
     await Global.preference.setString("loc-city", currentCity!);
@@ -50,21 +59,16 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
 
-    setState(() {
-      if (currentTown != null) {
-        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
-      currentTown = value;
-      Global.preference.setString("loc-town", currentTown!);
-      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
-    });
-  }
+    if (currentTown != null) {
+      await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+    }
 
-  @override
-  void initState() {
-    super.initState();
-    checkLocationPermissionAndSyncSwitchState();
-    getLocation();
+    setState(() {
+      currentTown = value;
+    });
+
+    await Global.preference.setString("loc-town", currentTown!);
+    await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
   }
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
@@ -90,6 +94,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       setState(() {
         currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
       });
+
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
