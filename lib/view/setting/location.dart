@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/main.dart';
+import 'package:dpip/view/setting/location_utils.dart';
 import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -60,25 +60,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     });
   }
 
-  Future<void> openLocationSettings() async {
-    const urlAndroid = 'package:com.android.settings';
-    const urlIOS = 'app-settings:';
-
-    if (Platform.isAndroid) {
-      if (await canLaunchUrl(Uri.parse(urlAndroid))) {
-        await launchUrl(Uri.parse(urlAndroid));
-      } else {
-        throw 'Could not launch $urlAndroid';
-      }
-    } else if (Platform.isIOS) {
-      if (await canLaunchUrl(Uri.parse(urlIOS))) {
-        await launchUrl(Uri.parse(urlIOS));
-      } else {
-        throw 'Could not launch $urlIOS';
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -106,6 +87,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      setState(() {
+        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+      });
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
@@ -119,10 +103,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         await Global.preference.setString("loc-city", currentCity!);
         await Global.preference.setString("loc-town", currentTown!);
       }
-
-      setState(() {
-        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
-      });
     } catch (e) {
       print('無法取得位置: $e');
     }
