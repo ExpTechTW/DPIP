@@ -59,7 +59,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   String? town = Global.preference.getString("loc-town");
 
   bool loading = true;
-  Widget? stack;
 
   void ntp() async {
     var ans = await get("https://lb-${randomNum(4)}.exptech.com.tw/ntp");
@@ -269,21 +268,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                     style: TextStyle(fontSize: 14),
                   ),
                 ),
-                Flexible(
-                  flex: 1,
-                  fit: FlexFit.tight,
-                  child: stack != null
-                      ? ClipRRect(
-                          child: InteractiveViewer(
-                            clipBehavior: Clip.none,
-                            maxScale: 10,
-                            child: stack!,
-                          ),
-                        )
-                      : const Center(
-                          child: CupertinoActivityIndicator(),
-                        ),
-                ),
+                Flexible(child: flutterMap),
                 if (eewList.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.all(12),
