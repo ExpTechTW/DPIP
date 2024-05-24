@@ -231,7 +231,6 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
           child: const Icon(Icons.my_location, color: Colors.blue, size: 30),
         ),
       );
-      mapController.move(LatLng(report.lat, report.lon), mapController.camera.zoom);
     });
     rebuildFlutterMap();
   }
