@@ -8,6 +8,7 @@ import 'package:dpip/model/eew.dart';
 import 'package:dpip/model/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/util/extension.dart';
+import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/view/about_rts.dart';
 import 'package:flutter/cupertino.dart';
@@ -186,20 +187,42 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
     List<Marker> rtsMarkers = [];
 
     if (stations != null) {
-      stations!.forEach((key, value) {
-        value.info[0].lat;
+      final stationList = stations!.entries.toList();
+
+      if (rts != null) {
+        stationList.sort((a, b) {
+          final rtsA = rts!.station[a.key];
+          final rtsB = rts!.station[b.key];
+
+          if (rtsA == null) {
+            return -1;
+          }
+
+          if (rtsB == null) {
+            return 1;
+          }
+
+          return (rtsA.i - rtsB.i).sign.toInt();
+        });
+      }
+
+      for (var MapEntry(key: key, value: value) in stationList) {
         rtsMarkers.add(Marker(
           height: 8,
           width: 8,
           point: LatLng(value.info[0].lat, value.info[0].lon),
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.lightBlue,
+              color: rts != null ? InstrumentalIntensityColor.i(rts!.station[key]?.i) : Colors.transparent,
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.6),
+                strokeAlign: BorderSide.strokeAlignOutside,
+              ),
             ),
           ),
         ));
-      });
+      }
     }
 
     final flutterMap = FlutterMap(
