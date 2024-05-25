@@ -332,7 +332,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                         height: 50,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12.0),
-                                          color: context.colors.intensity(eewList.first.eq.max),
+                                          color: IntensityColor.intensity(eewList.first.eq.max),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -340,7 +340,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                             style: TextStyle(
                                               fontSize: 36,
                                               fontWeight: FontWeight.bold,
-                                              color: context.colors.onIntensity(eewList.first.eq.max),
+                                              color: IntensityColor.onIntensity(eewList.first.eq.max),
                                             ),
                                           ),
                                         ),
@@ -417,7 +417,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                         height: 58,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12.0),
-                                          color: context.colors.intensity(userIntensity),
+                                          color: IntensityColor.intensity(userIntensity),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -425,7 +425,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                             style: TextStyle(
                                               fontSize: 42,
                                               fontWeight: FontWeight.bold,
-                                              color: context.colors.onIntensity(userIntensity),
+                                              color: IntensityColor.onIntensity(userIntensity),
                                             ),
                                           ),
                                         ),
@@ -599,7 +599,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                         height: 52,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12.0),
-                                          color: context.colors.intensity(eewList.first.eq.max),
+                                          color: IntensityColor.intensity(eewList.first.eq.max),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -607,7 +607,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                             style: TextStyle(
                                               fontSize: 36,
                                               fontWeight: FontWeight.bold,
-                                              color: context.colors.onIntensity(eewList.first.eq.max),
+                                              color: IntensityColor.onIntensity(eewList.first.eq.max),
                                             ),
                                           ),
                                         ),
@@ -682,7 +682,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                         height: 58,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(12.0),
-                                          color: context.colors.intensity(userIntensity),
+                                          color: IntensityColor.intensity(userIntensity),
                                         ),
                                         child: Center(
                                           child: Text(
@@ -690,7 +690,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                                             style: TextStyle(
                                               fontSize: 42,
                                               fontWeight: FontWeight.bold,
-                                              color: context.colors.onIntensity(userIntensity),
+                                              color: IntensityColor.onIntensity(userIntensity),
                                             ),
                                           ),
                                         ),
