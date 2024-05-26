@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+import 'home_page.dart';
 import 'me.dart';
 
 class InitPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _InitPageState extends State<InitPage> {
   int currentPageIndex = 0;
   late PageController _pageController;
   List<Widget> bodyPages = [
-    // const HomePage(),
+    const HomePage(),
     // const HistoryPage(),
     const EarthquakePage(),
     const ReportList(),
@@ -177,6 +178,11 @@ class _InitPageState extends State<InitPage> {
             //     icon: Icon(Icons.home_outlined), label: '首頁'),
             // NavigationDestination(
             //     icon: Icon(Icons.history_outlined), label: '歷史'),
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: '首頁',
+            ),
             NavigationDestination(
               icon: Icon(Icons.heart_broken_outlined),
               selectedIcon: Icon(Icons.heart_broken),

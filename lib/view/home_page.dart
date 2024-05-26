@@ -1,0 +1,203 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePage();
+}
+
+class Areas {
+  static List<String> getOptions() {
+    return ['萬榮鄉', '壽豐鄉', '花蓮市']; // 鄉鎮列表
+  }
+}
+
+class Cal {
+  double percentToPixel(double percent, BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return percent / 100 * screenWidth;
+  }
+}
+
+class _HomePage extends State<HomePage> {
+  late String _selectedArea;
+  double precip = 10.0; // 降水量
+  int humidity = 99; // 濕度
+  double feelslike = 27.9; // 體感
+  double temp = 26.4; // 氣溫
+  List temp_ = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedArea = Areas.getOptions().first; // 初始化時設定_selectedValue為列表的第一項
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Cal calculator = Cal(); // 創建 Cal 類的一個實例
+    temp_ = temp.toString().split(".");
+    if (Platform.isIOS) {
+      return const SafeArea(
+        child: Scaffold(
+          body: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "首頁",
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Color(0xFFFF9000),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                const Text(
+                  "首頁",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                DropdownButton<String>(
+                  value: _selectedArea, // 當前選中的值
+                  icon: const Icon(Icons.navigate_next), // 下拉箭頭圖標
+                  onChanged: (String? newArea) {
+                    setState(() {
+                      _selectedArea = newArea!;
+                    });
+                  },
+                  items: Areas.getOptions().map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(1.0),
+              child: Container(
+                color: Colors.white,
+                height: 2,
+              ),
+            ),
+          ),
+          body: SizedBox(
+            height: calculator.percentToPixel(60, context),
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Column(
+                  children: [
+                    SizedBox(height: calculator.percentToPixel(45, context)),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: Container(
+                        height: 30, //
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.transparent,
+                              Color(0xFFFFAA00),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    SizedBox(height: calculator.percentToPixel(3, context)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(width: calculator.percentToPixel(5, context)),
+                        Icon(
+                          Icons.cloud_outlined,
+                          size: calculator.percentToPixel(35, context),
+                        ),
+                        SizedBox(width: calculator.percentToPixel(10, context)),
+                        SizedBox(
+                          width: calculator.percentToPixel(45, context),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("降水量", style: TextStyle(fontSize: 20)),
+                                  Text("$precip mm", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("濕度", style: TextStyle(fontSize: 20)),
+                                  Text("$humidity %",
+                                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("體感", style: TextStyle(fontSize: 20)),
+                                  Text("$feelslike ℃",
+                                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(temp_[0],
+                                      style:
+                                          const TextStyle(fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5)),
+                                  Column(
+                                    children: [
+                                      Text("℃", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                      Text("." + temp_[1],
+                                          style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900)),
+                                      SizedBox(height: calculator.percentToPixel(4.5, context)),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: calculator.percentToPixel(5, context)),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+  }
+}
