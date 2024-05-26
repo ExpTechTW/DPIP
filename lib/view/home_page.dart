@@ -105,28 +105,24 @@ class _HomePage extends State<HomePage> {
             child: Stack(
               alignment: Alignment.bottomCenter,
               children: [
-                Column(
-                  children: [
-                    SizedBox(height: calculator.percentToPixel(45, context)),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      left: 0,
-                      child: Container(
-                        height: 30, //
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.transparent,
-                              Color(0xFFFFAA00),
-                            ],
-                          ),
-                        ),
+                SizedBox(height: calculator.percentToPixel(45, context)),
+                Positioned(
+                  bottom: calculator.percentToPixel(8, context),
+                  right: 0,
+                  left: 0,
+                  child: Container(
+                    height: 30, //
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.transparent,
+                          Color(0xFFFFAA00),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
                 Column(
                   children: [
@@ -177,7 +173,7 @@ class _HomePage extends State<HomePage> {
                                           const TextStyle(fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5)),
                                   Column(
                                     children: [
-                                      Text("℃", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                      const Text("℃", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                                       Text("." + temp_[1],
                                           style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900)),
                                       SizedBox(height: calculator.percentToPixel(4.5, context)),
