@@ -130,8 +130,11 @@ class _InitPageState extends State<InitPage> {
         tabBar: CupertinoTabBar(
           currentIndex: currentPageIndex,
           items: const <BottomNavigationBarItem>[
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.home_outlined), label: '首頁'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: '首頁',
+            ),
             // BottomNavigationBarItem(
             //     icon: Icon(Icons.history_outlined), label: '歷史'),
             BottomNavigationBarItem(
@@ -174,8 +177,6 @@ class _InitPageState extends State<InitPage> {
             });
           },
           destinations: const <NavigationDestination>[
-            // NavigationDestination(
-            //     icon: Icon(Icons.home_outlined), label: '首頁'),
             // NavigationDestination(
             //     icon: Icon(Icons.history_outlined), label: '歷史'),
             NavigationDestination(
