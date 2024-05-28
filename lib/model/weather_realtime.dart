@@ -70,4 +70,8 @@ class weatherRealtime {
     required this.isday,
     required this.air,
   });
+
+  factory weatherRealtime.fromJson(Map<String, dynamic> json) => _$weatherRealtimeFromJson(json);
+
+  Map<String, dynamic> toJson() => _$weatherRealtimeToJson(this);
 }
