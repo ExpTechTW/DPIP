@@ -145,7 +145,7 @@ class _AboutRtsState extends State<AboutRts> {
               child: GestureDetector(
                 onTap: () {
                   launchUrl(
-                    Uri.parse('https://example.com/terms_of_service'),
+                    Uri.parse('https://exptech.com.tw/tos'),
                   );
                 },// 在這裡添加導航到網站的操作
                 child: Text(
