@@ -64,6 +64,38 @@ class ExpTechApi {
     }
   }
 
+  Future<List<String>> getWeatherRealtime(String code) async {
+    final response =
+        await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v1/weather/realtime/$code'));
+
+    if (response.statusCode == 200) {
+      return List<String>.from(jsonDecode(response.body) as List);
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
+  Future<List<String>> getWeatherForecast(String code) async {
+    final response =
+        await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v1/weather/forecast/$code'));
+
+    if (response.statusCode == 200) {
+      return List<String>.from(jsonDecode(response.body) as List);
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
+  Future<List<String>> getWeatherAll(String code) async {
+    final response = await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v1/weather/all/$code'));
+
+    if (response.statusCode == 200) {
+      return List<String>.from(jsonDecode(response.body) as List);
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
   Future<List<Eew>> getEew(EewSource source) async {
     final response =
         await http.get(Uri.parse('https://lb-${randomNum(4)}.exptech.com.tw/api/v1/eq/eew?type=${source.name}'));
