@@ -4,6 +4,7 @@ import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/about_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutRts extends StatefulWidget {
   const AboutRts({super.key});
@@ -141,9 +142,16 @@ class _AboutRtsState extends State<AboutRts> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
-              child: Text(
-                "更多資訊請參閱服務條款",
-                style: TextStyle(color: context.colors.onSurfaceVariant),
+              child: GestureDetector(
+                onTap: () {
+                  launchUrl(
+                    Uri.parse('https://example.com/terms_of_service'),
+                  );
+                },// 在這裡添加導航到網站的操作
+                child: Text(
+                  "更多資訊請參閱服務條款",
+                  style: TextStyle(color: context.colors.onSurfaceVariant, decoration: TextDecoration.underline,),
+                ),
               ),
             ),
           ],
