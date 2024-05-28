@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dpip/view/report_list.dart';
 import 'package:dpip/view/weather_warning.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -234,13 +235,13 @@ class _HomePage extends State<HomePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      left: calculator.percentToPixel(5, context), right: calculator.percentToPixel(5, context)),
+                      left: calculator.percentToPixel(5, context), right: calculator.percentToPixel(2, context)),
                   child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             "天氣警特報",
                             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
@@ -253,20 +254,44 @@ class _HomePage extends State<HomePage> {
                                   ),
                                 );
                               },
-                              child: Text(
-                                "詳細資訊",
-                                style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                              ))
+                              child: const Row(children: [
+                                Text(
+                                  "詳細資訊",
+                                  style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                ),
+                                Icon(
+                                  Icons.navigate_next,
+                                  color: Color(0xfff9f9f9),
+                                ),
+                              ]))
                         ],
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             "地震資訊",
                             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
-                          Text("詳細資訊")
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ReportList(),
+                                  ),
+                                );
+                              },
+                              child: const Row(children: [
+                                Text(
+                                  "詳細資訊",
+                                  style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                ),
+                                Icon(
+                                  Icons.navigate_next,
+                                  color: Color(0xfff9f9f9),
+                                ),
+                              ]))
                         ],
                       )
                     ],
