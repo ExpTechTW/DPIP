@@ -65,6 +65,7 @@ class _AboutRtsState extends State<AboutRts> {
         appBar: AppBar(
           title: const Text("幫助"),
         ),
+
         body: ListView(
           children: [
             ExpansionTile(
@@ -116,6 +117,13 @@ class _AboutRtsState extends State<AboutRts> {
                   style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+              child: Text(
+                "更多資訊請參閱服務條款",
+                style: TextStyle(color: context.colors.onSurfaceVariant),
+              ),
             ),
           ],
         ),
