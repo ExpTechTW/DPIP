@@ -14,6 +14,7 @@ class weatherAir {
   final double o3;
 
   /// 空氣pm2.5
+  @JsonKey(name: 'pm2.5')
   final double pm25;
 
   /// 空氣pm10
@@ -23,9 +24,11 @@ class weatherAir {
   final double so2;
 
   /// 空氣
+  @JsonKey(name: 'gb-defra-index')
   final double gbdefraindex;
 
   /// 空氣
+  @JsonKey(name: 'us-epa-index')
   final double usepaindex;
 
   const weatherAir({

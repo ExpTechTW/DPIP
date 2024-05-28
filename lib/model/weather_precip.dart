@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'weather_precip.g.dart';
@@ -5,13 +7,14 @@ part 'weather_precip.g.dart';
 @JsonSerializable()
 class weatherPrecip {
   /// 降水
-  final double precipmm;
+  final double mm;
 
   /// 降水
+  @JsonKey(name: 'in')
   final double precipin;
 
   const weatherPrecip({
-    required this.precipmm,
+    required this.mm,
     required this.precipin,
   });
 

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:dpip/model/weather_air.dart';
 import 'package:dpip/model/weather_feel.dart';
 import 'package:dpip/model/weather_gust.dart';
@@ -49,6 +51,7 @@ class weatherRealtime {
   final double cloud;
 
   /// 天氣
+  @JsonKey(name: 'is_day')
   final double isday;
 
   /// 空氣
