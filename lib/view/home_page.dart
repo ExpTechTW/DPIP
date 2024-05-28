@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../global.dart';
+import '../model/partial_earthquake_report.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,12 +30,14 @@ class Cal {
 
 class _HomePage extends State<HomePage> {
   late String _selectedArea;
+  List<PartialEarthquakeReport> reports = [];
   var weather = {
     'temp': "-99.9",
     'feel': "-99.9",
     'humidity': "-99.9",
     'precip': "-99.9",
   };
+  List eqReport = [];
   late Cal calculator;
 
   void refreshWeather() async {
@@ -52,11 +55,24 @@ class _HomePage extends State<HomePage> {
     }
   }
 
+  void refreshEqReport() async {
+    try {
+      final eqReportData = await Global.api.getReportList(limit: 2);
+      print(eqReportData[0].id.toString());
+      if (eqReportData is List) {
+        eqReport = eqReportData;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     calculator = Cal(); // 創建 Cal 類的一個實例
     refreshWeather();
+    refreshEqReport();
     _selectedArea = Areas.getOptions().first; // 初始化時設定_selectedValue為列表的第一項
   }
 
@@ -327,15 +343,17 @@ class _HomePage extends State<HomePage> {
                               ]))
                         ],
                       ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "7天內無設定區域震度1以上地震",
-                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                          ),
-                        ],
-                      ),
+                      eqReport.isNotEmpty
+                          ? Row(children: [Text("${eqReport[0].id}")])
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "7天內無設定區域震度1以上地震",
+                                  style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 )
