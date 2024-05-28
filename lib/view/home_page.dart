@@ -29,18 +29,23 @@ class Cal {
 
 class _HomePage extends State<HomePage> {
   late String _selectedArea;
-  var weather;
-  double precip = 10.0; // 降水量
-  int humidity = 99; // 濕度
-  double feelslike = 27.9; // 體感
-  // var temp; // 氣溫
-  List temp_ = [];
+  var weather = {
+    'temp': "-99.9",
+    'feel': "-99.9",
+    'humidity': "-99",
+    'precip': "-99.9",
+  };
   late Cal calculator;
 
   void refreshWeather() async {
     try {
-      weather = await Global.api.getWeatherRealtime("100");
-      print(weather);
+      final weatherData = await Global.api.getWeatherRealtime("100");
+      weather = {
+        'temp': weatherData.temp.c.toString(),
+        'feel': weatherData.feel.c.toString(),
+        'humidity': weatherData.humidity.toString(),
+        'precip': weatherData.precip.mm.toString(),
+      };
       setState(() {});
     } catch (e) {
       print(e);
@@ -170,48 +175,64 @@ class _HomePage extends State<HomePage> {
                                 Icons.cloud_outlined,
                                 size: calculator.percentToPixel(35, context),
                               ),
-                              SizedBox(width: calculator.percentToPixel(10, context)),
+                              SizedBox(width: calculator.percentToPixel(0, context)),
                               SizedBox(
-                                width: calculator.percentToPixel(45, context),
+                                width: calculator.percentToPixel(55, context),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text("降水量", style: TextStyle(fontSize: 20)),
-                                        Text("$precip mm",
-                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text("濕度", style: TextStyle(fontSize: 20)),
-                                        Text("$humidity %",
-                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text("體感", style: TextStyle(fontSize: 20)),
-                                        Text("$feelslike ℃",
-                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                        SizedBox(
+                                          width: calculator.percentToPixel(10, context),
+                                        ),
+                                        SizedBox(
+                                            width: calculator.percentToPixel(45, context),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const Text("降水量", style: TextStyle(fontSize: 20)),
+                                                    Text("${weather["precip"]} mm",
+                                                        style:
+                                                            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const Text("濕度", style: TextStyle(fontSize: 20)),
+                                                    Text("${weather["humidity"]} %",
+                                                        style:
+                                                            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const Text("體感", style: TextStyle(fontSize: 20)),
+                                                    Text("${weather["feel"]} ℃",
+                                                        style:
+                                                            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                              ],
+                                            )),
                                       ],
                                     ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       crossAxisAlignment: CrossAxisAlignment.end,
                                       children: [
-                                        Text("1.1".toString().split(".")[0],
+                                        Text("${weather["temp"]?.split(".")[0]}",
                                             style: const TextStyle(
                                                 fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5)),
                                         Column(
                                           children: [
                                             const Text("℃",
                                                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                                            Text("." + "1.1".toString().split(".")[1],
+                                            Text(".${weather["temp"]?.split(".")[1]}",
                                                 style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900)),
                                             SizedBox(height: calculator.percentToPixel(4.5, context)),
                                           ],
