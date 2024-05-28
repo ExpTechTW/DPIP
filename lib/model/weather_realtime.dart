@@ -13,13 +13,13 @@ part 'weather_realtime.g.dart';
 @JsonSerializable()
 class weatherRealtime {
   /// 天氣更新時間
-  final int update;
+  final double update;
 
   /// 天氣溫度
   final weatherTemp temp;
 
   /// 天氣狀態
-  final int condition;
+  final double condition;
 
   /// 天氣溫度
   final weatherWind wind;
@@ -31,7 +31,7 @@ class weatherRealtime {
   final weatherPrecip precip;
 
   /// 天氣相對溼度
-  final int humidity;
+  final double humidity;
 
   /// 天氣體感溫度
   final weatherFeel feel;
@@ -40,16 +40,16 @@ class weatherRealtime {
   final weatherVis vis;
 
   /// 天氣紫外線
-  final int uv;
+  final double uv;
 
   /// 陣風
   final weatherGust gust;
 
   /// 天氣
-  final int cloud;
+  final double cloud;
 
   /// 天氣
-  final int isday;
+  final double isday;
 
   /// 空氣
   final weatherAir air;

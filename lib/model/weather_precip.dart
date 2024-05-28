@@ -5,15 +5,17 @@ part 'weather_precip.g.dart';
 @JsonSerializable()
 class weatherPrecip {
   /// 降水
-  final int precipmm;
+  final double precipmm;
 
   /// 降水
-  final int precipin;
+  final double precipin;
 
   const weatherPrecip({
     required this.precipmm,
     required this.precipin,
   });
 
-  static fromJson(Map<String, dynamic> json) {}
+  factory weatherPrecip.fromJson(Map<String, dynamic> json) => _$weatherPrecipFromJson(json);
+
+  Map<String, dynamic> toJson() => _$weatherPrecipToJson(this);
 }

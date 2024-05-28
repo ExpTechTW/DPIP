@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:json_annotation/json_annotation.dart';
 
 part 'weather_air.g.dart';
@@ -5,28 +7,28 @@ part 'weather_air.g.dart';
 @JsonSerializable()
 class weatherAir {
   /// 空氣一氧化碳
-  final int co;
+  final double co;
 
   /// 空氣二氧化氮
-  final int no2;
+  final double no2;
 
   /// 空氣臭氧
-  final int o3;
+  final double o3;
 
   /// 空氣pm2.5
-  final int pm25;
+  final double pm25;
 
   /// 空氣pm10
-  final int pm10;
+  final double pm10;
 
   /// 空氣二氧化硫
-  final int so2;
+  final double so2;
 
   /// 空氣
-  final int gbdefraindex;
+  final double gbdefraindex;
 
   /// 空氣
-  final int usepaindex;
+  final double usepaindex;
 
   const weatherAir({
     required this.co,

@@ -5,10 +5,10 @@ part 'weather_feel.g.dart';
 @JsonSerializable()
 class weatherFeel {
   /// 天氣體感溫度攝氏
-  final int c;
+  final double c;
 
   /// 天氣體感溫度華氏
-  final int f;
+  final double f;
 
   const weatherFeel({
     required this.c,

@@ -5,10 +5,10 @@ part 'weather_gust.g.dart';
 @JsonSerializable()
 class weatherGust {
   /// 陣風
-  final int mph;
+  final double mph;
 
   /// 陣風
-  final int kph;
+  final double kph;
 
   const weatherGust({
     required this.mph,

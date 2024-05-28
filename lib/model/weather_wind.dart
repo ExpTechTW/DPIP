@@ -5,13 +5,13 @@ part 'weather_wind.g.dart';
 @JsonSerializable()
 class weatherWind {
   /// mph
-  final int mph;
+  final double mph;
 
   /// kph
-  final int kph;
+  final double kph;
 
   /// 度數
-  final int degree;
+  final double degree;
 
   /// 風向
   final String dir;

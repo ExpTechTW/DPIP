@@ -5,10 +5,10 @@ part 'weather_vis.g.dart';
 @JsonSerializable()
 class weatherVis {
   /// 能見度公里
-  final int km;
+  final double km;
 
   /// 能見度英里
-  final int miles;
+  final double miles;
 
   const weatherVis({
     required this.km,
