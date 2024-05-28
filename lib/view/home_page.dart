@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dpip/view/weather_warning.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -243,7 +244,19 @@ class _HomePage extends State<HomePage> {
                             "天氣警特報",
                             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
-                          Text("")
+                          TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const WeatherWarning(),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "詳細資訊",
+                                style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                              ))
                         ],
                       ),
                       Row(
@@ -253,7 +266,7 @@ class _HomePage extends State<HomePage> {
                             "地震資訊",
                             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
-                          Text("")
+                          Text("詳細資訊")
                         ],
                       )
                     ],
