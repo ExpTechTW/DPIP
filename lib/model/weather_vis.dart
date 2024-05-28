@@ -15,5 +15,7 @@ class weatherVis {
     required this.miles,
   });
 
-  static fromJson(Map<String, dynamic> json) {}
+  factory weatherVis.fromJson(Map<String, dynamic> json) => _$weatherVisFromJson(json);
+
+  Map<String, dynamic> toJson() => _$weatherVisToJson(this);
 }

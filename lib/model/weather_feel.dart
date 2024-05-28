@@ -15,5 +15,7 @@ class weatherFeel {
     required this.f,
   });
 
-  static fromJson(Map<String, dynamic> json) {}
+  factory weatherFeel.fromJson(Map<String, dynamic> json) => _$weatherFeelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$weatherFeelToJson(this);
 }
