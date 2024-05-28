@@ -57,6 +57,16 @@ class _AboutRtsState extends State<AboutRts> {
                 "地震發生時因干涉或疊加會產生P波、S波兩種震動波，P波(上下)傳遞速度較快破壞力較小，S波(前後左右) 傳遞速度較慢破壞力大通常是導致災害的的關鍵。",
               ),
             ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 0, 8),
+              child: Text(
+                "更多資訊請參閱服務條款",
+                style: TextStyle(
+                  color: context.colors.onSurfaceVariant,
+                ),
+              ),
+            ),
           ],
         ),
       );
@@ -65,7 +75,6 @@ class _AboutRtsState extends State<AboutRts> {
         appBar: AppBar(
           title: const Text("幫助"),
         ),
-
         body: ListView(
           children: [
             ExpansionTile(
