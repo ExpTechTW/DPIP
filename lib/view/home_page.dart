@@ -32,14 +32,14 @@ class _HomePage extends State<HomePage> {
   var weather = {
     'temp': "-99.9",
     'feel': "-99.9",
-    'humidity': "-99",
+    'humidity': "-99.9",
     'precip': "-99.9",
   };
   late Cal calculator;
 
   void refreshWeather() async {
     try {
-      final weatherData = await Global.api.getWeatherRealtime("100");
+      final weatherData = await Global.api.getWeatherRealtime("979");
       weather = {
         'temp': weatherData.temp.c.toString(),
         'feel': weatherData.feel.c.toString(),
@@ -264,7 +264,7 @@ class _HomePage extends State<HomePage> {
                         children: [
                           const Text(
                             "天氣警特報",
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
                           TextButton(
                               onPressed: () {
@@ -278,7 +278,7 @@ class _HomePage extends State<HomePage> {
                               child: const Row(children: [
                                 Text(
                                   "詳細資訊",
-                                  style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                  style: TextStyle(fontSize: 20, letterSpacing: 2, color: Color(0xFFC9C9C9)),
                                 ),
                                 Icon(
                                   Icons.navigate_next,
@@ -287,12 +287,24 @@ class _HomePage extends State<HomePage> {
                               ]))
                         ],
                       ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "目前設定區域未發布天氣警特報",
+                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: calculator.percentToPixel(5, context),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             "地震資訊",
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
                           TextButton(
                               onPressed: () {
@@ -306,7 +318,7 @@ class _HomePage extends State<HomePage> {
                               child: const Row(children: [
                                 Text(
                                   "詳細資訊",
-                                  style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                  style: TextStyle(fontSize: 20, letterSpacing: 2, color: Color(0xFFC9C9C9)),
                                 ),
                                 Icon(
                                   Icons.navigate_next,
@@ -314,7 +326,16 @@ class _HomePage extends State<HomePage> {
                                 ),
                               ]))
                         ],
-                      )
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "7天內無設定區域震度1以上地震",
+                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 )
