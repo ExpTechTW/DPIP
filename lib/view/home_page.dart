@@ -137,7 +137,7 @@ class _HomePage extends State<HomePage> {
             body: Column(
               children: [
                 SizedBox(
-                  height: calculator.percentToPixel(60, context),
+                  // height: calculator.percentToPixel(60, context),
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
@@ -162,7 +162,7 @@ class _HomePage extends State<HomePage> {
                               ),
                             ),
                             SizedBox(
-                              height: calculator.percentToPixel(8, context),
+                              height: calculator.percentToPixel(6, context),
                               child: Padding(
                                 padding: EdgeInsets.only(bottom: calculator.percentToPixel(2, context)),
                                 child: const Row(
@@ -181,6 +181,7 @@ class _HomePage extends State<HomePage> {
                         ),
                       ),
                       Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(height: calculator.percentToPixel(3, context)),
                           Row(
@@ -200,10 +201,10 @@ class _HomePage extends State<HomePage> {
                                     Row(
                                       children: [
                                         SizedBox(
-                                          width: calculator.percentToPixel(10, context),
+                                          width: calculator.percentToPixel(5, context),
                                         ),
                                         SizedBox(
-                                            width: calculator.percentToPixel(45, context),
+                                            width: calculator.percentToPixel(50, context),
                                             child: Column(
                                               children: [
                                                 Row(
