@@ -13,7 +13,7 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
         locationManager?.delegate = self
         locationManager?.requestWhenInUseAuthorization()
         locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager?.distanceFilter = 100.0
+        locationManager?.distanceFilter = 500.0
         locationManager?.allowsBackgroundLocationUpdates = true
     }
 }
