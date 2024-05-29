@@ -16,7 +16,7 @@ Future<void> messageHandler(RemoteMessage message) async {
   print(data);
 
   if (type == "rts" && (preference.getBool("notification:monitor") ?? true)) {
-    flutterLocalNotificationsPlugin.show(
+    localNotifications.show(
       DateTime.now().millisecondsSinceEpoch.remainder(1000000),
       title,
       body,

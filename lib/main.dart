@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/core/notification/android.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/view/init.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final FlutterLocalNotificationsPlugin localNotifications = FlutterLocalNotificationsPlugin();
 final FirebaseMessaging messaging = FirebaseMessaging.instance;
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
     StreamController<ReceivedNotification>.broadcast();
@@ -69,56 +70,6 @@ final List<DarwinNotificationCategory> darwinNotificationCategories = <DarwinNot
   )
 ];
 
-void ignoreErrors(_) {}
-
-void setupAndroidNotificationChannels() {
-  AndroidFlutterLocalNotificationsPlugin? plugin =
-      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-
-  if (plugin == null) return;
-
-  const report = AndroidNotificationChannel(
-    "report",
-    "地震報告",
-    groupId: "earthquake",
-    description: "地震發生後接收的地震報告。",
-    importance: Importance.defaultImportance,
-  );
-
-  const intensity = AndroidNotificationChannel(
-    "intensity",
-    "震度速報",
-    groupId: "earthquake",
-    description: "地震發生後接收的各地地震的最大震度通知。",
-    importance: Importance.high,
-  );
-
-  const eew = AndroidNotificationChannel(
-    "eew",
-    "地震速報",
-    groupId: "earthquake",
-    description: "在地震發生時接收中央氣象署發布的強震即時警報。",
-    importance: Importance.max,
-    enableLights: true,
-    enableVibration: true,
-    playSound: true,
-    sound: RawResourceAndroidNotificationSound("eew_alert.wav"),
-  );
-
-  const monitor = AndroidNotificationChannel(
-    "monitor",
-    "強震監視器",
-    groupId: "earthquake",
-    description: "當 TREM 在全臺部署的測站中，離所在地最近的測站觸發時接收的通知。",
-    importance: Importance.high,
-  );
-
-  plugin.createNotificationChannel(report).catchError(ignoreErrors);
-  plugin.createNotificationChannel(intensity).catchError(ignoreErrors);
-  plugin.createNotificationChannel(eew).catchError(ignoreErrors);
-  plugin.createNotificationChannel(monitor).catchError(ignoreErrors);
-}
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
@@ -161,7 +112,7 @@ void main() async {
     iOS: initializationSettingsDarwin,
   );
 
-  flutterLocalNotificationsPlugin.initialize(
+  localNotifications.initialize(
     initializationSettings,
     onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
       switch (notificationResponse.notificationResponseType) {
