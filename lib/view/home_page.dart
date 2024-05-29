@@ -272,7 +272,7 @@ class _HomePage extends State<HomePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      left: calculator.percentToPixel(5, context), right: calculator.percentToPixel(2, context)),
+                      left: calculator.percentToPixel(5, context), right: calculator.percentToPixel(5, context)),
                   child: Column(
                     children: [
                       Row(
@@ -344,7 +344,41 @@ class _HomePage extends State<HomePage> {
                         ],
                       ),
                       eqReport.isNotEmpty
-                          ? Row(children: [Text("${eqReport[0].id}")])
+                          ? Container(
+                              width: calculator.percentToPixel(90, context),
+                              height: calculator.percentToPixel(20, context),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Color(0x30808080),
+                              ),
+                              child: Stack(
+                                children: <Widget>[
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      width: calculator.percentToPixel(2, context),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF20AAAA),
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          bottomLeft: Radius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Column(
+                                        children: [
+                                          Text(eqReport[0].loc.substring(0, eqReport[0].loc.length - 1).split("位於")[1])
+                                        ],
+                                      ),
+                                      Text("")
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
                           : const Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
