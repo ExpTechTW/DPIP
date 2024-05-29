@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dpip/core/utils.dart';
@@ -83,6 +84,36 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       print(isLocationAutoSetEnabled);
       if (isLocationAutoSetEnabled) {
         getLocation();
+        const LocationSettings locationSettings = LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 1,
+        );
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
+          print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+
+          if (position != null) {
+            String? lat = position.latitude.toString();
+            String? lon = position.longitude.toString();
+            String? coordinate = '$lat,$lon';
+
+            messaging.getToken().then((value) {
+              Global.api
+                  .postNotifyLocation(
+                "0.0.0",
+                "Android",
+                coordinate,
+                value!,
+              )
+                  .then((value) {
+                print(value); // value 是一個 String 類型
+              }).catchError((error) {
+                print(error); // 處理錯誤
+              });
+            }).catchError((error) {
+              print(error);
+            });
+          }
+        });
       }
     });
   }
