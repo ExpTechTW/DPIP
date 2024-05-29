@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         applicationId "com.exptech.dpip"
-        minSdkVersion 19
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

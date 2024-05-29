@@ -2,16 +2,27 @@ import 'dart:io';
 
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:permission_handler/permission_handler.dart';
+
 Future<void> openLocationSettings() async {
-  const urlAndroid = 'intent://#Intent;action=android.settings.LOCATION_SOURCE_SETTINGS;end';
   const urlIOS = 'app-settings:';
 
   if (Platform.isAndroid) {
-    final uriAndroid = Uri.parse(urlAndroid);
-    if (await canLaunchUrl(uriAndroid)) {
-      await launchUrl(uriAndroid, mode: LaunchMode.externalApplication);
+    var status = await Permission.location.status;
+    if (status.isDenied) {
+      Permission.location.request();
+    }
+
+    status = await Permission.locationWhenInUse.status;
+    if (status.isDenied) {
+      Permission.locationWhenInUse.request();
+    }
+
+    status = await Permission.locationAlways.status;
+    if (status.isDenied) {
+      Permission.locationAlways.request();
     } else {
-      throw 'Could not launch $urlAndroid';
+      openAppSettings();
     }
   } else if (Platform.isIOS) {
     final uriIOS = Uri.parse(urlIOS);
