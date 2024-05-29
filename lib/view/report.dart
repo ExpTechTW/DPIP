@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dpip/global.dart';
@@ -18,6 +19,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../core/utils.dart';
 
@@ -44,6 +46,8 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   final _sheetController = DraggableScrollableController();
   late String baseMap;
   int selectedMapIndex = 0;
+
+  late StreamSubscription<Position> positionStreamSubscription;
 
   late AnimationController _animationController;
   final borderRadius = BorderRadiusTween(
@@ -164,6 +168,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     baseMap = Global.preference.getString("base_map") ?? "geojson";
     selectedMapIndex = baseMapOptions.keys.toList().indexOf(baseMap);
     fetchFullReport();
+    initLocationService();
 
     _animationController = AnimationController(
       vsync: this,
@@ -175,13 +180,63 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
         _sheetController.size,
       );
     });
+
+    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
+      print(position == null ? 'Unknown' : '${position.latitude}, ${position.longitude}');
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
+    positionStreamSubscription.cancel();
     _sheetController.dispose();
     _animationController.dispose();
+  }
+
+  void initLocationService() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition();
+    updateLocationMarker(position);
+
+    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
+      updateLocationMarker(position);
+    });
+  }
+
+  void updateLocationMarker(Position position) {
+    setState(() {
+      markers.removeWhere((marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+      markers.add(
+        Marker(
+          point: LatLng(position.latitude, position.longitude),
+          width: 40,
+          height: 40,
+          child: const Icon(Icons.my_location, color: Colors.blue, size: 30),
+        ),
+      );
+    });
+    rebuildFlutterMap();
+  }
+
+  void rebuildFlutterMap() {
+    setState(() {});
   }
 
   @override
@@ -420,7 +475,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                   Text(
                                     "各地最大震度",
                                     style: TextStyle(
-                                      color: CupertinoColors.label.resolveFrom(context),
+                                      color: context.colors.onSurface,
                                       fontSize: 16,
                                     ),
                                   ),

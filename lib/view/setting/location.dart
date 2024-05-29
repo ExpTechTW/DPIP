@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/main.dart';
+import 'package:dpip/view/setting/location_utils.dart';
 import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -18,7 +21,17 @@ class LocationSettingsPage extends StatefulWidget {
 class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
+  String? currentLocation;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkLocationPermissionAndSyncSwitchState();
+    if (isLocationAutoSetEnabled) {
+      getLocation();
+    }
+  }
 
   Future<void> setCityLocation(String? value) async {
     if (value == null) return;
@@ -32,7 +45,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
     setState(() {
       currentCity = value;
-      currentTown = Global.region[value]!.keys.first;
+      currentTown = Global.region[value]?.keys.first;
     });
 
     await Global.preference.setString("loc-city", currentCity!);
@@ -46,20 +59,68 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
 
+    if (currentTown != null) {
+      await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+    }
+
     setState(() {
-      if (currentTown != null) {
-        messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
       currentTown = value;
-      Global.preference.setString("loc-town", currentTown!);
-      messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
     });
+
+    await Global.preference.setString("loc-town", currentTown!);
+    await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+  }
+
+  Future<void> checkLocationPermissionAndSyncSwitchState() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    bool isEnabled = permission == LocationPermission.whileInUse || permission == LocationPermission.always;
+    setState(() {
+      isLocationAutoSetEnabled = isEnabled;
+    });
+  }
+
+  Future<void> getLocation() async {
+    if (!isLocationAutoSetEnabled) return;
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      setState(() {
+        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+      });
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks.first;
+        String? city = placemark.subAdministrativeArea;
+        String? town = placemark.locality;
+
+        setState(() {
+          currentCity = city;
+          currentTown = town;
+        });
+        await Global.preference.setString("loc-city", currentCity!);
+        await Global.preference.setString("loc-town", currentTown!);
+      }
+    } catch (e) {
+      print('無法取得位置: $e');
+    }
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
     setState(() {
       isLocationAutoSetEnabled = value;
+      if (isLocationAutoSetEnabled) {
+        getLocation();
+      }
     });
+    await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
 
   @override
@@ -71,6 +132,13 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
           ),
           child: ListView(
             children: [
+              CupertinoListTile(
+                title: const Text("自動設定"),
+                subtitle: const Text("使用手機定位自動設定所在地"),
+                onTap: () {
+                  openLocationSettings();
+                },
+              ),
               CupertinoListSection(
                 header: const Text("所在地"),
                 children: [
@@ -118,11 +186,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             ListTile(
               title: const Text("自動設定"),
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
-              trailing: Switch(
-                value: isLocationAutoSetEnabled,
-                onChanged: null,
-              ),
-              enabled: false,
+              onTap: () {
+                openLocationSettings();
+              },
             ),
             ListTile(
               title: const Text('縣市'),
