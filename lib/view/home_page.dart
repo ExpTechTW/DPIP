@@ -1,12 +1,17 @@
 import 'dart:io';
 
+import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/report_list.dart';
 import 'package:dpip/view/weather_warning.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart';
 
+import '../core/utils.dart';
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
+import '../util/intensity_color.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,6 +32,25 @@ class Cal {
     return percent / 100 * screenWidth;
   }
 }
+
+// class IntColor {
+//   static const Map<int, Color> _colors = {
+//     0: Color(0xff202020),
+//     1: Color(0xff003264),
+//     2: Color(0xff0064c8),
+//     3: Color(0xff1e9632),
+//     4: Color(0xffffc800),
+//     5: Color(0xffff9600),
+//     6: Color(0xffff6400),
+//     7: Color(0xffff0000),
+//     8: Color(0xffc00000),
+//     9: Color(0xff9600c8),
+//   };
+//
+//   Color intColor(int intensity) {
+//     return _colors[intensity] ?? Color(0xFF202020);
+//   }
+// }
 
 class _HomePage extends State<HomePage> {
   late String _selectedArea;
@@ -263,7 +287,7 @@ class _HomePage extends State<HomePage> {
                             ],
                           ),
                           Container(
-                            height: 1.5, // 横线高度
+                            height: 1.5,
                             color: Colors.white,
                           )
                         ],
@@ -347,7 +371,7 @@ class _HomePage extends State<HomePage> {
                       eqReport.isNotEmpty
                           ? Container(
                               width: calculator.percentToPixel(90, context),
-                              height: calculator.percentToPixel(20, context),
+                              height: calculator.percentToPixel(25, context),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 color: Color(0x30808080),
@@ -367,16 +391,60 @@ class _HomePage extends State<HomePage> {
                                       ),
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Text(eqReport[0].loc.substring(0, eqReport[0].loc.length - 1).split("位於")[1])
-                                        ],
-                                      ),
-                                      Text("")
-                                    ],
-                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: calculator.percentToPixel(5, context),
+                                      right: calculator.percentToPixel(5, context),
+                                      top: calculator.percentToPixel(1, context),
+                                      bottom: calculator.percentToPixel(1, context),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              eqReport[0].loc.substring(0, eqReport[0].loc.length - 1).split("位於")[1],
+                                              style: const TextStyle(
+                                                  fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                                            ),
+                                            Text(
+                                              DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                                                TZDateTime.fromMillisecondsSinceEpoch(
+                                                  getLocation("Asia/Taipei"),
+                                                  eqReport[0].time,
+                                                ),
+                                              ),
+                                              style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                              textAlign: TextAlign.left,
+                                            ),
+                                            Text(
+                                              "規模${eqReport[0].mag}　深度${eqReport[0].depth}公里",
+                                              style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                                            ),
+                                          ],
+                                        ),
+                                        Container(
+                                          alignment: Alignment.center,
+                                          width: calculator.percentToPixel(15, context),
+                                          height: calculator.percentToPixel(15, context),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: context.colors.intensity(eqReport[0].intensity),
+                                          ),
+                                          child: Text(
+                                            intensityToNumberString(eqReport[0].intensity),
+                                            style: TextStyle(
+                                              fontSize: 36,
+                                              fontWeight: FontWeight.w900,
+                                              color: context.colors.onIntensity(eqReport[0].intensity),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
                             )
