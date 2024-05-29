@@ -29,9 +29,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   void initState() {
     super.initState();
     checkLocationPermissionAndSyncSwitchState();
-    if (isLocationAutoSetEnabled) {
-      getLocation();
-    }
   }
 
   Future<void> setCityLocation(String? value) async {
@@ -73,34 +70,50 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    bool isEnabled = permission == LocationPermission.whileInUse || permission == LocationPermission.always;
+    bool isEnabled = false;
+    var status = await Permission.locationAlways.status;
+    if (status.isDenied) {
+      print('初次檢查時沒權限');
+      isEnabled = false;
+    } else {
+      isEnabled = true;
+    }
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
+      print(isLocationAutoSetEnabled);
+      if (isLocationAutoSetEnabled) {
+        getLocation();
+      }
     });
   }
 
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) return;
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return;
-        }
+      var status = await Permission.locationAlways.status;
+      if (status.isDenied) {
+        print('檢查時沒權限');
+        return;
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      String? lat = position.latitude.toString();
+      String? lon = position.longitude.toString();
       setState(() {
-        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+        currentLocation = 'Lat: $lat, Lng: $lon';
+        print(currentLocation);
       });
+      await Global.preference.setString("loc-lat", lat);
+      await Global.preference.setString("loc-lon", lon);
 
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
         String? city = placemark.administrativeArea;
         String? town = placemark.subAdministrativeArea;
+
+        print('縣市: $city');
+        print('鄉鎮市區: $town');
 
         setState(() {
           currentCity = city;
@@ -188,12 +201,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               title: const Text("自動設定"),
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
               onTap: () async {
-                final autoget = await openLocationSettings();
-                if (autoget) {
-                  openAppSettings();
-                } else {
-                  toggleLocationAutoSet(autoget);
-                }
+                toggleLocationAutoSet(await openLocationSettings());
               },
             ),
             ListTile(
