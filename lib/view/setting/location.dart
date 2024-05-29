@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -98,8 +99,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
-        String? city = placemark.subAdministrativeArea;
-        String? town = placemark.locality;
+        String? city = placemark.administrativeArea;
+        String? town = placemark.subAdministrativeArea;
 
         setState(() {
           currentCity = city;
@@ -186,8 +187,13 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             ListTile(
               title: const Text("自動設定"),
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
-              onTap: () {
-                openLocationSettings();
+              onTap: () async {
+                final autoget = await openLocationSettings();
+                if (autoget) {
+                  openAppSettings();
+                } else {
+                  toggleLocationAutoSet(autoget);
+                }
               },
             ),
             ListTile(
