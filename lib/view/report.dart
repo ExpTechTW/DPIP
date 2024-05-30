@@ -222,8 +222,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   void updateLocationMarker(Position position) {
     setState(() {
-      markers.removeWhere(
-          (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+      markers.removeWhere((marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
       markers.add(
         Marker(
           point: LatLng(position.latitude, position.longitude),
@@ -476,7 +475,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                   Text(
                                     "各地最大震度",
                                     style: TextStyle(
-                                      color: context.colors.onSurface,
+                                      color: CupertinoColors.label.resolveFrom(context),
                                       fontSize: 16,
                                     ),
                                   ),

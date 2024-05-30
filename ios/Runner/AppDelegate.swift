@@ -7,7 +7,7 @@ import flutter_local_notifications
 
 class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     var locationManager: CLLocationManager?
-    
+
     func requestLocationPermission() {
         locationManager = CLLocationManager()
         locationManager?.delegate = self
@@ -21,7 +21,7 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
     var locationManager: YourLocationManagerClass?
-    
+
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -38,6 +38,8 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
         GeneratedPluginRegistrant.register(with: self)
         hyperCriticalRulesExample()
         Siren.shared.wail() // line 2
+        locationManager = YourLocationManagerClass()
+        locationManager?.requestLocationPermission()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
         
