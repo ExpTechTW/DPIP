@@ -85,11 +85,37 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       print(isLocationAutoSetEnabled);
       if (isLocationAutoSetEnabled) {
         getLocation();
-        const LocationSettings locationSettings = LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          distanceFilter: 1,
-        );
-        Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
+      }
+    });
+  }
+
+  Future<void> getLocation() async {
+    if (!isLocationAutoSetEnabled) return;
+
+    try {
+      var status = await Permission.locationAlways.status;
+      if (status.isDenied) {
+        print('檢查時沒權限');
+        return;
+      }
+
+      if (Platform.isAndroid) {
+        Geolocator.getPositionStream(
+            locationSettings: AndroidSettings(
+                accuracy: LocationAccuracy.high,
+                distanceFilter: 1,
+                forceLocationManager: false,
+                intervalDuration: const Duration(seconds: 1),
+                //(Optional) Set foreground notification config to keep the app alive
+                //when going to the background
+                foregroundNotificationConfig: const ForegroundNotificationConfig(
+                  notificationText: "服務中...",
+                  notificationTitle: "DPIP 背景定位",
+                  notificationChannelName: '背景定位',
+                  enableWifiLock: true,
+                  enableWakeLock: true,
+                  setOngoing: false,
+                ))).listen((Position? position) async {
           if (position != null) {
             String? lat = position.latitude.toStringAsFixed(4);
             String? lon = position.longitude.toStringAsFixed(4);
@@ -121,18 +147,47 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             }
           }
         });
-      }
-    });
-  }
-
-  Future<void> getLocation() async {
-    if (!isLocationAutoSetEnabled) return;
-
-    try {
-      var status = await Permission.locationAlways.status;
-      if (status.isDenied) {
-        print('檢查時沒權限');
-        return;
+      } else if (Platform.isIOS) {
+        Geolocator.getPositionStream(
+            locationSettings: AppleSettings(
+          accuracy: LocationAccuracy.high,
+          activityType: ActivityType.fitness,
+          distanceFilter: 100,
+          pauseLocationUpdatesAutomatically: true,
+          // Only set to true if our app will be started up in the background.
+          showBackgroundLocationIndicator: false,
+        )).listen((Position? position) async {
+          if (position != null) {
+            String? lat = position.latitude.toStringAsFixed(4);
+            String? lon = position.longitude.toStringAsFixed(4);
+            String? coordinate = '$lat,$lon';
+            setState(() {
+              BackgroundLocationData = '背景$coordinate';
+            });
+            if (Platform.isAndroid) {
+              messaging.getToken().then((value) {
+                Global.api
+                    .postNotifyLocation(
+                  "0.0.0",
+                  "Android",
+                  coordinate,
+                  value!,
+                )
+                    .then((value) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n $value';
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                  });
+                });
+              }).catchError((error) {
+                print(error);
+              });
+            }
+          }
+        });
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
@@ -359,7 +414,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 String? lon = position.longitude.toStringAsFixed(4);
                 String? coordinate = '$lat,$lon';
                 setState(() {
-                  BackgroundLocationData = '前景$coordinate';
+                  BackgroundLocationData = '當前$coordinate';
                 });
                 if (Platform.isAndroid) {
                   messaging.getToken().then((value) {
