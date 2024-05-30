@@ -228,7 +228,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
           point: LatLng(position.latitude, position.longitude),
           width: 40,
           height: 40,
-          child: const Icon(Icons.my_location, color: Colors.blue, size: 30),
+          child: const Icon(Icons.my_location, color: Colors.blue, size: 35),
         ),
       );
     });
