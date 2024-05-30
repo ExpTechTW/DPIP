@@ -224,6 +224,43 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                           }
                         : null,
                   ),
+                  CupertinoListTile(
+                    title: const Text('背景資料'),
+                    subtitle: Text(BackgroundLocationData ?? "無資料"),
+                    onTap: () async {
+                      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+                      String? lat = position.latitude.toStringAsFixed(4);
+                      String? lon = position.longitude.toStringAsFixed(4);
+                      String? coordinate = '$lat,$lon';
+                      setState(() {
+                        BackgroundLocationData = '前景$coordinate';
+                      });
+                      if (Platform.isAndroid) {
+                        messaging.getToken().then((value) {
+                          Global.api
+                              .postNotifyLocation(
+                            "0.0.0",
+                            "Ios",
+                            coordinate,
+                            value!,
+                          )
+                              .then((value) {
+                            setState(() {
+                              BackgroundLocationData = '$BackgroundLocationData \n $value';
+                            });
+                          }).catchError((error) {
+                            setState(() {
+                              BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                            });
+                          });
+                        }).catchError((error) {
+                          print(error);
+                        });
+                      }
+                      await Global.preference.setString("loc-lat", lat);
+                      await Global.preference.setString("loc-lon", lon);
+                    },
+                  ),
                 ],
               ),
             ],
