@@ -123,28 +123,26 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             setState(() {
               BackgroundLocationData = '背景$coordinate';
             });
-            if (Platform.isAndroid) {
-              messaging.getToken().then((value) {
-                Global.api
-                    .postNotifyLocation(
-                  "0.0.0",
-                  "Android",
-                  coordinate,
-                  value!,
-                )
-                    .then((value) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n $value';
-                  });
-                }).catchError((error) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                  });
+            messaging.getToken().then((value) {
+              Global.api
+                  .postNotifyLocation(
+                "0.0.0",
+                "Android",
+                coordinate,
+                value!,
+              )
+                  .then((value) {
+                setState(() {
+                  BackgroundLocationData = '$BackgroundLocationData \n $value';
                 });
               }).catchError((error) {
-                print(error);
+                setState(() {
+                  BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                });
               });
-            }
+            }).catchError((error) {
+              print(error);
+            });
           }
         });
       } else if (Platform.isIOS) {
@@ -164,28 +162,26 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             setState(() {
               BackgroundLocationData = '背景$coordinate';
             });
-            if (Platform.isAndroid) {
-              messaging.getToken().then((value) {
-                Global.api
-                    .postNotifyLocation(
-                  "0.0.0",
-                  "Android",
-                  coordinate,
-                  value!,
-                )
-                    .then((value) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n $value';
-                  });
-                }).catchError((error) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                  });
+            messaging.getToken().then((value) {
+              Global.api
+                  .postNotifyLocation(
+                "0.0.0",
+                "Ios",
+                coordinate,
+                value!,
+              )
+                  .then((value) {
+                setState(() {
+                  BackgroundLocationData = '$BackgroundLocationData \n $value';
                 });
               }).catchError((error) {
-                print(error);
+                setState(() {
+                  BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                });
               });
-            }
+            }).catchError((error) {
+              print(error);
+            });
           }
         });
       }
@@ -288,30 +284,28 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                       String? lon = position.longitude.toStringAsFixed(4);
                       String? coordinate = '$lat,$lon';
                       setState(() {
-                        BackgroundLocationData = '前景$coordinate';
+                        BackgroundLocationData = '當前$coordinate';
                       });
-                      if (Platform.isAndroid) {
-                        messaging.getToken().then((value) {
-                          Global.api
-                              .postNotifyLocation(
-                            "0.0.0",
-                            "Ios",
-                            coordinate,
-                            value!,
-                          )
-                              .then((value) {
-                            setState(() {
-                              BackgroundLocationData = '$BackgroundLocationData \n $value';
-                            });
-                          }).catchError((error) {
-                            setState(() {
-                              BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                            });
+                      messaging.getToken().then((value) {
+                        Global.api
+                            .postNotifyLocation(
+                          "0.0.0",
+                          "Ios",
+                          coordinate,
+                          value!,
+                        )
+                            .then((value) {
+                          setState(() {
+                            BackgroundLocationData = '$BackgroundLocationData \n $value';
                           });
                         }).catchError((error) {
-                          print(error);
+                          setState(() {
+                            BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                          });
                         });
-                      }
+                      }).catchError((error) {
+                        print(error);
+                      });
                       await Global.preference.setString("loc-lat", lat);
                       await Global.preference.setString("loc-lon", lon);
                     },
@@ -416,28 +410,26 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 setState(() {
                   BackgroundLocationData = '當前$coordinate';
                 });
-                if (Platform.isAndroid) {
-                  messaging.getToken().then((value) {
-                    Global.api
-                        .postNotifyLocation(
-                      "0.0.0",
-                      "Android",
-                      coordinate,
-                      value!,
-                    )
-                        .then((value) {
-                      setState(() {
-                        BackgroundLocationData = '$BackgroundLocationData \n $value';
-                      });
-                    }).catchError((error) {
-                      setState(() {
-                        BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                      });
+                messaging.getToken().then((value) {
+                  Global.api
+                      .postNotifyLocation(
+                    "0.0.0",
+                    "Android",
+                    coordinate,
+                    value!,
+                  )
+                      .then((value) {
+                    setState(() {
+                      BackgroundLocationData = '$BackgroundLocationData \n $value';
                     });
                   }).catchError((error) {
-                    print(error);
+                    setState(() {
+                      BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                    });
                   });
-                }
+                }).catchError((error) {
+                  print(error);
+                });
                 await Global.preference.setString("loc-lat", lat);
                 await Global.preference.setString("loc-lon", lon);
               },
