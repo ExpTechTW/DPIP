@@ -71,7 +71,7 @@ class EqInfo extends StatelessWidget {
         // height: calculator.percentToPixel(25, context),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Color(0x30808080),
+          color: const Color(0x30808080),
         ),
         child: IntrinsicHeight(
           child: Stack(
@@ -81,8 +81,8 @@ class EqInfo extends StatelessWidget {
                 child: Container(
                   width: calculator.percentToPixel(2, context),
                   decoration: BoxDecoration(
-                    color: Color(0xFF20AAAA),
-                    borderRadius: BorderRadius.only(
+                    color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(10),
                       bottomLeft: Radius.circular(10),
                     ),
