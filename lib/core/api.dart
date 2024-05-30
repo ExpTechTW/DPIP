@@ -87,7 +87,7 @@ class ExpTechApi {
     if (response.statusCode == 200) {
       return url;
     } else {
-      throw Exception('The server returned a status code of ${response.statusCode}');
+      throw Exception('The server returned a status code of ${response.statusCode} $url');
     }
   }
 }

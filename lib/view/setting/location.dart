@@ -12,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:background_locator/background_locator.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -25,6 +24,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
+  String? BackgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
   @override
@@ -85,31 +85,40 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       print(isLocationAutoSetEnabled);
       if (isLocationAutoSetEnabled) {
         getLocation();
-        Geolocator.getPositionStream(
-          desiredAccuracy: LocationAccuracy.high,
+        const LocationSettings locationSettings = LocationSettings(
+          accuracy: LocationAccuracy.high,
           distanceFilter: 1,
-        ).listen((Position? position) async {
+        );
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
           if (position != null) {
-            String? lat = position.latitude.toString();
-            String? lon = position.longitude.toString();
+            String? lat = position.latitude.toStringAsFixed(4);
+            String? lon = position.longitude.toStringAsFixed(4);
             String? coordinate = '$lat,$lon';
-
-            messaging.getToken().then((value) {
-              Global.api
-                  .postNotifyLocation(
-                "0.0.0",
-                "Android",
-                coordinate,
-                value!,
-              )
-                  .then((value) {
-                print(value); // value 是一個 String 類型
-              }).catchError((error) {
-                print(error); // 處理錯誤
-              });
-            }).catchError((error) {
-              print(error);
+            setState(() {
+              BackgroundLocationData = '背景$coordinate';
             });
+            if (Platform.isAndroid) {
+              messaging.getToken().then((value) {
+                Global.api
+                    .postNotifyLocation(
+                  "0.0.0",
+                  "Android",
+                  coordinate,
+                  value!,
+                )
+                    .then((value) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n $value';
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                  });
+                });
+              }).catchError((error) {
+                print(error);
+              });
+            }
           }
         });
       }
@@ -118,6 +127,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) return;
+
     try {
       var status = await Permission.locationAlways.status;
       if (status.isDenied) {
@@ -141,12 +151,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         String? city = placemark.administrativeArea;
         String? town = placemark.subAdministrativeArea;
 
-        print('縣市: $city');
-        print('鄉鎮市區: $town');
-
         setState(() {
           currentCity = city;
           currentTown = town;
+          print('縣市: $currentCity');
+          print('鄉鎮市區: $currentTown');
         });
         await Global.preference.setString("loc-city", currentCity!);
         await Global.preference.setString("loc-town", currentTown!);
@@ -302,6 +311,43 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                     ],
                   ),
                 );
+              },
+            ),
+            ListTile(
+              title: const Text('背景資料'),
+              subtitle: Text(BackgroundLocationData ?? "無資料"),
+              onTap: () async {
+                Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+                String? lat = position.latitude.toStringAsFixed(4);
+                String? lon = position.longitude.toStringAsFixed(4);
+                String? coordinate = '$lat,$lon';
+                setState(() {
+                  BackgroundLocationData = '前景$coordinate';
+                });
+                if (Platform.isAndroid) {
+                  messaging.getToken().then((value) {
+                    Global.api
+                        .postNotifyLocation(
+                      "0.0.0",
+                      "Android",
+                      coordinate,
+                      value!,
+                    )
+                        .then((value) {
+                      setState(() {
+                        BackgroundLocationData = '$BackgroundLocationData \n $value';
+                      });
+                    }).catchError((error) {
+                      setState(() {
+                        BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                      });
+                    });
+                  }).catchError((error) {
+                    print(error);
+                  });
+                }
+                await Global.preference.setString("loc-lat", lat);
+                await Global.preference.setString("loc-lon", lon);
               },
             ),
           ],

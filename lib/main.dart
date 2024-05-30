@@ -13,10 +13,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:background_locator/background_locator.dart';
-import 'package:background_locator/settings/ios_settings.dart';
-import 'package:background_locator/settings/android_settings.dart';
-import 'package:background_locator/settings/locator_settings.dart' as background_locator;
 
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
@@ -132,40 +128,6 @@ class MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    startBackgroundLocator();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    BackgroundLocator.unRegisterLocationUpdate();
-  }
-
-  void startBackgroundLocator() async {
-    await BackgroundLocator.initialize();
-    BackgroundLocator.registerLocationUpdate(
-      locationCallback,
-      initCallback: initCallback,
-      disposeCallback: disposeCallback,
-      iosSettings: const IOSSettings(
-        accuracy: background_locator.LocationAccuracy.BALANCED,
-        distanceFilter: 500,
-      ),
-      autoStop: false,
-      androidSettings: const AndroidSettings(
-        accuracy: background_locator.LocationAccuracy.BALANCED,
-        interval: 3600,
-        distanceFilter: 500,
-        androidNotificationSettings: AndroidNotificationSettings(
-          notificationChannelName: 'Location tracking',
-          notificationTitle: 'Start Location Tracking',
-          notificationMsg: 'Track location in background',
-          notificationBigMsg: 'Background location tracking is running',
-          notificationIconColor: Colors.grey,
-          notificationTapCallback: notificationCallback,
-        ),
-      ),
-    );
   }
 
   static Future<void> initCallback(Map<dynamic, dynamic> params) async {
