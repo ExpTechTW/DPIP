@@ -53,6 +53,39 @@ class Cal {
 //   }
 // }
 
+class TempColor {
+  List<Color> tempColors = [
+    const Color(0xFF006060),
+    const Color(0xFF00AFAF),
+    const Color(0xFF00FFFF),
+    const Color(0xFF3AAA50),
+    const Color(0xFFFFFF00),
+    const Color(0xFFFF8A00),
+    const Color(0xFFFF0000),
+    const Color(0xFFFF00CA),
+    const Color(0xFF6040B0),
+  ];
+
+  Color getColorForTemp(double temp) {
+    const double minTemp = 0;
+    const double maxTemp = 40;
+
+    if (temp == -99.9) {
+      return const Color(0xFF808080);
+    } else if (temp <= minTemp) {
+      return const Color(0xFF006060);
+    } else if (temp >= maxTemp) {
+      return const Color(0xFF6040B0);
+    } else {
+      double t = ((temp - minTemp) / (maxTemp - minTemp)).clamp(0.0, 1.0);
+      int index = (t * (tempColors.length - 1)).floor();
+      double localT = (t * (tempColors.length - 1)) - index;
+
+      return Color.lerp(tempColors[index], tempColors[index + 1 < tempColors.length ? index + 1 : index], localT)!;
+    }
+  }
+}
+
 class EqInfo extends StatelessWidget {
   // final List eqReport;
   //
@@ -166,6 +199,7 @@ class _HomePage extends State<HomePage> {
   String weatherStatus = "";
   String eqReportStatus = "";
   late Cal calculator;
+  late TempColor tempToColor;
 
   void refreshWeather() async {
     try {
@@ -199,6 +233,7 @@ class _HomePage extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    tempToColor = TempColor();
     calculator = Cal();
     refreshWeather();
     refreshEqReport();
@@ -280,13 +315,13 @@ class _HomePage extends State<HomePage> {
                                 children: [
                                   Container(
                                     height: 30, //
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         begin: Alignment.centerLeft,
                                         end: Alignment.centerRight,
                                         colors: [
                                           Colors.transparent,
-                                          Color(0xFFFFAA00),
+                                          tempToColor.getColorForTemp(double.parse(weather["temp"]!)),
                                         ],
                                       ),
                                     ),
