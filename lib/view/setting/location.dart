@@ -232,17 +232,31 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
-        String? city = placemark.subAdministrativeArea;
-        String? town = placemark.locality;
+        if (Platform.isIOS) {
+          String? city = placemark.subAdministrativeArea;
+          String? town = placemark.locality;
 
-        setState(() {
-          currentCity = city;
-          currentTown = town;
-          print('縣市: $currentCity');
-          print('鄉鎮市區: $currentTown');
-        });
-        await Global.preference.setString("loc-city", currentCity!);
-        await Global.preference.setString("loc-town", currentTown!);
+          setState(() {
+            currentCity = city;
+            currentTown = town;
+            print('縣市: $currentCity');
+            print('鄉鎮市區: $currentTown');
+            await Global.preference.setString("loc-city", currentCity!);
+            await Global.preference.setString("loc-town", currentTown!);
+          });
+        } else {
+          String? city = placemark.administrativeArea;
+          String? town = placemark.subAdministrativeArea;
+
+          setState(() {
+            currentCity = city;
+            currentTown = town;
+            print('縣市: $currentCity');
+            print('鄉鎮市區: $currentTown');
+            await Global.preference.setString("loc-city", currentCity!);
+            await Global.preference.setString("loc-town", currentTown!);
+          });
+        }
       }
     } catch (e) {
       print('無法取得位置: $e');
