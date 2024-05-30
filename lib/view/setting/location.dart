@@ -232,8 +232,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
-        String? city = placemark.administrativeArea;
-        String? town = placemark.subAdministrativeArea;
+        String? city = placemark.subAdministrativeArea;
+        String? town = placemark.locality;
 
         setState(() {
           currentCity = city;
