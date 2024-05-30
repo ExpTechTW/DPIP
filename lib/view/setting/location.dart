@@ -11,7 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -26,6 +25,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentLocation;
   String? BackgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
+
+  final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
+  StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<ServiceStatus>? serviceStatusStream;
 
   @override
   void initState() {
@@ -73,8 +76,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     bool isEnabled = false;
-    var status = await Permission.locationAlways.status;
-    if (status.isDenied) {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always) {
       print('初次檢查時沒權限');
       isEnabled = false;
     } else {
@@ -93,97 +96,127 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     if (!isLocationAutoSetEnabled) return;
 
     try {
-      var status = await Permission.locationAlways.status;
-      if (status.isDenied) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission != LocationPermission.always) {
         print('檢查時沒權限');
         return;
       }
 
-      if (Platform.isAndroid) {
-        Geolocator.getPositionStream(
-            locationSettings: AndroidSettings(
-                accuracy: LocationAccuracy.high,
-                distanceFilter: 1,
-                forceLocationManager: false,
-                intervalDuration: const Duration(seconds: 1),
-                //(Optional) Set foreground notification config to keep the app alive
-                //when going to the background
-                foregroundNotificationConfig: const ForegroundNotificationConfig(
-                  notificationText: "服務中...",
-                  notificationTitle: "DPIP 背景定位",
-                  notificationChannelName: '背景定位',
-                  enableWifiLock: true,
-                  enableWakeLock: true,
-                  setOngoing: false,
-                ))).listen((Position? position) async {
-          if (position != null) {
-            String? lat = position.latitude.toStringAsFixed(4);
-            String? lon = position.longitude.toStringAsFixed(4);
-            String? coordinate = '$lat,$lon';
+      bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+      print('服務: $isLocationServiceEnabled');
+      if (!isLocationServiceEnabled) {
+        return;
+      }
+
+      serviceStatusStream = Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
+        if (status == ServiceStatus.enabled) {
+          print('服務啟用');
+          if (_positionStreamSubscription != null) {
             setState(() {
-              BackgroundLocationData = '背景$coordinate';
-            });
-            messaging.getToken().then((value) {
-              Global.api
-                  .postNotifyLocation(
-                "0.0.0",
-                "Android",
-                coordinate,
-                value!,
-              )
-                  .then((value) {
-                setState(() {
-                  BackgroundLocationData = '$BackgroundLocationData \n $value';
-                });
-              }).catchError((error) {
-                setState(() {
-                  BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                });
-              });
-            }).catchError((error) {
-              print(error);
+              _positionStreamSubscription?.cancel();
+              _positionStreamSubscription = null;
             });
           }
-        });
-      } else if (Platform.isIOS) {
-        Geolocator.getPositionStream(
-            locationSettings: AppleSettings(
-          accuracy: LocationAccuracy.high,
-          activityType: ActivityType.otherNavigation,
-          distanceFilter: 100,
-          pauseLocationUpdatesAutomatically: true,
-          // Only set to true if our app will be started up in the background.
-          showBackgroundLocationIndicator: false,
-        )).listen((Position? position) async {
-          if (position != null) {
-            String? lat = position.latitude.toStringAsFixed(4);
-            String? lon = position.longitude.toStringAsFixed(4);
-            String? coordinate = '$lat,$lon';
-            setState(() {
-              BackgroundLocationData = '背景$coordinate';
-            });
-            messaging.getToken().then((value) {
-              Global.api
-                  .postNotifyLocation(
-                "0.0.0",
-                "Ios",
-                coordinate,
-                value!,
-              )
-                  .then((value) {
-                setState(() {
-                  BackgroundLocationData = '$BackgroundLocationData \n $value';
+        } else {
+          print('服務未啟用');
+        }
+      });
+
+      if (_positionStreamSubscription == null) {
+        if (Platform.isAndroid) {
+          final positionStream = _geolocatorPlatform.getPositionStream(
+              locationSettings: AndroidSettings(
+                  accuracy: LocationAccuracy.high,
+                  distanceFilter: 1,
+                  forceLocationManager: false,
+                  intervalDuration: const Duration(seconds: 1),
+                  //(Optional) Set foreground notification config to keep the app alive
+                  //when going to the background
+                  foregroundNotificationConfig: const ForegroundNotificationConfig(
+                    notificationText: "服務中...",
+                    notificationTitle: "DPIP 背景定位",
+                    notificationChannelName: '背景定位',
+                    enableWifiLock: true,
+                    enableWakeLock: true,
+                    setOngoing: false,
+                  )));
+          _positionStreamSubscription = positionStream.handleError((error) {
+            _positionStreamSubscription?.cancel();
+            _positionStreamSubscription = null;
+          }).listen((Position? position) async {
+            if (position != null) {
+              String? lat = position.latitude.toStringAsFixed(4);
+              String? lon = position.longitude.toStringAsFixed(4);
+              String? coordinate = '$lat,$lon';
+              setState(() {
+                BackgroundLocationData = '背景$coordinate';
+              });
+              messaging.getToken().then((value) {
+                Global.api
+                    .postNotifyLocation(
+                  "0.0.0",
+                  "Android",
+                  coordinate,
+                  value!,
+                )
+                    .then((value) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n $value';
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                  });
                 });
               }).catchError((error) {
-                setState(() {
-                  BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                });
+                print(error);
               });
-            }).catchError((error) {
-              print(error);
-            });
-          }
-        });
+            }
+          });
+        } else if (Platform.isIOS) {
+          final positionStream = _geolocatorPlatform.getPositionStream(
+              locationSettings: AppleSettings(
+            accuracy: LocationAccuracy.high,
+            activityType: ActivityType.otherNavigation,
+            distanceFilter: 100,
+            pauseLocationUpdatesAutomatically: true,
+            // Only set to true if our app will be started up in the background.
+            showBackgroundLocationIndicator: false,
+          ));
+          _positionStreamSubscription = positionStream.handleError((error) {
+            _positionStreamSubscription?.cancel();
+            _positionStreamSubscription = null;
+          }).listen((Position? position) async {
+            if (position != null) {
+              String? lat = position.latitude.toStringAsFixed(4);
+              String? lon = position.longitude.toStringAsFixed(4);
+              String? coordinate = '$lat,$lon';
+              setState(() {
+                BackgroundLocationData = '背景$coordinate';
+              });
+              messaging.getToken().then((value) {
+                Global.api
+                    .postNotifyLocation(
+                  "0.0.0",
+                  "Ios",
+                  coordinate,
+                  value!,
+                )
+                    .then((value) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n $value';
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                  });
+                });
+              }).catchError((error) {
+                print(error);
+              });
+            }
+          });
+        }
       }
 
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
