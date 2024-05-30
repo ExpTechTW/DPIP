@@ -220,7 +220,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     });
   }
 
-  void updateLocationMarker(position) {
+  void updateLocationMarker(Position position) {
     setState(() {
       markers.removeWhere(
           (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);

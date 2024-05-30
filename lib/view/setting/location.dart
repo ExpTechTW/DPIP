@@ -86,7 +86,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       if (isLocationAutoSetEnabled) {
         getLocation();
         const LocationSettings locationSettings = LocationSettings(
-          accuracy: LocationAccuracy.high,
+          accuracy: LocationAccuracy.medium,
           distanceFilter: 1,
         );
         Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
