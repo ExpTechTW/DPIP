@@ -1,26 +1,18 @@
 import UIKit
 import Siren
-import CoreLocation
+import background_locator
 import Flutter
 import Firebase
 import flutter_local_notifications
 
-class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
-    var locationManager: CLLocationManager?
-    
-    func requestLocationPermission() {
-        locationManager = CLLocationManager()
-        locationManager?.delegate = self
-        locationManager?.requestWhenInUseAuthorization()
-        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager?.distanceFilter = 500.0
-        locationManager?.allowsBackgroundLocationUpdates = true
-    }
+func registerPlugins(registry: FlutterPluginRegistry) -> () {
+    if (!registry.hasPlugin("BackgroundLocatorPlugin")) {
+        GeneratedPluginRegistrant.register(with: registry)
+    } 
 }
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-    var locationManager: YourLocationManagerClass?
     
     override func application(
         _ application: UIApplication,
@@ -36,11 +28,16 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
             UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
         }
         GeneratedPluginRegistrant.register(with: self)
+        BackgroundLocatorPlugin.setPluginRegistrantCallback(registerPlugins)
         hyperCriticalRulesExample()
         Siren.shared.wail() // line 2
-        locationManager = YourLocationManagerClass()
-        locationManager?.requestLocationPermission()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+
+        func registerOtherPlugins() {
+            if !hasPlugin("io.flutter.plugins.pathprovider") {
+                FLTPathProviderPlugin.register(with: registrar(forPlugin: "io.flutter.plugins.pathprovider"))
+            }
+        }
     }
         
     func hyperCriticalRulesExample() {

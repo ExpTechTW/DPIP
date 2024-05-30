@@ -12,6 +12,11 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:background_locator/background_locator.dart';
+import 'package:background_locator/settings/ios_settings.dart';
+import 'package:background_locator/settings/android_settings.dart';
+import 'package:background_locator/settings/locator_settings.dart' as background_locator;
 
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
@@ -127,29 +132,84 @@ class MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    startListening();
+    startBackgroundLocator();
   }
 
   @override
   void dispose() {
     super.dispose();
-    stopListening();
+    BackgroundLocator.unRegisterLocationUpdate();
   }
 
-  void startListening() {
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      setState(() {
-        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
-      });
-    }, onError: (dynamic error) {
-      setState(() {
-        currentLocation = 'Could not get location: $error';
-      });
-    });
+  void startBackgroundLocator() async {
+    await BackgroundLocator.initialize();
+    BackgroundLocator.registerLocationUpdate(
+      locationCallback,
+      initCallback: initCallback,
+      disposeCallback: disposeCallback,
+      iosSettings: const IOSSettings(
+        accuracy: background_locator.LocationAccuracy.BALANCED,
+        distanceFilter: 500,
+      ),
+      autoStop: false,
+      androidSettings: const AndroidSettings(
+        accuracy: background_locator.LocationAccuracy.BALANCED,
+        interval: 3600,
+        distanceFilter: 500,
+        androidNotificationSettings: AndroidNotificationSettings(
+          notificationChannelName: 'Location tracking',
+          notificationTitle: 'Start Location Tracking',
+          notificationMsg: 'Track location in background',
+          notificationBigMsg: 'Background location tracking is running',
+          notificationIconColor: Colors.grey,
+          notificationTapCallback: notificationCallback,
+        ),
+      ),
+    );
   }
 
-  void stopListening() {
-    positionStreamSubscription.cancel();
+  static Future<void> initCallback(Map<dynamic, dynamic> params) async {
+    print('Locator initialized');
+  }
+
+  static Future<void> disposeCallback() async {
+    print('Locator disposed');
+  }
+
+  static Future<void> locationCallback(locationDto) async {
+    double latitude = locationDto.latitude;
+    double longitude = locationDto.longitude;
+
+    // 使用 geocoding 插件進行反向地理編碼
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    if (placemarks.isNotEmpty) {
+      Placemark place = placemarks.first;
+      String address = '${place.street}, ${place.locality}, ${place.country}';
+      print('Current location address: $address');
+    } else {
+      print('No address available for the current location');
+    }
+
+    // 處理你的位置信息上報邏輯，例如：
+    String coordinate = '$latitude,$longitude';
+    String? token = await messaging.getToken();
+    if (token != null) {
+      try {
+        String response = await Global.api.postNotifyLocation(
+          "0.0.0",
+          "Android",
+          coordinate,
+          token,
+        );
+        print(response);
+      } catch (error) {
+        print('Location update error: $error');
+      }
+    }
+  }
+
+  static void notificationCallback() {
+    print('Notification clicked');
   }
 
   @override

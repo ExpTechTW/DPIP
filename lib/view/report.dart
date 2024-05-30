@@ -220,9 +220,10 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     });
   }
 
-  void updateLocationMarker(Position position) {
+  void updateLocationMarker(position) {
     setState(() {
-      markers.removeWhere((marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+      markers.removeWhere(
+          (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
       markers.add(
         Marker(
           point: LatLng(position.latitude, position.longitude),
@@ -247,7 +248,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
             defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
           )
         : GeoJsonParser(
-            defaultPolygonFillColor: context.colors.surfaceVariant,
+            defaultPolygonFillColor: context.colors.surfaceContainerHighest,
             defaultPolygonBorderColor: context.colors.outline,
           );
 

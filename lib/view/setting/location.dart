@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:background_locator/background_locator.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -84,13 +85,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       print(isLocationAutoSetEnabled);
       if (isLocationAutoSetEnabled) {
         getLocation();
-        const LocationSettings locationSettings = LocationSettings(
-          accuracy: LocationAccuracy.high,
+        Geolocator.getPositionStream(
+          desiredAccuracy: LocationAccuracy.high,
           distanceFilter: 1,
-        );
-        Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? position) async {
-          print(position == null ? 'Unknown' : '${position.latitude.toString()}, ${position.longitude.toString()}');
-
+        ).listen((Position? position) async {
           if (position != null) {
             String? lat = position.latitude.toString();
             String? lon = position.longitude.toString();
