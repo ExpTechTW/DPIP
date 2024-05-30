@@ -182,7 +182,7 @@ class _HomePage extends State<HomePage> {
 
   void refreshEqReport() async {
     try {
-      final eqReportData = await Global.api.getReportList(limit: 5);
+      final eqReportData = await Global.api.getReportList(limit: 3);
       eqReport = eqReportData;
     } catch (e) {
       print(e);
@@ -472,20 +472,12 @@ class _HomePage extends State<HomePage> {
                       //   ],
                       // ),
                       eqReport.isNotEmpty
-                          ? SizedBox(
-                              height: 410,
-                              child: Column(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: eqReport.length,
-                                      itemBuilder: (context, index) {
-                                        return EqInfo(eqReport: eqReport[index]);
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          ? ListView.builder(
+                              itemCount: eqReport.length,
+                              itemBuilder: (context, index) {
+                                return EqInfo(eqReport: eqReport[index]);
+                              },
+                              shrinkWrap: true,
                             )
                           // ? Container(
                           //     width: calculator.percentToPixel(90, context),
