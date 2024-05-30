@@ -125,30 +125,6 @@ class MainAppState extends State<MainApp> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    startListening();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    stopListening();
-  }
-
-  void startListening() {
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      setState(() {
-        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
-      });
-    }, onError: (dynamic error) {
-      setState(() {
-        currentLocation = 'Could not get location: $error';
-      });
-    });
-  }
-
   static Future<void> initCallback(Map<dynamic, dynamic> params) async {
     print('Locator initialized');
   }
@@ -192,10 +168,6 @@ class MainAppState extends State<MainApp> {
 
   static void notificationCallback() {
     print('Notification clicked');
-  }
-
-  void stopListening() {
-    positionStreamSubscription.cancel();
   }
 
   @override
