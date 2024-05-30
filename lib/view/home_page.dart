@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart';
 
 import '../core/utils.dart';
 import '../global.dart';
+import '../model/earthquake_report.dart';
 import '../model/partial_earthquake_report.dart';
 import '../util/intensity_color.dart';
 
@@ -52,6 +53,106 @@ class Cal {
 //   }
 // }
 
+class EqInfo extends StatelessWidget {
+  // final List eqReport;
+  //
+  // const EqInfo({Key? key, required this.eqReport}) : super(key: key);
+  final PartialEarthquakeReport eqReport;
+
+  EqInfo({super.key, required this.eqReport});
+
+  Cal calculator = Cal();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Container(
+        width: calculator.percentToPixel(90, context),
+        // height: calculator.percentToPixel(25, context),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Color(0x30808080),
+        ),
+        child: IntrinsicHeight(
+          child: Stack(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  width: calculator.percentToPixel(2, context),
+                  decoration: BoxDecoration(
+                    color: Color(0xFF20AAAA),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      bottomLeft: Radius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  left: calculator.percentToPixel(5, context),
+                  right: calculator.percentToPixel(5, context),
+                  top: calculator.percentToPixel(1, context),
+                  bottom: calculator.percentToPixel(2, context),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                        ),
+                        Text(
+                          DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                            TZDateTime.fromMillisecondsSinceEpoch(
+                              getLocation("Asia/Taipei"),
+                              eqReport.time,
+                            ),
+                          ),
+                          style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                          textAlign: TextAlign.left,
+                        ),
+                        Text(
+                          "規模${eqReport.mag}　深度${eqReport.depth}公里",
+                          style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      width: calculator.percentToPixel(15, context),
+                      height: calculator.percentToPixel(15, context),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: context.colors.intensity(eqReport.intensity),
+                      ),
+                      child: Text(
+                        intensityToNumberString(eqReport.intensity),
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          color: context.colors.onIntensity(eqReport.intensity),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      SizedBox(
+        height: calculator.percentToPixel(2, context),
+      ),
+    ]);
+  }
+}
+
 class _HomePage extends State<HomePage> {
   late String _selectedArea;
   List<PartialEarthquakeReport> reports = [];
@@ -81,11 +182,8 @@ class _HomePage extends State<HomePage> {
 
   void refreshEqReport() async {
     try {
-      final eqReportData = await Global.api.getReportList(limit: 2);
-      print(eqReportData[0].id.toString());
-      if (eqReportData is List) {
-        eqReport = eqReportData;
-      }
+      final eqReportData = await Global.api.getReportList(limit: 5);
+      eqReport = eqReportData;
     } catch (e) {
       print(e);
     }
@@ -94,7 +192,7 @@ class _HomePage extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    calculator = Cal(); // 創建 Cal 類的一個實例
+    calculator = Cal();
     refreshWeather();
     refreshEqReport();
     _selectedArea = Areas.getOptions().first; // 初始化時設定_selectedValue為列表的第一項
@@ -188,7 +286,10 @@ class _HomePage extends State<HomePage> {
                             SizedBox(
                               height: calculator.percentToPixel(6, context),
                               child: Padding(
-                                padding: EdgeInsets.only(bottom: calculator.percentToPixel(2, context)),
+                                padding: EdgeInsets.only(
+                                    bottom: calculator.percentToPixel(2, context),
+                                    left: calculator.percentToPixel(5, context),
+                                    right: calculator.percentToPixel(5, context)),
                                 child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -297,162 +398,181 @@ class _HomePage extends State<HomePage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      left: calculator.percentToPixel(5, context), right: calculator.percentToPixel(5, context)),
+                      left: calculator.percentToPixel(5, context),
+                      right: calculator.percentToPixel(5, context),
+                      top: calculator.percentToPixel(5, context)),
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "天氣警特報",
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const WeatherWarning(),
-                                  ),
-                                );
-                              },
-                              child: const Row(children: [
-                                Text(
-                                  "詳細資訊",
-                                  style: TextStyle(fontSize: 20, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                ),
-                                Icon(
-                                  Icons.navigate_next,
-                                  color: Color(0xfff9f9f9),
-                                ),
-                              ]))
-                        ],
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "目前設定區域未發布天氣警特報",
-                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: calculator.percentToPixel(5, context),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "地震資訊",
-                            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
-                          ),
-                          TextButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ReportList(),
-                                  ),
-                                );
-                              },
-                              child: const Row(children: [
-                                Text(
-                                  "詳細資訊",
-                                  style: TextStyle(fontSize: 20, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                ),
-                                Icon(
-                                  Icons.navigate_next,
-                                  color: Color(0xfff9f9f9),
-                                ),
-                              ]))
-                        ],
-                      ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     const Text(
+                      //       "天氣警特報",
+                      //       style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
+                      //     ),
+                      //     TextButton(
+                      //         onPressed: () {
+                      //           Navigator.push(
+                      //             context,
+                      //             MaterialPageRoute(
+                      //               builder: (context) => const WeatherWarning(),
+                      //             ),
+                      //           );
+                      //         },
+                      //         child: const Row(children: [
+                      //           Text(
+                      //             "詳細資訊",
+                      //             style: TextStyle(fontSize: 20, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                      //           ),
+                      //           Icon(
+                      //             Icons.navigate_next,
+                      //             color: Color(0xfff9f9f9),
+                      //           ),
+                      //         ]))
+                      //   ],
+                      // ),
+                      // const Row(
+                      //   mainAxisAlignment: MainAxisAlignment.start,
+                      //   children: [
+                      //     Text(
+                      //       "目前設定區域未發布天氣警特報",
+                      //       style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                      //     ),
+                      //   ],
+                      // ),
+                      // SizedBox(
+                      //   height: calculator.percentToPixel(5, context),
+                      // ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     const Text(
+                      //       "地震資訊",
+                      //       style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
+                      //     ),
+                      //     TextButton(
+                      //         onPressed: () {
+                      //           Navigator.push(
+                      //             context,
+                      //             MaterialPageRoute(
+                      //               builder: (context) => const ReportList(),
+                      //             ),
+                      //           );
+                      //         },
+                      //         child: const Row(children: [
+                      //           Text(
+                      //             "詳細資訊",
+                      //             style: TextStyle(fontSize: 20, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                      //           ),
+                      //           Icon(
+                      //             Icons.navigate_next,
+                      //             color: Color(0xfff9f9f9),
+                      //           ),
+                      //         ]))
+                      //   ],
+                      // ),
                       eqReport.isNotEmpty
-                          ? Container(
-                              width: calculator.percentToPixel(90, context),
-                              height: calculator.percentToPixel(25, context),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color(0x30808080),
-                              ),
-                              child: Stack(
+                          ? SizedBox(
+                              height: 410,
+                              child: Column(
                                 children: <Widget>[
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      width: calculator.percentToPixel(2, context),
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFF20AAAA),
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10),
-                                        ),
-                                      ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: eqReport.length,
+                                      itemBuilder: (context, index) {
+                                        return EqInfo(eqReport: eqReport[index]);
+                                      },
                                     ),
                                   ),
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                      left: calculator.percentToPixel(5, context),
-                                      right: calculator.percentToPixel(5, context),
-                                      top: calculator.percentToPixel(1, context),
-                                      bottom: calculator.percentToPixel(1, context),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              eqReport[0].loc.substring(0, eqReport[0].loc.length - 1).split("位於")[1],
-                                              style: const TextStyle(
-                                                  fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
-                                            ),
-                                            Text(
-                                              DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                                                TZDateTime.fromMillisecondsSinceEpoch(
-                                                  getLocation("Asia/Taipei"),
-                                                  eqReport[0].time,
-                                                ),
-                                              ),
-                                              style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
-                                              textAlign: TextAlign.left,
-                                            ),
-                                            Text(
-                                              "規模${eqReport[0].mag}　深度${eqReport[0].depth}公里",
-                                              style: const TextStyle(fontSize: 18, letterSpacing: 2),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          width: calculator.percentToPixel(15, context),
-                                          height: calculator.percentToPixel(15, context),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10),
-                                            color: context.colors.intensity(eqReport[0].intensity),
-                                          ),
-                                          child: Text(
-                                            intensityToNumberString(eqReport[0].intensity),
-                                            style: TextStyle(
-                                              fontSize: 36,
-                                              fontWeight: FontWeight.w900,
-                                              color: context.colors.onIntensity(eqReport[0].intensity),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  )
                                 ],
                               ),
                             )
+                          // ? Container(
+                          //     width: calculator.percentToPixel(90, context),
+                          //     // height: calculator.percentToPixel(25, context),
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //       color: Color(0x30808080),
+                          //     ),
+                          //     child: IntrinsicHeight(
+                          //       child: Stack(
+                          //         children: <Widget>[
+                          //           Align(
+                          //             alignment: Alignment.topLeft,
+                          //             child: Container(
+                          //               width: calculator.percentToPixel(2, context),
+                          //               decoration: BoxDecoration(
+                          //                 color: Color(0xFF20AAAA),
+                          //                 borderRadius: BorderRadius.only(
+                          //                   topLeft: Radius.circular(10),
+                          //                   bottomLeft: Radius.circular(10),
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           Padding(
+                          //             padding: EdgeInsets.only(
+                          //               left: calculator.percentToPixel(5, context),
+                          //               right: calculator.percentToPixel(5, context),
+                          //               top: calculator.percentToPixel(1, context),
+                          //               bottom: calculator.percentToPixel(2, context),
+                          //             ),
+                          //             child: Row(
+                          //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //               children: [
+                          //                 Column(
+                          //                   crossAxisAlignment: CrossAxisAlignment.start,
+                          //                   children: [
+                          //                     Text(
+                          //                       eqReport[0].loc.substring(0, eqReport[0].loc.length - 1).split("位於")[1],
+                          //                       style: const TextStyle(
+                          //                           fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                          //                     ),
+                          //                     Text(
+                          //                       DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                          //                         TZDateTime.fromMillisecondsSinceEpoch(
+                          //                           getLocation("Asia/Taipei"),
+                          //                           eqReport[0].time,
+                          //                         ),
+                          //                       ),
+                          //                       style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                          //                       textAlign: TextAlign.left,
+                          //                     ),
+                          //                     Text(
+                          //                       "規模${eqReport[0].mag}　深度${eqReport[0].depth}公里",
+                          //                       style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                          //                     ),
+                          //                   ],
+                          //                 ),
+                          //                 Container(
+                          //                   alignment: Alignment.center,
+                          //                   width: calculator.percentToPixel(15, context),
+                          //                   height: calculator.percentToPixel(15, context),
+                          //                   decoration: BoxDecoration(
+                          //                     borderRadius: BorderRadius.circular(10),
+                          //                     color: context.colors.intensity(eqReport[0].intensity),
+                          //                   ),
+                          //                   child: Text(
+                          //                     intensityToNumberString(eqReport[0].intensity),
+                          //                     style: TextStyle(
+                          //                       fontSize: 36,
+                          //                       fontWeight: FontWeight.w900,
+                          //                       color: context.colors.onIntensity(eqReport[0].intensity),
+                          //                     ),
+                          //                   ),
+                          //                 )
+                          //               ],
+                          //             ),
+                          //           )
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   )
                           : const Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Text(
-                                  "7天內無設定區域震度1以上地震",
+                                  "近期設定區域無地震或警特報資訊",
                                   style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
                                 ),
                               ],
