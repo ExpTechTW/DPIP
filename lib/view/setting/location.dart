@@ -149,7 +149,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         Geolocator.getPositionStream(
             locationSettings: AppleSettings(
           accuracy: LocationAccuracy.high,
-          activityType: ActivityType.fitness,
+          activityType: ActivityType.otherNavigation,
           distanceFilter: 100,
           pauseLocationUpdatesAutomatically: true,
           // Only set to true if our app will be started up in the background.
