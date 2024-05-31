@@ -219,14 +219,14 @@ class _HomePage extends State<HomePage> {
   }
 
   void refreshEqReport() async {
-    weatherRefreshing = true;
+    eqReportRefreshing = true;
     try {
       final eqReportData = await Global.api.getReportList(limit: 3);
       eqReport = eqReportData;
     } catch (e) {
       print(e);
     }
-    weatherRefreshing = false;
+    eqReportRefreshing = false;
     setState(() {});
   }
 
@@ -526,14 +526,24 @@ class _HomePage extends State<HomePage> {
                       //         ]))
                       //   ],
                       // ),
-                      eqReport.isNotEmpty
-                          ? ListView.builder(
-                              itemCount: eqReport.length,
-                              itemBuilder: (context, index) {
-                                return EqInfo(eqReport: eqReport[index]);
-                              },
-                              shrinkWrap: true,
-                            )
+                      eqReportRefreshing == false
+                          ? eqReport.isEmpty
+                              ? const Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "近期設定區域無地震或警特報資訊",
+                                      style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                    ),
+                                  ],
+                                )
+                              : ListView.builder(
+                                  itemCount: eqReport.length,
+                                  itemBuilder: (context, index) {
+                                    return EqInfo(eqReport: eqReport[index]);
+                                  },
+                                  shrinkWrap: true,
+                                )
                           // ? Container(
                           //     width: calculator.percentToPixel(90, context),
                           //     // height: calculator.percentToPixel(25, context),
@@ -615,17 +625,7 @@ class _HomePage extends State<HomePage> {
                           //       ),
                           //     ),
                           //   )
-                          : eqReportRefreshing == false
-                              ? const Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "近期設定區域無地震或警特報資訊",
-                                      style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                    ),
-                                  ],
-                                )
-                              : const Center(child: CircularProgressIndicator())
+                          : const Center(child: CircularProgressIndicator())
                     ],
                   ),
                 )
