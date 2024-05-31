@@ -299,28 +299,32 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                   title: const Text('縣市'),
                   additionalInfo: Text(currentCity ?? "尚未設定"),
                   trailing: const CupertinoListTileChevron(),
-                  onTap: isLocationAutoSetEnabled ? () {
-                    Navigator.push<String>(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
-                      ),
-                    ).then(setCityLocation);
-                  } : null,
+                  onTap: isLocationAutoSetEnabled
+                      ? () {
+                          Navigator.push<String>(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
+                            ),
+                          ).then(setCityLocation);
+                        }
+                      : null,
                 ),
                 CupertinoListTile(
                   leading: const Icon(CupertinoIcons.tree),
                   title: const Text('鄉鎮市區'),
                   additionalInfo: Text(currentTown ?? "尚未設定"),
                   trailing: const CupertinoListTileChevron(),
-                  onTap: !isLocationAutoSetEnabled && currentCity != null ? () {
-                    Navigator.push<String>(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
-                      ),
-                    ).then(setTownLocation);
-                  } : null,
+                  onTap: !isLocationAutoSetEnabled && currentCity != null
+                      ? () {
+                          Navigator.push<String>(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
+                            ),
+                          ).then(setTownLocation);
+                        }
+                      : null,
                 ),
                 CupertinoListTile(
                   title: const Text('背景資料'),
@@ -374,9 +378,19 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
               trailing: Switch(
                 value: isLocationAutoSetEnabled,
-                onChanged: null,
+                onChanged: (value) {
+                  if (value) {
+                    setState(() {
+                      isLocationAutoSetEnabled = value;
+                    });
+                  } else {
+                    setState(() {
+                      isLocationAutoSetEnabled = value;
+                    });
+                  }
+                },
               ),
-              enabled: false,
+              enabled: true,
               onTap: () async {
                 toggleLocationAutoSet(await openLocationSettings());
               },
@@ -410,8 +424,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                       ),
                     ),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("取消")
-                      ),
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("取消")),
                     ],
                   ),
                 );
