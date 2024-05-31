@@ -93,18 +93,40 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> getLocation() async {
-    if (!isLocationAutoSetEnabled) return;
+    if (!isLocationAutoSetEnabled) {
+      if (_positionStreamSubscription != null) {
+        setState(() {
+          _positionStreamSubscription?.cancel();
+          _positionStreamSubscription = null;
+        });
+      }
+      return;
+    }
 
     try {
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission != LocationPermission.always) {
         print('檢查時沒權限');
+        if (!isLocationAutoSetEnabled) {
+          if (_positionStreamSubscription != null) {
+            setState(() {
+              _positionStreamSubscription?.cancel();
+              _positionStreamSubscription = null;
+            });
+          }
+        }
         return;
       }
 
       bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
       print('服務: $isLocationServiceEnabled');
       if (!isLocationServiceEnabled) {
+        if (_positionStreamSubscription != null) {
+          setState(() {
+            _positionStreamSubscription?.cancel();
+            _positionStreamSubscription = null;
+          });
+        }
         return;
       }
 
@@ -380,20 +402,23 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 value: isLocationAutoSetEnabled,
                 onChanged: (value) {
                   if (value) {
-                    setState(() {
-                      isLocationAutoSetEnabled = value;
+                    setState(() async {
+                      toggleLocationAutoSet(await openLocationSettings());
                     });
                   } else {
                     setState(() {
                       isLocationAutoSetEnabled = value;
+                      if (_positionStreamSubscription != null) {
+                        setState(() {
+                          _positionStreamSubscription?.cancel();
+                          _positionStreamSubscription = null;
+                        });
+                      }
                     });
                   }
                 },
               ),
               enabled: true,
-              onTap: () async {
-                toggleLocationAutoSet(await openLocationSettings());
-              },
             ),
             ListTile(
               title: const Text('縣市'),
