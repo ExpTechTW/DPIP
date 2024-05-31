@@ -300,153 +300,157 @@ class _HomePage extends State<HomePage> {
             ),
             body: Column(
               children: [
-                weatherRefreshing == false && weather["temp"] != "-99.9"
-                    ? SizedBox(
-                        // height: calculator.percentToPixel(60, context),
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            SizedBox(height: calculator.percentToPixel(45, context)),
-                            Positioned(
-                              bottom: calculator.percentToPixel(0, context),
-                              right: 0,
-                              left: 0,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 30, //
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                        colors: [
-                                          Colors.transparent,
-                                          tempToColor.getColorForTemp(double.parse(weather["temp"]!)),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: calculator.percentToPixel(6, context),
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                          bottom: calculator.percentToPixel(2, context),
-                                          left: calculator.percentToPixel(5, context),
-                                          right: calculator.percentToPixel(5, context)),
-                                      child: const Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("", style: TextStyle(fontSize: 12)),
-                                          Text(
-                                            "天氣資料來自 weather.com",
-                                            style: TextStyle(fontSize: 12),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Stack(
+                  children: [
+                    // height: calculator.percentToPixel(60, context),
+
+                    weatherRefreshing == true
+                        ? const Positioned.fill(
+                            child: Center(
+                            child: CircularProgressIndicator(),
+                          ))
+                        : weather["temp"] == "-99.9"
+                            ? const Positioned.fill(
+                                child: Center(
+                                child: Text("天氣取得失敗"),
+                              ))
+                            : Container(),
+                    Opacity(
+                      opacity: weatherRefreshing == true || weather["temp"] == "-99.9" ? 0 : 1,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          SizedBox(height: calculator.percentToPixel(45, context)),
+                          Positioned(
+                            bottom: calculator.percentToPixel(0, context),
+                            right: 0,
+                            left: 0,
+                            child: Column(
                               children: [
-                                SizedBox(height: calculator.percentToPixel(3, context)),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    SizedBox(width: calculator.percentToPixel(5, context)),
-                                    Icon(
-                                      Icons.cloud_outlined,
-                                      size: calculator.percentToPixel(35, context),
+                                Container(
+                                  height: 30, //
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Colors.transparent,
+                                        tempToColor.getColorForTemp(double.parse(weather["temp"]!)),
+                                      ],
                                     ),
-                                    SizedBox(width: calculator.percentToPixel(0, context)),
-                                    SizedBox(
-                                      width: calculator.percentToPixel(55, context),
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              SizedBox(
-                                                width: calculator.percentToPixel(5, context),
-                                              ),
-                                              SizedBox(
-                                                  width: calculator.percentToPixel(50, context),
-                                                  child: Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const Text("降水量", style: TextStyle(fontSize: 20)),
-                                                          Text("${weather["precip"]} mm",
-                                                              style: const TextStyle(
-                                                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const Text("濕度", style: TextStyle(fontSize: 20)),
-                                                          Text("${weather["humidity"]} %",
-                                                              style: const TextStyle(
-                                                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const Text("體感", style: TextStyle(fontSize: 20)),
-                                                          Text("${weather["feel"]} ℃",
-                                                              style: const TextStyle(
-                                                                  fontSize: 20, fontWeight: FontWeight.bold)),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  )),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              Text("${weather["temp"]?.split(".")[0]}",
-                                                  style: const TextStyle(
-                                                      fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5)),
-                                              Column(
-                                                children: [
-                                                  const Text("℃",
-                                                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                                                  Text(".${weather["temp"]?.split(".")[1]}",
-                                                      style:
-                                                          const TextStyle(fontSize: 48, fontWeight: FontWeight.w900)),
-                                                  SizedBox(height: calculator.percentToPixel(4.5, context)),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: calculator.percentToPixel(6, context),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: calculator.percentToPixel(2, context),
+                                        left: calculator.percentToPixel(5, context),
+                                        right: calculator.percentToPixel(5, context)),
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("", style: TextStyle(fontSize: 12)),
+                                        Text(
+                                          "天氣資料來自 weather.com",
+                                          style: TextStyle(fontSize: 12),
+                                        )
+                                      ],
                                     ),
-                                    SizedBox(width: calculator.percentToPixel(5, context)),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      )
-                    : weatherRefreshing == true
-                        ? SizedBox(
-                            height: calculator.percentToPixel(60, context),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ))
-                        : SizedBox(
-                            height: calculator.percentToPixel(60, context),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            )),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(height: calculator.percentToPixel(3, context)),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  SizedBox(width: calculator.percentToPixel(5, context)),
+                                  Icon(
+                                    Icons.cloud_outlined,
+                                    size: calculator.percentToPixel(35, context),
+                                  ),
+                                  SizedBox(width: calculator.percentToPixel(0, context)),
+                                  SizedBox(
+                                    width: calculator.percentToPixel(55, context),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: calculator.percentToPixel(5, context),
+                                            ),
+                                            SizedBox(
+                                                width: calculator.percentToPixel(50, context),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        const Text("降水量", style: TextStyle(fontSize: 20)),
+                                                        Text("${weather["precip"]} mm",
+                                                            style: const TextStyle(
+                                                                fontSize: 20, fontWeight: FontWeight.bold)),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        const Text("濕度", style: TextStyle(fontSize: 20)),
+                                                        Text("${weather["humidity"]} %",
+                                                            style: const TextStyle(
+                                                                fontSize: 20, fontWeight: FontWeight.bold)),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        const Text("體感", style: TextStyle(fontSize: 20)),
+                                                        Text("${weather["feel"]} ℃",
+                                                            style: const TextStyle(
+                                                                fontSize: 20, fontWeight: FontWeight.bold)),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                )),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Text("${weather["temp"]?.split(".")[0]}",
+                                                style: const TextStyle(
+                                                    fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5)),
+                                            Column(
+                                              children: [
+                                                const Text("℃",
+                                                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                                Text(".${weather["temp"]?.split(".")[1]}",
+                                                    style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900)),
+                                                SizedBox(height: calculator.percentToPixel(4.5, context)),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: calculator.percentToPixel(5, context)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 Container(
                   height: 1.5,
                   color: Colors.white,
