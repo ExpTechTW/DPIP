@@ -304,6 +304,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   void dispose() {
     super.dispose();
     stopListening();
+    _positionStreamSubscription?.cancel();
+    _positionStreamSubscription = null;
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
