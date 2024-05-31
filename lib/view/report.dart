@@ -172,17 +172,13 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(minutes: 1),
+      duration: Duration.zero,
     );
 
     _sheetController.addListener(() {
       _animationController.animateTo(
         _sheetController.size,
       );
-    });
-
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      print(position == null ? 'Unknown' : '${position.latitude}, ${position.longitude}');
     });
   }
 

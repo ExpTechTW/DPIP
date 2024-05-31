@@ -23,6 +23,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
+  late StreamSubscription<Position> positionStreamSubscription;
   String? BackgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
@@ -33,6 +34,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   @override
   void initState() {
     super.initState();
+    startListening();
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -281,6 +283,27 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     } catch (e) {
       print('無法取得位置: $e');
     }
+  }
+
+  void startListening() {
+    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
+      setState(() {
+        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
+      });
+    }, onError: (dynamic error) {
+      setState(() {
+        currentLocation = 'Could not get location: $error';
+      });
+    });
+  }
+  void stopListening() {
+    positionStreamSubscription.cancel();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopListening();
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
