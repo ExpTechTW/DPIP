@@ -275,88 +275,93 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
-          navigationBar: const CupertinoNavigationBar(
-            middle: Text("所在地"),
-          ),
-          child: ListView(
-            children: [
-              CupertinoListTile(
-                title: const Text("自動設定"),
-                subtitle: const Text("使用手機定位自動設定所在地"),
-                onTap: () async {
-                  toggleLocationAutoSet(await openLocationSettings());
-                },
+        navigationBar: const CupertinoNavigationBar(
+          middle: Text("所在地"),
+        ),
+        child: ListView(
+          children: [
+            CupertinoListTile(
+              title: const Text("自動設定"),
+              subtitle: const Text("使用手機定位自動設定所在地"),
+              trailing: CupertinoSwitch(
+                value: isLocationAutoSetEnabled,
+                onChanged: null,
               ),
-              CupertinoListSection(
-                header: const Text("所在地"),
-                children: [
-                  CupertinoListTile(
-                    leading: const Icon(CupertinoIcons.building_2_fill),
-                    title: const Text('縣市'),
-                    additionalInfo: Text(currentCity ?? "尚未設定"),
-                    trailing: const CupertinoListTileChevron(),
-                    onTap: isLocationAutoSetEnabled ? () {
-                      Navigator.push<String>(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
-                        ),
-                      ).then(setCityLocation);
-                    } : null,
-                  ),
-                  CupertinoListTile(
-                    leading: const Icon(CupertinoIcons.tree),
-                    title: const Text('鄉鎮市區'),
-                    additionalInfo: Text(currentTown ?? "尚未設定"),
-                    trailing: const CupertinoListTileChevron(),
-                    onTap: !isLocationAutoSetEnabled && currentCity != null ? () {
-                      Navigator.push<String>(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
-                        ),
-                      ).then(setTownLocation);
-                    } : null,
-                  ),
-                  CupertinoListTile(
-                    title: const Text('背景資料'),
-                    subtitle: Text(BackgroundLocationData ?? "無資料"),
-                    onTap: () async {
-                      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-                      String? lat = position.latitude.toStringAsFixed(4);
-                      String? lon = position.longitude.toStringAsFixed(4);
-                      String? coordinate = '$lat,$lon';
-                      setState(() {
-                        BackgroundLocationData = '當前$coordinate';
-                      });
-                      messaging.getToken().then((value) {
-                        Global.api
-                            .postNotifyLocation(
-                          "0.0.0",
-                          "Ios",
-                          coordinate,
-                          value!,
-                        )
-                            .then((value) {
-                          setState(() {
-                            BackgroundLocationData = '$BackgroundLocationData \n $value';
-                          });
-                        }).catchError((error) {
-                          setState(() {
-                            BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                          });
+              onTap: () async {
+                toggleLocationAutoSet(await openLocationSettings());
+              },
+            ),
+            CupertinoListSection(
+              header: const Text("所在地"),
+              children: [
+                CupertinoListTile(
+                  leading: const Icon(CupertinoIcons.building_2_fill),
+                  title: const Text('縣市'),
+                  additionalInfo: Text(currentCity ?? "尚未設定"),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: isLocationAutoSetEnabled ? () {
+                    Navigator.push<String>(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
+                      ),
+                    ).then(setCityLocation);
+                  } : null,
+                ),
+                CupertinoListTile(
+                  leading: const Icon(CupertinoIcons.tree),
+                  title: const Text('鄉鎮市區'),
+                  additionalInfo: Text(currentTown ?? "尚未設定"),
+                  trailing: const CupertinoListTileChevron(),
+                  onTap: !isLocationAutoSetEnabled && currentCity != null ? () {
+                    Navigator.push<String>(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
+                      ),
+                    ).then(setTownLocation);
+                  } : null,
+                ),
+                CupertinoListTile(
+                  title: const Text('背景資料'),
+                  subtitle: Text(BackgroundLocationData ?? "無資料"),
+                  onTap: () async {
+                    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+                    String? lat = position.latitude.toStringAsFixed(4);
+                    String? lon = position.longitude.toStringAsFixed(4);
+                    String? coordinate = '$lat,$lon';
+                    setState(() {
+                      BackgroundLocationData = '當前$coordinate';
+                    });
+                    messaging.getToken().then((value) {
+                      Global.api
+                          .postNotifyLocation(
+                        "0.0.0",
+                        "Ios",
+                        coordinate,
+                        value!,
+                      )
+                          .then((value) {
+                        setState(() {
+                          BackgroundLocationData = '$BackgroundLocationData \n $value';
                         });
                       }).catchError((error) {
-                        print(error);
+                        setState(() {
+                          BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+                        });
                       });
-                      await Global.preference.setString("loc-lat", lat);
-                      await Global.preference.setString("loc-lon", lon);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ));
+                    }).catchError((error) {
+                      print(error);
+                    });
+                    await Global.preference.setString("loc-lat", lat);
+                    await Global.preference.setString("loc-lon", lon);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
     } else {
       return Scaffold(
         appBar: AppBar(
@@ -367,6 +372,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
             ListTile(
               title: const Text("自動設定"),
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
+              trailing: Switch(
+                value: isLocationAutoSetEnabled,
+                onChanged: null,
+              ),
+              enabled: false,
               onTap: () async {
                 toggleLocationAutoSet(await openLocationSettings());
               },
@@ -399,7 +409,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                         ),
                       ),
                     ),
-                    actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("取消"))],
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text("取消")
+                      ),
+                    ],
                   ),
                 );
               },
