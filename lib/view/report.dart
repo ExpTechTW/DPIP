@@ -172,7 +172,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration.zero,
+      duration: const Duration(minutes: 1),
     );
 
     _sheetController.addListener(() {
@@ -222,7 +222,8 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   void updateLocationMarker(Position position) {
     setState(() {
-      markers.removeWhere((marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+      markers.removeWhere(
+          (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
       markers.add(
         Marker(
           point: LatLng(position.latitude, position.longitude),
