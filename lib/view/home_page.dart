@@ -197,6 +197,8 @@ class _HomePage extends State<HomePage> {
     'humidity': "-99.9",
     'precip': "-99.9",
     'update': 0.0,
+    'isday': 1,
+    'condition': 0,
   };
   List eqReport = [];
   bool weatherRefreshing = true;
@@ -214,6 +216,8 @@ class _HomePage extends State<HomePage> {
         'humidity': weatherData.humidity.toString(),
         'precip': weatherData.precip.mm.toString(),
         'update': weatherData.update,
+        'isday': weatherData.isday.round(),
+        'condition': weatherData.condition.round(),
       };
     } catch (e) {
       print(e);
@@ -364,8 +368,8 @@ class _HomePage extends State<HomePage> {
                                                   (weather["update"] as double).round() * 1000,
                                                 ),
                                               )}",
-                                              style: TextStyle(fontSize: 12)),
-                                          Text(
+                                              style: const TextStyle(fontSize: 12)),
+                                          const Text(
                                             "天氣資料來自 weather.com",
                                             style: TextStyle(fontSize: 12),
                                           )
@@ -385,9 +389,33 @@ class _HomePage extends State<HomePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(width: calculator.percentToPixel(5, context)),
-                                    Icon(
-                                      Icons.cloud_outlined,
-                                      size: calculator.percentToPixel(35, context),
+                                    // Icon(
+                                    //   weatherIcon.getWeatherIcon(weather["isday"], weather["condition"]),
+                                    //   size: calculator.percentToPixel(35, context),
+                                    // ),
+                                    SizedBox(
+                                      width: calculator.percentToPixel(35, context),
+                                      child: Image.network(
+                                        'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
+                                        width: calculator.percentToPixel(35, context),
+                                        height: calculator.percentToPixel(35, context),
+                                        fit: BoxFit.cover,
+                                        loadingBuilder:
+                                            (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded /
+                                                      loadingProgress.expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                          return Container();
+                                        },
+                                      ),
                                     ),
                                     SizedBox(width: calculator.percentToPixel(0, context)),
                                     SizedBox(
