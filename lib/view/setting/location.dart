@@ -344,7 +344,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                   title: const Text('縣市'),
                   additionalInfo: Text(currentCity ?? "尚未設定"),
                   trailing: const CupertinoListTileChevron(),
-                  onTap: isLocationAutoSetEnabled
+                  onTap: !isLocationAutoSetEnabled
                       ? () {
                           Navigator.push<String>(
                             context,
