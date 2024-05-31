@@ -196,12 +196,13 @@ class _HomePage extends State<HomePage> {
     'precip': "-99.9",
   };
   List eqReport = [];
-  String weatherStatus = "";
-  String eqReportStatus = "";
+  bool weatherRefreshing = true;
+  bool eqReportRefreshing = true;
   late Cal calculator;
   late TempColor tempToColor;
 
   void refreshWeather() async {
+    weatherRefreshing = true;
     try {
       final weatherData = await Global.api.getWeatherRealtime("979");
       weather = {
@@ -210,23 +211,22 @@ class _HomePage extends State<HomePage> {
         'humidity': weatherData.humidity.toString(),
         'precip': weatherData.precip.mm.toString(),
       };
-      weatherStatus = "200";
     } catch (e) {
       print(e);
-      weatherStatus = e.toString().split("of ")[1];
     }
+    weatherRefreshing = false;
     setState(() {});
   }
 
   void refreshEqReport() async {
+    weatherRefreshing = true;
     try {
       final eqReportData = await Global.api.getReportList(limit: 3);
       eqReport = eqReportData;
-      weatherStatus = "200";
     } catch (e) {
       print(e);
-      eqReportStatus = e.toString().split("of ")[1];
     }
+    weatherRefreshing = false;
     setState(() {});
   }
 
@@ -300,7 +300,7 @@ class _HomePage extends State<HomePage> {
             ),
             body: Column(
               children: [
-                weatherStatus == "200"
+                weatherRefreshing == false && weather["temp"] != "-99.9"
                     ? SizedBox(
                         // height: calculator.percentToPixel(60, context),
                         child: Stack(
@@ -436,11 +436,17 @@ class _HomePage extends State<HomePage> {
                           ],
                         ),
                       )
-                    : SizedBox(
-                        height: calculator.percentToPixel(60, context),
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        )),
+                    : weatherRefreshing == true
+                        ? SizedBox(
+                            height: calculator.percentToPixel(60, context),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ))
+                        : SizedBox(
+                            height: calculator.percentToPixel(60, context),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            )),
                 Container(
                   height: 1.5,
                   color: Colors.white,
@@ -609,7 +615,7 @@ class _HomePage extends State<HomePage> {
                           //       ),
                           //     ),
                           //   )
-                          : eqReportStatus == "200"
+                          : eqReportRefreshing == false
                               ? const Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
