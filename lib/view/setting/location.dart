@@ -283,8 +283,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               CupertinoListTile(
                 title: const Text("自動設定"),
                 subtitle: const Text("使用手機定位自動設定所在地"),
-                onTap: () {
-                  openLocationSettings();
+                onTap: () async {
+                  toggleLocationAutoSet(await openLocationSettings());
                 },
               ),
               CupertinoListSection(
@@ -295,30 +295,28 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                     title: const Text('縣市'),
                     additionalInfo: Text(currentCity ?? "尚未設定"),
                     trailing: const CupertinoListTileChevron(),
-                    onTap: () {
+                    onTap: isLocationAutoSetEnabled ? () {
                       Navigator.push<String>(
                         context,
                         CupertinoPageRoute(
                           builder: (context) => CupertinoCityPage(city: currentCity ?? "縣市"),
                         ),
                       ).then(setCityLocation);
-                    },
+                    } : null,
                   ),
                   CupertinoListTile(
                     leading: const Icon(CupertinoIcons.tree),
                     title: const Text('鄉鎮市區'),
                     additionalInfo: Text(currentTown ?? "尚未設定"),
                     trailing: const CupertinoListTileChevron(),
-                    onTap: currentCity != null
-                        ? () {
-                            Navigator.push<String>(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
-                              ),
-                            ).then(setTownLocation);
-                          }
-                        : null,
+                    onTap: !isLocationAutoSetEnabled && currentCity != null ? () {
+                      Navigator.push<String>(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => CupertinoTownPage(city: currentCity!, town: currentTown),
+                        ),
+                      ).then(setTownLocation);
+                    } : null,
                   ),
                   CupertinoListTile(
                     title: const Text('背景資料'),
@@ -412,7 +410,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               enabled: !isLocationAutoSetEnabled && currentCity != null,
               onTap: () {
                 List<String> townList = Global.region[currentCity]!.keys.toList();
-
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
