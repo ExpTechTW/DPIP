@@ -10,6 +10,7 @@ import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carp_background_location/carp_background_location.dart';
+import 'package:geolocator_platform_interface/src/enums/location_accuracy.dart' as geolocator;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -116,9 +117,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       //   return;
       // }
 
-      LocationDto location = await LocationManager().getCurrentLocation();
-      String lat = location.latitude.toString();
-      String lon = location.longitude.toString();
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.medium);
+      String? lat = position.latitude.toString();
+      String? lon = position.longitude.toString();
       setState(() {
         currentLocation = 'Lat: $lat, Lng: $lon';
         print(currentLocation);
@@ -126,7 +127,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       await Global.preference.setString("loc-lat", lat);
       await Global.preference.setString("loc-lon", lon);
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(location.latitude, location.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
         if (Platform.isIOS) {
