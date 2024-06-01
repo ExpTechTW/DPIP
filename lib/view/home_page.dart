@@ -217,7 +217,11 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('取得天氣資料時發生錯誤\n$e'),
+          content: Text(
+            '取得天氣資料時發生錯誤\n$e',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xAA202020),
         ),
       );
     }
@@ -234,7 +238,11 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('取得地震資料時發生錯誤\n$e'),
+          content: Text(
+            '取得地震資料時發生錯誤\n$e',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xAA202020),
         ),
       );
     }
