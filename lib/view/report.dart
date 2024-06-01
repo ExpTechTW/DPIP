@@ -210,13 +210,13 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     Position position = await Geolocator.getCurrentPosition();
     updateLocationMarker(position.latitude, position.longitude);
 
-    // 监听位置变化
     Geolocator.getPositionStream().listen((Position position) {
       updateLocationMarker(position.latitude, position.longitude);
     });
   }
 
   void updateLocationMarker(double latitude, double longitude) {
+    if (!mounted) return;
     setState(() {
       markers.removeWhere(
         (marker) => marker.point.latitude == latitude && marker.point.longitude == longitude,
