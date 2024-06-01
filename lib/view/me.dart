@@ -325,7 +325,7 @@ class _MePageState extends State<MePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const NotifyPage(),
+                              builder: (context) => NotifyPage(),
                             ),
                           );
                         },
@@ -577,7 +577,7 @@ class _MePageState extends State<MePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const NotifyPage(),
+                          builder: (context) => NotifyPage(),
                         ),
                       );
                     },
