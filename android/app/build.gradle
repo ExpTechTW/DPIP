@@ -1,14 +1,17 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+    id "com.google.gms.google-services"
+    id "com.google.firebase.crashlytics"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
         localProperties.load(reader)
     }
-}
-
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
@@ -23,17 +26,15 @@ def patchVersion = versionParts[2].padLeft(2, '0')
 
 def flutterVersionCode = (majorVersion + minorVersion + patchVersion).toInteger()
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
-apply plugin: 'com.google.gms.google-services'
+// def background_geolocation = project(':flutter_background_geolocation')
 
 android {
     namespace "com.exptech.dpip.dpip"
-    compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    ndkVersion rootProject.ext.ndkVersion
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -49,7 +50,7 @@ android {
     defaultConfig {
         applicationId "com.exptech.dpip"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -72,10 +73,16 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
+            // shrinkResources false
+            // // background_geolocation requires custom Proguard Rules with minifyEnabled
+            // proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
         }
         debug {
             signingConfig signingConfigs.debug
             minifyEnabled true
+            // shrinkResources false
+            // // background_geolocation requires custom Proguard Rules with minifyEnabled
+            // proguardFiles "${background_geolocation.projectDir}/proguard-rules.pro"
         }
     }
 }
@@ -85,5 +92,6 @@ flutter {
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
     implementation "androidx.multidex:multidex:2.0.1"
 }

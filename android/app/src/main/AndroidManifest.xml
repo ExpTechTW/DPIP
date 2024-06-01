@@ -1,15 +1,19 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:minSdkVersion="34" android:name="android.permission.USE_EXACT_ALARM" />
 
     <application
+            tools:replace="android:label"
             android:label="DPIP"
             android:name="${applicationName}"
             android:icon="@mipmap/ic_launcher">
@@ -31,7 +35,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name="com.exptech.dpip.api.location.Service"
+            android:name="com.exptech.dpip.location.Service"
             android:foregroundServiceType="location" />
         <meta-data
                 android:name="flutterEmbedding"

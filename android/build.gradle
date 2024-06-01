@@ -1,20 +1,18 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.google.gms:google-services:4.3.14'
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22"
-    }
+ext {
+    ndkVersion          = "26.1.10909125"   // or higher / as desired
+    compileSdkVersion   = 34                // or higher / as desired
+    targetSdkVersion    = 34                // or higher / as desired
 }
 
 allprojects {
     repositories {
         google()
         mavenCentral()
+        // [required] flutter_background_geolocation
+        maven { url "${project(':flutter_background_geolocation').projectDir}/libs" }
+        maven { url 'https://developer.huawei.com/repo/' }
+        // [required] background_fetch
+        maven { url "${project(':background_fetch').projectDir}/libs" }
     }
 }
 

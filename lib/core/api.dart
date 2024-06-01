@@ -81,7 +81,7 @@ class ExpTechApi {
     String coordinate,
     String token,
   ) async {
-    String url = 'https://api-1.exptech.com.tw/api/v1/notify/location/$version/$platform/$coordinate/$token';
+    String url = 'https://lb-2.exptech.com.tw/api/v1/notify/location/$version/$platform/$coordinate/$token';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
