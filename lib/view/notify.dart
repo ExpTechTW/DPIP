@@ -9,13 +9,9 @@ class NotifyPage extends StatelessWidget {
 
   // 播放音效的函式
   Future<void> playSound(String soundPath) async {
-    try {
       await _audioPlayer.setSource(AssetSource(soundPath));
       await _audioPlayer.resume();
-    } catch (error) {
-      print("Error playing sound: $error");
     }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,8 +127,7 @@ class NotifyPage extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(90)),
               ),
               child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween, // 靠兩側(其實我看不太懂
+                mainAxisAlignment: MainAxisAlignment.spaceBetween, // 靠兩側(其實我看不太懂
                 children: [
                   const Text(
                     '強震即時警報 (EEW) ',
