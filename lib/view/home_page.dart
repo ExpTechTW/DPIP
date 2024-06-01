@@ -1,18 +1,12 @@
-import 'dart:ffi' hide Size;
 import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
-import 'package:dpip/view/report_list.dart';
-import 'package:dpip/view/weather_warning.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:timezone/timezone.dart';
 
 import '../core/utils.dart';
 import '../global.dart';
-import '../model/earthquake_report.dart';
 import '../model/partial_earthquake_report.dart';
 import '../util/intensity_color.dart';
 

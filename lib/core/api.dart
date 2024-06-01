@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:dpip/model/earthquake_report.dart';
 import 'package:dpip/model/eew.dart';
-import 'package:dpip/model/weather_realtime.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
+import 'package:dpip/model/weather_realtime.dart';
 import 'package:http/http.dart' as http;
 
 enum EewSource {
