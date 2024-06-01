@@ -10,6 +10,7 @@ import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carp_background_location/carp_background_location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationSettingsPage extends StatefulWidget {
@@ -23,7 +24,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
-  late StreamSubscription<LocationDto> positionStreamSubscription;
+  late StreamSubscription<Position> positionStreamSubscription;
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
@@ -115,39 +116,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       //   return;
       // }
 
-      if (Platform.isAndroid || Platform.isIOS) {
-        positionStreamSubscription = LocationManager().locationStream.listen((LocationDto location) async {
-          if (location != null) {
-            String lat = location.latitude.toStringAsFixed(4);
-            String lon = location.longitude.toStringAsFixed(4);
-            String coordinate = '$lat,$lon';
-            setState(() {
-              backgroundLocationData = '背景$coordinate';
-            });
-            messaging.getToken().then((value) {
-              Global.api
-                  .postNotifyLocation(
-                "0.0.0",
-                Platform.isAndroid ? "Android" : "iOS",
-                coordinate,
-                value!,
-              )
-                  .then((value) {
-                setState(() {
-                  backgroundLocationData = '$backgroundLocationData \n $value';
-                });
-              }).catchError((error) {
-                setState(() {
-                  backgroundLocationData = '$backgroundLocationData \n ${error.toString()}';
-                });
-              });
-            }).catchError((error) {
-              print(error);
-            });
-          }
-        });
-      }
-
       LocationDto location = await LocationManager().getCurrentLocation();
       String lat = location.latitude.toString();
       String lon = location.longitude.toString();
@@ -191,9 +159,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   void startListening() {
-    positionStreamSubscription = LocationManager().locationStream.listen((LocationDto location) {
+    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
       setState(() {
-        currentLocation = 'Lat: ${location.latitude}, Lng: ${location.longitude}';
+        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
       });
     }, onError: (dynamic error) {
       setState(() {
