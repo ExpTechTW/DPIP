@@ -163,7 +163,6 @@ class MainAppState extends State<MainApp> {
     }
   }
 
-
   static void notificationCallback() {
     print('Notification clicked');
   }

@@ -9,8 +9,7 @@ import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
-import 'package:permission_handler/permission_handler.dart';
+import 'package:carp_background_location/carp_background_location.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationSettingsPage extends StatefulWidget {
@@ -24,31 +23,14 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
-  String? BackgroundLocationData;
+  late StreamSubscription<LocationDto> positionStreamSubscription;
+  String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
-  StreamSubscription<bg.Location>? _locationSubscription;
 
   @override
   void initState() {
     super.initState();
-    bg.BackgroundGeolocation.onLocation(onLocation);
-
-    bg.BackgroundGeolocation.ready(bg.Config(
-      desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
-      distanceFilter: 1,
-      stopOnTerminate: false,
-      startOnBoot: true,
-      foregroundService: true,
-      notification: bg.Notification(
-        title: "DPIP 背景定位",
-        text: "服務中...",
-      ),
-    )).then((bg.State state) {
-      if (!state.enabled) {
-        bg.BackgroundGeolocation.start();
-      }
-    });
-
+    startListening();
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -91,16 +73,15 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
-    bool isEnabled = false;
-    PermissionStatus permission = await Permission.locationWhenInUse.status;
-    if (!permission.isGranted) {
-      permission = await Permission.locationWhenInUse.request();
-    }
-    if (permission.isGranted) {
-      isEnabled = true;
-    } else {
-      isEnabled = false;
-    }
+    bool isEnabled = await LocationManager().isRunning;
+    // bool isPermissionGranted = await checkLocationPermission();
+
+    // if (!isPermissionGranted) {
+    //   print('初次檢查時沒權限');
+    //   isEnabled = false;
+    // } else {
+    //   isEnabled = true;
+    // }
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
       print(isLocationAutoSetEnabled);
@@ -110,93 +91,76 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     });
   }
 
-  Future<bool> getLocationPermission() async {
-    final PermissionStatus permission = await Permission.locationWhenInUse.status;
-    if (!permission.isGranted) {
-      await Permission.locationWhenInUse.request();
-      return false;
-    }
-    return true;
-  }
-
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) {
-      if (_locationSubscription != null) {
+      if (positionStreamSubscription != null) {
         setState(() {
-          _locationSubscription?.cancel();
-          _locationSubscription = null;
+          positionStreamSubscription.cancel();
         });
       }
       return;
     }
 
     try {
-      PermissionStatus permission = await Permission.locationWhenInUse.status;
-      if (!permission.isGranted) {
-        permission = await Permission.locationWhenInUse.request();
-      }
-      if (!permission.isGranted) {
-        print('檢查時沒權限');
-        if (!isLocationAutoSetEnabled) {
-          if (_locationSubscription != null) {
+      // bool isPermissionGranted = await checkLocationPermission();
+      // if (!isPermissionGranted) {
+      //   print('檢查時沒權限');
+      //   if (!isLocationAutoSetEnabled) {
+      //     if (positionStreamSubscription != null) {
+      //       setState(() {
+      //         positionStreamSubscription.cancel();
+      //       });
+      //     }
+      //   }
+      //   return;
+      // }
+
+      if (Platform.isAndroid || Platform.isIOS) {
+        positionStreamSubscription = LocationManager().locationStream.listen((LocationDto location) async {
+          if (location != null) {
+            String lat = location.latitude.toStringAsFixed(4);
+            String lon = location.longitude.toStringAsFixed(4);
+            String coordinate = '$lat,$lon';
             setState(() {
-              _locationSubscription?.cancel();
-              _locationSubscription = null;
+              backgroundLocationData = '背景$coordinate';
+            });
+            messaging.getToken().then((value) {
+              Global.api
+                  .postNotifyLocation(
+                "0.0.0",
+                Platform.isAndroid ? "Android" : "iOS",
+                coordinate,
+                value!,
+              )
+                  .then((value) {
+                setState(() {
+                  backgroundLocationData = '$backgroundLocationData \n $value';
+                });
+              }).catchError((error) {
+                setState(() {
+                  backgroundLocationData = '$backgroundLocationData \n ${error.toString()}';
+                });
+              });
+            }).catchError((error) {
+              print(error);
             });
           }
-        }
-        return;
-      }
-
-      ServiceStatus serviceStatus = await Permission.locationWhenInUse.serviceStatus;
-      bool isLocationServiceEnabled = serviceStatus == ServiceStatus.enabled;
-      print('服務: $isLocationServiceEnabled');
-      if (!isLocationServiceEnabled) {
-        if (_locationSubscription != null) {
-          setState(() {
-            _locationSubscription?.cancel();
-            _locationSubscription = null;
-          });
-        }
-        return;
-      }
-      bg.BackgroundGeolocation.getCurrentPosition(
-        desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
-        timeout: 30,
-      ).then((bg.Location location) {
-        onLocation(location);
-      });
-    } catch (e) {
-      print('無法取得位置: $e');
-    }
-  }
-
-  void onLocation(bg.Location location) async {
-    if (location != null) {
-      final String lat = location.coords.latitude.toStringAsFixed(4);
-      final String lon = location.coords.longitude.toStringAsFixed(4);
-      final String coordinate = '$lat,$lon';
-      setState(() {
-        BackgroundLocationData = '背景$coordinate';
-      });
-      messaging.getToken().then((value) {
-        Global.api.postNotifyLocation("0.0.0", "Android", coordinate, value!).then((value) {
-          setState(() {
-            BackgroundLocationData = '$BackgroundLocationData \n $value';
-          });
-        }).catchError((error) {
-          setState(() {
-            BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-          });
         });
-      }).catchError((error) {
-        print(error);
-      });
+      }
 
-      final List<Placemark> placemarks =
-          await placemarkFromCoordinates(location.coords.latitude, location.coords.longitude);
+      LocationDto location = await LocationManager().getCurrentLocation();
+      String lat = location.latitude.toString();
+      String lon = location.longitude.toString();
+      setState(() {
+        currentLocation = 'Lat: $lat, Lng: $lon';
+        print(currentLocation);
+      });
+      await Global.preference.setString("loc-lat", lat);
+      await Global.preference.setString("loc-lon", lon);
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(location.latitude, location.longitude);
       if (placemarks.isNotEmpty) {
-        final Placemark placemark = placemarks.first;
+        Placemark placemark = placemarks.first;
         if (Platform.isIOS) {
           String? city = placemark.subAdministrativeArea;
           String? town = placemark.locality;
@@ -221,13 +185,31 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         await Global.preference.setString("loc-city", currentCity!);
         await Global.preference.setString("loc-town", currentTown!);
       }
+    } catch (e) {
+      print('無法取得位置: $e');
     }
+  }
+
+  void startListening() {
+    positionStreamSubscription = LocationManager().locationStream.listen((LocationDto location) {
+      setState(() {
+        currentLocation = 'Lat: ${location.latitude}, Lng: ${location.longitude}';
+      });
+    }, onError: (dynamic error) {
+      setState(() {
+        currentLocation = 'Could not get location: $error';
+      });
+    });
+  }
+
+  void stopListening() {
+    positionStreamSubscription.cancel();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _locationSubscription?.cancel();
+    stopListening();
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
@@ -254,10 +236,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用手機定位自動設定所在地"),
               trailing: CupertinoSwitch(
                 value: isLocationAutoSetEnabled,
-                onChanged: (bool value) async {
-                  await toggleLocationAutoSet(await openLocationSettings());
-                },
+                onChanged: null,
               ),
+              onTap: () async {
+                toggleLocationAutoSet(await openLocationSettings());
+              },
             ),
             CupertinoListSection(
               header: const Text("所在地"),
@@ -311,11 +294,20 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
               trailing: Switch(
                 value: isLocationAutoSetEnabled,
-                onChanged: (value) async {
+                onChanged: (value) {
                   if (value) {
-                    toggleLocationAutoSet(await openLocationSettings());
+                    setState(() async {
+                      toggleLocationAutoSet(await openLocationSettings());
+                    });
                   } else {
-                    toggleLocationAutoSet(value);
+                    setState(() {
+                      isLocationAutoSetEnabled = value;
+                      if (positionStreamSubscription != null) {
+                        setState(() {
+                          positionStreamSubscription.cancel();
+                        });
+                      }
+                    });
                   }
                 },
               ),
