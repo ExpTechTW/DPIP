@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
+import 'package:dpip/view/report.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart';
@@ -95,83 +96,93 @@ class EqInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Container(
-        width: calculator.percentToPixel(90, context),
-        // height: calculator.percentToPixel(25, context),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: const Color(0x30808080),
-        ),
-        child: IntrinsicHeight(
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  width: calculator.percentToPixel(2, context),
-                  decoration: BoxDecoration(
-                    color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      bottomLeft: Radius.circular(10),
+      InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ReportPage(report: eqReport),
+            ),
+          );
+        },
+        child: Container(
+          width: calculator.percentToPixel(90, context),
+          // height: calculator.percentToPixel(25, context),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: const Color(0x30808080),
+          ),
+          child: IntrinsicHeight(
+            child: Stack(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    width: calculator.percentToPixel(2, context),
+                    decoration: BoxDecoration(
+                      color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        bottomLeft: Radius.circular(10),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: calculator.percentToPixel(5, context),
-                  right: calculator.percentToPixel(5, context),
-                  top: calculator.percentToPixel(1, context),
-                  bottom: calculator.percentToPixel(2, context),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
-                        ),
-                        Text(
-                          DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                            TZDateTime.fromMillisecondsSinceEpoch(
-                              getLocation("Asia/Taipei"),
-                              eqReport.time,
-                            ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: calculator.percentToPixel(5, context),
+                    right: calculator.percentToPixel(5, context),
+                    top: calculator.percentToPixel(1, context),
+                    bottom: calculator.percentToPixel(2, context),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
                           ),
-                          style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
-                          textAlign: TextAlign.left,
-                        ),
-                        Text(
-                          "規模${eqReport.mag}　深度${eqReport.depth}公里",
-                          style: const TextStyle(fontSize: 18, letterSpacing: 2),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      alignment: Alignment.center,
-                      width: calculator.percentToPixel(15, context),
-                      height: calculator.percentToPixel(15, context),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: context.colors.intensity(eqReport.intensity),
+                          Text(
+                            DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                              TZDateTime.fromMillisecondsSinceEpoch(
+                                getLocation("Asia/Taipei"),
+                                eqReport.time,
+                              ),
+                            ),
+                            style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            "規模${eqReport.mag}　深度${eqReport.depth}公里",
+                            style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        intensityToNumberString(eqReport.intensity),
-                        style: TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.w900,
-                          color: context.colors.onIntensity(eqReport.intensity),
+                      Container(
+                        alignment: Alignment.center,
+                        width: calculator.percentToPixel(15, context),
+                        height: calculator.percentToPixel(15, context),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: context.colors.intensity(eqReport.intensity),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
+                        child: Text(
+                          intensityToNumberString(eqReport.intensity),
+                          style: TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w900,
+                            color: context.colors.onIntensity(eqReport.intensity),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
