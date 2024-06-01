@@ -31,7 +31,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   @override
   void initState() {
     super.initState();
-    bg.BackgroundGeolocation.onLocation(_onLocation);
+    bg.BackgroundGeolocation.onLocation(onLocation);
 
     bg.BackgroundGeolocation.ready(bg.Config(
       desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
@@ -110,6 +110,15 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     });
   }
 
+  Future<bool> getLocationPermission() async {
+    final PermissionStatus permission = await Permission.locationWhenInUse.status;
+    if (!permission.isGranted) {
+      await Permission.locationWhenInUse.request();
+      return false;
+    }
+    return true;
+  }
+
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) {
       if (_locationSubscription != null) {
@@ -151,23 +160,22 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         }
         return;
       }
-
       bg.BackgroundGeolocation.getCurrentPosition(
         desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
         timeout: 30,
       ).then((bg.Location location) {
-        _onLocation(location);
+        onLocation(location);
       });
     } catch (e) {
       print('無法取得位置: $e');
     }
   }
 
-  void _onLocation(bg.Location location) async {
+  void onLocation(bg.Location location) async {
     if (location != null) {
-      String? lat = location.coords.latitude.toStringAsFixed(4);
-      String? lon = location.coords.longitude.toStringAsFixed(4);
-      String? coordinate = '$lat,$lon';
+      final String lat = location.coords.latitude.toStringAsFixed(4);
+      final String lon = location.coords.longitude.toStringAsFixed(4);
+      final String coordinate = '$lat,$lon';
       setState(() {
         BackgroundLocationData = '背景$coordinate';
       });
@@ -185,9 +193,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         print(error);
       });
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(location.coords.latitude, location.coords.longitude);
+      final List<Placemark> placemarks =
+          await placemarkFromCoordinates(location.coords.latitude, location.coords.longitude);
       if (placemarks.isNotEmpty) {
-        Placemark placemark = placemarks.first;
+        final Placemark placemark = placemarks.first;
         if (Platform.isIOS) {
           String? city = placemark.subAdministrativeArea;
           String? town = placemark.locality;
@@ -212,7 +221,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         await Global.preference.setString("loc-city", currentCity!);
         await Global.preference.setString("loc-town", currentTown!);
       }
-  }
+    }
   }
 
   @override
@@ -306,7 +315,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                   if (value) {
                     toggleLocationAutoSet(await openLocationSettings());
                   } else {
-                  toggleLocationAutoSet(value);
+                    toggleLocationAutoSet(value);
                   }
                 },
               ),
