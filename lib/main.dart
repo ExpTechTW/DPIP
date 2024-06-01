@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 import 'core/fcm.dart';
@@ -99,7 +98,6 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   String? currentLocation;
-  late StreamSubscription<Position> positionStreamSubscription;
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,

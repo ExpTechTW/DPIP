@@ -19,7 +19,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../core/utils.dart';
 
@@ -46,8 +48,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   final _sheetController = DraggableScrollableController();
   late String baseMap;
   int selectedMapIndex = 0;
-
-  late StreamSubscription<Position> positionStreamSubscription;
+  StreamSubscription<bg.Location>? locationSubscription;
 
   late AnimationController _animationController;
   final borderRadius = BorderRadiusTween(
@@ -185,17 +186,11 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   @override
   void dispose() {
     super.dispose();
-    positionStreamSubscription.cancel();
     _sheetController.dispose();
     _animationController.dispose();
   }
 
   void initLocationService() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
-    }
-
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -208,21 +203,28 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
       return;
     }
 
-    Position position = await Geolocator.getCurrentPosition();
-    updateLocationMarker(position);
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
 
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      updateLocationMarker(position);
+    Position position = await Geolocator.getCurrentPosition();
+    updateLocationMarker(position.latitude, position.longitude);
+
+    // 监听位置变化
+    Geolocator.getPositionStream().listen((Position position) {
+      updateLocationMarker(position.latitude, position.longitude);
     });
   }
 
-  void updateLocationMarker(Position position) {
+  void updateLocationMarker(double latitude, double longitude) {
     setState(() {
       markers.removeWhere(
-          (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+            (marker) => marker.point.latitude == latitude && marker.point.longitude == longitude,
+      );
       markers.add(
         Marker(
-          point: LatLng(position.latitude, position.longitude),
+          point: LatLng(latitude, longitude),
           width: 40,
           height: 40,
           child: const Icon(Icons.my_location, color: Colors.blue, size: 35),

@@ -9,7 +9,8 @@ import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationSettingsPage extends StatefulWidget {
@@ -23,18 +24,31 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
-  late StreamSubscription<Position> positionStreamSubscription;
   String? BackgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
-
-  final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
-  StreamSubscription<Position>? _positionStreamSubscription;
-  StreamSubscription<ServiceStatus>? serviceStatusStream;
+  StreamSubscription<bg.Location>? _locationSubscription;
 
   @override
   void initState() {
     super.initState();
-    startListening();
+    bg.BackgroundGeolocation.onLocation(_onLocation);
+
+    bg.BackgroundGeolocation.ready(bg.Config(
+      desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
+      distanceFilter: 1,
+      stopOnTerminate: false,
+      startOnBoot: true,
+      foregroundService: true,
+      notification: bg.Notification(
+        title: "DPIP 背景定位",
+        text: "服務中...",
+      ),
+    )).then((bg.State state) {
+      if (!state.enabled) {
+        bg.BackgroundGeolocation.start();
+      }
+    });
+
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -78,12 +92,14 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     bool isEnabled = false;
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission != LocationPermission.always) {
-      print('初次檢查時沒權限');
-      isEnabled = false;
-    } else {
+    PermissionStatus permission = await Permission.locationWhenInUse.status;
+    if (!permission.isGranted) {
+      permission = await Permission.locationWhenInUse.request();
+    }
+    if (permission.isGranted) {
       isEnabled = true;
+    } else {
+      isEnabled = false;
     }
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
@@ -96,164 +112,80 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) {
-      if (_positionStreamSubscription != null) {
+      if (_locationSubscription != null) {
         setState(() {
-          _positionStreamSubscription?.cancel();
-          _positionStreamSubscription = null;
+          _locationSubscription?.cancel();
+          _locationSubscription = null;
         });
       }
       return;
     }
 
     try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission != LocationPermission.always) {
+      PermissionStatus permission = await Permission.locationWhenInUse.status;
+      if (!permission.isGranted) {
+        permission = await Permission.locationWhenInUse.request();
+      }
+      if (!permission.isGranted) {
         print('檢查時沒權限');
         if (!isLocationAutoSetEnabled) {
-          if (_positionStreamSubscription != null) {
+          if (_locationSubscription != null) {
             setState(() {
-              _positionStreamSubscription?.cancel();
-              _positionStreamSubscription = null;
+              _locationSubscription?.cancel();
+              _locationSubscription = null;
             });
           }
         }
         return;
       }
 
-      bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+      ServiceStatus serviceStatus = await Permission.locationWhenInUse.serviceStatus;
+      bool isLocationServiceEnabled = serviceStatus == ServiceStatus.enabled;
       print('服務: $isLocationServiceEnabled');
       if (!isLocationServiceEnabled) {
-        if (_positionStreamSubscription != null) {
+        if (_locationSubscription != null) {
           setState(() {
-            _positionStreamSubscription?.cancel();
-            _positionStreamSubscription = null;
+            _locationSubscription?.cancel();
+            _locationSubscription = null;
           });
         }
         return;
       }
 
-      serviceStatusStream = Geolocator.getServiceStatusStream().listen((ServiceStatus status) {
-        if (status == ServiceStatus.enabled) {
-          print('服務啟用');
-          if (_positionStreamSubscription != null) {
-            setState(() {
-              _positionStreamSubscription?.cancel();
-              _positionStreamSubscription = null;
-            });
-          }
-        } else {
-          print('服務未啟用');
-        }
+      bg.BackgroundGeolocation.getCurrentPosition(
+        desiredAccuracy: bg.Config.DESIRED_ACCURACY_HIGH,
+        timeout: 30,
+      ).then((bg.Location location) {
+        _onLocation(location);
       });
+    } catch (e) {
+      print('無法取得位置: $e');
+    }
+  }
 
-      if (_positionStreamSubscription == null) {
-        if (Platform.isAndroid) {
-          final positionStream = _geolocatorPlatform.getPositionStream(
-              locationSettings: AndroidSettings(
-                  accuracy: LocationAccuracy.high,
-                  distanceFilter: 1,
-                  forceLocationManager: false,
-                  intervalDuration: const Duration(seconds: 1),
-                  //(Optional) Set foreground notification config to keep the app alive
-                  //when going to the background
-                  foregroundNotificationConfig: const ForegroundNotificationConfig(
-                    notificationText: "服務中...",
-                    notificationTitle: "DPIP 背景定位",
-                    notificationChannelName: '背景定位',
-                    enableWifiLock: true,
-                    enableWakeLock: true,
-                    setOngoing: false,
-                  )));
-          _positionStreamSubscription = positionStream.handleError((error) {
-            _positionStreamSubscription?.cancel();
-            _positionStreamSubscription = null;
-          }).listen((Position? position) async {
-            if (position != null) {
-              String? lat = position.latitude.toStringAsFixed(4);
-              String? lon = position.longitude.toStringAsFixed(4);
-              String? coordinate = '$lat,$lon';
-              setState(() {
-                BackgroundLocationData = '背景$coordinate';
-              });
-              messaging.getToken().then((value) {
-                Global.api
-                    .postNotifyLocation(
-                  "0.0.0",
-                  "Android",
-                  coordinate,
-                  value!,
-                )
-                    .then((value) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n $value';
-                  });
-                }).catchError((error) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                  });
-                });
-              }).catchError((error) {
-                print(error);
-              });
-            }
-          });
-        } else if (Platform.isIOS) {
-          final positionStream = _geolocatorPlatform.getPositionStream(
-              locationSettings: AppleSettings(
-            accuracy: LocationAccuracy.high,
-            activityType: ActivityType.otherNavigation,
-            distanceFilter: 100,
-            pauseLocationUpdatesAutomatically: true,
-            // Only set to true if our app will be started up in the background.
-            showBackgroundLocationIndicator: false,
-          ));
-          _positionStreamSubscription = positionStream.handleError((error) {
-            _positionStreamSubscription?.cancel();
-            _positionStreamSubscription = null;
-          }).listen((Position? position) async {
-            if (position != null) {
-              String? lat = position.latitude.toStringAsFixed(4);
-              String? lon = position.longitude.toStringAsFixed(4);
-              String? coordinate = '$lat,$lon';
-              setState(() {
-                BackgroundLocationData = '背景$coordinate';
-              });
-              messaging.getToken().then((value) {
-                Global.api
-                    .postNotifyLocation(
-                  "0.0.0",
-                  "Ios",
-                  coordinate,
-                  value!,
-                )
-                    .then((value) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n $value';
-                  });
-                }).catchError((error) {
-                  setState(() {
-                    BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                  });
-                });
-              }).catchError((error) {
-                print(error);
-              });
-            }
-          });
-        }
-      }
-
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-      String? lat = position.latitude.toString();
-      String? lon = position.longitude.toString();
+  void _onLocation(bg.Location location) async {
+    if (location != null) {
+      String? lat = location.coords.latitude.toStringAsFixed(4);
+      String? lon = location.coords.longitude.toStringAsFixed(4);
+      String? coordinate = '$lat,$lon';
       setState(() {
-        currentLocation = 'Lat: $lat, Lng: $lon';
-        print(currentLocation);
+        BackgroundLocationData = '背景$coordinate';
       });
-      await Global.preference.setString("loc-lat", lat);
-      await Global.preference.setString("loc-lon", lon);
+      messaging.getToken().then((value) {
+        Global.api.postNotifyLocation("0.0.0", "Android", coordinate, value!).then((value) {
+          setState(() {
+            BackgroundLocationData = '$BackgroundLocationData \n $value';
+          });
+        }).catchError((error) {
+          setState(() {
+            BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
+          });
+        });
+      }).catchError((error) {
+        print(error);
+      });
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(location.coords.latitude, location.coords.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
         if (Platform.isIOS) {
@@ -280,32 +212,13 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         await Global.preference.setString("loc-city", currentCity!);
         await Global.preference.setString("loc-town", currentTown!);
       }
-    } catch (e) {
-      print('無法取得位置: $e');
-    }
   }
-
-  void startListening() {
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      setState(() {
-        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
-      });
-    }, onError: (dynamic error) {
-      setState(() {
-        currentLocation = 'Could not get location: $error';
-      });
-    });
-  }
-  void stopListening() {
-    positionStreamSubscription.cancel();
   }
 
   @override
   void dispose() {
     super.dispose();
-    stopListening();
-    _positionStreamSubscription?.cancel();
-    _positionStreamSubscription = null;
+    _locationSubscription?.cancel();
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
@@ -332,11 +245,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用手機定位自動設定所在地"),
               trailing: CupertinoSwitch(
                 value: isLocationAutoSetEnabled,
-                onChanged: null,
+                onChanged: (bool value) async {
+                  await toggleLocationAutoSet(await openLocationSettings());
+                },
               ),
-              onTap: () async {
-                toggleLocationAutoSet(await openLocationSettings());
-              },
             ),
             CupertinoListSection(
               header: const Text("所在地"),
@@ -373,41 +285,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                         }
                       : null,
                 ),
-                CupertinoListTile(
-                  title: const Text('背景資料'),
-                  subtitle: Text(BackgroundLocationData ?? "無資料"),
-                  onTap: () async {
-                    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-                    String? lat = position.latitude.toStringAsFixed(4);
-                    String? lon = position.longitude.toStringAsFixed(4);
-                    String? coordinate = '$lat,$lon';
-                    setState(() {
-                      BackgroundLocationData = '當前$coordinate';
-                    });
-                    messaging.getToken().then((value) {
-                      Global.api
-                          .postNotifyLocation(
-                        "0.0.0",
-                        "Ios",
-                        coordinate,
-                        value!,
-                      )
-                          .then((value) {
-                        setState(() {
-                          BackgroundLocationData = '$BackgroundLocationData \n $value';
-                        });
-                      }).catchError((error) {
-                        setState(() {
-                          BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                        });
-                      });
-                    }).catchError((error) {
-                      print(error);
-                    });
-                    await Global.preference.setString("loc-lat", lat);
-                    await Global.preference.setString("loc-lon", lon);
-                  },
-                ),
               ],
             ),
           ],
@@ -425,21 +302,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
               trailing: Switch(
                 value: isLocationAutoSetEnabled,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value) {
-                    setState(() async {
-                      toggleLocationAutoSet(await openLocationSettings());
-                    });
+                    toggleLocationAutoSet(await openLocationSettings());
                   } else {
-                    setState(() {
-                      isLocationAutoSetEnabled = value;
-                      if (_positionStreamSubscription != null) {
-                        setState(() {
-                          _positionStreamSubscription?.cancel();
-                          _positionStreamSubscription = null;
-                        });
-                      }
-                    });
+                  toggleLocationAutoSet(value);
                   }
                 },
               ),
@@ -515,41 +382,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                     ],
                   ),
                 );
-              },
-            ),
-            ListTile(
-              title: const Text('背景資料'),
-              subtitle: Text(BackgroundLocationData ?? "無資料"),
-              onTap: () async {
-                Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-                String? lat = position.latitude.toStringAsFixed(4);
-                String? lon = position.longitude.toStringAsFixed(4);
-                String? coordinate = '$lat,$lon';
-                setState(() {
-                  BackgroundLocationData = '當前$coordinate';
-                });
-                messaging.getToken().then((value) {
-                  Global.api
-                      .postNotifyLocation(
-                    "0.0.0",
-                    "Android",
-                    coordinate,
-                    value!,
-                  )
-                      .then((value) {
-                    setState(() {
-                      BackgroundLocationData = '$BackgroundLocationData \n $value';
-                    });
-                  }).catchError((error) {
-                    setState(() {
-                      BackgroundLocationData = '$BackgroundLocationData \n ${error.toString()}';
-                    });
-                  });
-                }).catchError((error) {
-                  print(error);
-                });
-                await Global.preference.setString("loc-lat", lat);
-                await Global.preference.setString("loc-lon", lon);
               },
             ),
           ],
