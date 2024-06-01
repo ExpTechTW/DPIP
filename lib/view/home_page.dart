@@ -200,7 +200,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   late Cal calculator;
   late TempColor tempToColor;
 
-  void refreshWeather() async {
+  Future<void> refreshWeather(context) async {
+    setState(() {});
     weatherRefreshing = true;
     try {
       final weatherData = await Global.api.getWeatherRealtime("979");
@@ -214,19 +215,28 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         'condition': weatherData.condition.round(),
       };
     } catch (e) {
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('取得天氣資料時發生錯誤\n$e'),
+        ),
+      );
     }
     weatherRefreshing = false;
     setState(() {});
   }
 
-  void refreshEqReport() async {
+  Future<void> refreshEqReport(context) async {
+    setState(() {});
     eqReportRefreshing = true;
     try {
       final eqReportData = await Global.api.getReportList(limit: 10);
       eqReport = eqReportData;
     } catch (e) {
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('取得地震資料時發生錯誤\n$e'),
+        ),
+      );
     }
     eqReportRefreshing = false;
     setState(() {});
@@ -240,8 +250,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     super.initState();
     tempToColor = TempColor();
     calculator = Cal();
-    refreshWeather();
-    refreshEqReport();
+    refreshWeather(context);
+    refreshEqReport(context);
     _selectedArea = Areas.getOptions().first; // 初始化時設定_selectedValue為列表的第一項
   }
 
@@ -505,21 +515,42 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                             top: calculator.percentToPixel(5, context)),
                         child: eqReportRefreshing == false
                             ? eqReport.isEmpty
-                                ? const Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "近期設定區域無地震或警特報資訊",
-                                        style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                      ),
-                                    ],
-                                  )
-                                : ListView.builder(
-                                    itemCount: eqReport.length,
-                                    itemBuilder: (context, index) {
-                                      return EqInfo(eqReport: eqReport[index]);
+                                ? RefreshIndicator(
+                                    onRefresh: () async {
+                                      // 使用 Future.wait 來同時等待多個異步操作完成
+                                      await Future.wait([
+                                        refreshWeather(context),
+                                        refreshEqReport(context),
+                                      ]);
                                     },
-                                    // shrinkWrap: true,
+                                    child: const SingleChildScrollView(
+                                      physics: AlwaysScrollableScrollPhysics(),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "近期設定區域無地震或警特報資訊",
+                                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : RefreshIndicator(
+                                    onRefresh: () async {
+                                      // 使用 Future.wait 來同時等待多個異步操作完成
+                                      await Future.wait([
+                                        refreshWeather(context),
+                                        refreshEqReport(context),
+                                      ]);
+                                    },
+                                    child: ListView.builder(
+                                      itemCount: eqReport.length,
+                                      itemBuilder: (context, index) {
+                                        return EqInfo(eqReport: eqReport[index]);
+                                      },
+                                      // shrinkWrap: true,
+                                    ),
                                   )
                             : const Center(child: CircularProgressIndicator())),
                   ),
