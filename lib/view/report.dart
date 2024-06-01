@@ -21,7 +21,6 @@ import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_background_geolocation/flutter_background_geolocation.dart' as bg;
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../core/utils.dart';
 
@@ -220,7 +219,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   void updateLocationMarker(double latitude, double longitude) {
     setState(() {
       markers.removeWhere(
-            (marker) => marker.point.latitude == latitude && marker.point.longitude == longitude,
+        (marker) => marker.point.latitude == latitude && marker.point.longitude == longitude,
       );
       markers.add(
         Marker(
