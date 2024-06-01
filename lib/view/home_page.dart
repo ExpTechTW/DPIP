@@ -182,7 +182,7 @@ class EqInfo extends StatelessWidget {
   }
 }
 
-class _HomePage extends State<HomePage> {
+class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomePage> {
   late String _selectedArea;
   List<PartialEarthquakeReport> reports = [];
   var weather = {
@@ -231,6 +231,9 @@ class _HomePage extends State<HomePage> {
     eqReportRefreshing = false;
     setState(() {});
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
