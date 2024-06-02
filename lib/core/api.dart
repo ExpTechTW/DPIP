@@ -81,13 +81,13 @@ class ExpTechApi {
     String coordinate,
     String token,
   ) async {
-    String url = 'https://lb-2.exptech.com.tw/api/v1/notify/location/$version/$platform/$coordinate/$token';
-    final response = await http.get(Uri.parse(url));
+    final response = await http.get(Uri.parse(
+        'https://api-${randomNum(2)}.exptech.com.tw/api/v1/notify/location/${version}/${platform}/${coordinate}/${token}'));
 
     if (response.statusCode == 200) {
-      return url;
+      return response.body;
     } else {
-      throw Exception('The server returned a status code of ${response.statusCode} $url');
+      throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
 }
