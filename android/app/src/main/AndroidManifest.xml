@@ -34,9 +34,17 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service
-            android:name="com.exptech.dpip.location.Service"
-            android:foregroundServiceType="location" />
+        <receiver android:name="com.exptech.dpip.BootBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+        <service android:name="com.exptech.dpip.location.Service"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:exported="true"
+            android:foregroundServiceType = "location"/>
         <meta-data
                 android:name="flutterEmbedding"
                 android:value="2"/>

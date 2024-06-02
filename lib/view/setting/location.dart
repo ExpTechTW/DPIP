@@ -9,10 +9,13 @@ import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
 import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:carp_background_location/carp_background_location.dart';
-import 'package:geolocator_platform_interface/src/enums/location_accuracy.dart' as geolocator;
+import 'package:flutter/services.dart';
+// import 'package:carp_background_location/carp_background_location.dart';
+// import 'package:geolocator_platform_interface/src/enums/location_accuracy.dart' as geolocator;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+
+import 'package:flutter_generic_location/flutter_generic_location.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -29,10 +32,18 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
+  final _flutterGenericLocationPlugin = FlutterGenericLocation();
+  late StreamSubscription<Map<String, dynamic>> streamSubscription;
+  bool runningLocationUpdates = false;
+  bool runningLocationService = false;
+
+  Map<String, dynamic> _location = {};
+  String _error = "";
+
   @override
   void initState() {
     super.initState();
-    startListening();
+    // startListening();
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -75,15 +86,15 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
-    bool isEnabled = await LocationManager().isRunning;
-    // bool isPermissionGranted = await checkLocationPermission();
-
-    // if (!isPermissionGranted) {
-    //   print('初次檢查時沒權限');
-    //   isEnabled = false;
-    // } else {
-    //   isEnabled = true;
-    // }
+    // bool isEnabled = await LocationManager().isRunning;
+    bool isEnabled = false;
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always) {
+      print('初次檢查時沒權限');
+      isEnabled = false;
+    } else {
+      isEnabled = true;
+    }
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
       print(isLocationAutoSetEnabled);
@@ -94,31 +105,41 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> getLocation() async {
-    if (!isLocationAutoSetEnabled) {
-      positionStreamSubscription?.cancel();
+    // if (!isLocationAutoSetEnabled) {
+    //   positionStreamSubscription?.cancel();
+    //   return;
+    // }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always) {
+      print('檢查時沒權限');
+      if (!isLocationAutoSetEnabled) {
+        if (positionStreamSubscription != null) {
+          setState(() {
+            positionStreamSubscription.cancel();
+          });
+        }
+      }
       return;
     }
 
+    await getLocaion();
+    print(_location);
+    await startAndStopLocaitonService();
+    print(runningLocationService);
+    await startStopLocationUpdates();
+    print(runningLocationUpdates);
+    await showNotification();
+    await getLastLocation();
+    print(_location);
+
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.medium);
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
       await updateLocation(position);
     } catch (e) {
       print('無法取得位置: $e');
     }
   }
-
-      // bool isPermissionGranted = await checkLocationPermission();
-      // if (!isPermissionGranted) {
-      //   print('檢查時沒權限');
-      //   if (!isLocationAutoSetEnabled) {
-      //     if (positionStreamSubscription != null) {
-      //       setState(() {
-      //         positionStreamSubscription.cancel();
-      //       });
-      //     }
-      //   }
-      //   return;
-      // }
 
   Future<void> updateLocation(Position position) async {
     try {
@@ -195,6 +216,83 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       }
     });
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
+  }
+
+  Future<void> getLocaion() async {
+    try {
+      final location = await _flutterGenericLocationPlugin.getLocation();
+      setState(() {
+        _location = location;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    }
+  }
+
+  Future<void> getLastLocation() async {
+    try {
+      final location = await _flutterGenericLocationPlugin.getLastLocation();
+      setState(() {
+        _location = location;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    }
+  }
+
+  Future<void> startStopLocationUpdates() async {
+    try {
+      if (runningLocationUpdates == false) {
+        await _flutterGenericLocationPlugin.startLocationUpdates();
+        runningLocationUpdates = true;
+      } else {
+        _flutterGenericLocationPlugin.stopLocationUpdates();
+        runningLocationUpdates = false;
+      }
+      setState(() {});
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    }
+  }
+
+  Future<void> startAndStopLocaitonService() async {
+    try {
+      if (runningLocationService == false) {
+        await _flutterGenericLocationPlugin.startLocationService();
+        runningLocationService = true;
+      } else {
+        _flutterGenericLocationPlugin.stopLocationService();
+        runningLocationService = false;
+      }
+      setState(() {});
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    }
+  }
+
+  Future<Uint8List> fetchNotificationIcon() async {
+    ByteData imageData = await rootBundle.load('assets/app_icon.png');
+    return imageData.buffer.asUint8List();
+  }
+
+  Future<void> showNotification() async {
+    try {
+      final notificationIcon = await fetchNotificationIcon();
+      await _flutterGenericLocationPlugin.showNotification(
+          'Test Notification', 'This is a test notification message', "PluginDemoChannel", notificationIcon);
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
+    }
   }
 
   @override
@@ -275,13 +373,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                       toggleLocationAutoSet(await openLocationSettings());
                     });
                   } else {
-                    setState(() {
+                    setState(() async {
                       isLocationAutoSetEnabled = value;
-                      if (positionStreamSubscription != null) {
-                        setState(() {
-                          positionStreamSubscription.cancel();
-                        });
-                      }
+                      await startAndStopLocaitonService();
+                      await startStopLocationUpdates();
                     });
                   }
                 },
