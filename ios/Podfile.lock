@@ -3,8 +3,6 @@ PODS:
     - Flutter
   - audioplayers_darwin (0.0.1):
     - Flutter
-  - background_locator_2 (0.0.1):
-    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -42,6 +40,8 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 7.8)
     - nanopb (< 2.30911.0, >= 2.30908.0)
   - Flutter (1.0.0)
+  - flutter_generic_location (0.0.1):
+    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
@@ -106,11 +106,11 @@ PODS:
 DEPENDENCIES:
   - app_settings (from `.symlinks/plugins/app_settings/ios`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
-  - background_locator_2 (from `.symlinks/plugins/background_locator_2/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
+  - flutter_generic_location (from `.symlinks/plugins/flutter_generic_location/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
@@ -142,8 +142,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/app_settings/ios"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
-  background_locator_2:
-    :path: ".symlinks/plugins/background_locator_2/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/darwin"
   firebase_core:
@@ -152,6 +150,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
+  flutter_generic_location:
+    :path: ".symlinks/plugins/flutter_generic_location/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   fluttertoast:
@@ -174,7 +174,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   app_settings: 017320c6a680cdc94c799949d95b84cb69389ebc
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
-  background_locator_2: bc8a422343ab656d5bd98e08694c6f89fef20418
   connectivity_plus: e2dad488011aeb593e219360e804c43cc1af5770
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
   firebase_core: a626d00494efa398e7c54f25f1454a64c8abf197
@@ -184,6 +183,7 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 91950fe859846fff0fbd296180909dd273103b09
   FirebaseMessaging: 88950ba9485052891ebe26f6c43a52bb62248952
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_generic_location: 4bf80172640cf24ccbdb52960c7b18d22fc42dc2
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
   fluttertoast: 9f2f8e81bb5ce18facb9748d7855bf5a756fe3db
   geocoding_ios: d7460f56e80e118d57678efe5c2cdc888739ff18
