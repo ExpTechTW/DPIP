@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:carp_background_location/carp_background_location.dart';
 // import 'package:geolocator_platform_interface/src/enums/location_accuracy.dart' as geolocator;
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 import 'package:flutter_generic_location/flutter_generic_location.dart';
@@ -28,7 +28,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
-  late StreamSubscription<Position> positionStreamSubscription;
+  // late StreamSubscription<Position> positionStreamSubscription;
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
@@ -38,7 +38,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   bool runningLocationService = false;
 
   Map<String, dynamic> _location = {};
-  String _error = "";
+  String error = "";
 
   @override
   void initState() {
@@ -88,13 +88,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     // bool isEnabled = await LocationManager().isRunning;
     bool isEnabled = false;
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission != LocationPermission.always) {
-      print('初次檢查時沒權限');
-      isEnabled = false;
-    } else {
-      isEnabled = true;
-    }
+    isEnabled = true;
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
       print(isLocationAutoSetEnabled);
@@ -110,18 +104,19 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     //   return;
     // }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission != LocationPermission.always) {
-      print('檢查時沒權限');
-      if (!isLocationAutoSetEnabled) {
-        if (positionStreamSubscription != null) {
-          setState(() {
-            positionStreamSubscription.cancel();
-          });
-        }
-      }
-      return;
-    }
+
+    // LocationPermission permission = await Geolocator.checkPermission();
+    // if (permission != LocationPermission.always) {
+    //   print('檢查時沒權限');
+    //   if (!isLocationAutoSetEnabled) {
+    //     if (positionStreamSubscription != null) {
+    //       setState(() {
+    //         positionStreamSubscription.cancel();
+    //       });
+    //     }
+    //   }
+    //   return;
+    // }
 
     await getLocaion();
     print(_location);
@@ -134,17 +129,20 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     print(_location);
 
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-      await updateLocation(position);
+      final location = await _flutterGenericLocationPlugin.getLocation();
+      setState(() {
+        _location = location;
+      });
+      await updateLocation(location);
     } catch (e) {
       print('無法取得位置: $e');
     }
   }
 
-  Future<void> updateLocation(Position position) async {
+  Future<void> updateLocation(Map<String, dynamic> location) async {
     try {
-      String lat = position.latitude.toString();
-      String lon = position.longitude.toString();
+      String lat = location['latitude'].toString();
+      String lon = location['longitude'].toString();
 
       setState(() {
         currentLocation = 'Lat: $lat, Lng: $lon';
@@ -153,7 +151,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       await Global.preference.setString("loc-lat", lat);
       await Global.preference.setString("loc-lon", lon);
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(location['latitude'], location['longitude']);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
         String? city;
@@ -183,7 +181,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     }
   }
 
-  void startListening() {
+  /*void startListening() {
     positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
       setState(() {
         currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
@@ -198,12 +196,12 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   void stopListening() {
     positionStreamSubscription.cancel();
-  }
+  }*/
 
   @override
   void dispose() {
     super.dispose();
-    stopListening();
+    streamSubscription.cancel();
   }
 
   Future<void> toggleLocationAutoSet(bool value) async {
@@ -212,7 +210,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       if (isLocationAutoSetEnabled) {
         getLocation();
       } else {
-        positionStreamSubscription?.cancel();
+        streamSubscription.cancel();
       }
     });
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
@@ -226,7 +224,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        error = e.toString();
       });
     }
   }
@@ -239,7 +237,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       });
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        error = e.toString();
       });
     }
   }
@@ -256,7 +254,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       setState(() {});
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        error = e.toString();
       });
     }
   }
@@ -273,7 +271,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       setState(() {});
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        error = e.toString();
       });
     }
   }
@@ -290,7 +288,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
           'Test Notification', 'This is a test notification message', "PluginDemoChannel", notificationIcon);
     } catch (e) {
       setState(() {
-        _error = e.toString();
+        error = e.toString();
       });
     }
   }

@@ -19,7 +19,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:geolocator/geolocator.dart';
+// import 'package:geolocator/geolocator.dart';
+import 'package:flutter_generic_location/flutter_generic_location.dart';
 
 import '../core/utils.dart';
 
@@ -47,7 +48,9 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   late String baseMap;
   int selectedMapIndex = 0;
 
-  late StreamSubscription<Position> positionStreamSubscription;
+  final _flutterGenericLocationPlugin = FlutterGenericLocation();
+  // late StreamSubscription<Position> positionStreamSubscription;
+  late StreamSubscription<Map<String, dynamic>> streamSubscription;
 
   late AnimationController _animationController;
   final borderRadius = BorderRadiusTween(
@@ -185,44 +188,34 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   @override
   void dispose() {
     super.dispose();
-    positionStreamSubscription.cancel();
+    streamSubscription.cancel();
     _sheetController.dispose();
     _animationController.dispose();
   }
 
   void initLocationService() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
+    try {
+      final location = await _flutterGenericLocationPlugin.getLocation();
+      updateLocationMarker(location);
+
+      streamSubscription = FlutterGenericLocation.locationStream.listen((location) {
+        updateLocationMarker(location);
+      });
+    } catch (e) {
+      print('無法取得位置: $e');
     }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition();
-    updateLocationMarker(position);
-
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      updateLocationMarker(position);
-    });
   }
 
-  void updateLocationMarker(Position position) {
+  void updateLocationMarker(Map<String, dynamic> location) {
     setState(() {
+      double latitude = location['latitude'];
+      double longitude = location['longitude'];
+
       markers.removeWhere(
-          (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+              (marker) => marker.point.latitude == latitude && marker.point.longitude == longitude);
       markers.add(
         Marker(
-          point: LatLng(position.latitude, position.longitude),
+          point: LatLng(latitude, longitude),
           width: 40,
           height: 40,
           child: const Icon(Icons.my_location, color: Colors.blue, size: 35),
