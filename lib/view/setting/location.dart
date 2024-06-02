@@ -95,15 +95,18 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) {
-      if (positionStreamSubscription != null) {
-        setState(() {
-          positionStreamSubscription.cancel();
-        });
-      }
+      positionStreamSubscription?.cancel();
       return;
     }
 
     try {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.medium);
+      await updateLocation(position);
+    } catch (e) {
+      print('無法取得位置: $e');
+    }
+  }
+
       // bool isPermissionGranted = await checkLocationPermission();
       // if (!isPermissionGranted) {
       //   print('檢查時沒權限');
@@ -117,36 +120,36 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       //   return;
       // }
 
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.medium);
-      String? lat = position.latitude.toString();
-      String? lon = position.longitude.toString();
+  Future<void> updateLocation(Position position) async {
+    try {
+      String lat = position.latitude.toString();
+      String lon = position.longitude.toString();
+
       setState(() {
         currentLocation = 'Lat: $lat, Lng: $lon';
-        print(currentLocation);
       });
+
       await Global.preference.setString("loc-lat", lat);
       await Global.preference.setString("loc-lon", lon);
 
       List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
         Placemark placemark = placemarks.first;
+        String? city;
+        String? town;
+
         if (Platform.isIOS) {
-          String? city = placemark.subAdministrativeArea;
-          String? town = placemark.locality;
-
-          setState(() {
-            currentCity = city;
-            currentTown = town;
-          });
+          city = placemark.subAdministrativeArea;
+          town = placemark.locality;
         } else if (Platform.isAndroid) {
-          String? city = placemark.administrativeArea;
-          String? town = placemark.subAdministrativeArea;
-
-          setState(() {
-            currentCity = city;
-            currentTown = town;
-          });
+          city = placemark.administrativeArea;
+          town = placemark.subAdministrativeArea;
         }
+
+        setState(() {
+          currentCity = city;
+          currentTown = town;
+        });
 
         print('縣市: $currentCity');
         print('鄉鎮市區: $currentTown');
@@ -164,6 +167,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       setState(() {
         currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
       });
+      updateLocation(position);
     }, onError: (dynamic error) {
       setState(() {
         currentLocation = 'Could not get location: $error';
@@ -186,6 +190,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       isLocationAutoSetEnabled = value;
       if (isLocationAutoSetEnabled) {
         getLocation();
+      } else {
+        positionStreamSubscription?.cancel();
       }
     });
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);

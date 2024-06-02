@@ -3,28 +3,25 @@ PODS:
     - Flutter
   - audioplayers_darwin (0.0.1):
     - Flutter
-  - background_fetch (1.3.5):
+  - background_locator_2 (0.0.1):
     - Flutter
-  - CocoaLumberjack (3.8.5):
-    - CocoaLumberjack/Core (= 3.8.5)
-  - CocoaLumberjack/Core (3.8.5)
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
     - ReachabilitySwift
-  - Firebase/CoreOnly (10.22.0):
-    - FirebaseCore (= 10.22.0)
-  - Firebase/Messaging (10.22.0):
+  - Firebase/CoreOnly (10.25.0):
+    - FirebaseCore (= 10.25.0)
+  - Firebase/Messaging (10.25.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 10.22.0)
-  - firebase_core (2.28.0):
-    - Firebase/CoreOnly (= 10.22.0)
+    - FirebaseMessaging (~> 10.25.0)
+  - firebase_core (2.32.0):
+    - Firebase/CoreOnly (= 10.25.0)
     - Flutter
-  - firebase_messaging (14.8.0):
-    - Firebase/Messaging (= 10.22.0)
+  - firebase_messaging (14.9.4):
+    - Firebase/Messaging (= 10.25.0)
     - firebase_core
     - Flutter
-  - FirebaseCore (10.22.0):
+  - FirebaseCore (10.25.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.12)
     - GoogleUtilities/Logger (~> 7.12)
@@ -35,7 +32,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
-  - FirebaseMessaging (10.22.0):
+  - FirebaseMessaging (10.25.0):
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
     - GoogleDataTransport (~> 9.3)
@@ -45,9 +42,6 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 7.8)
     - nanopb (< 2.30911.0, >= 2.30908.0)
   - Flutter (1.0.0)
-  - flutter_background_geolocation (4.15.3):
-    - CocoaLumberjack (~> 3.8.5)
-    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
@@ -96,8 +90,6 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.3.0):
-    - Flutter
   - PromisesObjC (2.4.0)
   - ReachabilitySwift (5.2.3)
   - shared_preferences_foundation (0.0.1):
@@ -114,19 +106,17 @@ PODS:
 DEPENDENCIES:
   - app_settings (from `.symlinks/plugins/app_settings/ios`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
-  - background_fetch (from `.symlinks/plugins/background_fetch/ios`)
+  - background_locator_2 (from `.symlinks/plugins/background_locator_2/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
-  - flutter_background_geolocation (from `.symlinks/plugins/flutter_background_geolocation/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
-  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - Siren
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
@@ -134,7 +124,6 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - CocoaLumberjack
     - Firebase
     - FirebaseCore
     - FirebaseCoreInternal
@@ -153,8 +142,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/app_settings/ios"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
-  background_fetch:
-    :path: ".symlinks/plugins/background_fetch/ios"
+  background_locator_2:
+    :path: ".symlinks/plugins/background_locator_2/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/darwin"
   firebase_core:
@@ -163,8 +152,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
-  flutter_background_geolocation:
-    :path: ".symlinks/plugins/flutter_background_geolocation/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   fluttertoast:
@@ -177,8 +164,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
-  permission_handler_apple:
-    :path: ".symlinks/plugins/permission_handler_apple/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   sqflite:
@@ -189,18 +174,16 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   app_settings: 017320c6a680cdc94c799949d95b84cb69389ebc
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
-  background_fetch: f73d045fee3d313ea8c0afa205317bff8a6bf8d2
-  CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
+  background_locator_2: bc8a422343ab656d5bd98e08694c6f89fef20418
   connectivity_plus: e2dad488011aeb593e219360e804c43cc1af5770
-  Firebase: 797fd7297b7e1be954432743a0b3f90038e45a71
-  firebase_core: d955499180c3c8ef355adf46b8752c4c01d09e0a
-  firebase_messaging: 23c8eaa885a11552e45c98b7a08ba81860092883
-  FirebaseCore: 0326ec9b05fbed8f8716cddbf0e36894a13837f7
+  Firebase: 0312a2352584f782ea56f66d91606891d4607f06
+  firebase_core: a626d00494efa398e7c54f25f1454a64c8abf197
+  firebase_messaging: 06391e8f35dc65a00c56580266285263d2861f10
+  FirebaseCore: 7ec4d0484817f12c3373955bc87762d96842d483
   FirebaseCoreInternal: 910a81992c33715fec9263ca7381d59ab3a750b7
   FirebaseInstallations: 91950fe859846fff0fbd296180909dd273103b09
-  FirebaseMessaging: 9f71037fd9db3376a4caa54e5a3949d1027b4b6e
+  FirebaseMessaging: 88950ba9485052891ebe26f6c43a52bb62248952
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_background_geolocation: 50e2a72a821164a9a7e4f5768630085f688c72e8
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
   fluttertoast: 9f2f8e81bb5ce18facb9748d7855bf5a756fe3db
   geocoding_ios: d7460f56e80e118d57678efe5c2cdc888739ff18
@@ -210,7 +193,6 @@ SPEC CHECKSUMS:
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
-  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   ReachabilitySwift: 7f151ff156cea1481a8411701195ac6a984f4979
   shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
