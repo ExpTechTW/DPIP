@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:carp_background_location/carp_background_location.dart';
 // import 'package:geolocator_platform_interface/src/enums/location_accuracy.dart' as geolocator;
-// import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 import 'package:flutter_generic_location/flutter_generic_location.dart';
@@ -88,10 +88,12 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     // bool isEnabled = await LocationManager().isRunning;
     bool isEnabled = false;
-    isEnabled = true;
+    final status = await Geolocator.checkPermission();
+    if (status == LocationPermission.always || status == LocationPermission.whileInUse) {
+      isEnabled = true;
+    }
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
-      print(isLocationAutoSetEnabled);
       if (isLocationAutoSetEnabled) {
         getLocation();
       }
@@ -99,10 +101,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> getLocation() async {
-    // if (!isLocationAutoSetEnabled) {
-    //   positionStreamSubscription?.cancel();
-    //   return;
-    // }
+    if (!isLocationAutoSetEnabled) {
+      streamSubscription.cancel();
+      return;
+    }
 
 
     // LocationPermission permission = await Geolocator.checkPermission();
@@ -118,22 +120,21 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     //   return;
     // }
 
-    await getLocaion();
-    print(_location);
-    await startAndStopLocaitonService();
-    print(runningLocationService);
-    await startStopLocationUpdates();
-    print(runningLocationUpdates);
-    await showNotification();
-    await getLastLocation();
-    print(_location);
-
     try {
       final location = await _flutterGenericLocationPlugin.getLocation();
       setState(() {
         _location = location;
       });
       await updateLocation(location);
+      await getLocaion();
+      print(_location);
+      await startAndStopLocaitonService();
+      print(runningLocationService);
+      await startStopLocationUpdates();
+      print(runningLocationUpdates);
+      await showNotification();
+      await getLastLocation();
+      print(_location);
     } catch (e) {
       print('無法取得位置: $e');
     }
@@ -198,22 +199,28 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     positionStreamSubscription.cancel();
   }*/
 
-  @override
-  void dispose() {
-    super.dispose();
-    streamSubscription.cancel();
-  }
-
   Future<void> toggleLocationAutoSet(bool value) async {
+    if (!value) {
+      streamSubscription.cancel();
+    }
+
     setState(() {
       isLocationAutoSetEnabled = value;
-      if (isLocationAutoSetEnabled) {
-        getLocation();
-      } else {
-        streamSubscription.cancel();
-      }
     });
+
+    if (value) {
+      getLocation();
+    } else {
+      streamSubscription.cancel();
+    }
+
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
+  }
+
+  @override
+  void dispose() {
+    streamSubscription.cancel();
+    super.dispose();
   }
 
   Future<void> getLocaion() async {
@@ -261,10 +268,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> startAndStopLocaitonService() async {
     try {
-      if (runningLocationService == false) {
+      if (isLocationAutoSetEnabled && !runningLocationService) {
         await _flutterGenericLocationPlugin.startLocationService();
         runningLocationService = true;
-      } else {
+      } else if (!isLocationAutoSetEnabled && runningLocationService) {
         _flutterGenericLocationPlugin.stopLocationService();
         runningLocationService = false;
       }
@@ -310,7 +317,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 onChanged: null,
               ),
               onTap: () async {
-                toggleLocationAutoSet(await openLocationSettings());
+                final permissionGranted = await openLocationSettings();
+                if (permissionGranted) {
+                  toggleLocationAutoSet(true);
+                }
               },
             ),
             CupertinoListSection(
