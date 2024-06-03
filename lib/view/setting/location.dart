@@ -10,12 +10,9 @@ import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:carp_background_location/carp_background_location.dart';
-// import 'package:geolocator_platform_interface/src/enums/location_accuracy.dart' as geolocator;
+import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-
-import 'package:flutter_generic_location/flutter_generic_location.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -28,14 +25,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentTown = Global.preference.getString("loc-town");
   String? currentCity = Global.preference.getString("loc-city");
   String? currentLocation;
-  // late StreamSubscription<Position> positionStreamSubscription;
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
-
-  final _flutterGenericLocationPlugin = FlutterGenericLocation();
-  late StreamSubscription<Map<String, dynamic>> streamSubscription;
-  bool runningLocationUpdates = false;
-  bool runningLocationService = false;
 
   Map<String, dynamic> _location = {};
   String error = "";
@@ -43,7 +34,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   @override
   void initState() {
     super.initState();
-    // startListening();
+    BackgroundTask.instance.setBackgroundHandler(_backgroundLocationHandler);
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -102,7 +93,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> getLocation() async {
     if (!isLocationAutoSetEnabled) {
-      streamSubscription.cancel();
       return;
     }
 
@@ -121,20 +111,12 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     // }
 
     try {
-      final location = await _flutterGenericLocationPlugin.getLocation();
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       setState(() {
-        _location = location;
+        _location = {'latitude': position.latitude, 'longitude': position.longitude};
       });
-      await updateLocation(location);
-      await getLocaion();
-      print(_location);
-      await startAndStopLocaitonService();
-      print(runningLocationService);
-      await startStopLocationUpdates();
-      print(runningLocationUpdates);
+      await updateLocation(_location);
       await showNotification();
-      await getLastLocation();
-      print(_location);
     } catch (e) {
       print('無法取得位置: $e');
     }
@@ -152,9 +134,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       await Global.preference.setString("loc-lat", lat);
       await Global.preference.setString("loc-lon", lon);
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(location['latitude'], location['longitude']);
+      List<geocoding.Placemark> placemarks = await geocoding.placemarkFromCoordinates(location['latitude'], location['longitude']);
       if (placemarks.isNotEmpty) {
-        Placemark placemark = placemarks.first;
+        geocoding.Placemark placemark = placemarks.first;
         String? city;
         String? town;
 
@@ -182,105 +164,30 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     }
   }
 
-  /*void startListening() {
-    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
-      setState(() {
-        currentLocation = 'Lat: ${position.latitude}, Lng: ${position.longitude}';
-      });
-      updateLocation(position);
-    }, onError: (dynamic error) {
-      setState(() {
-        currentLocation = 'Could not get location: $error';
-      });
-    });
-  }
-
-  void stopListening() {
-    positionStreamSubscription.cancel();
-  }*/
-
   Future<void> toggleLocationAutoSet(bool value) async {
-    if (!value) {
-      streamSubscription.cancel();
-    }
-
     setState(() {
       isLocationAutoSetEnabled = value;
     });
 
     if (value) {
       getLocation();
+      BackgroundTask.instance.start();
     } else {
-      streamSubscription.cancel();
+      BackgroundTask.instance.stop();
     }
+
 
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
 
   @override
   void dispose() {
-    streamSubscription.cancel();
+    BackgroundTask.instance.stop();
     super.dispose();
   }
 
-  Future<void> getLocaion() async {
-    try {
-      final location = await _flutterGenericLocationPlugin.getLocation();
-      setState(() {
-        _location = location;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
-    }
-  }
-
-  Future<void> getLastLocation() async {
-    try {
-      final location = await _flutterGenericLocationPlugin.getLastLocation();
-      setState(() {
-        _location = location;
-      });
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
-    }
-  }
-
-  Future<void> startStopLocationUpdates() async {
-    try {
-      if (runningLocationUpdates == false) {
-        await _flutterGenericLocationPlugin.startLocationUpdates();
-        runningLocationUpdates = true;
-      } else {
-        _flutterGenericLocationPlugin.stopLocationUpdates();
-        runningLocationUpdates = false;
-      }
-      setState(() {});
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
-    }
-  }
-
-  Future<void> startAndStopLocaitonService() async {
-    try {
-      if (isLocationAutoSetEnabled && !runningLocationService) {
-        await _flutterGenericLocationPlugin.startLocationService();
-        runningLocationService = true;
-      } else if (!isLocationAutoSetEnabled && runningLocationService) {
-        _flutterGenericLocationPlugin.stopLocationService();
-        runningLocationService = false;
-      }
-      setState(() {});
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
-    }
+  static Future<void> _backgroundLocationHandler(Location location) async {
+    print('Background location: ${location.lat}, ${location.lng}');
   }
 
   Future<Uint8List> fetchNotificationIcon() async {
@@ -291,8 +198,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> showNotification() async {
     try {
       final notificationIcon = await fetchNotificationIcon();
-      await _flutterGenericLocationPlugin.showNotification(
-          'Test Notification', 'This is a test notification message', "PluginDemoChannel", notificationIcon);
+      // Replace with your notification logic
     } catch (e) {
       setState(() {
         error = e.toString();
@@ -383,8 +289,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                   } else {
                     setState(() async {
                       isLocationAutoSetEnabled = value;
-                      await startAndStopLocaitonService();
-                      await startStopLocationUpdates();
                     });
                   }
                 },

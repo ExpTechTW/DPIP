@@ -105,6 +105,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  background_task:
+    dependency: "direct main"
+    description:
+      name: background_task
+      sha256: "0a2dfb3eb788e3596692265e0703a6dffe0bc76bba2ec419f92b71d1b014c579"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1+1"
   boolean_selector:
     dependency: transitive
     description:
@@ -406,14 +414,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
-  flutter_generic_location:
-    dependency: "direct main"
-    description:
-      name: flutter_generic_location
-      sha256: ddf9f4219a42e5f4f9d94e124fda403d11f9ab07b2dad2d64c8271dff32a8f6a
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
   flutter_highlight:
     dependency: transitive
     description:
