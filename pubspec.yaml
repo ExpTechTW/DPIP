@@ -39,7 +39,7 @@ dependencies:
   flutter_map_geojson: ^1.0.8
   geolocator: ^12.0.0
   geocoding: ^3.0.0
-  flutter_generic_location: ^0.0.1
+  background_task: ^0.1.1+1
 
 dev_dependencies:
   flutter_test:
