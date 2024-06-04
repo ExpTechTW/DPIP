@@ -28,13 +28,13 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
-  Map<String, dynamic> _location = {};
-  String error = "";
+  Map<String, dynamic> location = {};
+  // String error = "";
 
   @override
   void initState() {
     super.initState();
-    BackgroundTask.instance.setBackgroundHandler(_backgroundLocationHandler);
+    // BackgroundTask.instance.setBackgroundHandler(_backgroundLocationHandler);
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -182,9 +182,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     super.dispose();
   }
 
-  static Future<void> _backgroundLocationHandler(Location location) async {
-    print('Background location: ${location.lat}, ${location.lng}');
-  }
+  // static Future<void> _backgroundLocationHandler(Location location) async {
+  //   print('Background location: ${location.lat}, ${location.lng}');
+  // }
 
   Future<Uint8List> fetchNotificationIcon() async {
     ByteData imageData = await rootBundle.load('assets/app_icon.png');
@@ -192,14 +192,14 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> showNotification() async {
-    try {
-      final notificationIcon = await fetchNotificationIcon();
-      // Replace with your notification logic
-    } catch (e) {
-      setState(() {
-        error = e.toString();
-      });
-    }
+    // try {
+    //   final notificationIcon = await fetchNotificationIcon();
+    //   // Replace with your notification logic
+    // } catch (e) {
+    //   setState(() {
+    //     error = e.toString();
+    //   });
+    // }
   }
 
   @override
