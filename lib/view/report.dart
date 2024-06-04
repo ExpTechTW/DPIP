@@ -218,8 +218,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   void updateLocationMarker(Position position) {
     setState(() {
-      markers.removeWhere(
-              (marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+      markers.removeWhere((marker) => marker.child is Icon && (marker.child as Icon).icon == Icons.my_location);
       markers.add(
         Marker(
           point: LatLng(position.latitude, position.longitude),

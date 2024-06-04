@@ -28,6 +28,7 @@ const String darwinNotificationCategoryPlain = 'plainCategory';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -88,6 +89,14 @@ void main() async {
   runApp(const MainApp());
 }
 
+@pragma('vm:entry-point')
+void backgroundHandler(Location data) {
+  // Implement the process you want to run in the background.
+  // ex) Check health data.
+
+  print('背景位置: ${data.lat}, ${data.lng}');
+}
+
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
@@ -131,7 +140,6 @@ class MainAppState extends State<MainApp> {
   }
 
   void initializeBackgroundTask() {
-    BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
     BackgroundTask.instance.start(
       isEnabledEvenIfKilled: true,
     );
@@ -141,9 +149,9 @@ class MainAppState extends State<MainApp> {
     });
   }
 
-  void backgroundHandler(Location location) {
-    print('背景位置: ${location.lat}, ${location.lng}');
-  }
+  // void backgroundHandler(Location location) {
+  //   print('背景位置: ${location.lat}, ${location.lng}');
+  // }
 
   static Future<void> initCallback(Map<dynamic, dynamic> params) async {
     print('Locator initialized');
