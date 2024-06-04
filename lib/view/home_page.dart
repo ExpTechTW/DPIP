@@ -96,101 +96,197 @@ class EqInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ReportPage(report: eqReport),
-            ),
-          );
-        },
-        child: Container(
-          width: calculator.percentToPixel(90, context),
-          // height: calculator.percentToPixel(25, context),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: const Color(0x30808080),
-          ),
-          child: IntrinsicHeight(
-            child: Stack(
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    width: calculator.percentToPixel(2, context),
-                    decoration: BoxDecoration(
-                      color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10),
+    if (Platform.isIOS) {
+      return Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => ReportPage(report: eqReport),
+                ),
+              );
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: const Color(0x30808080),
+              ),
+              child: IntrinsicHeight(
+                child: Stack(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.02,
+                        decoration: BoxDecoration(
+                          color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: calculator.percentToPixel(5, context),
-                    right: calculator.percentToPixel(5, context),
-                    top: calculator.percentToPixel(1, context),
-                    bottom: calculator.percentToPixel(2, context),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
+                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                              ),
+                              Text(
+                                DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                                  TZDateTime.fromMillisecondsSinceEpoch(
+                                    getLocation("Asia/Taipei"),
+                                    eqReport.time,
+                                  ),
+                                ),
+                                style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                textAlign: TextAlign.left,
+                              ),
+                              Text(
+                                "規模${eqReport.mag}　深度${eqReport.depth}公里",
+                                style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                              ),
+                            ],
                           ),
-                          Text(
-                            DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                              TZDateTime.fromMillisecondsSinceEpoch(
-                                getLocation("Asia/Taipei"),
-                                eqReport.time,
+                          Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width * 0.15,
+                            height: MediaQuery.of(context).size.width * 0.15,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              // color: intensityToColor(eqReport.intensity),
+                            ),
+                            child: Text(
+                              intensityToNumberString(eqReport.intensity),
+                              style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.w900,
+                                color: CupertinoColors.white,
                               ),
                             ),
-                            style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
-                            textAlign: TextAlign.left,
-                          ),
-                          Text(
-                            "規模${eqReport.mag}　深度${eqReport.depth}公里",
-                            style: const TextStyle(fontSize: 18, letterSpacing: 2),
-                          ),
+                          )
                         ],
                       ),
-                      Container(
-                        alignment: Alignment.center,
-                        width: calculator.percentToPixel(15, context),
-                        height: calculator.percentToPixel(15, context),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: context.colors.intensity(eqReport.intensity),
-                        ),
-                        child: Text(
-                          intensityToNumberString(eqReport.intensity),
-                          style: TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w900,
-                            color: context.colors.onIntensity(eqReport.intensity),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: calculator.percentToPixel(2, context),
+          ),
+        ],
+      );
+  } else {
+      return Column(
+          children: [
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReportPage(report: eqReport),
+                  ),
+                );
+              },
+              child: Container(
+                width: calculator.percentToPixel(90, context),
+                // height: calculator.percentToPixel(25, context),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0x30808080),
+                ),
+                child: IntrinsicHeight(
+                  child: Stack(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          width: calculator.percentToPixel(2, context),
+                          decoration: BoxDecoration(
+                            color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              bottomLeft: Radius.circular(10),
+                            ),
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: calculator.percentToPixel(5, context),
+                          right: calculator.percentToPixel(5, context),
+                          top: calculator.percentToPixel(1, context),
+                          bottom: calculator.percentToPixel(2, context),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                                ),
+                                Text(
+                                  DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                                    TZDateTime.fromMillisecondsSinceEpoch(
+                                      getLocation("Asia/Taipei"),
+                                      eqReport.time,
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  "規模${eqReport.mag}　深度${eqReport.depth}公里",
+                                  style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              alignment: Alignment.center,
+                              width: calculator.percentToPixel(15, context),
+                              height: calculator.percentToPixel(15, context),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: context.colors.intensity(eqReport.intensity),
+                              ),
+                              child: Text(
+                                intensityToNumberString(eqReport.intensity),
+                                style: TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w900,
+                                  color: context.colors.onIntensity(eqReport.intensity),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       )
                     ],
                   ),
-                )
-              ],
+                ),
+              ),
             ),
+          SizedBox(
+            height: calculator.percentToPixel(2, context),
           ),
-        ),
-      ),
-      SizedBox(
-        height: calculator.percentToPixel(2, context),
-      ),
-    ]);
+        ],
+      );
+    }
   }
 }
 
@@ -284,7 +380,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 CupertinoSegmentedControl<String>(
@@ -350,8 +446,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                             right: calculator.percentToPixel(5, context),
                                           ),
                                           child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 "更新時間：${DateFormat("MM/dd HH:mm").format(
@@ -378,13 +473,15 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     SizedBox(
-                                        height: calculator.percentToPixel(3, context)),
+                                        height: calculator.percentToPixel(3, context),
+                                    ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         SizedBox(
-                                            width: calculator.percentToPixel(1, context)),
+                                            width: calculator.percentToPixel(1, context),
+                                        ),
                                         SizedBox(
                                           width: calculator.percentToPixel(35, context),
                                           child: Image.network(
@@ -401,8 +498,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                 return child;
                                               }
                                               return const Center(
-                                                child:
-                                                    CupertinoActivityIndicator(),
+                                                child: CupertinoActivityIndicator(),
                                               );
                                             },
                                             errorBuilder: (BuildContext context,
@@ -413,7 +509,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           ),
                                         ),
                                         SizedBox(
-                                            width: calculator.percentToPixel(0, context)),
+                                            width: calculator.percentToPixel(0, context),
+                                        ),
                                         SizedBox(
                                           width: calculator.percentToPixel(50, context),
                                           child: Column(
@@ -454,7 +551,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
                                                             const Text("體感",
-                                                                style: TextStyle(fontSize: 20)),
+                                                                style: TextStyle(fontSize: 20),
+                                                            ),
                                                             Text("${weather["feel"]} ℃",
                                                                 style: const TextStyle(
                                                                     fontSize: 20, fontWeight: FontWeight.bold),
@@ -471,9 +569,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                 crossAxisAlignment: CrossAxisAlignment.end,
                                                 children: [
                                                   Text(
-                                                      (weather["temp"]
-                                                              as String)
-                                                          .split(".")[0],
+                                                      (weather["temp"] as String).split(".")[0],
                                                       style: const TextStyle(
                                                           fontSize: 96,
                                                           fontWeight: FontWeight.w900, letterSpacing: 5),
@@ -500,7 +596,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           ),
                                         ),
                                         SizedBox(
-                                            width: calculator.percentToPixel(5, context)),
+                                            width: calculator.percentToPixel(5, context),
+                                        ),
                                       ],
                                     ),
                                   ],
