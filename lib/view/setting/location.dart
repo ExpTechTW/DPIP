@@ -96,7 +96,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       return;
     }
 
-
     // LocationPermission permission = await Geolocator.checkPermission();
     // if (permission != LocationPermission.always) {
     //   print('檢查時沒權限');
@@ -111,11 +110,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     // }
 
     try {
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        _location = {'latitude': position.latitude, 'longitude': position.longitude};
-      });
-      await updateLocation(_location);
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      await updateLocation({'latitude': position.latitude, 'longitude': position.longitude});
       await showNotification();
     } catch (e) {
       print('無法取得位置: $e');
@@ -134,7 +130,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       await Global.preference.setString("loc-lat", lat);
       await Global.preference.setString("loc-lon", lon);
 
-      List<geocoding.Placemark> placemarks = await geocoding.placemarkFromCoordinates(location['latitude'], location['longitude']);
+      List<geocoding.Placemark> placemarks =
+          await geocoding.placemarkFromCoordinates(location['latitude'], location['longitude']);
       if (placemarks.isNotEmpty) {
         geocoding.Placemark placemark = placemarks.first;
         String? city;
@@ -175,7 +172,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     } else {
       BackgroundTask.instance.stop();
     }
-
 
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }

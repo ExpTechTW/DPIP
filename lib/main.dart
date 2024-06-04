@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:background_task/background_task.dart';
 
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
@@ -47,6 +47,7 @@ void main() async {
   FirebaseMessaging.onMessage.listen(messageHandler);
   FirebaseMessaging.onBackgroundMessage(messageHandler);
   FirebaseMessaging.onMessageOpenedApp.listen(messageHandler);
+
   final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
@@ -123,6 +124,27 @@ class MainAppState extends State<MainApp> {
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    initializeBackgroundTask();
+  }
+
+  void initializeBackgroundTask() {
+    BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
+    BackgroundTask.instance.start(
+      isEnabledEvenIfKilled: true,
+    );
+
+    BackgroundTask.instance.stream.listen((location) {
+      print('背景位置: ${location.lat}, ${location.lng}');
+    });
+  }
+
+  void backgroundHandler(Location location) {
+    print('背景位置: ${location.lat}, ${location.lng}');
+  }
+
   static Future<void> initCallback(Map<dynamic, dynamic> params) async {
     print('Locator initialized');
   }
@@ -131,37 +153,35 @@ class MainAppState extends State<MainApp> {
     print('Locator disposed');
   }
 
-  static Future<void> locationCallback(locationDto) async {
-    double latitude = locationDto.latitude;
-    double longitude = locationDto.longitude;
+  // static Future<void> locationCallback(locationDto) async {
+  //   double latitude = locationDto.latitude;
+  //   double longitude = locationDto.longitude;
 
-    // 使用 geocoding 插件進行反向地理編碼
-    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
-    if (placemarks.isNotEmpty) {
-      Placemark place = placemarks.first;
-      String address = '${place.street}, ${place.locality}, ${place.country}';
-      print('Current location address: $address');
-    } else {
-      print('No address available for the current location');
-    }
+  //   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+  //   if (placemarks.isNotEmpty) {
+  //     Placemark place = placemarks.first;
+  //     String address = '${place.street}, ${place.locality}, ${place.country}';
+  //     print('Current location address: $address');
+  //   } else {
+  //     print('No address available for the current location');
+  //   }
 
-    // 處理你的位置信息上報邏輯，例如：
-    String coordinate = '$latitude,$longitude';
-    String? token = await messaging.getToken();
-    if (token != null) {
-      try {
-        String response = await Global.api.postNotifyLocation(
-          "0.0.0",
-          "Android",
-          coordinate,
-          token,
-        );
-        print(response);
-      } catch (error) {
-        print('Location update error: $error');
-      }
-    }
-  }
+  //   String coordinate = '$latitude,$longitude';
+  //   String? token = await messaging.getToken();
+  //   if (token != null) {
+  //     try {
+  //       String response = await Global.api.postNotifyLocation(
+  //         "0.0.0",
+  //         "Android",
+  //         coordinate,
+  //         token,
+  //       );
+  //       print(response);
+  //     } catch (error) {
+  //       print('Location update error: $error');
+  //     }
+  //   }
+  // }
 
   static void notificationCallback() {
     print('Notification clicked');
