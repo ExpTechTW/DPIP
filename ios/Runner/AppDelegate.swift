@@ -1,5 +1,5 @@
 import UIKit
-import Sirenimport
+import Siren
 import background_task
 import CoreLocation
 import Flutter
@@ -9,14 +9,14 @@ import flutter_local_notifications
 class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     var locationManager: CLLocationManager?
 
-    // func requestLocationPermission() {
-    //     locationManager = CLLocationManager()
-    //     locationManager?.delegate = self
-    //     locationManager?.requestWhenInUseAuthorization()
-    //     locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-    //     locationManager?.distanceFilter = 500.0
-    //     locationManager?.allowsBackgroundLocationUpdates = true
-    // }
+     func requestLocationPermission() {
+//         locationManager = CLLocationManager()
+//         locationManager?.delegate = self
+//         locationManager?.requestWhenInUseAuthorization()
+//         locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
+//         locationManager?.distanceFilter = 500.0
+//         locationManager?.allowsBackgroundLocationUpdates = true
+     }
 }
 
 @UIApplicationMain
