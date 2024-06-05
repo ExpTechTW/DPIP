@@ -375,50 +375,66 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   Widget build(BuildContext context) {
     super.build(context);
     if (Platform.isIOS) {
-      return CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
-          middle: Text("首頁"),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+      return MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+        child: CupertinoPageScaffold(
+          navigationBar: const CupertinoNavigationBar(
+            middle: Text("首頁"),
+          ),
+          child: SafeArea(
+            child: CustomScrollView(
+                slivers: [
+            SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  CupertinoSegmentedControl<String>(
+                    children: {
+                      for (var item in Areas.getOptions())
+                        item: Text(
+                          item,
+                          style: const TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                    },
+                    onValueChanged: (String newArea) {
+                      setState(() {
+                        _selectedArea = newArea;
+                      });
+                    },
+                    groupValue: _selectedArea,
+                  ),
+                  const Divider(color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+          CupertinoSliverRefreshControl(
+            onRefresh: () async {
+              await Future.wait([
+                refreshWeather(context),
+                refreshEqReport(context),
+              ]);
+            },
+          ),
+          SliverToBoxAdapter(
             child: Column(
               children: [
-                CupertinoSegmentedControl<String>(
-                  children: {
-                    for (var item in Areas.getOptions())
-                      item: Text(
-                        item,
-                        style: const TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                  },
-                  onValueChanged: (String newArea) {
-                    setState(() {
-                      _selectedArea = newArea;
-                    });
-                  },
-                  groupValue: _selectedArea,
-                ),
-                const Divider(color: Colors.white, height: 1.5),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          if (weatherRefreshing == true)
-                            const Positioned.fill(
-                                child: Center(
-                                  child: CupertinoActivityIndicator(),))
-                          else if (weather["temp"] == "-99.9")
-                            const Center(child: Text("天氣取得失敗"))
-                          else
-                            Container(),
-                          Opacity(
-                            opacity: weatherRefreshing == true || weather["temp"] == "-99.9" ? 0 : 1,
-                            child: Stack(
-                              alignment: Alignment.center,
+                Stack(
+                  children: [
+                    if (weatherRefreshing)
+                    const Positioned.fill(
+                      child: Center(
+                        child: CupertinoActivityIndicator(),))
+                      else if (weather["temp"] == "-99.9")
+                      const Center(child: Text("天氣取得失敗"))
+                      else Container(),
+                        Opacity(
+                          opacity: weatherRefreshing || weather["temp"] == "-99.9" ? 0 : 1,
+                          child: Stack(
+                            alignment: Alignment.center,
                               children: [
                                 SizedBox(
                                   height: calculator.percentToPixel(45, context),
@@ -447,8 +463,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                         child: Padding(
                                           padding: EdgeInsets.only(
                                             bottom: calculator.percentToPixel(2, context),
-                                            left: calculator.percentToPixel(2, context),
-                                            right: calculator.percentToPixel(2, context),
+                                            left: calculator.percentToPixel(5, context),
+                                            right: calculator.percentToPixel(5, context),
                                           ),
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -476,9 +492,6 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    SizedBox(
-                                      height: calculator.percentToPixel(3, context),
-                                    ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,8 +506,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                             width: calculator.percentToPixel(35, context),
                                             height: calculator.percentToPixel(35, context),
                                             fit: BoxFit.cover,
-                                            loadingBuilder:
-                                                (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent?loadingProgress) {
                                               if (loadingProgress == null) {
                                                 return child;
                                               }
@@ -502,8 +514,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                 child: CupertinoActivityIndicator(),
                                               );
                                             },
-                                            errorBuilder:
-                                                (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
                                               return Container();
                                             },
                                           ),
@@ -512,14 +523,14 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           width: calculator.percentToPixel(0, context),
                                         ),
                                         SizedBox(
-                                          width: calculator.percentToPixel(50, context),
+                                          width: calculator.percentToPixel(55, context),
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
                                                 children: [
                                                   SizedBox(
-                                                    width: calculator.percentToPixel(5, context),
+                                                    width: calculator.percentToPixel(10, context),
                                                   ),
                                                   SizedBox(
                                                     width: calculator.percentToPixel(45, context),
@@ -532,7 +543,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                             Text(
                                                               "${weather["precip"]} mm",
                                                               style: const TextStyle(
-                                                                  fontSize: 19, fontWeight: FontWeight.bold),
+                                                                fontSize: 20, fontWeight: FontWeight.bold),
                                                             ),
                                                           ],
                                                         ),
@@ -543,21 +554,18 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                             Text(
                                                               "${weather["humidity"]} %",
                                                               style: const TextStyle(
-                                                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                                                fontSize: 20, fontWeight: FontWeight.bold),
                                                             ),
                                                           ],
                                                         ),
                                                         Row(
                                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                           children: [
-                                                            const Text(
-                                                              "體感",
-                                                              style: TextStyle(fontSize: 20),
-                                                            ),
+                                                            const Text("體感", style: TextStyle(fontSize: 20)),
                                                             Text(
                                                               "${weather["feel"]} ℃",
                                                               style: const TextStyle(
-                                                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                                                fontSize: 20, fontWeight: FontWeight.bold),
                                                             ),
                                                           ],
                                                         ),
@@ -573,7 +581,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                   Text(
                                                     (weather["temp"] as String).split(".")[0],
                                                     style: const TextStyle(
-                                                        fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5),
+                                                      fontSize: 96, fontWeight: FontWeight.w900, letterSpacing: 5),
                                                   ),
                                                   Column(
                                                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -584,8 +592,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       ),
                                                       Text(
                                                         ".${(weather["temp"] as String).split(".")[1]}",
-                                                        style:
-                                                        const TextStyle(fontSize: 48, fontWeight: FontWeight.w900),
+                                                        style: const TextStyle(fontSize: 48, fontWeight: FontWeight.w900),
                                                       ),
                                                       SizedBox(
                                                         height: calculator.percentToPixel(4.5, context),
@@ -609,61 +616,38 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                           ),
                         ],
                       ),
-                      Container(
-                        height: 1.5,
-                        color: Colors.white,
-                      ),
-                      /*Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: calculator.percentToPixel(5, context),
-                        right: calculator.percentToPixel(5, context),
-                        top: calculator.percentToPixel(5, context),
-                      ),
-                      child: eqReportRefreshing == false
-                          ? eqReport.isEmpty
-                          ? RefreshIndicator(
-                        onRefresh: () async {
-                          await Future.wait([
-                            refreshWeather(context),
-                            refreshEqReport(context),
-                          ]);
-                        },
-                        child: const SingleChildScrollView(
-                          physics: AlwaysScrollableScrollPhysics(),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "近期設定區域無地震或警特報資訊",
-                                style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                        : RefreshIndicator(
-                          onRefresh: () async {
-                            await Future.wait([
-                              refreshWeather(context),
-                              refreshEqReport(context),
-                            ]);
-                          },
-                          child: ListView.builder(
-                            itemCount: eqReport.length,
-                            itemBuilder: (context, index) {
-                              return EqInfo(eqReport: eqReport[index]);
-                            },
-                          ),
-                        )
-                          : const Center(child: CupertinoActivityIndicator(),
-                          ),
-                        ),
-                      ),*/
+                      const Divider(color: Colors.white),
                     ],
                   ),
                 ),
-              ],
+                eqReportRefreshing == false
+                  ? eqReport.isEmpty
+                    ? SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: calculator.percentToPixel(5, context),
+                          horizontal: calculator.percentToPixel(5, context),
+                        ),
+                        child: const Text(
+                          "近期設定區域無地震或警特報資訊",
+                          style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                        ),
+                      ),
+                    )
+                    : SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          return EqInfo(eqReport: eqReport[index]);
+                        },
+                        childCount: eqReport.length,
+                      ),
+                    )
+                    : const SliverFillRemaining(
+                    child: Center(
+                      child: CupertinoActivityIndicator(),
+                    ),
+                  ),
+              ]
             ),
           ),
         ),
@@ -721,15 +705,15 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
 
                     weatherRefreshing == true
                         ? const Positioned.fill(
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ))
+                            child: Center(
+                            child: CircularProgressIndicator(),
+                          ))
                         : weather["temp"] == "-99.9"
-                        ? const Positioned.fill(
-                        child: Center(
-                          child: Text("天氣取得失敗"),
-                        ))
-                        : Container(),
+                            ? const Positioned.fill(
+                                child: Center(
+                                child: Text("天氣取得失敗"),
+                              ))
+                            : Container(),
                     Opacity(
                       opacity: weatherRefreshing == true || weather["temp"] == "-99.9" ? 0 : 1,
                       child: Stack(
@@ -842,8 +826,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       const Text("降水量", style: TextStyle(fontSize: 20)),
                                                       Text(
                                                         "${weather["precip"]} mm",
-                                                        style:
-                                                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   ),
@@ -853,8 +836,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       const Text("濕度", style: TextStyle(fontSize: 20)),
                                                       Text(
                                                         "${weather["humidity"]} %",
-                                                        style:
-                                                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   ),
@@ -864,8 +846,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       const Text("體感", style: TextStyle(fontSize: 20)),
                                                       Text(
                                                         "${weather["feel"]} ℃",
-                                                        style:
-                                                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   ),
@@ -945,43 +926,43 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     ),
                     child: eqReportRefreshing == false
                         ? eqReport.isEmpty
-                        ? RefreshIndicator(
-                      onRefresh: () async {
-                        // 使用 Future.wait 來同時等待多個異步操作完成
-                        await Future.wait([
-                          refreshWeather(context),
-                          refreshEqReport(context),
-                        ]);
-                      },
-                      child: const SingleChildScrollView(
-                        physics: AlwaysScrollableScrollPhysics(),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "近期設定區域無地震或警特報資訊",
-                              style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                        : RefreshIndicator(
-                      onRefresh: () async {
-                        // 使用 Future.wait 來同時等待多個異步操作完成
-                        await Future.wait([
-                          refreshWeather(context),
-                          refreshEqReport(context),
-                        ]);
-                      },
-                      child: ListView.builder(
-                        itemCount: eqReport.length,
-                        itemBuilder: (context, index) {
-                          return EqInfo(eqReport: eqReport[index]);
-                        },
-                        // shrinkWrap: true,
-                      ),
-                    )
+                            ? RefreshIndicator(
+                                onRefresh: () async {
+                                  // 使用 Future.wait 來同時等待多個異步操作完成
+                                  await Future.wait([
+                                    refreshWeather(context),
+                                    refreshEqReport(context),
+                                  ]);
+                                },
+                                child: const SingleChildScrollView(
+                                  physics: AlwaysScrollableScrollPhysics(),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "近期設定區域無地震或警特報資訊",
+                                        style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: () async {
+                                  // 使用 Future.wait 來同時等待多個異步操作完成
+                                  await Future.wait([
+                                    refreshWeather(context),
+                                    refreshEqReport(context),
+                                  ]);
+                                },
+                                child: ListView.builder(
+                                  itemCount: eqReport.length,
+                                  itemBuilder: (context, index) {
+                                    return EqInfo(eqReport: eqReport[index]);
+                                  },
+                                  // shrinkWrap: true,
+                                ),
+                              )
                         : const Center(child: CircularProgressIndicator()),
                   ),
                 ),
