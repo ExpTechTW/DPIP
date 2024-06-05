@@ -176,11 +176,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
 
-  @override
-  void dispose() {
-    BackgroundTask.instance.stop();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   BackgroundTask.instance.stop();
+  //   super.dispose();
+  // }
 
   // static Future<void> _backgroundLocationHandler(Location location) async {
   //   print('Background location: ${location.lat}, ${location.lng}');
@@ -283,8 +283,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                       toggleLocationAutoSet(await openLocationSettings());
                     });
                   } else {
-                    setState(() async {
-                      isLocationAutoSetEnabled = value;
+                    setState(() {
+                      toggleLocationAutoSet(false);
                     });
                   }
                 },
