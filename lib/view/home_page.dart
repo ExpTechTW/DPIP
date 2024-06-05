@@ -429,13 +429,18 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
               children: [
                 Stack(
                   children: [
-                    if (weatherRefreshing)
-                    const Positioned.fill(
-                      child: Center(
-                        child: CupertinoActivityIndicator(),))
-                      else if (weather["temp"] == "-99.9")
-                      const Center(child: Text("天氣取得失敗"))
-                      else Container(),
+                    if (weatherRefreshing && weather["temp"] != "-99.9")
+                      const Positioned.fill(
+                        child: Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ),
+                    if (weather["temp"] == "-99.9")
+                      const Positioned.fill(
+                        child: Center(
+                          child: Text("天氣取得失敗"),
+                        ),
+                      ),
                         Opacity(
                           opacity: weatherRefreshing || weather["temp"] == "-99.9" ? 0 : 1,
                           child: Stack(
