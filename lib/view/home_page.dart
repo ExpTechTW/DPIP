@@ -312,6 +312,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   bool eqReportRefreshing = true;
   late Cal calculator;
   late TempColor tempToColor;
+  final ScrollController _controller = ScrollController();
 
   Future<void> refreshWeather(context) async {
     setState(() {});
@@ -363,6 +364,13 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     setState(() {});
   }
 
+  void scrollToTop() {
+    _controller.animateTo(0,
+      duration: const Duration(seconds: 2),
+      curve: Easing.standard,
+    );
+  }
+
   @override
   bool get wantKeepAlive => true;
 
@@ -374,6 +382,17 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     refreshWeather(context);
     refreshEqReport(context);
     _selectedArea = Areas.getOptions().first; // 初始化時設定_selectedValue為列表的第一項
+    _controller.addListener(() {
+      if (_controller.position.pixels == _controller.position.minScrollExtent) {
+        setState(() {
+          weatherRefreshing = false;
+        });
+      } else {
+        setState(() {
+          weatherRefreshing;
+        });
+      }
+    });
   }
 
   @override
@@ -388,41 +407,42 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
           ),
           child: SafeArea(
             child: CustomScrollView(
-                slivers: [
-            SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  CupertinoSegmentedControl<String>(
-                    children: {
-                      for (var item in Areas.getOptions())
-                        item: Text(
-                          item,
-                          style: const TextStyle(
-                            fontSize: 20,
-                          ),
+              controller: _controller,
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: () async {
+                    await Future.wait([
+                      refreshWeather(context),
+                      refreshEqReport(context),
+                    ]);
+                  },
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        CupertinoSegmentedControl<String>(
+                          children: {
+                            for (var item in Areas.getOptions())
+                            item: Text(
+                              item,
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                            ),
+                          },
+                          onValueChanged: (String newArea) {
+                            setState(() {
+                              _selectedArea = newArea;
+                            });
+                          },
+                          groupValue: _selectedArea,
                         ),
-                    },
-                    onValueChanged: (String newArea) {
-                      setState(() {
-                        _selectedArea = newArea;
-                      });
-                    },
-                    groupValue: _selectedArea,
-                  ),
                   const Divider(color: Colors.white),
                 ],
               ),
             ),
-          ),
-          CupertinoSliverRefreshControl(
-            onRefresh: () async {
-              await Future.wait([
-                refreshWeather(context),
-                refreshEqReport(context),
-              ]);
-            },
           ),
           SliverToBoxAdapter(
             child: Column(
