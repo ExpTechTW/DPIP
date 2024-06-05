@@ -131,7 +131,12 @@ class EqInfo extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: EdgeInsets.only(
+                        left: calculator.percentToPixel(5, context),
+                        right: calculator.percentToPixel(5, context),
+                        top: calculator.percentToPixel(1, context),
+                        bottom: calculator.percentToPixel(2, context),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -164,7 +169,7 @@ class EqInfo extends StatelessWidget {
                             height: MediaQuery.of(context).size.width * 0.15,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              // color: intensityToColor(eqReport.intensity),
+                              color: context.colors.intensity(eqReport.intensity),
                             ),
                             child: Text(
                               intensityToNumberString(eqReport.intensity),
@@ -184,7 +189,7 @@ class EqInfo extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.02,
+            height: MediaQuery.of(context).size.height * 0.01,
           ),
         ],
       );
