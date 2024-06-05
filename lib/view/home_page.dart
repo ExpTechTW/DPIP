@@ -10,6 +10,7 @@ import 'package:timezone/timezone.dart';
 import '../core/utils.dart';
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
+import '../util/dist_code.dart';
 import '../util/intensity_color.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,7 +22,7 @@ class HomePage extends StatefulWidget {
 
 class Areas {
   static List<String> getOptions() {
-    return ['萬榮鄉', '壽豐鄉', '花蓮市']; // 鄉鎮列表
+    return ['花蓮縣 萬榮鄉', '花蓮縣 壽豐鄉', '臺北市 中正區']; // 鄉鎮列表
   }
 }
 
@@ -32,6 +33,10 @@ class Cal {
   }
 }
 
+Future<int?> getZipCodeForArea(String area) async {
+  final data = await DistCodeUtil.readJsonFile();
+  return DistCodeUtil.getZipCode(area, data);
+}
 // class IntColor {
 //   static const Map<int, Color> _colors = {
 //     0: Color(0xff202020),
@@ -313,12 +318,14 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   late Cal calculator;
   late TempColor tempToColor;
   final ScrollController _controller = ScrollController();
+  var distCode = 100;
 
   Future<void> refreshWeather(context) async {
     setState(() {});
     weatherRefreshing = true;
     try {
-      final weatherData = await Global.api.getWeatherRealtime("979");
+      distCode = (await getZipCodeForArea(_selectedArea))!;
+      final weatherData = await Global.api.getWeatherRealtime("$distCode");
       weather = {
         'temp': weatherData.temp.c.toString(),
         'feel': weatherData.feel.c.toString(),
@@ -379,9 +386,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     super.initState();
     tempToColor = TempColor();
     calculator = Cal();
+    _selectedArea = Areas.getOptions().first;
     refreshWeather(context);
     refreshEqReport(context);
-    _selectedArea = Areas.getOptions().first; // 初始化時設定_selectedValue為列表的第一項
     _controller.addListener(() {
       if (_controller.position.pixels == _controller.position.minScrollExtent) {
         setState(() {
@@ -389,7 +396,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         });
       } else {
         setState(() {
-          weatherRefreshing;
+          weatherRefreshing = false;
         });
       }
     });
@@ -706,6 +713,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                       setState(() {
                         _selectedArea = newArea!;
                       });
+                      refreshWeather(context);
+                      refreshEqReport(context);
                     },
                     items: Areas.getOptions().map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
