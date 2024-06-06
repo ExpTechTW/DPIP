@@ -182,6 +182,7 @@ class MainAppState extends State<MainApp> {
     );
 
     positionStreamSubscription = Geolocator.getPositionStream(
+      // locationSettings: locationSettings,
     ).listen((Position position) {
       setState(() {
         currentLocation = '位置: ${position.latitude}, ${position.longitude}';
