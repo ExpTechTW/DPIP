@@ -1,6 +1,5 @@
 import UIKit
 import Siren
-import background_task
 import CoreLocation
 import Flutter
 import Firebase
@@ -14,12 +13,12 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     }
     
     private func requestLocationPermission() {
-        locationManager = CLLocationManager()
-        locationManager?.delegate = self
-        locationManager?.requestWhenInUseAuthorization()
-        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager?.distanceFilter = 300.0
-        locationManager?.allowsBackgroundLocationUpdates = true
+//        locationManager = CLLocationManager()
+//        locationManager?.delegate = self
+//        locationManager?.requestWhenInUseAuthorization()
+//        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
+//        locationManager?.distanceFilter = 100.0
+//        locationManager?.allowsBackgroundLocationUpdates = true
     }
 }
 
@@ -41,9 +40,6 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
             UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
         }
         GeneratedPluginRegistrant.register(with: self)
-        BackgroundTaskPlugin.onRegisterDispatchEngine = {
-            GeneratedPluginRegistrant.register(with: BackgroundTaskPlugin.dispatchEngine)
-        }
         hyperCriticalRulesExample()
         Siren.shared.wail() // line 2
         locationManager = YourLocationManagerClass()

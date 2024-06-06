@@ -31,7 +31,7 @@ const String darwinNotificationCategoryPlain = 'plainCategory';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
+  // BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -92,13 +92,13 @@ void main() async {
   runApp(const MainApp());
 }
 
-@pragma('vm:entry-point')
-void backgroundHandler(Location data) {
-  // Implement the process you want to run in the background.
-  // ex) Check health data.
-
-  print('背景位置: ${data.lat}, ${data.lng}');
-}
+// @pragma('vm:entry-point')
+// void backgroundHandler(Location data) {
+//   // Implement the process you want to run in the background.
+//   // ex) Check health data.
+//
+//   print('背景位置: ${data.lat}, ${data.lng}');
+// }
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -171,13 +171,17 @@ class MainAppState extends State<MainApp> {
   }
 
   void startPositionStream() {
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.medium,
-      distanceFilter: 100,
+    // LocationSettings locationSettings = const LocationSettings(
+    //   accuracy: LocationAccuracy.medium,
+    //   distanceFilter: 150,
+    // );
+    BackgroundTask.instance.start(
+      distanceFilter: 150,
+      isEnabledEvenIfKilled: true,
+      iOSDesiredAccuracy: DesiredAccuracy.hundredMeters,
     );
 
     positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: locationSettings,
     ).listen((Position position) {
       setState(() {
         currentLocation = '位置: ${position.latitude}, ${position.longitude}';
@@ -191,7 +195,7 @@ class MainAppState extends State<MainApp> {
           position.longitude,
         );
 
-        if (distance >= 100) {
+        if (distance >= 150) {
           stopPositionStream();
         }
       }
@@ -208,7 +212,7 @@ class MainAppState extends State<MainApp> {
 
   @override
   void dispose() {
-    positionStreamSubscription?.cancel();
+    stopPositionStream();
     super.dispose();
   }
 
