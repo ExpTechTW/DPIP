@@ -336,18 +336,45 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         'condition': weatherData.condition.round(),
       };
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '取得天氣資料時發生錯誤\n$e',
-            style: const TextStyle(color: Colors.white),
+      if (!mounted) return;
+
+      if (Platform.isIOS) {
+        showCupertinoDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: const Text("取得天氣資料時發生錯誤"),
+              content: Text(
+                e.toString(),
+                style: const TextStyle(fontSize: 16),
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: const Text("確定"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '取得天氣資料時發生錯誤\n$e',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color(0xAA202020),
           ),
-          backgroundColor: const Color(0xAA202020),
-        ),
-      );
+        );
+      }
+      weatherRefreshing = false;
+      setState(() {});
     }
-    weatherRefreshing = false;
-    setState(() {});
   }
 
   Future<void> refreshEqReport(context) async {

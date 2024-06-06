@@ -353,15 +353,27 @@ class _MePageState extends State<MePage> {
                         onTap: () {
                           messaging.getToken().then((value) {
                             FlutterClipboard.copy(value ?? "");
-                            context.scaffoldMessenger.showSnackBar(
-                              const SnackBar(
-                                content: Text('已複製 FCM Token'),
-                              ),
-                            );
+                              showCupertinoDialog(
+                                context: context,
+                                builder: (context) {
+                                  return CupertinoAlertDialog(
+                                    title: const Text("已複製 FCM Token"),
+                                    actions: [
+                                      CupertinoDialogAction(
+                                        isDefaultAction: true,
+                                        child: const Text("確定"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      )
+                                    ],
+                                  );
+                                },
+                              );
                           }).catchError((error) {
-                            context.scaffoldMessenger.showSnackBar(
+                            ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('複製 FCM Token 時發生錯誤：$error'),
+                                content: Text('取得 FCM Token 時發生錯誤：$error'),
                               ),
                             );
                           });
