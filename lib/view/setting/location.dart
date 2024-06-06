@@ -120,11 +120,32 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
     try {
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      bool isInSpecifiedCountry = await checkIfInSpecifiedCountry(position.latitude, position.longitude);
+      if (isInSpecifiedCountry) {
       await updateLocation({'latitude': position.latitude, 'longitude': position.longitude});
       await setAndroidNotification();
+      } else {
+        print('位置不在指定的國家範圍內');
+      }
     } catch (e) {
       print('無法取得位置: $e');
     }
+  }
+
+  Future<bool> checkIfInSpecifiedCountry(double latitude, double longitude) async {
+    try {
+      List<geocoding.Placemark> placemarks = await geocoding.placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        geocoding.Placemark placemark = placemarks.first;
+        String? country = placemark.country;
+        if (country == 'Taiwan') {
+          return true;
+        }
+      }
+    } catch (e) {
+      print('檢查國家時出錯: $e');
+    }
+    return false;
   }
 
   Future<void> updateLocation(Map<String, dynamic> location) async {
