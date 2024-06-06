@@ -8,15 +8,19 @@ import flutter_local_notifications
 
 class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     var locationManager: CLLocationManager?
-
-     func requestLocationPermission() {
-//         locationManager = CLLocationManager()
-//         locationManager?.delegate = self
-//         locationManager?.requestWhenInUseAuthorization()
-//         locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-//         locationManager?.distanceFilter = 500.0
-//         locationManager?.allowsBackgroundLocationUpdates = true
-     }
+    
+    func startMonitoringSignificantLocationChanges() {
+        requestLocationPermission()
+    }
+    
+    private func requestLocationPermission() {
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        locationManager?.requestWhenInUseAuthorization()
+        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager?.distanceFilter = 300.0
+        locationManager?.allowsBackgroundLocationUpdates = true
+    }
 }
 
 @UIApplicationMain
@@ -43,10 +47,10 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
         hyperCriticalRulesExample()
         Siren.shared.wail() // line 2
         locationManager = YourLocationManagerClass()
-        locationManager?.requestLocationPermission()
+        locationManager?.startMonitoringSignificantLocationChanges()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-        
+    
     func hyperCriticalRulesExample() {
         let siren = Siren.shared
         siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 3)

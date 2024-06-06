@@ -10,6 +10,7 @@ import 'package:dpip/view/setting/ios/cupertino_town_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
@@ -27,13 +28,21 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? currentLocation;
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   Map<String, dynamic> location = {};
-  // String error = "";
 
   @override
   void initState() {
     super.initState();
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
+
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
     // BackgroundTask.instance.setBackgroundHandler(_backgroundLocationHandler);
     checkLocationPermissionAndSyncSwitchState();
   }
@@ -112,7 +121,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     try {
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
       await updateLocation({'latitude': position.latitude, 'longitude': position.longitude});
-      await showNotification();
+      await setAndroidNotification();
     } catch (e) {
       print('無法取得位置: $e');
     }
@@ -131,7 +140,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       await Global.preference.setString("loc-lon", lon);
 
       List<geocoding.Placemark> placemarks =
-          await geocoding.placemarkFromCoordinates(location['latitude'], location['longitude']);
+      await geocoding.placemarkFromCoordinates(location['latitude'], location['longitude']);
       if (placemarks.isNotEmpty) {
         geocoding.Placemark placemark = placemarks.first;
         String? city;
@@ -169,6 +178,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     if (value) {
       getLocation();
       BackgroundTask.instance.start();
+      await setAndroidNotification();
     } else {
       BackgroundTask.instance.stop();
     }
@@ -191,15 +201,53 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     return imageData.buffer.asUint8List();
   }
 
-  Future<void> showNotification() async {
-    // try {
-    //   final notificationIcon = await fetchNotificationIcon();
-    //   // Replace with your notification logic
-    // } catch (e) {
-    //   setState(() {
-    //     error = e.toString();
-    //   });
-    // }
+  // Future<void> showNotification() async {
+  //   const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  //     'DPIP',
+  //     '位置更新',
+  //     channelDescription: '背景位置已更新。',
+  //     importance: Importance.max,
+  //     priority: Priority.high,
+  //     showWhen: false,
+  //     icon: 'ic_launcher',
+  //   );
+  //
+  //   const NotificationDetails platformChannelSpecifics = NotificationDetails(
+  //     android: androidPlatformChannelSpecifics,
+  //   );
+  //
+  //   await flutterLocalNotificationsPlugin.show(
+  //     0,
+  //     '位置更新',
+  //     '背景位置已更新。',
+  //     platformChannelSpecifics,
+  //   );
+  // }
+
+  Future<void> setAndroidNotification({
+    String? title,
+    String? message,
+    String? icon,
+  }) async {
+    if (Platform.isAndroid) {
+      await BackgroundTask.instance.setAndroidNotification(
+        title: title ?? '位置更新',
+        message: message ?? '背景位置已更新。',
+        icon: icon ?? 'ic_launcher',
+      );
+    }
+  }
+
+  Future<void> start({
+    double? distanceFilter = 300,
+    bool isEnabledEvenIfKilled = true,
+    DesiredAccuracy iOSDesiredAccuracy = DesiredAccuracy.hundredMeters,
+  }) async {
+    await BackgroundTask.instance.start(
+      distanceFilter: distanceFilter,
+      isEnabledEvenIfKilled: isEnabledEvenIfKilled,
+      iOSDesiredAccuracy: iOSDesiredAccuracy,
+    );
   }
 
   @override
