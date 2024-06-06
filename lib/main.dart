@@ -22,6 +22,8 @@ final FirebaseMessaging messaging = FirebaseMessaging.instance;
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
     StreamController<ReceivedNotification>.broadcast();
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
+StreamSubscription<Position>? positionStreamSubscription;
+Position? lastPosition;
 
 const String darwinNotificationCategoryText = 'textCategory';
 const String navigationActionId = 'id_3';
@@ -165,19 +167,49 @@ class MainAppState extends State<MainApp> {
       print('背景位置: ${location.lat}, ${location.lng}');
     });
 
+    startPositionStream();
+  }
+
+  void startPositionStream() {
     LocationSettings locationSettings = const LocationSettings(
       accuracy: LocationAccuracy.medium,
       distanceFilter: 100,
     );
 
-    Geolocator.getPositionStream(
+    positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen((Position position) {
-      print('位置: ${position.latitude}, ${position.longitude}');
       setState(() {
         currentLocation = '位置: ${position.latitude}, ${position.longitude}';
       });
+
+      if (lastPosition != null) {
+        double distance = Geolocator.distanceBetween(
+          lastPosition!.latitude,
+          lastPosition!.longitude,
+          position.latitude,
+          position.longitude,
+        );
+
+        if (distance >= 100) {
+          stopPositionStream();
+        }
+      }
+
+      lastPosition = position;
     });
+  }
+
+  void stopPositionStream() {
+    positionStreamSubscription?.cancel();
+    positionStreamSubscription = null;
+    print('位置已停止');
+  }
+
+  @override
+  void dispose() {
+    positionStreamSubscription?.cancel();
+    super.dispose();
   }
 
   static Future<void> initCallback(Map<dynamic, dynamic> params) async {
