@@ -367,7 +367,7 @@ class _MePageState extends State<MePage> {
                           }).catchError((error) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('取得 FCM Token 時發生錯誤：$error'),
+                                content: Text('複製 FCM Token 時發生錯誤：$error'),
                               ),
                             );
                           });
