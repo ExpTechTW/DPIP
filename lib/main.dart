@@ -166,6 +166,7 @@ class MainAppState extends State<MainApp> {
     });
 
     LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.medium,
       distanceFilter: 100,
     );
 
