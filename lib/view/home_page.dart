@@ -336,28 +336,23 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         'condition': weatherData.condition.round(),
       };
     } catch (e) {
-      if (!mounted) return;
-
       if (Platform.isIOS) {
         showCupertinoDialog(
           barrierDismissible: true,
           context: context,
           builder: (context) {
-            return CupertinoAlertDialog(
-              title: const Text("取得天氣資料時發生錯誤"),
-              content: Text(
-                e.toString(),
-                style: const TextStyle(fontSize: 16),
+            Future.delayed(const Duration(seconds: 2), () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            });
+            return const CupertinoAlertDialog(
+              content: Center(
+                child: Text(
+                  "取得天氣資料時發生錯誤",
+                  style: TextStyle(fontSize: 15),
+                ),
               ),
-              actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: const Text("確定"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                )
-              ],
             );
           },
         );
