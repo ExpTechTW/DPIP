@@ -271,6 +271,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     );
   }
 
+  Future<void> stop() async {
+    await BackgroundTask.instance.stop();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
