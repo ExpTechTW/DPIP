@@ -259,22 +259,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     }
   }
 
-  Future<void> start({
-    double? distanceFilter = 300,
-    bool isEnabledEvenIfKilled = true,
-    DesiredAccuracy iOSDesiredAccuracy = DesiredAccuracy.hundredMeters,
-  }) async {
-    await BackgroundTask.instance.start(
-      distanceFilter: distanceFilter,
-      isEnabledEvenIfKilled: isEnabledEvenIfKilled,
-      iOSDesiredAccuracy: iOSDesiredAccuracy,
-    );
-  }
-
-  Future<void> stop() async {
-    await BackgroundTask.instance.stop();
-  }
-
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {

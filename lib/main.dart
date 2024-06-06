@@ -12,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:background_task/background_task.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
@@ -139,19 +140,44 @@ class MainAppState extends State<MainApp> {
     initializeBackgroundTask();
   }
 
-  void initializeBackgroundTask() {
-    BackgroundTask.instance.start(
-      isEnabledEvenIfKilled: true,
-    );
+  void initializeBackgroundTask() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('定位服務被禁止。');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('位置權限被拒絕。');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('位置權限被永久拒絕，我們無法請求權限。');
+    }
 
     BackgroundTask.instance.stream.listen((location) {
       print('背景位置: ${location.lat}, ${location.lng}');
     });
-  }
 
-  // void backgroundHandler(Location location) {
-  //   print('背景位置: ${location.lat}, ${location.lng}');
-  // }
+    LocationSettings locationSettings = const LocationSettings(
+      distanceFilter: 100,
+    );
+
+    Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen((Position position) {
+      print('位置: ${position.latitude}, ${position.longitude}');
+      setState(() {
+        currentLocation = '位置: ${position.latitude}, ${position.longitude}';
+      });
+    });
+  }
 
   static Future<void> initCallback(Map<dynamic, dynamic> params) async {
     print('Locator initialized');
