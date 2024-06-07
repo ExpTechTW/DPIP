@@ -321,8 +321,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   var distCode = 100;
 
   Future<void> refreshWeather(context) async {
-    setState(() {});
     weatherRefreshing = true;
+    setState(() {});
     try {
       distCode = (await getZipCodeForArea(_selectedArea))!;
       final weatherData = await Global.api.getWeatherRealtime("$distCode");
@@ -367,9 +367,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
           ),
         );
       }
-      weatherRefreshing = false;
-      setState(() {});
     }
+    weatherRefreshing = false;
+    setState(() {});
   }
 
   Future<void> refreshEqReport(context) async {
