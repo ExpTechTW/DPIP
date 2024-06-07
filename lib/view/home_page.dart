@@ -396,6 +396,14 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     setState(() {});
   }
 
+  void updateArea() {
+    if (currentCity != null) {
+      currentArea = "$currentCity $currentTown";
+    } else {
+      currentArea = "臺北市 中正區";
+    }
+  }
+
   void scrollToTop() {
     _controller.animateTo(
       0,
@@ -412,11 +420,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     super.initState();
     tempToColor = TempColor();
     calculator = Cal();
-    if (currentCity != null) {
-      currentArea = "$currentCity $currentTown";
-    } else {
-      currentArea = "臺北市 中正區";
-    }
+    updateArea();
     _selectedArea = Areas.getOptions(currentArea).toSet().first;
     refreshWeather(context);
     refreshEqReport(context);
