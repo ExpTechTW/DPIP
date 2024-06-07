@@ -11,9 +11,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:geocoding/geocoding.dart';
 
 class LocationSettingsPage extends StatefulWidget {
   const LocationSettingsPage({super.key});
@@ -30,20 +29,17 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-  Map<String, dynamic> location = {};
-
   @override
   void initState() {
     super.initState();
-    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
-
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-    // BackgroundTask.instance.setBackgroundHandler(_backgroundLocationHandler);
+    // flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    // const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('ic_launcher');
+    //
+    // const InitializationSettings initializationSettings = InitializationSettings(
+    //   android: initializationSettingsAndroid,
+    // );
+    //
+    // flutterLocalNotificationsPlugin.initialize(initializationSettings);
     checkLocationPermissionAndSyncSwitchState();
   }
 
@@ -88,8 +84,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     // bool isEnabled = await LocationManager().isRunning;
     bool isEnabled = false;
-    final status = await Geolocator.checkPermission();
-    if (status == LocationPermission.always || status == LocationPermission.whileInUse) {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission != LocationPermission.always) {
+      print('初次檢查時沒權限');
+      isEnabled = false;
+    } else {
       isEnabled = true;
     }
     setState(() {
@@ -101,29 +100,15 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> getLocation() async {
-    if (!isLocationAutoSetEnabled) {
-      return;
-    }
-
-    // LocationPermission permission = await Geolocator.checkPermission();
-    // if (permission != LocationPermission.always) {
-    //   print('檢查時沒權限');
-    //   if (!isLocationAutoSetEnabled) {
-    //     if (positionStreamSubscription != null) {
-    //       setState(() {
-    //         positionStreamSubscription.cancel();
-    //       });
-    //     }
-    //   }
-    //   return;
-    // }
+    if (!isLocationAutoSetEnabled) return;
 
     try {
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      print('獲取到的經緯度: ${position.latitude}, ${position.longitude}');
+
       bool isInSpecifiedCountry = await checkIfInSpecifiedCountry(position.latitude, position.longitude);
       if (isInSpecifiedCountry) {
-      await updateLocation({'latitude': position.latitude, 'longitude': position.longitude});
-      await setAndroidNotification();
+        await updateLocation(position);
       } else {
         print('位置不在指定的國家範圍內');
       }
@@ -134,12 +119,12 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<bool> checkIfInSpecifiedCountry(double latitude, double longitude) async {
     try {
-      List<geocoding.Placemark> placemarks = await geocoding.placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
-        geocoding.Placemark placemark = placemarks.first;
-        String? country = placemark.country;
-        if (country == 'Taiwan') {
-          return true;
+      Placemark placemark = placemarks.first;
+      String? country = placemark.country;
+      if (country != 'Taiwan') {
+        return true;
         }
       }
     } catch (e) {
@@ -148,22 +133,22 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     return false;
   }
 
-  Future<void> updateLocation(Map<String, dynamic> location) async {
+  Future<void> updateLocation(Position position) async {
     try {
-      String lat = location['latitude'].toString();
-      String lon = location['longitude'].toString();
+      String lat = position.latitude.toString();
+      String lon = position.longitude.toString();
 
       setState(() {
         currentLocation = 'Lat: $lat, Lng: $lon';
+        print(currentLocation);
       });
 
       await Global.preference.setString("loc-lat", lat);
       await Global.preference.setString("loc-lon", lon);
 
-      List<geocoding.Placemark> placemarks =
-      await geocoding.placemarkFromCoordinates(location['latitude'], location['longitude']);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placemarks.isNotEmpty) {
-        geocoding.Placemark placemark = placemarks.first;
+        Placemark placemark = placemarks.first;
         String? city;
         String? town;
 
@@ -194,15 +179,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> toggleLocationAutoSet(bool value) async {
     setState(() {
       isLocationAutoSetEnabled = value;
+      if (isLocationAutoSetEnabled) {
+        getLocation();
+      }
     });
-
-    if (value) {
-      getLocation();
-      BackgroundTask.instance.start();
-      await setAndroidNotification();
-    } else {
-      BackgroundTask.instance.stop();
-    }
+    await fetchNotificationIcon();
 
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
@@ -245,20 +226,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   //   );
   // }
 
-  Future<void> setAndroidNotification({
-    String? title,
-    String? message,
-    String? icon,
-  }) async {
-    if (Platform.isAndroid) {
-      await BackgroundTask.instance.setAndroidNotification(
-        title: title ?? '位置更新',
-        message: message ?? '背景位置已更新。',
-        icon: icon ?? 'ic_launcher',
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
@@ -276,10 +243,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 onChanged: null,
               ),
               onTap: () async {
-                final permissionGranted = await openLocationSettings();
-                if (permissionGranted) {
-                  toggleLocationAutoSet(true);
-                }
+                toggleLocationAutoSet(await openLocationSettings());
               },
             ),
             CupertinoListSection(

@@ -3,8 +3,6 @@ PODS:
     - Flutter
   - audioplayers_darwin (0.0.1):
     - Flutter
-  - background_task (0.0.1):
-    - Flutter
   - connectivity_plus (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -106,7 +104,6 @@ PODS:
 DEPENDENCIES:
   - app_settings (from `.symlinks/plugins/app_settings/ios`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
-  - background_task (from `.symlinks/plugins/background_task/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
@@ -142,8 +139,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/app_settings/ios"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
-  background_task:
-    :path: ".symlinks/plugins/background_task/ios"
   connectivity_plus:
     :path: ".symlinks/plugins/connectivity_plus/darwin"
   firebase_core:
@@ -174,7 +169,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   app_settings: 017320c6a680cdc94c799949d95b84cb69389ebc
   audioplayers_darwin: 877d9a4d06331c5c374595e46e16453ac7eafa40
-  background_task: a584ba6e093a60641252e89f7cd404ec92a30c8d
   connectivity_plus: e2dad488011aeb593e219360e804c43cc1af5770
   Firebase: 0312a2352584f782ea56f66d91606891d4607f06
   firebase_core: a626d00494efa398e7c54f25f1454a64c8abf197

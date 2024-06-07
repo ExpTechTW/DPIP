@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:background_task/background_task.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'core/fcm.dart';
@@ -20,8 +19,9 @@ import 'model/received_notification.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 final FirebaseMessaging messaging = FirebaseMessaging.instance;
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
-    StreamController<ReceivedNotification>.broadcast();
+StreamController<ReceivedNotification>.broadcast();
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
+final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
 Position? lastPosition;
 
@@ -112,10 +112,10 @@ class MainApp extends StatefulWidget {
 class MainAppState extends State<MainApp> {
   String? currentLocation;
   ThemeMode _themeMode = {
-        "light": ThemeMode.light,
-        "dark": ThemeMode.dark,
-        "system": ThemeMode.system
-      }[Global.preference.getString('theme')] ??
+    "light": ThemeMode.light,
+    "dark": ThemeMode.dark,
+    "system": ThemeMode.system
+  }[Global.preference.getString('theme')] ??
       ThemeMode.system;
 
   void changeTheme(String themeMode) {
@@ -163,23 +163,85 @@ class MainAppState extends State<MainApp> {
       return Future.error('位置權限被永久拒絕，我們無法請求權限。');
     }
 
-    BackgroundTask.instance.stream.listen((location) {
-      print('背景位置: ${location.lat}, ${location.lng}');
-    });
-
     startPositionStream();
   }
 
   void startPositionStream() {
+    if (positionStreamSubscription == null) {
+      if (Platform.isAndroid) {
+        final positionStream = geolocatorPlatform.getPositionStream(
+            locationSettings: AndroidSettings(
+                accuracy: LocationAccuracy.high,
+                distanceFilter: 100,
+                forceLocationManager: false,
+                intervalDuration: const Duration(seconds: 1),
+                //(Optional) Set foreground notification config to keep the app alive
+                //when going to the background
+                foregroundNotificationConfig: const ForegroundNotificationConfig(
+                  notificationText: "服務中...",
+                  notificationTitle: "DPIP 背景定位",
+                  notificationChannelName: '背景定位',
+                  enableWifiLock: true,
+                  enableWakeLock: true,
+                  setOngoing: false,
+                )));
+        positionStreamSubscription = positionStream.handleError((error) {
+          positionStreamSubscription?.cancel();
+          positionStreamSubscription = null;
+        }).listen((Position? position) async {
+          if (position != null) {
+            String? lat = position.latitude.toStringAsFixed(4);
+            String? lon = position.longitude.toStringAsFixed(4);
+            String? coordinate = '$lat,$lon';
+            messaging.getToken().then((value) {
+              Global.api.postNotifyLocation(
+                "0.0.0",
+                "Android",
+                coordinate,
+                value!,
+              );
+            });
+          }
+        });
+      } else if (Platform.isIOS) {
+        final positionStream = geolocatorPlatform.getPositionStream(
+            locationSettings: AppleSettings(
+              accuracy: LocationAccuracy.medium,
+              activityType: ActivityType.otherNavigation,
+              distanceFilter: 100,
+              pauseLocationUpdatesAutomatically: true,
+              // Only set to true if our app will be started up in the background.
+              showBackgroundLocationIndicator: false,
+            ));
+        positionStreamSubscription = positionStream.handleError((error) {
+          positionStreamSubscription?.cancel();
+          positionStreamSubscription = null;
+        }).listen((Position? position) async {
+          if (position != null) {
+            String? lat = position.latitude.toStringAsFixed(4);
+            String? lon = position.longitude.toStringAsFixed(4);
+            String? coordinate = '$lat,$lon';
+            messaging.getToken().then((value) {
+              Global.api.postNotifyLocation(
+                "0.0.0",
+                "Ios",
+                coordinate,
+                value!,
+              );
+            });
+          }
+        });
+      }
+    }
     // LocationSettings locationSettings = const LocationSettings(
     //   accuracy: LocationAccuracy.medium,
-    //   distanceFilter: 150,
+    //   distanceFilter: 100,
     // );
-    BackgroundTask.instance.start(
-      distanceFilter: 150,
-      isEnabledEvenIfKilled: true,
-      iOSDesiredAccuracy: DesiredAccuracy.hundredMeters,
-    );
+    // BackgroundTask.instance.start(
+    //   distanceFilter: 150,
+    //   isEnabledEvenIfKilled: true,
+    //   iOSDesiredAccuracy: DesiredAccuracy.hundredMeters,
+    // );
 
     positionStreamSubscription = Geolocator.getPositionStream(
       // locationSettings: locationSettings,
@@ -196,7 +258,7 @@ class MainAppState extends State<MainApp> {
           position.longitude,
         );
 
-        if (distance >= 150) {
+        if (distance >= 100) {
           stopPositionStream();
         }
       }
