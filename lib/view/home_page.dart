@@ -21,8 +21,8 @@ class HomePage extends StatefulWidget {
 }
 
 class Areas {
-  static List<String> getOptions() {
-    return ['花蓮縣 萬榮鄉', '花蓮縣 壽豐鄉', '臺北市 中正區']; // 鄉鎮列表
+  static List<String> getOptions(currentArea) {
+    return [currentArea, '花蓮縣 萬榮鄉', '臺北市 中正區']; // 鄉鎮列表
   }
 }
 
@@ -319,6 +319,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   late TempColor tempToColor;
   final ScrollController _controller = ScrollController();
   var distCode = 100;
+  String? currentCity = Global.preference.getString("loc-city");
+  String? currentTown = Global.preference.getString("loc-town");
+  String currentArea = "";
 
   Future<void> refreshWeather(context) async {
     weatherRefreshing = true;
@@ -409,7 +412,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     super.initState();
     tempToColor = TempColor();
     calculator = Cal();
-    _selectedArea = Areas.getOptions().first;
+    currentCity != null ? currentArea = "$currentCity $currentTown" : currentArea = "臺北市 中正區";
+    _selectedArea = Areas.getOptions(currentArea).toSet().first;
     refreshWeather(context);
     refreshEqReport(context);
     _controller.addListener(() {
@@ -452,7 +456,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     children: [
                       CupertinoSegmentedControl<String>(
                         children: {
-                          for (var item in Areas.getOptions())
+                          for (var item in Areas.getOptions(currentArea))
                             item: Text(
                               item,
                               style: const TextStyle(
@@ -738,7 +742,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                       refreshWeather(context);
                       refreshEqReport(context);
                     },
-                    items: Areas.getOptions().map<DropdownMenuItem<String>>((String value) {
+                    items: Areas.getOptions(currentArea).toSet().map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(
