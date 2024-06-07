@@ -48,6 +48,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   int selectedMapIndex = 0;
 
   late StreamSubscription<Position> positionStreamSubscription;
+  bool locationRequested = false;
 
   late AnimationController _animationController;
   final borderRadius = BorderRadiusTween(
@@ -71,6 +72,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     setState(() => report = data);
     initMapMarkers();
     fillIntensityCapsule();
+    initLocationService();
     setState(() {});
   }
 
@@ -168,7 +170,6 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     baseMap = Global.preference.getString("base_map") ?? "geojson";
     selectedMapIndex = baseMapOptions.keys.toList().indexOf(baseMap);
     fetchFullReport();
-    initLocationService();
 
     _animationController = AnimationController(
       vsync: this,
@@ -204,11 +205,16 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
       }
     }
 
+    locationRequested = true;
+
     if (permission == LocationPermission.deniedForever) {
       return;
     }
 
-    Position position = await Geolocator.getCurrentPosition();
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.low,
+      forceAndroidLocationManager: false,
+    );
     updateLocationMarker(position);
 
     positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
