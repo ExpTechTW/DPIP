@@ -209,6 +209,7 @@ class MainAppState extends State<MainApp> {
               accuracy: LocationAccuracy.medium,
               activityType: ActivityType.otherNavigation,
               distanceFilter: 100,
+              timeLimit: const Duration(minutes: 15),
               pauseLocationUpdatesAutomatically: true,
               // Only set to true if our app will be started up in the background.
               showBackgroundLocationIndicator: false,
@@ -233,15 +234,6 @@ class MainAppState extends State<MainApp> {
         });
       }
     }
-    // LocationSettings locationSettings = const LocationSettings(
-    //   accuracy: LocationAccuracy.medium,
-    //   distanceFilter: 100,
-    // );
-    // BackgroundTask.instance.start(
-    //   distanceFilter: 150,
-    //   isEnabledEvenIfKilled: true,
-    //   iOSDesiredAccuracy: DesiredAccuracy.hundredMeters,
-    // );
 
     positionStreamSubscription = Geolocator.getPositionStream(
       // locationSettings: locationSettings,
