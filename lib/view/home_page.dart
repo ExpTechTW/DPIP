@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/report.dart';
+import 'package:dpip/view/setting/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
@@ -462,6 +463,35 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     }
   }
 
+  void checkIsSetArea(context) {
+    setState(() {});
+    if (Global.preference.getString("loc-city") == null) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              contentPadding: const EdgeInsets.all(24),
+              content: const Text("尚未設定所在區域\n請前往設定"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LocationSettingsPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('確定'),
+                ),
+              ],
+            );
+          });
+    }
+  }
+
   void scrollToTop() {
     _controller.animateTo(
       0,
@@ -483,6 +513,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     // _selectedArea = Areas.getOptions(currentArea).toSet().first;
     refreshWeather(context);
     refreshEqReport(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkIsSetArea(context);
+    });
     _controller.addListener(() {
       if (_controller.position.pixels == _controller.position.minScrollExtent) {
         setState(() {
@@ -1159,6 +1192,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                   // 使用 Future.wait 來同時等待多個異步操作完成
                                   await Future.wait([
                                     updateArea(),
+                                    checkIsSetArea(context),
                                     refreshWeather(context),
                                     refreshEqReport(context),
                                   ] as Iterable<Future>);
