@@ -266,23 +266,42 @@ class EqInfo extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: calculator.percentToPixel(15, context),
-                            height: calculator.percentToPixel(15, context),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: context.colors.intensity(eqReport.intensity),
-                            ),
-                            child: Text(
-                              intensityToNumberString(eqReport.intensity),
-                              style: TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.w900,
-                                color: context.colors.onIntensity(eqReport.intensity),
+                          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                            Container(
+                              alignment: Alignment.center,
+                              width: calculator.percentToPixel(12, context),
+                              height: calculator.percentToPixel(12, context),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: context.colors.intensity(eqReport.intensity),
+                              ),
+                              child: Text(
+                                intensityToNumberString(eqReport.intensity),
+                                style: TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w900,
+                                  color: context.colors.onIntensity(eqReport.intensity),
+                                ),
                               ),
                             ),
-                          )
+                            // Container(
+                            //   alignment: Alignment.center,
+                            //   width: calculator.percentToPixel(12, context),
+                            //   height: calculator.percentToPixel(12, context),
+                            //   decoration: BoxDecoration(
+                            //     borderRadius: BorderRadius.circular(10),
+                            //     color: context.colors.intensity(eqReport.intensity),
+                            //   ),
+                            //   child: Text(
+                            //     intensityToNumberString(eqReport.intensity),
+                            //     style: TextStyle(
+                            //       fontSize: 36,
+                            //       fontWeight: FontWeight.w900,
+                            //       color: context.colors.onIntensity(eqReport.intensity),
+                            //     ),
+                            //   ),
+                            // )
+                          ])
                         ],
                       ),
                     )
@@ -397,6 +416,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   }
 
   void updateArea() {
+    currentCity = Global.preference.getString("loc-city");
+    currentTown = Global.preference.getString("loc-town");
     if (currentCity != null) {
       currentArea = "$currentCity $currentTown";
     } else {
@@ -613,7 +634,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                               child: CupertinoActivityIndicator(),
                                             );
                                           },
-                                          errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                          errorBuilder:
+                                              (BuildContext context, Object exception, StackTrace? stackTrace) {
                                             return Container();
                                           },
                                         ),
@@ -753,23 +775,23 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                Text(
-                                "近期設定區域無地震或警特報資訊",
-                                style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                  Text(
+                                    "近期設定區域無地震或警特報資訊",
+                                    style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    )
-                  : SliverList(
-                      delegate: SliverChildBuilderDelegate(
+                        )
+                      : SliverList(
+                          delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
                               return EqInfo(eqReport: eqReport[index]);
-                              },
-                        childCount: eqReport.length,
-                      ),
-                    )
+                            },
+                            childCount: eqReport.length,
+                          ),
+                        )
                   : const SliverFillRemaining(
                       child: Center(
                         child: CupertinoActivityIndicator(),
@@ -879,13 +901,13 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                            "更新時間：${DateFormat("MM/dd HH:mm").format(
-                                              TZDateTime.fromMillisecondsSinceEpoch(
-                                                getLocation("Asia/Taipei"),
-                                                (weather["update"] as double).round() * 1000,
-                                              ),
-                                            )}",
-                                            style: const TextStyle(fontSize: 12),
+                                          "更新時間：${DateFormat("MM/dd HH:mm").format(
+                                            TZDateTime.fromMillisecondsSinceEpoch(
+                                              getLocation("Asia/Taipei"),
+                                              (weather["update"] as double).round() * 1000,
+                                            ),
+                                          )}",
+                                          style: const TextStyle(fontSize: 12),
                                         ),
                                         const Text(
                                           "天氣資料來自 weather.com",
@@ -1100,7 +1122,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                               )
                         : const Center(
                             child: CircularProgressIndicator(),
-                    ),
+                          ),
                   ),
                 ),
               ],
