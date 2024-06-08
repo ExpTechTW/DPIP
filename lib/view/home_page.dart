@@ -114,7 +114,7 @@ class EqInfo extends StatelessWidget {
               );
             },
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.9,
+              width: MediaQuery.of(context).size.width * 0.92,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: const Color(0x30808080),
@@ -194,7 +194,7 @@ class EqInfo extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.005,
+            height: MediaQuery.of(context).size.height * 0.01,
           ),
         ],
       );
@@ -458,31 +458,58 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 },
               ),
               SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      CupertinoSegmentedControl<String>(
-                        children: {
-                          for (var item in Areas.getOptions(currentArea))
-                            item: Text(
-                              item,
-                              style: const TextStyle(
-                                fontSize: 20,
-                              ),
-                            ),
-                        },
-                        onValueChanged: (String newArea) {
-                          setState(() {
-                            _selectedArea = newArea;
-                          });
-                          refreshWeather(context);
-                          refreshEqReport(context);
-                        },
-                        groupValue: _selectedArea,
+                child: GestureDetector(
+                  onTap: () {
+                    showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) => CupertinoActionSheet(
+                        message: SizedBox(
+                          height: 200,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              for (var item in Areas.getOptions(currentArea))
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedArea = item;
+                                    });
+                                    refreshWeather(context);
+                                    refreshEqReport(context);
+                                    Navigator.of(context).pop(); // 關閉彈出視窗
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    child: Text(
+                                      item,
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
-                      const Divider(color: Colors.white),
-                    ],
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              _selectedArea,
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                            const Icon(CupertinoIcons.right_chevron),
+                          ],
+                        ),
+                        const Divider(color: Colors.white),
+                      ],
+                    ),
                   ),
                 ),
               ),
