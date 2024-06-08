@@ -194,7 +194,7 @@ class EqInfo extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.01,
+            height: MediaQuery.of(context).size.height * 0.005,
           ),
         ],
       );
@@ -476,6 +476,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                           setState(() {
                             _selectedArea = newArea;
                           });
+                          refreshWeather(context);
+                          refreshEqReport(context);
                         },
                         groupValue: _selectedArea,
                       ),
