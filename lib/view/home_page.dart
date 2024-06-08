@@ -299,9 +299,10 @@ class EqInfo extends StatelessWidget {
                                   width: calculator.percentToPixel(8, context),
                                   height: calculator.percentToPixel(8, context),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                    color: context.colors.intensity(cityMaxInt[eqReport.id]),
-                                  ),
+                                      borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                      color: cityMaxInt[eqReport.id] == 0
+                                          ? const Color(0xFF202020)
+                                          : context.colors.intensity(cityMaxInt[eqReport.id])),
                                   child: Text(
                                     intensityToNumberString(cityMaxInt[eqReport.id]),
                                     style: TextStyle(
