@@ -186,7 +186,7 @@ class EqInfo extends StatelessWidget {
                                 color: CupertinoColors.white,
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -493,9 +493,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
       return MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
         child: CupertinoPageScaffold(
-          navigationBar: const CupertinoNavigationBar(
-            middle: Text("首頁"),
-          ),
+          navigationBar: null,
           child: SafeArea(
             child: CustomScrollView(controller: _controller, slivers: [
               CupertinoSliverRefreshControl(
@@ -544,17 +542,28 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Column(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              _selectedArea,
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                            const Icon(CupertinoIcons.right_chevron),
-                          ],
+                        const SizedBox(width: 8),
+                        const Text(
+                          "首頁",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                _selectedArea,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                              const Icon(CupertinoIcons.right_chevron),
+                            ],
+                          ),
                         ),
                         const Divider(color: Colors.white),
                       ],
