@@ -95,7 +95,9 @@ class EqInfo extends StatelessWidget {
   // const EqInfo({Key? key, required this.eqReport}) : super(key: key);
   final PartialEarthquakeReport eqReport;
 
-  EqInfo({super.key, required this.eqReport});
+  final Map cityMaxInt;
+
+  EqInfo({super.key, required this.cityMaxInt, required this.eqReport});
 
   Cal calculator = Cal();
 
@@ -236,72 +238,79 @@ class EqInfo extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(
                         left: calculator.percentToPixel(5, context),
-                        right: calculator.percentToPixel(5, context),
-                        top: calculator.percentToPixel(1, context),
-                        bottom: calculator.percentToPixel(2, context),
+                        right: calculator.percentToPixel(2, context),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                              top: calculator.percentToPixel(1, context),
+                              bottom: calculator.percentToPixel(2, context),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                                ),
+                                Text(
+                                  DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                                    TZDateTime.fromMillisecondsSinceEpoch(
+                                      getLocation("Asia/Taipei"),
+                                      eqReport.time,
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  "規模${eqReport.mag}　深度${eqReport.depth}公里",
+                                  style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                                ),
+                              ],
+                            ),
+                          ),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
-                              ),
-                              Text(
-                                DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                                  TZDateTime.fromMillisecondsSinceEpoch(
-                                    getLocation("Asia/Taipei"),
-                                    eqReport.time,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  alignment: Alignment.center,
+                                  width: calculator.percentToPixel(12, context),
+                                  height: calculator.percentToPixel(12, context),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: context.colors.intensity(eqReport.intensity),
+                                  ),
+                                  child: Text(
+                                    intensityToNumberString(eqReport.intensity),
+                                    style: TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.w900,
+                                      color: context.colors.onIntensity(eqReport.intensity),
+                                    ),
                                   ),
                                 ),
-                                style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
-                                textAlign: TextAlign.left,
-                              ),
-                              Text(
-                                "規模${eqReport.mag}　深度${eqReport.depth}公里",
-                                style: const TextStyle(fontSize: 18, letterSpacing: 2),
-                              ),
-                            ],
-                          ),
-                          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                            Container(
-                              alignment: Alignment.center,
-                              width: calculator.percentToPixel(12, context),
-                              height: calculator.percentToPixel(12, context),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: context.colors.intensity(eqReport.intensity),
-                              ),
-                              child: Text(
-                                intensityToNumberString(eqReport.intensity),
-                                style: TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w900,
-                                  color: context.colors.onIntensity(eqReport.intensity),
-                                ),
-                              ),
-                            ),
-                            // Container(
-                            //   alignment: Alignment.center,
-                            //   width: calculator.percentToPixel(12, context),
-                            //   height: calculator.percentToPixel(12, context),
-                            //   decoration: BoxDecoration(
-                            //     borderRadius: BorderRadius.circular(10),
-                            //     color: context.colors.intensity(eqReport.intensity),
-                            //   ),
-                            //   child: Text(
-                            //     intensityToNumberString(eqReport.intensity),
-                            //     style: TextStyle(
-                            //       fontSize: 36,
-                            //       fontWeight: FontWeight.w900,
-                            //       color: context.colors.onIntensity(eqReport.intensity),
-                            //     ),
-                            //   ),
-                            // )
-                          ])
+                                Container(
+                                  alignment: Alignment.center,
+                                  width: calculator.percentToPixel(8, context),
+                                  height: calculator.percentToPixel(8, context),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                    color: context.colors.intensity(cityMaxInt[eqReport.id]),
+                                  ),
+                                  child: Text(
+                                    intensityToNumberString(cityMaxInt[eqReport.id]),
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w900,
+                                      color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
+                                    ),
+                                  ),
+                                )
+                              ])
                         ],
                       ),
                     )
@@ -332,6 +341,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     'condition': 0,
   };
   List eqReport = [];
+  Map cityMaxInt = {};
   bool weatherRefreshing = true;
   bool eqReportRefreshing = true;
   late Cal calculator;
@@ -400,6 +410,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     try {
       final eqReportData = await Global.api.getReportList(limit: 10);
       eqReport = eqReportData;
+      for (var i = 0; i < eqReport.length; i++) {
+        cityMaxInt[eqReport[i].id] = await getCityInt(eqReport[i].id);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -413,6 +426,21 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     }
     eqReportRefreshing = false;
     setState(() {});
+  }
+
+  getCityInt(id) async {
+    final data = await Global.api.getReport(id);
+
+    var report = data;
+    var maxInt = 0;
+    for (var city in report.list.entries) {
+      if (_selectedArea.split(" ")[0] == city.key) {
+        maxInt = city.value.intensity;
+      }
+    }
+    return maxInt;
+    // print(maxInt);
+    // print(id);
   }
 
   void updateArea() {
@@ -787,7 +815,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                       : SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (BuildContext context, int index) {
-                              return EqInfo(eqReport: eqReport[index]);
+                              return EqInfo(
+                                eqReport: eqReport[index],
+                                cityMaxInt: cityMaxInt,
+                              );
                             },
                             childCount: eqReport.length,
                           ),
@@ -1115,7 +1146,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                 child: ListView.builder(
                                   itemCount: eqReport.length,
                                   itemBuilder: (context, index) {
-                                    return EqInfo(eqReport: eqReport[index]);
+                                    return EqInfo(eqReport: eqReport[index], cityMaxInt: cityMaxInt);
                                   },
                                   // shrinkWrap: true,
                                 ),
