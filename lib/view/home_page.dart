@@ -353,8 +353,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   String currentArea = "";
 
   Future<void> refreshWeather(context) async {
-    weatherRefreshing = true;
-    setState(() {});
+    setState(() {
+      weatherRefreshing = true;
+    });
     try {
       distCode = (await getZipCodeForArea(_selectedArea))!;
       final weatherData = await Global.api.getWeatherRealtime("$distCode");
@@ -400,13 +401,16 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         );
       }
     }
-    weatherRefreshing = false;
-    setState(() {});
+
+    setState(() {
+      weatherRefreshing = false;
+    });
   }
 
   Future<void> refreshEqReport(context) async {
-    setState(() {});
-    eqReportRefreshing = true;
+    setState(() {
+      eqReportRefreshing = true;
+    });
     try {
       final eqReportData = await Global.api.getReportList(limit: 10);
       eqReport = eqReportData;
@@ -424,8 +428,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         ),
       );
     }
-    eqReportRefreshing = false;
-    setState(() {});
+    setState(() {
+      eqReportRefreshing = false;
+    });
   }
 
   getCityInt(id) async {
@@ -446,10 +451,14 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   void updateArea() {
     currentCity = Global.preference.getString("loc-city");
     currentTown = Global.preference.getString("loc-town");
+
     if (currentCity != null) {
       currentArea = "$currentCity $currentTown";
     } else {
       currentArea = "臺北市 中正區";
+    }
+    if (_selectedArea != currentArea) {
+      _selectedArea = currentArea;
     }
   }
 
@@ -469,8 +478,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     super.initState();
     tempToColor = TempColor();
     calculator = Cal();
+    _selectedArea = "";
     updateArea();
-    _selectedArea = Areas.getOptions(currentArea).toSet().first;
+    // _selectedArea = Areas.getOptions(currentArea).toSet().first;
     refreshWeather(context);
     refreshEqReport(context);
     _controller.addListener(() {
@@ -1148,9 +1158,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                 onRefresh: () async {
                                   // 使用 Future.wait 來同時等待多個異步操作完成
                                   await Future.wait([
+                                    updateArea(),
                                     refreshWeather(context),
                                     refreshEqReport(context),
-                                  ]);
+                                  ] as Iterable<Future>);
                                 },
                                 child: ListView.builder(
                                   itemCount: eqReport.length,
