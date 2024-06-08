@@ -70,8 +70,8 @@ class TempColor {
   ];
 
   Color getColorForTemp(double temp) {
-    const double minTemp = 0;
-    const double maxTemp = 40;
+    const double minTemp = 5;
+    const double maxTemp = 45;
 
     if (temp == -99.9) {
       return const Color(0xFF808080);
