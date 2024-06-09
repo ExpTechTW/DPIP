@@ -865,7 +865,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                     fontWeight: FontWeight.w900,
                                                     letterSpacing: 5,
                                                     color:
-                                                    Color.lerp(context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                    Color.lerp(CupertinoColors.label.resolveFrom(context), const Color(0xFFFFFFFF), 0.1),
                                                     shadows: const [
                                                       Shadow(
                                                         offset: Offset(5, 5),
@@ -888,7 +888,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                         fontSize: 48,
                                                         fontWeight: FontWeight.w900,
                                                         color: Color.lerp(
-                                                            context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                            CupertinoColors.label.resolveFrom(context), const Color(0xFFFFFFFF), 0.1),
                                                         shadows: const [
                                                           Shadow(
                                                             offset: Offset(5, 5),
