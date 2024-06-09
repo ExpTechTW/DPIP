@@ -1163,11 +1163,13 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           children: [
                                             Text(
                                               (weather["temp"] as String).split(".")[0],
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 96,
                                                 fontWeight: FontWeight.w900,
                                                 letterSpacing: 5,
-                                                shadows: [
+                                                color:
+                                                    Color.lerp(context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                shadows: const [
                                                   Shadow(
                                                     offset: Offset(5, 5),
                                                     blurRadius: 20,
@@ -1185,10 +1187,12 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                 ),
                                                 Text(
                                                   ".${(weather["temp"] as String).split(".")[1]}",
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 48,
                                                     fontWeight: FontWeight.w900,
-                                                    shadows: [
+                                                    color: Color.lerp(
+                                                        context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                    shadows: const [
                                                       Shadow(
                                                         offset: Offset(5, 5),
                                                         blurRadius: 20,
