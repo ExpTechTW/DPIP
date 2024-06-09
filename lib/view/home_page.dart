@@ -148,45 +148,76 @@ class EqInfo extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Padding(
+                            padding: EdgeInsets.only(
+                              top: calculator.percentToPixel(1, context),
+                              bottom: calculator.percentToPixel(2, context),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
+                                ),
+                                Text(
+                                  DateFormat("yyyy/MM/dd HH:mm:ss").format(
+                                    TZDateTime.fromMillisecondsSinceEpoch(
+                                      getLocation("Asia/Taipei"),
+                                      eqReport.time,
+                                    ),
+                                  ),
+                                  style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Text(
+                                  "規模${eqReport.mag}　深度${eqReport.depth}公里",
+                                  style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                                ),
+                              ],
+                            ),
+                          ),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Text(
-                                eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 2),
-                              ),
-                              Text(
-                                DateFormat("yyyy/MM/dd HH:mm:ss").format(
-                                  TZDateTime.fromMillisecondsSinceEpoch(
-                                    getLocation("Asia/Taipei"),
-                                    eqReport.time,
+                              Container(
+                                alignment: Alignment.center,
+                                width: MediaQuery.of(context).size.width * 0.12,
+                                height: MediaQuery.of(context).size.width * 0.12,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: context.colors.intensity(eqReport.intensity),
+                                ),
+                                child: Text(
+                                  intensityToNumberString(eqReport.intensity),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w900,
+                                    color: context.colors.onIntensity(eqReport.intensity),
                                   ),
                                 ),
-                                style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
-                                textAlign: TextAlign.left,
                               ),
-                              Text(
-                                "規模${eqReport.mag}　深度${eqReport.depth}公里",
-                                style: const TextStyle(fontSize: 18, letterSpacing: 2),
+                              Container(
+                                alignment: Alignment.center,
+                                width: MediaQuery.of(context).size.width * 0.08,
+                                height: MediaQuery.of(context).size.width * 0.08,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                    color: cityMaxInt[eqReport.id] == 0
+                                        ? const Color(0xFF202020)
+                                        : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                ),
+                                child: Text(
+                                  intensityToNumberString(cityMaxInt[eqReport.id]),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
+                                  ),
+                                ),
                               ),
                             ],
-                          ),
-                          Container(
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width * 0.15,
-                            height: MediaQuery.of(context).size.width * 0.15,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: context.colors.intensity(eqReport.intensity),
-                            ),
-                            child: Text(
-                              intensityToNumberString(eqReport.intensity),
-                              style: const TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.w900,
-                                color: CupertinoColors.white,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -302,7 +333,8 @@ class EqInfo extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
                                       color: cityMaxInt[eqReport.id] == 0
                                           ? const Color(0xFF202020)
-                                          : context.colors.intensity(cityMaxInt[eqReport.id])),
+                                          : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                  ),
                                   child: Text(
                                     intensityToNumberString(cityMaxInt[eqReport.id]),
                                     style: TextStyle(
