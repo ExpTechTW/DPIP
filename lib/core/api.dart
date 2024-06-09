@@ -66,8 +66,7 @@ class ExpTechApi {
   }
 
   Future<weatherRealtime> getWeatherRealtime(String code) async {
-    final response =
-        await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v1/weather/realtime/$code'));
+    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/realtime/$code'));
 
     if (response.statusCode == 200) {
       return weatherRealtime.fromJson(jsonDecode(response.body));
@@ -77,8 +76,7 @@ class ExpTechApi {
   }
 
   Future<List<String>> getWeatherForecast(String code) async {
-    final response =
-        await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v1/weather/forecast/$code'));
+    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/forecast/$code'));
 
     if (response.statusCode == 200) {
       return List<String>.from(jsonDecode(response.body) as List);
@@ -88,7 +86,7 @@ class ExpTechApi {
   }
 
   Future<List<String>> getWeatherAll(String code) async {
-    final response = await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v1/weather/all/$code'));
+    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/all/$code'));
 
     if (response.statusCode == 200) {
       return List<String>.from(jsonDecode(response.body) as List);
