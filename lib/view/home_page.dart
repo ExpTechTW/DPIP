@@ -204,7 +204,24 @@ class EqInfo extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Container(
+                              cityIntRefreshing == true
+                                  ? Container(
+                                alignment: Alignment.center,
+                                width: calculator.percentToPixel(8, context),
+                                height: calculator.percentToPixel(8, context),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                    color: const Color(0xFF202020)),
+                                child: Text(
+                                  "--",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: context.colors.onIntensity(0),
+                                  ),
+                                ),
+                              )
+                                  : Container(
                                 alignment: Alignment.center,
                                 width: MediaQuery.of(context).size.width * 0.08,
                                 height: MediaQuery.of(context).size.width * 0.08,
@@ -315,63 +332,64 @@ class EqInfo extends StatelessWidget {
                             ),
                           ),
                           Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: calculator.percentToPixel(12, context),
-                                  height: calculator.percentToPixel(12, context),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: context.colors.intensity(eqReport.intensity),
-                                  ),
-                                  child: Text(
-                                    intensityToNumberString(eqReport.intensity),
-                                    style: TextStyle(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w900,
-                                      color: context.colors.onIntensity(eqReport.intensity),
-                                    ),
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                width: calculator.percentToPixel(12, context),
+                                height: calculator.percentToPixel(12, context),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: context.colors.intensity(eqReport.intensity),
+                                ),
+                                child: Text(
+                                  intensityToNumberString(eqReport.intensity),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w900,
+                                    color: context.colors.onIntensity(eqReport.intensity),
                                   ),
                                 ),
-                                cityIntRefreshing == true
-                                    ? Container(
-                                        alignment: Alignment.center,
-                                        width: calculator.percentToPixel(8, context),
-                                        height: calculator.percentToPixel(8, context),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                            color: const Color(0xFF202020)),
-                                        child: Text(
-                                          "--",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w900,
-                                            color: context.colors.onIntensity(0),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        alignment: Alignment.center,
-                                        width: calculator.percentToPixel(8, context),
-                                        height: calculator.percentToPixel(8, context),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                          color: cityMaxInt[eqReport.id] == 0
-                                              ? const Color(0xFF202020)
-                                              : context.colors.intensity(cityMaxInt[eqReport.id]),
-                                        ),
-                                        child: Text(
-                                          intensityToNumberString(cityMaxInt[eqReport.id]),
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w900,
-                                            color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
-                                          ),
-                                        ),
-                                      )
-                              ])
+                              ),
+                              cityIntRefreshing == true
+                                  ? Container(
+                                alignment: Alignment.center,
+                                width: calculator.percentToPixel(8, context),
+                                height: calculator.percentToPixel(8, context),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                    color: const Color(0xFF202020)),
+                                child: Text(
+                                  "--",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: context.colors.onIntensity(0),
+                                  ),
+                                ),
+                              )
+                                  : Container(
+                                alignment: Alignment.center,
+                                width: calculator.percentToPixel(8, context),
+                                height: calculator.percentToPixel(8, context),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                  color: cityMaxInt[eqReport.id] == 0
+                                      ? const Color(0xFF202020)
+                                      : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                ),
+                                child: Text(
+                                  intensityToNumberString(cityMaxInt[eqReport.id]),
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     )
@@ -842,11 +860,13 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                               children: [
                                                 Text(
                                                   (weather["temp"] as String).split(".")[0],
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 96,
                                                     fontWeight: FontWeight.w900,
                                                     letterSpacing: 5,
-                                                    shadows: [
+                                                    color:
+                                                    Color.lerp(context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                    shadows: const [
                                                       Shadow(
                                                         offset: Offset(5, 5),
                                                         blurRadius: 20,
@@ -864,10 +884,12 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                     ),
                                                     Text(
                                                       ".${(weather["temp"] as String).split(".")[1]}",
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         fontSize: 48,
                                                         fontWeight: FontWeight.w900,
-                                                        shadows: [
+                                                        color: Color.lerp(
+                                                            context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                        shadows: const [
                                                           Shadow(
                                                             offset: Offset(5, 5),
                                                             blurRadius: 20,
@@ -906,44 +928,44 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
               ),
               eqReportRefreshing == false
                   ? eqReport.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              left: calculator.percentToPixel(5, context),
-                              right: calculator.percentToPixel(5, context),
-                              top: calculator.percentToPixel(5, context),
-                            ),
-                            child: const SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "近期設定區域無地震或警特報資訊",
-                                    style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              return EqInfo(
-                                eqReport: eqReport[index],
-                                cityMaxInt: cityMaxInt,
-                                cityIntRefreshing: cityIntRefreshing,
-                              );
-                            },
-                            childCount: eqReport.length,
-                          ),
-                        )
-                  : const SliverFillRemaining(
-                      child: Center(
-                        child: CupertinoActivityIndicator(),
-                      ),
+                  ? SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: calculator.percentToPixel(5, context),
+                    right: calculator.percentToPixel(5, context),
+                    top: calculator.percentToPixel(5, context),
+                  ),
+                  child: const SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "近期設定區域無地震或警特報資訊",
+                          style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+              )
+                  : SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                    return EqInfo(
+                      eqReport: eqReport[index],
+                      cityMaxInt: cityMaxInt,
+                      cityIntRefreshing: cityIntRefreshing,
+                    );
+                  },
+                  childCount: eqReport.length,
+                ),
+              )
+                  : const SliverFillRemaining(
+                child: Center(
+                  child: CupertinoActivityIndicator(),
+                ),
+              ),
             ]),
           ),
         ),
@@ -1003,15 +1025,15 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
 
                     weatherRefreshing == true
                         ? const Positioned.fill(
-                            child: Center(
-                            child: CircularProgressIndicator(),
-                          ))
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ))
                         : weather["temp"] == "-99.9"
-                            ? const Positioned.fill(
-                                child: Center(
-                                child: Text("天氣取得失敗"),
-                              ))
-                            : Container(),
+                        ? const Positioned.fill(
+                        child: Center(
+                          child: Text("天氣取得失敗"),
+                        ))
+                        : Container(),
                     Opacity(
                       opacity: weatherRefreshing == true || weather["temp"] == "-99.9" ? 0 : 1,
                       child: Stack(
@@ -1094,7 +1116,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           child: CircularProgressIndicator(
                                             value: loadingProgress.expectedTotalBytes != null
                                                 ? loadingProgress.cumulativeBytesLoaded /
-                                                    loadingProgress.expectedTotalBytes!
+                                                loadingProgress.expectedTotalBytes!
                                                 : null,
                                           ),
                                         );
@@ -1126,7 +1148,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       Text(
                                                         "${weather["precip"]} mm",
                                                         style:
-                                                            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   ),
@@ -1137,7 +1159,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       Text(
                                                         "${weather["humidity"]} %",
                                                         style:
-                                                            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   ),
@@ -1148,7 +1170,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       Text(
                                                         "${weather["feel"]} ℃",
                                                         style:
-                                                            const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                                                       ),
                                                     ],
                                                   ),
@@ -1168,7 +1190,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                 fontWeight: FontWeight.w900,
                                                 letterSpacing: 5,
                                                 color:
-                                                    Color.lerp(context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
+                                                Color.lerp(context.colors.onSurface, const Color(0xFFFFFFFF), 0.1),
                                                 shadows: const [
                                                   Shadow(
                                                     offset: Offset(5, 5),
@@ -1234,52 +1256,52 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     ),
                     child: eqReportRefreshing == false
                         ? eqReport.isEmpty
-                            ? RefreshIndicator(
-                                onRefresh: () async {
-                                  // 使用 Future.wait 來同時等待多個異步操作完成
-                                  await Future.wait([
-                                    refreshWeather(context),
-                                    refreshEqReport(context),
-                                  ]);
-                                },
-                                child: const SingleChildScrollView(
-                                  physics: AlwaysScrollableScrollPhysics(),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "近期設定區域無地震或警特報資訊",
-                                        style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : RefreshIndicator(
-                                onRefresh: () async {
-                                  // 使用 Future.wait 來同時等待多個異步操作完成
-                                  await Future.wait([
-                                    updateArea(),
-                                    checkIsSetArea(context),
-                                    refreshWeather(context),
-                                    refreshEqReport(context),
-                                  ] as Iterable<Future>);
-                                },
-                                child: ListView.builder(
-                                  itemCount: eqReport.length,
-                                  itemBuilder: (context, index) {
-                                    return EqInfo(
-                                      eqReport: eqReport[index],
-                                      cityMaxInt: cityMaxInt,
-                                      cityIntRefreshing: cityIntRefreshing,
-                                    );
-                                  },
-                                  // shrinkWrap: true,
-                                ),
-                              )
+                        ? RefreshIndicator(
+                      onRefresh: () async {
+                        // 使用 Future.wait 來同時等待多個異步操作完成
+                        await Future.wait([
+                          refreshWeather(context),
+                          refreshEqReport(context),
+                        ]);
+                      },
+                      child: const SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "近期設定區域無地震或警特報資訊",
+                              style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                        : RefreshIndicator(
+                      onRefresh: () async {
+                        // 使用 Future.wait 來同時等待多個異步操作完成
+                        await Future.wait([
+                          updateArea(),
+                          checkIsSetArea(context),
+                          refreshWeather(context),
+                          refreshEqReport(context),
+                        ] as Iterable<Future>);
+                      },
+                      child: ListView.builder(
+                        itemCount: eqReport.length,
+                        itemBuilder: (context, index) {
+                          return EqInfo(
+                            eqReport: eqReport[index],
+                            cityMaxInt: cityMaxInt,
+                            cityIntRefreshing: cityIntRefreshing,
+                          );
+                        },
+                        // shrinkWrap: true,
+                      ),
+                    )
                         : const Center(
-                            child: CircularProgressIndicator(),
-                          ),
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
                 ),
               ],
