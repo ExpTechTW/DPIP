@@ -98,7 +98,9 @@ class EqInfo extends StatelessWidget {
 
   final Map cityMaxInt;
 
-  EqInfo({super.key, required this.cityMaxInt, required this.eqReport});
+  final bool cityIntRefreshing;
+
+  EqInfo({super.key, required this.cityMaxInt, required this.eqReport, required this.cityIntRefreshing});
 
   Cal calculator = Cal();
 
@@ -169,7 +171,8 @@ class EqInfo extends StatelessWidget {
                                   ),
                                   // style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
                                   style: TextStyle(
-                                      color: Color.lerp(CupertinoColors.label.resolveFrom(context), const Color(0xFF808080), 0.5),
+                                      color: Color.lerp(
+                                          CupertinoColors.label.resolveFrom(context), const Color(0xFF808080), 0.5),
                                       fontSize: 16),
                                   textAlign: TextAlign.left,
                                 ),
@@ -332,25 +335,42 @@ class EqInfo extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: calculator.percentToPixel(8, context),
-                                  height: calculator.percentToPixel(8, context),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                    color: cityMaxInt[eqReport.id] == 0
-                                        ? const Color(0xFF202020)
-                                        : context.colors.intensity(cityMaxInt[eqReport.id]),
-                                  ),
-                                  child: Text(
-                                    intensityToNumberString(cityMaxInt[eqReport.id]),
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w900,
-                                      color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
-                                    ),
-                                  ),
-                                )
+                                cityIntRefreshing == true
+                                    ? Container(
+                                        alignment: Alignment.center,
+                                        width: calculator.percentToPixel(8, context),
+                                        height: calculator.percentToPixel(8, context),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                            color: const Color(0xFF202020)),
+                                        child: Text(
+                                          "--",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w900,
+                                            color: context.colors.onIntensity(0),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        alignment: Alignment.center,
+                                        width: calculator.percentToPixel(8, context),
+                                        height: calculator.percentToPixel(8, context),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                          color: cityMaxInt[eqReport.id] == 0
+                                              ? const Color(0xFF202020)
+                                              : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                        ),
+                                        child: Text(
+                                          intensityToNumberString(cityMaxInt[eqReport.id]),
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w900,
+                                            color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
+                                          ),
+                                        ),
+                                      )
                               ])
                         ],
                       ),
@@ -385,6 +405,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   Map cityMaxInt = {};
   bool weatherRefreshing = true;
   bool eqReportRefreshing = true;
+  bool cityIntRefreshing = true;
   late Cal calculator;
   late TempColor tempToColor;
   final ScrollController _controller = ScrollController();
@@ -448,16 +469,24 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     });
   }
 
+  Future<void> getCityMaxInt() async {
+    for (var i = 0; i < eqReport.length; i++) {
+      cityMaxInt[eqReport[i].id] = await getCityInt(eqReport[i].id);
+    }
+    setState(() {
+      cityIntRefreshing = false;
+    });
+  }
+
   Future<void> refreshEqReport(context) async {
     setState(() {
       eqReportRefreshing = true;
+      cityIntRefreshing = true;
     });
     try {
       final eqReportData = await Global.api.getReportList(limit: 10);
       eqReport = eqReportData;
-      for (var i = 0; i < eqReport.length; i++) {
-        cityMaxInt[eqReport[i].id] = await getCityInt(eqReport[i].id);
-      }
+      getCityMaxInt();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -869,7 +898,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                         ),
                       ],
                     ),
-                    Divider(color: CupertinoColors.label.resolveFrom(context),),
+                    Divider(
+                      color: CupertinoColors.label.resolveFrom(context),
+                    ),
                   ],
                 ),
               ),
@@ -902,6 +933,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                               return EqInfo(
                                 eqReport: eqReport[index],
                                 cityMaxInt: cityMaxInt,
+                                cityIntRefreshing: cityIntRefreshing,
                               );
                             },
                             childCount: eqReport.length,
@@ -1232,7 +1264,11 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                 child: ListView.builder(
                                   itemCount: eqReport.length,
                                   itemBuilder: (context, index) {
-                                    return EqInfo(eqReport: eqReport[index], cityMaxInt: cityMaxInt);
+                                    return EqInfo(
+                                      eqReport: eqReport[index],
+                                      cityMaxInt: cityMaxInt,
+                                      cityIntRefreshing: cityIntRefreshing,
+                                    );
                                   },
                                   // shrinkWrap: true,
                                 ),
