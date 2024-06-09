@@ -10,4 +10,5 @@
     "editor.wordBasedSuggestions": "off"
   },
   "dart.lineLength": 120,
+  "cmake.ignoreCMakeListsMissing": true,
 }

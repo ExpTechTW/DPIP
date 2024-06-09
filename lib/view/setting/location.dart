@@ -89,11 +89,14 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       print('初次檢查時沒權限');
       isEnabled = false;
     } else {
-      isEnabled = true;
+      if (isLocationAutoSetEnabled) {
+        isEnabled = true;
+      }
     }
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
       if (isLocationAutoSetEnabled) {
+        MainAppState().startPositionStream();
         getLocation();
       }
     });
@@ -121,10 +124,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
-      Placemark placemark = placemarks.first;
-      String? country = placemark.country;
-      if (country != 'Taiwan') {
-        return true;
+        Placemark placemark = placemarks.first;
+        String? country = placemark.country;
+        if (country != 'Taiwan') {
+          return true;
         }
       }
     } catch (e) {
@@ -180,7 +183,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     setState(() {
       isLocationAutoSetEnabled = value;
       if (isLocationAutoSetEnabled) {
+        MainAppState().startPositionStream();
         getLocation();
+      } else {
+        MainAppState().stopPositionStream();
       }
     });
     await fetchNotificationIcon();

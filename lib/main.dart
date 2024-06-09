@@ -19,7 +19,7 @@ import 'model/received_notification.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 final FirebaseMessaging messaging = FirebaseMessaging.instance;
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
-StreamController<ReceivedNotification>.broadcast();
+    StreamController<ReceivedNotification>.broadcast();
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
@@ -112,10 +112,10 @@ class MainApp extends StatefulWidget {
 class MainAppState extends State<MainApp> {
   String? currentLocation;
   ThemeMode _themeMode = {
-    "light": ThemeMode.light,
-    "dark": ThemeMode.dark,
-    "system": ThemeMode.system
-  }[Global.preference.getString('theme')] ??
+        "light": ThemeMode.light,
+        "dark": ThemeMode.dark,
+        "system": ThemeMode.system
+      }[Global.preference.getString('theme')] ??
       ThemeMode.system;
 
   void changeTheme(String themeMode) {
@@ -145,25 +145,28 @@ class MainAppState extends State<MainApp> {
   void initializeBackgroundTask() async {
     bool serviceEnabled;
     LocationPermission permission;
+    bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('定位服務被禁止。');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('位置權限被拒絕。');
+    if (isLocationAutoSetEnabled) {
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return Future.error('定位服務被禁止。');
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error('位置權限被永久拒絕，我們無法請求權限。');
-    }
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('位置權限被拒絕。');
+        }
+      }
 
-    startPositionStream();
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('位置權限被永久拒絕，我們無法請求權限。');
+      }
+
+      startPositionStream();
+    }
   }
 
   void startPositionStream() {
@@ -206,14 +209,14 @@ class MainAppState extends State<MainApp> {
       } else if (Platform.isIOS) {
         final positionStream = geolocatorPlatform.getPositionStream(
             locationSettings: AppleSettings(
-              accuracy: LocationAccuracy.medium,
-              activityType: ActivityType.otherNavigation,
-              distanceFilter: 100,
-              timeLimit: const Duration(minutes: 15),
-              pauseLocationUpdatesAutomatically: true,
-              // Only set to true if our app will be started up in the background.
-              showBackgroundLocationIndicator: false,
-            ));
+          accuracy: LocationAccuracy.medium,
+          activityType: ActivityType.otherNavigation,
+          distanceFilter: 100,
+          timeLimit: const Duration(minutes: 15),
+          pauseLocationUpdatesAutomatically: true,
+          // Only set to true if our app will be started up in the background.
+          showBackgroundLocationIndicator: false,
+        ));
         positionStreamSubscription = positionStream.handleError((error) {
           positionStreamSubscription?.cancel();
           positionStreamSubscription = null;
@@ -236,8 +239,9 @@ class MainAppState extends State<MainApp> {
     }
 
     positionStreamSubscription = Geolocator.getPositionStream(
-      // locationSettings: locationSettings,
-    ).listen((Position position) {
+            // locationSettings: locationSettings,
+            )
+        .listen((Position position) {
       setState(() {
         currentLocation = '位置: ${position.latitude}, ${position.longitude}';
       });
@@ -257,6 +261,7 @@ class MainAppState extends State<MainApp> {
 
       lastPosition = position;
     });
+    print('位置已開啟');
   }
 
   void stopPositionStream() {
