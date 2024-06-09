@@ -343,8 +343,8 @@ class EqInfo extends StatelessWidget {
                               children: [
                                 Container(
                                   alignment: Alignment.center,
-                                  width: calculator.percentToPixel(12, context),
-                                  height: calculator.percentToPixel(12, context),
+                                  width: calculator.percentToPixel(15, context),
+                                  height: calculator.percentToPixel(15, context),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: context.colors.intensity(eqReport.intensity),
@@ -352,51 +352,51 @@ class EqInfo extends StatelessWidget {
                                   child: Text(
                                     intensityToNumberString(eqReport.intensity),
                                     style: TextStyle(
-                                      fontSize: 32,
+                                      fontSize: 40,
                                       fontWeight: FontWeight.w900,
                                       color: context.colors.onIntensity(eqReport.intensity),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: calculator.percentToPixel(1, context),
-                                ),
-                                cityIntRefreshing == true
-                                    ? Container(
-                                        alignment: Alignment.center,
-                                        width: calculator.percentToPixel(8, context),
-                                        height: calculator.percentToPixel(8, context),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                            color: const Color(0xFF202020)),
-                                        child: Text(
-                                          "--",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w900,
-                                            color: context.colors.onIntensity(0),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        alignment: Alignment.center,
-                                        width: calculator.percentToPixel(8, context),
-                                        height: calculator.percentToPixel(8, context),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                          color: cityMaxInt[eqReport.id] == 0
-                                              ? const Color(0xFF202020)
-                                              : context.colors.intensity(cityMaxInt[eqReport.id]),
-                                        ),
-                                        child: Text(
-                                          intensityToNumberString(cityMaxInt[eqReport.id]),
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w900,
-                                            color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
-                                          ),
-                                        ),
-                                      ),
+                                // SizedBox(
+                                //   height: calculator.percentToPixel(1, context),
+                                // ),
+                                // cityIntRefreshing == true
+                                //     ? Container(
+                                //         alignment: Alignment.center,
+                                //         width: calculator.percentToPixel(8, context),
+                                //         height: calculator.percentToPixel(8, context),
+                                //         decoration: BoxDecoration(
+                                //             borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                //             color: const Color(0xFF202020)),
+                                //         child: Text(
+                                //           "--",
+                                //           style: TextStyle(
+                                //             fontSize: 20,
+                                //             fontWeight: FontWeight.w900,
+                                //             color: context.colors.onIntensity(0),
+                                //           ),
+                                //         ),
+                                //       )
+                                //     : Container(
+                                //         alignment: Alignment.center,
+                                //         width: calculator.percentToPixel(8, context),
+                                //         height: calculator.percentToPixel(8, context),
+                                //         decoration: BoxDecoration(
+                                //           borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                //           color: cityMaxInt[eqReport.id] == 0
+                                //               ? const Color(0xFF202020)
+                                //               : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                //         ),
+                                //         child: Text(
+                                //           intensityToNumberString(cityMaxInt[eqReport.id]),
+                                //           style: TextStyle(
+                                //             fontSize: 20,
+                                //             fontWeight: FontWeight.w900,
+                                //             color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
+                                //           ),
+                                //         ),
+                                //       ),
                               ],
                             ),
                           ),
