@@ -120,7 +120,7 @@ class EqInfo extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.92,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: const Color(0x30808080),
+                color: const Color(0x20808080),
               ),
               child: IntrinsicHeight(
                 child: Stack(
@@ -130,7 +130,7 @@ class EqInfo extends StatelessWidget {
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.02,
                         decoration: BoxDecoration(
-                          color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
+                          color: eqReport.hasNumber ? const Color(0x99FFB400) : const Color(0x9919C8C8),
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(10),
                             bottomLeft: Radius.circular(10),
@@ -167,7 +167,10 @@ class EqInfo extends StatelessWidget {
                                       eqReport.time,
                                     ),
                                   ),
-                                  style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                  // style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                  style: TextStyle(
+                                      color: Color.lerp(CupertinoColors.label.resolveFrom(context), const Color(0xFF808080), 0.5),
+                                      fontSize: 16),
                                   textAlign: TextAlign.left,
                                 ),
                                 Text(
@@ -683,7 +686,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                           colors: [
-                                            Colors.transparent,
+                                            context.colors.surface,
                                             tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
                                           ],
                                         ),
@@ -867,7 +870,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                         ),
                       ],
                     ),
-                    const Divider(color: Colors.white),
+                    Divider(color: CupertinoColors.label.resolveFrom(context),),
                   ],
                 ),
               ),
