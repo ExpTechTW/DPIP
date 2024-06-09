@@ -537,7 +537,67 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
       return MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
         child: CupertinoPageScaffold(
-          navigationBar: null,
+          navigationBar: CupertinoNavigationBar(
+            middle: Row(
+              children: [
+                const Text(
+                  "首頁",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      showCupertinoModalPopup(
+                        context: context,
+                        builder: (context) => CupertinoActionSheet(
+                          message: SizedBox(
+                            height: 200,
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: [
+                                for (var item in Areas.getOptions(currentArea))
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedArea = item;
+                                      });
+                                      refreshWeather(context);
+                                      refreshEqReport(context);
+                                      Navigator.of(context).pop(); // 關閉彈出視窗
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      child: Text(
+                                        item,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          _selectedArea,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const Icon(CupertinoIcons.right_chevron),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           child: SafeArea(
             child: CustomScrollView(controller: _controller, slivers: [
               CupertinoSliverRefreshControl(
@@ -547,73 +607,6 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     refreshEqReport(context),
                   ]);
                 },
-              ),
-              SliverToBoxAdapter(
-                child: GestureDetector(
-                  onTap: () {
-                    showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) => CupertinoActionSheet(
-                        message: SizedBox(
-                          height: 200,
-                          child: ListView(
-                            shrinkWrap: true,
-                            children: [
-                              for (var item in Areas.getOptions(currentArea))
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedArea = item;
-                                    });
-                                    refreshWeather(context);
-                                    refreshEqReport(context);
-                                    Navigator.of(context).pop(); // 關閉彈出視窗
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Text(
-                                      item,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        const SizedBox(width: 8),
-                        const Text(
-                          "首頁",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                _selectedArea,
-                                style: const TextStyle(fontSize: 24),
-                              ),
-                              const Icon(CupertinoIcons.right_chevron),
-                            ],
-                          ),
-                        ),
-                        const Divider(color: Colors.white),
-                      ],
-                    ),
-                  ),
-                ),
               ),
               SliverToBoxAdapter(
                 child: Column(
