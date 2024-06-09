@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
 
 class Areas {
   static List<String> getOptions(currentArea) {
-    return [currentArea, '花蓮縣 萬榮鄉', '臺北市 中正區']; // 鄉鎮列表
+    return [currentArea, '花蓮縣 萬榮鄉', '宜蘭縣 南澳鄉']; // 鄉鎮列表
   }
 }
 
