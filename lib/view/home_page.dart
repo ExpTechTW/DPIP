@@ -259,7 +259,7 @@ class EqInfo extends StatelessWidget {
                       child: Container(
                         width: calculator.percentToPixel(2, context),
                         decoration: BoxDecoration(
-                          color: eqReport.hasNumber ? const Color(0xFFC09010) : const Color(0xFF20AAAA),
+                          color: eqReport.hasNumber ? const Color(0x99FFB400) : const Color(0x9919C8C8),
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(10),
                             bottomLeft: Radius.circular(10),
@@ -956,7 +956,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(1.0),
                 child: Container(
-                  color: Colors.white,
+                  color: context.colors.onSurface,
                   height: 1.5,
                 ),
               ),
@@ -997,7 +997,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                       colors: [
-                                        Colors.transparent,
+                                        context.colors.surface,
                                         tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
                                       ],
                                     ),
@@ -1185,7 +1185,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 ),
                 Container(
                   height: 1.5,
-                  color: Colors.white,
+                  color: context.colors.onSurface,
                 ),
                 Expanded(
                   child: Padding(
