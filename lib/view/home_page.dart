@@ -120,7 +120,7 @@ class EqInfo extends StatelessWidget {
               width: MediaQuery.of(context).size.width * 0.92,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: const Color(0x20808080),
+                color: const Color(0x50808080),
               ),
               child: IntrinsicHeight(
                 child: Stack(
