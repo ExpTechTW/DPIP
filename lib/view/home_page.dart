@@ -693,10 +693,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                       ),
                                     ),
                                     SizedBox(
-                                      height: calculator.percentToPixel(6, context),
+                                      height: calculator.percentToPixel(4, context),
                                       child: Padding(
                                         padding: EdgeInsets.only(
-                                          bottom: calculator.percentToPixel(2, context),
                                           left: calculator.percentToPixel(5, context),
                                           right: calculator.percentToPixel(5, context),
                                         ),
@@ -849,7 +848,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                      height: calculator.percentToPixel(4.5, context),
+                                                      height: calculator.percentToPixel(3, context),
                                                     ),
                                                   ],
                                                 ),
