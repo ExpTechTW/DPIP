@@ -204,9 +204,9 @@ class EqInfo extends StatelessWidget {
                                 height: MediaQuery.of(context).size.width * 0.08,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                    color: cityMaxInt[eqReport.id] == 0
-                                        ? const Color(0xFF202020)
-                                        : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                  color: cityMaxInt[eqReport.id] == 0
+                                      ? const Color(0xFF202020)
+                                      : context.colors.intensity(cityMaxInt[eqReport.id]),
                                 ),
                                 child: Text(
                                   intensityToNumberString(cityMaxInt[eqReport.id]),
@@ -294,7 +294,11 @@ class EqInfo extends StatelessWidget {
                                       eqReport.time,
                                     ),
                                   ),
-                                  style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+                                  // style: const TextStyle(color: Color(0xFFc9c9c9), fontSize: 16),
+
+                                  style: TextStyle(
+                                      color: Color.lerp(context.colors.onSurface, const Color(0xFF808080), 0.5),
+                                      fontSize: 16),
                                   textAlign: TextAlign.left,
                                 ),
                                 Text(
@@ -330,10 +334,10 @@ class EqInfo extends StatelessWidget {
                                   width: calculator.percentToPixel(8, context),
                                   height: calculator.percentToPixel(8, context),
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                      color: cityMaxInt[eqReport.id] == 0
-                                          ? const Color(0xFF202020)
-                                          : context.colors.intensity(cityMaxInt[eqReport.id]),
+                                    borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
+                                    color: cityMaxInt[eqReport.id] == 0
+                                        ? const Color(0xFF202020)
+                                        : context.colors.intensity(cityMaxInt[eqReport.id]),
                                   ),
                                   child: Text(
                                     intensityToNumberString(cityMaxInt[eqReport.id]),
