@@ -686,7 +686,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                           colors: [
-                                            context.colors.surface,
+                                            CupertinoColors.systemBackground.resolveFrom(context),
                                             tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
                                           ],
                                         ),
