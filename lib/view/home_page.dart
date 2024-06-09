@@ -358,6 +358,9 @@ class EqInfo extends StatelessWidget {
                                     ),
                                   ),
                                 ),
+                                SizedBox(
+                                  height: calculator.percentToPixel(1, context),
+                                ),
                                 cityIntRefreshing == true
                                     ? Container(
                                         alignment: Alignment.center,
@@ -871,8 +874,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                     fontSize: 96,
                                                     fontWeight: FontWeight.w900,
                                                     letterSpacing: 5,
-                                                    color:
-                                                    Color.lerp(CupertinoColors.label.resolveFrom(context), const Color(0xFFFFFFFF), 0.1),
+                                                    color: Color.lerp(CupertinoColors.label.resolveFrom(context),
+                                                        const Color(0xFFFFFFFF), 0.1),
                                                     shadows: const [
                                                       Shadow(
                                                         offset: Offset(5, 5),
@@ -894,8 +897,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                                       style: TextStyle(
                                                         fontSize: 48,
                                                         fontWeight: FontWeight.w900,
-                                                        color: Color.lerp(
-                                                            CupertinoColors.label.resolveFrom(context), const Color(0xFFFFFFFF), 0.1),
+                                                        color: Color.lerp(CupertinoColors.label.resolveFrom(context),
+                                                            const Color(0xFFFFFFFF), 0.1),
                                                         shadows: const [
                                                           Shadow(
                                                             offset: Offset(5, 5),
