@@ -56,6 +56,12 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   /// 使用者本地預估震度
   int userIntensity = 0;
 
+  /// P 波速度，單位：公里/秒
+  double waveSpeedP = 6.0;
+
+  /// S 波速度，單位：公里/秒
+  double waveSpeedS = 3.5;
+
   String? city = Global.preference.getString("loc-city");
   String? town = Global.preference.getString("loc-town");
 
@@ -114,7 +120,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         final location = Global.region[city]![town]!;
 
         final waveTime =
-            calculateWaveTime(data.eq.depth, distance(data.eq.lat, data.eq.lon, location.lat, location.lon));
+        calculateWaveTime(data.eq.depth, distance(data.eq.lat, data.eq.lon, location.lat, location.lon));
 
         sArrive = data.eq.time + waveTime.s * 1000;
         pArrive = data.eq.time + waveTime.p * 1000;
@@ -170,13 +176,13 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
 
     final geojson = Platform.isIOS
         ? GeoJsonParser(
-            defaultPolygonFillColor: CupertinoColors.tertiarySystemBackground.resolveFrom(context),
-            defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
-          )
+      defaultPolygonFillColor: CupertinoColors.tertiarySystemBackground.resolveFrom(context),
+      defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
+    )
         : GeoJsonParser(
-            defaultPolygonFillColor: context.colors.surfaceVariant,
-            defaultPolygonBorderColor: context.colors.outline,
-          );
+      defaultPolygonFillColor: context.colors.surfaceContainerHighest,
+      defaultPolygonBorderColor: context.colors.outline,
+    );
 
     String baseMap = Global.preference.getString("base_map") ?? "geojson";
 
@@ -225,6 +231,60 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
       }
     }
 
+    List<CircleMarker> waveCircles = [];
+    List<Marker> epicenterMarker = [];
+
+    if (eewList.isNotEmpty) {
+      final eew = eewList.first;
+
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+      // 計算P波和S波傳播半徑（單位：公里）
+      double pRadius = (currentTime - eew.eq.time) / 1000 * waveSpeedP; // P 波速度，單位：公里/秒
+      double sRadius = (currentTime - eew.eq.time) / 1000 * waveSpeedS; // S 波速度，單位：公里/秒
+
+      // 添加 P 波圓圈
+      waveCircles.add(CircleMarker(
+        point: LatLng(eew.eq.lat, eew.eq.lon),
+        radius: pRadius * 1000, // 將半徑轉換為米
+        color: Colors.blue.withOpacity(0.3),
+        borderStrokeWidth: 2,
+        useRadiusInMeter: true,
+      ));
+
+      // 添加 S 波圓圈
+      waveCircles.add(CircleMarker(
+        point: LatLng(eew.eq.lat, eew.eq.lon),
+        radius: sRadius * 1000, // 將半徑轉換為米
+        color: Colors.red.withOpacity(0.3),
+        borderStrokeWidth: 2,
+        useRadiusInMeter: true,
+      ));
+
+      // 添加震央標記
+      // epicenterMarker.add(Marker(
+      //   height: 20, // 調整震央標記的高度
+      //   width: 20,  // 調整震央標記的寬度
+      //   point: LatLng(eew.eq.lat, eew.eq.lon),
+      //   builder: (ctx) => Container(
+      //     decoration: BoxDecoration(
+      //       shape: BoxShape.circle,
+      //       color: Colors.black, // 震央標記顏色
+      //       border: Border.all(
+      //         color: Colors.yellow, // 震央標記邊框顏色
+      //         width: 3,
+      //         strokeAlign: BorderSide.strokeAlignOutside,
+      //       ),
+      //     ),
+      //     child: const Icon(
+      //       Icons.clear,
+      //       color: Colors.red,
+      //       size: 16,
+      //     ),
+      //   ),
+      // ));
+    }
+
     final flutterMap = FlutterMap(
       options: const MapOptions(
         initialCenter: LatLng(23.8, 120.1),
@@ -239,21 +299,24 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
       children: [
         baseMap == "geojson"
             ? PolygonLayer(
-                polygons: geojson.polygons,
-                polygonCulling: true,
-                polygonLabels: false,
-              )
+          polygons: geojson.polygons,
+          polygonCulling: true,
+          polygonLabels: false,
+        )
             : TileLayer(
-                urlTemplate: {
-                  "googlemap": "http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                  "googletrain": "http://mt1.google.com/vt/lyrs=r@221097413,bike,transit&x={x}&y={y}&z={z}",
-                  "googlesatellite": "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-                  "openstreetmap": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                }[baseMap],
-                userAgentPackageName: 'com.exptech.dpip.dpip',
-              ),
+          urlTemplate: {
+            "googlemap": "http://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+            "googletrain": "http://mt1.google.com/vt/lyrs=r@221097413,bike,transit&x={x}&y={y}&z={z}",
+            "googlesatellite": "http://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+            "openstreetmap": "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          }[baseMap],
+          userAgentPackageName: 'com.exptech.dpip.dpip',
+        ),
         MarkerLayer(
           markers: rtsMarkers,
+        ),
+        CircleLayer(
+          circles: waveCircles,
         ),
       ],
     );
