@@ -26,6 +26,8 @@ dependencies:
   fluttertoast: ^8.2.5
   geocoding: ^3.0.0
   geolocator: ^12.0.0
+  # 目前geolocator_android 4.6有問題，故鎖定在4.5.5
+  geolocator_android: 4.5.5
   http: ^1.2.1
   in_app_update: ^4.2.2
   intl: ^0.18.1
