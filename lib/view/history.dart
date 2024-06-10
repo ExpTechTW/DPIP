@@ -14,7 +14,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPage extends State<HistoryPage> {
   int _page = 0;
-  List<Widget> _List_children = <Widget>[];
+  List<Widget> _listchildren = <Widget>[];
 
   @override
   void initState() {
@@ -32,9 +32,9 @@ class _HistoryPage extends State<HistoryPage> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     data ??= await get(
         "https://api.exptech.com.tw/api/v1/dpip/history?city=${prefs.getString('loc-city') ?? "臺南市"}&town=${prefs.getString('loc-town') ?? "歸仁區"}");
-    _List_children = <Widget>[];
+    _listchildren = <Widget>[];
     if (data == null || data == false) {
-      _List_children.add(const Column(
+      _listchildren.add(const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -49,7 +49,7 @@ class _HistoryPage extends State<HistoryPage> {
       ));
     } else {
       if (_page == 0) {
-        _List_children.add(Padding(
+        _listchildren.add(Padding(
           padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +73,7 @@ class _HistoryPage extends State<HistoryPage> {
           ),
         ));
         if (data["loc"].length == 0) {
-          _List_children.add(const Padding(
+          _listchildren.add(const Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +92,7 @@ class _HistoryPage extends State<HistoryPage> {
                 DateTime.fromMillisecondsSinceEpoch(data["loc"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
-            _List_children.add(Padding(
+            _listchildren.add(Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +133,7 @@ class _HistoryPage extends State<HistoryPage> {
           }
         }
       } else {
-        _List_children.add(const Padding(
+        _listchildren.add(const Padding(
           padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,7 +152,7 @@ class _HistoryPage extends State<HistoryPage> {
           ),
         ));
         if (data["all"].length == 0) {
-          _List_children.add(const Padding(
+          _listchildren.add(const Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,7 +171,7 @@ class _HistoryPage extends State<HistoryPage> {
                 DateTime.fromMillisecondsSinceEpoch(data["all"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
-            _List_children.add(Padding(
+            _listchildren.add(Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +276,7 @@ class _HistoryPage extends State<HistoryPage> {
                 ],
               ),
               Expanded(
-                child: ListView(physics: const ClampingScrollPhysics(), children: _List_children.toList()),
+                child: ListView(physics: const ClampingScrollPhysics(), children: _listchildren.toList()),
               ),
             ],
           ),

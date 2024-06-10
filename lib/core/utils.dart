@@ -158,43 +158,43 @@ String intensityToString(level) {
 }
 
 WaveTime calculateWaveTime(double depth, double distance) {
-  final double Za = 1 * depth;
-  double G0, G;
-  final double Xb = distance;
+  final double za = 1 * depth;
+  double g0, G;
+  final double xb = distance;
   if (depth <= 40) {
-    G0 = 5.10298;
+    g0 = 5.10298;
     G = 0.06659;
   } else {
-    G0 = 7.804799;
+    g0 = 7.804799;
     G = 0.004573;
   }
-  final double Zc = -1 * (G0 / G);
-  final double Xc = (pow(Xb, 2) - 2 * (G0 / G) * Za - pow(Za, 2)) / (2 * Xb);
-  double Theta_A = atan((Za - Zc) / Xc);
-  if (Theta_A < 0) {
-    Theta_A = Theta_A + pi;
+  final double zc = -1 * (g0 / G);
+  final double xc = (pow(xb, 2) - 2 * (g0 / G) * za - pow(za, 2)) / (2 * xb);
+  double thetaA = atan((za - zc) / xc);
+  if (thetaA < 0) {
+    thetaA = thetaA + pi;
   }
-  Theta_A = pi - Theta_A;
-  final double Theta_B = atan(-1 * Zc / (Xb - Xc));
-  double Ptime = (1 / G) * log(tan((Theta_A / 2)) / tan((Theta_B / 2)));
-  final double G0_ = G0 / sqrt(3);
-  final double G_ = G / sqrt(3);
-  final double Zc_ = -1 * (G0_ / G_);
-  final double Xc_ = (pow(Xb, 2) - 2 * (G0_ / G_) * Za - pow(Za, 2)) / (2 * Xb);
-  double Theta_A_ = atan((Za - Zc_) / Xc_);
-  if (Theta_A_ < 0) {
-    Theta_A_ = Theta_A_ + pi;
+  thetaA = pi - thetaA;
+  final double thetaB = atan(-1 * zc / (xb - xc));
+  double ptime = (1 / G) * log(tan((thetaA / 2)) / tan((thetaB / 2)));
+  final double g0_ = g0 / sqrt(3);
+  final double g_ = G / sqrt(3);
+  final double zc_ = -1 * (g0_ / g_);
+  final double xc_ = (pow(xb, 2) - 2 * (g0_ / g_) * za - pow(za, 2)) / (2 * xb);
+  double thetaA_ = atan((za - zc_) / xc_);
+  if (thetaA_ < 0) {
+    thetaA_ = thetaA_ + pi;
   }
-  Theta_A_ = pi - Theta_A_;
-  final double Theta_B_ = atan(-1 * Zc_ / (Xb - Xc_));
-  double Stime = (1 / G_) * log(tan(Theta_A_ / 2) / tan(Theta_B_ / 2));
-  if (distance / Ptime > 7) {
-    Ptime = distance / 7;
+  thetaA_ = pi - thetaA_;
+  final double thetaB_ = atan(-1 * zc_ / (xb - xc_));
+  double stime = (1 / g_) * log(tan(thetaA_ / 2) / tan(thetaB_ / 2));
+  if (distance / ptime > 7) {
+    ptime = distance / 7;
   }
-  if (distance / Stime > 4) {
-    Stime = distance / 4;
+  if (distance / stime > 4) {
+    stime = distance / 4;
   }
-  return WaveTime(p: Ptime, s: Stime);
+  return WaveTime(p: ptime, s: stime);
 }
 
 String safeBase64Encode(String input) {

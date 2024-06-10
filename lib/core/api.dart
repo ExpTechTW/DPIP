@@ -99,4 +99,20 @@ class ExpTechApi {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
+
+  Future<String> postNotifyLocation(
+    String version,
+    String platform,
+    String coordinate,
+    String token,
+  ) async {
+    final response = await http.get(Uri.parse(
+        'https://api-${randomNum(2)}.exptech.com.tw/api/v1/notify/location/${version}/${platform}/${coordinate}/${token}'));
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
 }

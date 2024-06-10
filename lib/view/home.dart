@@ -25,7 +25,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   int _page = 0;
-  List<Widget> _List_children = <Widget>[];
+  List<Widget> _listchildren = <Widget>[];
   MapController mapController = MapController();
   final GlobalKey _globalKey = GlobalKey();
   String url = "";
@@ -61,9 +61,9 @@ class HomePageState extends State<HomePage> {
     var loc_info = loc_data[prefs.getString("loc-city") ?? "臺南市"][prefs.getString("loc-town") ?? "歸仁區"];
     loc_gps = LatLng(loc_info["lat"], loc_info["lon"]);
     focus_map = false;
-    _List_children = <Widget>[];
+    _listchildren = <Widget>[];
     if (data == null || data == false || data["info"] == null) {
-      _List_children.add(Column(
+      _listchildren.add(Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
@@ -76,11 +76,11 @@ class HomePageState extends State<HomePage> {
               borderRadius: BorderRadius.circular(2.5),
             ),
           )),
-          Text(
+          const Text(
             "服務異常",
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w100, color: Colors.red),
           ),
-          Text(
+          const Text(
             "稍等片刻後重試 如持續異常 請回報開發人員",
             style: TextStyle(fontSize: 16, color: Colors.white),
           ),
@@ -88,7 +88,7 @@ class HomePageState extends State<HomePage> {
       ));
     } else {
       if (_page == 0) {
-        _List_children.add(Padding(
+        _listchildren.add(Padding(
           padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +127,7 @@ class HomePageState extends State<HomePage> {
             ],
           ),
         ));
-        _List_children.add(Padding(
+        _listchildren.add(Padding(
           padding: const EdgeInsets.all(5),
           child: Container(
             decoration: BoxDecoration(
@@ -225,7 +225,7 @@ class HomePageState extends State<HomePage> {
           ),
         ));
         if (data["loc"].length == 0) {
-          _List_children.add(const Padding(
+          _listchildren.add(const Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,7 +244,7 @@ class HomePageState extends State<HomePage> {
                 DateTime.fromMillisecondsSinceEpoch(data["loc"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
-            _List_children.add(Padding(
+            _listchildren.add(Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -285,8 +285,8 @@ class HomePageState extends State<HomePage> {
           }
         }
       } else {
-        _List_children.add(Padding(
-          padding: EdgeInsets.fromLTRB(10, 5, 0, 0),
+        _listchildren.add(Padding(
+          padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -300,7 +300,7 @@ class HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(2.5),
                 ),
               )),
-              Row(
+              const Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
@@ -315,7 +315,7 @@ class HomePageState extends State<HomePage> {
         ));
 
         if (data["all"].length == 0) {
-          _List_children.add(const Padding(
+          _listchildren.add(const Padding(
             padding: EdgeInsets.all(10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,7 +334,7 @@ class HomePageState extends State<HomePage> {
                 DateTime.fromMillisecondsSinceEpoch(data["all"][i]["time"], isUtc: true).add(const Duration(hours: 8));
             String formattedDate =
                 '${dateTime.year}年${formatNumber(dateTime.month)}月${formatNumber(dateTime.day)}日 ${formatNumber(dateTime.hour)}:${formatNumber(dateTime.minute)} 發布';
-            _List_children.add(Padding(
+            _listchildren.add(Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -478,9 +478,9 @@ class HomePageState extends State<HomePage> {
                         child: FlutterMap(
                           key: ValueKey(_page),
                           mapController: mapController,
-                          options: MapOptions(
-                            center: const LatLng(23.4, 120.1),
-                            zoom: 7,
+                          options: const MapOptions(
+                            initialCenter: LatLng(23.4, 120.1),
+                            initialZoom: 7,
                             minZoom: 7,
                             maxZoom: 9,
                             interactiveFlags: InteractiveFlag.all - InteractiveFlag.rotate,
@@ -537,9 +537,9 @@ class HomePageState extends State<HomePage> {
                         behavior: ScrollConfiguration.of(context).copyWith(overscroll: false),
                         child: ListView.builder(
                           controller: scrollController,
-                          itemCount: _List_children.length,
+                          itemCount: _listchildren.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return _List_children[index];
+                            return _listchildren[index];
                           },
                         ),
                       ),
