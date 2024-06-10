@@ -646,38 +646,41 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) => CupertinoActionSheet(
-                          message: SizedBox(
-                            height: 200,
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: [
-                                for (var item in Areas.getOptions(currentArea))
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedArea = item;
-                                      });
-                                      refreshWeather(context);
-                                      refreshEqReport(context);
-                                      Navigator.of(context).pop(); // 關閉彈出視窗
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      child: Text(
-                                        item,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(fontSize: 20),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                      // showCupertinoModalPopup(
+                      //   context: context,
+                      //   builder: (context) => Center(
+                      //     child: SizedBox(
+                      //       width: MediaQuery.of(context).size.width * 0.8,
+                      //       child: CupertinoActionSheet(
+                      //     message: SizedBox(
+                      //       height: 200,
+                      //       child: ListView(
+                      //         shrinkWrap: true,
+                      //         children: [
+                      //           for (var item in Areas.getOptions(currentArea))
+                      //             GestureDetector(
+                      //               onTap: () {
+                      //                 setState(() {
+                      //                   _selectedArea = item;
+                      //                 });
+                      //                 refreshWeather(context);
+                      //                 refreshEqReport(context);
+                      //                 Navigator.of(context).pop(); // 關閉彈出視窗
+                      //               },
+                      //               child: Container(
+                      //                 padding: const EdgeInsets.symmetric(vertical: 12),
+                      //                 child: Text(
+                      //                   item,
+                      //                   textAlign: TextAlign.center,
+                      //                   style: const TextStyle(fontSize: 20),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //         ],
+                      //       ),),),
+                      //     ),
+                      //   ),
+                      // );
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -686,7 +689,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                           _selectedArea,
                           style: const TextStyle(fontSize: 20),
                         ),
-                        const Icon(CupertinoIcons.right_chevron),
+                        // const Icon(CupertinoIcons.right_chevron),
                       ],
                     ),
                   ),
