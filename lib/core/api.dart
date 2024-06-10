@@ -5,6 +5,8 @@ import 'package:dpip/model/earthquake_report.dart';
 import 'package:dpip/model/eew.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
 import 'package:dpip/model/weather_realtime.dart';
+import 'package:dpip/model/rts.dart';
+import 'package:dpip/model/station.dart';
 import 'package:http/http.dart' as http;
 
 enum EewSource {
@@ -64,7 +66,7 @@ class ExpTechApi {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
-
+  
   Future<weatherRealtime> getWeatherRealtime(String code) async {
     final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/realtime/$code'));
 
@@ -74,6 +76,7 @@ class ExpTechApi {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
+
 
   Future<List<String>> getWeatherForecast(String code) async {
     final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/forecast/$code'));
@@ -95,12 +98,51 @@ class ExpTechApi {
     }
   }
 
+  Future<Map<String, Station>> getStations() async {
+    final response =
+        await http.get(Uri.parse('https://raw.githubusercontent.com/exptechtw/api/master/resource/station.json'));
+
+    if (response.statusCode == 200) {
+      return (jsonDecode(response.body) as Map<String, dynamic>).map((key, value) {
+        return MapEntry(key, Station.fromJson(value as Map<String, dynamic>));
+      });
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+  
+  Future<Rts> getRts() async {
+    final response = await http.get(Uri.parse('https://lb-${randomNum(4)}.exptech.com.tw/api/v1/trem/rts'));
+
+    if (response.statusCode == 200) {
+      return Rts.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
   Future<List<Eew>> getEew(EewSource source) async {
     final response =
         await http.get(Uri.parse('https://lb-${randomNum(4)}.exptech.com.tw/api/v1/eq/eew?type=${source.name}'));
 
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>).map((e) => Eew.fromJson(e)).toList();
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
+  Future<String> postNotifyLocation(
+    String version,
+    String platform,
+    String coordinate,
+    String token,
+  ) async {
+    final response = await http.get(Uri.parse(
+        'https://api-${randomNum(2)}.exptech.com.tw/api/v1/notify/location/${version}/${platform}/${coordinate}/${token}'));
+
+    if (response.statusCode == 200) {
+      return response.body;
     } else {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }

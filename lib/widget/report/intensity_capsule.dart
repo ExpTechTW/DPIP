@@ -22,9 +22,9 @@ class IntensityCapsule extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: context.colors.intensity(intensity),
+          color: IntensityColor.intensity(intensity),
         ),
-        color: context.colors.intensity(intensity).withOpacity(0.08),
+        color: IntensityColor.intensity(intensity).withOpacity(0.08),
       ),
       margin: EdgeInsets.zero,
       child: Row(
@@ -34,14 +34,14 @@ class IntensityCapsule extends StatelessWidget {
             height: 30,
             width: 30,
             decoration: BoxDecoration(
-              color: context.colors.intensity(intensity),
+              color: IntensityColor.intensity(intensity),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
                 intensityToNumberString(intensity),
                 style: TextStyle(
-                    color: context.colors.onIntensity(intensity), height: 1, fontSize: 16, fontWeight: FontWeight.bold),
+                    color: IntensityColor.onIntensity(intensity), height: 1, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -52,7 +52,7 @@ class IntensityCapsule extends StatelessWidget {
               style: TextStyle(
                 color: Platform.isIOS
                     ? CupertinoColors.label.resolveFrom(context)
-                    : context.colors.onSurfaceVariant.harmonizeWith(context.colors.intensity(intensity)),
+                    : context.colors.onSurfaceVariant.harmonizeWith(IntensityColor.intensity(intensity)),
                 height: 1,
                 fontSize: 14,
               ),

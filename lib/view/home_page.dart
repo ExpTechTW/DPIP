@@ -193,14 +193,14 @@ class EqInfo extends StatelessWidget {
                                 height: MediaQuery.of(context).size.width * 0.15,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: context.colors.intensity(eqReport.intensity),
+                                  color: IntensityColor.intensity(eqReport.intensity),
                                 ),
                                 child: Text(
                                   intensityToNumberString(eqReport.intensity),
                                   style: TextStyle(
                                     fontSize: 38,
                                     fontWeight: FontWeight.w900,
-                                    color: context.colors.onIntensity(eqReport.intensity),
+                                    color: IntensityColor.onIntensity(eqReport.intensity),
                                   ),
                                 ),
                               ),
@@ -347,14 +347,14 @@ class EqInfo extends StatelessWidget {
                                   height: calculator.percentToPixel(15, context),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    color: context.colors.intensity(eqReport.intensity),
+                                    color: IntensityColor.intensity(eqReport.intensity),
                                   ),
                                   child: Text(
                                     intensityToNumberString(eqReport.intensity),
                                     style: TextStyle(
                                       fontSize: 40,
                                       fontWeight: FontWeight.w900,
-                                      color: context.colors.onIntensity(eqReport.intensity),
+                                      color: IntensityColor.onIntensity(eqReport.intensity),
                                     ),
                                   ),
                                 ),
@@ -646,38 +646,41 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) => CupertinoActionSheet(
-                          message: SizedBox(
-                            height: 200,
-                            child: ListView(
-                              shrinkWrap: true,
-                              children: [
-                                for (var item in Areas.getOptions(currentArea))
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedArea = item;
-                                      });
-                                      refreshWeather(context);
-                                      refreshEqReport(context);
-                                      Navigator.of(context).pop(); // 關閉彈出視窗
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 12),
-                                      child: Text(
-                                        item,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(fontSize: 20),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                      // showCupertinoModalPopup(
+                      //   context: context,
+                      //   builder: (context) => Center(
+                      //     child: SizedBox(
+                      //       width: MediaQuery.of(context).size.width * 0.8,
+                      //       child: CupertinoActionSheet(
+                      //     message: SizedBox(
+                      //       height: 200,
+                      //       child: ListView(
+                      //         shrinkWrap: true,
+                      //         children: [
+                      //           for (var item in Areas.getOptions(currentArea))
+                      //             GestureDetector(
+                      //               onTap: () {
+                      //                 setState(() {
+                      //                   _selectedArea = item;
+                      //                 });
+                      //                 refreshWeather(context);
+                      //                 refreshEqReport(context);
+                      //                 Navigator.of(context).pop(); // 關閉彈出視窗
+                      //               },
+                      //               child: Container(
+                      //                 padding: const EdgeInsets.symmetric(vertical: 12),
+                      //                 child: Text(
+                      //                   item,
+                      //                   textAlign: TextAlign.center,
+                      //                   style: const TextStyle(fontSize: 20),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //         ],
+                      //       ),),),
+                      //     ),
+                      //   ),
+                      // );
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -686,7 +689,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                           _selectedArea,
                           style: const TextStyle(fontSize: 20),
                         ),
-                        const Icon(CupertinoIcons.right_chevron),
+                        // const Icon(CupertinoIcons.right_chevron),
                       ],
                     ),
                   ),
@@ -695,288 +698,291 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
             ),
           ),
           child: SafeArea(
-            child: CustomScrollView(controller: _controller, slivers: [
-              CupertinoSliverRefreshControl(
-                onRefresh: () async {
-                  await Future.wait([
-                    refreshWeather(context),
-                    refreshEqReport(context),
-                  ]);
-                },
-              ),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        if (weatherRefreshing && weather["temp"] != "-99.9")
-                          const Positioned.fill(
-                            child: Center(
-                              child: CupertinoActivityIndicator(),
-                            ),
-                          ),
-                        if (weather["temp"] == "-99.9")
-                          const Positioned.fill(
-                            child: Center(
-                              child: Text("天氣取得失敗"),
-                            ),
-                          ),
-                        Container(),
-                        Opacity(
-                          opacity: weatherRefreshing || weather["temp"] == "-99.9" ? 0 : 1,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              SizedBox(
-                                height: calculator.percentToPixel(45, context),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: CustomScrollView(controller: _controller, slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: () async {
+                    await Future.wait([
+                      refreshWeather(context),
+                      refreshEqReport(context),
+                    ]);
+                  },
+                ),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      Stack(
+                        children: [
+                          if (weatherRefreshing && weather["temp"] != "-99.9")
+                            const Positioned.fill(
+                              child: Center(
+                                child: CupertinoActivityIndicator(),
                               ),
-                              Positioned(
-                                bottom: calculator.percentToPixel(0, context),
-                                right: 0,
-                                left: 0,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [
-                                            CupertinoColors.systemBackground.resolveFrom(context),
-                                            tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: calculator.percentToPixel(4, context),
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          left: calculator.percentToPixel(5, context),
-                                          right: calculator.percentToPixel(5, context),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "更新時間：${DateFormat("MM/dd HH:mm").format(
-                                                TZDateTime.fromMillisecondsSinceEpoch(
-                                                  getLocation("Asia/Taipei"),
-                                                  (weather["update"] as double).round() * 1000,
-                                                ),
-                                              )}",
-                                              style: const TextStyle(fontSize: 12),
-                                            ),
-                                            const Text(
-                                              "天氣資料來自 weather.com",
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                            ),
+                          if (weather["temp"] == "-99.9")
+                            const Positioned.fill(
+                              child: Center(
+                                child: Text("天氣取得失敗"),
+                              ),
+                            ),
+                          Container(),
+                          Opacity(
+                            opacity: weatherRefreshing || weather["temp"] == "-99.9" ? 0 : 1,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  height: calculator.percentToPixel(45, context),
                                 ),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                Positioned(
+                                  bottom: calculator.percentToPixel(0, context),
+                                  right: 0,
+                                  left: 0,
+                                  child: Column(
                                     children: [
-                                      SizedBox(
-                                        width: calculator.percentToPixel(5, context),
-                                      ),
-                                      SizedBox(
-                                        width: calculator.percentToPixel(35, context),
-                                        child: Image.network(
-                                          'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                                          width: calculator.percentToPixel(35, context),
-                                          height: calculator.percentToPixel(35, context),
-                                          fit: BoxFit.cover,
-                                          loadingBuilder:
-                                              (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                            if (loadingProgress == null) return child;
-                                            return const Center(
-                                              child: CupertinoActivityIndicator(),
-                                            );
-                                          },
-                                          errorBuilder:
-                                              (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                            return Container();
-                                          },
+                                      Container(
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                            colors: [
+                                              CupertinoColors.systemBackground.resolveFrom(context),
+                                              tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       SizedBox(
-                                        width: calculator.percentToPixel(0, context),
-                                      ),
-                                      SizedBox(
-                                        width: calculator.percentToPixel(55, context),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: calculator.percentToPixel(10, context),
-                                                ),
-                                                SizedBox(
-                                                  width: calculator.percentToPixel(45, context),
-                                                  child: Column(
-                                                    children: [
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const Text("降水量", style: TextStyle(fontSize: 20)),
-                                                          Text(
-                                                            "${weather["precip"]} mm",
-                                                            style: const TextStyle(
-                                                                fontSize: 20, fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const Text("濕度", style: TextStyle(fontSize: 20)),
-                                                          Text(
-                                                            "${weather["humidity"]} %",
-                                                            style: const TextStyle(
-                                                                fontSize: 20, fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          const Text("體感", style: TextStyle(fontSize: 20)),
-                                                          Text(
-                                                            "${weather["feel"]} ℃",
-                                                            style: const TextStyle(
-                                                                fontSize: 20, fontWeight: FontWeight.bold),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
+                                        height: calculator.percentToPixel(4, context),
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            left: calculator.percentToPixel(5, context),
+                                            right: calculator.percentToPixel(5, context),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "更新時間：${DateFormat("MM/dd HH:mm").format(
+                                                  TZDateTime.fromMillisecondsSinceEpoch(
+                                                    getLocation("Asia/Taipei"),
+                                                    (weather["update"] as double).round() * 1000,
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  (weather["temp"] as String).split(".")[0],
-                                                  style: TextStyle(
-                                                    fontSize: 96,
-                                                    fontWeight: FontWeight.w900,
-                                                    letterSpacing: 5,
-                                                    color: Color.lerp(CupertinoColors.label.resolveFrom(context),
-                                                        const Color(0xFFFFFFFF), 0.1),
-                                                    shadows: const [
-                                                      Shadow(
-                                                        offset: Offset(5, 5),
-                                                        blurRadius: 20,
-                                                        color: Color.fromARGB(120, 0, 0, 0),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                  children: [
-                                                    const Text(
-                                                      "℃",
-                                                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                      ".${(weather["temp"] as String).split(".")[1]}",
-                                                      style: TextStyle(
-                                                        fontSize: 48,
-                                                        fontWeight: FontWeight.w900,
-                                                        color: Color.lerp(CupertinoColors.label.resolveFrom(context),
-                                                            const Color(0xFFFFFFFF), 0.1),
-                                                        shadows: const [
-                                                          Shadow(
-                                                            offset: Offset(5, 5),
-                                                            blurRadius: 20,
-                                                            color: Color.fromARGB(120, 0, 0, 0),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      height: calculator.percentToPixel(3, context),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                                )}",
+                                                style: const TextStyle(fontSize: 12),
+                                              ),
+                                              const Text(
+                                                "天氣資料來自 weather.com",
+                                                style: TextStyle(fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(
-                                        width: calculator.percentToPixel(5, context),
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: calculator.percentToPixel(5, context),
+                                        ),
+                                        SizedBox(
+                                          width: calculator.percentToPixel(35, context),
+                                          child: Image.network(
+                                            'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
+                                            width: calculator.percentToPixel(35, context),
+                                            height: calculator.percentToPixel(35, context),
+                                            fit: BoxFit.cover,
+                                            loadingBuilder:
+                                                (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                              if (loadingProgress == null) return child;
+                                              return const Center(
+                                                child: CupertinoActivityIndicator(),
+                                              );
+                                            },
+                                            errorBuilder:
+                                                (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                              return Container();
+                                            },
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: calculator.percentToPixel(0, context),
+                                        ),
+                                        SizedBox(
+                                          width: calculator.percentToPixel(55, context),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: calculator.percentToPixel(10, context),
+                                                  ),
+                                                  SizedBox(
+                                                    width: calculator.percentToPixel(45, context),
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            const Text("降水量", style: TextStyle(fontSize: 20)),
+                                                            Text(
+                                                              "${weather["precip"]} mm",
+                                                              style: const TextStyle(
+                                                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            const Text("濕度", style: TextStyle(fontSize: 20)),
+                                                            Text(
+                                                              "${weather["humidity"]} %",
+                                                              style: const TextStyle(
+                                                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            const Text("體感", style: TextStyle(fontSize: 20)),
+                                                            Text(
+                                                              "${weather["feel"]} ℃",
+                                                              style: const TextStyle(
+                                                                  fontSize: 20, fontWeight: FontWeight.bold),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    (weather["temp"] as String).split(".")[0],
+                                                    style: TextStyle(
+                                                      fontSize: 96,
+                                                      fontWeight: FontWeight.w900,
+                                                      letterSpacing: 5,
+                                                      color: Color.lerp(CupertinoColors.label.resolveFrom(context),
+                                                          const Color(0xFFFFFFFF), 0.1),
+                                                      shadows: const [
+                                                        Shadow(
+                                                          offset: Offset(5, 5),
+                                                          blurRadius: 20,
+                                                          color: Color.fromARGB(120, 0, 0, 0),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    children: [
+                                                      const Text(
+                                                        "℃",
+                                                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                                      ),
+                                                      Text(
+                                                        ".${(weather["temp"] as String).split(".")[1]}",
+                                                        style: TextStyle(
+                                                          fontSize: 48,
+                                                          fontWeight: FontWeight.w900,
+                                                          color: Color.lerp(CupertinoColors.label.resolveFrom(context),
+                                                              const Color(0xFFFFFFFF), 0.1),
+                                                          shadows: const [
+                                                            Shadow(
+                                                              offset: Offset(5, 5),
+                                                              blurRadius: 20,
+                                                              color: Color.fromARGB(120, 0, 0, 0),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: calculator.percentToPixel(3, context),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: calculator.percentToPixel(5, context),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Divider(
-                      color: CupertinoColors.label.resolveFrom(context),
-                    ),
-                  ],
+                        ],
+                      ),
+                      Divider(
+                        color: CupertinoColors.label.resolveFrom(context),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              eqReportRefreshing == false
-                  ? eqReport.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              left: calculator.percentToPixel(5, context),
-                              right: calculator.percentToPixel(5, context),
-                              top: calculator.percentToPixel(5, context),
-                            ),
-                            child: const SingleChildScrollView(
-                              physics: AlwaysScrollableScrollPhysics(),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "近期設定區域無地震或警特報資訊",
-                                    style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
-                                  ),
-                                ],
-                              ),
-                            ),
+                eqReportRefreshing == false
+                    ? eqReport.isEmpty
+                    ? SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: calculator.percentToPixel(5, context),
+                      right: calculator.percentToPixel(5, context),
+                      top: calculator.percentToPixel(5, context),
+                    ),
+                    child: const SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "近期設定區域無地震或警特報資訊",
+                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9)),
                           ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-                              return EqInfo(
-                                eqReport: eqReport[index],
-                                cityMaxInt: cityMaxInt,
-                                cityIntRefreshing: cityIntRefreshing,
-                              );
-                            },
-                            childCount: eqReport.length,
-                          ),
-                        )
-                  : const SliverFillRemaining(
-                      child: Center(
-                        child: CupertinoActivityIndicator(),
+                        ],
                       ),
                     ),
-            ]),
+                  ),
+                )
+                    : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                      return EqInfo(
+                        eqReport: eqReport[index],
+                        cityMaxInt: cityMaxInt,
+                        cityIntRefreshing: cityIntRefreshing,
+                      );
+                    },
+                    childCount: eqReport.length,
+                  ),
+                )
+                    : const SliverFillRemaining(
+                  child: Center(
+                    child: CupertinoActivityIndicator(),
+                  ),
+                ),
+              ]),
+            ),
           ),
         ),
       );
