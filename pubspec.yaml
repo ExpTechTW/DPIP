@@ -16,7 +16,7 @@ dependencies:
   markdown_widget: ^2.2.0
   url_launcher: ^6.1.12
   cupertino_icons: ^1.0.2
-  flutter_map: ^6.1.0
+  flutter_map: ^7.0.1
   latlong2: ^0.9.1
   firebase_core: ^2.28.0
   firebase_messaging: ^14.8.0
