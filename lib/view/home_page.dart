@@ -997,26 +997,30 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  DropdownButton<String>(
-                    value: _selectedArea, // 當前選中的值
-                    icon: const Icon(Icons.navigate_next), // 下拉箭頭圖標
-                    onChanged: (String? newArea) {
-                      setState(() {
-                        _selectedArea = newArea!;
-                      });
-                      refreshWeather(context);
-                      refreshEqReport(context);
-                    },
-                    items: Areas.getOptions(currentArea).toSet().map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(
-                          value,
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                  // DropdownButton<String>(
+                  //   value: _selectedArea, // 當前選中的值
+                  //   icon: const Icon(Icons.navigate_next), // 下拉箭頭圖標
+                  //   onChanged: (String? newArea) {
+                  //     setState(() {
+                  //       _selectedArea = newArea!;
+                  //     });
+                  //     refreshWeather(context);
+                  //     refreshEqReport(context);
+                  //   },
+                  //   items: Areas.getOptions(currentArea).toSet().map<DropdownMenuItem<String>>((String value) {
+                  //     return DropdownMenuItem<String>(
+                  //       value: value,
+                  //       child: Text(
+                  //         value,
+                  //         style: const TextStyle(fontSize: 20),
+                  //       ),
+                  //     );
+                  //   }).toList(),
+                  // ),
+                  Text(
+                    _selectedArea,
+                    style: const TextStyle(fontSize: 20),
+                  )
                 ],
               ),
               bottom: PreferredSize(
