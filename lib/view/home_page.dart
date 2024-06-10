@@ -193,14 +193,14 @@ class EqInfo extends StatelessWidget {
                                 height: MediaQuery.of(context).size.width * 0.15,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
-                                  color: context.colors.intensity(eqReport.intensity),
+                                  color: IntensityColor.intensity(eqReport.intensity),
                                 ),
                                 child: Text(
                                   intensityToNumberString(eqReport.intensity),
                                   style: TextStyle(
                                     fontSize: 38,
                                     fontWeight: FontWeight.w900,
-                                    color: context.colors.onIntensity(eqReport.intensity),
+                                    color: IntensityColor.onIntensity(eqReport.intensity),
                                   ),
                                 ),
                               ),
@@ -347,14 +347,14 @@ class EqInfo extends StatelessWidget {
                                   height: calculator.percentToPixel(15, context),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    color: context.colors.intensity(eqReport.intensity),
+                                    color: IntensityColor.intensity(eqReport.intensity),
                                   ),
                                   child: Text(
                                     intensityToNumberString(eqReport.intensity),
                                     style: TextStyle(
                                       fontSize: 40,
                                       fontWeight: FontWeight.w900,
-                                      color: context.colors.onIntensity(eqReport.intensity),
+                                      color: IntensityColor.onIntensity(eqReport.intensity),
                                     ),
                                   ),
                                 ),
