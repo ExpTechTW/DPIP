@@ -120,7 +120,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         final location = Global.region[city]![town]!;
 
         final waveTime =
-            calculateWaveTime(data.eq.depth, distance(data.eq.lat, data.eq.lon, location.lat, location.lon));
+        calculateWaveTime(data.eq.depth, distance(data.eq.lat, data.eq.lon, location.lat, location.lon));
 
         sArrive = data.eq.time + waveTime.s * 1000;
         pArrive = data.eq.time + waveTime.p * 1000;
@@ -249,6 +249,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         radius: pRadius * 1000, // 將半徑轉換為米
         color: Colors.blue.withOpacity(0.2),
         borderStrokeWidth: 3,
+        borderColor: const Color(0xFF00008B),
         useRadiusInMeter: true,
       ));
 
@@ -258,6 +259,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         radius: sRadius * 1000, // 將半徑轉換為米
         color: Colors.red.withOpacity(0.3),
         borderStrokeWidth: 3,
+        borderColor: const Color(0xFF8B0000),
         useRadiusInMeter: true,
       ));
 
