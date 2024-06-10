@@ -130,7 +130,6 @@ SPEC REPOS:
     - GoogleUtilities
     - nanopb
     - PromisesObjC
-    - ReachabilitySwift
     - Siren
     - Toast
 
