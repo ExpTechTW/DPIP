@@ -247,8 +247,8 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
       waveCircles.add(CircleMarker(
         point: LatLng(eew.eq.lat, eew.eq.lon),
         radius: pRadius * 1000, // 將半徑轉換為米
-        color: Colors.blue.withOpacity(0.3),
-        borderStrokeWidth: 2,
+        color: Colors.blue.withOpacity(0.2),
+        borderStrokeWidth: 3,
         useRadiusInMeter: true,
       ));
 
@@ -257,29 +257,23 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         point: LatLng(eew.eq.lat, eew.eq.lon),
         radius: sRadius * 1000, // 將半徑轉換為米
         color: Colors.red.withOpacity(0.3),
-        borderStrokeWidth: 2,
+        borderStrokeWidth: 3,
         useRadiusInMeter: true,
       ));
 
       // 添加震央標記
       epicenterMarker.add(Marker(
-        height: 20, // 調整震央標記的高度
-        width: 20, // 調整震央標記的寬度
+        height: 40, // 調整震央標記的高度
+        width: 40, // 調整震央標記的寬度
         point: LatLng(eew.eq.lat, eew.eq.lon),
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.black, // 震央標記顏色
-            border: Border.all(
-              color: Colors.yellow, // 震央標記邊框顏色
-              width: 3,
-              strokeAlign: BorderSide.strokeAlignOutside,
-            ),
           ),
           child: const Icon(
             Icons.clear,
             color: Colors.red,
-            size: 16,
+            size: 36,
           ),
         ),
       ));
@@ -287,7 +281,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
 
     final flutterMap = FlutterMap(
       options: const MapOptions(
-        initialCenter: LatLng(23.8, 120.1),
+        initialCenter: LatLng(23.8, 120.8),
         initialZoom: 7,
         minZoom: 7,
         maxZoom: 12,
