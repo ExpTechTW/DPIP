@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'weather_wind.g.dart';
 
 @JsonSerializable()
-class weatherWind {
+class WeatherWind {
   /// mph
   final double mph;
 
@@ -14,16 +14,17 @@ class weatherWind {
   final double degree;
 
   /// 風向
-  final String dir;
+  @JsonKey(name: 'dir')
+  final String direction;
 
-  const weatherWind({
+  const WeatherWind({
     required this.mph,
     required this.kph,
     required this.degree,
-    required this.dir,
+    required this.direction,
   });
 
-  factory weatherWind.fromJson(Map<String, dynamic> json) => _$weatherWindFromJson(json);
+  factory WeatherWind.fromJson(Map<String, dynamic> json) => _$weatherWindFromJson(json);
 
   Map<String, dynamic> toJson() => _$weatherWindToJson(this);
 }

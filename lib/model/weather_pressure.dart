@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'weather_pressure.g.dart';
 
 @JsonSerializable()
-class weatherPressure {
+class WeatherPressure {
   /// 大氣壓力
   final double mb;
 
@@ -13,12 +13,12 @@ class weatherPressure {
   @JsonKey(name: 'in')
   final double pressurein;
 
-  const weatherPressure({
+  const WeatherPressure({
     required this.mb,
     required this.pressurein,
   });
 
-  factory weatherPressure.fromJson(Map<String, dynamic> json) => _$weatherPressureFromJson(json);
+  factory WeatherPressure.fromJson(Map<String, dynamic> json) => _$weatherPressureFromJson(json);
 
   Map<String, dynamic> toJson() => _$weatherPressureToJson(this);
 }

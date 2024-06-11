@@ -8,7 +8,7 @@ import '../view/home_page.dart';
 class HomePageWeather extends StatelessWidget {
   final Map weather;
   final bool weatherRefreshing;
-  final TempColor tempToColor;
+  final TemperatureColor tempToColor;
 
   HomePageWeather({super.key, required this.weather, required this.weatherRefreshing, required this.tempToColor});
 
@@ -51,7 +51,7 @@ class HomePageWeather extends StatelessWidget {
                           end: Alignment.centerRight,
                           colors: [
                             context.colors.surface,
-                            tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
+                            tempToColor.getTemperatureColor(double.parse(weather["temp"] as String)),
                           ],
                         ),
                       ),

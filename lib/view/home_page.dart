@@ -56,7 +56,7 @@ Future<int?> getZipCodeForArea(String area) async {
 //   }
 // }
 
-class TempColor {
+class TemperatureColor {
   List<Color> tempColors = [
     const Color(0xFF006060),
     const Color(0xFF00AFAF),
@@ -69,18 +69,18 @@ class TempColor {
     const Color(0xFF6040B0),
   ];
 
-  Color getColorForTemp(double temp) {
+  Color getTemperatureColor(double temperature) {
     const double minTemp = 5;
     const double maxTemp = 45;
 
-    if (temp == -99.9) {
+    if (temperature == -99.9) {
       return const Color(0xFF808080);
-    } else if (temp <= minTemp) {
+    } else if (temperature <= minTemp) {
       return const Color(0xFF006060);
-    } else if (temp >= maxTemp) {
+    } else if (temperature >= maxTemp) {
       return const Color(0xFF6040B0);
     } else {
-      double t = ((temp - minTemp) / (maxTemp - minTemp)).clamp(0.0, 1.0);
+      double t = ((temperature - minTemp) / (maxTemp - minTemp)).clamp(0.0, 1.0);
       int index = (t * (tempColors.length - 1)).floor();
       double localT = (t * (tempColors.length - 1)) - index;
 
@@ -107,7 +107,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   bool eqReportRefreshing = true;
   bool cityIntRefreshing = true;
   late Cal calculator;
-  late TempColor tempToColor;
+  late TemperatureColor tempToColor;
   final ScrollController _controller = ScrollController();
   var distCode = 100;
   String? currentCity = Global.preference.getString("loc-city");
@@ -127,7 +127,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         'humidity': weatherData.humidity.toString(),
         'precip': weatherData.precip.mm.toString(),
         'update': weatherData.update,
-        'isday': weatherData.isday.round(),
+        'isday': weatherData.isDay.round(),
         'condition': weatherData.condition.round(),
       };
     } catch (e) {
@@ -275,7 +275,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   @override
   void initState() {
     super.initState();
-    tempToColor = TempColor();
+    tempToColor = TemperatureColor();
     calculator = Cal();
     _selectedArea = currentArea;
     updateArea();
@@ -423,7 +423,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                               end: Alignment.centerRight,
                                               colors: [
                                                 CupertinoColors.systemBackground.resolveFrom(context),
-                                                tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
+                                                tempToColor
+                                                    .getTemperatureColor(double.parse(weather["temp"] as String)),
                                               ],
                                             ),
                                           ),
@@ -785,7 +786,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                               end: Alignment.centerRight,
                                               colors: [
                                                 CupertinoColors.systemBackground.resolveFrom(context),
-                                                tempToColor.getColorForTemp(double.parse(weather["temp"] as String)),
+                                                tempToColor
+                                                    .getTemperatureColor(double.parse(weather["temp"] as String)),
                                               ],
                                             ),
                                           ),

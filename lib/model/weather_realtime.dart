@@ -13,51 +13,51 @@ import 'package:json_annotation/json_annotation.dart';
 part 'weather_realtime.g.dart';
 
 @JsonSerializable()
-class weatherRealtime {
+class WeatherRealtime {
   /// 天氣更新時間
   final double update;
 
   /// 天氣溫度
-  final weatherTemp temp;
+  final WeatherTemp temp;
 
   /// 天氣狀態
   final double condition;
 
   /// 天氣溫度
-  final weatherWind wind;
+  final WeatherWind wind;
 
   /// 大氣壓力
-  final weatherPressure pressure;
+  final WeatherPressure pressure;
 
   /// 降水
-  final weatherPrecip precip;
+  final WeatherPrecip precip;
 
   /// 天氣相對溼度
   final double humidity;
 
   /// 天氣體感溫度
-  final weatherFeel feel;
+  final WeatherFeel feel;
 
-  /// 天氣體感溫度
-  final weatherVis vis;
+  /// 能見度
+  final WeatherVisibility vis;
 
   /// 天氣紫外線
   final double uv;
 
   /// 陣風
-  final weatherGust gust;
+  final WeatherGust gust;
 
   /// 天氣
   final double cloud;
 
   /// 天氣
   @JsonKey(name: 'is_day')
-  final double isday;
+  final double isDay;
 
   /// 空氣
-  final weatherAir air;
+  final WeatherAir air;
 
-  const weatherRealtime({
+  const WeatherRealtime({
     required this.update,
     required this.temp,
     required this.condition,
@@ -70,11 +70,11 @@ class weatherRealtime {
     required this.uv,
     required this.gust,
     required this.cloud,
-    required this.isday,
+    required this.isDay,
     required this.air,
   });
 
-  factory weatherRealtime.fromJson(Map<String, dynamic> json) => _$weatherRealtimeFromJson(json);
+  factory WeatherRealtime.fromJson(Map<String, dynamic> json) => _$weatherRealtimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$weatherRealtimeToJson(this);
 }

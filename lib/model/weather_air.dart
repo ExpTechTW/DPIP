@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'weather_air.g.dart';
 
 @JsonSerializable()
-class weatherAir {
+class WeatherAir {
   /// 空氣一氧化碳
   final double co;
 
@@ -25,24 +25,24 @@ class weatherAir {
 
   /// 空氣
   @JsonKey(name: 'gb-defra-index')
-  final double gbdefraindex;
+  final double gbDefraIndex;
 
   /// 空氣
   @JsonKey(name: 'us-epa-index')
-  final double usepaindex;
+  final double usePaIndex;
 
-  const weatherAir({
+  const WeatherAir({
     required this.co,
     required this.no2,
     required this.o3,
     required this.pm25,
     required this.pm10,
     required this.so2,
-    required this.gbdefraindex,
-    required this.usepaindex,
+    required this.gbDefraIndex,
+    required this.usePaIndex,
   });
 
-  factory weatherAir.fromJson(Map<String, dynamic> json) => _$weatherAirFromJson(json);
+  factory WeatherAir.fromJson(Map<String, dynamic> json) => _$weatherAirFromJson(json);
 
   Map<String, dynamic> toJson() => _$weatherAirToJson(this);
 }

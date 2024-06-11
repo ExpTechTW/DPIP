@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'weather_precip.g.dart';
 
 @JsonSerializable()
-class weatherPrecip {
+class WeatherPrecip {
   /// 降水
   final double mm;
 
@@ -13,12 +13,12 @@ class weatherPrecip {
   @JsonKey(name: 'in')
   final double precipin;
 
-  const weatherPrecip({
+  const WeatherPrecip({
     required this.mm,
     required this.precipin,
   });
 
-  factory weatherPrecip.fromJson(Map<String, dynamic> json) => _$weatherPrecipFromJson(json);
+  factory WeatherPrecip.fromJson(Map<String, dynamic> json) => _$weatherPrecipFromJson(json);
 
   Map<String, dynamic> toJson() => _$weatherPrecipToJson(this);
 }

@@ -67,11 +67,11 @@ class ExpTechApi {
     }
   }
 
-  Future<weatherRealtime> getWeatherRealtime(String code) async {
+  Future<WeatherRealtime> getWeatherRealtime(String code) async {
     final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/realtime/$code'));
 
     if (response.statusCode == 200) {
-      return weatherRealtime.fromJson(jsonDecode(response.body));
+      return WeatherRealtime.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
