@@ -1,7 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:io';
 
+import 'package:dpip/util/extension.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart';
+
+import '../core/utils.dart';
 import '../model/partial_earthquake_report.dart';
+import '../util/intensity_color.dart';
 import '../view/home_page.dart';
+import '../view/report.dart';
 
 class HomePageInfo extends StatelessWidget {
   // final List eqReport;
