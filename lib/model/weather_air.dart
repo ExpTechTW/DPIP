@@ -42,7 +42,7 @@ class WeatherAir {
     required this.usePaIndex,
   });
 
-  factory WeatherAir.fromJson(Map<String, dynamic> json) => _$weatherAirFromJson(json);
+  factory WeatherAir.fromJson(Map<String, dynamic> json) => _$WeatherAirFromJson(json);
 
-  Map<String, dynamic> toJson() => _$weatherAirToJson(this);
+  Map<String, dynamic> toJson() => _$WeatherAirToJson(this);
 }

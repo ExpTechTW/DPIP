@@ -18,7 +18,7 @@ class WeatherPressure {
     required this.pressurein,
   });
 
-  factory WeatherPressure.fromJson(Map<String, dynamic> json) => _$weatherPressureFromJson(json);
+  factory WeatherPressure.fromJson(Map<String, dynamic> json) => _$WeatherPressureFromJson(json);
 
-  Map<String, dynamic> toJson() => _$weatherPressureToJson(this);
+  Map<String, dynamic> toJson() => _$WeatherPressureToJson(this);
 }

@@ -18,7 +18,7 @@ class WeatherPrecip {
     required this.precipin,
   });
 
-  factory WeatherPrecip.fromJson(Map<String, dynamic> json) => _$weatherPrecipFromJson(json);
+  factory WeatherPrecip.fromJson(Map<String, dynamic> json) => _$WeatherPrecipFromJson(json);
 
-  Map<String, dynamic> toJson() => _$weatherPrecipToJson(this);
+  Map<String, dynamic> toJson() => _$WeatherPrecipToJson(this);
 }

@@ -24,7 +24,7 @@ class WeatherWind {
     required this.direction,
   });
 
-  factory WeatherWind.fromJson(Map<String, dynamic> json) => _$weatherWindFromJson(json);
+  factory WeatherWind.fromJson(Map<String, dynamic> json) => _$WeatherWindFromJson(json);
 
-  Map<String, dynamic> toJson() => _$weatherWindToJson(this);
+  Map<String, dynamic> toJson() => _$WeatherWindToJson(this);
 }
