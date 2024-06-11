@@ -4,8 +4,6 @@ import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/setting/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
-import 'package:timezone/timezone.dart';
 
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
@@ -371,67 +369,69 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 ],
               ),
             ),
-            child: Column(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40),
+              child: Column(
                 children: [
-                HomePageWeather(weather: weather, weatherRefreshing: weatherRefreshing, tempToColor: tempToColor),
-            Divider(
-              color: CupertinoColors.label.resolveFrom(context),
-            ),
-            Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: CustomScrollView(controller: _controller, slivers: [
-                    CupertinoSliverRefreshControl(
-                      onRefresh: () async {
-                        await Future.wait([
-                          refreshWeather(context),
-                          refreshEqReport(context),
-                        ]);
-                      },
-                    ),
-                    eqReportRefreshing == false
-                        ? eqReport.isEmpty
-                            ? SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: calculator.percentToPixel(5, context),
-                                    right: calculator.percentToPixel(5, context),
-                                    top: calculator.percentToPixel(5, context),
-                                  ),
-                                  child: const SingleChildScrollView(
-                                    physics: AlwaysScrollableScrollPhysics(),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "近期設定區域無地震或警特報資訊",
-                                          style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+                  HomePageWeather(weather: weather, weatherRefreshing: weatherRefreshing, tempToColor: tempToColor),
+                  Divider(
+                    color: CupertinoColors.label.resolveFrom(context),
+                  ),
+                  Expanded(
+                    child: CustomScrollView(controller: _controller, slivers: [
+                      CupertinoSliverRefreshControl(
+                        onRefresh: () async {
+                          await Future.wait([
+                            refreshWeather(context),
+                            refreshEqReport(context),
+                          ]);
+                        },
+                      ),
+                      eqReportRefreshing == false
+                          ? eqReport.isEmpty
+                              ? SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      left: calculator.percentToPixel(5, context),
+                                      right: calculator.percentToPixel(5, context),
+                                      top: calculator.percentToPixel(5, context),
+                                    ),
+                                    child: const SingleChildScrollView(
+                                      physics: AlwaysScrollableScrollPhysics(),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "近期設定區域無地震或警特報資訊",
+                                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-                            : SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
-                                    return HomePageInfo(
-                                      eqReport: eqReport[index],
-                                      cityMaxInt: cityMaxInt,
-                                      cityIntRefreshing: cityIntRefreshing,
-                                    );
-                                  },
-                                  childCount: eqReport.length,
-                                ),
-                              )
-                        : const SliverFillRemaining(
-                            child: Center(
-                              child: CupertinoActivityIndicator(),
+                                )
+                              : SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (BuildContext context, int index) {
+                                      return HomePageInfo(
+                                        eqReport: eqReport[index],
+                                        cityMaxInt: cityMaxInt,
+                                        cityIntRefreshing: cityIntRefreshing,
+                                      );
+                                    },
+                                    childCount: eqReport.length,
+                                  ),
+                                )
+                          : const SliverFillRemaining(
+                              child: Center(
+                                child: CupertinoActivityIndicator(),
+                              ),
                             ),
-                          ),
-                  ]),
-                ),
-              ],
+                    ]),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -503,67 +503,69 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 ],
               ),
             ),
-            child: Column(
-              children: [
-                HomePageWeather(weather: weather, weatherRefreshing: weatherRefreshing, tempToColor: tempToColor),
-                Divider(
-                  color: CupertinoColors.label.resolveFrom(context),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: CustomScrollView(controller: _controller, slivers: [
-                    CupertinoSliverRefreshControl(
-                      onRefresh: () async {
-                        await Future.wait([
-                          refreshWeather(context),
-                          refreshEqReport(context),
-                        ]);
-                      },
-                    ),
-                    eqReportRefreshing == false
-                        ? eqReport.isEmpty
-                            ? SliverToBoxAdapter(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: calculator.percentToPixel(5, context),
-                                    right: calculator.percentToPixel(5, context),
-                                    top: calculator.percentToPixel(5, context),
-                                  ),
-                                  child: const SingleChildScrollView(
-                                    physics: AlwaysScrollableScrollPhysics(),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "近期設定區域無地震或警特報資訊",
-                                          style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Column(
+                children: [
+                  HomePageWeather(weather: weather, weatherRefreshing: weatherRefreshing, tempToColor: tempToColor),
+                  Divider(
+                    color: CupertinoColors.label.resolveFrom(context),
+                  ),
+                  Expanded(
+                    child: CustomScrollView(controller: _controller, slivers: [
+                      CupertinoSliverRefreshControl(
+                        onRefresh: () async {
+                          await Future.wait([
+                            refreshWeather(context),
+                            refreshEqReport(context),
+                          ]);
+                        },
+                      ),
+                      eqReportRefreshing == false
+                          ? eqReport.isEmpty
+                              ? SliverToBoxAdapter(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                      left: calculator.percentToPixel(5, context),
+                                      right: calculator.percentToPixel(5, context),
+                                      top: calculator.percentToPixel(5, context),
+                                    ),
+                                    child: const SingleChildScrollView(
+                                      physics: AlwaysScrollableScrollPhysics(),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "近期設定區域無地震或警特報資訊",
+                                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-                            : SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (BuildContext context, int index) {
-                                    return HomePageInfo(
-                                      eqReport: eqReport[index],
-                                      cityMaxInt: cityMaxInt,
-                                      cityIntRefreshing: cityIntRefreshing,
-                                    );
-                                  },
-                                  childCount: eqReport.length,
-                                ),
-                              )
-                        : const SliverFillRemaining(
-                            child: Center(
-                              child: CupertinoActivityIndicator(),
+                                )
+                              : SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (BuildContext context, int index) {
+                                      return HomePageInfo(
+                                        eqReport: eqReport[index],
+                                        cityMaxInt: cityMaxInt,
+                                        cityIntRefreshing: cityIntRefreshing,
+                                      );
+                                    },
+                                    childCount: eqReport.length,
+                                  ),
+                                )
+                          : const SliverFillRemaining(
+                              child: Center(
+                                child: CupertinoActivityIndicator(),
+                              ),
                             ),
-                          ),
-                  ]),
-                ),
-              ],
+                    ]),
+                  ),
+                ],
+              ),
             ),
           ),
         );
