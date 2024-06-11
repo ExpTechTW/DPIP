@@ -340,7 +340,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
           ),
         ),
         child: MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.15)),
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(4),
@@ -628,7 +628,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
           ],
         ),
         body: MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.15)),
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(4),
