@@ -1,18 +1,15 @@
 import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
-import 'package:dpip/view/report.dart';
 import 'package:dpip/view/setting/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart';
 
-import '../core/utils.dart';
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
 import '../util/dist_code.dart';
-import '../util/intensity_color.dart';
 import '../widget/home_page_info.dart';
 import '../widget/home_page_weather.dart';
 
