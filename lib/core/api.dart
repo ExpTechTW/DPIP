@@ -66,7 +66,7 @@ class ExpTechApi {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
-  
+
   Future<weatherRealtime> getWeatherRealtime(String code) async {
     final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/realtime/$code'));
 
@@ -76,7 +76,6 @@ class ExpTechApi {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
-
 
   Future<List<String>> getWeatherForecast(String code) async {
     final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/forecast/$code'));
@@ -110,7 +109,7 @@ class ExpTechApi {
       throw Exception('The server returned a status code of ${response.statusCode}');
     }
   }
-  
+
   Future<Rts> getRts() async {
     final response = await http.get(Uri.parse('https://lb-${randomNum(4)}.exptech.com.tw/api/v1/trem/rts'));
 
