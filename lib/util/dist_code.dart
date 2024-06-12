@@ -14,9 +14,4 @@ class DistCodeUtil {
       return {};
     }
   }
-
-  static int? getZipCode(String area, Map<String, int> data) {
-    final key = area;
-    return data[key];
-  }
 }

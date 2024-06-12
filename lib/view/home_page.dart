@@ -33,7 +33,8 @@ class Cal {
 
 Future<int?> getZipCodeForArea(String area) async {
   final data = await DistCodeUtil.readJsonFile();
-  return DistCodeUtil.getZipCode(area, data);
+  var zipCode = data[area];
+  return zipCode;
 }
 // class IntColor {
 //   static const Map<int, Color> _colors = {
@@ -403,7 +404,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                         children: [
                                           Text(
                                             "近期設定區域無地震或警特報資訊",
-                                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 2,
+                                              color: Color(0xFFC9C9C9),
                                             ),
                                           ),
                                         ],
@@ -537,7 +541,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                         children: [
                                           Text(
                                             "近期設定區域無地震或警特報資訊",
-                                            style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 2,
+                                              color: Color(0xFFC9C9C9),
                                             ),
                                           ),
                                         ],
@@ -652,7 +659,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                     children: [
                                       Text(
                                         "近期設定區域無地震或警特報資訊",
-                                        style: TextStyle(fontSize: 16, letterSpacing: 2, color: Color(0xFFC9C9C9),
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          letterSpacing: 2,
+                                          color: Color(0xFFC9C9C9),
                                         ),
                                       ),
                                     ],
