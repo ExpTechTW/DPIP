@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
-import '../util/dist_code.dart';
 import '../widget/home_page_info.dart';
 import '../widget/home_page_weather.dart';
 
@@ -31,11 +30,6 @@ class Cal {
   }
 }
 
-Future<int?> getZipCodeForArea(String area) async {
-  final data = await DistCodeUtil.readJsonFile();
-  var zipCode = data[area];
-  return zipCode;
-}
 // class IntColor {
 //   static const Map<int, Color> _colors = {
 //     0: Color(0xff202020),
@@ -118,7 +112,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
       weatherRefreshing = true;
     });
     try {
-      distCode = (await getZipCodeForArea(_selectedArea))!;
+      final distCode = Global.distCodeData[_selectedArea];
       final weatherData = await Global.api.getWeatherRealtime("$distCode");
       weather = {
         'temp': weatherData.temp.c.toString(),
