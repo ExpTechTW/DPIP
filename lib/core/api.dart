@@ -81,8 +81,8 @@ class ExpTechApi {
     String coordinate,
     String token,
   ) async {
-    final response = await http.get(Uri.parse(
-        'https://api-1.exptech.com.tw/api/v1/notify/location/:version/:platform/:coordinate/:token'));
+    final response = await http
+        .get(Uri.parse('https://api-1.exptech.com.tw/api/v1/notify/location/$version/$platform/$coordinate/$token'));
 
     if (response.statusCode == 200) {
       return response.body;
