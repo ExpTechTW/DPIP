@@ -384,14 +384,14 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                       ),
                       eqReportRefreshing == false
                           ? eqReport.isEmpty
-                              ? SliverToBoxAdapter(
+                              ? const SliverToBoxAdapter(
                                   child: Padding(
                                     padding: EdgeInsets.only(
-                                      left: calculator.percentToPixel(5, context),
-                                      right: calculator.percentToPixel(5, context),
-                                      top: calculator.percentToPixel(5, context),
+                                      left: 20,
+                                      right: 20,
+                                      top: 20,
                                     ),
-                                    child: const SingleChildScrollView(
+                                    child: SingleChildScrollView(
                                       physics: AlwaysScrollableScrollPhysics(),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.start,
@@ -521,14 +521,14 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                       ),
                       eqReportRefreshing == false
                           ? eqReport.isEmpty
-                              ? SliverToBoxAdapter(
+                              ? const SliverToBoxAdapter(
                                   child: Padding(
                                     padding: EdgeInsets.only(
-                                      left: calculator.percentToPixel(5, context),
-                                      right: calculator.percentToPixel(5, context),
-                                      top: calculator.percentToPixel(5, context),
+                                      left: 20,
+                                      right: 20,
+                                      top: 20,
                                     ),
-                                    child: const SingleChildScrollView(
+                                    child: SingleChildScrollView(
                                       physics: AlwaysScrollableScrollPhysics(),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.start,
@@ -631,10 +631,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(
-                      left: calculator.percentToPixel(5, context),
-                      right: calculator.percentToPixel(5, context),
-                      top: calculator.percentToPixel(5, context),
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      top: 20,
                     ),
                     child: eqReportRefreshing == false
                         ? eqReport.isEmpty
