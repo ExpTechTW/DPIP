@@ -494,8 +494,6 @@ class HomePageWeather extends StatelessWidget {
     } else {
       return Stack(
         children: [
-// height: calculator.percentToPixel(60, context),
-
           weatherRefreshing == true
               ? const Positioned.fill(
                   child: Center(
@@ -512,9 +510,8 @@ class HomePageWeather extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                SizedBox(height: calculator.percentToPixel(45, context)),
                 Positioned(
-                  bottom: calculator.percentToPixel(0, context),
+                  bottom: 0,
                   right: 0,
                   left: 0,
                   child: Column(
@@ -533,12 +530,12 @@ class HomePageWeather extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        height: calculator.percentToPixel(6, context),
+                        height: 25,
                         child: Padding(
-                          padding: EdgeInsets.only(
-                              bottom: calculator.percentToPixel(2, context),
-                              left: calculator.percentToPixel(5, context),
-                              right: calculator.percentToPixel(5, context),
+                          padding: const EdgeInsets.only(
+                            bottom: 10,
+                            left: 25,
+                            right: 25,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -566,22 +563,18 @@ class HomePageWeather extends StatelessWidget {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(height: calculator.percentToPixel(3, context)),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(width: calculator.percentToPixel(5, context)),
-                        // Icon(
-                        //   weatherIcon.getWeatherIcon(weather["isday"], weather["condition"]),
-                        //   size: calculator.percentToPixel(35, context),
-                        // ),
-                        SizedBox(
-                          width: calculator.percentToPixel(35, context),
+                        Flexible(flex: 5, child: Container()),
+                        Flexible(
+                          flex: 35,
                           child: Image.network(
                             'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                            width: calculator.percentToPixel(35, context),
-                            height: calculator.percentToPixel(35, context),
+                            // width: 128,
+                            // height: 128,
                             fit: BoxFit.cover,
                             loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                               if (loadingProgress == null) return child;
@@ -598,19 +591,16 @@ class HomePageWeather extends StatelessWidget {
                             },
                           ),
                         ),
-                        SizedBox(width: calculator.percentToPixel(0, context)),
-                        SizedBox(
-                          width: calculator.percentToPixel(55, context),
+                        Flexible(
+                          flex: 55,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
-                                  SizedBox(
-                                    width: calculator.percentToPixel(10, context),
-                                  ),
-                                  SizedBox(
-                                    width: calculator.percentToPixel(45, context),
+                                  Flexible(flex: 10, child: Container()),
+                                  Flexible(
+                                    flex: 45,
                                     child: Column(
                                       children: [
                                         Row(
@@ -690,8 +680,8 @@ class HomePageWeather extends StatelessWidget {
                                           ],
                                         ),
                                       ),
-                                      SizedBox(
-                                        height: calculator.percentToPixel(4.5, context),
+                                      const SizedBox(
+                                        height: 20,
                                       ),
                                     ],
                                   )
@@ -700,7 +690,7 @@ class HomePageWeather extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(width: calculator.percentToPixel(5, context)),
+                        Flexible(flex: 5, child: Container()),
                       ],
                     ),
                   ],
