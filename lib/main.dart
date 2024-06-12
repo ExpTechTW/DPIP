@@ -197,12 +197,17 @@ class MainAppState extends State<MainApp> {
             String? lon = position.longitude.toStringAsFixed(4);
             String? coordinate = '$lat,$lon';
             messaging.getToken().then((value) {
-              Global.api.postNotifyLocation(
+              Future<String> test = Global.api.postNotifyLocation(
                 "0.0.0",
                 "Android",
                 coordinate,
                 value!,
               );
+              test.then((value) {
+                print(value); // 打印 Future<String> 的值
+              }).catchError((error) {
+                print('發生錯誤: $error');
+              });
             });
           }
         });
