@@ -82,7 +82,7 @@ class ExpTechApi {
     String token,
   ) async {
     final response = await http.get(Uri.parse(
-        'https://api-${randomNum(2)}.exptech.com.tw/api/v1/notify/location/$version/$platform/$coordinate/$token'));
+        'https://api-1.exptech.com.tw/api/v1/notify/location/:version/:platform/:coordinate/:token'));
 
     if (response.statusCode == 200) {
       return response.body;
