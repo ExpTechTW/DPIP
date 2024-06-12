@@ -232,8 +232,8 @@ class MainAppState extends State<MainApp> {
             String? coordinate = '$lat,$lon';
             messaging.getToken().then((value) {
               Global.api.postNotifyLocation(
-                "0.0.0",
-                "Ios",
+                Global.packageInfo.version,
+                (Platform.isAndroid) ? "1" : "0",
                 coordinate,
                 value!,
               );
