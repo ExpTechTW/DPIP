@@ -236,7 +236,7 @@ class MainAppState extends State<MainApp> {
             messaging.getToken().then((value) {
               Global.api.postNotifyLocation(
                 Global.packageInfo.version,
-                (Platform.isIOS) ? "1" : "0",
+                (Platform.isAndroid) ? "1" : "0",
                 coordinate,
                 value!,
               )
