@@ -342,7 +342,7 @@ class HomePageInfo extends StatelessWidget {
               );
             },
             child: Container(
-              width: calculator.percentToPixel(90, context),
+              // width: calculator.percentToPixel(90, context),
               // height: calculator.percentToPixel(25, context),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -354,7 +354,7 @@ class HomePageInfo extends StatelessWidget {
                     Align(
                       alignment: Alignment.topLeft,
                       child: Container(
-                        width: calculator.percentToPixel(2, context),
+                        width: 8,
                         decoration: BoxDecoration(
                           color: eqReport.hasNumber ? const Color(0x99FFB400) : const Color(0x9919C8C8),
                           borderRadius: const BorderRadius.only(
@@ -365,17 +365,17 @@ class HomePageInfo extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(
-                        left: calculator.percentToPixel(5, context),
-                        right: calculator.percentToPixel(2, context),
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 15,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(
-                              top: calculator.percentToPixel(1, context),
-                              bottom: calculator.percentToPixel(2, context),
+                            padding: const EdgeInsets.only(
+                              top: 3,
+                              bottom: 6,
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,9 +407,9 @@ class HomePageInfo extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(
-                              top: calculator.percentToPixel(1, context),
-                              bottom: calculator.percentToPixel(1, context),
+                            padding: const EdgeInsets.only(
+                              top: 2,
+                              bottom: 2,
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -417,8 +417,8 @@ class HomePageInfo extends StatelessWidget {
                               children: [
                                 Container(
                                   alignment: Alignment.center,
-                                  width: calculator.percentToPixel(15, context),
-                                  height: calculator.percentToPixel(15, context),
+                                  width: 60,
+                                  height: 60,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     color: IntensityColor.intensity(eqReport.intensity),
@@ -432,45 +432,6 @@ class HomePageInfo extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                // SizedBox(
-                                //   height: calculator.percentToPixel(1, context),
-                                // ),
-                                // cityIntRefreshing == true
-                                //     ? Container(
-                                //         alignment: Alignment.center,
-                                //         width: calculator.percentToPixel(8, context),
-                                //         height: calculator.percentToPixel(8, context),
-                                //         decoration: BoxDecoration(
-                                //             borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                //             color: const Color(0xFF202020)),
-                                //         child: Text(
-                                //           "--",
-                                //           style: TextStyle(
-                                //             fontSize: 20,
-                                //             fontWeight: FontWeight.w900,
-                                //             color: context.colors.onIntensity(0),
-                                //           ),
-                                //         ),
-                                //       )
-                                //     : Container(
-                                //         alignment: Alignment.center,
-                                //         width: calculator.percentToPixel(8, context),
-                                //         height: calculator.percentToPixel(8, context),
-                                //         decoration: BoxDecoration(
-                                //           borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                //           color: cityMaxInt[eqReport.id] == 0
-                                //               ? const Color(0xFF202020)
-                                //               : context.colors.intensity(cityMaxInt[eqReport.id]),
-                                //         ),
-                                //         child: Text(
-                                //           intensityToNumberString(cityMaxInt[eqReport.id]),
-                                //           style: TextStyle(
-                                //             fontSize: 20,
-                                //             fontWeight: FontWeight.w900,
-                                //             color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
-                                //           ),
-                                //         ),
-                                //       ),
                               ],
                             ),
                           ),
@@ -482,8 +443,8 @@ class HomePageInfo extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: calculator.percentToPixel(2, context),
+          const SizedBox(
+            height: 10,
           ),
         ],
       );
