@@ -187,7 +187,9 @@ class MainAppState extends State<MainApp> {
                   enableWifiLock: true,
                   enableWakeLock: true,
                   setOngoing: false,
-                )));
+                ),
+            ),
+        );
         positionStreamSubscription = positionStream.handleError((error) {
           positionStreamSubscription?.cancel();
           positionStreamSubscription = null;
@@ -213,15 +215,16 @@ class MainAppState extends State<MainApp> {
         });
       } else if (Platform.isIOS) {
         final positionStream = geolocatorPlatform.getPositionStream(
-            locationSettings: AppleSettings(
-          accuracy: LocationAccuracy.medium,
-          activityType: ActivityType.otherNavigation,
-          distanceFilter: 100,
-          timeLimit: const Duration(minutes: 15),
-          pauseLocationUpdatesAutomatically: true,
-          // Only set to true if our app will be started up in the background.
-          showBackgroundLocationIndicator: false,
-        ));
+          locationSettings: AppleSettings(
+            accuracy: LocationAccuracy.medium,
+            activityType: ActivityType.otherNavigation,
+            distanceFilter: 100,
+            timeLimit: const Duration(minutes: 15),
+            pauseLocationUpdatesAutomatically: true,
+            // Only set to true if our app will be started up in the background.
+            showBackgroundLocationIndicator: false,
+          ),
+        );
         positionStreamSubscription = positionStream.handleError((error) {
           positionStreamSubscription?.cancel();
           positionStreamSubscription = null;
@@ -233,10 +236,15 @@ class MainAppState extends State<MainApp> {
             messaging.getToken().then((value) {
               Global.api.postNotifyLocation(
                 Global.packageInfo.version,
-                (Platform.isAndroid) ? "1" : "0",
+                (Platform.isIOS) ? "1" : "0",
                 coordinate,
                 value!,
-              );
+              )
+              .then((value) {
+                print(value); // 打印 Future<String> 的值
+              }).catchError((error) {
+                print('發生錯誤: $error');
+              });
             });
           }
         });
