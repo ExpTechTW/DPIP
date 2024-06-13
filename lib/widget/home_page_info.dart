@@ -22,9 +22,7 @@ class HomePageInfo extends StatelessWidget {
 
   final bool cityIntRefreshing;
 
-  HomePageInfo({super.key, required this.cityMaxInt, required this.eqReport, required this.cityIntRefreshing});
-
-  Cal calculator = Cal();
+  const HomePageInfo({super.key, required this.cityMaxInt, required this.eqReport, required this.cityIntRefreshing});
 
   @override
   Widget build(BuildContext context) {

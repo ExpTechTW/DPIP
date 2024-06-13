@@ -13,14 +13,12 @@ class HomePageWeather extends StatelessWidget {
   final bool weatherRefreshing;
   final TemperatureColor tempToColor;
 
-  HomePageWeather({
+  const HomePageWeather({
     super.key,
     required this.weather,
     required this.weatherRefreshing,
     required this.tempToColor,
   });
-
-  Cal calculator = Cal();
 
   @override
   Widget build(BuildContext context) {
@@ -111,8 +109,8 @@ class HomePageWeather extends StatelessWidget {
                             flex: 50,
                             child: Image.network(
                               'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                              width: 384,
-                              height: 384,
+                              width: 342,
+                              height: 342,
                               fit: BoxFit.cover,
                               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                 if (loadingProgress == null) return child;
@@ -181,9 +179,6 @@ class HomePageWeather extends StatelessWidget {
                                       ),
                                     ),
                                   ],
-                                ),
-                                SizedBox(
-                                  height: calculator.percentToPixel(9.3, context),
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,

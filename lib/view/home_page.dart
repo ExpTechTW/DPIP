@@ -23,13 +23,6 @@ class Areas {
   }
 }
 
-class Cal {
-  double percentToPixel(double percent, BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return percent / 100 * screenWidth;
-  }
-}
-
 // class IntColor {
 //   static const Map<int, Color> _colors = {
 //     0: Color(0xff202020),
@@ -99,7 +92,6 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   bool weatherRefreshing = true;
   bool eqReportRefreshing = true;
   bool cityIntRefreshing = true;
-  late Cal calculator;
   late TemperatureColor tempToColor;
   final ScrollController _controller = ScrollController();
   var distCode = 100;
@@ -269,7 +261,6 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   void initState() {
     super.initState();
     tempToColor = TemperatureColor();
-    calculator = Cal();
     _selectedArea = currentArea;
     updateArea();
     // _selectedArea = Areas.getOptions(currentArea).toSet().first;
