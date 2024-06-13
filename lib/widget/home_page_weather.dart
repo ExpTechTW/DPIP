@@ -59,7 +59,8 @@ class HomePageWeather extends StatelessWidget {
                               end: Alignment.centerRight,
                               colors: [
                                 CupertinoColors.systemBackground.resolveFrom(context),
-                                tempToColor.getTemperatureColor(double.parse(weather["temp"] as String),
+                                tempToColor.getTemperatureColor(
+                                  double.parse(weather["temp"] as String),
                                 ),
                               ],
                             ),
@@ -103,7 +104,9 @@ class HomePageWeather extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(flex: 5, child: Container(),
+                          Flexible(
+                            flex: 5,
+                            child: Container(),
                           ),
                           Flexible(
                             flex: 50,
@@ -130,7 +133,9 @@ class HomePageWeather extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    Flexible(flex: 20, child: Container(),
+                                    Flexible(
+                                      flex: 20,
+                                      child: Container(),
                                     ),
                                     Flexible(
                                       flex: 40,
@@ -234,7 +239,9 @@ class HomePageWeather extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Flexible(flex: 5, child: Container(),
+                          Flexible(
+                            flex: 5,
+                            child: Container(),
                           ),
                         ],
                       ),
@@ -329,7 +336,9 @@ class HomePageWeather extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(flex: 5, child: Container(),
+                          Flexible(
+                            flex: 5,
+                            child: Container(),
                           ),
                           Flexible(
                             flex: 35,
@@ -356,7 +365,9 @@ class HomePageWeather extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    Flexible(flex: 10, child: Container(),
+                                    Flexible(
+                                      flex: 10,
+                                      child: Container(),
                                     ),
                                     Flexible(
                                       flex: 45,
@@ -460,7 +471,9 @@ class HomePageWeather extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Flexible(flex: 5, child: Container(),
+                          Flexible(
+                            flex: 5,
+                            child: Container(),
                           ),
                         ],
                       ),
@@ -505,7 +518,8 @@ class HomePageWeather extends StatelessWidget {
                             end: Alignment.centerRight,
                             colors: [
                               context.colors.surface,
-                              tempToColor.getTemperatureColor(double.parse(weather["temp"] as String),
+                              tempToColor.getTemperatureColor(
+                                double.parse(weather["temp"] as String),
                               ),
                             ],
                           ),
@@ -550,28 +564,33 @@ class HomePageWeather extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(flex: 5, child: Container(),
+                        Flexible(
+                          flex: 5,
+                          child: Container(),
                         ),
                         Flexible(
                           flex: 35,
-                          child: Image.network(
-                            'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                            // width: 128,
-                            // height: 128,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                            errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                              return Container();
-                            },
+                          child: AspectRatio(
+                            aspectRatio: 1,
+                            child: Image.network(
+                              'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
+                              // width: 128,
+                              // height: 128,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                return Container();
+                              },
+                            ),
                           ),
                         ),
                         Flexible(
@@ -581,7 +600,9 @@ class HomePageWeather extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Flexible(flex: 10, child: Container(),
+                                  Flexible(
+                                    flex: 10,
+                                    child: Container(),
                                   ),
                                   Flexible(
                                     flex: 45,
@@ -590,7 +611,9 @@ class HomePageWeather extends StatelessWidget {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Text("降水量", style: TextStyle(fontSize: 20),
+                                            const Text(
+                                              "降水量",
+                                              style: TextStyle(fontSize: 20),
                                             ),
                                             Text(
                                               "${weather["precip"]} mm",
@@ -601,7 +624,9 @@ class HomePageWeather extends StatelessWidget {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Text("濕度", style: TextStyle(fontSize: 20),
+                                            const Text(
+                                              "濕度",
+                                              style: TextStyle(fontSize: 20),
                                             ),
                                             Text(
                                               "${weather["humidity"]} %",
@@ -612,7 +637,9 @@ class HomePageWeather extends StatelessWidget {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Text("體感", style: TextStyle(fontSize: 20),
+                                            const Text(
+                                              "體感",
+                                              style: TextStyle(fontSize: 20),
                                             ),
                                             Text(
                                               "${weather["feel"]} ℃",
@@ -677,7 +704,9 @@ class HomePageWeather extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Flexible(flex: 5, child: Container(),
+                        Flexible(
+                          flex: 5,
+                          child: Container(),
                         ),
                       ],
                     ),
