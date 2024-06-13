@@ -411,6 +411,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                 )
                               : SliverList(
                                   delegate: SliverChildBuilderDelegate(
+                                    childCount: eqReport.length,
                                     (BuildContext context, int index) {
                                       return HomePageInfo(
                                         eqReport: eqReport[index],
@@ -418,7 +419,6 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                         cityIntRefreshing: cityIntRefreshing,
                                       );
                                     },
-                                    childCount: eqReport.length,
                                   ),
                                 )
                           : const SliverFillRemaining(
@@ -548,6 +548,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                 )
                               : SliverList(
                                   delegate: SliverChildBuilderDelegate(
+                                    childCount: eqReport.length,
                                     (BuildContext context, int index) {
                                       return HomePageInfo(
                                         eqReport: eqReport[index],
@@ -555,7 +556,6 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                                         cityIntRefreshing: cityIntRefreshing,
                                       );
                                     },
-                                    childCount: eqReport.length,
                                   ),
                                 )
                           : const SliverFillRemaining(
