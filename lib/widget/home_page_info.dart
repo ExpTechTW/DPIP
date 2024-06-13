@@ -43,7 +43,7 @@ class HomePageInfo extends StatelessWidget {
                 );
               },
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.92,
+                width: 1300,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: const Color(0x50808080),
@@ -54,7 +54,7 @@ class HomePageInfo extends StatelessWidget {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.02,
+                          width: 12,
                           decoration: BoxDecoration(
                             color: eqReport.hasNumber ? const Color(0x99FFB400) : const Color(0x9919C8C8),
                             borderRadius: const BorderRadius.only(
@@ -65,26 +65,24 @@ class HomePageInfo extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(
-                          left: calculator.percentToPixel(5, context),
-                          right: calculator.percentToPixel(5, context),
-                          top: calculator.percentToPixel(1, context),
-                          bottom: calculator.percentToPixel(1.5, context),
+                        padding: const EdgeInsets.only(
+                          left: 30,
+                          right: 25,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                top: calculator.percentToPixel(1, context),
-                                bottom: calculator.percentToPixel(1, context),
+                              padding: const EdgeInsets.only(
+                                top: 3,
+                                bottom: 6,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     eqReport.loc.substring(0, eqReport.loc.length - 1).split("位於")[1],
-                                    style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, letterSpacing: 2),
+                                    style: const TextStyle(fontSize: 46, fontWeight: FontWeight.bold, letterSpacing: 2),
                                   ),
                                   Text(
                                     DateFormat("yyyy/MM/dd HH:mm:ss").format(
@@ -97,74 +95,44 @@ class HomePageInfo extends StatelessWidget {
                                     style: TextStyle(
                                         color: Color.lerp(
                                             CupertinoColors.label.resolveFrom(context), const Color(0xFF808080), 0.5),
-                                        fontSize: 32),
+                                        fontSize: 30),
                                     textAlign: TextAlign.left,
                                   ),
                                   Text(
                                     "規模${eqReport.mag}　深度${eqReport.depth}公里",
-                                    style: const TextStyle(fontSize: 36, letterSpacing: 2),
+                                    style: const TextStyle(fontSize: 34, letterSpacing: 2),
                                   ),
                                 ],
                               ),
                             ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.12,
-                                  height: MediaQuery.of(context).size.width * 0.12,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: IntensityColor.intensity(eqReport.intensity),
-                                  ),
-                                  child: Text(
-                                    intensityToNumberString(eqReport.intensity),
-                                    style: TextStyle(
-                                      fontSize: 76,
-                                      fontWeight: FontWeight.w900,
-                                      color: IntensityColor.onIntensity(eqReport.intensity),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 2,
+                                bottom: 2,
+                              ),
+                              child:Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: 130,
+                                    height: 130,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: IntensityColor.intensity(eqReport.intensity),
+                                    ),
+                                    child: Text(
+                                      intensityToNumberString(eqReport.intensity),
+                                      style: TextStyle(
+                                        fontSize: 76,
+                                        fontWeight: FontWeight.w900,
+                                        color: IntensityColor.onIntensity(eqReport.intensity),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                // cityIntRefreshing == true
-                                //     ? Container(
-                                //         alignment: Alignment.center,
-                                //         width: calculator.percentToPixel(8, context),
-                                //         height: calculator.percentToPixel(8, context),
-                                //         decoration: BoxDecoration(
-                                //             borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                //             color: const Color(0xFF202020)),
-                                //         child: Text(
-                                //           "--",
-                                //           style: TextStyle(
-                                //             fontSize: 20,
-                                //             fontWeight: FontWeight.w900,
-                                //             color: context.colors.onIntensity(0),
-                                //           ),
-                                //         ),
-                                //       )
-                                //     : Container(
-                                //         alignment: Alignment.center,
-                                //         width: MediaQuery.of(context).size.width * 0.08,
-                                //         height: MediaQuery.of(context).size.width * 0.08,
-                                //         decoration: BoxDecoration(
-                                //           borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                //           color: cityMaxInt[eqReport.id] == 0
-                                //               ? const Color(0xFF202020)
-                                //               : context.colors.intensity(cityMaxInt[eqReport.id]),
-                                //         ),
-                                //         child: Text(
-                                //           intensityToNumberString(cityMaxInt[eqReport.id]),
-                                //           style: TextStyle(
-                                //             fontSize: 20,
-                                //             fontWeight: FontWeight.w900,
-                                //             color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
-                                //           ),
-                                //         ),
-                                //       ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -174,8 +142,8 @@ class HomePageInfo extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.01,
+            const SizedBox(
+              height: 10,
             ),
           ],
         );
@@ -192,7 +160,7 @@ class HomePageInfo extends StatelessWidget {
                 );
               },
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.92,
+                width: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: const Color(0x50808080),
@@ -203,7 +171,7 @@ class HomePageInfo extends StatelessWidget {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.02,
+                          width: 8,
                           decoration: BoxDecoration(
                             color: eqReport.hasNumber ? const Color(0x99FFB400) : const Color(0x9919C8C8),
                             borderRadius: const BorderRadius.only(
@@ -214,19 +182,17 @@ class HomePageInfo extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(
-                          left: calculator.percentToPixel(5, context),
-                          right: calculator.percentToPixel(5, context),
-                          top: calculator.percentToPixel(1, context),
-                          bottom: calculator.percentToPixel(2, context),
+                        padding: const EdgeInsets.only(
+                          left: 20,
+                          right: 15,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(
-                                top: calculator.percentToPixel(1, context),
-                                bottom: calculator.percentToPixel(2, context),
+                              padding: const EdgeInsets.only(
+                                top: 3,
+                                bottom: 6,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,64 +222,34 @@ class HomePageInfo extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width * 0.15,
-                                  height: MediaQuery.of(context).size.width * 0.15,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: IntensityColor.intensity(eqReport.intensity),
-                                  ),
-                                  child: Text(
-                                    intensityToNumberString(eqReport.intensity),
-                                    style: TextStyle(
-                                      fontSize: 38,
-                                      fontWeight: FontWeight.w900,
-                                      color: IntensityColor.onIntensity(eqReport.intensity),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 2,
+                                bottom: 2,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: IntensityColor.intensity(eqReport.intensity),
+                                    ),
+                                    child: Text(
+                                      intensityToNumberString(eqReport.intensity),
+                                      style: TextStyle(
+                                        fontSize: 38,
+                                        fontWeight: FontWeight.w900,
+                                        color: IntensityColor.onIntensity(eqReport.intensity),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                // cityIntRefreshing == true
-                                //     ? Container(
-                                //         alignment: Alignment.center,
-                                //         width: calculator.percentToPixel(8, context),
-                                //         height: calculator.percentToPixel(8, context),
-                                //         decoration: BoxDecoration(
-                                //             borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                //             color: const Color(0xFF202020)),
-                                //         child: Text(
-                                //           "--",
-                                //           style: TextStyle(
-                                //             fontSize: 20,
-                                //             fontWeight: FontWeight.w900,
-                                //             color: context.colors.onIntensity(0),
-                                //           ),
-                                //         ),
-                                //       )
-                                //     : Container(
-                                //         alignment: Alignment.center,
-                                //         width: MediaQuery.of(context).size.width * 0.08,
-                                //         height: MediaQuery.of(context).size.width * 0.08,
-                                //         decoration: BoxDecoration(
-                                //           borderRadius: BorderRadius.circular(calculator.percentToPixel(8, context)),
-                                //           color: cityMaxInt[eqReport.id] == 0
-                                //               ? const Color(0xFF202020)
-                                //               : context.colors.intensity(cityMaxInt[eqReport.id]),
-                                //         ),
-                                //         child: Text(
-                                //           intensityToNumberString(cityMaxInt[eqReport.id]),
-                                //           style: TextStyle(
-                                //             fontSize: 20,
-                                //             fontWeight: FontWeight.w900,
-                                //             color: context.colors.onIntensity(cityMaxInt[eqReport.id]),
-                                //           ),
-                                //         ),
-                                //       ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -323,8 +259,8 @@ class HomePageInfo extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.01,
+            const SizedBox(
+              height: 8,
             ),
           ],
         );
