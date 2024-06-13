@@ -61,7 +61,8 @@ class HomePageWeather extends StatelessWidget {
                               end: Alignment.centerRight,
                               colors: [
                                 CupertinoColors.systemBackground.resolveFrom(context),
-                                tempToColor.getTemperatureColor(double.parse(weather["temp"] as String)),
+                                tempToColor.getTemperatureColor(double.parse(weather["temp"] as String),
+                                ),
                               ],
                             ),
                           ),
@@ -104,7 +105,8 @@ class HomePageWeather extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(flex: 5, child: Container()),
+                          Flexible(flex: 5, child: Container(),
+                          ),
                           Flexible(
                             flex: 50,
                             child: Image.network(
@@ -332,7 +334,8 @@ class HomePageWeather extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Flexible(flex: 5, child: Container()),
+                          Flexible(flex: 5, child: Container(),
+                          ),
                           Flexible(
                             flex: 35,
                             child: Image.network(
@@ -507,7 +510,8 @@ class HomePageWeather extends StatelessWidget {
                             end: Alignment.centerRight,
                             colors: [
                               context.colors.surface,
-                              tempToColor.getTemperatureColor(double.parse(weather["temp"] as String)),
+                              tempToColor.getTemperatureColor(double.parse(weather["temp"] as String),
+                              ),
                             ],
                           ),
                         ),
@@ -551,7 +555,8 @@ class HomePageWeather extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(flex: 5, child: Container()),
+                        Flexible(flex: 5, child: Container(),
+                        ),
                         Flexible(
                           flex: 35,
                           child: Image.network(
@@ -581,7 +586,8 @@ class HomePageWeather extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Flexible(flex: 10, child: Container()),
+                                  Flexible(flex: 10, child: Container(),
+                                  ),
                                   Flexible(
                                     flex: 45,
                                     child: Column(
@@ -589,7 +595,8 @@ class HomePageWeather extends StatelessWidget {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Text("降水量", style: TextStyle(fontSize: 20)),
+                                            const Text("降水量", style: TextStyle(fontSize: 20),
+                                            ),
                                             Text(
                                               "${weather["precip"]} mm",
                                               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -599,7 +606,8 @@ class HomePageWeather extends StatelessWidget {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Text("濕度", style: TextStyle(fontSize: 20)),
+                                            const Text("濕度", style: TextStyle(fontSize: 20),
+                                            ),
                                             Text(
                                               "${weather["humidity"]} %",
                                               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -609,7 +617,8 @@ class HomePageWeather extends StatelessWidget {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            const Text("體感", style: TextStyle(fontSize: 20)),
+                                            const Text("體感", style: TextStyle(fontSize: 20),
+                                            ),
                                             Text(
                                               "${weather["feel"]} ℃",
                                               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -673,7 +682,8 @@ class HomePageWeather extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Flexible(flex: 5, child: Container()),
+                        Flexible(flex: 5, child: Container(),
+                        ),
                       ],
                     ),
                   ],
