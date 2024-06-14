@@ -173,22 +173,22 @@ class MainAppState extends State<MainApp> {
     if (positionStreamSubscription == null) {
       if (Platform.isAndroid) {
         final positionStream = geolocatorPlatform.getPositionStream(
-            locationSettings: AndroidSettings(
-                accuracy: LocationAccuracy.high,
-                distanceFilter: 100,
-                forceLocationManager: false,
-                intervalDuration: const Duration(seconds: 1),
-                //(Optional) Set foreground notification config to keep the app alive
-                //when going to the background
-                foregroundNotificationConfig: const ForegroundNotificationConfig(
-                  notificationText: "服務中...",
-                  notificationTitle: "DPIP 背景定位",
-                  notificationChannelName: '背景定位',
-                  enableWifiLock: true,
-                  enableWakeLock: true,
-                  setOngoing: false,
-                ),
+          locationSettings: AndroidSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 1,
+            forceLocationManager: false,
+            intervalDuration: const Duration(seconds: 1),
+            //(Optional) Set foreground notification config to keep the app alive
+            //when going to the background
+            foregroundNotificationConfig: const ForegroundNotificationConfig(
+              notificationText: "服務中...",
+              notificationTitle: "DPIP 背景定位",
+              notificationChannelName: '背景定位',
+              enableWifiLock: true,
+              enableWakeLock: true,
+              setOngoing: false,
             ),
+          ),
         );
         positionStreamSubscription = positionStream.handleError((error) {
           positionStreamSubscription?.cancel();
@@ -201,7 +201,7 @@ class MainAppState extends State<MainApp> {
             messaging.getToken().then((value) {
               Future<String> test = Global.api.postNotifyLocation(
                 Global.packageInfo.version,
-                (Platform.isAndroid) ? "1" : "0",
+                "0",
                 coordinate,
                 value!,
               );
@@ -234,13 +234,14 @@ class MainAppState extends State<MainApp> {
             String? lon = position.longitude.toStringAsFixed(4);
             String? coordinate = '$lat,$lon';
             messaging.getToken().then((value) {
-              Global.api.postNotifyLocation(
+              Global.api
+                  .postNotifyLocation(
                 Global.packageInfo.version,
-                (Platform.isIOS) ? "1" : "0",
+                "1",
                 coordinate,
                 value!,
               )
-              .then((value) {
+                  .then((value) {
                 print(value); // 打印 Future<String> 的值
               }).catchError((error) {
                 print('發生錯誤: $error');
