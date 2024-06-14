@@ -218,11 +218,11 @@ class MainAppState extends State<MainApp> {
           locationSettings: AppleSettings(
             accuracy: LocationAccuracy.medium,
             activityType: ActivityType.otherNavigation,
-            distanceFilter: 100,
-            timeLimit: const Duration(minutes: 15),
-            pauseLocationUpdatesAutomatically: true,
+            distanceFilter: 1,
+            pauseLocationUpdatesAutomatically: false,
             // Only set to true if our app will be started up in the background.
             showBackgroundLocationIndicator: false,
+            allowBackgroundLocationUpdates: true,
           ),
         );
         positionStreamSubscription = positionStream.handleError((error) {
@@ -236,7 +236,7 @@ class MainAppState extends State<MainApp> {
             messaging.getToken().then((value) {
               Global.api.postNotifyLocation(
                 Global.packageInfo.version,
-                (Platform.isAndroid) ? "0" : "1",
+                (Platform.isIOS) ? "1" : "0",
                 coordinate,
                 value!,
               )
