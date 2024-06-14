@@ -231,10 +231,10 @@ class MainAppState extends State<MainApp> {
           locationSettings: AppleSettings(
             accuracy: LocationAccuracy.medium,
             activityType: ActivityType.otherNavigation,
-            distanceFilter: 1,
+            distanceFilter: 100,
             pauseLocationUpdatesAutomatically: false,
             // Only set to true if our app will be started up in the background.
-            showBackgroundLocationIndicator: false,
+            showBackgroundLocationIndicator: true,
             allowBackgroundLocationUpdates: true,
           ),
         );
@@ -254,12 +254,7 @@ class MainAppState extends State<MainApp> {
                 "1",
                 coordinate,
                 value!,
-              )
-                  .then((value) {
-                print(value); // 打印 Future<String> 的值
-              }).catchError((error) {
-                print('發生錯誤: $error');
-              });
+              );
             });
           }
         });

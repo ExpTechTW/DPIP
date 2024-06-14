@@ -22,13 +22,7 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     func startMonitoringSignificantLocationChanges() {
         locationManager?.startMonitoringSignificantLocationChanges()
     }
-    
-    let locationData = ["latitude": location.coordinate.latitude, "longitude": location.coordinate.longitude]
-       if let rootViewController = (UIApplication.shared.delegate as? FlutterAppDelegate)?.window.rootViewController as? FlutterBinaryMessenger {
-           FlutterMethodChannel(name: "com.exptech.dpip/location", binaryMessenger: rootViewController)
-               .invokeMethod("updateLocation", arguments: locationData)
-       }
-    }
+}
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -55,7 +49,7 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
         locationManager?.startMonitoringSignificantLocationChanges()
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-    
+
     func hyperCriticalRulesExample() {
         let siren = Siren.shared
         siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 3)
