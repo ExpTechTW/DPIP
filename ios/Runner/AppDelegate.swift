@@ -8,26 +8,27 @@ import flutter_local_notifications
 class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     var locationManager: CLLocationManager?
     
+    override init() {
+        super.init()
+        locationManager = CLLocationManager()
+        locationManager?.delegate = self
+        locationManager?.requestWhenInUseAuthorization()
+        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager?.distanceFilter = 100.0
+        locationManager?.allowsBackgroundLocationUpdates = true
+        locationManager?.pausesLocationUpdatesAutomatically = false
+    }
+
     func startMonitoringSignificantLocationChanges() {
-        requestLocationPermission()
         locationManager?.startMonitoringSignificantLocationChanges()
     }
     
-    private func requestLocationPermission() {
-       locationManager = CLLocationManager()
-       locationManager?.delegate = self
-       locationManager?.requestWhenInUseAuthorization()
-       locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-       locationManager?.distanceFilter = 100.0
-       locationManager?.allowsBackgroundLocationUpdates = true
-       locationManager?.pausesLocationUpdatesAutomatically = false
+    let locationData = ["latitude": location.coordinate.latitude, "longitude": location.coordinate.longitude]
+       if let rootViewController = (UIApplication.shared.delegate as? FlutterAppDelegate)?.window.rootViewController as? FlutterBinaryMessenger {
+           FlutterMethodChannel(name: "com.exptech.dpip/location", binaryMessenger: rootViewController)
+               .invokeMethod("updateLocation", arguments: locationData)
+       }
     }
-    
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-       guard let location = locations.last else { return }
-       print("位置變化: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-    }
-}
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {

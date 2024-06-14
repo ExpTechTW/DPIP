@@ -111,6 +111,8 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   String? currentLocation;
+  static const platform = MethodChannel('com.exptech.dpip/location');
+  String location = 'Unknown';
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
@@ -140,6 +142,17 @@ class MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     initializeBackgroundTask();
+    platform.setMethodCallHandler(handleLocationUpdate);
+  }
+
+  Future<void> handleLocationUpdate(MethodCall call) async {
+    if (call.method == 'updateLocation') {
+      final double latitude = call.arguments['latitude'];
+      final double longitude = call.arguments['longitude'];
+      setState(() {
+        location = 'Lat: $latitude, Lon: $longitude';
+      });
+    }
   }
 
   void initializeBackgroundTask() async {
@@ -229,6 +242,7 @@ class MainAppState extends State<MainApp> {
           positionStreamSubscription?.cancel();
           positionStreamSubscription = null;
         }).listen((Position? position) async {
+          stopPositionStream();
           if (position != null) {
             String? lat = position.latitude.toStringAsFixed(4);
             String? lon = position.longitude.toStringAsFixed(4);
@@ -249,34 +263,36 @@ class MainAppState extends State<MainApp> {
             });
           }
         });
+        print('位置已開啟');
       }
     }
-
-    positionStreamSubscription = Geolocator.getPositionStream(
-            // locationSettings: locationSettings,
-            )
-        .listen((Position position) {
-      setState(() {
-        currentLocation = '位置: ${position.latitude}, ${position.longitude}';
-      });
-
-      if (lastPosition != null) {
-        double distance = Geolocator.distanceBetween(
-          lastPosition!.latitude,
-          lastPosition!.longitude,
-          position.latitude,
-          position.longitude,
-        );
-
-        if (distance >= 100) {
-          stopPositionStream();
-        }
-      }
-
-      lastPosition = position;
-    });
-    print('位置已開啟');
   }
+
+  //   positionStreamSubscription = Geolocator.getPositionStream(
+  //           //locationSettings: locationSettings,
+  //           )
+  //       .listen((Position position) {
+  //     setState(() {
+  //       currentLocation = '位置: ${position.latitude}, ${position.longitude}';
+  //     });
+
+  //     if (lastPosition != null) {
+  //       double distance = Geolocator.distanceBetween(
+  //         lastPosition!.latitude,
+  //         lastPosition!.longitude,
+  //         position.latitude,
+  //         position.longitude,
+  //       );
+
+  //       if (distance >= 100) {
+  //         stopPositionStream();
+  //       }
+  //     }
+
+  //     lastPosition = position;
+  //   });
+  //   print('位置已開啟');
+  // }
 
   void stopPositionStream() {
     positionStreamSubscription?.cancel();
@@ -290,13 +306,13 @@ class MainAppState extends State<MainApp> {
     super.dispose();
   }
 
-  static Future<void> initCallback(Map<dynamic, dynamic> params) async {
-    print('Locator initialized');
-  }
+  // static Future<void> initCallback(Map<dynamic, dynamic> params) async {
+  //   print('Locator initialized');
+  // }
 
-  static Future<void> disposeCallback() async {
-    print('Locator disposed');
-  }
+  // static Future<void> disposeCallback() async {
+  //   print('Locator disposed');
+  // }
 
   // static Future<void> locationCallback(locationDto) async {
   //   double latitude = locationDto.latitude;
@@ -328,9 +344,9 @@ class MainAppState extends State<MainApp> {
   //   }
   // }
 
-  static void notificationCallback() {
-    print('Notification clicked');
-  }
+  // static void notificationCallback() {
+  //   print('Notification clicked');
+  // }
 
   @override
   Widget build(BuildContext context) {
