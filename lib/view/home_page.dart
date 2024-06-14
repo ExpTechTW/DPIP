@@ -367,6 +367,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     child: Padding(
                       padding: const EdgeInsets.only(
                         top: 5,
+                        right: 10,
+                        left: 10,
                       ),
                       child: eqReportRefreshing == false
                           ? eqReport.isEmpty
@@ -509,6 +511,11 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     color: CupertinoColors.label.resolveFrom(context),
                   ),
                   Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        right: 10,
+                        left: 10,
+                      ),
                     child: eqReportRefreshing == false
                         ? eqReport.isEmpty
                         ? CustomScrollView(
@@ -565,6 +572,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                     )
                         : const Center(
                       child: CupertinoActivityIndicator(),
+                      ),
                     ),
                   ),
                 ],
