@@ -10,15 +10,22 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     
     func startMonitoringSignificantLocationChanges() {
         requestLocationPermission()
+        locationManager?.startMonitoringSignificantLocationChanges()
     }
     
     private func requestLocationPermission() {
-//        locationManager = CLLocationManager()
-//        locationManager?.delegate = self
-//        locationManager?.requestWhenInUseAuthorization()
-//        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-//        locationManager?.distanceFilter = 100.0
-//        locationManager?.allowsBackgroundLocationUpdates = true
+       locationManager = CLLocationManager()
+       locationManager?.delegate = self
+       locationManager?.requestWhenInUseAuthorization()
+       locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
+       locationManager?.distanceFilter = 100.0
+       locationManager?.allowsBackgroundLocationUpdates = true
+       locationManager?.pausesLocationUpdatesAutomatically = false
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+       guard let location = locations.last else { return }
+       print("位置變化: \(location.coordinate.latitude), \(location.coordinate.longitude)")
     }
 }
 
