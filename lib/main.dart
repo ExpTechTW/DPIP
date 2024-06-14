@@ -229,12 +229,13 @@ class MainAppState extends State<MainApp> {
       } else if (Platform.isIOS) {
         final positionStream = geolocatorPlatform.getPositionStream(
           locationSettings: AppleSettings(
-            accuracy: LocationAccuracy.medium,
+            accuracy: LocationAccuracy.low,
             activityType: ActivityType.otherNavigation,
-            distanceFilter: 100,
+            distanceFilter: 500,
+            timeLimit: const Duration(minutes: 5) ,
             pauseLocationUpdatesAutomatically: false,
             // Only set to true if our app will be started up in the background.
-            showBackgroundLocationIndicator: true,
+            showBackgroundLocationIndicator: false,
             allowBackgroundLocationUpdates: true,
           ),
         );
@@ -242,7 +243,6 @@ class MainAppState extends State<MainApp> {
           positionStreamSubscription?.cancel();
           positionStreamSubscription = null;
         }).listen((Position? position) async {
-          stopPositionStream();
           if (position != null) {
             String? lat = position.latitude.toStringAsFixed(4);
             String? lon = position.longitude.toStringAsFixed(4);
