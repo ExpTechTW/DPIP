@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-extension IntensityColor on ColorScheme {
+class IntensityColor {
   static const intensity0 = Colors.grey;
   static const intensity1 = Color(0xff003264);
   static const intensity2 = Color(0xff0064c8);
@@ -12,7 +12,7 @@ extension IntensityColor on ColorScheme {
   static const intensity8 = Color(0xffc00000);
   static const intensity9 = Color(0xff9600c8);
 
-  Color intensity(int intensity) {
+  static Color intensity(int intensity) {
     switch (intensity) {
       case 0:
         return IntensityColor.intensity0;
@@ -39,7 +39,7 @@ extension IntensityColor on ColorScheme {
     }
   }
 
-  Color onIntensity(int intensity) {
+  static Color onIntensity(int intensity) {
     switch (intensity) {
       case 4:
       case 5:

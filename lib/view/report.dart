@@ -96,14 +96,14 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
               border: Border.all(
                 color: Colors.white,
               ),
-              color: context.colors.intensity(station.intensity),
+              color: IntensityColor.intensity(station.intensity),
             ),
             child: Center(
               child: Text(
                 intensityToNumberString(station.intensity),
                 style: TextStyle(
                   height: 1,
-                  color: context.colors.onIntensity(station.intensity),
+                  color: IntensityColor.onIntensity(station.intensity),
                   fontSize: 14,
                 ),
               ),
@@ -394,7 +394,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                     height: 52,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12.0),
-                                      color: context.colors.intensity(widget.report.intensity),
+                                      color: IntensityColor.intensity(widget.report.intensity),
                                     ),
                                     child: Center(
                                       child: Text(
@@ -402,7 +402,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                         style: TextStyle(
                                           fontSize: 28,
                                           fontWeight: FontWeight.bold,
-                                          color: context.colors.onIntensity(widget.report.intensity),
+                                          color: IntensityColor.onIntensity(widget.report.intensity),
                                         ),
                                       ),
                                     ),
@@ -607,7 +607,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                       height: 52,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12.0),
-                                        color: context.colors.intensity(widget.report.intensity),
+                                        color: IntensityColor.intensity(widget.report.intensity),
                                       ),
                                       child: Center(
                                         child: Text(
@@ -615,7 +615,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
                                           style: TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
-                                            color: context.colors.onIntensity(widget.report.intensity),
+                                            color: IntensityColor.onIntensity(widget.report.intensity),
                                           ),
                                         ),
                                       ),
