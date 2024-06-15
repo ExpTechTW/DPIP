@@ -31,7 +31,6 @@ const String darwinNotificationCategoryPlain = 'plainCategory';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // BackgroundTask.instance.setBackgroundHandler(backgroundHandler);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -91,14 +90,6 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MainApp());
 }
-
-// @pragma('vm:entry-point')
-// void backgroundHandler(Location data) {
-//   // Implement the process you want to run in the background.
-//   // ex) Check health data.
-//
-//   print('背景位置: ${data.lat}, ${data.lng}');
-// }
 
 class MainApp extends StatefulWidget {
   const MainApp({super.key});
@@ -232,7 +223,7 @@ class MainAppState extends State<MainApp> {
             accuracy: LocationAccuracy.low,
             activityType: ActivityType.otherNavigation,
             distanceFilter: 500,
-            timeLimit: const Duration(minutes: 5) ,
+            timeLimit: const Duration(minutes: 5),
             pauseLocationUpdatesAutomatically: false,
             // Only set to true if our app will be started up in the background.
             showBackgroundLocationIndicator: false,
@@ -248,8 +239,7 @@ class MainAppState extends State<MainApp> {
             String? lon = position.longitude.toStringAsFixed(4);
             String? coordinate = '$lat,$lon';
             messaging.getToken().then((value) {
-              Global.api
-                  .postNotifyLocation(
+              Global.api.postNotifyLocation(
                 Global.packageInfo.version,
                 "1",
                 coordinate,
@@ -264,9 +254,9 @@ class MainAppState extends State<MainApp> {
   }
 
   //   positionStreamSubscription = Geolocator.getPositionStream(
-  //           //locationSettings: locationSettings,
-  //           )
-  //       .listen((Position position) {
+  //     locationSettings: locationSettings,
+  //   )
+  //   .listen((Position position) {
   //     setState(() {
   //       currentLocation = '位置: ${position.latitude}, ${position.longitude}';
   //     });

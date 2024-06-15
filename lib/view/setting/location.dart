@@ -137,45 +137,36 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   }
 
   Future<void> updateLocation(Position position) async {
-    try {
-      String lat = position.latitude.toString();
-      String lon = position.longitude.toString();
+    String lat = position.latitude.toString();
+    String lon = position.longitude.toString();
+
+    await Global.preference.setString("loc-lat", lat);
+    await Global.preference.setString("loc-lon", lon);
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+    if (placemarks.isNotEmpty) {
+      Placemark placemark = placemarks.first;
+      String? city;
+      String? town;
+
+      if (Platform.isIOS) {
+        city = placemark.subAdministrativeArea;
+        town = placemark.locality;
+      } else if (Platform.isAndroid) {
+        city = placemark.administrativeArea;
+        town = placemark.subAdministrativeArea;
+      }
 
       setState(() {
-        currentLocation = 'Lat: $lat, Lng: $lon';
-        print(currentLocation);
+        currentCity = city;
+        currentTown = town;
       });
 
-      await Global.preference.setString("loc-lat", lat);
-      await Global.preference.setString("loc-lon", lon);
+      print('縣市: $currentCity');
+      print('鄉鎮市區: $currentTown');
 
-      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (placemarks.isNotEmpty) {
-        Placemark placemark = placemarks.first;
-        String? city;
-        String? town;
-
-        if (Platform.isIOS) {
-          city = placemark.subAdministrativeArea;
-          town = placemark.locality;
-        } else if (Platform.isAndroid) {
-          city = placemark.administrativeArea;
-          town = placemark.subAdministrativeArea;
-        }
-
-        setState(() {
-          currentCity = city;
-          currentTown = town;
-        });
-
-        print('縣市: $currentCity');
-        print('鄉鎮市區: $currentTown');
-
-        await Global.preference.setString("loc-city", currentCity!);
-        await Global.preference.setString("loc-town", currentTown!);
-      }
-    } catch (e) {
-      print('無法取得位置: $e');
+      await Global.preference.setString("loc-city", currentCity!);
+      await Global.preference.setString("loc-town", currentTown!);
     }
   }
 
