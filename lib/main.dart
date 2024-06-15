@@ -224,7 +224,7 @@ class MainAppState extends State<MainApp> {
             activityType: ActivityType.otherNavigation,
             distanceFilter: 500,
             timeLimit: const Duration(minutes: 5),
-            pauseLocationUpdatesAutomatically: false,
+            pauseLocationUpdatesAutomatically: true,
             // Only set to true if our app will be started up in the background.
             showBackgroundLocationIndicator: false,
             allowBackgroundLocationUpdates: true,
