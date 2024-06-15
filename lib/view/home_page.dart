@@ -356,7 +356,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 70),
+              padding: const EdgeInsets.only(bottom: 50),
               child: Column(
                 children: [
                   HomePageWeather(weather: weather, weatherRefreshing: weatherRefreshing, tempToColor: tempToColor),
@@ -366,9 +366,10 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(
-                        top: 5,
+                        top: 2,
                         right: 10,
                         left: 10,
+                        bottom: 5,
                       ),
                       child: eqReportRefreshing == false
                           ? eqReport.isEmpty

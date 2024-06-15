@@ -52,7 +52,7 @@ class HomePageWeather extends StatelessWidget {
                     child: Column(
                       children: [
                         Container(
-                          height: 56,
+                          height: 52,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.centerLeft,
@@ -70,8 +70,8 @@ class HomePageWeather extends StatelessWidget {
                           height: 31,
                           child: Padding(
                             padding: const EdgeInsets.only(
-                              left: 60,
-                              right: 65,
+                              left: 55,
+                              right: 60,
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -99,21 +99,21 @@ class HomePageWeather extends StatelessWidget {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(height: 65),
+                      const SizedBox(height: 58),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Flexible(
-                            flex: 5,
+                            flex: 10,
                             child: Container(),
                           ),
                           Flexible(
-                            flex: 50,
+                            flex: 60,
                             child: Image.network(
                               'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                              width: 342,
-                              height: 342,
+                              width: 332,
+                              height: 332,
                               fit: BoxFit.cover,
                               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                 if (loadingProgress == null) return child;
@@ -127,14 +127,14 @@ class HomePageWeather extends StatelessWidget {
                             ),
                           ),
                           Flexible(
-                            flex: 100,
+                            flex: 130,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
                                   children: [
                                     Flexible(
-                                      flex: 20,
+                                      flex: 15,
                                       child: Container(),
                                     ),
                                     Flexible(
@@ -146,11 +146,11 @@ class HomePageWeather extends StatelessWidget {
                                             children: [
                                               const Text(
                                                 "降水量",
-                                                style: TextStyle(fontSize: 48),
+                                                style: TextStyle(fontSize: 45),
                                               ),
                                               Text(
                                                 "${weather["precip"]} mm",
-                                                style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                                                style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
                                               ),
                                             ],
                                           ),
@@ -159,11 +159,11 @@ class HomePageWeather extends StatelessWidget {
                                             children: [
                                               const Text(
                                                 "濕度",
-                                                style: TextStyle(fontSize: 48),
+                                                style: TextStyle(fontSize: 45),
                                               ),
                                               Text(
                                                 "${weather["humidity"]} %",
-                                                style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                                                style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
                                               ),
                                             ],
                                           ),
@@ -172,11 +172,11 @@ class HomePageWeather extends StatelessWidget {
                                             children: [
                                               const Text(
                                                 "體感",
-                                                style: TextStyle(fontSize: 48),
+                                                style: TextStyle(fontSize: 45),
                                               ),
                                               Text(
                                                 "${weather["feel"]} ℃",
-                                                style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                                                style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
                                               ),
                                             ],
                                           ),
@@ -192,7 +192,7 @@ class HomePageWeather extends StatelessWidget {
                                     Text(
                                       (weather["temp"] as String).split(".")[0],
                                       style: TextStyle(
-                                        fontSize: 192,
+                                        fontSize: 180,
                                         fontWeight: FontWeight.w900,
                                         letterSpacing: 5,
                                         color: Color.lerp(
@@ -211,12 +211,12 @@ class HomePageWeather extends StatelessWidget {
                                       children: [
                                         const Text(
                                           "℃",
-                                          style: TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                                          style: TextStyle(fontSize: 58, fontWeight: FontWeight.bold),
                                         ),
                                         Text(
                                           ".${(weather["temp"] as String).split(".")[1]}",
                                           style: TextStyle(
-                                            fontSize: 90,
+                                            fontSize: 88,
                                             fontWeight: FontWeight.w900,
                                             color: Color.lerp(CupertinoColors.label.resolveFrom(context),
                                                 const Color(0xFFFFFFFF), 0.1),
