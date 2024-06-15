@@ -107,7 +107,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
     try {
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-      print('獲取到的經緯度: ${position.latitude}, ${position.longitude}');
 
       bool isInSpecifiedCountry = await checkIfInSpecifiedCountry(position.latitude, position.longitude);
       if (isInSpecifiedCountry) {
@@ -184,16 +183,6 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
     await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
-
-  // @override
-  // void dispose() {
-  //   BackgroundTask.instance.stop();
-  //   super.dispose();
-  // }
-
-  // static Future<void> _backgroundLocationHandler(Location location) async {
-  //   print('Background location: ${location.lat}, ${location.lng}');
-  // }
 
   Future<Uint8List> fetchNotificationIcon() async {
     ByteData imageData = await rootBundle.load('assets/app_icon.png');
