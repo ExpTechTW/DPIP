@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:dpip/model/earthquake_report.dart';
 import 'package:dpip/model/eew.dart';
 import 'package:dpip/model/partial_earthquake_report.dart';
+import 'package:dpip/model/weather_realtime.dart';
 import 'package:dpip/model/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:http/http.dart' as http;
@@ -58,6 +59,36 @@ class ExpTechApi {
   Future<List<String>> getNotificationTopics(String fcmToken) async {
     final response =
         await http.get(Uri.parse('https://api-${randomNum(2)}.exptech.com.tw/api/v2/dpip/topic?token=$fcmToken'));
+
+    if (response.statusCode == 200) {
+      return List<String>.from(jsonDecode(response.body) as List);
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
+  Future<WeatherRealtime> getWeatherRealtime(String code) async {
+    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/realtime/$code'));
+
+    if (response.statusCode == 200) {
+      return WeatherRealtime.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
+  Future<List<String>> getWeatherForecast(String code) async {
+    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/forecast/$code'));
+
+    if (response.statusCode == 200) {
+      return List<String>.from(jsonDecode(response.body) as List);
+    } else {
+      throw Exception('The server returned a status code of ${response.statusCode}');
+    }
+  }
+
+  Future<List<String>> getWeatherAll(String code) async {
+    final response = await http.get(Uri.parse('https://api-1.exptech.com.tw/api/v1/weather/all/$code'));
 
     if (response.statusCode == 200) {
       return List<String>.from(jsonDecode(response.body) as List);

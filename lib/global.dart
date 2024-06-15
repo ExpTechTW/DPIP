@@ -12,8 +12,9 @@ class Global {
   static late SharedPreferences preference;
   static late PackageInfo packageInfo;
   static late String taiwanGeojsonString;
-
   static Map<String, Map<String, Town>> region = {};
+
+  static late Map<String, int> distCodeData;
 
   static Future init() async {
     api = ExpTechApi();
@@ -35,5 +36,9 @@ class Global {
     });
 
     taiwanGeojsonString = await rootBundle.loadString("assets/tw_city.geojson");
+
+    String jsonString = await rootBundle.loadString("assets/dist_code.json");
+    Map<String, dynamic> data = jsonDecode(jsonString);
+    distCodeData = data.map((key, value) => MapEntry(key, value as int));
   }
 }
