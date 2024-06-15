@@ -341,11 +341,11 @@ class HomePageWeather extends StatelessWidget {
                             child: Container(),
                           ),
                           Flexible(
-                            flex: 35,
+                            flex: 40,
                             child: Image.network(
                               'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                              width: 128,
-                              height: 128,
+                              width: 142,
+                              height: 142,
                               fit: BoxFit.cover,
                               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                                 if (loadingProgress == null) return child;
@@ -370,7 +370,7 @@ class HomePageWeather extends StatelessWidget {
                                       child: Container(),
                                     ),
                                     Flexible(
-                                      flex: 45,
+                                      flex: 60,
                                       child: Column(
                                         children: [
                                           Row(
