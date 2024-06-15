@@ -57,7 +57,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   );
 
   List<Widget> maxIntensities = [];
-  final List<Marker> markers = [];
+  List<Marker> markers = [];
   late EarthquakeReport report;
 
   DraggableScrollableSheet get sheet => (_sheet.currentWidget as DraggableScrollableSheet);
@@ -224,7 +224,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
 
   void updateLocationMarker(Position position) {
     setState(() {
-      markers.removeWhere((marker) => marker.child is Icon && (marker.child as Icon).icon == Icons.my_location);
+      markers.removeWhere((marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
       markers.add(
         Marker(
           point: LatLng(position.latitude, position.longitude),
@@ -234,11 +234,6 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
         ),
       );
     });
-    rebuildFlutterMap();
-  }
-
-  void rebuildFlutterMap() {
-    setState(() {});
   }
 
   @override
