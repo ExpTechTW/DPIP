@@ -68,7 +68,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
-                  color: context.colors.intensity(report.intensity),
+                  color: IntensityColor.intensity(report.intensity),
                 ),
                 child: Center(
                   child: Text(
@@ -76,7 +76,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: context.colors.onIntensity(report.intensity),
+                      color: IntensityColor.onIntensity(report.intensity),
                     ),
                   ),
                 ),
@@ -130,7 +130,7 @@ class EarthquakeReportListTile extends StatelessWidget {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
-                  color: context.colors.intensity(report.intensity),
+                  color: IntensityColor.intensity(report.intensity),
                 ),
                 child: Center(
                   child: Text(
@@ -139,7 +139,7 @@ class EarthquakeReportListTile extends StatelessWidget {
                       height: 1,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: context.colors.onIntensity(report.intensity),
+                      color: IntensityColor.onIntensity(report.intensity),
                     ),
                   ),
                 ),

@@ -54,6 +54,7 @@ flutter:
   assets:
     - assets/app_icon.png
     - assets/cross.png
+    - assets/dist_code.json
     - assets/region.json
     - assets/eew_alert.wav
     - assets/eew_warn.wav
