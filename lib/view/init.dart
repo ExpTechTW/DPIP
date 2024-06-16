@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+import '../global.dart';
 import 'home_page.dart';
 import 'me.dart';
 
@@ -25,8 +26,8 @@ class _InitPageState extends State<InitPage> {
   List<Widget> bodyPages = [
     const HomePage(),
     // const HistoryPage(),
-    // const EarthquakePage(),
-    const WelcomePage(),
+    const EarthquakePage(),
+    // const WelcomePage(),
     const ReportList(),
     // const Radar(), //TODO 更多
     const MePage()
@@ -169,62 +170,66 @@ class _InitPageState extends State<InitPage> {
         },
       );
     } else {
-      return Scaffold(
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: currentPageIndex,
-          onDestinationSelected: (index) {
-            setState(() {
-              currentPageIndex = index;
-              _pageController.jumpToPage(currentPageIndex);
-            });
-          },
-          destinations: const <NavigationDestination>[
-            // NavigationDestination(
-            //     icon: Icon(Icons.history_outlined), label: '歷史'),
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: '首頁',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.heart_broken_outlined),
-              selectedIcon: Icon(Icons.heart_broken),
-              label: '監視器',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.analytics_outlined),
-              selectedIcon: Icon(Icons.analytics_rounded),
-              label: '地震報告',
-            ),
-            // NavigationDestination(
-            //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-            NavigationDestination(
-              icon: Icon(Icons.supervised_user_circle_outlined),
-              selectedIcon: Icon(Icons.supervised_user_circle),
-              label: '我',
-            ),
-          ],
-        ),
-        bottomSheet: Visibility(
-          visible: !isInternetConnected,
-          child: Container(
-            width: double.maxFinite,
-            color: context.colors.surfaceVariant,
-            child: Text(
-              "無網際網路連線",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: context.colors.onSurfaceVariant,
+      if (Global.preference.getBool("first") == false) {
+        return Scaffold(
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: currentPageIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                currentPageIndex = index;
+                _pageController.jumpToPage(currentPageIndex);
+              });
+            },
+            destinations: const <NavigationDestination>[
+              // NavigationDestination(
+              //     icon: Icon(Icons.history_outlined), label: '歷史'),
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: '首頁',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.heart_broken_outlined),
+                selectedIcon: Icon(Icons.heart_broken),
+                label: '監視器',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.analytics_outlined),
+                selectedIcon: Icon(Icons.analytics_rounded),
+                label: '地震報告',
+              ),
+              // NavigationDestination(
+              //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
+              NavigationDestination(
+                icon: Icon(Icons.supervised_user_circle_outlined),
+                selectedIcon: Icon(Icons.supervised_user_circle),
+                label: '我',
+              ),
+            ],
+          ),
+          bottomSheet: Visibility(
+            visible: !isInternetConnected,
+            child: Container(
+              width: double.maxFinite,
+              color: context.colors.surfaceVariant,
+              child: Text(
+                "無網際網路連線",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.colors.onSurfaceVariant,
+                ),
               ),
             ),
           ),
-        ),
-        body: PageView(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: bodyPages,
-        ),
-      );
+          body: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: bodyPages,
+          ),
+        );
+      } else {
+        return const WelcomePage();
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../global.dart';
 import '../home_page.dart';
 import '../init.dart';
 
@@ -22,10 +23,11 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                   Align(
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await Global.preference.setBool("first", false);
                             Navigator.pushAndRemoveUntil(
                               context,
-                              MaterialPageRoute(builder: (context) => InitPage()),
+                              MaterialPageRoute(builder: (context) => const InitPage()),
                               (Route<dynamic> route) => false,
                             );
                           },
