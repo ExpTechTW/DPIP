@@ -106,7 +106,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     if (!isLocationAutoSetEnabled) return;
 
     try {
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.low);
 
       bool isInSpecifiedCountry = await checkIfInSpecifiedCountry(position.latitude, position.longitude);
       if (isInSpecifiedCountry) {
