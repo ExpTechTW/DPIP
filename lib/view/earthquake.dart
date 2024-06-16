@@ -56,6 +56,12 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   /// 使用者本地預估震度
   int userIntensity = 0;
 
+  /// P 波速度，單位：公里/秒
+  double waveSpeedP = 6.0;
+
+  /// S 波速度，單位：公里/秒
+  double waveSpeedS = 3.5;
+
   String? city = Global.preference.getString("loc-city");
   String? town = Global.preference.getString("loc-town");
 
@@ -114,7 +120,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         final location = Global.region[city]![town]!;
 
         final waveTime =
-            calculateWaveTime(data.eq.depth, distance(data.eq.lat, data.eq.lon, location.lat, location.lon));
+        calculateWaveTime(data.eq.depth, distance(data.eq.lat, data.eq.lon, location.lat, location.lon));
 
         sArrive = data.eq.time + waveTime.s * 1000;
         pArrive = data.eq.time + waveTime.p * 1000;
@@ -174,7 +180,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
             defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
           )
         : GeoJsonParser(
-            defaultPolygonFillColor: context.colors.surfaceVariant,
+            defaultPolygonFillColor: context.colors.surfaceContainerHighest,
             defaultPolygonBorderColor: context.colors.outline,
           );
 
@@ -225,9 +231,59 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
       }
     }
 
+    List<CircleMarker> waveCircles = [];
+    List<Marker> epicenterMarker = [];
+
+    if (eewList.isNotEmpty) {
+      final eew = eewList.first;
+
+      final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+      // 計算P波和S波傳播半徑（單位：公里）
+      double pRadius = (currentTime - eew.eq.time) / 1000 * waveSpeedP; // P 波速度，單位：公里/秒
+      double sRadius = (currentTime - eew.eq.time) / 1000 * waveSpeedS; // S 波速度，單位：公里/秒
+
+      // 添加 P 波圓圈
+      waveCircles.add(CircleMarker(
+        point: LatLng(eew.eq.lat, eew.eq.lon),
+        radius: pRadius * 1000, // 將半徑轉換為米
+        color: Colors.blue.withOpacity(0.2),
+        borderStrokeWidth: 3,
+        borderColor: const Color(0xFF00008B),
+        useRadiusInMeter: true,
+      ));
+
+      // 添加 S 波圓圈
+      waveCircles.add(CircleMarker(
+        point: LatLng(eew.eq.lat, eew.eq.lon),
+        radius: sRadius * 1000, // 將半徑轉換為米
+        color: Colors.red.withOpacity(0.3),
+        borderStrokeWidth: 3,
+        borderColor: const Color(0xFF8B0000),
+        useRadiusInMeter: true,
+      ));
+
+      // 添加震央標記
+      epicenterMarker.add(Marker(
+        height: 40, // 調整震央標記的高度
+        width: 40, // 調整震央標記的寬度
+        point: LatLng(eew.eq.lat, eew.eq.lon),
+        child: Container(
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.clear,
+            color: Colors.red,
+            size: 36,
+          ),
+        ),
+      ));
+    }
+
     final flutterMap = FlutterMap(
       options: const MapOptions(
-        initialCenter: LatLng(23.8, 120.1),
+        initialCenter: LatLng(23.8, 120.8),
         initialZoom: 7,
         minZoom: 7,
         maxZoom: 12,
@@ -255,6 +311,12 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         MarkerLayer(
           markers: rtsMarkers,
         ),
+        CircleLayer(
+          circles: waveCircles,
+        ),
+        MarkerLayer(
+          markers: epicenterMarker,
+        ),
       ],
     );
 
@@ -277,266 +339,269 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
             },
           ),
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "即時資料僅供參考\n實際請以中央氣象署的資料為主",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ),
-                Flexible(child: flutterMap),
-                if (eewList.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: (eewList.first.eq.max > 4) ? Colors.red : Colors.orange,
-                        width: 2.0,
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 40),
+                    child: Text(
+                      "即時資料僅供參考\n實際請以中央氣象署的資料為主",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 14),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Symbols.crisis_alert_rounded,
-                              color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              (eewList.first.eq.max > 4) ? "緊急地震速報" : "地震速報",
-                              style: TextStyle(
-                                  height: 1, color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "第 ${eewList.first.serial} 報",
-                              style: TextStyle(
-                                  height: 1, color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
-                            )
-                          ],
+                  ),
+                  Flexible(child: flutterMap),
+                  if (eewList.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: (eewList.first.eq.max > 4) ? Colors.red : Colors.orange,
+                          width: 2.0,
                         ),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        eewList.first.eq.loc,
-                                        style: TextStyle(
-                                          color: CupertinoColors.label.resolveFrom(context),
-                                          fontSize: 23,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        "M ${eewList.first.eq.mag}",
-                                        style: TextStyle(
-                                          color: CupertinoColors.label.resolveFrom(context),
-                                          fontSize: 23,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          color: IntensityColor.intensity(eewList.first.eq.max),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            intensityToNumberString(eewList.first.eq.max),
-                                            style: TextStyle(
-                                              fontSize: 36,
-                                              fontWeight: FontWeight.bold,
-                                              color: IntensityColor.onIntensity(eewList.first.eq.max),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("$eewTime 發生", style: const TextStyle(fontSize: 16)),
-                                      Text("${eewList.first.eq.depth}km", style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                if (eewList.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.blue,
-                        width: 2.0,
+                        borderRadius: const BorderRadius.all(Radius.circular(8)),
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    ),
-                    child: city == null || town == null
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
                             children: [
                               Icon(
-                                Symbols.pin_drop_rounded,
+                                Symbols.crisis_alert_rounded,
                                 color: CupertinoColors.secondaryLabel.resolveFrom(context),
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                "尚未設定所在地",
-                                style:
-                                    TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
+                                (eewList.first.eq.max > 4) ? "緊急地震速報" : "地震速報",
+                                style: TextStyle(
+                                    height: 1, color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "第 ${eewList.first.serial} 報",
+                                style: TextStyle(
+                                    height: 1, color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
                               )
                             ],
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                          ),
+                          Row(
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Symbols.pin_drop_rounded,
-                                        color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        "$city$town",
-                                        style: TextStyle(
-                                            color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width: 58,
-                                        height: 58,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          color: IntensityColor.intensity(userIntensity),
+                              Flexible(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          eewList.first.eq.loc,
+                                          style: TextStyle(
+                                            color: CupertinoColors.label.resolveFrom(context),
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            intensityToNumberString(userIntensity),
-                                            style: TextStyle(
-                                              fontSize: 42,
-                                              fontWeight: FontWeight.bold,
-                                              color: IntensityColor.onIntensity(userIntensity),
+                                        Text(
+                                          "M ${eewList.first.eq.mag}",
+                                          style: TextStyle(
+                                            color: CupertinoColors.label.resolveFrom(context),
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Container(
+                                          width: 54,
+                                          height: 54,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12.0),
+                                            color: IntensityColor.intensity(eewList.first.eq.max),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              intensityToNumberString(eewList.first.eq.max),
+                                              style: TextStyle(
+                                                fontSize: 38,
+                                                fontWeight: FontWeight.bold,
+                                                color: IntensityColor.onIntensity(eewList.first.eq.max),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "P波",
-                                                    style: TextStyle(
-                                                      height: 1,
-                                                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      ((pArrive <
-                                                              (timeNtp +
-                                                                  (DateTime.now().millisecondsSinceEpoch - timeLocal)))
-                                                          ? "抵達"
-                                                          : ((pArrive -
-                                                                      (timeNtp +
-                                                                          (DateTime.now().millisecondsSinceEpoch -
-                                                                              timeLocal))) /
-                                                                  1000)
-                                                              .toStringAsFixed(0)),
-                                                      style: const TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight: FontWeight.w900,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "S波",
-                                                    style: TextStyle(
-                                                      height: 1,
-                                                      color: CupertinoColors.secondaryLabel.resolveFrom(context),
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      ((sArrive <
-                                                              (timeNtp +
-                                                                  (DateTime.now().millisecondsSinceEpoch - timeLocal)))
-                                                          ? "抵達"
-                                                          : ((sArrive -
-                                                                      (timeNtp +
-                                                                          (DateTime.now().millisecondsSinceEpoch -
-                                                                              timeLocal))) /
-                                                                  1000)
-                                                              .toStringAsFixed(0)),
-                                                      style: const TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight: FontWeight.w900,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  )
-                                ],
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("$eewTime 發生", style: const TextStyle(fontSize: 16)),
+                                        Text("${eewList.first.eq.depth}km", style: const TextStyle(fontSize: 16)),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
+                          )
+                        ],
+                      ),
+                    ),
+                  if (eewList.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.blue,
+                          width: 2.0,
+                        ),
+                        borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      ),
+                      child: city == null || town == null
+                          ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Symbols.pin_drop_rounded,
+                            color: CupertinoColors.secondaryLabel.resolveFrom(context),
                           ),
-                  ),
-              ],
+                          const SizedBox(width: 8),
+                          Text(
+                            "尚未設定所在地",
+                            style:
+                            TextStyle(color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
+                          )
+                        ],
+                      )
+                          : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Symbols.pin_drop_rounded,
+                                    color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "$city$town",
+                                    style: TextStyle(
+                                        color: CupertinoColors.secondaryLabel.resolveFrom(context), fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 58,
+                                    height: 58,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      color: IntensityColor.intensity(userIntensity),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        intensityToNumberString(userIntensity),
+                                        style: TextStyle(
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.bold,
+                                          color: IntensityColor.onIntensity(userIntensity),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "P波",
+                                                style: TextStyle(
+                                                  height: 1,
+                                                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  ((pArrive <
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch - timeLocal)))
+                                                      ? "抵達"
+                                                      : ((pArrive -
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch -
+                                                              timeLocal))) /
+                                                      1000)
+                                                      .toStringAsFixed(0)),
+                                                  style: const TextStyle(
+                                                    fontSize: 28,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "S波",
+                                                style: TextStyle(
+                                                  height: 1,
+                                                  color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  ((sArrive <
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch - timeLocal)))
+                                                      ? "抵達"
+                                                      : ((sArrive -
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch -
+                                                              timeLocal))) /
+                                                      1000)
+                                                      .toStringAsFixed(0)),
+                                                  style: const TextStyle(
+                                                    fontSize: 28,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -562,246 +627,249 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
             ),
           ],
         ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(4),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const Text(
-                  "即時資料僅供參考\n實際請以中央氣象署的資料為主",
-                  textAlign: TextAlign.center,
-                ),
-                Flexible(child: flutterMap),
-                if (eewList.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: (eewList.first.eq.max > 4) ? Colors.red : Colors.orange,
-                        width: 2.0,
-                      ),
-                      borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Symbols.crisis_alert_rounded,
-                              color: context.colors.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              (eewList.first.eq.max > 4) ? "緊急地震速報" : "地震速報",
-                              style: TextStyle(height: 1, color: context.colors.onSurfaceVariant, fontSize: 18),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "第 ${eewList.first.serial} 報",
-                              style: TextStyle(height: 1, color: context.colors.onSurfaceVariant, fontSize: 18),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(eewList.first.eq.loc,
-                                          style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-                                      Text("M ${eewList.first.eq.mag}",
-                                          style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-                                      Container(
-                                        width: 52,
-                                        height: 52,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          color: IntensityColor.intensity(eewList.first.eq.max),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            intensityToNumberString(eewList.first.eq.max),
-                                            style: TextStyle(
-                                              fontSize: 36,
-                                              fontWeight: FontWeight.bold,
-                                              color: IntensityColor.onIntensity(eewList.first.eq.max),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("$eewTime 發生", style: const TextStyle(fontSize: 16)),
-                                      Text("${eewList.first.eq.depth}km", style: const TextStyle(fontSize: 16)),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
+        body: MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const Text(
+                    "即時資料僅供參考\n實際請以中央氣象署的資料為主",
+                    textAlign: TextAlign.center,
                   ),
-                if (eewList.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.blue,
-                        width: 2.0,
+                  Flexible(child: flutterMap),
+                  if (eewList.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: (eewList.first.eq.max > 4) ? Colors.red : Colors.orange,
+                          width: 2.0,
+                        ),
+                        borderRadius: const BorderRadius.all(Radius.circular(16.0)),
                       ),
-                      borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-                    ),
-                    child: city == null || town == null
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
                             children: [
                               Icon(
-                                Symbols.pin_drop_rounded,
+                                Symbols.crisis_alert_rounded,
                                 color: context.colors.onSurfaceVariant,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                "尚未設定所在地",
-                                style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 18),
+                                (eewList.first.eq.max > 4) ? "緊急地震速報" : "地震速報",
+                                style: TextStyle(height: 1, color: context.colors.onSurfaceVariant, fontSize: 18),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "第 ${eewList.first.serial} 報",
+                                style: TextStyle(height: 1, color: context.colors.onSurfaceVariant, fontSize: 18),
                               )
                             ],
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                          ),
+                          Row(
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Symbols.pin_drop_rounded,
-                                        color: context.colors.onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        "$city$town",
-                                        style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 18),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        width: 58,
-                                        height: 58,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          color: IntensityColor.intensity(userIntensity),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            intensityToNumberString(userIntensity),
-                                            style: TextStyle(
-                                              fontSize: 42,
-                                              fontWeight: FontWeight.bold,
-                                              color: IntensityColor.onIntensity(userIntensity),
+                              Flexible(
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(eewList.first.eq.loc,
+                                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                        Text("M ${eewList.first.eq.mag}",
+                                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                                        Container(
+                                          width: 54,
+                                          height: 54,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(12.0),
+                                            color: IntensityColor.intensity(eewList.first.eq.max),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              intensityToNumberString(eewList.first.eq.max),
+                                              style: TextStyle(
+                                                fontSize: 38,
+                                                fontWeight: FontWeight.bold,
+                                                color: IntensityColor.onIntensity(eewList.first.eq.max),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "P波",
-                                                    style: TextStyle(
-                                                      height: 1,
-                                                      color: context.colors.onSurfaceVariant,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      ((pArrive <
-                                                              (timeNtp +
-                                                                  (DateTime.now().millisecondsSinceEpoch - timeLocal)))
-                                                          ? "抵達"
-                                                          : ((pArrive -
-                                                                      (timeNtp +
-                                                                          (DateTime.now().millisecondsSinceEpoch -
-                                                                              timeLocal))) /
-                                                                  1000)
-                                                              .toStringAsFixed(0)),
-                                                      style: const TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight: FontWeight.w900,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    "S波",
-                                                    style: TextStyle(
-                                                      height: 1,
-                                                      color: context.colors.onSurfaceVariant,
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                  Center(
-                                                    child: Text(
-                                                      ((sArrive <
-                                                              (timeNtp +
-                                                                  (DateTime.now().millisecondsSinceEpoch - timeLocal)))
-                                                          ? "抵達"
-                                                          : ((sArrive -
-                                                                      (timeNtp +
-                                                                          (DateTime.now().millisecondsSinceEpoch -
-                                                                              timeLocal))) /
-                                                                  1000)
-                                                              .toStringAsFixed(0)),
-                                                      style: const TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight: FontWeight.w900,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  )
-                                ],
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("$eewTime 發生", style: const TextStyle(fontSize: 16)),
+                                        Text("${eewList.first.eq.depth}km", style: const TextStyle(fontSize: 16)),
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
+                          )
+                        ],
+                      ),
+                    ),
+                  if (eewList.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.blue,
+                          width: 2.0,
+                        ),
+                        borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+                      ),
+                      child: city == null || town == null
+                          ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Symbols.pin_drop_rounded,
+                            color: context.colors.onSurfaceVariant,
                           ),
-                  ),
-              ],
+                          const SizedBox(width: 8),
+                          Text(
+                            "尚未設定所在地",
+                            style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 18),
+                          )
+                        ],
+                      )
+                          : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Symbols.pin_drop_rounded,
+                                    color: context.colors.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    "$city$town",
+                                    style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 58,
+                                    height: 58,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      color: IntensityColor.intensity(userIntensity),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        intensityToNumberString(userIntensity),
+                                        style: TextStyle(
+                                          fontSize: 42,
+                                          fontWeight: FontWeight.bold,
+                                          color: IntensityColor.onIntensity(userIntensity),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "P波",
+                                                style: TextStyle(
+                                                  height: 1,
+                                                  color: context.colors.onSurfaceVariant,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  ((pArrive <
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch - timeLocal)))
+                                                      ? "抵達"
+                                                      : ((pArrive -
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch -
+                                                              timeLocal))) /
+                                                      1000)
+                                                      .toStringAsFixed(0)),
+                                                  style: const TextStyle(
+                                                    fontSize: 28,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "S波",
+                                                style: TextStyle(
+                                                  height: 1,
+                                                  color: context.colors.onSurfaceVariant,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Center(
+                                                child: Text(
+                                                  ((sArrive <
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch - timeLocal)))
+                                                      ? "抵達"
+                                                      : ((sArrive -
+                                                      (timeNtp +
+                                                          (DateTime.now().millisecondsSinceEpoch -
+                                                              timeLocal))) /
+                                                      1000)
+                                                      .toStringAsFixed(0)),
+                                                  style: const TextStyle(
+                                                    fontSize: 28,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
