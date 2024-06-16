@@ -133,17 +133,6 @@ class MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     initializeBackgroundTask();
-    platform.setMethodCallHandler(handleLocationUpdate);
-  }
-
-  Future<void> handleLocationUpdate(MethodCall call) async {
-    if (call.method == 'updateLocation') {
-      final double latitude = call.arguments['latitude'];
-      final double longitude = call.arguments['longitude'];
-      setState(() {
-        location = 'Lat: $latitude, Lon: $longitude';
-      });
-    }
   }
 
   void initializeBackgroundTask() async {
@@ -175,81 +164,54 @@ class MainAppState extends State<MainApp> {
 
   void startPositionStream() {
     if (positionStreamSubscription == null) {
-      if (Platform.isAndroid) {
-        final positionStream = geolocatorPlatform.getPositionStream(
-          locationSettings: AndroidSettings(
-            accuracy: LocationAccuracy.medium,
-            distanceFilter: 500,
-            forceLocationManager: false,
-            intervalDuration: const Duration(minutes: 5),
-            //(Optional) Set foreground notification config to keep the app alive
-            //when going to the background
-            foregroundNotificationConfig: const ForegroundNotificationConfig(
-              notificationText: "服務中...",
-              notificationTitle: "DPIP 背景定位",
-              notificationChannelName: '背景定位',
-              enableWifiLock: true,
-              enableWakeLock: true,
-              setOngoing: false,
-            ),
-          ),
-        );
-        positionStreamSubscription = positionStream.handleError((error) {
-          positionStreamSubscription?.cancel();
-          positionStreamSubscription = null;
-        }).listen((Position? position) async {
-          if (position != null) {
-            String? lat = position.latitude.toStringAsFixed(4);
-            String? lon = position.longitude.toStringAsFixed(4);
-            String? coordinate = '$lat,$lon';
-            messaging.getToken().then((value) {
-              Future<String> test = Global.api.postNotifyLocation(
-                Global.packageInfo.version,
-                "0",
-                coordinate,
-                value!,
-              );
-              test.then((value) {
-                print(value); // 打印 Future<String> 的值
-              }).catchError((error) {
-                print('發生錯誤: $error');
-              });
-            });
-          }
-        });
-      } else if (Platform.isIOS) {
-        final positionStream = geolocatorPlatform.getPositionStream(
-          locationSettings: AppleSettings(
-            accuracy: LocationAccuracy.low,
-            activityType: ActivityType.otherNavigation,
-            distanceFilter: 500,
-            timeLimit: const Duration(minutes: 5),
-            pauseLocationUpdatesAutomatically: true,
-            // Only set to true if our app will be started up in the background.
-            showBackgroundLocationIndicator: false,
-            allowBackgroundLocationUpdates: true,
-          ),
-        );
-        positionStreamSubscription = positionStream.handleError((error) {
-          positionStreamSubscription?.cancel();
-          positionStreamSubscription = null;
-        }).listen((Position? position) async {
-          if (position != null) {
-            String? lat = position.latitude.toStringAsFixed(4);
-            String? lon = position.longitude.toStringAsFixed(4);
-            String? coordinate = '$lat,$lon';
-            messaging.getToken().then((value) {
-              Global.api.postNotifyLocation(
-                Global.packageInfo.version,
-                "1",
-                coordinate,
-                value!,
-              );
-            });
-          }
-        });
-        print('位置已開啟');
-      }
+      final positionStream = geolocatorPlatform.getPositionStream(
+        locationSettings: Platform.isAndroid
+            ? AndroidSettings(
+                accuracy: LocationAccuracy.medium,
+                distanceFilter: 500,
+                forceLocationManager: false,
+                intervalDuration: const Duration(minutes: 5),
+                //(Optional) Set foreground notification config to keep the app alive
+                //when going to the background
+                foregroundNotificationConfig: const ForegroundNotificationConfig(
+                  notificationText: "服務中...",
+                  notificationTitle: "DPIP 背景定位",
+                  notificationChannelName: '背景定位',
+                  enableWifiLock: true,
+                  enableWakeLock: true,
+                  setOngoing: false,
+                ),
+              )
+            : AppleSettings(
+                accuracy: LocationAccuracy.low,
+                activityType: ActivityType.otherNavigation,
+                distanceFilter: 500,
+                timeLimit: const Duration(minutes: 5),
+                pauseLocationUpdatesAutomatically: true,
+                // Only set to true if our app will be started up in the background.
+                showBackgroundLocationIndicator: false,
+                allowBackgroundLocationUpdates: true,
+              ),
+      );
+      positionStreamSubscription = positionStream.handleError((error) {
+        positionStreamSubscription?.cancel();
+        positionStreamSubscription = null;
+      }).listen((Position? position) async {
+        if (position != null) {
+          String? lat = position.latitude.toStringAsFixed(4);
+          String? lon = position.longitude.toStringAsFixed(4);
+          String? coordinate = '$lat,$lon';
+          messaging.getToken().then((value) {
+            Global.api.postNotifyLocation(
+              Global.packageInfo.version,
+              Platform.isAndroid ? "0" : "1",
+              coordinate,
+              value!,
+            );
+          });
+        }
+      });
+      print('位置已開啟');
     }
   }
 
