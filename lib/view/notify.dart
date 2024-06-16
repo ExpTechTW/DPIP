@@ -500,6 +500,7 @@ class _NotifyPage extends State<NotifyPage> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< Updated upstream
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -510,6 +511,80 @@ class _NotifyPage extends State<NotifyPage> {
             children: _List_children.toList(),
           ),
         ),
+=======
+    final List<Map<String, dynamic>> soundButtonsData = [
+      {
+        'text': '強震即時警報(警報)',
+        'soundPath': 'eew_alert.wav',
+        'colors': [const Color(0x330063C6), const Color(0xFF0063C6)],
+      },
+      {
+        'text': '地震速報(注意)',
+        'soundPath': 'eew_warn.wav',
+        'colors': [const Color(0x330063C6), const Color(0xFF0063C6)],
+      },
+      {
+        'text': '震度速報',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
+      },
+      {
+        'text': '強震監視器',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
+      },
+      {
+        'text': '地震報告',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
+      },
+      {
+        'text': '大雷雨即時訊息',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '豪雨特報',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '大雨特報',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '高溫資訊',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '大雨特報',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '路上強風特報',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '停班停課資訊',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+      {
+        'text': '海上陸上颱風警報',
+        'soundPath': 'warn.wav',
+        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      },
+    ];
+    final List<Widget> soundButtons = soundButtonsData.map(
+          (data) => buildSoundButton(
+        text: data['text'],
+        soundPath: data['soundPath'],
+        colors: data['colors'],
+>>>>>>> Stashed changes
       ),
     );
   }
