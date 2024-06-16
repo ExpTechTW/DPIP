@@ -178,10 +178,10 @@ class MainAppState extends State<MainApp> {
       if (Platform.isAndroid) {
         final positionStream = geolocatorPlatform.getPositionStream(
           locationSettings: AndroidSettings(
-            accuracy: LocationAccuracy.high,
-            distanceFilter: 1,
+            accuracy: LocationAccuracy.medium,
+            distanceFilter: 500,
             forceLocationManager: false,
-            intervalDuration: const Duration(seconds: 1),
+            intervalDuration: const Duration(minutes: 5),
             //(Optional) Set foreground notification config to keep the app alive
             //when going to the background
             foregroundNotificationConfig: const ForegroundNotificationConfig(
