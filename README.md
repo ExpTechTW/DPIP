@@ -32,6 +32,9 @@ DPIP 是一款開放原始碼防災資訊軟體，提供給您即時的防災資
 - yayacat `程式開發`
 - Yoyochou0901 `程式開發` `介面設計`
 - lowrt `程式開發`
+- charlie112787 `程式開發` `介面設計`
+- Cracks666666 `程式開發` `介面設計`
+
 
 ## 如何貢獻
 點擊 [Repo](https://github.com/ExpTechTW/TREM) 首頁右上角的 Code 按鈕後點擊 Download ZIP 來下載原始碼壓縮檔\
