@@ -13,20 +13,20 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
-              title: Text("注意事項"),
+              title: const Text("注意事項"),
             ),
             body: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text("內文"),
+                  const Text("內文"),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context)
-                                .push(MaterialPageRoute(builder: (context) => WelcomeEarthquakePage()));
+                                .push(MaterialPageRoute(builder: (context) => const WelcomeEarthquakePage()));
                           },
-                          child: Text("下一步")))
+                          child: const Text("下一步")))
                 ]))));
   }
 }

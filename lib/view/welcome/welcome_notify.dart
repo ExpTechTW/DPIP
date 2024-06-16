@@ -31,7 +31,7 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                               (Route<dynamic> route) => false,
                             );
                           },
-                          child: Text("下一步")))
+                          child: const Text("下一步")))
                 ]))));
   }
 }
