@@ -20,17 +20,39 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   const Text("內文"),
                   Align(
-                      alignment: Alignment.bottomRight,
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF009E8B), Color(0xFF203864)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
                       child: ElevatedButton(
-                          onPressed: () async {
-                            await Global.preference.setBool("first", false);
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(builder: (context) => const InitPage()),
-                              (Route<dynamic> route) => false,
-                            );
-                          },
-                          child: const Text("下一步")))
+                        onPressed: () async {
+                          await Global.preference.setBool("first", false);
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const InitPage()),
+                            (Route<dynamic> route) => false,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          "開始使用",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ]))));
   }
 }
