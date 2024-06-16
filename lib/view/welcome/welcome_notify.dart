@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../global.dart';
-import '../home_page.dart';
 import '../init.dart';
 
 class WelcomeNotifyPage extends StatefulWidget {
@@ -15,11 +14,11 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            appBar: AppBar(title: Text("通知")),
+            appBar: AppBar(title: const Text("通知")),
             body: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text("內文"),
+                  const Text("內文"),
                   Align(
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
