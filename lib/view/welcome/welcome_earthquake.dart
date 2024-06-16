@@ -1,22 +1,20 @@
-import 'package:dpip/view/welcome/welcome_note.dart';
+import 'package:dpip/view/welcome/welcome_notify.dart';
 import 'package:flutter/material.dart';
 
 import '../home_page.dart';
 
-class WelcomePage extends StatefulWidget {
-  const WelcomePage({Key? key}) : super(key: key);
+class WelcomeEarthquakePage extends StatefulWidget {
+  const WelcomeEarthquakePage({Key? key}) : super(key: key);
   @override
-  State<StatefulWidget> createState() => _WelcomePageState();
+  State<StatefulWidget> createState() => _WelcomeEarthquakePageState();
 }
 
-class _WelcomePageState extends State<WelcomePage> {
+class _WelcomeEarthquakePageState extends State<WelcomeEarthquakePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            appBar: AppBar(
-              title: Text("歡迎"),
-            ),
+            appBar: AppBar(title: Text("強震監視器")),
             body: Padding(
                 padding: EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -25,7 +23,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => WelcomeNotePage()));
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => WelcomeNotifyPage()));
                           },
                           child: Text("下一步")))
                 ]))));
