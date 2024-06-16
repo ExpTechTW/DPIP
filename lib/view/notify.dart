@@ -20,14 +20,14 @@ class NotifyPage extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(left: 15, right: 10, top: 5, bottom: 5),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: colors,
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: const BorderRadius.all(Radius.circular(90)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -40,6 +40,13 @@ class NotifyPage extends StatelessWidget {
             ),
           ),
           buildPlayButton(soundPath),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
         ],
       ),
     );
@@ -71,53 +78,68 @@ class NotifyPage extends StatelessWidget {
     );
   }
 
+  // 生成標題文本容器的函式
+  Widget buildTitleText(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, bottom: 10),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 25),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> soundButtonsData = [
-      {
-        'text': '強震即時警報(警報)',
-        'soundPath': 'eew_alert.wav',
-        'colors': [const Color(0x330063C6), const Color(0xFF0063C6)],
-      },
-      {
-        'text': '地震速報(注意)',
-        'soundPath': 'eew_warn.wav',
-        'colors': [const Color(0x330063C6), const Color(0xFF0063C6)],
-      },
-      {
-        'text': '震度速報',
-        'soundPath': 'warn.wav',
-        'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
-      },
-      {
-        'text': '強震監視器',
-        'soundPath': 'warn.wav',
-        'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
-      },
-      {
-        'text': '地震報告',
-        'soundPath': 'warn.wav',
-        'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
-      },
-      {
-        'text': '大雷雨即時訊息',
-        'soundPath': 'warn.wav',
-        'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
-      },
-      {
-        'text': '強震即時警報 (EEW)',
-        'soundPath': 'warn.wav',
-        'colors': [const Color(0x660063C6), const Color(0xFF0063C6)],
-      },
-    ];
+    const String eewTitle = "地震速報相關音效";
+    const String eqTitle = "地震資訊音效音效";
+    const String weatherTitle = "防災資訊音效";
+    const String otherTitle = "其他音效";
 
-    final List<Widget> soundButtons = soundButtonsData.map(
-          (data) => buildSoundButton(
-        text: data['text'],
-        soundPath: data['soundPath'],
-        colors: data['colors'],
+
+
+
+
+    final List<Widget> soundButtons = [
+      buildTitleText(eewTitle),
+      buildSoundButton(
+        text: '強震即時警報(警報)',
+        soundPath: 'eew_alert.wav',
+        colors: [const Color(0x330063C6), const Color(0xFF0063C6)],
       ),
-    ).toList();
+      buildSoundButton(
+        text: '地震速報(注意)',
+        soundPath: 'eew_warn.wav',
+        colors: [const Color(0x330063C6), const Color(0xFF0063C6)],
+      ),
+      buildSoundButton(
+        text: '震度速報',
+        soundPath: 'warn.wav',
+        colors: [const Color(0x33F8E495), const Color(0xFFF8E495)],
+      ),
+      buildSoundButton(
+        text: '強震監視器',
+        soundPath: 'warn.wav',
+        colors: [const Color(0x33F8E495), const Color(0xFFF8E495)],
+      ),
+      buildSoundButton(
+        text: '地震報告',
+        soundPath: 'warn.wav',
+        colors: [const Color(0x33F8E495), const Color(0xFFF8E495)],
+      ),
+      buildTitleText(weatherTitle),
+      buildSoundButton(
+        text: '大雷雨即時訊息',
+        soundPath: 'warn.wav',
+        colors: [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      ),
+      buildTitleText(otherTitle),
+      buildSoundButton(
+        text: '大雷雨即時訊息',
+        soundPath: 'warn.wav',
+        colors: [const Color(0x1AFD9800), const Color(0xFFFD9800)],
+      ),
+    ];
 
     if (Platform.isIOS) {
       return CupertinoPageScaffold(
@@ -144,9 +166,22 @@ class NotifyPage extends StatelessWidget {
         ),
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
             child: CustomScrollView(
               slivers: [
+                const SliverToBoxAdapter(
+                  // 新增的文字
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      "僅供音效測試使用",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
                 SliverList(
                   delegate: SliverChildListDelegate(soundButtons),
                 ),
