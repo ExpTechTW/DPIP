@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/setting/location.dart';
+import 'package:dpip/view/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
