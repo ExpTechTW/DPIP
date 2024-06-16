@@ -1,8 +1,8 @@
-<img alt="Logo" src="https://github.com/ExpTechTW/DPIP/blob/master/assets/app_icon.png" width="128px" height="128px" align="left"/>
+<img alt="Logo" src="https://github.com/ExpTechTW/DPIP/blob/main/assets/app_icon.png" width="128px" height="128px" align="left"/>
 
 # Disaster Prevention Information Platform
 防災資訊平台
-<a href="https://github.com/ExpTechTW/TREM/actions/workflows/github_actions.yml"><img alt="GitHub Workflow Status" align="right" src="https://github.com/ExpTechTW/TREM/actions/workflows/github_actions.yml/badge.svg"></a>
+<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/github_actions.yml"><img alt="GitHub Workflow Status" align="right" src="https://github.com/ExpTechTW/DPIP/actions/workflows/github_actions.yml/badge.svg"></a>
 <a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord" align="right" src="https://img.shields.io/discord/926545182407688273?color=%237289DA&logo=discord&logoColor=white"></a>\
 &nbsp;
 
@@ -30,6 +30,8 @@ DPIP 是一款開放原始碼防災資訊軟體，提供給您即時的防災資
 - whes1015 `程式開發` `文件`
 - kamiya10 `程式開發` `介面設計`
 - yayacat `程式開發`
+- Yoyochou0901 `程式開發` `介面設計`
+- lowrt `程式開發`
 
 ## 如何貢獻
 點擊 [Repo](https://github.com/ExpTechTW/TREM) 首頁右上角的 Code 按鈕後點擊 Download ZIP 來下載原始碼壓縮檔\
