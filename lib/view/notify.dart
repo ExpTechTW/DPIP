@@ -20,14 +20,14 @@ class NotifyPage extends StatelessWidget {
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(left: 15,right: 10,top: 5,bottom: 5),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: colors,
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: const BorderRadius.all(Radius.circular(90)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,18 +100,13 @@ class NotifyPage extends StatelessWidget {
         'colors': [const Color(0x33F8E495), const Color(0xFFF8E495)],
       },
       {
-        'text': '大雷雨及時訊息',
+        'text': '大雷雨即時訊息',
         'soundPath': 'warn.wav',
         'colors': [const Color(0x1AFD9800), const Color(0xFFFD9800)],
       },
-      {
-        'text': '強震即時警報 (EEW)',
-        'soundPath': 'warn.wav',
-        'colors': [const Color(0x660063C6), const Color(0xFF0063C6)],
-      },
     ];
 
-    final List<Widget> soundButtons = soundButtonsData.map(
+     List<Widget> soundButtons = soundButtonsData.map(
           (data) => buildSoundButton(
         text: data['text'],
         soundPath: data['soundPath'],
@@ -143,10 +138,21 @@ class NotifyPage extends StatelessWidget {
           title: const Text("音效測試"),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
+          child:
+          Padding(
+            padding: const EdgeInsets.only(left: 16,right: 16,),
             child: CustomScrollView(
-              slivers: [
+              slivers: [const SliverToBoxAdapter( // 新增的文字
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child:
+                  Text(
+                    "僅供音效測試使用",
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ),
+              ),
+                
                 SliverList(
                   delegate: SliverChildListDelegate(soundButtons),
                 ),
