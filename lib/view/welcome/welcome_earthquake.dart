@@ -1,6 +1,8 @@
 import 'package:dpip/view/welcome/welcome_notify.dart';
 import 'package:flutter/material.dart';
 
+import '../../global.dart';
+
 class WelcomeEarthquakePage extends StatefulWidget {
   const WelcomeEarthquakePage({Key? key}) : super(key: key);
   @override
@@ -19,34 +21,71 @@ class _WelcomeEarthquakePageState extends State<WelcomeEarthquakePage> {
                   const Text("內文"),
                   Align(
                     alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF009E8B), Color(0xFF203864)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) => const WelcomeNotifyPage()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          "下一步",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF009E8B), Color(0xFF203864)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await Global.preference.setBool("monitor", true);
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) => const WelcomeNotifyPage()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              "同意",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF009E8B), Color(0xFF203864)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await Global.preference.setBool("monitor", false);
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) => const WelcomeNotifyPage()));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              "不同意",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  )
+                  ),
                 ]))));
   }
 }
