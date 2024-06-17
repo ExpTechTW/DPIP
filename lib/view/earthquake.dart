@@ -39,6 +39,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   late Timer ntpClock;
   int timeNtp = 0;
   int timeLocal = 0;
+  DateTime currentTime = DateTime.now();
 
   Map<String, Station>? stations;
   Rts? rts;
@@ -146,6 +147,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
     clock = Timer.periodic(const Duration(seconds: 1), (timer) async {
       updateImage();
       updateEEW();
+      currentTime = DateTime.now();
     });
 
     updateStations();
@@ -338,8 +340,18 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
               );
             },
           ),
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '資料時間：${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(width: 8), // 調整資料時間和文字之間的距離
+            ],
+          ),
         ),
-        child: MediaQuery(
+          child: MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
           child: SafeArea(
             child: Padding(
