@@ -15,6 +15,7 @@ class NotifyPage extends StatelessWidget {
   // 生成音效按鈕容器的函式
   Widget buildSoundButton({
     required String text,
+    required String subtitle,
     required String soundPath,
     required List<Color> colors,
   }) {
@@ -30,23 +31,30 @@ class NotifyPage extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 21,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
             ),
           ),
           buildPlayButton(soundPath),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.normal,
-            ),
-          ),
         ],
       ),
     );
@@ -104,38 +112,45 @@ class NotifyPage extends StatelessWidget {
       buildTitleText(eewTitle),
       buildSoundButton(
         text: '強震即時警報(警報)',
+        subtitle: '地震速報所在地',
         soundPath: 'eew_alert.wav',
         colors: [const Color(0x330063C6), const Color(0xFF0063C6)],
       ),
       buildSoundButton(
         text: '地震速報(注意)',
+        subtitle: '地震速報所在地',
         soundPath: 'eew_warn.wav',
         colors: [const Color(0x330063C6), const Color(0xFF0063C6)],
       ),
       buildSoundButton(
         text: '震度速報',
+        subtitle: '地震速報所在地',
         soundPath: 'warn.wav',
         colors: [const Color(0x33F8E495), const Color(0xFFF8E495)],
       ),
       buildSoundButton(
         text: '強震監視器',
+        subtitle: '地震速報所在地',
         soundPath: 'warn.wav',
         colors: [const Color(0x33F8E495), const Color(0xFFF8E495)],
       ),
       buildSoundButton(
         text: '地震報告',
+        subtitle: '地震速報所在地',
         soundPath: 'warn.wav',
         colors: [const Color(0x33F8E495), const Color(0xFFF8E495)],
       ),
       buildTitleText(weatherTitle),
       buildSoundButton(
         text: '大雷雨即時訊息',
+        subtitle: '地震速報所在地',
         soundPath: 'warn.wav',
         colors: [const Color(0x1AFD9800), const Color(0xFFFD9800)],
       ),
       buildTitleText(otherTitle),
       buildSoundButton(
         text: '大雷雨即時訊息',
+        subtitle: '地震速報所在地',
         soundPath: 'warn.wav',
         colors: [const Color(0x1AFD9800), const Color(0xFFFD9800)],
       ),
