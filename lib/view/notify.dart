@@ -166,6 +166,12 @@ class NotifyPage extends StatelessWidget {
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
       buildSoundButton(
+        text: '火山資訊',
+        subtitle: '所在地發布 火山資訊',
+        soundPath: 'warn.wav',
+        colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
+      ),
+      buildSoundButton(
         text: '大雨特報',
         subtitle: '所在地發布 大雨特報',
         soundPath: 'normal.wav',
@@ -235,7 +241,6 @@ class NotifyPage extends StatelessWidget {
               child: CustomScrollView(
                 slivers: [
                   const SliverToBoxAdapter(
-                    // 新增的文字
                     child: Padding(
                       padding: EdgeInsets.only(left: 10),
                       child: Text(
