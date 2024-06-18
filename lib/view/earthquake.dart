@@ -347,7 +347,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                 '資料時間：${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              const SizedBox(width: 8), // 調整資料時間和文字之間的距離
             ],
           ),
         ),
