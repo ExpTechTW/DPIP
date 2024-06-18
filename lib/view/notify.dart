@@ -63,26 +63,26 @@ class NotifyPage extends StatelessWidget {
   Widget buildPlayButton(String soundPath) {
     return Platform.isIOS
         ? CupertinoButton(
-      onPressed: () {
-        playSound(soundPath);
-      },
-      padding: EdgeInsets.zero,
-      child: const Icon(
-        CupertinoIcons.play_circle_fill,
-        color: CupertinoColors.white,
-        size: 32,
-      ),
-    )
+            onPressed: () {
+              playSound(soundPath);
+            },
+            padding: EdgeInsets.zero,
+            child: const Icon(
+              CupertinoIcons.play_circle_fill,
+              color: CupertinoColors.white,
+              size: 32,
+            ),
+          )
         : IconButton(
-      onPressed: () {
-        playSound(soundPath);
-      },
-      icon: const Icon(
-        Icons.play_circle,
-        color: Colors.white,
-        size: 32,
-      ),
-    );
+            onPressed: () {
+              playSound(soundPath);
+            },
+            icon: const Icon(
+              Icons.play_circle,
+              color: Colors.white,
+              size: 32,
+            ),
+          );
   }
 
   // 生成標題文本容器的函式
@@ -103,15 +103,11 @@ class NotifyPage extends StatelessWidget {
     const String weatherTitle = "防災資訊音效";
     const String otherTitle = "其他音效";
 
-
-
-
-
     final List<Widget> soundButtons = [
       buildTitleText(eewTitle),
       buildSoundButton(
         text: '強震即時警報(警報)',
-        subtitle: '地震速報 所在地預估震度 4 以上 或\n最大震度 5弱 以上',
+        subtitle: '地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上',
         soundPath: 'eew_alert.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
