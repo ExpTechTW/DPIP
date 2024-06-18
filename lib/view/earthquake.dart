@@ -637,6 +637,16 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
               },
             ),
           ],
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(width: 10),
+              Text(
+                '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ],
+          ),
         ),
         body: MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
