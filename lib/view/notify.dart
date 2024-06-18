@@ -123,13 +123,13 @@ class NotifyPage extends StatelessWidget {
       ),
       buildSoundButton(
         text: '震度速報',
-        subtitle: '所在地 TREM觀測網 實測震度1以上',
+        subtitle: 'TREM觀測網 所在地實測震度1以上',
         soundPath: 'eq.wav',
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
       buildSoundButton(
         text: '強震監視器',
-        subtitle: 'TREM地震速 報預估震度1以上',
+        subtitle: 'TREM地震速報 預估震度1以上',
         soundPath: 'eq.wav',
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
@@ -154,13 +154,13 @@ class NotifyPage extends StatelessWidget {
       ),
       buildSoundButton(
         text: '海嘯警報(警報)',
-        subtitle: '海嘯警報 所在地預估浪高1公尺以上',
+        subtitle: '所在地發布 海嘯警報(警報) 預估浪高1公尺以上',
         soundPath: 'warn.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
       buildSoundButton(
         text: '海嘯警報(注意)',
-        subtitle: '海嘯警報 所在地預估浪高1公尺以下',
+        subtitle: '所在地發布 海嘯警報(注意) 預估浪高1公尺以下',
         soundPath: 'warn.wav',
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
