@@ -111,32 +111,32 @@ class NotifyPage extends StatelessWidget {
       buildTitleText(eewTitle),
       buildSoundButton(
         text: '強震即時警報(警報)',
-        subtitle: '地震速報 所在地預估震度4以上或最大震度5弱以上',
+        subtitle: '地震速報 所在地預估震度 4 以上 或\n最大震度 5弱 以上',
         soundPath: 'eew_alert.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
       buildSoundButton(
         text: '地震速報(注意)',
-        subtitle: '地震速報 所在地預估震度1以上',
+        subtitle: '地震速報 所在地預估震度 1 以上',
         soundPath: 'eq.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
       buildTitleText(eqTitle),
       buildSoundButton(
         text: '震度速報',
-        subtitle: 'TREM觀測網 所在地實測震度1以上',
+        subtitle: 'TREM觀測網 所在地實測震度 1 以上',
         soundPath: 'eq.wav',
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
       buildSoundButton(
         text: '強震監視器',
-        subtitle: 'TREM地震速報 預估震度1以上',
+        subtitle: 'TREM地震速報 預估震度 1 以上',
         soundPath: 'eq.wav',
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
       buildSoundButton(
         text: '地震報告',
-        subtitle: '地震報告 所在地震度1以上',
+        subtitle: '地震報告 所在地震度 1 以上',
         soundPath: 'report.wav',
         colors: [const Color(0x330063C6), const Color(0xFF0063C6)],
       ),
@@ -155,13 +155,13 @@ class NotifyPage extends StatelessWidget {
       ),
       buildSoundButton(
         text: '海嘯警報(警報)',
-        subtitle: '所在地發布 海嘯警報(警報) 預估浪高1公尺以上',
+        subtitle: '所在地發布 海嘯警報(警報)\n預估浪高 1公尺 以上',
         soundPath: 'warn.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
       buildSoundButton(
         text: '海嘯警報(注意)',
-        subtitle: '所在地發布 海嘯警報(注意) 預估浪高1公尺以下',
+        subtitle: '所在地發布 海嘯警報(注意)\n預估浪高 1公尺 以下',
         soundPath: 'warn.wav',
         colors: [const Color(0x33FFC901), const Color(0xFFFFC901)],
       ),
@@ -199,50 +199,56 @@ class NotifyPage extends StatelessWidget {
     ];
 
     if (Platform.isIOS) {
-      return CupertinoPageScaffold(
-        navigationBar: const CupertinoNavigationBar(
-          middle: Text("音效測試"),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildListDelegate(soundButtons),
-                ),
-              ],
+      return MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.2)),
+        child: CupertinoPageScaffold(
+          navigationBar: const CupertinoNavigationBar(
+            middle: Text("音效測試"),
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: CustomScrollView(
+                slivers: [
+                  SliverList(
+                    delegate: SliverChildListDelegate(soundButtons),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       );
     } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("音效測試"),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-            ),
-            child: CustomScrollView(
-              slivers: [
-                const SliverToBoxAdapter(
-                  // 新增的文字
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      "僅供音效測試使用",
-                      style: TextStyle(fontSize: 18),
+      return MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.2)),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("音效測試"),
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+              ),
+              child: CustomScrollView(
+                slivers: [
+                  const SliverToBoxAdapter(
+                    // 新增的文字
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        "僅供音效測試使用",
+                        style: TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate(soundButtons),
-                ),
-              ],
+                  SliverList(
+                    delegate: SliverChildListDelegate(soundButtons),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
