@@ -350,7 +350,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
             ],
           ),
         ),
-          child: MediaQuery(
+        child: MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
           child: SafeArea(
             child: Padding(
