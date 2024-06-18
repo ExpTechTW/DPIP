@@ -25,7 +25,7 @@ final baseMapOptions = {
   "geojson": "GeoJson",
   "googlemap": "Google 地圖",
   "googletrain": "Google 路線地圖",
-  "googlesatellite": "Google 衛星影象",
+  "googlesatellite": "Google 衛星影像",
   "openstreetmap": "OpenStreetMap"
 };
 
