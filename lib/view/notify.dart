@@ -98,8 +98,8 @@ class NotifyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String eewTitle = "地震速報相關音效";
-    const String eqTitle = "地震資訊音效音效";
+    const String eewTitle = "地震速報音效";
+    const String eqTitle = "地震資訊音效";
     const String weatherTitle = "防災資訊音效";
     const String otherTitle = "其他音效";
 
@@ -121,6 +121,7 @@ class NotifyPage extends StatelessWidget {
         soundPath: 'eq.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
+      buildTitleText(eqTitle),
       buildSoundButton(
         text: '震度速報',
         subtitle: 'TREM觀測網 所在地實測震度1以上',
