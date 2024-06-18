@@ -150,13 +150,13 @@ class NotifyPage extends StatelessWidget {
       buildSoundButton(
         text: '豪雨特報',
         subtitle: '所在地發布 豪雨特報',
-        soundPath: 'wheather.wav',
+        soundPath: 'weather.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
       buildSoundButton(
         text: '海嘯警報(警報)',
         subtitle: '所在地發布 海嘯警報(警報)\n預估浪高 1公尺 以上',
-        soundPath: 'warn.wav',
+        soundPath: 'tuswarn.wav',
         colors: [const Color(0x33FF0000), const Color(0xFFFF0000)],
       ),
       buildSoundButton(
@@ -199,7 +199,7 @@ class NotifyPage extends StatelessWidget {
       buildSoundButton(
         text: '伺服器公告',
         subtitle: 'ExpTech發布之公告',
-        soundPath: 'warn.wav',
+        soundPath: 'info.wav',
         colors: [const Color(0x330063C6), const Color(0xFF0063C6)],
       ),
     ];
