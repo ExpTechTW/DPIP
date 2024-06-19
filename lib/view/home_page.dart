@@ -4,6 +4,7 @@ import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/setting/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
@@ -98,6 +99,40 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   String? currentCity = Global.preference.getString("loc-city");
   String? currentTown = Global.preference.getString("loc-town");
   String currentArea = "";
+
+  Future<void> checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      if (Platform.isIOS) {
+        showCupertinoDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) {
+            Future.delayed(const Duration(seconds: 2), () {
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            });
+            return const CupertinoAlertDialog(
+              content: Center(
+                child: Text(
+                  "無法自動取得位置，可能影響通知體驗。",
+                  style: TextStyle(fontSize: 15),
+                ),
+              ),
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('無法自動取得位置，可能影響通知體驗。'),
+            backgroundColor: Color(0xAA202020),
+          ),
+        );
+      }
+    }
+  }
 
   Future<void> refreshWeather(context) async {
     setState(() {
@@ -280,6 +315,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         });
       }
     });
+    checkLocationPermission();
   }
 
   @override
