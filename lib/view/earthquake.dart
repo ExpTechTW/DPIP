@@ -637,16 +637,6 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
               },
             ),
           ],
-          leading: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(width: 10),
-              Text(
-                '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ],
-          ),
         ),
         body: MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
@@ -656,6 +646,14 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Text(
+                      '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   const Text(
                     "即時資料僅供參考\n實際請以中央氣象署的資料為主",
                     textAlign: TextAlign.center,
