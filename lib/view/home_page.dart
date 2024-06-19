@@ -108,16 +108,18 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
           barrierDismissible: true,
           context: context,
           builder: (context) {
-            Future.delayed(const Duration(seconds: 2), () {
+            Future.delayed(const Duration(seconds: 3), () {
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
               }
             });
             return const CupertinoAlertDialog(
-              content: Center(
+              title: Text("定位權限"),
+              content: Padding(
+                padding: EdgeInsets.only(top: 6),
                 child: Text(
-                  "無法自動取得位置，可能影響通知體驗。",
-                  style: TextStyle(fontSize: 15),
+                  "無法自動取得位置，\n可能影響通知體驗。",
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             );
