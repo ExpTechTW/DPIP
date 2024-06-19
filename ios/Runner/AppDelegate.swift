@@ -10,13 +10,13 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     
     override init() {
         super.init()
-        locationManager = CLLocationManager()
-        locationManager?.delegate = self
-        locationManager?.requestWhenInUseAuthorization()
-        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
-        locationManager?.distanceFilter = 100.0
-        locationManager?.allowsBackgroundLocationUpdates = true
-        locationManager?.pausesLocationUpdatesAutomatically = false
+//        locationManager = CLLocationManager()
+//        locationManager?.delegate = self
+//        locationManager?.requestWhenInUseAuthorization()
+//        locationManager?.desiredAccuracy = kCLLocationAccuracyHundredMeters
+//        locationManager?.distanceFilter = 500.0
+//        locationManager?.allowsBackgroundLocationUpdates = true
+//        locationManager?.pausesLocationUpdatesAutomatically = true
     }
 
     func startMonitoringSignificantLocationChanges() {
