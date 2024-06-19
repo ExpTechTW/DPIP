@@ -298,6 +298,15 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       CupertinoListTile(
+                        leading: const Icon(Icons.web),
+                        title: const Text("官方網站"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://exptech.com.tw"),
+                          );
+                        },
+                      ),
+                      CupertinoListTile(
                         leading: const Icon(SimpleIcons.discord),
                         title: const Text("Discord 社群"),
                         onTap: () {
@@ -524,6 +533,22 @@ class _MePageState extends State<MePage> {
                       Clipboard.setData(
                         const ClipboardData(
                           text: "https://www.github.com/ExpTechTW/DPIP",
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.web),
+                    title: const Text("官方網站"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://www.exptech.com.tw"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://www.exptech.com.tw",
                         ),
                       );
                     },
