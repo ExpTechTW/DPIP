@@ -102,7 +102,6 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   String? currentLocation;
-  static const platform = MethodChannel('com.exptech.dpip/location');
   String location = 'Unknown';
   ThemeMode _themeMode = {
         "light": ThemeMode.light,

@@ -105,30 +105,35 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
     if (permission == LocationPermission.deniedForever) {
       if (Platform.isIOS) {
         showCupertinoDialog(
-          barrierDismissible: true,
+          barrierDismissible: false,
           context: context,
           builder: (context) {
-            Future.delayed(const Duration(seconds: 3), () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
-            });
-            return const CupertinoAlertDialog(
-              title: Text("定位權限"),
-              content: Padding(
+            return CupertinoAlertDialog(
+              title: const Text("無法取得定位權限"),
+              content: const Padding(
                 padding: EdgeInsets.only(top: 6),
                 child: Text(
-                  "無法自動取得位置，\n可能影響通知體驗。",
+                  "無法自動設定所在地，\n請手動設定所在地來取得即時資訊。",
                   style: TextStyle(fontSize: 16),
                 ),
               ),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  child: const Text('確定'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             );
           },
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('無法自動取得位置，可能影響通知體驗。'),
+            content: Text("無法自動設定所在地，請手動設定所在地來取得即時資訊。",
+              style: TextStyle(color: Colors.white),
+            ),
             backgroundColor: Color(0xAA202020),
           ),
         );
