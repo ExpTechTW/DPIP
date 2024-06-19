@@ -61,5 +61,5 @@ flutter:
     - assets/warn.wav
     - assets/weather.wav
     - assets/tw_city.geojson
-    - assets/tuswarn.wav
+    - assets/tsunami.wav
     - assets/info.wav
