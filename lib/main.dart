@@ -168,7 +168,7 @@ class MainAppState extends State<MainApp> {
             ? AndroidSettings(
                 accuracy: LocationAccuracy.medium,
                 distanceFilter: 500,
-                forceLocationManager: false,
+                forceLocationManager: true,
                 intervalDuration: const Duration(minutes: 5),
                 //(Optional) Set foreground notification config to keep the app alive
                 //when going to the background
