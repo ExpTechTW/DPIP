@@ -26,7 +26,7 @@ class _InitPageState extends State<InitPage> {
   List<Widget> bodyPages = [
     const HomePage(),
     // const HistoryPage(),
-    const EarthquakePage(),
+    if (Global.preference.getBool("monitor") == true) const EarthquakePage(),
     // const WelcomePage(),
     const ReportList(),
     // const Radar(), //TODO 更多
@@ -180,27 +180,28 @@ class _InitPageState extends State<InitPage> {
                 _pageController.jumpToPage(currentPageIndex);
               });
             },
-            destinations: const <NavigationDestination>[
+            destinations: <NavigationDestination>[
               // NavigationDestination(
               //     icon: Icon(Icons.history_outlined), label: '歷史'),
-              NavigationDestination(
+              const NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home),
                 label: '首頁',
               ),
-              NavigationDestination(
-                icon: Icon(Icons.heart_broken_outlined),
-                selectedIcon: Icon(Icons.heart_broken),
-                label: '監視器',
-              ),
-              NavigationDestination(
+              if (Global.preference.getBool("monitor") == true)
+                const NavigationDestination(
+                  icon: Icon(Icons.heart_broken_outlined),
+                  selectedIcon: Icon(Icons.heart_broken),
+                  label: '監視器',
+                ),
+              const NavigationDestination(
                 icon: Icon(Icons.analytics_outlined),
                 selectedIcon: Icon(Icons.analytics_rounded),
                 label: '地震報告',
               ),
               // NavigationDestination(
               //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-              NavigationDestination(
+              const NavigationDestination(
                 icon: Icon(Icons.supervised_user_circle_outlined),
                 selectedIcon: Icon(Icons.supervised_user_circle),
                 label: '我',
