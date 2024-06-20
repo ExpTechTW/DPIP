@@ -54,7 +54,7 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                       ),
                       child: ElevatedButton(
                         onPressed: () async {
-                          await Global.preference.setBool("first", false);
+                          await Global.preference.setString("infoVersion", "1.0.0");
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(builder: (context) => const InitPage()),

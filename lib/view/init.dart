@@ -170,7 +170,7 @@ class _InitPageState extends State<InitPage> {
         },
       );
     } else {
-      if (Global.preference.getBool("first") == false) {
+      if (Global.preference.getString("infoVersion") == "1.0.0") {
         return Scaffold(
           bottomNavigationBar: NavigationBar(
             selectedIndex: currentPageIndex,
