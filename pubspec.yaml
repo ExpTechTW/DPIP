@@ -57,3 +57,4 @@ flutter:
     - assets/eew_warn.wav
     - assets/warn.wav
     - assets/tw_city.geojson
+    - assets/tos.md
