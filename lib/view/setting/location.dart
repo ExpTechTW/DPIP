@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
@@ -64,6 +65,20 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     // subscribe new location topic
     await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
     await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+
+    final String response = await rootBundle.loadString('assets/region.json');
+    final data = json.decode(response);
+
+    if (data != null && data.containsKey(currentCity) && data[currentCity].containsKey(currentTown)) {
+      final townData = data[currentCity][currentTown];
+      String lat = townData['lat'].toStringAsFixed(4);
+      String lon = townData['lon'].toStringAsFixed(4);
+      String coordinate = '$lat,$lon';
+
+      messaging.getToken().then((value) {
+        Global.api.postNotifyLocation(Global.packageInfo.version, Platform.isAndroid ? "0" : "1", coordinate, value!);
+      });
+    }
   }
 
   Future<void> setTownLocation(String? value) async {
@@ -79,6 +94,20 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
     await Global.preference.setString("loc-town", currentTown!);
     await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+
+    final String response = await rootBundle.loadString('assets/region.json');
+    final data = json.decode(response);
+
+    if (data != null && data.containsKey(currentCity) && data[currentCity].containsKey(currentTown)) {
+      final townData = data[currentCity][currentTown];
+      String lat = townData['lat'].toStringAsFixed(4);
+      String lon = townData['lon'].toStringAsFixed(4);
+      String coordinate = '$lat,$lon';
+
+      messaging.getToken().then((value) {
+        Global.api.postNotifyLocation(Global.packageInfo.version, Platform.isAndroid ? "0" : "1", coordinate, value!);
+      });
+    }
   }
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
