@@ -298,7 +298,7 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       CupertinoListTile(
-                        leading: const Icon(Icons.web),
+                        leading: const Icon(CupertinoIcons.macwindow),
                         title: const Text("官方網站"),
                         onTap: () {
                           launchUrl(
@@ -343,7 +343,7 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       CupertinoListTile(
-                        leading: const Icon(Icons.pending),
+                        leading: const Icon(CupertinoIcons.ellipsis_circle_fill),
                         title: const Text("服務條款"),
                         onTap: () {
                           launchUrl(
@@ -357,16 +357,19 @@ class _MePageState extends State<MePage> {
                     header: const Text("除錯"),
                     children: [
                       CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.info),
                         title: const Text("版本"),
                         additionalInfo: Text(Global.packageInfo.version),
                         onTap: () {},
                       ),
                       CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.lab_flask_solid),
                         title: const Text("建置號碼"),
                         additionalInfo: Text(Global.packageInfo.buildNumber),
                         onTap: () {},
                       ),
                       CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.square_on_square),
                         title: const Text("複製 FCM Token"),
                         onTap: () {
                           messaging.getToken().then((value) {
@@ -394,6 +397,15 @@ class _MePageState extends State<MePage> {
                       CupertinoListTile(
                         title: const Text("重置 FCM 主題訂閱"),
                         onTap: unsubscribeAllTopics,
+                      ),
+                      CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.graph_square_fill),
+                        title: const Text("系統狀態頁面"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://status.exptech.dev/"),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -688,6 +700,22 @@ class _MePageState extends State<MePage> {
                     leading: const Icon(Icons.bug_report_rounded),
                     title: const Text("重置 FCM 主題訂閱"),
                     onTap: unsubscribeAllTopics,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.query_stats),
+                    title: const Text("系統狀態頁面"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://status.exptech.dev/"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://status.exptech.dev/",
+                        ),
+                      );
+                    },
                   ),
                 ],
               )
