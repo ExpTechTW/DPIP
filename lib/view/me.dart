@@ -396,7 +396,6 @@ class _MePageState extends State<MePage> {
                         onTap: unsubscribeAllTopics,
                       ),
                       CupertinoListTile(
-                        leading: const Icon(Icons.query_stats),
                         title: const Text("系統狀態頁面"),
                         onTap: () {
                           launchUrl(
