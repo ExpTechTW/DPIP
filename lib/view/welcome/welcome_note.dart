@@ -1,5 +1,7 @@
 import 'package:dpip/view/welcome/welcome_earthquake.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class WelcomeNotePage extends StatefulWidget {
   const WelcomeNotePage({Key? key}) : super(key: key);
@@ -8,6 +10,19 @@ class WelcomeNotePage extends StatefulWidget {
 }
 
 class _WelcomeNotePageState extends State<WelcomeNotePage> {
+  String data = "";
+
+  void loadTos() async {
+    data = await rootBundle.loadString('assets/tos.md');
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadTos();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -18,7 +33,16 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
             body: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  const Text("內文"),
+                  // FutureBuilder(
+                  //     future: rootBundle.loadString('assets/tos.md'),
+                  //     builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  //       if (snapshot.hasData) {
+                  //         return Markdown(data: snapshot.data!);
+                  //       } else {
+                  //         return const Center(child: CircularProgressIndicator());
+                  //       }
+                  //     }),
+                  data != "" ? Expanded(child: Markdown(data: data)) : const Center(child: CircularProgressIndicator()),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
