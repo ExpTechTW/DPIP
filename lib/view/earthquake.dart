@@ -39,6 +39,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
   late Timer ntpClock;
   int timeNtp = 0;
   int timeLocal = 0;
+  DateTime currentTime = DateTime.now();
 
   Map<String, Station>? stations;
   Rts? rts;
@@ -146,6 +147,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
     clock = Timer.periodic(const Duration(seconds: 1), (timer) async {
       updateImage();
       updateEEW();
+      currentTime = DateTime.now();
     });
 
     updateStations();
@@ -343,18 +345,20 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.only(top: 43),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 40),
-                    child: Text(
+                    const Text(
                       "即時資料僅供參考\n實際請以中央氣象署的資料為主",
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 14),
                     ),
-                  ),
+                    Text(
+                      '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   Flexible(child: flutterMap),
                   if (eewList.isNotEmpty)
                     Container(
@@ -630,14 +634,20 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
         body: MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.10)),
           child: SafeArea(
+            top: false,
             child: Padding(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.only(top: 0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   const Text(
                     "即時資料僅供參考\n實際請以中央氣象署的資料為主",
                     textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Flexible(child: flutterMap),
                   if (eewList.isNotEmpty)

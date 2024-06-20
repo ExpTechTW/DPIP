@@ -148,7 +148,7 @@ class _MePageState extends State<MePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const NotifyPage(),
+                              builder: (context) => NotifyPage(),
                             ),
                           );
                         },
@@ -164,6 +164,15 @@ class _MePageState extends State<MePage> {
                         onTap: () {
                           launchUrl(
                             Uri.parse("https://www.github.com/ExpTechTW/DPIP"),
+                          );
+                        },
+                      ),
+                      CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.macwindow),
+                        title: const Text("官方網站"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://exptech.com.tw"),
                           );
                         },
                       ),
@@ -204,7 +213,7 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       CupertinoListTile(
-                        leading: const Icon(Icons.pending),
+                        leading: const Icon(CupertinoIcons.ellipsis_circle_fill),
                         title: const Text("服務條款"),
                         onTap: () {
                           launchUrl(
@@ -218,14 +227,17 @@ class _MePageState extends State<MePage> {
                     header: const Text("除錯"),
                     children: [
                       CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.info),
                         title: const Text("版本"),
                         additionalInfo: Text(Global.packageInfo.version),
                       ),
                       CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.lab_flask_solid),
                         title: const Text("建置號碼"),
                         additionalInfo: Text(Global.packageInfo.buildNumber),
                       ),
                       CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.square_on_square),
                         title: const Text("複製 FCM Token"),
                         onTap: () {
                           messaging.getToken().then((value) {
@@ -248,6 +260,15 @@ class _MePageState extends State<MePage> {
                               ),
                             );
                           });
+                        },
+                      ),
+                      CupertinoListTile(
+                        leading: const Icon(CupertinoIcons.graph_square_fill),
+                        title: const Text("系統狀態頁面"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://status.exptech.dev/"),
+                          );
                         },
                       ),
                     ],
@@ -347,7 +368,7 @@ class _MePageState extends State<MePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const NotifyPage(),
+                          builder: (context) => NotifyPage(),
                         ),
                       );
                     },
@@ -388,6 +409,22 @@ class _MePageState extends State<MePage> {
                       Clipboard.setData(
                         const ClipboardData(
                           text: "https://www.github.com/ExpTechTW/DPIP",
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.web),
+                    title: const Text("官方網站"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://www.exptech.com.tw"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://www.exptech.com.tw",
                         ),
                       );
                     },
@@ -519,6 +556,22 @@ class _MePageState extends State<MePage> {
                           ),
                         );
                       });
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.query_stats),
+                    title: const Text("系統狀態頁面"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://status.exptech.dev/"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://status.exptech.dev/",
+                        ),
+                      );
                     },
                   ),
                 ],

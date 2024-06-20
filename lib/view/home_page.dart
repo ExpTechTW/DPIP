@@ -335,67 +335,70 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: CupertinoPageScaffold(
             navigationBar: CupertinoNavigationBar(
-              middle: Row(
-                children: [
-                  const Text(
-                    "首頁",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        // showCupertinoModalPopup(
-                        //   context: context,
-                        //   builder: (context) => Center(
-                        //     child: SizedBox(
-                        //       width: MediaQuery.of(context).size.width * 0.8,
-                        //       child: CupertinoActionSheet(
-                        //     message: SizedBox(
-                        //       height: 200,
-                        //       child: ListView(
-                        //         shrinkWrap: true,
-                        //         children: [
-                        //           for (var item in Areas.getOptions(currentArea))
-                        //             GestureDetector(
-                        //               onTap: () {
-                        //                 setState(() {
-                        //                   _selectedArea = item;
-                        //                 });
-                        //                 refreshWeather(context);
-                        //                 refreshEqReport(context);
-                        //                 Navigator.of(context).pop(); // 關閉彈出視窗
-                        //               },
-                        //               child: Container(
-                        //                 padding: const EdgeInsets.symmetric(vertical: 12),
-                        //                 child: Text(
-                        //                   item,
-                        //                   textAlign: TextAlign.center,
-                        //                   style: const TextStyle(fontSize: 20),
-                        //                 ),
-                        //               ),
-                        //             ),
-                        //         ],
-                        //       ),),),
-                        //     ),
-                        //   ),
-                        // );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            _selectedArea,
-                            style: const TextStyle(fontSize: 28),
-                          ),
-                          // const Icon(CupertinoIcons.right_chevron),
-                        ],
+              middle: Padding(
+                padding: const EdgeInsets.only(left: 48, right: 48),
+                child: Row(
+                  children: [
+                    const Text(
+                      "首頁",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: GestureDetector(
+                        // onTap: () {
+                        //   showCupertinoModalPopup(
+                        //     context: context,
+                        //     builder: (context) => Center(
+                        //       child: SizedBox(
+                        //         width: MediaQuery.of(context).size.width * 0.8,
+                        //         child: CupertinoActionSheet(
+                        //       message: SizedBox(
+                        //         height: 200,
+                        //         child: ListView(
+                        //           shrinkWrap: true,
+                        //           children: [
+                        //             for (var item in Areas.getOptions(currentArea))
+                        //               GestureDetector(
+                        //                 onTap: () {
+                        //                   setState(() {
+                        //                     _selectedArea = item;
+                        //                   });
+                        //                   refreshWeather(context);
+                        //                   refreshEqReport(context);
+                        //                   Navigator.of(context).pop(); // 關閉彈出視窗
+                        //                 },
+                        //                 child: Container(
+                        //                   padding: const EdgeInsets.symmetric(vertical: 12),
+                        //                   child: Text(
+                        //                     item,
+                        //                     textAlign: TextAlign.center,
+                        //                     style: const TextStyle(fontSize: 20),
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //           ],
+                        //         ),),),
+                        //       ),
+                        //     ),
+                        //   );
+                        // },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              _selectedArea,
+                              style: const TextStyle(fontSize: 28),
+                            ),
+                            // const Icon(CupertinoIcons.right_chevron),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             child: Column(
@@ -480,67 +483,70 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
           data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: CupertinoPageScaffold(
             navigationBar: CupertinoNavigationBar(
-              middle: Row(
-                children: [
-                  const Text(
-                    "首頁",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        // showCupertinoModalPopup(
-                        //   context: context,
-                        //   builder: (context) => Center(
-                        //     child: SizedBox(
-                        //       width: MediaQuery.of(context).size.width * 0.8,
-                        //       child: CupertinoActionSheet(
-                        //     message: SizedBox(
-                        //       height: 200,
-                        //       child: ListView(
-                        //         shrinkWrap: true,
-                        //         children: [
-                        //           for (var item in Areas.getOptions(currentArea))
-                        //             GestureDetector(
-                        //               onTap: () {
-                        //                 setState(() {
-                        //                   _selectedArea = item;
-                        //                 });
-                        //                 refreshWeather(context);
-                        //                 refreshEqReport(context);
-                        //                 Navigator.of(context).pop(); // 關閉彈出視窗
-                        //               },
-                        //               child: Container(
-                        //                 padding: const EdgeInsets.symmetric(vertical: 12),
-                        //                 child: Text(
-                        //                   item,
-                        //                   textAlign: TextAlign.center,
-                        //                   style: const TextStyle(fontSize: 20),
-                        //                 ),
-                        //               ),
-                        //             ),
-                        //         ],
-                        //       ),),),
-                        //     ),
-                        //   ),
-                        // );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            _selectedArea,
-                            style: const TextStyle(fontSize: 20),
-                          ),
-                          // const Icon(CupertinoIcons.right_chevron),
-                        ],
+              middle: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  children: [
+                    const Text(
+                      "首頁",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: GestureDetector(
+                        // onTap: () {
+                        //   showCupertinoModalPopup(
+                        //     context: context,
+                        //     builder: (context) => Center(
+                        //       child: SizedBox(
+                        //         width: MediaQuery.of(context).size.width * 0.8,
+                        //         child: CupertinoActionSheet(
+                        //       message: SizedBox(
+                        //         height: 200,
+                        //         child: ListView(
+                        //           shrinkWrap: true,
+                        //           children: [
+                        //             for (var item in Areas.getOptions(currentArea))
+                        //               GestureDetector(
+                        //                 onTap: () {
+                        //                   setState(() {
+                        //                     _selectedArea = item;
+                        //                   });
+                        //                   refreshWeather(context);
+                        //                   refreshEqReport(context);
+                        //                   Navigator.of(context).pop(); // 關閉彈出視窗
+                        //                 },
+                        //                 child: Container(
+                        //                   padding: const EdgeInsets.symmetric(vertical: 12),
+                        //                   child: Text(
+                        //                     item,
+                        //                     textAlign: TextAlign.center,
+                        //                     style: const TextStyle(fontSize: 20),
+                        //                   ),
+                        //                 ),
+                        //               ),
+                        //           ],
+                        //         ),),),
+                        //       ),
+                        //     ),
+                        //   );
+                        // },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              _selectedArea,
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            // const Icon(CupertinoIcons.right_chevron),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             child: Column(

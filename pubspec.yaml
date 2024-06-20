@@ -21,7 +21,7 @@ dependencies:
   firebase_messaging: ^14.9.4
 #  flutter_cache_manager: ^3.3.1
   flutter_local_notifications: ^17.0.1
-  flutter_map: ^7.0.1
+  flutter_map: 6.1.0
   flutter_map_geojson: ^1.0.8
   fluttertoast: ^8.2.5
   geocoding: ^3.0.0
@@ -58,5 +58,12 @@ flutter:
     - assets/region.json
     - assets/eew_alert.wav
     - assets/eew_warn.wav
+    - assets/eq.wav
+    - assets/normal.wav
+    - assets/rain.wav
+    - assets/report.wav
     - assets/warn.wav
+    - assets/weather.wav
     - assets/tw_city.geojson
+    - assets/tsunami.wav
+    - assets/info.wav

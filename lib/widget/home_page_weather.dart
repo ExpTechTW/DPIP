@@ -424,7 +424,7 @@ class HomePageWeather extends StatelessWidget {
                                     Text(
                                       (weather["temp"] as String).split(".")[0],
                                       style: TextStyle(
-                                        fontSize: 96,
+                                        fontSize: 94,
                                         fontWeight: FontWeight.w900,
                                         letterSpacing: 5,
                                         color: Color.lerp(
