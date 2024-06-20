@@ -357,16 +357,19 @@ class _MePageState extends State<MePage> {
                     header: const Text("除錯"),
                     children: [
                       CupertinoListTile(
+                        leading: const Icon(Icons.bug_report_rounded),
                         title: const Text("版本"),
                         additionalInfo: Text(Global.packageInfo.version),
                         onTap: () {},
                       ),
                       CupertinoListTile(
+                        leading: const Icon(Icons.bug_report_rounded),
                         title: const Text("建置號碼"),
                         additionalInfo: Text(Global.packageInfo.buildNumber),
                         onTap: () {},
                       ),
                       CupertinoListTile(
+                        leading: const Icon(Icons.bug_report_rounded),
                         title: const Text("複製 FCM Token"),
                         onTap: () {
                           messaging.getToken().then((value) {
@@ -396,6 +399,7 @@ class _MePageState extends State<MePage> {
                         onTap: unsubscribeAllTopics,
                       ),
                       CupertinoListTile(
+                        leading: const Icon(Icons.query_stats),
                         title: const Text("系統狀態頁面"),
                         onTap: () {
                           launchUrl(
