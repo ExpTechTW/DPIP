@@ -33,15 +33,6 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
             body: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  // FutureBuilder(
-                  //     future: rootBundle.loadString('assets/tos.md'),
-                  //     builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                  //       if (snapshot.hasData) {
-                  //         return Markdown(data: snapshot.data!);
-                  //       } else {
-                  //         return const Center(child: CircularProgressIndicator());
-                  //       }
-                  //     }),
                   data != "" ? Expanded(child: Markdown(data: data)) : const Center(child: CircularProgressIndicator()),
                   Align(
                     alignment: Alignment.bottomRight,
