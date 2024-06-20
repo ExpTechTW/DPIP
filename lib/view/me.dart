@@ -357,7 +357,7 @@ class _MePageState extends State<MePage> {
                     header: const Text("除錯"),
                     children: [
                       CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.shield_lefthalf_fill),
+                        leading: const Icon(CupertinoIcons.info),
                         title: const Text("版本"),
                         additionalInfo: Text(Global.packageInfo.version),
                         onTap: () {},
@@ -369,7 +369,7 @@ class _MePageState extends State<MePage> {
                         onTap: () {},
                       ),
                       CupertinoListTile(
-                        leading: const Icon(CupertinoIcons.hammer_fill),
+                        leading: const Icon(CupertinoIcons.square_on_square),
                         title: const Text("複製 FCM Token"),
                         onTap: () {
                           messaging.getToken().then((value) {
