@@ -33,7 +33,29 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
             body: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  data != "" ? Expanded(child: Markdown(data: data)) : const Center(child: CircularProgressIndicator()),
+                  const Text(
+                    "請詳閱並同意以下條款",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Flexible(
+                      flex: 1,
+                      child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Container(
+                              decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.5)!,
+                                      Color.lerp(const Color(0xFF203864), Colors.transparent, 0.5)!
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  border: Border.all(color: const Color(0xFF606060), width: 2)),
+                              child: data != ""
+                                  ? Markdown(data: data)
+                                  : const Center(child: CircularProgressIndicator())))),
                   Align(
                     alignment: Alignment.bottomLeft,
                     child: Container(

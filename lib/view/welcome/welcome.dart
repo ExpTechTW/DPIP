@@ -65,11 +65,11 @@ class _WelcomePageState extends State<WelcomePage> {
                                   children: [
                                     Text(
                                       "DPIP",
-                                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
                                     ),
                                     Text(
                                       "防災資訊整合平台",
-                                      style: TextStyle(fontSize: 16),
+                                      style: TextStyle(fontSize: 16, color: Colors.white),
                                     ),
                                     SizedBox(
                                       height: 10,
