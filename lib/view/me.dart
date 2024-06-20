@@ -395,6 +395,15 @@ class _MePageState extends State<MePage> {
                         title: const Text("重置 FCM 主題訂閱"),
                         onTap: unsubscribeAllTopics,
                       ),
+                      CupertinoListTile(
+                        leading: const Icon(Icons.query_stats),
+                        title: const Text("系統狀態頁面"),
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse("https://status.exptech.dev/"),
+                          );
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -688,6 +697,22 @@ class _MePageState extends State<MePage> {
                     leading: const Icon(Icons.bug_report_rounded),
                     title: const Text("重置 FCM 主題訂閱"),
                     onTap: unsubscribeAllTopics,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.query_stats),
+                    title: const Text("系統狀態頁面"),
+                    onTap: () {
+                      launchUrl(
+                        Uri.parse("https://status.exptech.dev/"),
+                      );
+                    },
+                    onLongPress: () {
+                      Clipboard.setData(
+                        const ClipboardData(
+                          text: "https://status.exptech.dev/",
+                        ),
+                      );
+                    },
                   ),
                 ],
               )
