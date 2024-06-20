@@ -18,7 +18,29 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
             body: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  const Text("內文"),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.5)!,
+                              Color.lerp(const Color(0xFF203864), Colors.transparent, 0.5)!
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(20.0),
+                          border: Border.all(color: const Color(0xFF606060), width: 2)),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          "請開啟通知權限，以收取地震速報及即時劇烈天氣通知。",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: Container(
@@ -44,7 +66,7 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                           elevation: 0,
                         ),
                         child: const Text(
-                          "開始使用",
+                          "確認並開始使用",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
