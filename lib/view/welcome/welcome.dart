@@ -31,13 +31,37 @@ class _WelcomePageState extends State<WelcomePage> {
                     child: Stack(children: [
                       Align(
                         alignment: Alignment.center,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(0.0), // 設定圓角半徑
-                          child: Image.asset(
-                            'assets/app_icon.png',
-                            width: 100,
-                            height: 100,
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                'assets/app_icon.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "DPIP",
+                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "防災資訊整合平台",
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                       Align(
