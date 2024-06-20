@@ -54,5 +54,12 @@ flutter:
     - assets/region.json
     - assets/eew_alert.wav
     - assets/eew_warn.wav
+    - assets/eq.wav
+    - assets/normal.wav
+    - assets/rain.wav
+    - assets/report.wav
     - assets/warn.wav
+    - assets/weather.wav
     - assets/tw_city.geojson
+    - assets/tsunami.wav
+    - assets/info.wav
