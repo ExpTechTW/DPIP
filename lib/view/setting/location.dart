@@ -223,14 +223,21 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
           children: [
             CupertinoListTile(
               title: const Text("自動設定"),
-              subtitle: const Text("使用手機定位自動設定所在地"),
+              subtitle: const Text("使用裝置定位自動設定所在地"),
               trailing: CupertinoSwitch(
                 value: isLocationAutoSetEnabled,
-                onChanged: null,
+                onChanged: (value) {
+                  if (value) {
+                    setState(() async {
+                      toggleLocationAutoSet(await openLocationSettings());
+                    });
+                  } else {
+                    setState(() {
+                      toggleLocationAutoSet(false);
+                    });
+                  }
+                },
               ),
-              onTap: () async {
-                toggleLocationAutoSet(await openLocationSettings());
-              },
             ),
             CupertinoListSection(
               header: const Text("所在地"),
@@ -281,7 +288,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
           children: [
             ListTile(
               title: const Text("自動設定"),
-              subtitle: const Text("使用手機定位自動設定所在地\n⚠ 此功能目前還在製作中"),
+              subtitle: const Text("使用裝置定位自動設定所在地\n⚠ 此功能目前還在製作中"),
               trailing: Switch(
                 value: isLocationAutoSetEnabled,
                 onChanged: (value) {
