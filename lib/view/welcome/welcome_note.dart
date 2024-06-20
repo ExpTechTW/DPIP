@@ -35,7 +35,7 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
                 child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   data != "" ? Expanded(child: Markdown(data: data)) : const Center(child: CircularProgressIndicator()),
                   Align(
-                    alignment: Alignment.bottomRight,
+                    alignment: Alignment.bottomLeft,
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(15),
@@ -55,7 +55,7 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
                           elevation: 0,
                         ),
                         child: const Text(
-                          "下一步",
+                          "同意並繼續",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -63,7 +63,7 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ]))));
   }
 }
