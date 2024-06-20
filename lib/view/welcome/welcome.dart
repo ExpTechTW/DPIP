@@ -50,10 +50,11 @@ class _WelcomePageState extends State<WelcomePage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(20),
                                   child: Image.asset(
-                                    'assets/app_icon.png',
-                                    fit: BoxFit.cover,
+                                    'assets/DPIP.png',
+                                    width: 100,
+                                    height: 100,
                                   ),
                                 ),
                                 const SizedBox(
@@ -65,11 +66,11 @@ class _WelcomePageState extends State<WelcomePage> {
                                   children: [
                                     Text(
                                       "DPIP",
-                                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white),
                                     ),
                                     Text(
                                       "防災資訊整合平台",
-                                      style: TextStyle(fontSize: 16, color: Colors.white),
+                                      style: TextStyle(fontSize: 20, color: Colors.white),
                                     ),
                                     SizedBox(
                                       height: 10,
