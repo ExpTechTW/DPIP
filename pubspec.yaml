@@ -16,7 +16,7 @@ dependencies:
   markdown_widget: ^2.2.0
   url_launcher: ^6.2.6
   cupertino_icons: ^1.0.2
-  flutter_map: ^7.0.1
+  flutter_map: 6.1.0
   latlong2: ^0.9.1
   firebase_core: ^2.30.1
   firebase_messaging: ^14.9.0
@@ -55,7 +55,14 @@ flutter:
     - assets/region.json
     - assets/eew_alert.wav
     - assets/eew_warn.wav
+    - assets/eq.wav
+    - assets/normal.wav
+    - assets/rain.wav
+    - assets/report.wav
     - assets/warn.wav
+    - assets/weather.wav
+    - assets/tsunami.wav
+    - assets/info.wav
     - assets/tw_city.geojson
     - assets/tos.md
     - assets/DPIP.png
