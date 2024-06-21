@@ -151,7 +151,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
     });
 
     updateStations();
-    stationClock = Timer.periodic(const Duration(minutes: 1), (timer) async {
+    stationClock = Timer.periodic(const Duration(minutes: 5), (timer) async {
       updateStations();
     });
   }
