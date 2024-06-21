@@ -94,7 +94,11 @@ class _WelcomePageState extends State<WelcomePage> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => const WelcomeNotePage()));
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const WelcomeNotePage(),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,

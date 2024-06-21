@@ -26,66 +26,81 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-            appBar: AppBar(
-              title: const Text("注意事項"),
-            ),
-            body: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  const Text(
-                    "請詳閱並同意以下條款",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  Flexible(
-                      flex: 1,
-                      child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Container(
-                              decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.5)!,
-                                      Color.lerp(const Color(0xFF203864), Colors.transparent, 0.5)!
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  border: Border.all(color: const Color(0xFF606060), width: 2)),
-                              child: data != ""
-                                  ? Markdown(data: data)
-                                  : const Center(child: CircularProgressIndicator())))),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF009E8B), Color(0xFF203864)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("注意事項"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "請詳閱並同意以下條款",
+                style: TextStyle(fontSize: 16),
+              ),
+              Flexible(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.5)!,
+                          Color.lerp(const Color(0xFF203864), Colors.transparent, 0.5)!
+                        ],
                       ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) => const WelcomeEarthquakePage()));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          "同意並繼續",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.0),
+                      border: Border.all(color: const Color(0xFF606060), width: 2),
+                    ),
+                    child: data != ""
+                        ? Markdown(data: data)
+                        : const Center(
+                            child: CircularProgressIndicator(),
                           ),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF009E8B), Color(0xFF203864)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const WelcomeEarthquakePage(),
                         ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      "同意並繼續",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                ]))));
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
