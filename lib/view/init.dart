@@ -133,27 +133,28 @@ class _InitPageState extends State<InitPage> {
         return CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
             currentIndex: currentPageIndex,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
                 activeIcon: Icon(Icons.home),
                 label: '首頁',
               ),
               // BottomNavigationBarItem(
               //     icon: Icon(Icons.history_outlined), label: '歷史'),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.heart_broken_outlined),
-                activeIcon: Icon(Icons.heart_broken),
-                label: '監視器',
-              ),
-              BottomNavigationBarItem(
+              if (Global.preference.getBool("monitor") == true)
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.heart_broken_outlined),
+                  activeIcon: Icon(Icons.heart_broken),
+                  label: '監視器',
+                ),
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.analytics_outlined),
                 activeIcon: Icon(Icons.analytics_rounded),
                 label: '地震報告',
               ),
               // BottomNavigationBarItem(
               //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.supervised_user_circle_outlined),
                 activeIcon: Icon(Icons.supervised_user_circle),
                 label: '我',

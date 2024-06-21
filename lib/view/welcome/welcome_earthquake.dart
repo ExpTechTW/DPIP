@@ -100,8 +100,10 @@ class _WelcomeEarthquakePageState extends State<WelcomeEarthquakePage> {
                         width: 10,
                       ),
                       Container(
-                        decoration:
-                            BoxDecoration(borderRadius: BorderRadius.circular(15), color: const Color(0xFF505050)),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: const Color(0xFF505050),
+                        ),
                         child: ElevatedButton(
                           onPressed: () async {
                             await Global.preference.setBool("monitor", false);
@@ -216,8 +218,10 @@ class _WelcomeEarthquakePageState extends State<WelcomeEarthquakePage> {
                         width: 10,
                       ),
                       Container(
-                        decoration:
-                            BoxDecoration(borderRadius: BorderRadius.circular(15), color: const Color(0xFF505050)),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          color: const Color(0xFF505050),
+                        ),
                         child: ElevatedButton(
                           onPressed: () async {
                             await Global.preference.setBool("monitor", false);

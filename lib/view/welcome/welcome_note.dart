@@ -79,7 +79,7 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
                         end: Alignment.bottomRight,
                       ),
                     ),
-                    child: CupertinoButton(
+                    child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).push(
                           CupertinoPageRoute(
@@ -87,7 +87,10 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
                           ),
                         );
                       },
-                      color: Colors.transparent,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+                      ),
                       child: const Text(
                         "同意並繼續",
                         style: TextStyle(
