@@ -121,8 +121,8 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.5)!,
-                          Color.lerp(const Color(0xFF203864), Colors.transparent, 0.5)!
+                          Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.7)!,
+                          Color.lerp(const Color(0xFF203864), Colors.transparent, 0.7)!
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20.0),
