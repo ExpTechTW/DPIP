@@ -129,46 +129,50 @@ class _InitPageState extends State<InitPage> {
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
-      return CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          currentIndex: currentPageIndex,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: '首頁',
-            ),
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.history_outlined), label: '歷史'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.heart_broken_outlined),
-              activeIcon: Icon(Icons.heart_broken),
-              label: '監視器',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.analytics_outlined),
-              activeIcon: Icon(Icons.analytics_rounded),
-              label: '地震報告',
-            ),
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.supervised_user_circle_outlined),
-              activeIcon: Icon(Icons.supervised_user_circle),
-              label: '我',
-            ),
-          ],
-          onTap: (value) {
-            setState(() {
-              currentPageIndex = value;
-              _pageController.jumpToPage(currentPageIndex);
-            });
+      if (Global.preference.getString("infoVersion") == "1.0.0") {
+        return CupertinoTabScaffold(
+          tabBar: CupertinoTabBar(
+            currentIndex: currentPageIndex,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: '首頁',
+              ),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.history_outlined), label: '歷史'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.heart_broken_outlined),
+                activeIcon: Icon(Icons.heart_broken),
+                label: '監視器',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.analytics_outlined),
+                activeIcon: Icon(Icons.analytics_rounded),
+                label: '地震報告',
+              ),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.supervised_user_circle_outlined),
+                activeIcon: Icon(Icons.supervised_user_circle),
+                label: '我',
+              ),
+            ],
+            onTap: (value) {
+              setState(() {
+                currentPageIndex = value;
+                _pageController.jumpToPage(currentPageIndex);
+              });
+            },
+          ),
+          tabBuilder: (context, index) {
+            return bodyPages[index];
           },
-        ),
-        tabBuilder: (context, index) {
-          return bodyPages[index];
-        },
-      );
+        );
+      } else {
+        return const WelcomePage();
+      }
     } else {
       if (Global.preference.getString("infoVersion") == "1.0.0") {
         return Scaffold(

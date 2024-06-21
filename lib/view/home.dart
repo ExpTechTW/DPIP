@@ -483,7 +483,7 @@ class HomePageState extends State<HomePage> {
                             initialZoom: 7,
                             minZoom: 7,
                             maxZoom: 9,
-                            // interactiveFlags: InteractiveFlag.all - InteractiveFlag.rotate,
+                            interactiveFlags: InteractiveFlag.all - InteractiveFlag.rotate,
                           ),
                           children: [
                             TileLayer(
