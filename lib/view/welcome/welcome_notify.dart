@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../global.dart';
+import '../../main.dart';
 import '../init.dart';
 
 class WelcomeNotifyPage extends StatefulWidget {
   const WelcomeNotifyPage({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _WelcomeNotifyPageState();
 }
@@ -63,6 +65,15 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () async {
+                        await messaging.requestPermission(
+                          alert: true,
+                          announcement: true,
+                          badge: true,
+                          carPlay: true,
+                          criticalAlert: true,
+                          provisional: true,
+                          sound: true,
+                        );
                         await Global.preference.setString("infoVersion", "1.0.0");
                         Navigator.pushAndRemoveUntil(
                           context,
@@ -139,6 +150,15 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
                     ),
                     child: ElevatedButton(
                       onPressed: () async {
+                        await messaging.requestPermission(
+                          alert: true,
+                          announcement: true,
+                          badge: true,
+                          carPlay: true,
+                          criticalAlert: true,
+                          provisional: true,
+                          sound: true,
+                        );
                         await Global.preference.setString("infoVersion", "1.0.0");
                         Navigator.pushAndRemoveUntil(
                           context,
