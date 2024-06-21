@@ -183,7 +183,7 @@ class MainAppState extends State<MainApp> {
               )
             : AppleSettings(
                 accuracy: LocationAccuracy.low,
-                activityType: ActivityType.otherNavigation,
+                activityType: ActivityType.other,
                 distanceFilter: 500,
                 timeLimit: const Duration(minutes: 5),
                 pauseLocationUpdatesAutomatically: true,
