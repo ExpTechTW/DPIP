@@ -34,15 +34,6 @@ void main() async {
   );
   await Global.init();
   await Firebase.initializeApp();
-  await messaging.requestPermission(
-    alert: true,
-    announcement: true,
-    badge: true,
-    carPlay: true,
-    criticalAlert: true,
-    provisional: true,
-    sound: true,
-  );
   FirebaseMessaging.onMessage.listen(messageHandler);
   FirebaseMessaging.onBackgroundMessage(messageHandler);
   FirebaseMessaging.onMessageOpenedApp.listen(messageHandler);

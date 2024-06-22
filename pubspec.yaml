@@ -2,7 +2,7 @@ name: dpip
 description: Disaster Prevention Information Platform
 publish_to: "none"
 
-version: 1.2.4
+version: 1.2.5
 
 environment:
   sdk: ">=3.2.0 <4.0.0"
@@ -37,6 +37,7 @@ dependencies:
   path_provider: ^2.1.3
   fluttertoast: ^8.2.5
   flutter_map_geojson: ^1.0.8
+  flutter_markdown: ^0.7.2
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +61,8 @@ flutter:
     - assets/report.wav
     - assets/warn.wav
     - assets/weather.wav
-    - assets/tw_city.geojson
     - assets/tsunami.wav
     - assets/info.wav
+    - assets/tw_city.geojson
+    - assets/tos.md
+    - assets/DPIP.png

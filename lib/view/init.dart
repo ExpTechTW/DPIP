@@ -4,10 +4,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/earthquake.dart';
 import 'package:dpip/view/report_list.dart';
+import 'package:dpip/view/welcome/welcome.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+import '../global.dart';
 import 'home_page.dart';
 import 'me.dart';
 
@@ -24,7 +26,8 @@ class _InitPageState extends State<InitPage> {
   List<Widget> bodyPages = [
     const HomePage(),
     // const HistoryPage(),
-    const EarthquakePage(),
+    if (Global.preference.getBool("monitor") == true) const EarthquakePage(),
+    // const WelcomePage(),
     const ReportList(),
     // const Radar(), //TODO 更多
     const MePage()
@@ -126,103 +129,113 @@ class _InitPageState extends State<InitPage> {
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
-      return CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          currentIndex: currentPageIndex,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: '首頁',
-            ),
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.history_outlined), label: '歷史'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.heart_broken_outlined),
-              activeIcon: Icon(Icons.heart_broken),
-              label: '監視器',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.analytics_outlined),
-              activeIcon: Icon(Icons.analytics_rounded),
-              label: '地震報告',
-            ),
-            // BottomNavigationBarItem(
-            //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.supervised_user_circle_outlined),
-              activeIcon: Icon(Icons.supervised_user_circle),
-              label: '我',
-            ),
-          ],
-          onTap: (value) {
-            setState(() {
-              currentPageIndex = value;
-              _pageController.jumpToPage(currentPageIndex);
-            });
+      if (Global.preference.getString("infoVersion") == "1.0.0") {
+        return CupertinoTabScaffold(
+          tabBar: CupertinoTabBar(
+            currentIndex: currentPageIndex,
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                activeIcon: Icon(Icons.home),
+                label: '首頁',
+              ),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.history_outlined), label: '歷史'),
+              if (Global.preference.getBool("monitor") == true)
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.heart_broken_outlined),
+                  activeIcon: Icon(Icons.heart_broken),
+                  label: '監視器',
+                ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.analytics_outlined),
+                activeIcon: Icon(Icons.analytics_rounded),
+                label: '地震報告',
+              ),
+              // BottomNavigationBarItem(
+              //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.supervised_user_circle_outlined),
+                activeIcon: Icon(Icons.supervised_user_circle),
+                label: '我',
+              ),
+            ],
+            onTap: (value) {
+              setState(() {
+                currentPageIndex = value;
+                _pageController.jumpToPage(currentPageIndex);
+              });
+            },
+          ),
+          tabBuilder: (context, index) {
+            return bodyPages[index];
           },
-        ),
-        tabBuilder: (context, index) {
-          return bodyPages[index];
-        },
-      );
+        );
+      } else {
+        return const WelcomePage();
+      }
     } else {
-      return Scaffold(
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: currentPageIndex,
-          onDestinationSelected: (index) {
-            setState(() {
-              currentPageIndex = index;
-              _pageController.jumpToPage(currentPageIndex);
-            });
-          },
-          destinations: const <NavigationDestination>[
-            // NavigationDestination(
-            //     icon: Icon(Icons.history_outlined), label: '歷史'),
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: '首頁',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.heart_broken_outlined),
-              selectedIcon: Icon(Icons.heart_broken),
-              label: '監視器',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.analytics_outlined),
-              selectedIcon: Icon(Icons.analytics_rounded),
-              label: '地震報告',
-            ),
-            // NavigationDestination(
-            //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
-            NavigationDestination(
-              icon: Icon(Icons.supervised_user_circle_outlined),
-              selectedIcon: Icon(Icons.supervised_user_circle),
-              label: '我',
-            ),
-          ],
-        ),
-        bottomSheet: Visibility(
-          visible: !isInternetConnected,
-          child: Container(
-            width: double.maxFinite,
-            color: context.colors.surfaceVariant,
-            child: Text(
-              "無網際網路連線",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: context.colors.onSurfaceVariant,
+      if (Global.preference.getString("infoVersion") == "1.0.0") {
+        return Scaffold(
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: currentPageIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                currentPageIndex = index;
+                _pageController.jumpToPage(currentPageIndex);
+              });
+            },
+            destinations: <NavigationDestination>[
+              // NavigationDestination(
+              //     icon: Icon(Icons.history_outlined), label: '歷史'),
+              const NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: '首頁',
+              ),
+              if (Global.preference.getBool("monitor") == true)
+                const NavigationDestination(
+                  icon: Icon(Icons.heart_broken_outlined),
+                  selectedIcon: Icon(Icons.heart_broken),
+                  label: '監視器',
+                ),
+              const NavigationDestination(
+                icon: Icon(Icons.analytics_outlined),
+                selectedIcon: Icon(Icons.analytics_rounded),
+                label: '地震報告',
+              ),
+              // NavigationDestination(
+              //     icon: Icon(Icons.playlist_add_outlined), label: '更多'),
+              const NavigationDestination(
+                icon: Icon(Icons.supervised_user_circle_outlined),
+                selectedIcon: Icon(Icons.supervised_user_circle),
+                label: '我',
+              ),
+            ],
+          ),
+          bottomSheet: Visibility(
+            visible: !isInternetConnected,
+            child: Container(
+              width: double.maxFinite,
+              color: context.colors.surfaceVariant,
+              child: Text(
+                "無網際網路連線",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: context.colors.onSurfaceVariant,
+                ),
               ),
             ),
           ),
-        ),
-        body: PageView(
-          controller: _pageController,
-          physics: const NeverScrollableScrollPhysics(),
-          children: bodyPages,
-        ),
-      );
+          body: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: bodyPages,
+          ),
+        );
+      } else {
+        return const WelcomePage();
+      }
     }
   }
 }
