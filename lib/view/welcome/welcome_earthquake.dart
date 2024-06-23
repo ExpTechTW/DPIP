@@ -48,7 +48,7 @@ class _WelcomeEarthquakePageState extends State<WelcomeEarthquakePage> {
                         borderRadius: BorderRadius.circular(20.0),
                         border: Border.all(color: const Color(0xFF606060), width: 2),
                       ),
-                      child: const Markdown(
+                      child: Markdown(
                         data: "- 強震監視器是由 TREM（臺灣即時地震監測）觀測到 全臺 現在的震動做為即時震度顯示的功能。\n"
                             "- 地震發生當下，可以透過站點顏色變化，觀察地震波傳播情形。\n"
                             "- 中央氣象署發布強震即時警報（地震速報）後，圖層上會顯示出 P 波（藍色）S 波（紅色）的預估地震波傳播狀況。\n"
@@ -56,6 +56,11 @@ class _WelcomeEarthquakePageState extends State<WelcomeEarthquakePage> {
                             "- 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
                             "\n"
                             "### 注意：若關閉此功能，也無法看到地圖上發布中的地震速報。",
+                        styleSheet: MarkdownStyleSheet(
+                          p: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          h3: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          listBullet: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                        ),
                       ),
                     ),
                   ),
