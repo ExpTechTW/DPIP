@@ -102,7 +102,6 @@ class MainApp extends StatefulWidget {
 
 class MainAppState extends State<MainApp> {
   String? currentLocation;
-  String location = 'Unknown';
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
