@@ -64,5 +64,6 @@ flutter:
     - assets/tsunami.wav
     - assets/info.wav
     - assets/tw_city.geojson
+    - assets/important_hint.md
     - assets/tos.md
     - assets/DPIP.png
