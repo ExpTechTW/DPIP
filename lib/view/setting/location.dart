@@ -46,6 +46,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> setCityLocation(String? value) async {
     if (value == null) return;
+
+    showLoadingDialog();
     // unsubscribe old location topic
     if (currentCity != null) {
       await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
@@ -79,10 +81,13 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         Global.api.postNotifyLocation(Global.packageInfo.version, Platform.isAndroid ? "0" : "1", coordinate, value!);
       });
     }
+    Navigator.pop(context);
   }
 
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
+
+    showLoadingDialog();
 
     if (currentTown != null) {
       await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
@@ -107,6 +112,43 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       messaging.getToken().then((value) {
         Global.api.postNotifyLocation(Global.packageInfo.version, Platform.isAndroid ? "0" : "1", coordinate, value!);
       });
+    }
+    Navigator.pop(context);
+  }
+
+  void showLoadingDialog() {
+    if (Platform.isIOS) {
+      showCupertinoDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const CupertinoAlertDialog(
+            content: Row(
+              children: [
+                CupertinoActivityIndicator(),
+                SizedBox(width: 24),
+                Text("載入中..."),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 24),
+                Text("載入中..."),
+              ],
+            ),
+          );
+        },
+      );
     }
   }
 
