@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../../global.dart';
 import '../../main.dart';
@@ -15,6 +17,19 @@ class WelcomeNotifyPage extends StatefulWidget {
 }
 
 class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
+  String data = "";
+
+  void load() async {
+    data = await rootBundle.loadString('assets/important_hint.md');
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (Platform.isIOS) {
@@ -28,26 +43,33 @@ class _WelcomeNotifyPageState extends State<WelcomeNotifyPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.7)!,
-                          Color.lerp(const Color(0xFF203864), Colors.transparent, 0.7)!
-                        ],
+                Flexible(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color.lerp(const Color(0xFF009E8B), Colors.transparent, 0.7)!,
+                            Color.lerp(const Color(0xFF203864), Colors.transparent, 0.7)!
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20.0),
+                        border: Border.all(color: const Color(0xFF606060), width: 2),
                       ),
-                      borderRadius: BorderRadius.circular(20.0),
-                      border: Border.all(color: const Color(0xFF606060), width: 2),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        "請開啟通知權限，以收取地震速報及即時劇烈天氣通知。",
-                        style: TextStyle(fontSize: 16),
+                      child: data.isNotEmpty
+                          ? Markdown(data: data,
+                        styleSheet: MarkdownStyleSheet(
+                          p: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          h2: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          h3: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                        ),
+                      )
+                          : const Center(
+                        child: CupertinoActivityIndicator(),
                       ),
                     ),
                   ),

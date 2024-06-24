@@ -61,10 +61,17 @@ class _WelcomeNotePageState extends State<WelcomeNotePage> {
                         border: Border.all(color: const Color(0xFF606060), width: 2),
                       ),
                       child: data.isNotEmpty
-                          ? Markdown(data: data)
+                          ? Markdown(data: data,
+                        styleSheet: MarkdownStyleSheet(
+                          p: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          h2: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          h3: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                          listBullet: TextStyle(color: CupertinoColors.label.resolveFrom(context)),
+                        ),
+                      )
                           : const Center(
-                              child: CupertinoActivityIndicator(),
-                            ),
+                        child: CupertinoActivityIndicator(),
+                      ),
                     ),
                   ),
                 ),
