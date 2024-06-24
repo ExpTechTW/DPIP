@@ -23,7 +23,6 @@ final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
-Position? lastPosition;
 
 const String darwinNotificationCategoryText = 'textCategory';
 const String navigationActionId = 'id_3';
@@ -101,7 +100,6 @@ class MainApp extends StatefulWidget {
 }
 
 class MainAppState extends State<MainApp> {
-  String? currentLocation;
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
