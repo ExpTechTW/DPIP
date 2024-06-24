@@ -130,34 +130,7 @@ class MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    initializeBackgroundTask();
-  }
-
-  void initializeBackgroundTask() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
-
-    if (isLocationAutoSetEnabled) {
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return Future.error('定位服務被禁止。');
-      }
-
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return Future.error('位置權限被拒絕。');
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return Future.error('位置權限被永久拒絕，我們無法請求權限。');
-      }
-
-      startPositionStream();
-    }
+    startPositionStream();
   }
 
   void startPositionStream() {
@@ -236,7 +209,6 @@ class MainAppState extends State<MainApp> {
 
   //     lastPosition = position;
   //   });
-  //   print('位置已開啟');
   // }
 
   void stopPositionStream() {
@@ -257,36 +229,6 @@ class MainAppState extends State<MainApp> {
 
   // static Future<void> disposeCallback() async {
   //   print('Locator disposed');
-  // }
-
-  // static Future<void> locationCallback(locationDto) async {
-  //   double latitude = locationDto.latitude;
-  //   double longitude = locationDto.longitude;
-
-  //   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
-  //   if (placemarks.isNotEmpty) {
-  //     Placemark place = placemarks.first;
-  //     String address = '${place.street}, ${place.locality}, ${place.country}';
-  //     print('Current location address: $address');
-  //   } else {
-  //     print('No address available for the current location');
-  //   }
-
-  //   String coordinate = '$latitude,$longitude';
-  //   String? token = await messaging.getToken();
-  //   if (token != null) {
-  //     try {
-  //       String response = await Global.api.postNotifyLocation(
-  //         "0.0.0",
-  //         "Android",
-  //         coordinate,
-  //         token,
-  //       );
-  //       print(response);
-  //     } catch (error) {
-  //       print('Location update error: $error');
-  //     }
-  //   }
   // }
 
   // static void notificationCallback() {
