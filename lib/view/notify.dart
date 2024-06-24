@@ -47,7 +47,7 @@ class NotifyPage extends StatelessWidget {
       ),
       SoundButton(
         text: '強震監視器',
-        subtitle: 'TREM地震速報 預估震度 1 以上',
+        subtitle: 'TREM觀測網 偵測到晃動',
         soundPath: 'eq.wav',
         colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,

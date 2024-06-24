@@ -23,6 +23,7 @@ dependencies:
   flutter_local_notifications: ^17.0.1
   flutter_map: 6.1.0
   flutter_map_geojson: ^1.0.8
+  flutter_markdown: ^0.7.2
   fluttertoast: ^8.2.5
   geocoding: ^3.0.0
   geolocator: ^12.0.0
@@ -64,6 +65,9 @@ flutter:
     - assets/report.wav
     - assets/warn.wav
     - assets/weather.wav
-    - assets/tw_city.geojson
     - assets/tsunami.wav
     - assets/info.wav
+    - assets/tw_city.geojson
+    - assets/important_hint.md
+    - assets/tos.md
+    - assets/DPIP.png
