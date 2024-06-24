@@ -127,11 +127,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               children: [
                 CupertinoActivityIndicator(),
                 SizedBox(width: 24),
-                Expanded(
-                  child: Center(
-                    child: Text("避免重複通知訂閱問題\n請稍候"),
-                  ),
-                ),
+                Text("正在更新設定..."),
               ],
             ),
           );
@@ -147,7 +143,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               children: [
                 CircularProgressIndicator(),
                 SizedBox(width: 24),
-                Text("避免重複通知訂閱問題\n請稍候"),
+                Text("正在更新設定..."),
               ],
             ),
           );
