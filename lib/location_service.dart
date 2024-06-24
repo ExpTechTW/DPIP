@@ -8,7 +8,7 @@ class LocationService {
   final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
   StreamSubscription<Position>? positionStreamSubscription;
 
-  void startPositionStream() {
+  void startPositionStream() async {
     if (positionStreamSubscription == null) {
       final positionStream = geolocatorPlatform.getPositionStream(
         locationSettings: Platform.isAndroid
@@ -36,10 +36,10 @@ class LocationService {
                 allowBackgroundLocationUpdates: true,
               ),
       );
-      positionStreamSubscription = positionStream.handleError((error) {
-        positionStreamSubscription?.cancel();
+      positionStreamSubscription = positionStream.handleError((error) async {
+        await positionStreamSubscription?.cancel();
         positionStreamSubscription = null;
-      }).listen((Position? position) async {
+      }).listen((Position? position) {
         if (position != null) {
           String lat = position.latitude.toStringAsFixed(4);
           String lon = position.longitude.toStringAsFixed(4);
@@ -58,9 +58,11 @@ class LocationService {
     }
   }
 
-  void stopPositionStream() {
-    positionStreamSubscription?.cancel();
-    positionStreamSubscription = null;
-    print('位置已停止');
+  void stopPositionStream() async {
+    if (positionStreamSubscription != null) {
+      await positionStreamSubscription?.cancel();
+      positionStreamSubscription = null;
+      print('位置已停止');
+    }
   }
 }
