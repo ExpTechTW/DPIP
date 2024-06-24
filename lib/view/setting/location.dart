@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:dpip/core/utils.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/location_service.dart';
 import 'package:dpip/main.dart';
 import 'package:dpip/view/setting/location_utils.dart';
 import 'package:dpip/view/setting/ios/cupertino_city_page.dart';
@@ -29,6 +30,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   String? backgroundLocationData;
   bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  LocationService locationService = LocationService();
 
   @override
   void initState() {
@@ -167,7 +169,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     setState(() {
       isLocationAutoSetEnabled = isEnabled;
       if (isLocationAutoSetEnabled) {
-        MainAppState().startPositionStream();
+        locationService.startPositionStream();
         getLocation();
       }
     });
@@ -244,10 +246,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     setState(() {
       isLocationAutoSetEnabled = value;
       if (isLocationAutoSetEnabled) {
-        MainAppState().startPositionStream();
+        locationService.startPositionStream();
         getLocation();
       } else {
-        MainAppState().stopPositionStream();
+        locationService.stopPositionStream();
       }
     });
     await fetchNotificationIcon();

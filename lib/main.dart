@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:geolocator/geolocator.dart';
 
+import 'location_service.dart';
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
 
@@ -21,8 +21,6 @@ final FirebaseMessaging messaging = FirebaseMessaging.instance;
 final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
     StreamController<ReceivedNotification>.broadcast();
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
-final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
-StreamSubscription<Position>? positionStreamSubscription;
 
 const String darwinNotificationCategoryText = 'textCategory';
 const String navigationActionId = 'id_3';
@@ -107,6 +105,9 @@ class MainAppState extends State<MainApp> {
       }[Global.preference.getString('theme')] ??
       ThemeMode.system;
 
+  String location = 'Unknown';
+  LocationService locationService = LocationService();
+
   void changeTheme(String themeMode) {
     setState(() {
       switch (themeMode) {
@@ -128,110 +129,14 @@ class MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    startPositionStream();
-  }
-
-  void startPositionStream() {
-    if (positionStreamSubscription == null) {
-      final positionStream = geolocatorPlatform.getPositionStream(
-        locationSettings: Platform.isAndroid
-            ? AndroidSettings(
-                accuracy: LocationAccuracy.medium,
-                distanceFilter: 500,
-                forceLocationManager: false,
-                intervalDuration: const Duration(minutes: 5),
-                //(Optional) Set foreground notification config to keep the app alive
-                //when going to the background
-                foregroundNotificationConfig: const ForegroundNotificationConfig(
-                  notificationText: "服務中...",
-                  notificationTitle: "DPIP 背景定位",
-                  notificationChannelName: '背景定位',
-                  enableWifiLock: true,
-                  enableWakeLock: true,
-                  setOngoing: false,
-                ),
-              )
-            : AppleSettings(
-                accuracy: LocationAccuracy.low,
-                activityType: ActivityType.other,
-                distanceFilter: 500,
-                timeLimit: const Duration(minutes: 5),
-                pauseLocationUpdatesAutomatically: true,
-                // Only set to true if our app will be started up in the background.
-                showBackgroundLocationIndicator: false,
-                allowBackgroundLocationUpdates: true,
-              ),
-      );
-      positionStreamSubscription = positionStream.handleError((error) {
-        positionStreamSubscription?.cancel();
-        positionStreamSubscription = null;
-      }).listen((Position? position) async {
-        if (position != null) {
-          String? lat = position.latitude.toStringAsFixed(4);
-          String? lon = position.longitude.toStringAsFixed(4);
-          String? coordinate = '$lat,$lon';
-          messaging.getToken().then((value) {
-            Global.api.postNotifyLocation(
-              Global.packageInfo.version,
-              Platform.isAndroid ? "0" : "1",
-              coordinate,
-              value!,
-            );
-          });
-        }
-      });
-      print('位置已開啟');
-    }
-  }
-
-  //   positionStreamSubscription = Geolocator.getPositionStream(
-  //     locationSettings: locationSettings,
-  //   )
-  //   .listen((Position position) {
-  //     setState(() {
-  //       currentLocation = '位置: ${position.latitude}, ${position.longitude}';
-  //     });
-
-  //     if (lastPosition != null) {
-  //       double distance = Geolocator.distanceBetween(
-  //         lastPosition!.latitude,
-  //         lastPosition!.longitude,
-  //         position.latitude,
-  //         position.longitude,
-  //       );
-
-  //       if (distance >= 100) {
-  //         stopPositionStream();
-  //       }
-  //     }
-
-  //     lastPosition = position;
-  //   });
-  // }
-
-  void stopPositionStream() {
-    positionStreamSubscription?.cancel();
-    positionStreamSubscription = null;
-    print('位置已停止');
+    locationService.startPositionStream();
   }
 
   @override
   void dispose() {
-    stopPositionStream();
+    locationService.stopPositionStream();
     super.dispose();
   }
-
-  // static Future<void> initCallback(Map<dynamic, dynamic> params) async {
-  //   print('Locator initialized');
-  // }
-
-  // static Future<void> disposeCallback() async {
-  //   print('Locator disposed');
-  // }
-
-  // static void notificationCallback() {
-  //   print('Notification clicked');
-  // }
 
   @override
   Widget build(BuildContext context) {
