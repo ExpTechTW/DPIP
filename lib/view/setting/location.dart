@@ -173,7 +173,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     //     getLocation();
     //   }
     // });
-    toggleLocationAutoSet(await openLocationSettings(false));
+    toggleLocationAutoSet(await openLocationSettings(true));
   }
 
   Future<void> getLocation() async {
