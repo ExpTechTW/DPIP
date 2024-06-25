@@ -38,14 +38,16 @@
         </activity>
         <receiver android:name="com.exptech.dpip.BootBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <service android:name="com.exptech.dpip.location.Service"
             android:permission="android.permission.FOREGROUND_SERVICE"
-            android:exported="true"
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="true"
             android:foregroundServiceType="location"/>
         <meta-data
                 android:name="flutterEmbedding"
