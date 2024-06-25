@@ -121,9 +121,12 @@ class MainAppState extends State<MainApp> {
   @override
   Future<void> initState() async {
     super.initState();
-    if (await openLocationSettings()) {
+    bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
+    isLocationAutoSetEnabled = await openLocationSettings();
+    if (isLocationAutoSetEnabled) {
       locationService.startPositionStream();
     }
+    await Global.preference.setBool("loc-auto", isLocationAutoSetEnabled);
   }
 
   // @override
