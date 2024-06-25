@@ -166,13 +166,14 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     //     isEnabled = true;
     //   }
     // }
-    setState(() async {
-      isLocationAutoSetEnabled = await openLocationSettings();
-      if (isLocationAutoSetEnabled) {
-        locationService.startPositionStream();
-        getLocation();
-      }
-    });
+    // setState(() async {
+    //   isLocationAutoSetEnabled = await openLocationSettings();
+    //   if (isLocationAutoSetEnabled) {
+    //     locationService.startPositionStream();
+    //     getLocation();
+    //   }
+    // });
+    toggleLocationAutoSet(await openLocationSettings());
   }
 
   Future<void> getLocation() async {
