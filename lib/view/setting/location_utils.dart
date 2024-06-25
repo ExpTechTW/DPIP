@@ -6,28 +6,21 @@ import 'package:url_launcher/url_launcher.dart';
 
 Future<bool> openLocationSettings(bool init) async {
   if (Platform.isAndroid) {
+    LocationPermission permission = await Geolocator.checkPermission();
     if (init) {
-      LocationPermission permission = await Geolocator.checkPermission();
-
       if (permission == LocationPermission.always) {
         return true;
       }
     } else {
-      LocationPermission permission = await Geolocator.checkPermission();
-
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
 
         if (permission == LocationPermission.deniedForever) {
-          Geolocator.openLocationSettings();
+          Geolocator.openAppSettings();
         }
 
         if (permission == LocationPermission.whileInUse) {
-          permission = await Geolocator.requestPermission();
-
-          if (permission == LocationPermission.always) {
-            return true;
-          }
+          Geolocator.openAppSettings();
         }
 
         if (permission == LocationPermission.always) {
@@ -36,15 +29,11 @@ Future<bool> openLocationSettings(bool init) async {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        Geolocator.openLocationSettings();
+        Geolocator.openAppSettings();
       }
 
       if (permission == LocationPermission.whileInUse) {
-        permission = await Geolocator.requestPermission();
-
-        if (permission == LocationPermission.always) {
-          return true;
-        }
+        Geolocator.openAppSettings();
       }
 
       if (permission == LocationPermission.always) {
