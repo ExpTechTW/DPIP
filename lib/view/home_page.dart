@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/setting/location.dart';
-import 'package:dpip/view/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -221,7 +220,34 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   void checkIsSetArea(context) {
     setState(() {});
     if (Global.preference.getString("loc-city") == null) {
-      showDialog(
+      if (Platform.isIOS) {
+        showCupertinoDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoAlertDialog(
+              content: const Text("尚未設定所在區域\n請前往設定",
+                style: TextStyle(fontSize: 15),
+              ),
+              actions: <CupertinoDialogAction>[
+                CupertinoDialogAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => const LocationSettingsPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('確定'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
           barrierDismissible: false,
           context: context,
           builder: (BuildContext context) {
@@ -243,7 +269,9 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                 ),
               ],
             );
-          });
+          },
+        );
+      }
     }
   }
 
