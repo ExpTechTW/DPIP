@@ -5,6 +5,7 @@ import 'package:dpip/view/setting/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
@@ -93,6 +94,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   bool weatherRefreshing = true;
   bool eqReportRefreshing = true;
   bool cityIntRefreshing = true;
+  bool doNotRemindAgain = false;
   late TemperatureColor tempToColor;
   final ScrollController _controller = ScrollController();
   var distCode = 100;
@@ -100,9 +102,24 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   String? currentTown = Global.preference.getString("loc-town");
   String currentArea = "";
 
+  Future<void> loadDoNotRemindAgain() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      doNotRemindAgain = prefs.getBool('doNotRemindAgain') ?? false;
+    });
+  }
+
+  Future<void> setDoNotRemindAgain(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      doNotRemindAgain = value;
+      prefs.setBool('doNotRemindAgain', value);
+    });
+  }
+
   Future<void> checkLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.deniedForever && !doNotRemindAgain) {
       if (Platform.isIOS) {
         showCupertinoDialog(
           barrierDismissible: false,
@@ -119,9 +136,18 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
               ),
               actions: <Widget>[
                 CupertinoDialogAction(
-                  child: const Text('確定'),
+                  child: const Text("確定"),
                   onPressed: () {
                     Navigator.of(context).pop();
+                  },
+                ),
+                CupertinoDialogAction(
+                  child: const Text("下次不再提醒",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setDoNotRemindAgain(true);
                   },
                 ),
               ],
@@ -351,6 +377,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         });
       }
     });
+    loadDoNotRemindAgain();
     checkLocationPermission();
   }
 
