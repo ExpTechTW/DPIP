@@ -156,18 +156,18 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     // bool isEnabled = await LocationManager().isRunning;
-    bool isEnabled = false;
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission != LocationPermission.always) {
-      print('初次檢查時沒權限');
-      isEnabled = false;
-    } else {
-      if (isLocationAutoSetEnabled) {
-        isEnabled = true;
-      }
-    }
-    setState(() {
-      isLocationAutoSetEnabled = isEnabled;
+    // bool isEnabled = false;
+    // LocationPermission permission = await Geolocator.checkPermission();
+    // if (permission != LocationPermission.always) {
+    //   print('初次檢查時沒權限');
+    //   isEnabled = false;
+    // } else {
+    //   if (permission == LocationPermission.always) {
+    //     isEnabled = true;
+    //   }
+    // }
+    setState(() async {
+      isLocationAutoSetEnabled = await openLocationSettings();
       if (isLocationAutoSetEnabled) {
         locationService.startPositionStream();
         getLocation();
