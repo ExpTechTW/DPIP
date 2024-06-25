@@ -36,7 +36,7 @@ class LocationService {
                 ),
               )
             : AppleSettings(
-                accuracy: LocationAccuracy.low,
+                accuracy: LocationAccuracy.medium,
                 activityType: ActivityType.other,
                 distanceFilter: 500,
                 timeLimit: const Duration(minutes: 5),
