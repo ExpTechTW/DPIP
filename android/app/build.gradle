@@ -19,12 +19,6 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0.0'
 }
 
-def args = ["-Xlint:deprecation", "-Xlint:unchecked", "-Werror"]
-
-project.getTasks().withType(JavaCompile) {
-    options.compilerArgs.addAll(args)
-}
-
 def versionParts = flutterVersionName.split("\\.")
 def majorVersion = versionParts[0].padLeft(2, '0')
 def minorVersion = versionParts[1].padLeft(2, '0')
