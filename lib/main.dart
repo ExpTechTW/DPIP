@@ -119,7 +119,7 @@ class MainAppState extends State<MainApp> {
   }
 
   @override
-  Future<void> initState() async {
+  void initState() async {
     super.initState();
     if (await openLocationSettings()) {
       locationService.startPositionStream();
