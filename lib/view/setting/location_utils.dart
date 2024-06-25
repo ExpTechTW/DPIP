@@ -20,7 +20,11 @@ Future<bool> openLocationSettings(bool init) async {
         }
 
         if (permission == LocationPermission.whileInUse) {
-          Geolocator.openAppSettings();
+          permission = await Geolocator.requestPermission();
+
+          if (permission == LocationPermission.always) {
+            return true;
+          }
         }
 
         if (permission == LocationPermission.always) {
