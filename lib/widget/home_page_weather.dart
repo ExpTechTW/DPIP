@@ -342,21 +342,24 @@ class HomePageWeather extends StatelessWidget {
                           ),
                           Flexible(
                             flex: 40,
-                            child: Image.network(
-                              'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
-                              width: 142,
-                              height: 142,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: CupertinoActivityIndicator(),
-                                );
-                              },
-                              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                                return Container();
-                              },
-                            ),
+                            child: weather["temp"] != "-99.9"
+                                ? Image.network(
+                                    'https://cdn.weatherapi.com/weather/128x128/${weather["isday"] == 1 ? "day" : "night"}/${(weather["condition"] as int) - 887}.png',
+                                    width: 142,
+                                    height: 142,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const Center(
+                                        child: CupertinoActivityIndicator(),
+                                      );
+                                    },
+                                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                                      return Container();
+                                    },
+                                  )
+                                : Container(),
                           ),
                           Flexible(
                             flex: 55,
