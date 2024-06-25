@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dpip/global.dart';
 import 'package:dpip/view/init.dart';
+import 'package:dpip/view/setting/location_utils.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -118,9 +119,11 @@ class MainAppState extends State<MainApp> {
   }
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
-    locationService.startPositionStream();
+    if (await openLocationSettings()) {
+      locationService.startPositionStream();
+    }
   }
 
   // @override
