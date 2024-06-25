@@ -5,17 +5,26 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
+  static final LocationService _instance = LocationService._internal();
+
+  factory LocationService() {
+    return _instance;
+  }
+
+  LocationService._internal();
+
   final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
   StreamSubscription<Position>? positionStreamSubscription;
+  late StreamSubscription<ServiceStatus> serviceStatusStream;
 
   void startPositionStream() async {
     if (positionStreamSubscription == null) {
       final positionStream = geolocatorPlatform.getPositionStream(
         locationSettings: Platform.isAndroid
             ? AndroidSettings(
-                accuracy: LocationAccuracy.medium,
+                accuracy: LocationAccuracy.high,
                 distanceFilter: 500,
-                forceLocationManager: false,
+                forceLocationManager: true,
                 intervalDuration: const Duration(minutes: 5),
                 foregroundNotificationConfig: const ForegroundNotificationConfig(
                   notificationText: "服務中...",
@@ -23,7 +32,7 @@ class LocationService {
                   notificationChannelName: '背景定位',
                   enableWifiLock: true,
                   enableWakeLock: true,
-                  setOngoing: false,
+                  setOngoing: true,
                 ),
               )
             : AppleSettings(
@@ -51,6 +60,7 @@ class LocationService {
               coordinate,
               value!,
             );
+            print('${Global.packageInfo.version} ${Platform.isAndroid ? "0" : "1"} $coordinate $value');
           });
         }
       });
