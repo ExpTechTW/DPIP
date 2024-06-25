@@ -6,11 +6,14 @@ Future<bool> openLocationSettings() async {
   LocationPermission permission = await Geolocator.checkPermission();
 
   if (permission != LocationPermission.always) {
-    permission = await Geolocator.requestPermission();
+    await Geolocator.requestPermission();
+    permission = await Geolocator.checkPermission();
     if (permission != LocationPermission.always) {
-      permission = await Geolocator.requestPermission();
+      await Geolocator.requestPermission();
+      permission = await Geolocator.checkPermission();
       if (permission != LocationPermission.always) {
-        permission = await Geolocator.requestPermission();
+        await Geolocator.requestPermission();
+        permission = await Geolocator.checkPermission();
         if (permission != LocationPermission.always) {
           return false;
         } else {
