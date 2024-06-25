@@ -19,7 +19,7 @@ class LocationService {
   late StreamSubscription<ServiceStatus> serviceStatusStream;
 
   void startPositionStream() async {
-    if (await openLocationSettings()) {
+    if (await openLocationSettings(true)) {
       if (positionStreamSubscription == null) {
         final positionStream = geolocatorPlatform.getPositionStream(
           locationSettings: Platform.isAndroid

@@ -173,7 +173,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     //     getLocation();
     //   }
     // });
-    toggleLocationAutoSet(await openLocationSettings());
+    toggleLocationAutoSet(await openLocationSettings(false));
   }
 
   Future<void> getLocation() async {
@@ -303,7 +303,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 onChanged: (value) {
                   if (value) {
                     setState(() async {
-                      toggleLocationAutoSet(await openLocationSettings());
+                      toggleLocationAutoSet(await openLocationSettings(false));
                     });
                   } else {
                     setState(() {
@@ -368,7 +368,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 onChanged: (value) {
                   if (value) {
                     setState(() async {
-                      toggleLocationAutoSet(await openLocationSettings());
+                      toggleLocationAutoSet(await openLocationSettings(false));
                     });
                   } else {
                     setState(() {
