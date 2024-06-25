@@ -8,28 +8,20 @@ Future<bool> openLocationSettings() async {
   if (Platform.isAndroid) {
     LocationPermission permission = await Geolocator.checkPermission();
 
-    if (permission != LocationPermission.always) {
-      await Geolocator.requestPermission();
-      permission = await Geolocator.checkPermission();
-      if (permission != LocationPermission.always) {
-        await Geolocator.requestPermission();
-        permission = await Geolocator.checkPermission();
-        if (permission != LocationPermission.always) {
-          await Geolocator.requestPermission();
-          permission = await Geolocator.checkPermission();
-          if (permission != LocationPermission.always) {
-            return false;
-          } else {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      } else {
-        return true;
-      }
-    } else {
+    if (permission == LocationPermission.always) {
       return true;
+    } else {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.always) {
+        return true;
+      } else {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.always) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   } else if (Platform.isIOS) {
     const urlIOS = 'app-settings:';
