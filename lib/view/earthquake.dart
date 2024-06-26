@@ -355,7 +355,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                       style: TextStyle(fontSize: 14),
                     ),
                     Text(
-                      '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                      '資料時間:${currentTime.hour.toString().padLeft(2, '0')}:${currentTime.minute.toString().padLeft(2, '0')}:${currentTime.second.toString().padLeft(2, '0')}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 16),
                     ),
@@ -645,7 +645,7 @@ class _EarthquakePage extends State<EarthquakePage> with AutomaticKeepAliveClien
                     textAlign: TextAlign.center,
                   ),
                   Text(
-                    '資料時間:${currentTime.hour}:${currentTime.minute}:${currentTime.second}',
+                    '資料時間:${currentTime.hour.toString().padLeft(2, '0')}:${currentTime.minute.toString().padLeft(2, '0')}:${currentTime.second.toString().padLeft(2, '0')}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
