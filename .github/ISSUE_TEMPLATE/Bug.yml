@@ -1,7 +1,6 @@
 name: "🚧問題回報"
-title: "[Bug]: "
 labels: ["錯誤"]
-projects: ["ExpTech 問題回報"]
+projects: ["ExpTechTW/12"]
 description: |
   請詳細描述你遇到的問題協助我們排除問題
 body:
