@@ -18,26 +18,24 @@ body:
   attributes:
     label: 裝置
     description: 填入裝置名稱
-    placeholder: "裝置名稱..."
-    value: device
+    value: "裝置名稱..."
   validations:
     required: true
 - type: textarea
   attributes:
     label: 內文
     description: 請輸入內容
-    placeholder: "內容..."
-    value: text
+    value: "內容..."
   validations:
     required: true
 - type: textarea
   attributes:
     label: 日誌
     description: 請輸入日誌內容
-    render: bash
-    value: log
+    render: log
+    value: ""
   validations:
     required: false
 - type: markdown
   attributes:
-    value: "### 此檔案由 ExpTech.tw 設計製作"
+    value: "### 此檔案由 ExpTech Studio 設計製作"
