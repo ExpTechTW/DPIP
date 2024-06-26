@@ -16,6 +16,12 @@ body:
     required: true
 - type: textarea
   attributes:
+    label: 版本
+    description: 填入版本
+  validations:
+    required: true
+- type: textarea
+  attributes:
     label: 裝置
     description: 填入裝置名稱
   validations:
@@ -26,6 +32,22 @@ body:
     description: 請輸入內容
   validations:
     required: true
+- type: textarea
+  attributes:
+    label: 重現步驟
+    description: 如果有的話請輸入重現步驟
+    placeholder: |
+      1. ...
+      2. ...
+      3. ...
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: 影片/照片
+    description: 如果有的話請上傳影片或照片
+  validations:
+    required: false
 - type: textarea
   attributes:
     label: 日誌
