@@ -53,13 +53,14 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     if (Platform.isIOS) {
       showLoadingDialog();
     }
+
     // unsubscribe old location topic
-    if (currentCity != null) {
-      await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
-      if (currentTown != null) {
-        await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-      }
-    }
+    // if (currentCity != null) {
+    //   await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
+    //   if (currentTown != null) {
+    //     await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+    //   }
+    // }
 
     // if (Platform.isAndroid) {
     //   showLoadingDialog();
@@ -74,8 +75,8 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     await Global.preference.setString("loc-town", currentTown!);
 
     // subscribe new location topic
-    await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
-    await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+    // await messaging.subscribeToTopic(safeBase64Encode(currentCity!));
+    // await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
 
     final String response = await rootBundle.loadString('assets/region.json');
     final data = json.decode(response);
@@ -99,9 +100,10 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     if (Platform.isIOS) {
       showLoadingDialog();
     }
-    if (currentTown != null) {
-      await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
-    }
+
+    // if (currentTown != null) {
+    //   await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+    // }
 
     // if (Platform.isAndroid) {
     //   showLoadingDialog();
@@ -112,7 +114,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     });
 
     await Global.preference.setString("loc-town", currentTown!);
-    await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
+    // await messaging.subscribeToTopic(safeBase64Encode("$currentCity$currentTown"));
 
     final String response = await rootBundle.loadString('assets/region.json');
     final data = json.decode(response);
