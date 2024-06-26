@@ -32,8 +32,6 @@ body:
   attributes:
     label: 日誌
     description: 請輸入日誌內容
-    render: log
-    value: ""
   validations:
     required: false
 - type: markdown
