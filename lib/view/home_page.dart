@@ -142,7 +142,7 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
                   },
                 ),
                 CupertinoDialogAction(
-                  child: const Text("下次不再提醒",
+                  child: const Text("永不",
                     style: TextStyle(color: Colors.red),
                   ),
                   onPressed: () {
