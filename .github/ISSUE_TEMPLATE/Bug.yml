@@ -51,7 +51,7 @@ body:
 - type: textarea
   attributes:
     label: 日誌
-    description: 請輸入日誌內容
+    description: 如果有的話請輸入日誌內容
   validations:
     required: false
 - type: markdown
