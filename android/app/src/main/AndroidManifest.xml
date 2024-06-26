@@ -28,8 +28,8 @@
                 android:showWhenLocked="true"
                 android:turnScreenOn="true">
             <meta-data
-                    android:name="io.flutter.embedding.android.NormalTheme"
-                    android:resource="@style/NormalTheme"
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"
             />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -38,15 +38,17 @@
         </activity>
         <receiver android:name="com.exptech.dpip.BootBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <service android:name="com.exptech.dpip.location.Service"
             android:permission="android.permission.FOREGROUND_SERVICE"
-            android:exported="true"
-            android:foregroundServiceType = "location"/>
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="true"
+            android:foregroundServiceType="location"/>
         <meta-data
                 android:name="flutterEmbedding"
                 android:value="2"/>

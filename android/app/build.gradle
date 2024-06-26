@@ -77,6 +77,10 @@ android {
             minifyEnabled true
         }
     }
+
+    lint {
+        disable 'InvalidPackage'
+    }
 }
 
 flutter {

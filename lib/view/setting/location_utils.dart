@@ -4,32 +4,45 @@ import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Future<bool> openLocationSettings() async {
+Future<bool> openLocationSettings(bool init) async {
   if (Platform.isAndroid) {
     LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission != LocationPermission.always) {
-      await Geolocator.requestPermission();
-      permission = await Geolocator.checkPermission();
-      if (permission != LocationPermission.always) {
-        await Geolocator.requestPermission();
-        permission = await Geolocator.checkPermission();
-        if (permission != LocationPermission.always) {
-          await Geolocator.requestPermission();
-          permission = await Geolocator.checkPermission();
-          if (permission != LocationPermission.always) {
-            return false;
-          } else {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      } else {
+    if (init) {
+      if (permission == LocationPermission.always) {
         return true;
       }
     } else {
-      return true;
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+
+        if (permission == LocationPermission.deniedForever) {
+          Geolocator.openAppSettings();
+        }
+
+        if (permission == LocationPermission.whileInUse) {
+          permission = await Geolocator.requestPermission();
+
+          if (permission == LocationPermission.always) {
+            return true;
+          }
+        }
+
+        if (permission == LocationPermission.always) {
+          return true;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Geolocator.openAppSettings();
+      }
+
+      if (permission == LocationPermission.whileInUse) {
+        Geolocator.openAppSettings();
+      }
+
+      if (permission == LocationPermission.always) {
+        return true;
+      }
     }
   } else if (Platform.isIOS) {
     const urlIOS = 'app-settings:';

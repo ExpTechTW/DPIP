@@ -156,23 +156,24 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     // bool isEnabled = await LocationManager().isRunning;
-    bool isEnabled = false;
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission != LocationPermission.always) {
-      print('初次檢查時沒權限');
-      isEnabled = false;
-    } else {
-      if (isLocationAutoSetEnabled) {
-        isEnabled = true;
-      }
-    }
-    setState(() {
-      isLocationAutoSetEnabled = isEnabled;
-      if (isLocationAutoSetEnabled) {
-        locationService.startPositionStream();
-        getLocation();
-      }
-    });
+    // bool isEnabled = false;
+    // LocationPermission permission = await Geolocator.checkPermission();
+    // if (permission != LocationPermission.always) {
+    //   print('初次檢查時沒權限');
+    //   isEnabled = false;
+    // } else {
+    //   if (permission == LocationPermission.always) {
+    //     isEnabled = true;
+    //   }
+    // }
+    // setState(() async {
+    //   isLocationAutoSetEnabled = await openLocationSettings();
+    //   if (isLocationAutoSetEnabled) {
+    //     locationService.startPositionStream();
+    //     getLocation();
+    //   }
+    // });
+    toggleLocationAutoSet(await openLocationSettings(true));
   }
 
   Future<void> getLocation() async {
@@ -302,7 +303,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 onChanged: (value) {
                   if (value) {
                     setState(() async {
-                      toggleLocationAutoSet(await openLocationSettings());
+                      toggleLocationAutoSet(await openLocationSettings(false));
                     });
                   } else {
                     setState(() {
@@ -367,7 +368,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
                 onChanged: (value) {
                   if (value) {
                     setState(() async {
-                      toggleLocationAutoSet(await openLocationSettings());
+                      toggleLocationAutoSet(await openLocationSettings(false));
                     });
                   } else {
                     setState(() {
