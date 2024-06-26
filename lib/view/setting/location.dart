@@ -61,9 +61,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       }
     }
 
-    if (Platform.isAndroid) {
-      showLoadingDialog();
-    }
+    // if (Platform.isAndroid) {
+    //   showLoadingDialog();
+    // }
 
     setState(() {
       currentCity = value;
@@ -103,9 +103,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
       await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
     }
 
-    if (Platform.isAndroid) {
-      showLoadingDialog();
-    }
+    // if (Platform.isAndroid) {
+    //   showLoadingDialog();
+    // }
 
     setState(() {
       currentTown = value;
