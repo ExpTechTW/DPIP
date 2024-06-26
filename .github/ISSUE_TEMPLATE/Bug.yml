@@ -18,14 +18,12 @@ body:
   attributes:
     label: 裝置
     description: 填入裝置名稱
-    value: "裝置名稱..."
   validations:
     required: true
 - type: textarea
   attributes:
     label: 內文
     description: 請輸入內容
-    value: "內容..."
   validations:
     required: true
 - type: textarea
