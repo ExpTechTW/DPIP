@@ -49,13 +49,19 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> setCityLocation(String? value) async {
     if (value == null) return;
 
-    showLoadingDialog();
+    if (Platform.isIOS) {
+      showLoadingDialog();
+    }
     // unsubscribe old location topic
     if (currentCity != null) {
       await messaging.unsubscribeFromTopic(safeBase64Encode(currentCity!));
       if (currentTown != null) {
         await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
       }
+    }
+
+    if (Platform.isAndroid) {
+      showLoadingDialog();
     }
 
     setState(() {
@@ -89,10 +95,15 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
 
-    showLoadingDialog();
-
+    if (Platform.isIOS) {
+      showLoadingDialog();
+    }
     if (currentTown != null) {
       await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
+    }
+
+    if (Platform.isAndroid) {
+      showLoadingDialog();
     }
 
     setState(() {
