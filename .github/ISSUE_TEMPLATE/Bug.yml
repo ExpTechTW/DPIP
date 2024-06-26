@@ -1,4 +1,4 @@
-name: "\U0001F6A7問題回報"
+name: "🚧問題回報"
 title: "[Bug]: "
 labels: ["錯誤"]
 projects: ["ExpTech 問題回報"]
@@ -10,8 +10,8 @@ body:
   attributes:
     label: 平台
     options:
-      - iOS
-      - Android
+    - iOS
+    - Android
     default: 0
   validations:
     required: true
