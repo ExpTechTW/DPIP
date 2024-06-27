@@ -4,7 +4,11 @@ import 'package:dpip/app/android.dart';
 import 'package:dpip/app/ios.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'core/service.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeService();
   if (Platform.isIOS) {
     runApp(const CupertinoDPIP());
   } else {

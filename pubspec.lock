@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
-  auto_start_flutter:
-    dependency: "direct main"
-    description:
-      name: auto_start_flutter
-      sha256: "27b12be7dc2d37b1a535189f461a12dad15b54c12f0a36e6ea69e73e579d433b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -177,6 +169,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.6"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "365c771ac3b0e58845f39ec6deebc76e3276aa9922b0cc60840712094d9047ac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.10"
   fake_async:
     dependency: transitive
     description:
@@ -214,14 +214,38 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_boot_receiver:
+  flutter_background_service:
     dependency: "direct main"
     description:
-      name: flutter_boot_receiver
-      sha256: "0860fa1bc49d050b5d4b70b9d48587adeed52653c99f553b2a2547594e450ed5"
+      name: flutter_background_service
+      sha256: "30d1786c7fccba10ba1ca49297bc14343456f24e3dfd4cafc06f35de68d92619"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "5.0.6"
+  flutter_background_service_android:
+    dependency: transitive
+    description:
+      name: flutter_background_service_android
+      sha256: b28215e18ee743eb78105a5869a802ca7a13b01ed21a0401a4b1c4900b63676e
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.3"
+  flutter_background_service_ios:
+    dependency: transitive
+    description:
+      name: flutter_background_service_ios
+      sha256: "9365d6b8d71ef967e32320417ea9e2444c82b526930cd6b88adb2c459e7dfc9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.1"
+  flutter_background_service_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_background_service_platform_interface
+      sha256: da16560237e055c0ef65bc93597b71d4442698acee983951474f8882c1928ea7
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -230,6 +254,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  flutter_local_notifications:
+    dependency: "direct main"
+    description:
+      name: flutter_local_notifications
+      sha256: "40e6fbd2da7dcc7ed78432c5cdab1559674b4af035fddbfb2f9a8f9c2112fcef"
+      url: "https://pub.dev"
+    source: hosted
+    version: "17.1.2"
+  flutter_local_notifications_linux:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_linux
+      sha256: "33f741ef47b5f63cc7f78fe75eeeac7e19f171ff3c3df054d84c1e38bedb6a03"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0+1"
+  flutter_local_notifications_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_local_notifications_platform_interface
+      sha256: "340abf67df238f7f0ef58f4a26d2a83e1ab74c77ab03cd2b2d5018ac64db30b7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -456,6 +504,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  petitparser:
+    dependency: transitive
+    description:
+      name: petitparser
+      sha256: c15605cd28af66339f8eb6fbe0e541bfe2d1b72d5825efc6598f3e0a31b9ad27
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.2"
   platform:
     dependency: transitive
     description:
@@ -725,6 +781,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  xml:
+    dependency: transitive
+    description:
+      name: xml
+      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.5.0"
   yaml:
     dependency: transitive
     description:

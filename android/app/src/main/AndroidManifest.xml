@@ -2,53 +2,41 @@
     android:installLocation="internalOnly"
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
-        android:label="DPIP"
-        android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+            android:label="DPIP"
+            android:name="${applicationName}"
+            android:icon="@mipmap/ic_launcher">
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true">
+                android:name=".MainActivity"
+                android:exported="true"
+                android:launchMode="singleTop"
+                android:theme="@style/LaunchTheme"
+                android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                android:hardwareAccelerated="true"
+                android:windowSoftInputMode="adjustResize"
+                android:showWhenLocked="true"
+                android:turnScreenOn="true">
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+                    android:name="io.flutter.embedding.android.NormalTheme"
+                    android:resource="@style/NormalTheme"
+            />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <meta-data
-            android:name="flutterEmbedding"
-            android:value="2" />
+                android:name="flutterEmbedding"
+                android:value="2"/>
         <service
-                android:name="com.flux.flutter_boot_receiver.BootHandlerService"
-                android:exported="false"
-                android:permission="android.permission.BIND_JOB_SERVICE"
+                android:name="id.flutter.flutter_background_service.BackgroundService"
+                android:foregroundServiceType="location"
         />
-        <receiver
-                android:enabled="true"
-                android:exported="true"
-                android:name="com.flux.flutter_boot_receiver.BootBroadcastReceiver"
-                android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </receiver>
     </application>
     <queries>
         <intent>
