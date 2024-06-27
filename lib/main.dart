@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:dpip/app/android.dart';
+import 'package:dpip/app/ios.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   if (Platform.isIOS) {
-    /* TODO: ios app */
-    throw UnimplementedError();
+    runApp(const CupertinoDPIP());
   } else {
-    runApp(const AndroidApp());
+    runApp(const AndroidDPIP());
   }
 }

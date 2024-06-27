@@ -3,14 +3,14 @@ import 'package:dpip/app/monitor/android.dart';
 import 'package:dpip/app/report/android.dart';
 import 'package:flutter/material.dart';
 
-class AndroidApp extends StatefulWidget {
-  const AndroidApp({super.key});
+class AndroidDPIP extends StatefulWidget {
+  const AndroidDPIP({super.key});
 
   @override
-  State<AndroidApp> createState() => _AndroidAppState();
+  State<AndroidDPIP> createState() => _AndroidDPIPState();
 }
 
-class _AndroidAppState extends State<AndroidApp> {
+class _AndroidDPIPState extends State<AndroidDPIP> {
   int currentTabIndex = 0;
   PageController pageController = PageController();
 
