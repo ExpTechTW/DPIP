@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/global.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -8,8 +9,11 @@ Future<bool> openLocationSettings(bool init) async {
   if (Platform.isAndroid) {
     LocationPermission permission = await Geolocator.checkPermission();
     if (init) {
-      if (permission == LocationPermission.always) {
-        return true;
+      bool isLocationAutoSetEnabled = Global.preference.getBool("loc-auto") ?? false;
+      if (isLocationAutoSetEnabled) {
+        if (permission == LocationPermission.always) {
+          return true;
+        }
       }
     } else {
       if (permission == LocationPermission.denied) {
