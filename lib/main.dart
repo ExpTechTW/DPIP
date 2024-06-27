@@ -1,20 +1,13 @@
+import 'dart:io';
+
+import 'package:dpip/app/android.dart';
+import 'package:dpip/app/ios.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+  if (Platform.isIOS) {
+    runApp(const CupertinoDPIP());
+  } else {
+    runApp(const AndroidDPIP());
   }
 }
