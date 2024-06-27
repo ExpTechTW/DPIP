@@ -50,9 +50,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> setCityLocation(String? value) async {
     if (value == null) return;
 
-    if (Platform.isIOS) {
-      showLoadingDialog();
-    }
+    // if (Platform.isIOS) {
+    //   showLoadingDialog();
+    // }
 
     // unsubscribe old location topic
     // if (currentCity != null) {
@@ -97,9 +97,9 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
   Future<void> setTownLocation(String? value) async {
     if (value == null) return;
 
-    if (Platform.isIOS) {
-      showLoadingDialog();
-    }
+    // if (Platform.isIOS) {
+    //   showLoadingDialog();
+    // }
 
     // if (currentTown != null) {
     //   await messaging.unsubscribeFromTopic(safeBase64Encode("$currentCity$currentTown"));
@@ -132,41 +132,41 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
     // Navigator.pop(context);
   }
 
-  void showLoadingDialog() {
-    if (Platform.isIOS) {
-      showCupertinoDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return const CupertinoAlertDialog(
-            content: Row(
-              children: [
-                CupertinoActivityIndicator(),
-                SizedBox(width: 24),
-                Text("正在更新設定..."),
-              ],
-            ),
-          );
-        },
-      );
-    } else {
-      showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return const AlertDialog(
-            content: Row(
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(width: 24),
-                Text("正在更新設定..."),
-              ],
-            ),
-          );
-        },
-      );
-    }
-  }
+  // void showLoadingDialog() {
+  //   if (Platform.isIOS) {
+  //     showCupertinoDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (context) {
+  //         return const CupertinoAlertDialog(
+  //           content: Row(
+  //             children: [
+  //               CupertinoActivityIndicator(),
+  //               SizedBox(width: 24),
+  //               Text("正在更新設定..."),
+  //             ],
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   } else {
+  //     showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (context) {
+  //         return const AlertDialog(
+  //           content: Row(
+  //             children: [
+  //               CircularProgressIndicator(),
+  //               SizedBox(width: 24),
+  //               Text("正在更新設定..."),
+  //             ],
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
 
   Future<void> checkLocationPermissionAndSyncSwitchState() async {
     bool isEnabled = false;
