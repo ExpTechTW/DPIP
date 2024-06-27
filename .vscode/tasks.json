@@ -1,9 +1,0 @@
-{
-  "version": "2.0.0",
-  "tasks": [{
-      "label": "build",
-      "command": "dart",
-      "args": ["run", "build_runner", "build"],
-      "type": "shell"
-  }]
-}
