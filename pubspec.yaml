@@ -1,7 +1,7 @@
 name: dpip
-description: "A new Flutter project."
+description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 0.1.0
+version: 2.0.0
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -9,11 +9,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.2.1
+  json_annotation: ^4.9.0
+  package_info_plus: ^8.0.0
+  shared_preferences: ^2.2.3
+  timezone: ^0.9.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^3.0.2
+  build_runner: ^2.4.9
+  json_serializable: ^6.8.0
 
 flutter:
   uses-material-design: true
