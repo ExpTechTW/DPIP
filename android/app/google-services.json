@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "141632948166",
+    "project_id": "dpip-a658c",
+    "storage_bucket": "dpip-a658c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141632948166:android:3cb29f28a0a04c589e14c7",
+        "android_client_info": {
+          "package_name": "com.exptech.dpip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMgbvC0NWLL2CfRChypf3yy7OWxEO-I0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
