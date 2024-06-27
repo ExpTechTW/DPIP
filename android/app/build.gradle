@@ -27,7 +27,7 @@ def patchVersion = versionParts[2].padLeft(2, '0')
 def flutterVersionCode = (majorVersion + minorVersion + patchVersion).toInteger()
 
 android {
-    namespace "com.exptech.dpip.dpip"
+    namespace "com.exptech.dpip"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 

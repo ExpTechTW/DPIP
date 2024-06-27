@@ -29,6 +29,15 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <receiver android:name=".BootBroadcastReceiver"
+            android:exported="true" >   
+            <intent-filter>   
+                <action android:name="android.intent.action.BOOT_COMPLETED" />  
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" /> 
+            </intent-filter>   
+        </receiver> 
+
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility?hl=en and
@@ -41,4 +50,7 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+
+
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>
