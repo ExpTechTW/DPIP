@@ -312,10 +312,11 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
               subtitle: const Text("使用裝置定位自動設定所在地"),
               trailing: CupertinoSwitch(
                 value: isLocationAutoSetEnabled,
-                onChanged: (value) {
+                onChanged: (value) async {
                   if (value) {
-                    setState(() async {
-                      toggleLocationAutoSet(await openLocationSettings(false));
+                    bool success = await LocationService().openLocationSettings(false);
+                    setState(() {
+                      toggleLocationAutoSet(success);
                     });
                   } else {
                     setState(() {

@@ -17,6 +17,12 @@ class LocationService {
   final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
   StreamSubscription<Position>? positionStreamSubscription;
   late StreamSubscription<ServiceStatus> serviceStatusStream;
+  Position? lastPosition;
+  DateTime? lastUpdateTime;
+
+  Future<bool> openLocationSettings(bool value) async {
+    return true;
+  }
 
   void startPositionStream() async {
     if (await openLocationSettings(true)) {
@@ -51,7 +57,13 @@ class LocationService {
           await positionStreamSubscription?.cancel();
           positionStreamSubscription = null;
         }).listen((Position? position) {
-          if (position != null) {
+          if (position != null && shouldUpdatePosition(position)) {
+            lastPosition = position;
+            lastUpdateTime = DateTime.now();
+
+            stopPositionStream();
+            Timer(const Duration(minutes: 5), startPositionStream);
+
             String lat = position.latitude.toStringAsFixed(4);
             String lon = position.longitude.toStringAsFixed(4);
             String coordinate = '$lat,$lon';
@@ -69,6 +81,23 @@ class LocationService {
         print('位置已開啟');
       }
     }
+  }
+
+  bool shouldUpdatePosition(Position newPosition) {
+    if (lastPosition == null || lastUpdateTime == null) {
+      return true;
+    }
+
+    final distance = Geolocator.distanceBetween(
+      lastPosition!.latitude,
+      lastPosition!.longitude,
+      newPosition.latitude,
+      newPosition.longitude,
+    );
+
+    final timeDifference = DateTime.now().difference(lastUpdateTime!).inMinutes;
+
+    return distance >= 500 && timeDifference >= 5;
   }
 
   void stopPositionStream() async {
