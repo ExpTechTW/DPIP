@@ -91,7 +91,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         Global.api.postNotifyLocation(Global.packageInfo.version, Platform.isAndroid ? "0" : "1", coordinate, value!);
       });
     }
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
   Future<void> setTownLocation(String? value) async {
@@ -129,7 +129,7 @@ class _LocationSettingsPageState extends State<LocationSettingsPage> {
         Global.api.postNotifyLocation(Global.packageInfo.version, Platform.isAndroid ? "0" : "1", coordinate, value!);
       });
     }
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
   void showLoadingDialog() {
