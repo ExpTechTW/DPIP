@@ -19,7 +19,7 @@
       "name": "DPIP (deprecated mode)",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "profile",
+      "flutterMode": "release",
       "args": [
         "--dart-define=XLINT_DEPRECATION=true"
       ]

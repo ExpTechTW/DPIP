@@ -116,32 +116,36 @@ Future<bool> requestNotificationPermission() async {
   return false;
 }
 
-Future<bool> requestlocationAlwaysPermission() async {
-  PermissionStatus status = await Permission.locationAlways.request();
+Future<bool> requestLocationAlwaysPermission() async {
+  // 首先請求位置權限
+  PermissionStatus status = await Permission.location.request();
+
   if (status.isGranted) {
     print('位置權限已授予');
-    return true;
+
+    // 檢查是否可以請求後台位置權限
+    if (await Permission.locationAlways.status.isGranted) {
+      print('後台位置權限已授予');
+      return true;
+    } else {
+      // 嘗試請求後台位置權限
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('後台位置權限已授予');
+        return true;
+      } else {
+        print('後台位置權限被拒絕，但基本位置權限已授予');
+        return true; // 仍然返回 true，因為至少獲得了基本位置權限
+      }
+    }
   } else if (status.isDenied) {
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('位置權限已授予');
-      return true;
-    } else if (status.isDenied) {
-      openAppSettings();
-    } else if (status.isPermanentlyDenied) {
-      openAppSettings();
-    }
+    print('位置權限被拒絕');
+    // 可以在這裡添加邏輯來解釋為什麼需要權限
   } else if (status.isPermanentlyDenied) {
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('位置權限已授予');
-      return true;
-    } else if (status.isDenied) {
-      openAppSettings();
-    } else if (status.isPermanentlyDenied) {
-      openAppSettings();
-    }
+    print('位置權限被永久拒絕');
+    // 打開應用設置頁面
+    await openAppSettings();
   }
-  print('位置權限被拒絕');
+
   return false;
 }

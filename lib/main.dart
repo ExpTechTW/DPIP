@@ -9,7 +9,7 @@ import 'core/service.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   final isNotificationEnabled = await requestNotificationPermission();
-  final isLocationAlwaysEnabled = await requestlocationAlwaysPermission();
+  final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
   if (isLocationAlwaysEnabled && isNotificationEnabled) {
     await initializeService();
   }
