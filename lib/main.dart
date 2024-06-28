@@ -123,11 +123,11 @@ class MainAppState extends State<MainApp> {
     locationService.startPositionStream();
   }
 
-  // @override
-  // void dispose() {
-  //   locationService.stopPositionStream();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    locationService.stopPositionStream();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

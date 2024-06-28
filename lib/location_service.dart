@@ -19,6 +19,7 @@ class LocationService {
   late StreamSubscription<ServiceStatus> serviceStatusStream;
   Position? lastPosition;
   DateTime? lastUpdateTime;
+  Timer? restartTimer;
 
   Future<bool> openLocationSettings(bool value) async {
     return true;
@@ -62,7 +63,7 @@ class LocationService {
             lastUpdateTime = DateTime.now();
 
             stopPositionStream();
-            Timer(const Duration(minutes: 5), startPositionStream);
+            restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
 
             String lat = position.latitude.toStringAsFixed(4);
             String lon = position.longitude.toStringAsFixed(4);
