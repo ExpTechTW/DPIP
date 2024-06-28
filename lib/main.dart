@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dpip/app/android.dart';
 import 'package:dpip/app/ios.dart';
 import 'package:dpip/core/fcm.dart';
+import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization_loader/easy_localization_loader.dart';
