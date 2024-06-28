@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/timezone.dart';
 
 part 'partial_earthquake_report.g.dart';
 
@@ -44,6 +44,8 @@ class PartialEarthquakeReport {
     return null;
   }
 
+  TZDateTime get dateTime => TZDateTime.fromMillisecondsSinceEpoch(getLocation("Asia/Taipei"), time);
+
   bool get hasNumber => number != null;
 
   Uri get cwaUrl {
@@ -53,7 +55,7 @@ class PartialEarthquakeReport {
   }
 
   String get reportImageName {
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
+    final date = dateTime;
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
     final hour = date.hour.toString().padLeft(2, '0');
@@ -73,7 +75,7 @@ class PartialEarthquakeReport {
   String get reportImageUrl => "https://www.cwa.gov.tw/Data/earthquake/img/$reportImageName";
 
   String get zipName {
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
+    final date = dateTime;
     final year = date.year.toString();
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
@@ -89,7 +91,7 @@ class PartialEarthquakeReport {
   String? get intensityMapImageName {
     if (!hasNumber) return null;
 
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
+    final date = dateTime;
     final year = date.year.toString();
     return "$year${number!.substring(3)}i.png";
   }
@@ -99,7 +101,7 @@ class PartialEarthquakeReport {
   String? get pgaMapImageName {
     if (!hasNumber) return null;
 
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
+    final date = dateTime;
     final year = date.year.toString();
     return "$year${number!.substring(3)}a.png";
   }
@@ -109,14 +111,14 @@ class PartialEarthquakeReport {
   String? get pgvMapImageName {
     if (!hasNumber) return null;
 
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
+    final date = dateTime;
     final year = date.year.toString();
     return "$year${number!.substring(3)}v.png";
   }
 
   String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$zipUrl/$pgvMapImageName";
 
-  String getLocation() {
+  String extractLocation() {
     if (loc.contains("(")) {
       return loc.substring(loc.indexOf("(") + 3, loc.indexOf(")"));
     } else {
