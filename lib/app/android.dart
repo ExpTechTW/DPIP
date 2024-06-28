@@ -17,9 +17,10 @@ class _AndroidDPIPState extends State<AndroidDPIP> {
 
   @override
   Widget build(BuildContext context) {
-    context.setLocale(Locale('zh', 'Hant'));
-    print(context.locale.toString());
     return MaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       home: Scaffold(
         body: PageView(
           controller: pageController,

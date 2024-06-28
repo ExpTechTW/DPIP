@@ -1,6 +1,7 @@
 import 'package:dpip/app/home/ios.dart';
 import 'package:dpip/app/monitor/ios.dart';
 import 'package:dpip/app/report/ios.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 
 class CupertinoDPIP extends StatefulWidget {
@@ -16,6 +17,9 @@ class _CupertinoDPIPState extends State<CupertinoDPIP> {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       home: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
           items: [

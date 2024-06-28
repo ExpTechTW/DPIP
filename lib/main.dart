@@ -22,6 +22,7 @@ void main() async {
   if (Platform.isIOS) {
     runApp(EasyLocalization(
       supportedLocales: lang_list,
+      fallbackLocale: const Locale('zh', 'Hant'),
       path: lang_path,
       assetLoader: const YamlAssetLoader(),
       child: const CupertinoDPIP(),
@@ -29,6 +30,7 @@ void main() async {
   } else {
     runApp(EasyLocalization(
       supportedLocales: lang_list,
+      fallbackLocale: const Locale('zh', 'Hant'),
       path: lang_path,
       assetLoader: const YamlAssetLoader(),
       child: const AndroidDPIP(),
