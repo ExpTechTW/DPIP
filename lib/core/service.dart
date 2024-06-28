@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:dpip/core/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -79,10 +80,14 @@ void onStart(ServiceInstance service) async {
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
+        final position = await getLocation();
+        String lat = position.latitude.toStringAsFixed(4);
+        String lon = position.longitude.toStringAsFixed(4);
+        String country = await getLocationcitytown(position.latitude,position.longitude);
         flutterLocalNotificationsPlugin.show(
           888,
           'COOL SERVICE',
-          'Awesome ${DateTime.now()}',
+          'Awesome ${DateTime.now()}\n$lat,$lon $country',
           const NotificationDetails(
             android: AndroidNotificationDetails(
               'my_foreground',

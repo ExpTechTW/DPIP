@@ -22,6 +22,10 @@ dependencies:
   easy_localization_loader: ^2.0.2
   firebase_messaging: ^15.0.2
   firebase_core: ^3.1.1
+  geocoding: ^3.0.0
+  geolocator: ^12.0.0
+  # 目前geolocator_android 4.6有問題，故鎖定在4.5.5
+  geolocator_android: 4.5.5
 
 dev_dependencies:
   flutter_test:
