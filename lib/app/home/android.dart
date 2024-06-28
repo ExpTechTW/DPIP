@@ -16,6 +16,6 @@ class AndroidHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("home".tr());
+    return Text("test".tr());
   }
 }

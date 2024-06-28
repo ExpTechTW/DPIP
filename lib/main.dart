@@ -23,6 +23,7 @@ void main() async {
     runApp(EasyLocalization(
       supportedLocales: lang_list,
       fallbackLocale: const Locale('zh', 'Hant'),
+      useFallbackTranslations: true,
       path: lang_path,
       assetLoader: const YamlAssetLoader(),
       child: const CupertinoDPIP(),
@@ -31,6 +32,7 @@ void main() async {
     runApp(EasyLocalization(
       supportedLocales: lang_list,
       fallbackLocale: const Locale('zh', 'Hant'),
+      useFallbackTranslations: true,
       path: lang_path,
       assetLoader: const YamlAssetLoader(),
       child: const AndroidDPIP(),
