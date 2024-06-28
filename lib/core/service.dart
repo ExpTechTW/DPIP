@@ -117,17 +117,10 @@ Future<bool> requestNotificationPermission() async {
 }
 
 Future<bool> requestlocationAlwaysPermission() async {
-  PermissionStatus status = await Permission.location.request();
+  PermissionStatus status = await Permission.locationAlways.request();
   if (status.isGranted) {
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('位置權限已授予');
-      return true;
-    } else if (status.isDenied) {
-      openAppSettings();
-    } else if (status.isPermanentlyDenied) {
-      openAppSettings();
-    }
+    print('位置權限已授予');
+    return true;
   } else if (status.isDenied) {
     status = await Permission.locationAlways.request();
     if (status.isGranted) {
