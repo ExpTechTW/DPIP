@@ -45,3 +45,4 @@ app.*.map.json
 # Generated part files
 *.g.dart
 /ios/Flutter
+/windows
