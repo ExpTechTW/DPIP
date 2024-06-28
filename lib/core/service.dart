@@ -123,24 +123,19 @@ Future<bool> requestLocationAlwaysPermission() async {
   if (status.isGranted) {
     print('位置權限已授予');
 
-    // 檢查是否可以請求後台位置權限
-    if (await Permission.locationAlways.status.isGranted) {
+    status = await Permission.locationAlways.request();
+    if (status.isGranted) {
       print('後台位置權限已授予');
       return true;
-    } else {
-      // 嘗試請求後台位置權限
-      status = await Permission.locationAlways.request();
-      if (status.isGranted) {
-        print('後台位置權限已授予');
-        return true;
-      } else {
-        print('後台位置權限被拒絕，但基本位置權限已授予');
-        return true; // 仍然返回 true，因為至少獲得了基本位置權限
-      }
     }
   } else if (status.isDenied) {
     print('位置權限被拒絕');
-    // 可以在這裡添加邏輯來解釋為什麼需要權限
+
+    status = await Permission.locationAlways.request();
+    if (status.isGranted) {
+      print('後台位置權限已授予');
+      return true;
+    }
   } else if (status.isPermanentlyDenied) {
     print('位置權限被永久拒絕');
     // 打開應用設置頁面
