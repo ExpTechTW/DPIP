@@ -16,6 +16,6 @@ class CupertinoHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("test".tr());
+    return Text("home".tr());
   }
 }

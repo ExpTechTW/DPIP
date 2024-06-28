@@ -11,13 +11,20 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Dpip</string>
+	<string>DPIP</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>zh-Hant</string>
+		<string>ja</string>
+		<string>en-US</string>
+		<string>ko</string>
+	</array>
 	<key>CFBundleName</key>
 	<string>dpip</string>
 	<key>CFBundlePackageType</key>
@@ -35,6 +42,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -53,12 +61,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>CFBundleLocalizations</key>
-    <array>
-    	<string>zh-Hant</string>
-    	<string>ja</string>
-    	<string>en-US</string>
-    	<string>ko</string>
-    </array>
 </dict>
 </plist>
