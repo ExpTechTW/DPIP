@@ -12,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'location_service.dart';
 import 'core/fcm.dart';
 import 'model/received_notification.dart';
 
@@ -37,6 +38,7 @@ void main() async {
   FirebaseMessaging.onMessage.listen(messageHandler);
   FirebaseMessaging.onBackgroundMessage(messageHandler);
   FirebaseMessaging.onMessageOpenedApp.listen(messageHandler);
+
   final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
@@ -94,6 +96,9 @@ class MainAppState extends State<MainApp> {
       }[Global.preference.getString('theme')] ??
       ThemeMode.system;
 
+  String location = 'Unknown';
+  LocationService locationService = LocationService();
+
   void changeTheme(String themeMode) {
     setState(() {
       switch (themeMode) {
@@ -110,6 +115,18 @@ class MainAppState extends State<MainApp> {
           break;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    locationService.startPositionStream();
+  }
+
+  @override
+  void dispose() {
+    locationService.stopPositionStream();
+    super.dispose();
   }
 
   @override

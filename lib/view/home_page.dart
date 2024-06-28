@@ -4,6 +4,8 @@ import 'package:dpip/util/extension.dart';
 import 'package:dpip/view/setting/location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../global.dart';
 import '../model/partial_earthquake_report.dart';
@@ -92,12 +94,78 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
   bool weatherRefreshing = true;
   bool eqReportRefreshing = true;
   bool cityIntRefreshing = true;
+  bool doNotRemindAgain = false;
   late TemperatureColor tempToColor;
   final ScrollController _controller = ScrollController();
   var distCode = 100;
   String? currentCity = Global.preference.getString("loc-city");
   String? currentTown = Global.preference.getString("loc-town");
   String currentArea = "";
+
+  Future<void> loadDoNotRemindAgain() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      doNotRemindAgain = prefs.getBool('doNotRemindAgain') ?? false;
+    });
+  }
+
+  Future<void> setDoNotRemindAgain(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      doNotRemindAgain = value;
+      prefs.setBool('doNotRemindAgain', value);
+    });
+  }
+
+  Future<void> checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever && !doNotRemindAgain) {
+      if (Platform.isIOS) {
+        showCupertinoDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: const Text("無法取得定位權限"),
+              content: const Padding(
+                padding: EdgeInsets.only(top: 6),
+                child: Text(
+                  "無法自動設定所在地，\n請手動設定所在地來取得即時資訊。",
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  child: const Text("確定"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                CupertinoDialogAction(
+                  child: const Text("永不",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setDoNotRemindAgain(true);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("無法自動設定所在地，請手動設定所在地來取得即時資訊。",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color(0xAA202020),
+          ),
+        );
+      }
+    }
+  }
 
   Future<void> refreshWeather(context) async {
     setState(() {
@@ -309,6 +377,8 @@ class _HomePage extends State<HomePage> with AutomaticKeepAliveClientMixin<HomeP
         });
       }
     });
+    loadDoNotRemindAgain();
+    checkLocationPermission();
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dpip/global.dart';
@@ -18,6 +19,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../core/utils.dart';
 
@@ -45,6 +47,9 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   late String baseMap;
   int selectedMapIndex = 0;
 
+  late StreamSubscription<Position> positionStreamSubscription;
+  bool locationRequested = false;
+
   late AnimationController _animationController;
   final borderRadius = BorderRadiusTween(
     begin: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -52,7 +57,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   );
 
   List<Widget> maxIntensities = [];
-  final List<Marker> markers = [];
+  List<Marker> markers = [];
   late EarthquakeReport report;
 
   DraggableScrollableSheet get sheet => (_sheet.currentWidget as DraggableScrollableSheet);
@@ -67,6 +72,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
     setState(() => report = data);
     initMapMarkers();
     fillIntensityCapsule();
+    initLocationService();
     setState(() {});
   }
 
@@ -180,8 +186,54 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
   @override
   void dispose() {
     super.dispose();
+    positionStreamSubscription.cancel();
     _sheetController.dispose();
     _animationController.dispose();
+  }
+
+  void initLocationService() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    locationRequested = true;
+
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.low,
+      forceAndroidLocationManager: false,
+    );
+    updateLocationMarker(position);
+
+    positionStreamSubscription = Geolocator.getPositionStream().listen((Position position) {
+      updateLocationMarker(position);
+    });
+  }
+
+  void updateLocationMarker(Position position) {
+    setState(() {
+      markers.removeWhere((marker) => marker.point.latitude == position.latitude && marker.point.longitude == position.longitude);
+      markers.add(
+        Marker(
+          point: LatLng(position.latitude, position.longitude),
+          width: 40,
+          height: 40,
+          child: const Icon(Icons.my_location, color: Colors.blue, size: 35),
+        ),
+      );
+    });
   }
 
   @override
@@ -192,7 +244,7 @@ class _ReportPage extends State<ReportPage> with SingleTickerProviderStateMixin 
             defaultPolygonBorderColor: CupertinoColors.tertiaryLabel.resolveFrom(context),
           )
         : GeoJsonParser(
-            defaultPolygonFillColor: context.colors.surfaceVariant,
+            defaultPolygonFillColor: context.colors.surfaceContainerHighest,
             defaultPolygonBorderColor: context.colors.outline,
           );
 
