@@ -16,6 +16,15 @@
       "flutterMode": "profile"
     },
     {
+      "name": "DPIP (deprecated mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "args": [
+        "--dart-define=XLINT_DEPRECATION=true"
+      ]
+    },
+    {
       "name": "DPIP (release mode)",
       "request": "launch",
       "type": "dart",

@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -100,4 +101,54 @@ void onStart(ServiceInstance service) async {
       }
     }
   });
+}
+
+Future<bool> requestNotificationPermission() async {
+  PermissionStatus status = await Permission.notification.request();
+  if (status.isGranted) {
+    print('通知權限已授予');
+    return true;
+  } else if (status.isDenied) {
+    print('通知權限被拒絕');
+  } else if (status.isPermanentlyDenied) {
+    openAppSettings();
+  }
+  return false;
+}
+
+Future<bool> requestlocationAlwaysPermission() async {
+  PermissionStatus status = await Permission.location.request();
+  if (status.isGranted) {
+    status = await Permission.locationAlways.request();
+    if (status.isGranted) {
+      print('位置權限已授予');
+      return true;
+    } else if (status.isDenied) {
+      openAppSettings();
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  } else if (status.isDenied) {
+    status = await Permission.locationAlways.request();
+    if (status.isGranted) {
+      print('位置權限已授予');
+      return true;
+    } else if (status.isDenied) {
+      openAppSettings();
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  } else if (status.isPermanentlyDenied) {
+    status = await Permission.locationAlways.request();
+    if (status.isGranted) {
+      print('位置權限已授予');
+      return true;
+    } else if (status.isDenied) {
+      openAppSettings();
+    } else if (status.isPermanentlyDenied) {
+      openAppSettings();
+    }
+  }
+  print('位置權限被拒絕');
+  return false;
 }
