@@ -2,9 +2,9 @@ name: DPIP
 
 on:
   push:
-    branches: ["Release"]
+    branches: ["main"]
   pull_request:
-    branches: ["Release"]
+    branches: ["main"]
 
 jobs:
   build-app:
