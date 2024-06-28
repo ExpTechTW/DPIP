@@ -19,6 +19,7 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await fcmInit();
   await notifyInit();
+  print(await messaging.getToken());
   final isNotificationEnabled = await requestNotificationPermission();
   final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
   if (isLocationAlwaysEnabled && isNotificationEnabled) {
