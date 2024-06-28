@@ -1,4 +1,5 @@
 import 'package:dpip/app/home/model.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class AndroidHomeView extends StatelessWidget {
@@ -15,6 +16,6 @@ class AndroidHomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("home");
+    return Text("home".tr());
   }
 }

@@ -1,6 +1,7 @@
 import 'package:dpip/app/home/android.dart';
 import 'package:dpip/app/monitor/android.dart';
 import 'package:dpip/app/report/android.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class AndroidDPIP extends StatefulWidget {
@@ -16,6 +17,8 @@ class _AndroidDPIPState extends State<AndroidDPIP> {
 
   @override
   Widget build(BuildContext context) {
+    context.setLocale(Locale('zh', 'Hant'));
+    print(context.locale.toString());
     return MaterialApp(
       home: Scaffold(
         body: PageView(
