@@ -5,6 +5,7 @@ import 'package:dpip/app/ios.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
+import 'package:dpip/global.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization_loader/easy_localization_loader.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,14 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   await fcmInit();
   await notifyInit();
-  print(await messaging.getToken());
+  await Global.init();
+  messaging.getToken().then((value) {
+    print(value);
+    String fcmToken = Global.preference.getString("fcm-token") ?? "";
+    if (fcmToken == "" || fcmToken != value) {
+      Global.preference.setString("fcm-token", value!);
+    }
+  });
   final isNotificationEnabled = await requestNotificationPermission();
   final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
   if (isLocationAlwaysEnabled && isNotificationEnabled) {

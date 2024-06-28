@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/global.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -11,7 +12,14 @@ Future<Position> getLocation() async {
     return position;
 }
 
-Future<String> getLocationcitytown(double latitude, double longitude) async {
+class LocationResult {
+  final String cityTown;
+  final bool change;
+
+  LocationResult(this.cityTown, this.change);
+}
+
+Future<LocationResult> getLocationcitytown(double latitude, double longitude) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
   if (placemarks.isNotEmpty) {
     Placemark placemark = placemarks.first;
@@ -26,11 +34,20 @@ Future<String> getLocationcitytown(double latitude, double longitude) async {
       town = placemark.subAdministrativeArea;
     }
 
+    String citytown = '$city $town';
+    String citytowntemp = Global.preference.getString("loc-city-town") ?? "";
+
+    if (citytowntemp == "" || citytowntemp != citytown) {
+      await Global.preference.setString("loc-city-town", citytown);
+
+      return LocationResult(citytown, true);
+    }
+
     // print('縣市: $city');
     // print('鄉鎮市區: $town');
-    return '$city $town';
+    return LocationResult(citytown, false);
   }
-  return "";
+  return LocationResult("", false);
 }
 
 Future<bool> requestLocationAlwaysPermission() async {
