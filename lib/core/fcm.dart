@@ -6,7 +6,7 @@ Future<void> messageHandler(RemoteMessage message) async {
   await showNotify(message);
 }
 
-void fcmInit() async{
+Future<void> fcmInit() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onMessage.listen(messageHandler);
   FirebaseMessaging.onBackgroundMessage(messageHandler);

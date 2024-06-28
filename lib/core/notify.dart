@@ -15,7 +15,7 @@ const String darwinNotificationCategoryText = 'textCategory';
 const String navigationActionId = 'id_3';
 const String darwinNotificationCategoryPlain = 'plainCategory';
 
-Future<void> notifyInit() async{
+Future<void> notifyInit() async {
   final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
