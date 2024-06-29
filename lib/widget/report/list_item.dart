@@ -45,6 +45,7 @@ class ReportListItem extends StatelessWidget {
                             report.time,
                           ),
                         ),
+                        textAlign: TextAlign.right,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: context.colors.onSurfaceVariant,
@@ -57,6 +58,7 @@ class ReportListItem extends StatelessWidget {
                           report.time,
                         ),
                       ),
+                      textAlign: TextAlign.right,
                       style: TextStyle(
                         color: context.colors.onSurfaceVariant,
                       ),
@@ -83,42 +85,28 @@ class ReportListItem extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: Container(
-                  // 16 for keeping 8 pixel as vertical paddings
-                  height: height - 16,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.horizontal(right: Radius.circular(20)),
-                    gradient: LinearGradient(
-                      colors: [
-                        IntensityColor.intensity(report.intensity).withOpacity(0),
-                        IntensityColor.intensity(report.intensity).withOpacity(0.5),
-                      ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    /**
+                     * 位置
+                     */
+                    Text(
+                      report.extractLocation(),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /**
-                       * 位置
-                       */
-                      Text(
-                        report.extractLocation(),
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      /**
-                       * 規模、深度
-                       */
-                      Text(
-                        "M ${report.mag.toStringAsFixed(1)}　深度 ${report.depth} km",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
+                    const SizedBox(height: 2),
+                    /**
+                     * 規模、深度
+                     */
+                    Text(
+                      "M ${report.mag.toStringAsFixed(1)}　深度 ${report.depth} km",
+                    ),
+                  ],
                 ),
               ),
             ],
