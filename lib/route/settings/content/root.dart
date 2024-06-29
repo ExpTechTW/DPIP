@@ -17,7 +17,8 @@ class _SettingsRootViewState extends State<SettingsRootView> {
     );
 
     return Scaffold(
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const ListTileGroupHeader(title: "位置"),
           ListTile(

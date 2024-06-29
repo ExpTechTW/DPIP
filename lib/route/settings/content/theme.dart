@@ -1,6 +1,5 @@
 import 'package:dpip/global.dart';
 import 'package:dpip/main.dart';
-import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/settings/theme/theme_radio_tile.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +28,8 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

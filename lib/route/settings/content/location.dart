@@ -30,7 +30,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -48,6 +49,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               value: isAutoLocatingEnabled,
               onChanged: (value) => toggleAutoLocation(),
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(children: [
+              Padding(
+                padding: const EdgeInsets.all(8),
+                child: Icon(Symbols.info),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text("自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"),
+              )
+            ]),
           ),
           const ListTileGroupHeader(title: "所在地"),
           ListTile(
