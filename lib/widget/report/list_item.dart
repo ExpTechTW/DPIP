@@ -12,10 +12,12 @@ class ReportListItem extends StatelessWidget {
   final double height;
   final bool showDate;
   final bool first;
+  final Function refreshReportList;
 
   const ReportListItem({
     super.key,
     required this.report,
+    required this.refreshReportList,
     this.showDate = false,
     this.height = 88,
     this.first = false,
@@ -130,8 +132,8 @@ class ReportListItem extends StatelessWidget {
             ],
           ),
         ),
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) {
@@ -139,6 +141,7 @@ class ReportListItem extends StatelessWidget {
               },
             ),
           );
+          refreshReportList();
         },
       ),
     );

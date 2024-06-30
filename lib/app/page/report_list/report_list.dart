@@ -15,18 +15,25 @@ class _ReportListPageState extends State<ReportListPage> {
   List<PartialEarthquakeReport> reportList = [];
   DateTime? lastFetchTime;
 
-  Future<List<PartialEarthquakeReport>> fetchReportList() async {
+  Future<List<PartialEarthquakeReport>> refreshReportList() async {
     if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
       return reportList;
     }
 
-    var data = await ExpTech().getReportList();
+    final oldIdList = reportList.map((v) => v.id);
 
-    data = (data + reportList).toSet().toList();
-    data.sort((a, b) => b.time - a.time);
+    var newList = await ExpTech().getReportList();
+
+    newList.removeWhere(
+      (r) => oldIdList.contains(r.id),
+    );
+
+    newList = reportList + newList;
+
+    newList.sort((a, b) => b.time - a.time);
 
     setState(() {
-      reportList = data;
+      reportList = newList;
     });
 
     return reportList;
@@ -35,7 +42,7 @@ class _ReportListPageState extends State<ReportListPage> {
   @override
   void initState() {
     super.initState();
-    fetchReportList();
+    refreshReportList();
   }
 
   @override
@@ -52,27 +59,33 @@ class _ReportListPageState extends State<ReportListPage> {
             );
           }
 
-          return ListView.builder(
-            itemCount: reportList.length,
-            itemBuilder: (context, index) {
-              var showDate = false;
-              final current = reportList[index];
+          return RefreshIndicator(
+            onRefresh: () async {
+              await refreshReportList();
+            },
+            child: ListView.builder(
+              itemCount: reportList.length,
+              itemBuilder: (context, index) {
+                var showDate = false;
+                final current = reportList[index];
 
-              if (index != 0) {
-                final prev = reportList[index - 1];
-                if (current.dateTime.day != prev.dateTime.day) {
+                if (index != 0) {
+                  final prev = reportList[index - 1];
+                  if (current.dateTime.day != prev.dateTime.day) {
+                    showDate = true;
+                  }
+                } else {
                   showDate = true;
                 }
-              } else {
-                showDate = true;
-              }
 
-              return ReportListItem(
-                report: current,
-                showDate: showDate,
-                first: index == 0,
-              );
-            },
+                return ReportListItem(
+                  report: current,
+                  showDate: showDate,
+                  first: index == 0,
+                  refreshReportList: refreshReportList,
+                );
+              },
+            ),
           );
         },
       ),
