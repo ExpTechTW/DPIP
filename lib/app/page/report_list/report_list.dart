@@ -67,7 +67,11 @@ class _ReportListPageState extends State<ReportListPage> {
                 showDate = true;
               }
 
-              return ReportListItem(report: current, showDate: showDate);
+              return ReportListItem(
+                report: current,
+                showDate: showDate,
+                first: index == 0,
+              );
             },
           );
         },

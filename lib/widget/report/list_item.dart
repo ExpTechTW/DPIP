@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/report/report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/intensity_color.dart';
@@ -10,12 +11,14 @@ class ReportListItem extends StatelessWidget {
   final PartialEarthquakeReport report;
   final double height;
   final bool showDate;
+  final bool first;
 
   const ReportListItem({
     super.key,
     required this.report,
     this.showDate = false,
     this.height = 88,
+    this.first = false,
   });
 
   @override
@@ -71,15 +74,26 @@ class ReportListItem extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    Container(
-                      width: 2,
-                      height: height,
-                      color: context.colors.outlineVariant, // Color of the vertical line
-                    ),
+                    if (first)
+                      Padding(
+                        padding: EdgeInsets.only(top: height / 2),
+                        child: Container(
+                          width: 2,
+                          height: first ? height / 2 : height,
+                          color: context.colors.outlineVariant, // Color of the vertical line
+                        ),
+                      )
+                    else
+                      Container(
+                        width: 2,
+                        height: first ? height / 2 : height,
+                        color: context.colors.outlineVariant, // Color of the vertical line
+                      ),
                     IntensityBox(
                       intensity: report.intensity,
                       size: 36,
                       borderRadius: 36,
+                      border: !report.hasNumber,
                     ),
                   ],
                 ),
@@ -112,7 +126,16 @@ class ReportListItem extends StatelessWidget {
             ],
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return ReportPage(reportId: report.id);
+              },
+            ),
+          );
+        },
       ),
     );
   }

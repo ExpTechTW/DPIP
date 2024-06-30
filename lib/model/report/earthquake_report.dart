@@ -113,7 +113,7 @@ class EarthquakeReport {
 
   String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$zipUrl/$pgvMapImageName";
 
-  int? getMaxIntensity() {
+  int getMaxIntensity() {
     int max = 0;
 
     list.forEach((areaName, area) {
