@@ -53,7 +53,7 @@ class ReportListItem extends StatelessWidget {
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           color: context.colors.onSurfaceVariant,
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
