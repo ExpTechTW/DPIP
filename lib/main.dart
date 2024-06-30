@@ -19,7 +19,7 @@ void main() async {
     if (value == null) return;
     Global.preference.setString("fcm-token", value);
   });
-  bool isAutoLocatingEnabled = Global.preference.getBool("loc-auto") ?? false;
+  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await requestNotificationPermission();
     final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();

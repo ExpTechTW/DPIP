@@ -15,14 +15,14 @@ class SettingsLocationView extends StatefulWidget {
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> {
-  bool isAutoLocatingEnabled = Global.preference.getBool("loc-auto") ?? false;
+  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
 
   Future toggleAutoLocation() async {
     if (isAutoLocatingEnabled) {
       stopBackgroundService();
       setState(() {
         isAutoLocatingEnabled = false;
-        Global.preference.setBool("loc-auto", isAutoLocatingEnabled);
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
     } else {
       // TODO: Check Permission and start location service
@@ -34,7 +34,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
       setState(() {
         isAutoLocatingEnabled = true;
-        Global.preference.setBool("loc-auto", isAutoLocatingEnabled);
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
     }
   }
