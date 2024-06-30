@@ -22,12 +22,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   @override
   void initState() {
     super.initState();
-    init();
+    initlocstatus();
   }
 
-  void init() async {
-    final testLocationAlwaysEnabled = await requestLocationAlwaysPermission(true);
-    if (testLocationAlwaysEnabled.locstatus == "永久拒絕") {
+  Future<void> initlocstatus() async {
+    if (await Permission.speech.isPermanentlyDenied) {
       isPermanentlyDenied = true;
     }
   }
@@ -42,7 +41,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     } else {
       // TODO: Check Permission and start location service
       final isNotificationEnabled = await requestNotificationPermission();
-      final isLocationAlwaysEnabled = await requestLocationAlwaysPermission(false);
+      final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
       if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
         await initializeService();
       }

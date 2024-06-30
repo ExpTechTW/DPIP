@@ -58,48 +58,40 @@ class LocationStatus {
   LocationStatus(this.locstatus, this.islocstatus);
 }
 
-Future<LocationStatus> requestLocationAlwaysPermission(bool init) async {
+Future<LocationStatus> requestLocationAlwaysPermission() async {
   String locstatus = "";
   bool islocGranted = false;
   if (Platform.isAndroid) {
-    if (init) {
-      LocationPermission permission = await Geolocator.checkPermission();
-      bool isLocationAutoSetEnabled = Global.preference.getBool("auto-location") ?? false;
-      if (isLocationAutoSetEnabled) {
-        if (permission == LocationPermission.always) {
-          islocGranted = true;
-        } else if (permission == LocationPermission.deniedForever) {
-          locstatus = "永久拒絕";
-        }
-      }
-    } else {
-      PermissionStatus status = await Permission.location.request();
+    PermissionStatus status = await Permission.location.request();
+    if (status.isGranted) {
+      print('位置權限已授予');
+
+      status = await Permission.locationAlways.request();
       if (status.isGranted) {
-        print('位置權限已授予');
+        print('背景位置權限已授予');
+        islocGranted = true;
+      }
+    } else if (status.isDenied) {
+      print('位置權限被拒絕');
 
-        status = await Permission.locationAlways.request();
-        if (status.isGranted) {
-          print('背景位置權限已授予');
-          islocGranted = true;
-        }
-      } else if (status.isDenied) {
-        print('位置權限被拒絕');
-
-        status = await Permission.locationAlways.request();
-        if (status.isGranted) {
-          print('背景位置權限已授予');
-          islocGranted = true;
-        }
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('背景位置權限已授予');
+        islocGranted = true;
+      }
+    } else if (status.isPermanentlyDenied) {
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('背景位置權限已授予');
+        islocGranted = true;
       } else if (status.isPermanentlyDenied) {
-        status = await Permission.locationAlways.request();
-        if (status.isGranted) {
-          print('背景位置權限已授予');
-          islocGranted = true;
-        } else if (status.isPermanentlyDenied) {
-          print('位置權限被永久拒絕');
-          // await openAppSettings();
-          locstatus = "永久拒絕";
-        }
+        print('位置權限被永久拒絕');
+        // await openAppSettings();
+        locstatus = "永久拒絕";
+      } else {
+        print('位置權限被永久拒絕');
+        // await openAppSettings();
+        locstatus = "永久拒絕";
       }
     }
   } else if (Platform.isIOS) {
