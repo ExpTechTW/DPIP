@@ -60,9 +60,9 @@ class _ReportRouteState extends State<ReportRoute> with SingleTickerProviderStat
         title: Text(widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震"),
       ),
       body: Stack(children: [
-        FlutterMap(
-          children: [],
-        ),
+        // FlutterMap(
+        //   children: [],
+        // ),
         Positioned.fill(
           child: DraggableScrollableSheet(
             initialChildSize: sheetInitialSize,
