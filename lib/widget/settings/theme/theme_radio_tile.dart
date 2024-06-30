@@ -1,3 +1,4 @@
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -48,7 +49,17 @@ class ThemeRadioTile extends StatelessWidget {
             ),
             Row(
               children: [
-                Radio(value: value, groupValue: groupValue, onChanged: onChanged),
+                Radio(
+                  value: value,
+                  groupValue: groupValue,
+                  onChanged: onChanged,
+                  fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return context.colors.primary;
+                    }
+                    return context.colors.outline;
+                  }),
+                ),
                 Text(title),
               ],
             )
