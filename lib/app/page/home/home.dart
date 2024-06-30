@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
           initialZoom: 7,
           minZoom: 7,
           maxZoom: 12,
+          backgroundColor: Colors.transparent,
         ),
         children: [
           TileLayer(
