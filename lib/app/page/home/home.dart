@@ -20,30 +20,37 @@ class _HomePageState extends State<HomePage> {
           target: LatLng(23.6978, 120.9605), // 台灣的經緯度
           zoom: 8,
         ),
-        styleString: "https://demotiles.maplibre.org/style.json", // 替換為可用的樣式URL
+        styleString: '''
+        {
+          "version": 8,
+          "sources": {
+            "radar-source": {
+              "type": "raster",
+              "tiles": ["https://api-1.exptech.dev/api/v1/tiles/radar/{z}/{x}/{y}.png"],
+              "tileSize": 256
+            }
+          },
+          "layers": [
+            {
+              "id": "background",
+              "type": "background",
+              "paint": {
+                "background-color": "#0d1321"
+              }
+            },
+            {
+              "id": "radar-layer",
+              "type": "raster",
+              "source": "radar-source"
+            }
+          ]
+        }
+        ''',
       ),
     );
   }
 
   void _onMapCreated(MaplibreMapController controller) {
     mapController = controller;
-    addTileLayer();
-  }
-
-  void addTileLayer() {
-    // 添加雷達瓦片源
-    mapController.addSource(
-        "radar-source",
-        const RasterSourceProperties(
-            tiles: [
-              "https://api-1.exptech.dev/api/v1/tiles/radar/{z}/{x}/{y}.png"
-            ],
-            tileSize: 256));
-
-    // 在地圖上添加圖層以展示雷達數據
-    mapController.addLayer(
-        "radar-layer",
-        "radar-source",
-        const RasterLayerProperties());
   }
 }
