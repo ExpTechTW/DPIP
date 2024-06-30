@@ -14,6 +14,8 @@ class SettingsRoute extends StatefulWidget {
 class _SettingsRouteState extends State<SettingsRoute> {
   final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
   List<String> history = [];
+  final backTransition = const Interval(0, 0.5, curve: Easing.emphasizedAccelerate);
+  final forwardTransition = const Interval(0.5, 1, curve: Easing.emphasizedDecelerate);
 
   @override
   Widget build(BuildContext context) {
@@ -77,16 +79,18 @@ class _SettingsRouteState extends State<SettingsRoute> {
                 default:
                   return PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) => const SettingsRootView(),
+                    transitionDuration: Durations.long4,
+                    reverseTransitionDuration: Durations.long4,
                     transitionsBuilder: (context, animation, secondaryAnimation, child) {
                       var slide = Tween(
                         begin: Offset.zero,
                         end: const Offset(-0.2, 0.0),
-                      ).chain(CurveTween(curve: Easing.standardAccelerate));
+                      ).chain(CurveTween(curve: backTransition));
 
                       var fade = Tween(
                         begin: 1.0,
                         end: 0.0,
-                      ).chain(CurveTween(curve: Easing.standardAccelerate));
+                      ).chain(CurveTween(curve: backTransition));
 
                       return SlideTransition(
                         position: secondaryAnimation.drive(slide),
@@ -98,16 +102,18 @@ class _SettingsRouteState extends State<SettingsRoute> {
 
               return PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) => child,
+                transitionDuration: Durations.long4,
+                reverseTransitionDuration: Durations.long4,
                 transitionsBuilder: (context, animation, secondaryAnimation, child) {
                   var slide = Tween(
                     begin: const Offset(0.2, 0.0),
                     end: Offset.zero,
-                  ).chain(CurveTween(curve: Easing.standardDecelerate));
+                  ).chain(CurveTween(curve: forwardTransition));
 
                   var fade = Tween(
                     begin: 0.0,
                     end: 1.0,
-                  ).chain(CurveTween(curve: Easing.standardDecelerate));
+                  ).chain(CurveTween(curve: forwardTransition));
 
                   return SlideTransition(
                     position: animation.drive(slide),
