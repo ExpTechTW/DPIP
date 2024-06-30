@@ -23,7 +23,7 @@ void main() async {
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await requestNotificationPermission();
     final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-    if (isLocationAlwaysEnabled && isNotificationEnabled) {
+    if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
       await initializeService();
     }
   }

@@ -6,6 +6,7 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsLocationView extends StatefulWidget {
   const SettingsLocationView({super.key});
@@ -16,6 +17,7 @@ class SettingsLocationView extends StatefulWidget {
 
 class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+  bool isPermanentlyDenied = false;
 
   Future toggleAutoLocation() async {
     if (isAutoLocatingEnabled) {
@@ -28,11 +30,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       // TODO: Check Permission and start location service
       final isNotificationEnabled = await requestNotificationPermission();
       final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-      if (isLocationAlwaysEnabled && isNotificationEnabled) {
+      if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
         await initializeService();
       }
-
       setState(() {
+        if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
+          isPermanentlyDenied = true;
+        }
         isAutoLocatingEnabled = true;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
@@ -62,6 +66,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               onChanged: (value) => toggleAutoLocation(),
             ),
           ),
+          if (isPermanentlyDenied)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(children: [
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Symbols.warning,
+                    color: context.colors.error,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    "定位功能已被永久拒絕，請移至設定允許權限",
+                    style: TextStyle(color: context.colors.error),
+                  ),
+                ),
+                TextButton(child: const Text("設定"), onPressed: () async {await openAppSettings();}),
+              ]),
+            ),
           const Padding(
             padding: EdgeInsets.all(16),
             child: Row(children: [

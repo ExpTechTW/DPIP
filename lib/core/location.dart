@@ -50,8 +50,17 @@ Future<LocationResult> getLocationcitytown(double latitude, double longitude) as
   return LocationResult("", false);
 }
 
-Future<bool> requestLocationAlwaysPermission() async {
+class LocationStatus {
+  final String locstatus;
+  final bool islocstatus;
+
+  LocationStatus(this.locstatus, this.islocstatus);
+}
+
+Future<LocationStatus> requestLocationAlwaysPermission() async {
   PermissionStatus status = await Permission.location.request();
+  String locstatus = "";
+  bool islocGranted = false;
 
   if (status.isGranted) {
     print('位置權限已授予');
@@ -59,7 +68,7 @@ Future<bool> requestLocationAlwaysPermission() async {
     status = await Permission.locationAlways.request();
     if (status.isGranted) {
       print('背景位置權限已授予');
-      return true;
+      islocGranted = true;
     }
   } else if (status.isDenied) {
     print('位置權限被拒絕');
@@ -67,18 +76,19 @@ Future<bool> requestLocationAlwaysPermission() async {
     status = await Permission.locationAlways.request();
     if (status.isGranted) {
       print('背景位置權限已授予');
-      return true;
+      islocGranted = true;
     }
   } else if (status.isPermanentlyDenied) {
     status = await Permission.locationAlways.request();
     if (status.isGranted) {
       print('背景位置權限已授予');
-      return true;
+      islocGranted = true;
     } else if (status.isPermanentlyDenied) {
       print('位置權限被永久拒絕');
-      await openAppSettings();
+      // await openAppSettings();
+      locstatus = "永久拒絕";
     }
   }
 
-  return false;
+  return LocationStatus(locstatus, islocGranted);
 }
