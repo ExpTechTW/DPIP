@@ -1,3 +1,7 @@
+import 'package:dpip/core/location.dart';
+import 'package:dpip/core/notify.dart';
+import 'package:dpip/core/service.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +15,26 @@ class SettingsLocationView extends StatefulWidget {
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> {
-  bool isAutoLocatingEnabled = false;
+  bool isAutoLocatingEnabled = Global.preference.getBool("loc-auto") ?? false;
 
   Future toggleAutoLocation() async {
     if (isAutoLocatingEnabled) {
+      stopBackgroundService();
       setState(() {
         isAutoLocatingEnabled = false;
+        Global.preference.setBool("loc-auto", isAutoLocatingEnabled);
       });
     } else {
       // TODO: Check Permission and start location service
+      final isNotificationEnabled = await requestNotificationPermission();
+      final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
+      if (isLocationAlwaysEnabled && isNotificationEnabled) {
+        await initializeService();
+      }
 
       setState(() {
         isAutoLocatingEnabled = true;
+        Global.preference.setBool("loc-auto", isAutoLocatingEnabled);
       });
     }
   }

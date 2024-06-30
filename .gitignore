@@ -46,3 +46,4 @@ app.*.map.json
 *.g.dart
 /ios/Flutter
 /windows
+/.vscode
