@@ -22,7 +22,7 @@ void main() async {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await requestNotificationPermission();
-    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
+    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission(true);
     if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
       await initializeService();
     }

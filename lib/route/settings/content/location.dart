@@ -19,6 +19,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   bool isPermanentlyDenied = false;
 
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  void init() async {
+    final testLocationAlwaysEnabled = await requestLocationAlwaysPermission(true);
+    if (testLocationAlwaysEnabled.locstatus == "永久拒絕") {
+      isPermanentlyDenied = true;
+    }
+  }
+
   Future toggleAutoLocation() async {
     if (isAutoLocatingEnabled) {
       stopBackgroundService();
@@ -29,7 +42,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     } else {
       // TODO: Check Permission and start location service
       final isNotificationEnabled = await requestNotificationPermission();
-      final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
+      final isLocationAlwaysEnabled = await requestLocationAlwaysPermission(false);
       if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
         await initializeService();
       }

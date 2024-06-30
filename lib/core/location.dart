@@ -5,6 +5,7 @@ import 'package:dpip/global.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<Position> getLocation() async {
   final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -57,36 +58,56 @@ class LocationStatus {
   LocationStatus(this.locstatus, this.islocstatus);
 }
 
-Future<LocationStatus> requestLocationAlwaysPermission() async {
-  PermissionStatus status = await Permission.location.request();
+Future<LocationStatus> requestLocationAlwaysPermission(bool init) async {
   String locstatus = "";
   bool islocGranted = false;
+  if (Platform.isAndroid) {
+    if (init) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      bool isLocationAutoSetEnabled = Global.preference.getBool("auto-location") ?? false;
+      if (isLocationAutoSetEnabled) {
+        if (permission == LocationPermission.always) {
+          islocGranted = true;
+        } else if (permission == LocationPermission.deniedForever) {
+          locstatus = "永久拒絕";
+        }
+      }
+    } else {
+      PermissionStatus status = await Permission.location.request();
+      if (status.isGranted) {
+        print('位置權限已授予');
 
-  if (status.isGranted) {
-    print('位置權限已授予');
+        status = await Permission.locationAlways.request();
+        if (status.isGranted) {
+          print('背景位置權限已授予');
+          islocGranted = true;
+        }
+      } else if (status.isDenied) {
+        print('位置權限被拒絕');
 
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('背景位置權限已授予');
-      islocGranted = true;
+        status = await Permission.locationAlways.request();
+        if (status.isGranted) {
+          print('背景位置權限已授予');
+          islocGranted = true;
+        }
+      } else if (status.isPermanentlyDenied) {
+        status = await Permission.locationAlways.request();
+        if (status.isGranted) {
+          print('背景位置權限已授予');
+          islocGranted = true;
+        } else if (status.isPermanentlyDenied) {
+          print('位置權限被永久拒絕');
+          // await openAppSettings();
+          locstatus = "永久拒絕";
+        }
+      }
     }
-  } else if (status.isDenied) {
-    print('位置權限被拒絕');
-
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('背景位置權限已授予');
+  } else if (Platform.isIOS) {
+    const urlIOS = 'app-settings:';
+    final uriIOS = Uri.parse(urlIOS);
+    if (await canLaunchUrl(uriIOS)) {
+      await launchUrl(uriIOS);
       islocGranted = true;
-    }
-  } else if (status.isPermanentlyDenied) {
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('背景位置權限已授予');
-      islocGranted = true;
-    } else if (status.isPermanentlyDenied) {
-      print('位置權限被永久拒絕');
-      // await openAppSettings();
-      locstatus = "永久拒絕";
     }
   }
 
