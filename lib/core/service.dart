@@ -9,6 +9,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+void startBackgroundService() async {
+  final service = FlutterBackgroundService();
+  var isRunning = await service.isRunning();
+  if (isRunning) {
+    service.invoke("stopService");
+  }
+  service.startService();
+}
+
+void stopBackgroundService() async {
+  final service = FlutterBackgroundService();
+  var isRunning = await service.isRunning();
+  if (isRunning) {
+    service.invoke("stopService");
+  }
+}
+
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
 
@@ -78,6 +95,7 @@ void onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) {
     service.stopSelf();
+    debugPrint("background process is now stopped");
   });
 
   Timer.periodic(const Duration(seconds: 1), (timer) async {

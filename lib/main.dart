@@ -2,13 +2,12 @@ import 'package:dpip/app/dpip.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
+import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timezone/data/latest.dart';
-
-import 'core/service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,14 +19,15 @@ void main() async {
     if (value == null) return;
     Global.preference.setString("fcm-token", value);
   });
-  final isNotificationEnabled = await requestNotificationPermission();
-  final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-  if (isLocationAlwaysEnabled && isNotificationEnabled) {
-    await initializeService();
+  bool isAutoLocatingEnabled = Global.preference.getBool("loc-auto") ?? false;
+  if (isAutoLocatingEnabled) {
+    final isNotificationEnabled = await requestNotificationPermission();
+    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
+    if (isLocationAlwaysEnabled && isNotificationEnabled) {
+      await initializeService();
+    }
   }
   initializeTimeZones();
-
-  await Global.init();
   runApp(const DpipApp());
 }
 
