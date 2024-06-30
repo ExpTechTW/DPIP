@@ -7,9 +7,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<Position> getLocation() async {
-    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 
-    return position;
+  return position;
 }
 
 class LocationResult {

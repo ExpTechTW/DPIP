@@ -86,7 +86,7 @@ void onStart(ServiceInstance service) async {
         final position = await getLocation();
         String lat = position.latitude.toStringAsFixed(4);
         String lon = position.longitude.toStringAsFixed(4);
-        LocationResult country = await getLocationcitytown(position.latitude,position.longitude);
+        LocationResult country = await getLocationcitytown(position.latitude, position.longitude);
         String fcmToken = Global.preference.getString("fcm-token") ?? "";
         if (country.change && fcmToken != "") {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
