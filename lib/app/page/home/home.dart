@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
 
         },
         minMaxZoomPreference: const MinMaxZoomPreference(
-          0,
+          4,
           10,
         ),
         initialCameraPosition: const CameraPosition(
