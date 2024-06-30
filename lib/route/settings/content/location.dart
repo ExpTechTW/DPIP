@@ -26,7 +26,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Future<void> initlocstatus() async {
-    if (await Permission.speech.isPermanentlyDenied) {
+    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
+    if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
       setState(() {
         isPermanentlyDenied = true;
         isAutoLocatingEnabled = false;
