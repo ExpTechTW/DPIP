@@ -9,16 +9,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late MaplibreMapController mapController;
+  late MapLibreMapController mapController;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MaplibreMap(
+      body: MapLibreMap(
         onMapCreated: _onMapCreated,
+        onStyleLoadedCallback: () async {
+
+        },
+        minMaxZoomPreference: const MinMaxZoomPreference(
+          0,
+          10,
+        ),
         initialCameraPosition: const CameraPosition(
-          target: LatLng(23.6978, 120.9605), // 台灣的經緯度
-          zoom: 8,
+          target: LatLng(23.6978, 120.9605),
+          zoom: 6,
         ),
         styleString: '''
         {
@@ -46,11 +53,14 @@ class _HomePageState extends State<HomePage> {
           ]
         }
         ''',
+        rotateGesturesEnabled: false,
+        tiltGesturesEnabled: false,
+        trackCameraPosition: true,
       ),
     );
   }
 
-  void _onMapCreated(MaplibreMapController controller) {
+  void _onMapCreated(MapLibreMapController controller) {
     mapController = controller;
   }
 }
