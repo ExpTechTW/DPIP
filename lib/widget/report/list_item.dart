@@ -36,7 +36,7 @@ class ReportListItem extends StatelessWidget {
                * 時間
                */
               SizedBox(
-                width: 96,
+                width: 88,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -50,8 +50,9 @@ class ReportListItem extends StatelessWidget {
                         ),
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
                           color: context.colors.onSurfaceVariant,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     Text(
@@ -64,6 +65,7 @@ class ReportListItem extends StatelessWidget {
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         color: context.colors.onSurfaceVariant,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -98,6 +100,7 @@ class ReportListItem extends StatelessWidget {
                   ],
                 ),
               ),
+              // Text(report.hasNumber ? report.number! : "小區域"),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -108,9 +111,9 @@ class ReportListItem extends StatelessWidget {
                      */
                     Text(
                       report.extractLocation(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                        fontSize: report.hasNumber ? 20 : 18,
+                        fontWeight: report.hasNumber ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -119,6 +122,7 @@ class ReportListItem extends StatelessWidget {
                      */
                     Text(
                       "M ${report.mag.toStringAsFixed(1)}　深度 ${report.depth} km",
+                      style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
                   ],
                 ),
