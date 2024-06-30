@@ -1,0 +1,14 @@
+{
+  "@@locale": "en",
+  "home": "Home",
+  "monitor": "Monitor",
+  "report": "Reports",
+  "me": "Me",
+  "settings": "Settings",
+  "settingsDescription": "Adjust how DPIP should function.",
+  "donate": "Donate",
+  "instagram": "Follow us on Instagram",
+  "youtube": "Youtube Livestream",
+  "server_status": "Server Status",
+  "third_party_libraries": "Third Party Libraries"
+}

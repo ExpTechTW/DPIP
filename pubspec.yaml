@@ -26,6 +26,12 @@ dependencies:
   geolocator: ^12.0.0
   # 目前geolocator_android 4.6有問題，故鎖定在4.5.5
   geolocator_android: 4.5.5
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  dynamic_color: ^1.7.0
+  simple_icons: ^10.1.3
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -35,6 +41,8 @@ dev_dependencies:
   json_serializable: ^6.8.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
-    - assets/langs/
+    - assets/DPIP.png
+  

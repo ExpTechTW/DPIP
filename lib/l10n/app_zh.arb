@@ -1,0 +1,14 @@
+{
+  "@@locale": "zh",
+  "home": "主頁",
+  "monitor": "監視器",
+  "report": "地震報告",
+  "me": "我",
+  "settings": "設定",
+  "settingsDescription": "調整 DPIP 的運作方式。",
+  "donate": "贊助我們",
+  "instagram": "在 Instagram 上追蹤我們",
+  "youtube": "Youtube 直播",
+  "server_status": "伺服器狀態",
+  "third_party_libraries": "第三方套件授權"
+}

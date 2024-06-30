@@ -24,8 +24,8 @@ class ExpTech {
     return EarthquakeReport.fromJson(json);
   }
 
-  Future<List<PartialEarthquakeReport>> getReportList() async {
-    final requestUrl = Route.reportList();
+  Future<List<PartialEarthquakeReport>> getReportList({int? limit = 50}) async {
+    final requestUrl = Route.reportList(limit: limit);
 
     var res = await get(requestUrl);
 
@@ -39,7 +39,7 @@ class ExpTech {
   }
 
   Future<String> getNotifyLocation(String token, String lat, String lng) async {
-    final requestUrl = Route.location(token,lat,lng);
+    final requestUrl = Route.location(token, lat, lng);
 
     var res = await get(requestUrl);
 
