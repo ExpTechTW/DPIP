@@ -4,7 +4,7 @@ import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -60,8 +60,8 @@ class _ReportRouteState extends State<ReportRoute> with SingleTickerProviderStat
         title: Text(widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震"),
       ),
       body: Stack(children: [
-        MapLibreMap(
-          initialCameraPosition: const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
+        FlutterMap(
+          children: [],
         ),
         Positioned.fill(
           child: DraggableScrollableSheet(
