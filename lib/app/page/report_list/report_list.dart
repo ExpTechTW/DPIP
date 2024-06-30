@@ -34,6 +34,7 @@ class _ReportListPageState extends State<ReportListPage> {
 
     setState(() {
       reportList = newList;
+      lastFetchTime = DateTime.now();
     });
 
     return reportList;

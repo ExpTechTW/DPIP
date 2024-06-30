@@ -1,22 +1,24 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
+import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-class ReportPage extends StatefulWidget {
-  final String reportId;
-  const ReportPage({super.key, required this.reportId});
+class ReportRoute extends StatefulWidget {
+  final PartialEarthquakeReport report;
+  const ReportRoute({super.key, required this.report});
 
   @override
-  State<ReportPage> createState() => _ReportPageState();
+  State<ReportRoute> createState() => _ReportRouteState();
 }
 
-class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateMixin {
+class _ReportRouteState extends State<ReportRoute> with SingleTickerProviderStateMixin {
+  final sheetController = DraggableScrollableController();
+  final sheetInitialSize = 0.2;
   late final AnimationController controller = BottomSheet.createAnimationController(this);
   late final animController = AnimationController(vsync: this);
-  final sheetController = DraggableScrollableController();
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
@@ -31,7 +33,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
   EarthquakeReport? report;
 
   Future<EarthquakeReport> fetchEarthquakeReport() async {
-    final data = await ExpTech().getReport(widget.reportId);
+    final data = await ExpTech().getReport(widget.report.id);
     setState(() {
       report = data;
     });
@@ -45,7 +47,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
     sheetController.addListener(
       () {
         final newSize = sheetController.size;
-        final scrollPosition = ((newSize - 0.25) / (1 - 0.25)).clamp(0.0, 1.0);
+        final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
         animController.animateTo(scrollPosition, duration: Duration.zero);
       },
     );
@@ -55,14 +57,16 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.reportId),
+        title: Text(widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震"),
       ),
       body: Stack(children: [
-        FlutterMap(
-          children: [],
+        MapLibreMap(
+          initialCameraPosition: const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
         ),
         Positioned.fill(
           child: DraggableScrollableSheet(
+            initialChildSize: sheetInitialSize,
+            minChildSize: sheetInitialSize,
             controller: sheetController,
             snap: true,
             builder: (context, scrollController) {
@@ -92,9 +96,14 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
                               child: Row(
                                 children: [
                                   IntensityBox(intensity: report!.getMaxIntensity()),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 16),
                                   Column(
-                                    children: [Text(report!.getLocation())],
+                                    children: [
+                                      Text(
+                                        report!.getLocation(),
+                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
                                   )
                                 ],
                               ),
