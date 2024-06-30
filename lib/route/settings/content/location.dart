@@ -27,7 +27,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   Future<void> initlocstatus() async {
     if (await Permission.speech.isPermanentlyDenied) {
-      isPermanentlyDenied = true;
+      setState(() {
+        isPermanentlyDenied = true;
+        isAutoLocatingEnabled = false;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+      });
     }
   }
 
@@ -48,9 +52,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       setState(() {
         if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
           isPermanentlyDenied = true;
+          isAutoLocatingEnabled = false;
+          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+        } else {
+          isPermanentlyDenied = false;
+          isAutoLocatingEnabled = true;
+          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
         }
-        isAutoLocatingEnabled = true;
-        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
     }
   }
