@@ -20,6 +20,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isPermanentlyDenied = false;
   bool isDenied = false;
 
+  String city = "";
+  String town = "";
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +45,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
+    } else {
+      setAutoLocationcitytown();
     }
   }
 
@@ -75,7 +80,20 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           isDenied = false;
           isAutoLocatingEnabled = true;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          setAutoLocationcitytown();
         }
+      });
+    }
+  }
+
+  Future setAutoLocationcitytown() async {
+    String citytowntemp = Global.preference.getString("loc-city-town") ?? "";
+    print(citytowntemp);
+    if (citytowntemp != "") {
+      setState(() {
+          List<String> parts = citytowntemp.split(' ');
+          city = parts[0];
+          town = parts[1];
       });
     }
   }
@@ -165,7 +183,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               child: Icon(Symbols.location_city),
             ),
             title: Text("縣市"),
-            subtitle: Text(""),
+            subtitle: Text(city),
             enabled: !isAutoLocatingEnabled,
             onTap: () {},
           ),
@@ -175,7 +193,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               child: Icon(Symbols.forest),
             ),
             title: Text("鄉鎮"),
-            subtitle: Text(""),
+            subtitle: Text(town),
             enabled: !isAutoLocatingEnabled,
             onTap: () {},
           )

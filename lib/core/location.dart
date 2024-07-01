@@ -22,6 +22,7 @@ class LocationResult {
 
 Future<LocationResult> getLocationcitytown(double latitude, double longitude) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+  LocationResult locationGet = LocationResult('', false);
   if (placemarks.isNotEmpty) {
     Placemark placemark = placemarks.first;
     String? city;
@@ -40,15 +41,14 @@ Future<LocationResult> getLocationcitytown(double latitude, double longitude) as
 
     if (citytowntemp == "" || citytowntemp != citytown) {
       await Global.preference.setString("loc-city-town", citytown);
-
-      return LocationResult(citytown, true);
+      locationGet = LocationResult(citytown, true);
+    } else {
+      locationGet = LocationResult(citytowntemp, false);
     }
-
     // print('縣市: $city');
     // print('鄉鎮市區: $town');
-    return LocationResult(citytown, false);
   }
-  return LocationResult("", false);
+  return locationGet;
 }
 
 class LocationStatus {

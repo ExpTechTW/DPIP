@@ -7,7 +7,6 @@ import 'package:dpip/global.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart';
 
 void main() async {
