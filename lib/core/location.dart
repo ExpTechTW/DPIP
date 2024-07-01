@@ -70,6 +70,9 @@ Future<LocationStatus> requestLocationAlwaysPermission() async {
       if (status.isGranted) {
         print('背景位置權限已授予');
         islocGranted = true;
+      } else {
+        print('位置權限被拒絕');
+        locstatus = "拒絕";
       }
     } else if (status.isDenied) {
       print('位置權限被拒絕');
@@ -78,20 +81,32 @@ Future<LocationStatus> requestLocationAlwaysPermission() async {
       if (status.isGranted) {
         print('背景位置權限已授予');
         islocGranted = true;
+      } else {
+        print('位置權限被拒絕');
+        locstatus = "拒絕";
       }
     } else if (status.isPermanentlyDenied) {
+      print('位置權限被永久拒絕');
+
       status = await Permission.locationAlways.request();
       if (status.isGranted) {
         print('背景位置權限已授予');
         islocGranted = true;
-      } else if (status.isPermanentlyDenied) {
-        print('位置權限被永久拒絕');
-        // await openAppSettings();
-        locstatus = "永久拒絕";
-      } else {
-        print('位置權限被永久拒絕');
-        // await openAppSettings();
-        locstatus = "永久拒絕";
+      } else if (status.isDenied) {
+        print('位置權限被拒絕');
+
+        status = await Permission.location.request();
+
+        if (status.isGranted) {
+          print('背景位置權限已授予');
+          islocGranted = true;
+        } else if (status.isDenied) {
+          print('位置權限被拒絕');
+          locstatus = "拒絕";
+        } else if (status.isPermanentlyDenied) {
+          print('位置權限被永久拒絕');
+          locstatus = "永久拒絕";
+        }
       }
     }
   } else if (Platform.isIOS) {
