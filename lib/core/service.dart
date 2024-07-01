@@ -102,11 +102,11 @@ void onStart(ServiceInstance service) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
         final position = await getLocation();
-        String lat = position.latitude.toStringAsFixed(4);
-        String lon = position.longitude.toStringAsFixed(4);
-        LocationResult country = await getLocationcitytown(position.latitude, position.longitude);
+        String lat = position.position.latitude.toStringAsFixed(4);
+        String lon = position.position.longitude.toStringAsFixed(4);
+        LocationResult country = await getLocationcitytown(position.position.latitude, position.position.longitude);
         String fcmToken = Global.preference.getString("fcm-token") ?? "";
-        if (country.change && fcmToken != "") {
+        if ((country.change && position.change) && fcmToken != "") {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
           print(body);
         }

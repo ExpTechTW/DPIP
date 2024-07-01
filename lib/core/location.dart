@@ -7,10 +7,39 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-Future<Position> getLocation() async {
-  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+class GetLocationResult {
+  final Position position;
+  final bool change;
 
-  return position;
+  GetLocationResult(this.position, this.change);
+}
+
+Future<GetLocationResult> getLocation() async {
+  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+  final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+  bool positionchange = false;
+
+  if ((positionlattemp == 0.0 && positionlontemp == 0.0) || (positionlattemp != position.latitude && positionlontemp != position.longitude)) {
+      await Global.preference.setDouble("loc-position-lat", position.latitude);
+      await Global.preference.setDouble("loc-position-lon", position.longitude);
+  }
+
+  double distance = Geolocator.distanceBetween(
+    positionlattemp,
+    positionlontemp,
+    position.latitude,
+    position.longitude
+  );
+
+  if (distance >= 250) {
+    positionchange = true;
+    print('距離: $distance');
+  } else {
+    print('距離: $distance');
+  }
+
+  return GetLocationResult(position,positionchange);
 }
 
 class LocationResult {
