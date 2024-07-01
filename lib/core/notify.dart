@@ -99,10 +99,8 @@ Future<bool> requestNotificationPermission() async {
   if (status.isGranted) {
     print('通知權限已授予');
     return true;
-  } else if (status.isDenied) {
+  } else {
     print('通知權限被拒絕');
-  } else if (status.isPermanentlyDenied) {
-    openAppSettings();
   }
   return false;
 }

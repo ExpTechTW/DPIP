@@ -19,6 +19,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   bool isPermanentlyDenied = false;
   bool isDenied = false;
+  bool isNotDenied = false;
 
   String city = "";
   String town = "";
@@ -30,11 +31,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Future<void> initlocstatus() async {
+    final isNotificationEnabled = await requestNotificationPermission();
     final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
     if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
       setState(() {
         isPermanentlyDenied = true;
         isDenied = false;
+        isNotDenied = false;
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
@@ -42,6 +45,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       setState(() {
         isPermanentlyDenied = false;
         isDenied = true;
+        isNotDenied = false;
+        isAutoLocatingEnabled = false;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+      });
+    } else if (!isNotificationEnabled) {
+      setState(() {
+        isPermanentlyDenied = false;
+        isDenied = false;
+        isNotDenied = true;
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
@@ -68,16 +80,25 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
           isPermanentlyDenied = true;
           isDenied = false;
+          isNotDenied = false;
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
         } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
           isPermanentlyDenied = false;
           isDenied = true;
+          isNotDenied = false;
+          isAutoLocatingEnabled = false;
+          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+        } else if (!isNotificationEnabled) {
+          isPermanentlyDenied = false;
+          isDenied = false;
+          isNotDenied = true;
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
         } else {
           isPermanentlyDenied = false;
           isDenied = false;
+          isNotDenied = false;
           isAutoLocatingEnabled = true;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
           setAutoLocationcitytown();
@@ -157,6 +178,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                 Expanded(
                   child: Text(
                     '定位功能已被拒絕，請移至設定"一律允許"權限',
+                    style: TextStyle(color: context.colors.error),
+                  ),
+                ),
+                TextButton(child: const Text("設定"), onPressed: () async {await openAppSettings();}),
+              ]),
+            ),
+          if (isNotDenied)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(children: [
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Symbols.warning,
+                    color: context.colors.error,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '通知功能已被拒絕，請移至設定允許權限',
                     style: TextStyle(color: context.colors.error),
                   ),
                 ),
