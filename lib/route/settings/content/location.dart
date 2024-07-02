@@ -210,7 +210,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         return;
       }
 
-      await checkLocationAlwaysPermission();
+      final locationAlways = await checkLocationAlwaysPermission();
+
+      if (!locationAlways) {
+        return;
+      }
 
       await initializeService();
 
