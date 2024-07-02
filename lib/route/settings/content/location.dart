@@ -302,13 +302,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                       ),
                     ),
                     TextButton(
-                        child: const Text("設定"),
-                        onPressed: () async {
-                          final status = await Permission.locationAlways.request();
-                          if (status.isPermanentlyDenied) {
-                            openAppSettings();
-                          }
-                        }),
+                      child: const Text("設定"),
+                      onPressed: () async {
+                        final status = await Permission.locationAlways.request();
+                        if (status.isPermanentlyDenied) {
+                          openAppSettings();
+                        }
+                      },
+                    ),
                   ]),
                 ),
               ),
@@ -340,10 +341,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                       ),
                     ),
                     TextButton(
-                        child: const Text("設定"),
-                        onPressed: () async {
-                          await openAppSettings();
-                        }),
+                      child: const Text("設定"),
+                      onPressed: () async {
+                        await openAppSettings();
+                      },
+                    ),
                   ]),
                 ),
               ),
