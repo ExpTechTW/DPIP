@@ -136,6 +136,9 @@ Future<LocationStatus> requestLocationAlwaysPermission() async {
           print('位置權限被永久拒絕');
           locstatus = "永久拒絕";
         }
+      } else if (status.isPermanentlyDenied) {
+        print('位置權限被拒絕');
+        locstatus = "拒絕";
       }
     }
   // } else if (Platform.isIOS) {
