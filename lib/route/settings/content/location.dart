@@ -120,7 +120,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SwitchListTile(
               tileColor:
-                  isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainerHighest,
+                  isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 "啟用自動定位",

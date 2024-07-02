@@ -138,13 +138,13 @@ Future<LocationStatus> requestLocationAlwaysPermission() async {
         }
       }
     }
-  } else if (Platform.isIOS) {
-    const urlIOS = 'app-settings:';
-    final uriIOS = Uri.parse(urlIOS);
-    if (await canLaunchUrl(uriIOS)) {
-      await launchUrl(uriIOS);
-      islocGranted = true;
-    }
+  // } else if (Platform.isIOS) {
+  //   const urlIOS = 'app-settings:';
+  //   final uriIOS = Uri.parse(urlIOS);
+  //   if (await canLaunchUrl(uriIOS)) {
+  //     await launchUrl(uriIOS);
+  //     islocGranted = true;
+  //   }
   }
 
   return LocationStatus(locstatus, islocGranted);
