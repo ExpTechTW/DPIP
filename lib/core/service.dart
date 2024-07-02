@@ -83,8 +83,6 @@ void onStart(ServiceInstance service) async {
   await Global.init();
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  final isNotificationEnabled = await requestNotificationPermission();
-  final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
 
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
@@ -104,35 +102,33 @@ void onStart(ServiceInstance service) async {
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
-        if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
-          final position = await getLocation();
-          String lat = position.position.latitude.toStringAsFixed(4);
-          String lon = position.position.longitude.toStringAsFixed(4);
-          LocationResult country = await getLocationcitytown(position.position.latitude, position.position.longitude);
-          String fcmToken = Global.preference.getString("fcm-token") ?? "";
-          if ((country.change && position.change) && fcmToken != "") {
-            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-            print(body);
-          }
-          flutterLocalNotificationsPlugin.show(
-            888,
-            'COOL SERVICE',
-            'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
-            const NotificationDetails(
-              android: AndroidNotificationDetails(
-                'my_foreground',
-                'MY FOREGROUND SERVICE',
-                icon: 'ic_bg_service_small',
-                ongoing: true,
-              ),
-            ),
-          );
-
-          service.setForegroundNotificationInfo(
-            title: "My App Service",
-            content: "Updated at ${DateTime.now()}",
-          );
+        final position = await getLocation();
+        String lat = position.position.latitude.toStringAsFixed(4);
+        String lon = position.position.longitude.toStringAsFixed(4);
+        LocationResult country = await getLocationcitytown(position.position.latitude, position.position.longitude);
+        String fcmToken = Global.preference.getString("fcm-token") ?? "";
+        if ((country.change && position.change) && fcmToken != "") {
+          final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+          print(body);
         }
+        flutterLocalNotificationsPlugin.show(
+          888,
+          'COOL SERVICE',
+          'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'my_foreground',
+              'MY FOREGROUND SERVICE',
+              icon: 'ic_bg_service_small',
+              ongoing: true,
+            ),
+          ),
+        );
+
+        service.setForegroundNotificationInfo(
+          title: "My App Service",
+          content: "Updated at ${DateTime.now()}",
+        );
       }
     }
   });

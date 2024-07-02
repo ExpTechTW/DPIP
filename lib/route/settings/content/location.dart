@@ -36,6 +36,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     setState(() {
       if (!isNotificationEnabled) {
         isNotDenied = true;
+        isAutoLocatingEnabled = false;
       }
       if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
         isPermanentlyDenied = true;
@@ -45,7 +46,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         isPermanentlyDenied = false;
         isDenied = true;
         isAutoLocatingEnabled = false;
-      } else {
+      } else if (isLocationAlwaysEnabled.islocstatus) {
         isPermanentlyDenied = false;
         isDenied = false;
         isNotDenied = false;
@@ -59,11 +60,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   Future toggleAutoLocation(bool value) async {
     // TODO: Check Permission and start location service
     if (value) {
-      stopBackgroundService();
+      await stopBackgroundService();
       final isNotificationEnabled = await requestNotificationPermission();
       final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
       if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
-        await startBackgroundService();
+        await initializeService();
       }
       setState(() {
         if (!isNotificationEnabled) {
@@ -78,7 +79,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           isPermanentlyDenied = false;
           isDenied = true;
           isAutoLocatingEnabled = !value;
-        } else {
+        } else if (isLocationAlwaysEnabled.islocstatus) {
           isPermanentlyDenied = false;
           isDenied = false;
           isNotDenied = false;
@@ -87,7 +88,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         }
       });
     } else {
-      stopBackgroundService();
+      await stopBackgroundService();
       setState(() {
         isAutoLocatingEnabled = value;
       });

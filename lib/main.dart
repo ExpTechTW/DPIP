@@ -21,12 +21,12 @@ void main() async {
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
-    await initializeService();
-    await stopBackgroundService();
     final isNotificationEnabled = await requestNotificationPermission();
     final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
     if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
-      await startBackgroundService();
+      await initializeService();
+    } else {
+      await stopBackgroundService();
     }
   }
   initializeTimeZones();
