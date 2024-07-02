@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-void startBackgroundService() async {
+Future<void> startBackgroundService() async {
   final service = FlutterBackgroundService();
   var isRunning = await service.isRunning();
   if (isRunning) {
@@ -18,7 +18,7 @@ void startBackgroundService() async {
   service.startService();
 }
 
-void stopBackgroundService() async {
+Future<void> stopBackgroundService() async {
   final service = FlutterBackgroundService();
   var isRunning = await service.isRunning();
   if (isRunning) {

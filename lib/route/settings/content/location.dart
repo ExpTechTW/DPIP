@@ -32,77 +32,68 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   Future<void> initlocstatus() async {
     final isNotificationEnabled = await requestNotificationPermission();
-    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-    if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
+    if (!isNotificationEnabled) {
       setState(() {
+        isNotDenied = true;
+      });
+    }
+    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
+    setState(() {
+      if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
         isPermanentlyDenied = true;
         isDenied = false;
-        isNotDenied = false;
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-      });
-    } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
-      setState(() {
+      } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
         isPermanentlyDenied = false;
         isDenied = true;
-        isNotDenied = false;
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-      });
-    } else if (!isNotificationEnabled) {
-      setState(() {
-        isPermanentlyDenied = false;
-        isDenied = false;
-        isNotDenied = true;
-        isAutoLocatingEnabled = false;
-        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-      });
-    } else {
-      setAutoLocationcitytown();
-    }
+      } else {
+        setAutoLocationcitytown();
+      }
+    });
   }
 
-  Future toggleAutoLocation() async {
-    if (isAutoLocatingEnabled) {
+  Future toggleAutoLocation(bool value) async {
+    Global.preference.setBool("auto-location", value);
+    if (value) {
       stopBackgroundService();
       setState(() {
-        isAutoLocatingEnabled = false;
-        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+        isAutoLocatingEnabled = value;
       });
-    } else {
-      // TODO: Check Permission and start location service
+        // TODO: Check Permission and start location service
       final isNotificationEnabled = await requestNotificationPermission();
+      if (!isNotificationEnabled) {
+        setState(() {
+          isNotDenied = true;
+        });
+      }
       final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
       if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
-        await initializeService();
+        await startBackgroundService();
       }
       setState(() {
         if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
           isPermanentlyDenied = true;
           isDenied = false;
-          isNotDenied = false;
-          isAutoLocatingEnabled = false;
-          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          isAutoLocatingEnabled = value;
         } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
           isPermanentlyDenied = false;
           isDenied = true;
-          isNotDenied = false;
-          isAutoLocatingEnabled = false;
-          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-        } else if (!isNotificationEnabled) {
-          isPermanentlyDenied = false;
-          isDenied = false;
-          isNotDenied = true;
-          isAutoLocatingEnabled = false;
-          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          isAutoLocatingEnabled = value;
         } else {
           isPermanentlyDenied = false;
           isDenied = false;
           isNotDenied = false;
-          isAutoLocatingEnabled = true;
-          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          isAutoLocatingEnabled = value;
           setAutoLocationcitytown();
         }
+      });
+    } else {
+      stopBackgroundService();
+      setState(() {
+        isAutoLocatingEnabled = value;
       });
     }
   }
@@ -139,7 +130,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
               contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
               value: isAutoLocatingEnabled,
-              onChanged: (value) => toggleAutoLocation(),
+              onChanged: (value) => toggleAutoLocation(value),
             ),
           ),
           if (isPermanentlyDenied)
