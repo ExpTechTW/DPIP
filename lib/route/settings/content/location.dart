@@ -32,56 +32,52 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   Future<void> initlocstatus() async {
     final isNotificationEnabled = await requestNotificationPermission();
-    if (!isNotificationEnabled) {
-      setState(() {
-        isNotDenied = true;
-      });
-    }
     final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
     setState(() {
+      if (!isNotificationEnabled) {
+        isNotDenied = true;
+      }
       if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
         isPermanentlyDenied = true;
         isDenied = false;
         isAutoLocatingEnabled = false;
-        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
         isPermanentlyDenied = false;
         isDenied = true;
         isAutoLocatingEnabled = false;
-        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       } else {
+        isPermanentlyDenied = false;
+        isDenied = false;
+        isNotDenied = false;
+        isAutoLocatingEnabled = true;
         setAutoLocationcitytown();
       }
+      Global.preference.setBool("auto-location", isAutoLocatingEnabled);
     });
   }
 
   Future toggleAutoLocation(bool value) async {
-    Global.preference.setBool("auto-location", value);
+    // TODO: Check Permission and start location service
     if (value) {
       stopBackgroundService();
-      setState(() {
-        isAutoLocatingEnabled = value;
-      });
-        // TODO: Check Permission and start location service
       final isNotificationEnabled = await requestNotificationPermission();
-      if (!isNotificationEnabled) {
-        setState(() {
-          isNotDenied = true;
-        });
-      }
       final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
       if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
         await startBackgroundService();
       }
       setState(() {
+        if (!isNotificationEnabled) {
+          isNotDenied = true;
+          isAutoLocatingEnabled = !value;
+        }
         if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
           isPermanentlyDenied = true;
           isDenied = false;
-          isAutoLocatingEnabled = value;
+          isAutoLocatingEnabled = !value;
         } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
           isPermanentlyDenied = false;
           isDenied = true;
-          isAutoLocatingEnabled = value;
+          isAutoLocatingEnabled = !value;
         } else {
           isPermanentlyDenied = false;
           isDenied = false;
@@ -96,6 +92,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         isAutoLocatingEnabled = value;
       });
     }
+    Global.preference.setBool("auto-location", isAutoLocatingEnabled);
   }
 
   Future setAutoLocationcitytown() async {
