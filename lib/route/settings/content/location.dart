@@ -199,20 +199,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       return;
     } else {
       final location = await checkLocationPermission();
-
-      if (!location) {
-        return;
-      }
-
       final notification = await checkNotificationPermission();
-
-      if (!notification) {
-        return;
-      }
-
       final locationAlways = await checkLocationAlwaysPermission();
 
-      if (!locationAlways) {
+      if (!location && !notification && !locationAlways) {
         return;
       }
 
