@@ -39,49 +39,53 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Future<bool> checkNotificationPermission() async {
-    final status = await Permission.notification.status;
+    final status = await Permission.notification.request();
+    if (!mounted) return false;
 
     setState(() => notificationPermission = status);
 
-    if (status.isGranted) {
-      return true;
-    } else {
-      if (!mounted) return false;
+    if (!status.isGranted) {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            icon: const Icon(Symbols.error),
+            title: const Text("無法取得通知權限"),
+            content: Text(
+              "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
+            ),
+            actionsAlignment: MainAxisAlignment.spaceBetween,
+            actions: [
+              TextButton(
+                child: const Text("取消"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              status.isPermanentlyDenied
+                  ? FilledButton(
+                      child: const Text("設定"),
+                      onPressed: () {
+                        openAppSettings();
+                        Navigator.pop(context);
+                      },
+                    )
+                  : FilledButton(
+                      child: const Text("再試一次"),
+                      onPressed: () {
+                        checkNotificationPermission();
+                        Navigator.pop(context);
+                      },
+                    ),
+            ],
+          );
+        },
+      );
 
-      final status = await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text("通知權限"),
-                content: const Text("為了讓背景定位功能能正常運作，我們將懸掛一個常駐通知以防止系統將自動定位功能暫停。"),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: const Text("取消"),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  TextButton(
-                    child: const Text("確定"),
-                    onPressed: () async {
-                      final status = await Permission.notification.request();
-
-                      setState(() => notificationPermission = status);
-
-                      if (!context.mounted) return;
-
-                      Navigator.pop(context, status.isGranted);
-                    },
-                  ),
-                ],
-              );
-            },
-          ) ??
-          false;
-
-      return status;
+      return false;
     }
+
+    return true;
   }
 
   Future<bool> checkLocationPermission() async {
