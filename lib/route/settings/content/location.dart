@@ -210,6 +210,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         return;
       }
 
+      await checkLocationAlwaysPermission();
+
       await initializeService();
 
       setState(() {
@@ -312,31 +314,40 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
             ),
           if (notificationPermission != null)
-            if (notificationPermission!.isDenied)
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Icon(
-                      Symbols.warning,
-                      color: context.colors.error,
+            Visibility(
+              visible: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted,
+              maintainAnimation: true,
+              maintainState: true,
+              child: AnimatedOpacity(
+                opacity: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
+                curve: const Interval(0.2, 1, curve: Easing.standard),
+                duration: Durations.medium2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Symbols.warning,
+                        color: context.colors.error,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '通知功能已被拒絕，請移至設定允許權限',
-                      style: TextStyle(color: context.colors.error),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '通知功能已被拒絕，請移至設定允許權限',
+                        style: TextStyle(color: context.colors.error),
+                      ),
                     ),
-                  ),
-                  TextButton(
-                      child: const Text("設定"),
-                      onPressed: () async {
-                        await openAppSettings();
-                      }),
-                ]),
+                    TextButton(
+                        child: const Text("設定"),
+                        onPressed: () async {
+                          await openAppSettings();
+                        }),
+                  ]),
+                ),
               ),
+            ),
           const Padding(
             padding: EdgeInsets.all(16),
             child: Row(children: [
