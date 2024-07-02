@@ -6,6 +6,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+int last_location_update = DateTime.now().toUtc().millisecondsSinceEpoch;
+
 class GetLocationResult {
   final Position position;
   final bool change;
@@ -27,7 +29,10 @@ Future<GetLocationResult> getLocation() async {
 
   double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
 
-  if (distance >= 250) {
+  int now = DateTime.now().toUtc().millisecondsSinceEpoch;
+
+  if (distance >= 250 && now - last_location_update > 300000) {
+    last_location_update = now;
     positionchange = true;
     print('距離: $distance');
   } else {
