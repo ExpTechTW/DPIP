@@ -52,17 +52,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       } else if (isNotificationEnabled){
         isNotDenied = false;
       }
-      if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
+      if (isLocationAlwaysEnabled == "永久拒絕") {
         isPermanentlyDenied = true;
         isDenied = false;
-      } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
+      } else if (isLocationAlwaysEnabled == "拒絕") {
         isPermanentlyDenied = false;
         isDenied = true;
-      } else if (isLocationAlwaysEnabled.islocstatus) {
+      } else if (isLocationAlwaysEnabled) {
         isPermanentlyDenied = false;
         isDenied = false;
       }
-      if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
+      if (isLocationAlwaysEnabled && isNotificationEnabled) {
         isAutoLocatingEnabled = true;
         setAutoLocationcitytown();
         if (_timer != null) {
@@ -83,13 +83,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     });
   }
 
+  Future<bool> requestLocationAlwaysPermission() async {
+    var status = await Permission.locationWhenInUse.status;
+    if (status.isDenied) {
+      status = await Permission.locationWhenInUse.request();
+    }
+
+    if (status.isPermanentlyDenied) {
+      openAppSettings();
+      return false;
+    }
+
+    return status.isGranted;
+  }
+
   Future toggleAutoLocation(bool value) async {
     // TODO: Check Permission and start location service
     if (value) {
       await stopBackgroundService();
       final isNotificationEnabled = await requestNotificationPermission();
       final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-      if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
+      if (isLocationAlwaysEnabled && isNotificationEnabled) {
         await initializeService();
       }
       setState(() {
@@ -98,17 +112,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         } else if (isNotificationEnabled){
           isNotDenied = false;
         }
-        if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
+        if (isLocationAlwaysEnabled == "永久拒絕") {
           isPermanentlyDenied = true;
           isDenied = false;
-        } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
+        } else if (isLocationAlwaysEnabled == "拒絕") {
           isPermanentlyDenied = false;
           isDenied = true;
-        } else if (isLocationAlwaysEnabled.islocstatus) {
+        } else if (isLocationAlwaysEnabled) {
           isPermanentlyDenied = false;
           isDenied = false;
         }
-        if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
+        if (isLocationAlwaysEnabled && isNotificationEnabled) {
           isAutoLocatingEnabled = value;
           setAutoLocationcitytown();
           if (_timer != null) {
@@ -160,8 +174,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SwitchListTile(
-              tileColor:
-                  isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
+              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 "啟用自動定位",
