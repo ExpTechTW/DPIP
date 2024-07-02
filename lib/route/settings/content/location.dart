@@ -202,11 +202,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
       final notification = await checkNotificationPermission();
 
-      if (notification) {
-        await checkLocationAlwaysPermission();
+      if (!notification) {
+        return;
       }
 
-      await startBackgroundService();
+      await initializeService();
 
       setState(() {
         isAutoLocatingEnabled = true;
