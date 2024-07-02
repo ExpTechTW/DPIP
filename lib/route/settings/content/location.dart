@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
@@ -24,10 +26,21 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   String city = "";
   String town = "";
 
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     initlocstatus();
+  }
+
+  @override
+  void dispose() {
+    if (_timer != null) {
+      _timer?.cancel();
+      _timer = null;
+    }
+    super.dispose();
   }
 
   Future<void> initlocstatus() async {
@@ -52,8 +65,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
         isAutoLocatingEnabled = true;
         setAutoLocationcitytown();
+        if (_timer != null) {
+          _timer?.cancel();
+          _timer = null;
+        }
+        _timer = Timer.periodic(const Duration(seconds : 5), (timer) {
+          setAutoLocationcitytown();
+        });
       } else {
         isAutoLocatingEnabled = false;
+        if (_timer != null) {
+          _timer?.cancel();
+          _timer = null;
+        }
       }
       Global.preference.setBool("auto-location", isAutoLocatingEnabled);
     });
@@ -87,14 +111,29 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
           isAutoLocatingEnabled = value;
           setAutoLocationcitytown();
+          if (_timer != null) {
+            _timer?.cancel();
+            _timer = null;
+          }
+          _timer = Timer.periodic(const Duration(seconds : 5), (timer) {
+            setAutoLocationcitytown();
+          });
         } else {
           isAutoLocatingEnabled = !value;
+          if (_timer != null) {
+            _timer?.cancel();
+            _timer = null;
+          }
         }
       });
     } else {
       await stopBackgroundService();
       setState(() {
         isAutoLocatingEnabled = value;
+        if (_timer != null) {
+          _timer?.cancel();
+          _timer = null;
+        }
       });
     }
     Global.preference.setBool("auto-location", isAutoLocatingEnabled);
@@ -104,8 +143,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     String citytowntemp = Global.preference.getString("loc-city-town") ?? "";
     print(citytowntemp);
     if (citytowntemp != "") {
+      List<String> parts = citytowntemp.split(' ');
       setState(() {
-          List<String> parts = citytowntemp.split(' ');
           city = parts[0];
           town = parts[1];
       });
