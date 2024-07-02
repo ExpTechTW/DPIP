@@ -20,17 +20,13 @@ Future<GetLocationResult> getLocation() async {
   final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
   bool positionchange = false;
 
-  if ((positionlattemp == 0.0 && positionlontemp == 0.0) || (positionlattemp != position.latitude && positionlontemp != position.longitude)) {
-      await Global.preference.setDouble("loc-position-lat", position.latitude);
-      await Global.preference.setDouble("loc-position-lon", position.longitude);
+  if ((positionlattemp == 0.0 && positionlontemp == 0.0) ||
+      (positionlattemp != position.latitude && positionlontemp != position.longitude)) {
+    await Global.preference.setDouble("loc-position-lat", position.latitude);
+    await Global.preference.setDouble("loc-position-lon", position.longitude);
   }
 
-  double distance = Geolocator.distanceBetween(
-    positionlattemp,
-    positionlontemp,
-    position.latitude,
-    position.longitude
-  );
+  double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
 
   if (distance >= 250) {
     positionchange = true;
@@ -39,7 +35,7 @@ Future<GetLocationResult> getLocation() async {
     print('距離: $distance');
   }
 
-  return GetLocationResult(position,positionchange);
+  return GetLocationResult(position, positionchange);
 }
 
 class LocationResult {
@@ -49,7 +45,7 @@ class LocationResult {
   LocationResult(this.cityTown, this.change);
 }
 
-Future<LocationResult> getLocationcitytown(double latitude, double longitude) async {
+Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
   LocationResult locationGet = LocationResult('', false);
   if (placemarks.isNotEmpty) {
@@ -141,13 +137,13 @@ Future<LocationStatus> requestLocationAlwaysPermission() async {
         locstatus = "拒絕";
       }
     }
-  // } else if (Platform.isIOS) {
-  //   const urlIOS = 'app-settings:';
-  //   final uriIOS = Uri.parse(urlIOS);
-  //   if (await canLaunchUrl(uriIOS)) {
-  //     await launchUrl(uriIOS);
-  //     islocGranted = true;
-  //   }
+    // } else if (Platform.isIOS) {
+    //   const urlIOS = 'app-settings:';
+    //   final uriIOS = Uri.parse(urlIOS);
+    //   if (await canLaunchUrl(uriIOS)) {
+    //     await launchUrl(uriIOS);
+    //     islocGranted = true;
+    //   }
   }
 
   return LocationStatus(locstatus, islocGranted);

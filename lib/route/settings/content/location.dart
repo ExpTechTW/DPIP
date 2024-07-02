@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:dpip/core/location.dart';
-import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -19,69 +17,12 @@ class SettingsLocationView extends StatefulWidget {
 
 class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
-  bool isPermanentlyDenied = false;
-  bool isDenied = false;
-  bool isNotDenied = false;
+  PermissionStatus? notificationPermission;
+  PermissionStatus? locationPermission;
+  PermissionStatus? locationAlwaysPermission;
 
   String city = "";
   String town = "";
-
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    initlocstatus();
-  }
-
-  @override
-  void dispose() {
-    if (_timer != null) {
-      _timer?.cancel();
-      _timer = null;
-    }
-    super.dispose();
-  }
-
-  Future<void> initlocstatus() async {
-    final isNotificationEnabled = await requestNotificationPermission();
-    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-    setState(() {
-      if (!isNotificationEnabled) {
-        isNotDenied = true;
-      } else if (isNotificationEnabled){
-        isNotDenied = false;
-      }
-      if (isLocationAlwaysEnabled == "永久拒絕") {
-        isPermanentlyDenied = true;
-        isDenied = false;
-      } else if (isLocationAlwaysEnabled == "拒絕") {
-        isPermanentlyDenied = false;
-        isDenied = true;
-      } else if (isLocationAlwaysEnabled) {
-        isPermanentlyDenied = false;
-        isDenied = false;
-      }
-      if (isLocationAlwaysEnabled && isNotificationEnabled) {
-        isAutoLocatingEnabled = true;
-        setAutoLocationcitytown();
-        if (_timer != null) {
-          _timer?.cancel();
-          _timer = null;
-        }
-        _timer = Timer.periodic(const Duration(seconds : 5), (timer) {
-          setAutoLocationcitytown();
-        });
-      } else {
-        isAutoLocatingEnabled = false;
-        if (_timer != null) {
-          _timer?.cancel();
-          _timer = null;
-        }
-      }
-      Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-    });
-  }
 
   Future<bool> requestLocationAlwaysPermission() async {
     var status = await Permission.locationWhenInUse.status;
@@ -97,72 +38,213 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     return status.isGranted;
   }
 
-  Future toggleAutoLocation(bool value) async {
-    // TODO: Check Permission and start location service
-    if (value) {
-      await stopBackgroundService();
-      final isNotificationEnabled = await requestNotificationPermission();
-      final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-      if (isLocationAlwaysEnabled && isNotificationEnabled) {
-        await initializeService();
-      }
-      setState(() {
-        if (!isNotificationEnabled) {
-          isNotDenied = true;
-        } else if (isNotificationEnabled){
-          isNotDenied = false;
-        }
-        if (isLocationAlwaysEnabled == "永久拒絕") {
-          isPermanentlyDenied = true;
-          isDenied = false;
-        } else if (isLocationAlwaysEnabled == "拒絕") {
-          isPermanentlyDenied = false;
-          isDenied = true;
-        } else if (isLocationAlwaysEnabled) {
-          isPermanentlyDenied = false;
-          isDenied = false;
-        }
-        if (isLocationAlwaysEnabled && isNotificationEnabled) {
-          isAutoLocatingEnabled = value;
-          setAutoLocationcitytown();
-          if (_timer != null) {
-            _timer?.cancel();
-            _timer = null;
-          }
-          _timer = Timer.periodic(const Duration(seconds : 5), (timer) {
-            setAutoLocationcitytown();
-          });
-        } else {
-          isAutoLocatingEnabled = !value;
-          if (_timer != null) {
-            _timer?.cancel();
-            _timer = null;
-          }
-        }
-      });
+  Future<bool> checkNotificationPermission() async {
+    final status = await Permission.notification.status;
+
+    setState(() => notificationPermission = status);
+
+    if (status.isGranted) {
+      return true;
     } else {
-      await stopBackgroundService();
+      if (!mounted) return false;
+
+      final status = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("通知權限"),
+                content: const Text("為了讓背景定位功能能正常運作，我們將懸掛一個常駐通知以防止系統將自動定位功能暫停。"),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: const Text("取消"),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text("確定"),
+                    onPressed: () async {
+                      final status = await Permission.notification.request();
+
+                      setState(() => notificationPermission = status);
+
+                      if (!context.mounted) return;
+
+                      Navigator.pop(context, status.isGranted);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
+
+      return status;
+    }
+  }
+
+  Future<bool> checkLocationPermission() async {
+    final status = await Permission.location.request();
+    if (!mounted) return false;
+
+    setState(() => locationPermission = status);
+
+    if (!status.isGranted) {
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            icon: const Icon(Symbols.error),
+            title: const Text("無法取得位置權限"),
+            content: Text(
+              "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
+            ),
+            actionsAlignment: MainAxisAlignment.spaceBetween,
+            actions: [
+              TextButton(
+                child: const Text("取消"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              status.isPermanentlyDenied
+                  ? FilledButton(
+                      child: const Text("設定"),
+                      onPressed: () {
+                        openAppSettings();
+                        Navigator.pop(context);
+                      },
+                    )
+                  : FilledButton(
+                      child: const Text("再試一次"),
+                      onPressed: () {
+                        checkLocationPermission();
+                        Navigator.pop(context);
+                      },
+                    ),
+            ],
+          );
+        },
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<bool> checkLocationAlwaysPermission() async {
+    final status = await Permission.locationAlways.status;
+
+    setState(() => locationAlwaysPermission = status);
+
+    if (status.isGranted) {
+      return true;
+    } else {
+      if (!mounted) return false;
+
+      final status = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                icon: const Icon(Symbols.my_location),
+                title: const Text("一律允許位置權限"),
+                content: const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: const Text("取消"),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  FilledButton(
+                    child: const Text("確定"),
+                    onPressed: () async {
+                      final status = await Permission.locationAlways.request();
+
+                      setState(() => locationAlwaysPermission = status);
+
+                      if (status.isPermanentlyDenied) {
+                        openAppSettings();
+                      }
+
+                      if (!context.mounted) return;
+
+                      Navigator.pop(context, status.isGranted);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
+
+      return status;
+    }
+  }
+
+  Future toggleAutoLocation() async {
+    await stopBackgroundService();
+
+    if (isAutoLocatingEnabled) {
       setState(() {
-        isAutoLocatingEnabled = value;
-        if (_timer != null) {
-          _timer?.cancel();
-          _timer = null;
-        }
+        isAutoLocatingEnabled = false;
+      });
+      return;
+    } else {
+      final location = await checkLocationPermission();
+
+      if (!location) {
+        return;
+      }
+
+      final notification = await checkNotificationPermission();
+
+      if (notification) {
+        await checkLocationAlwaysPermission();
+      }
+
+      await startBackgroundService();
+
+      setState(() {
+        isAutoLocatingEnabled = true;
       });
     }
+
     Global.preference.setBool("auto-location", isAutoLocatingEnabled);
   }
 
-  Future setAutoLocationcitytown() async {
-    String citytowntemp = Global.preference.getString("loc-city-town") ?? "";
-    print(citytowntemp);
-    if (citytowntemp != "") {
-      List<String> parts = citytowntemp.split(' ');
-      setState(() {
-          city = parts[0];
-          town = parts[1];
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    Permission.notification.status.then(
+      (value) {
+        setState(() {
+          notificationPermission = value;
+        });
+      },
+    );
+    Permission.location.status.then(
+      (value) {
+        setState(() {
+          locationPermission = value;
+        });
+      },
+    );
+    Permission.locationAlways.status.then(
+      (value) {
+        setState(() {
+          locationAlwaysPermission = value;
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -184,72 +266,73 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
               contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
               value: isAutoLocatingEnabled,
-              onChanged: (value) => toggleAutoLocation(value),
+              onChanged: (value) => toggleAutoLocation(),
             ),
           ),
-          if (isPermanentlyDenied)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Symbols.warning,
-                    color: context.colors.error,
-                  ),
+          if (locationAlwaysPermission != null)
+            Visibility(
+              visible: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted,
+              maintainAnimation: true,
+              maintainState: true,
+              child: AnimatedOpacity(
+                opacity: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
+                curve: const Interval(0.2, 1, curve: Easing.standard),
+                duration: Durations.medium2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Symbols.warning,
+                        color: context.colors.error,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "自動定位功能需要將位置權限提升至「一律允許」以在背景使用。",
+                        style: TextStyle(color: context.colors.error),
+                      ),
+                    ),
+                    TextButton(
+                        child: const Text("設定"),
+                        onPressed: () async {
+                          final status = await Permission.locationAlways.request();
+                          if (status.isPermanentlyDenied) {
+                            openAppSettings();
+                          }
+                        }),
+                  ]),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '定位功能已被永久拒絕，請移至設定"一律允許"權限',
-                    style: TextStyle(color: context.colors.error),
-                  ),
-                ),
-                TextButton(child: const Text("設定"), onPressed: () async {await openAppSettings();}),
-              ]),
+              ),
             ),
-          if (isDenied)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Symbols.warning,
-                    color: context.colors.error,
+          if (notificationPermission != null)
+            if (notificationPermission!.isDenied)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      Symbols.warning,
+                      color: context.colors.error,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '定位功能已被拒絕，請移至設定"一律允許"權限',
-                    style: TextStyle(color: context.colors.error),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '通知功能已被拒絕，請移至設定允許權限',
+                      style: TextStyle(color: context.colors.error),
+                    ),
                   ),
-                ),
-                TextButton(child: const Text("設定"), onPressed: () async {await openAppSettings();}),
-              ]),
-            ),
-          if (isNotDenied)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Symbols.warning,
-                    color: context.colors.error,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '通知功能已被拒絕，請移至設定允許權限',
-                    style: TextStyle(color: context.colors.error),
-                  ),
-                ),
-                TextButton(child: const Text("設定"), onPressed: () async {await openAppSettings();}),
-              ]),
-            ),
+                  TextButton(
+                      child: const Text("設定"),
+                      onPressed: () async {
+                        await openAppSettings();
+                      }),
+                ]),
+              ),
           const Padding(
             padding: EdgeInsets.all(16),
             child: Row(children: [

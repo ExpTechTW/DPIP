@@ -10,26 +10,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+final service = FlutterBackgroundService();
+
 Future<void> startBackgroundService() async {
-  final service = FlutterBackgroundService();
   var isRunning = await service.isRunning();
-  if (isRunning) {
-    service.invoke("stopService");
+  if (!isRunning) {
+    service.startService();
   }
-  service.startService();
 }
 
 Future<void> stopBackgroundService() async {
-  final service = FlutterBackgroundService();
   var isRunning = await service.isRunning();
+  print("running $isRunning");
   if (isRunning) {
     service.invoke("stopService");
   }
 }
 
 Future<void> initializeService() async {
-  final service = FlutterBackgroundService();
-
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'my_foreground', // id
     'MY FOREGROUND SERVICE', // title
@@ -96,6 +94,7 @@ void onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) {
     service.stopSelf();
+    print("stop");
     debugPrint("background process is now stopped");
   });
 
@@ -105,7 +104,7 @@ void onStart(ServiceInstance service) async {
         final position = await getLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
-        LocationResult country = await getLocationcitytown(position.position.latitude, position.position.longitude);
+        LocationResult country = await getLatLngLocation(position.position.latitude, position.position.longitude);
         String fcmToken = Global.preference.getString("fcm-token") ?? "";
         if (position.change && fcmToken != "") {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);

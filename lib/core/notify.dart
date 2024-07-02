@@ -94,12 +94,12 @@ Future<void> showNotify(RemoteMessage message) async {
       ));
 }
 
-Future<bool> requestNotificationPermission() async {
+Future<PermissionStatus> requestNotificationPermission() async {
   PermissionStatus status = await Permission.notification.request();
   if (status.isGranted) {
     print('通知權限已授予');
-    return true;
   }
+
   print('通知權限被拒絕');
-  return false;
+  return status;
 }
