@@ -15,6 +15,7 @@ class GetLocationResult {
   GetLocationResult(this.position, this.change);
 }
 
+@pragma('vm:entry-point')
 Future<GetLocationResult> getLocation() async {
   final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
