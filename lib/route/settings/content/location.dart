@@ -88,8 +88,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     return true;
   }
 
-  Future<bool> checkLocationPermission() async {
-    final status = await Permission.location.request();
+  Future<bool> checkLocationPermission(int value) async {
+    PermissionStatus status;
+    if (value == 0) {
+      status = await Permission.location.status;
+    } else if (value == 1) {
+      status = await Permission.location.request();
+    } else {
+      status = await Permission.locationAlways.request();
+    }
     if (!mounted) return false;
 
     setState(() => locationPermission = status);
@@ -101,9 +108,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           return AlertDialog(
             icon: const Icon(Symbols.error),
             title: const Text("無法取得位置權限"),
-            content: Text(
+            content: value == 0 ? Text(
               "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
-            ),
+            ) : const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
@@ -112,7 +119,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                   Navigator.pop(context);
                 },
               ),
-              status.isPermanentlyDenied
+              status.isPermanentlyDenied && value == 2
                   ? FilledButton(
                       child: const Text("設定"),
                       onPressed: () {
@@ -123,7 +130,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                   : FilledButton(
                       child: const Text("再試一次"),
                       onPressed: () {
-                        checkLocationPermission();
+                        value += 1;
+                        checkLocationPermission(value);
                         Navigator.pop(context);
                       },
                     ),
@@ -198,7 +206,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       });
       return;
     } else {
-      final location = await checkLocationPermission();
+      final location = await checkLocationPermission(0);
       final notification = await checkNotificationPermission();
       final locationAlways = await checkLocationAlwaysPermission();
 
