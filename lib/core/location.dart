@@ -5,11 +5,37 @@ import 'package:dpip/global.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-Future<Position> getLocation() async {
+class GetLocationResult {
+  final Position position;
+  final bool change;
+
+  GetLocationResult(this.position, this.change);
+}
+
+Future<GetLocationResult> getLocation() async {
   final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+  final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+  bool positionchange = false;
 
-  return position;
+  if ((positionlattemp == 0.0 && positionlontemp == 0.0) ||
+      (positionlattemp != position.latitude && positionlontemp != position.longitude)) {
+    await Global.preference.setDouble("loc-position-lat", position.latitude);
+    await Global.preference.setDouble("loc-position-lon", position.longitude);
+  }
+
+  double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+
+  if (distance >= 250) {
+    positionchange = true;
+    print('距離: $distance');
+  } else {
+    print('距離: $distance');
+  }
+
+  return GetLocationResult(position, positionchange);
 }
 
 class LocationResult {
@@ -19,8 +45,9 @@ class LocationResult {
   LocationResult(this.cityTown, this.change);
 }
 
-Future<LocationResult> getLocationcitytown(double latitude, double longitude) async {
+Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+  LocationResult locationGet = LocationResult('', false);
   if (placemarks.isNotEmpty) {
     Placemark placemark = placemarks.first;
     String? city;
@@ -39,46 +66,85 @@ Future<LocationResult> getLocationcitytown(double latitude, double longitude) as
 
     if (citytowntemp == "" || citytowntemp != citytown) {
       await Global.preference.setString("loc-city-town", citytown);
-
-      return LocationResult(citytown, true);
+      locationGet = LocationResult(citytown, true);
+    } else {
+      locationGet = LocationResult(citytowntemp, false);
     }
-
     // print('縣市: $city');
     // print('鄉鎮市區: $town');
-    return LocationResult(citytown, false);
   }
-  return LocationResult("", false);
+  return locationGet;
 }
 
-Future<bool> requestLocationAlwaysPermission() async {
-  PermissionStatus status = await Permission.location.request();
+class LocationStatus {
+  final String locstatus;
+  final bool islocstatus;
 
-  if (status.isGranted) {
-    print('位置權限已授予');
+  LocationStatus(this.locstatus, this.islocstatus);
+}
 
-    status = await Permission.locationAlways.request();
+Future<LocationStatus> requestLocationAlwaysPermission() async {
+  String locstatus = "";
+  bool islocGranted = false;
+  if (Platform.isAndroid) {
+    PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
-      print('背景位置權限已授予');
-      return true;
-    }
-  } else if (status.isDenied) {
-    print('位置權限被拒絕');
+      print('位置權限已授予');
 
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('背景位置權限已授予');
-      return true;
-    }
-  } else if (status.isPermanentlyDenied) {
-    status = await Permission.locationAlways.request();
-    if (status.isGranted) {
-      print('背景位置權限已授予');
-      return true;
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('背景位置權限已授予');
+        islocGranted = true;
+      } else {
+        print('位置權限被拒絕');
+        locstatus = "拒絕";
+      }
+    } else if (status.isDenied) {
+      print('位置權限被拒絕');
+
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('背景位置權限已授予');
+        islocGranted = true;
+      } else {
+        print('位置權限被拒絕');
+        locstatus = "拒絕";
+      }
     } else if (status.isPermanentlyDenied) {
       print('位置權限被永久拒絕');
-      await openAppSettings();
+
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('背景位置權限已授予');
+        islocGranted = true;
+      } else if (status.isDenied) {
+        print('位置權限被拒絕');
+
+        status = await Permission.location.request();
+
+        if (status.isGranted) {
+          print('背景位置權限已授予');
+          islocGranted = true;
+        } else if (status.isDenied) {
+          print('位置權限被拒絕');
+          locstatus = "拒絕";
+        } else if (status.isPermanentlyDenied) {
+          print('位置權限被永久拒絕');
+          locstatus = "永久拒絕";
+        }
+      } else if (status.isPermanentlyDenied) {
+        print('位置權限被拒絕');
+        locstatus = "拒絕";
+      }
     }
+    // } else if (Platform.isIOS) {
+    //   const urlIOS = 'app-settings:';
+    //   final uriIOS = Uri.parse(urlIOS);
+    //   if (await canLaunchUrl(uriIOS)) {
+    //     await launchUrl(uriIOS);
+    //     islocGranted = true;
+    //   }
   }
 
-  return false;
+  return LocationStatus(locstatus, islocGranted);
 }

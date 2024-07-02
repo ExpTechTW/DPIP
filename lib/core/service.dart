@@ -4,31 +4,30 @@ import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-void startBackgroundService() async {
-  final service = FlutterBackgroundService();
+final service = FlutterBackgroundService();
+
+Future<void> startBackgroundService() async {
   var isRunning = await service.isRunning();
-  if (isRunning) {
-    service.invoke("stopService");
+  if (!isRunning) {
+    service.startService();
   }
-  service.startService();
 }
 
-void stopBackgroundService() async {
-  final service = FlutterBackgroundService();
+Future<void> stopBackgroundService() async {
   var isRunning = await service.isRunning();
+  print("running $isRunning");
   if (isRunning) {
     service.invoke("stopService");
   }
 }
 
 Future<void> initializeService() async {
-  final service = FlutterBackgroundService();
-
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'my_foreground', // id
     'MY FOREGROUND SERVICE', // title
@@ -95,6 +94,7 @@ void onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) {
     service.stopSelf();
+    print("stop");
     debugPrint("background process is now stopped");
   });
 
@@ -102,11 +102,11 @@ void onStart(ServiceInstance service) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
         final position = await getLocation();
-        String lat = position.latitude.toStringAsFixed(4);
-        String lon = position.longitude.toStringAsFixed(4);
-        LocationResult country = await getLocationcitytown(position.latitude, position.longitude);
+        String lat = position.position.latitude.toStringAsFixed(4);
+        String lon = position.position.longitude.toStringAsFixed(4);
+        LocationResult country = await getLatLngLocation(position.position.latitude, position.position.longitude);
         String fcmToken = Global.preference.getString("fcm-token") ?? "";
-        if (country.change && fcmToken != "") {
+        if (position.change && fcmToken != "") {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
           print(body);
         }

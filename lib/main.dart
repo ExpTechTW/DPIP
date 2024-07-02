@@ -7,6 +7,7 @@ import 'package:dpip/global.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart';
 
 void main() async {
@@ -19,12 +20,14 @@ void main() async {
     if (value == null) return;
     Global.preference.setString("fcm-token", value);
   });
-  bool isAutoLocatingEnabled = Global.preference.getBool("loc-auto") ?? false;
+  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await requestNotificationPermission();
     final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-    if (isLocationAlwaysEnabled && isNotificationEnabled) {
+    if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled.isGranted) {
       await initializeService();
+    } else {
+      await stopBackgroundService();
     }
   }
   initializeTimeZones();
