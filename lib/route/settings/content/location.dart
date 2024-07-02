@@ -315,11 +315,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
             ),
           if (notificationPermission != null)
             Visibility(
-              visible: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted,
+              visible: isAutoLocatingEnabled && !notificationPermission!.isGranted,
               maintainAnimation: true,
               maintainState: true,
               child: AnimatedOpacity(
-                opacity: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
+                opacity: isAutoLocatingEnabled && !notificationPermission!.isGranted ? 1 : 0,
                 curve: const Interval(0.2, 1, curve: Easing.standard),
                 duration: Durations.medium2,
                 child: Padding(
