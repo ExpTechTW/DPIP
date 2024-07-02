@@ -36,22 +36,24 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     setState(() {
       if (!isNotificationEnabled) {
         isNotDenied = true;
-        isAutoLocatingEnabled = false;
+      } else if (isNotificationEnabled){
+        isNotDenied = false;
       }
       if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
         isPermanentlyDenied = true;
         isDenied = false;
-        isAutoLocatingEnabled = false;
       } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
         isPermanentlyDenied = false;
         isDenied = true;
-        isAutoLocatingEnabled = false;
       } else if (isLocationAlwaysEnabled.islocstatus) {
         isPermanentlyDenied = false;
         isDenied = false;
-        isNotDenied = false;
+      }
+      if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
         isAutoLocatingEnabled = true;
         setAutoLocationcitytown();
+      } else {
+        isAutoLocatingEnabled = false;
       }
       Global.preference.setBool("auto-location", isAutoLocatingEnabled);
     });
@@ -69,22 +71,24 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       setState(() {
         if (!isNotificationEnabled) {
           isNotDenied = true;
-          isAutoLocatingEnabled = !value;
+        } else if (isNotificationEnabled){
+          isNotDenied = false;
         }
         if (isLocationAlwaysEnabled.locstatus == "永久拒絕") {
           isPermanentlyDenied = true;
           isDenied = false;
-          isAutoLocatingEnabled = !value;
         } else if (isLocationAlwaysEnabled.locstatus == "拒絕") {
           isPermanentlyDenied = false;
           isDenied = true;
-          isAutoLocatingEnabled = !value;
         } else if (isLocationAlwaysEnabled.islocstatus) {
           isPermanentlyDenied = false;
           isDenied = false;
-          isNotDenied = false;
+        }
+        if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled) {
           isAutoLocatingEnabled = value;
           setAutoLocationcitytown();
+        } else {
+          isAutoLocatingEnabled = !value;
         }
       });
     } else {
