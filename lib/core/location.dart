@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dpip/global.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class GetLocationResult {
@@ -159,4 +161,138 @@ Future<LocationStatus> requestLocationAlwaysPermission() async {
   }
 
   return LocationStatus(locstatus, islocGranted);
+}
+
+Future<PermissionStatus> requestnotificationPermission(int value) async {
+  switch (value) {
+    case 0:
+      return await Permission.notification.status;
+    case 1:
+      return await Permission.notification.request();
+    default:
+      return await Permission.notification.status;
+  }
+}
+
+Future<bool> shownotificationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
+  bool retry = false;
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        icon: const Icon(Symbols.error),
+        title: Text("${(value >= 1) ? "無法" : "請求"}取得通知權限"),
+        content: Text(
+          "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
+        ),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            child: const Text("取消"),
+            onPressed: () {
+              retry = false;
+              Navigator.pop(context);
+            },
+          ),
+          getnotificationActionButton(value, status, (shouldRetry) {
+            retry = shouldRetry;
+            Navigator.pop(context);
+          }),
+        ],
+      );
+    },
+  );
+  return retry;
+}
+
+Widget getnotificationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
+  if (value == 2) {
+    return FilledButton(
+      child: const Text("設定"),
+      onPressed: () {
+        openAppSettings();
+        onPressed(false);
+      },
+    );
+  } else {
+    return FilledButton(
+      child: Text((value >= 1) ? "再試一次" : "請求權限"),
+      onPressed: () {
+        onPressed(true);
+      },
+    );
+  }
+}
+
+Future<PermissionStatus> requestlocationPermission(int value) async {
+  switch (value) {
+    case 0:
+      return await Permission.location.status;
+    case 1:
+      return await Permission.location.request();
+    case 2:
+      return await Permission.locationAlways.request();
+    default:
+      return await Permission.location.status;
+  }
+}
+
+Future<bool> showlocationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
+  bool retry = false;
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        icon: const Icon(Symbols.error),
+        title: Text("${(value >= 1) ? "無法" : "請求"}取得位置權限"),
+        content: getlocationDialogContent(value, status),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            child: const Text("取消"),
+            onPressed: () {
+              retry = false;
+              Navigator.pop(context);
+            },
+          ),
+          getlocationActionButton(value, status, (shouldRetry) {
+            retry = shouldRetry;
+            Navigator.pop(context);
+          }),
+        ],
+      );
+    },
+  );
+  return retry;
+}
+
+Widget getlocationDialogContent(int value, PermissionStatus status) {
+  if (value == 0) {
+    return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
+  } else if (value == 3) {
+    return Text(
+      "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}"
+    );
+  } else {
+    return const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。");
+  }
+}
+
+Widget getlocationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
+  if (value == 3) {
+    return FilledButton(
+      child: const Text("設定"),
+      onPressed: () {
+        openAppSettings();
+        onPressed(false);
+      },
+    );
+  } else {
+    return FilledButton(
+      child: Text((value >= 1) ? "再試一次" : "請求權限"),
+      onPressed: () {
+        onPressed(true);
+      },
+    );
+  }
 }
