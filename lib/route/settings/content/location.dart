@@ -98,66 +98,159 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Future<bool> checkLocationPermission(int value) async {
-    PermissionStatus status;
-    if (value == 0) {
-      status = await Permission.location.status;
-    } else if (value == 1) {
-      status = await Permission.location.request();
-    } else if (value == 2) {
-      status = await Permission.location.status;
-    } else {
-      status = await Permission.locationAlways.request();
-    }
-    if (!mounted) return false;
+  PermissionStatus status;
+  bool result = false;
 
+  status = await _requestPermission(value);
+
+  if (mounted) {
     setState(() => locationPermission = status);
 
     if (!status.isGranted) {
-      await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            icon: const Icon(Symbols.error),
-            title: const Text("無法取得位置權限"),
-            content: value == 0 ? const Text(
-              "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。",
-            ) : value <= 2 ? Text(
-              "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
-            ) : const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: const Text("取消"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              !status.isGranted && value == 3
-                  ? FilledButton(
-                      child: const Text("設定"),
-                      onPressed: () {
-                        openAppSettings();
-                        Navigator.pop(context);
-                      },
-                    )
-                  : FilledButton(
-                      child: const Text("再試一次"),
-                      onPressed: () {
-                        value += 1;
-                        checkLocationPermission(value);
-                        Navigator.pop(context);
-                      },
-                    ),
-            ],
-          );
-        },
-      );
-
-      return false;
+      await _showPermissionDialog(value, status);
+    } else {
+      result = true;
     }
-
-    return true;
   }
+
+  return result;
+}
+
+Future<PermissionStatus> _requestPermission(int value) async {
+  switch (value) {
+    case 0:
+      return await Permission.location.status;
+    case 1:
+      return await Permission.location.request();
+    case 2:
+      return await Permission.location.status;
+    case 3:
+      return await Permission.locationAlways.request();
+    case 4:
+      return await Permission.locationAlways.status;
+    default:
+      return await Permission.location.request();
+  }
+}
+
+Future<void> _showPermissionDialog(int value, PermissionStatus status) async {
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        icon: const Icon(Symbols.error),
+        title: const Text("無法取得位置權限"),
+        content: _getDialogContent(value, status),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          TextButton(
+            child: const Text("取消"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          _getActionButton(value, status),
+        ],
+      );
+    },
+  );
+}
+
+Widget _getDialogContent(int value, PermissionStatus status) {
+  if (value == 0) {
+    return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
+  } else if (value == 5) {
+    return Text(
+      "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}"
+    );
+  } else {
+    return const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。");
+  }
+}
+
+Widget _getActionButton(int value, PermissionStatus status) {
+  if (value == 5) {
+    return FilledButton(
+      child: const Text("設定"),
+      onPressed: () {
+        openAppSettings();
+        Navigator.pop(context);
+      },
+    );
+  } else {
+    return FilledButton(
+      child: const Text("再試一次"),
+      onPressed: () {
+        checkLocationPermission(value + 1);
+        Navigator.pop(context);
+      },
+    );
+  }
+}
+
+  // Future<bool> checkLocationPermission(int value) async {
+  //   PermissionStatus status;
+  //   if (value == 0) {
+  //     status = await Permission.location.status;
+  //   } else if (value == 1) {
+  //     status = await Permission.location.request();
+  //   } else if (value == 2) {
+  //     status = await Permission.location.status;
+  //   } else if (value == 3) {
+  //     status = await Permission.locationAlways.request();
+  //   } else if (value == 4) {
+  //     status = await Permission.locationAlways.status;
+  //   } else {
+  //     status = await Permission.location.request();
+  //   }
+  //   if (!mounted) return false;
+
+  //   setState(() => locationPermission = status);
+
+  //   if (!status.isGranted) {
+  //     await showDialog(
+  //       context: context,
+  //       builder: (context) {
+  //         return AlertDialog(
+  //           icon: const Icon(Symbols.error),
+  //           title: const Text("無法取得位置權限"),
+  //           content: value == 0 ? const Text(
+  //             "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。",
+  //           ) : value == 5 ? Text(
+  //             "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
+  //           ) : const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
+  //           actionsAlignment: MainAxisAlignment.spaceBetween,
+  //           actions: [
+  //             TextButton(
+  //               child: const Text("取消"),
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //             value == 5
+  //                 ? FilledButton(
+  //                     child: const Text("設定"),
+  //                     onPressed: () {
+  //                       openAppSettings();
+  //                       Navigator.pop(context);
+  //                     },
+  //                   )
+  //                 : FilledButton(
+  //                     child: const Text("再試一次"),
+  //                     onPressed: () {
+  //                       value += 1;
+  //                       checkLocationPermission(value);
+  //                       Navigator.pop(context);
+  //                     },
+  //                   ),
+  //           ],
+  //         );
+  //       },
+  //     );
+
+  //     return false;
+  //   }
+
+  //   return true;
+  // }
 
   Future<bool> checkLocationAlwaysPermission() async {
     final status = await Permission.locationAlways.status;
@@ -223,9 +316,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     } else {
       final notification = await checkNotificationPermission(0);
       final location = await checkLocationPermission(0);
-      final locationAlways = await checkLocationAlwaysPermission();
+      print("notification $notification");
+      print("location $location");
 
-      if (!notification || !location || !locationAlways) {
+      if (!notification || !location) {
         return;
       }
 

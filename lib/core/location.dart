@@ -6,8 +6,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-int last_location_update = DateTime.now().toUtc().millisecondsSinceEpoch;
-
 class GetLocationResult {
   final Position position;
   final bool change;
@@ -20,6 +18,7 @@ Future<GetLocationResult> getLocation() async {
   final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
   final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
   final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+  int lastLocationUpdate = Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
   bool positionchange = false;
 
   if ((positionlattemp == 0.0 && positionlontemp == 0.0) ||
@@ -32,8 +31,9 @@ Future<GetLocationResult> getLocation() async {
 
   int now = DateTime.now().toUtc().millisecondsSinceEpoch;
 
-  if (distance >= 250 && now - last_location_update > 300000) {
-    last_location_update = now;
+  if (distance >= 250 && now - lastLocationUpdate > 300000) {
+    lastLocationUpdate = now;
+    await Global.preference.setInt("last-location-update", lastLocationUpdate);
     positionchange = true;
     print('距離: $distance');
   } else {

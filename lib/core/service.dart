@@ -13,6 +13,7 @@ final service = FlutterBackgroundService();
 
 Future<void> startBackgroundService() async {
   var isRunning = await service.isRunning();
+  print("Background Service running $isRunning");
   if (!isRunning) {
     service.startService();
   }
@@ -20,7 +21,7 @@ Future<void> startBackgroundService() async {
 
 Future<void> stopBackgroundService() async {
   var isRunning = await service.isRunning();
-  print("running $isRunning");
+  print("Background Service running $isRunning");
   if (isRunning) {
     service.invoke("stopService");
   }
