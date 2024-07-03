@@ -41,76 +41,18 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   Future<bool> checkNotificationPermission(int value) async {
     PermissionStatus status;
-    if (value == 0) {
-      status = await Permission.notification.status;
-    } else if (value == 1) {
-      status = await Permission.notification.request();
-    } else {
-      status = await Permission.notification.status;
-    }
-    if (!mounted) return false;
-
-    setState(() => notificationPermission = status);
-
-    if (!status.isGranted) {
-      await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            icon: const Icon(Symbols.error),
-            title: const Text("無法取得通知權限"),
-            content: Text(
-              "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
-            ),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: const Text("取消"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              status.isPermanentlyDenied
-                  ? FilledButton(
-                      child: const Text("設定"),
-                      onPressed: () {
-                        openAppSettings();
-                        Navigator.pop(context);
-                      },
-                    )
-                  : FilledButton(
-                      child: const Text("再試一次"),
-                      onPressed: () {
-                        value += 1;
-                        checkNotificationPermission(value);
-                        Navigator.pop(context);
-                      },
-                    ),
-            ],
-          );
-        },
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<bool> checkLocationPermission(int value) async {
-    PermissionStatus status;
     bool result = false;
     bool shouldRetry = true;
 
     while (shouldRetry) {
-      status = await _requestPermission(value);
+      status = await _requestnotificationPermission(value);
 
       if (!mounted) return false;
 
       setState(() => locationPermission = status);
 
       if (!status.isGranted) {
-        shouldRetry = await _showPermissionDialog(value, status);
+        shouldRetry = await _shownotificationPermissionDialog(value, status);
         if (shouldRetry) {
           value += 1;
         }
@@ -123,7 +65,94 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     return result;
   }
 
-  Future<PermissionStatus> _requestPermission(int value) async {
+  Future<PermissionStatus> _requestnotificationPermission(int value) async {
+    switch (value) {
+      case 0:
+        return await Permission.notification.status;
+      case 1:
+        return await Permission.notification.request();
+      default:
+        return await Permission.notification.status;
+    }
+  }
+
+  Future<bool> _shownotificationPermissionDialog(int value, PermissionStatus status) async {
+    bool retry = false;
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: const Icon(Symbols.error),
+          title: const Text("無法取得通知權限"),
+          content: Text(
+            "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
+          ),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            TextButton(
+              child: const Text("取消"),
+              onPressed: () {
+                retry = false;
+                Navigator.pop(context);
+              },
+            ),
+            _getnotificationActionButton(value, status, (shouldRetry) {
+              retry = shouldRetry;
+              Navigator.pop(context);
+            }),
+          ],
+        );
+      },
+    );
+    return retry;
+  }
+
+  Widget _getnotificationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
+    if (value == 2) {
+      return FilledButton(
+        child: const Text("設定"),
+        onPressed: () {
+          openAppSettings();
+          onPressed(false);
+        },
+      );
+    } else {
+      return FilledButton(
+        child: const Text("再試一次"),
+        onPressed: () {
+          onPressed(true);
+        },
+      );
+    }
+  }
+
+  Future<bool> checkLocationPermission(int value) async {
+    PermissionStatus status;
+    bool result = false;
+    bool shouldRetry = true;
+
+    while (shouldRetry) {
+      status = await _requestlocationPermission(value);
+
+      if (!mounted) return false;
+
+      setState(() => locationPermission = status);
+
+      if (!status.isGranted) {
+        shouldRetry = await _showlocationPermissionDialog(value, status);
+        if (shouldRetry) {
+          value += 1;
+        }
+      } else {
+        result = true;
+        shouldRetry = false;
+      }
+    }
+
+    return result;
+  }
+
+  Future<PermissionStatus> _requestlocationPermission(int value) async {
     switch (value) {
       case 0:
         return await Permission.location.status;
@@ -140,7 +169,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     }
   }
 
-  Future<bool> _showPermissionDialog(int value, PermissionStatus status) async {
+  Future<bool> _showlocationPermissionDialog(int value, PermissionStatus status) async {
     bool retry = false;
     await showDialog(
       context: context,
@@ -148,7 +177,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         return AlertDialog(
           icon: const Icon(Symbols.error),
           title: const Text("無法取得位置權限"),
-          content: _getDialogContent(value, status),
+          content: _getlocationDialogContent(value, status),
           actionsAlignment: MainAxisAlignment.spaceBetween,
           actions: [
             TextButton(
@@ -158,7 +187,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                 Navigator.pop(context);
               },
             ),
-            _getActionButton(value, status, (shouldRetry) {
+            _getlocationActionButton(value, status, (shouldRetry) {
               retry = shouldRetry;
               Navigator.pop(context);
             }),
@@ -169,7 +198,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     return retry;
   }
 
-  Widget _getDialogContent(int value, PermissionStatus status) {
+  Widget _getlocationDialogContent(int value, PermissionStatus status) {
     if (value == 0) {
       return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
     } else if (value == 5) {
@@ -181,13 +210,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     }
   }
 
-  Widget _getActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
+  Widget _getlocationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
     if (value == 5) {
       return FilledButton(
         child: const Text("設定"),
         onPressed: () {
           openAppSettings();
-          onPressed(true);
+          onPressed(false);
         },
       );
     } else {
@@ -296,7 +325,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         });
         if (!value.isGranted) {
           setState(() {
-            isAutoLocatingNotEnabled = true;
+            isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
             Global.preference.setBool("auto-location", isAutoLocatingEnabled);
           });
@@ -310,7 +339,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         });
         if (!value.isGranted) {
           setState(() {
-            isAutoLocatingNotEnabled = true;
+            isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
             Global.preference.setBool("auto-location", isAutoLocatingEnabled);
           });
@@ -324,7 +353,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         });
         if (!value.isGranted) {
           setState(() {
-            isAutoLocatingNotEnabled = true;
+            isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
             Global.preference.setBool("auto-location", isAutoLocatingEnabled);
           });
