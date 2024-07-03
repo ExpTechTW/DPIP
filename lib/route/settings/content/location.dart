@@ -25,20 +25,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   String city = "";
   String town = "";
 
-  Future<bool> requestLocationAlwaysPermission() async {
-    var status = await Permission.locationWhenInUse.status;
-    if (status.isDenied) {
-      status = await Permission.locationWhenInUse.request();
-    }
-
-    if (status.isPermanentlyDenied) {
-      openAppSettings();
-      return false;
-    }
-
-    return status.isGranted;
-  }
-
   Future<bool> checkNotificationPermission(int value) async {
     PermissionStatus status;
     bool result = false;
@@ -85,7 +71,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(Symbols.error),
-          title: const Text("無法取得通知權限"),
+          title: Text("${(value >= 1) ? "無法" : "請求"}取得通知權限"),
           content: Text(
             "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
           ),
@@ -120,7 +106,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       );
     } else {
       return FilledButton(
-        child: const Text("再試一次"),
+        child: Text((value >= 1) ? "再試一次" : "請求權限"),
         onPressed: () {
           onPressed(true);
         },
@@ -176,7 +162,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(Symbols.error),
-          title: const Text("無法取得位置權限"),
+          title: Text("${(value >= 1) ? "無法" : "請求"}取得位置權限"),
           content: _getlocationDialogContent(value, status),
           actionsAlignment: MainAxisAlignment.spaceBetween,
           actions: [
@@ -221,62 +207,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       );
     } else {
       return FilledButton(
-        child: const Text("再試一次"),
+        child: Text((value >= 1) ? "再試一次" : "請求權限"),
         onPressed: () {
           onPressed(true);
         },
       );
-    }
-  }
-
-  Future<bool> checkLocationAlwaysPermission() async {
-    final status = await Permission.locationAlways.status;
-
-    setState(() => locationAlwaysPermission = status);
-
-    if (status.isGranted) {
-      return true;
-    } else {
-      if (!mounted) return false;
-
-      final status = await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                icon: const Icon(Symbols.my_location),
-                title: const Text("一律允許位置權限"),
-                content: const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: const Text("取消"),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  FilledButton(
-                    child: const Text("確定"),
-                    onPressed: () async {
-                      final status = await Permission.locationAlways.request();
-
-                      setState(() => locationAlwaysPermission = status);
-
-                      if (status.isPermanentlyDenied) {
-                        openAppSettings();
-                      }
-
-                      if (!context.mounted) return;
-
-                      Navigator.pop(context, status.isGranted);
-                    },
-                  ),
-                ],
-              );
-            },
-          ) ??
-          false;
-
-      return status;
     }
   }
 
