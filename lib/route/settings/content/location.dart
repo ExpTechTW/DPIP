@@ -310,6 +310,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         });
       },
     );
+    if (!notificationPermission!.isGranted || !locationPermission!.isGranted || !locationAlwaysPermission!.isGranted) {
+      setState(() {
+        isAutoLocatingNotEnabled = true;
+        isAutoLocatingEnabled = false;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+      });
+    }
   }
 
   @override
