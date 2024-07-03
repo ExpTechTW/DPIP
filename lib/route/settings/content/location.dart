@@ -38,8 +38,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     return status.isGranted;
   }
 
-  Future<bool> checkNotificationPermission() async {
-    final status = await Permission.notification.request();
+  Future<bool> checkNotificationPermission(int value) async {
+    PermissionStatus status;
+    if (value == 0) {
+      status = await Permission.notification.status;
+    } else if (value == 1) {
+      status = await Permission.notification.request();
+    } else {
+      status = await Permission.notification.status;
+    }
     if (!mounted) return false;
 
     setState(() => notificationPermission = status);
@@ -73,7 +80,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                   : FilledButton(
                       child: const Text("再試一次"),
                       onPressed: () {
-                        checkNotificationPermission();
+                        value += 1;
+                        checkNotificationPermission(value);
                         Navigator.pop(context);
                       },
                     ),
@@ -95,9 +103,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     } else if (value == 1) {
       status = await Permission.location.request();
     } else if (value == 2) {
-      status = await Permission.locationAlways.request();
-    } else {
       status = await Permission.location.status;
+    } else {
+      status = await Permission.locationAlways.request();
     }
     if (!mounted) return false;
 
@@ -112,7 +120,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
             title: const Text("無法取得位置權限"),
             content: value == 0 ? const Text(
               "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。",
-            ) : value == 1 ? Text(
+            ) : value <= 2 ? Text(
               "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
             ) : const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
             actionsAlignment: MainAxisAlignment.spaceBetween,
@@ -123,7 +131,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                   Navigator.pop(context);
                 },
               ),
-              !status.isGranted && value == 2
+              !status.isGranted && value == 3
                   ? FilledButton(
                       child: const Text("設定"),
                       onPressed: () {
@@ -211,7 +219,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       return;
     } else {
       final location = await checkLocationPermission(0);
-      final notification = await checkNotificationPermission();
+      final notification = await checkNotificationPermission(0);
       final locationAlways = await checkLocationAlwaysPermission();
 
       if (!location && !notification && !locationAlways) {
