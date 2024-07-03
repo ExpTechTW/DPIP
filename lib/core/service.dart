@@ -10,12 +10,17 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final service = FlutterBackgroundService();
+bool isservicerun = false;
 
 Future<void> startBackgroundService() async {
-  var isRunning = await service.isRunning();
-  print("Background Service running $isRunning");
-  if (!isRunning) {
-    service.startService();
+  if (!isservicerun) {
+    initializeService();
+  } else if (isservicerun) {
+    var isRunning = await service.isRunning();
+    print("Background Service running $isRunning");
+    if (!isRunning) {
+      service.startService();
+    }
   }
 }
 
@@ -66,6 +71,7 @@ Future<void> initializeService() async {
       onBackground: onIosBackground,
     ),
   );
+  isservicerun = true;
 }
 
 @pragma('vm:entry-point')

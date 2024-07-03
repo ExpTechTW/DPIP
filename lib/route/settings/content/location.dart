@@ -56,9 +56,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         if (shouldRetry) {
           value += 1;
         }
-      } else {
+      } else if (status.isGranted && value >= 0) {
         result = true;
         shouldRetry = false;
+      } else {
+        value += 1;
       }
     }
 
@@ -143,9 +145,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         if (shouldRetry) {
           value += 1;
         }
-      } else {
+      } else if (status.isGranted && value >= 2) {
         result = true;
         shouldRetry = false;
+      } else {
+        value += 1;
       }
     }
 
@@ -159,13 +163,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       case 1:
         return await Permission.location.request();
       case 2:
-        return await Permission.location.status;
-      case 3:
         return await Permission.locationAlways.request();
-      case 4:
-        return await Permission.locationAlways.status;
       default:
-        return await Permission.location.request();
+        return await Permission.location.status;
     }
   }
 
@@ -201,7 +201,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   Widget _getlocationDialogContent(int value, PermissionStatus status) {
     if (value == 0) {
       return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
-    } else if (value == 5) {
+    } else if (value == 3) {
       return Text(
         "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}"
       );
@@ -211,7 +211,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Widget _getlocationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
-    if (value == 5) {
+    if (value == 3) {
       return FilledButton(
         child: const Text("設定"),
         onPressed: () {
@@ -280,20 +280,20 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     }
   }
 
-  Future toggleAutoLocation() async {
+  Future toggleAutoLocation(bool value) async {
     await stopBackgroundService();
 
-    if (isAutoLocatingEnabled) {
+    if (!value) {
       setState(() {
-        isAutoLocatingNotEnabled = true;
+        isAutoLocatingNotEnabled = false;
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
       return;
     } else {
       final notification = await checkNotificationPermission(0);
-      final location = await checkLocationPermission(0);
       print("notification $notification");
+      final location = await checkLocationPermission(0);
       print("location $location");
 
       if (!notification || !location) {
@@ -305,7 +305,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         return;
       }
 
-      await initializeService();
+      await startBackgroundService();
 
       setState(() {
         isAutoLocatingNotEnabled = false;
@@ -319,11 +319,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   void initState() {
     super.initState();
     Permission.notification.status.then(
-      (value) {
+      (value) async {
         setState(() {
           notificationPermission = value;
         });
         if (!value.isGranted) {
+          await stopBackgroundService();
           setState(() {
             isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
@@ -333,11 +334,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       },
     );
     Permission.location.status.then(
-      (value) {
+      (value) async {
         setState(() {
           locationPermission = value;
         });
         if (!value.isGranted) {
+          await stopBackgroundService();
           setState(() {
             isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
@@ -347,11 +349,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       },
     );
     Permission.locationAlways.status.then(
-      (value) {
+      (value) async {
         setState(() {
           locationAlwaysPermission = value;
         });
         if (!value.isGranted) {
+          await stopBackgroundService();
           setState(() {
             isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
@@ -386,7 +389,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
               contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
               value: isAutoLocatingEnabled,
-              onChanged: (value) => toggleAutoLocation(),
+              onChanged: (value) => toggleAutoLocation(value),
             ),
           ),
           if (locationAlwaysPermission != null)
