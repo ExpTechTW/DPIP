@@ -32,8 +32,7 @@ Future<GetLocationResult> getLocation() async {
   int now = DateTime.now().toUtc().millisecondsSinceEpoch;
 
   if (distance >= 250 && now - lastLocationUpdate > 300000) {
-    lastLocationUpdate = now;
-    await Global.preference.setInt("last-location-update", lastLocationUpdate);
+    await Global.preference.setInt("last-location-update", now);
     positionchange = true;
     print('距離: $distance');
   } else {
