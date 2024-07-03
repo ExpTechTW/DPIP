@@ -22,9 +22,9 @@ void main() async {
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
-    final isNotificationEnabled = await requestNotificationPermission();
-    final isLocationAlwaysEnabled = await requestLocationAlwaysPermission();
-    if (isLocationAlwaysEnabled.islocstatus && isNotificationEnabled.isGranted) {
+    final isNotificationEnabled = await Permission.notification.status;
+    final isLocationAlwaysEnabled = await Permission.locationAlways.status;
+    if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
       await startBackgroundService();
     } else {
       await stopBackgroundService();

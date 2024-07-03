@@ -268,21 +268,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         }
       },
     );
-    Permission.location.status.then(
-      (value) async {
-        setState(() {
-          locationPermission = value;
-        });
-        if (!value.isGranted) {
-          await stopBackgroundService();
-          setState(() {
-            isAutoLocatingNotEnabled = false;
-            isAutoLocatingEnabled = false;
-            Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-          });
-        }
-      },
-    );
     Permission.locationAlways.status.then(
       (value) async {
         setState(() {
@@ -356,10 +341,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                     TextButton(
                       child: const Text("設定"),
                       onPressed: () async {
-                        final status = await Permission.locationAlways.request();
-                        if (status.isPermanentlyDenied) {
-                          openAppSettings();
-                        }
+                        await openAppSettings();
                       },
                     ),
                   ]),
