@@ -294,6 +294,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         setState(() {
           notificationPermission = value;
         });
+        if (!value.isGranted) {
+          setState(() {
+            isAutoLocatingNotEnabled = true;
+            isAutoLocatingEnabled = false;
+            Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          });
+        }
       },
     );
     Permission.location.status.then(
@@ -301,6 +308,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         setState(() {
           locationPermission = value;
         });
+        if (!value.isGranted) {
+          setState(() {
+            isAutoLocatingNotEnabled = true;
+            isAutoLocatingEnabled = false;
+            Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          });
+        }
       },
     );
     Permission.locationAlways.status.then(
@@ -308,15 +322,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         setState(() {
           locationAlwaysPermission = value;
         });
+        if (!value.isGranted) {
+          setState(() {
+            isAutoLocatingNotEnabled = true;
+            isAutoLocatingEnabled = false;
+            Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          });
+        }
       },
     );
-    if (!notificationPermission!.isGranted || !locationPermission!.isGranted || !locationAlwaysPermission!.isGranted) {
-      setState(() {
-        isAutoLocatingNotEnabled = true;
-        isAutoLocatingEnabled = false;
-        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-      });
-    }
   }
 
   @override
