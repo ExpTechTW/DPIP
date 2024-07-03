@@ -20,7 +20,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   bool isAutoLocatingNotEnabled = false;
   PermissionStatus? notificationPermission;
-  PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
 
   String city = "";
@@ -36,7 +35,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
       if (!mounted) return false;
 
-      setState(() => locationPermission = status);
+      setState(() => locationAlwaysPermission = status);
 
       if (!status.isGranted) {
         shouldRetry = await shownotificationPermissionDialog(value, status, context);
@@ -64,7 +63,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
       if (!mounted) return false;
 
-      setState(() => locationPermission = status);
+      setState(() => locationAlwaysPermission = status);
 
       if (!status.isGranted) {
         shouldRetry = await showlocationPermissionDialog(value, status, context);
