@@ -17,6 +17,7 @@ class SettingsLocationView extends StatefulWidget {
 
 class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+  bool isAutoLocatingNotEnabled = false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
@@ -211,29 +212,31 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   Future toggleAutoLocation() async {
     await stopBackgroundService();
+    setState(() {
+      isAutoLocatingNotEnabled = true;
+      isAutoLocatingEnabled = false;
+      Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+    });
 
     if (isAutoLocatingEnabled) {
-      setState(() {
-        isAutoLocatingEnabled = false;
-      });
       return;
     } else {
-      final location = await checkLocationPermission(0);
       final notification = await checkNotificationPermission(0);
+      final location = await checkLocationPermission(0);
       final locationAlways = await checkLocationAlwaysPermission();
 
-      if (!location && !notification && !locationAlways) {
+      if (!notification || !location || !locationAlways) {
         return;
       }
 
       await initializeService();
 
       setState(() {
+        isAutoLocatingNotEnabled = false;
         isAutoLocatingEnabled = true;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
     }
-
-    Global.preference.setBool("auto-location", isAutoLocatingEnabled);
   }
 
   @override
@@ -291,11 +294,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           ),
           if (locationAlwaysPermission != null)
             Visibility(
-              visible: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted,
+              visible: isAutoLocatingNotEnabled && !locationAlwaysPermission!.isGranted,
               maintainAnimation: true,
               maintainState: true,
               child: AnimatedOpacity(
-                opacity: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
+                opacity: isAutoLocatingNotEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
                 curve: const Interval(0.2, 1, curve: Easing.standard),
                 duration: Durations.medium2,
                 child: Padding(
@@ -330,11 +333,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
             ),
           if (notificationPermission != null)
             Visibility(
-              visible: isAutoLocatingEnabled && !notificationPermission!.isGranted,
+              visible: isAutoLocatingNotEnabled && !notificationPermission!.isGranted,
               maintainAnimation: true,
               maintainState: true,
               child: AnimatedOpacity(
-                opacity: isAutoLocatingEnabled && !notificationPermission!.isGranted ? 1 : 0,
+                opacity: isAutoLocatingNotEnabled && !notificationPermission!.isGranted ? 1 : 0,
                 curve: const Interval(0.2, 1, curve: Easing.standard),
                 duration: Durations.medium2,
                 child: Padding(
