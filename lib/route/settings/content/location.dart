@@ -103,7 +103,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     bool shouldRetry = true;
 
     while (shouldRetry) {
-      // 请求权限
       status = await _requestPermission(value);
 
       if (!mounted) return false;
@@ -113,7 +112,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       if (!status.isGranted) {
         shouldRetry = await _showPermissionDialog(value, status);
         if (shouldRetry) {
-          value += 1;  // 增加 value 以尝试下一级权限
+          value += 1;
         }
       } else {
         result = true;
@@ -254,13 +253,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   Future toggleAutoLocation() async {
     await stopBackgroundService();
-    setState(() {
-      isAutoLocatingNotEnabled = true;
-      isAutoLocatingEnabled = false;
-      Global.preference.setBool("auto-location", isAutoLocatingEnabled);
-    });
 
     if (isAutoLocatingEnabled) {
+      setState(() {
+        isAutoLocatingNotEnabled = true;
+        isAutoLocatingEnabled = false;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+      });
       return;
     } else {
       final notification = await checkNotificationPermission(0);
@@ -269,6 +268,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       print("location $location");
 
       if (!notification || !location) {
+        setState(() {
+          isAutoLocatingNotEnabled = true;
+          isAutoLocatingEnabled = false;
+          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+        });
         return;
       }
 
