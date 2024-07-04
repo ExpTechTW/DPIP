@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/service.dart';
@@ -200,7 +201,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "自動定位功能需要將位置權限提升至「一律允許」以在背景使用。",
+                        Platform.isAndroid
+                            ? "自動定位功能需要將位置權限提升至「一律允許」以在背景使用。"
+                            : "自動定位功能需要將位置權限提升至「永遠」以在背景使用。",
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),

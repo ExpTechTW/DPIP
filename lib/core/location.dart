@@ -274,7 +274,11 @@ Widget getlocationDialogContent(int value, PermissionStatus status) {
       "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}"
     );
   } else {
-    return const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。");
+    return Text(
+        Platform.isAndroid
+            ? "為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"
+            : "為了獲得更好的自動定位體驗，您需要將位置權限提升至「永遠」以讓 DPIP 在背景自動設定所在地資訊。",
+    );
   }
 }
 
