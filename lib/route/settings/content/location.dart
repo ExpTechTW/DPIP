@@ -186,10 +186,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Material(
-              color: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
-              borderRadius: BorderRadius.circular(16),
-              child: SwitchListTile.adaptive(
+            child: GestureDetector(
+              onTap: () => toggleAutoLocation(!isAutoLocatingEnabled),
+              child: ListTile(
+                tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 title: Text(
                   "啟用自動定位",
@@ -197,8 +197,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                     color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
                   ),
                 ),
-                value: isAutoLocatingEnabled,
-                onChanged: (value) => toggleAutoLocation(value),
+                trailing: Switch(
+                  value: isAutoLocatingEnabled,
+                  onChanged: (value) => toggleAutoLocation(value),
+                ),
                 contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
               ),
             ),
