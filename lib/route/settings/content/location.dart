@@ -26,25 +26,32 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   String city = "";
   String town = "";
 
-  Future<bool> checkNotificationPermission(int value) async {
+  Future<int> checkNotificationPermission(int value) async {
     PermissionStatus status;
-    bool result = false;
+    int result = 0;
     bool shouldRetry = true;
+    int statusRetry = 0;
 
     while (shouldRetry) {
       status = await requestnotificationPermission(value);
 
-      if (!mounted) return false;
+      if (!mounted) return 0;
 
       setState(() => locationAlwaysPermission = status);
 
       if (!status.isGranted) {
-        shouldRetry = await shownotificationPermissionDialog(value, status, context);
-        if (shouldRetry) {
+        statusRetry = await shownotificationPermissionDialog(value, status, context);
+        if (statusRetry == 1) {
           value += 1;
+        } else if (statusRetry == 2) {
+          result = 2;
+          shouldRetry = false;
+        } else if (statusRetry == 3) {
+          result = 3;
+          shouldRetry = false;
         }
       } else if (status.isGranted && value >= 0) {
-        result = true;
+        result = 1;
         shouldRetry = false;
       } else {
         value += 1;
@@ -54,25 +61,32 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     return result;
   }
 
-  Future<bool> checkLocationPermission(int value) async {
+  Future<int> checkLocationPermission(int value) async {
     PermissionStatus status;
-    bool result = false;
+    int result = 0;
     bool shouldRetry = true;
+    int statusRetry = 0;
 
     while (shouldRetry) {
       status = await requestlocationPermission(value);
 
-      if (!mounted) return false;
+      if (!mounted) return 0;
 
       setState(() => locationAlwaysPermission = status);
 
       if (!status.isGranted) {
-        shouldRetry = await showlocationPermissionDialog(value, status, context);
-        if (shouldRetry) {
+        statusRetry = await showlocationPermissionDialog(value, status, context);
+        if (statusRetry == 1) {
           value += 1;
+        } else if (statusRetry == 2) {
+          result = 2;
+          shouldRetry = false;
+        } else if (statusRetry == 3) {
+          result = 3;
+          shouldRetry = false;
         }
       } else if (status.isGranted && value >= 2) {
-        result = true;
+        result = 1;
         shouldRetry = false;
       } else {
         value += 1;
@@ -98,9 +112,16 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       final location = await checkLocationPermission(0);
       print("location $location");
 
-      if (!notification || !location) {
+      if (notification == 2 || location == 2) {
         setState(() {
           isAutoLocatingNotEnabled = true;
+          isAutoLocatingEnabled = false;
+          Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+        });
+        return;
+      } else if (notification == 3 || location == 3 ) {
+        setState(() {
+          isAutoLocatingNotEnabled = false;
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
         });

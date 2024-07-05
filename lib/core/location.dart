@@ -174,8 +174,8 @@ Future<PermissionStatus> requestnotificationPermission(int value) async {
   }
 }
 
-Future<bool> shownotificationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
-  bool retry = false;
+Future<int> shownotificationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
+  int retry = 0;
   await showDialog(
     context: context,
     builder: (context) {
@@ -190,7 +190,7 @@ Future<bool> shownotificationPermissionDialog(int value, PermissionStatus status
           TextButton(
             child: const Text("取消"),
             onPressed: () {
-              retry = false;
+              retry = 3;
               Navigator.pop(context);
             },
           ),
@@ -205,20 +205,20 @@ Future<bool> shownotificationPermissionDialog(int value, PermissionStatus status
   return retry;
 }
 
-Widget getnotificationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
+Widget getnotificationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
   if (value == 2) {
     return FilledButton(
       child: const Text("設定"),
       onPressed: () {
         openAppSettings();
-        onPressed(false);
+        onPressed(2);
       },
     );
   } else {
     return FilledButton(
       child: Text((value >= 1) ? "再試一次" : "請求權限"),
       onPressed: () {
-        onPressed(true);
+        onPressed(1);
       },
     );
   }
@@ -237,8 +237,8 @@ Future<PermissionStatus> requestlocationPermission(int value) async {
   }
 }
 
-Future<bool> showlocationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
-  bool retry = false;
+Future<int> showlocationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
+  int retry = 0;
   await showDialog(
     context: context,
     builder: (context) {
@@ -251,7 +251,7 @@ Future<bool> showlocationPermissionDialog(int value, PermissionStatus status, Bu
           TextButton(
             child: const Text("取消"),
             onPressed: () {
-              retry = false;
+              retry = 3;
               Navigator.pop(context);
             },
           ),
@@ -282,20 +282,20 @@ Widget getlocationDialogContent(int value, PermissionStatus status) {
   }
 }
 
-Widget getlocationActionButton(int value, PermissionStatus status, Function(bool) onPressed) {
+Widget getlocationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
   if (value == 3) {
     return FilledButton(
       child: const Text("設定"),
       onPressed: () {
         openAppSettings();
-        onPressed(false);
+        onPressed(2);
       },
     );
   } else {
     return FilledButton(
       child: Text((value >= 1) ? "再試一次" : "請求權限"),
       onPressed: () {
-        onPressed(true);
+        onPressed(1);
       },
     );
   }
