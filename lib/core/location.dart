@@ -227,13 +227,15 @@ Widget getnotificationActionButton(int value, PermissionStatus status, Function(
 Future<PermissionStatus> requestlocationPermission(int value) async {
   switch (value) {
     case 0:
-      return await Permission.location.status;
+      return await Permission.locationAlways.status;
     case 1:
-      return await Permission.location.request();
+      return await Permission.locationAlways.request();
     case 2:
+      return await Permission.location.request();
+    case 3:
       return await Permission.locationAlways.request();
     default:
-      return await Permission.location.status;
+      return await Permission.locationAlways.status;
   }
 }
 
