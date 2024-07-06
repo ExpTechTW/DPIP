@@ -100,8 +100,6 @@ class LocationStatus {
 final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
 Position? lastPosition;
-DateTime? lastUpdateTime;
-Timer? restartTimer;
 
 void startPositionStream() async {
   if (await openLocationSettings(true)) {
@@ -121,16 +119,16 @@ void startPositionStream() async {
       }).listen((Position? position) async {
         if (position != null && shouldUpdatePosition(position)) {
           lastPosition = position;
-          lastUpdateTime = DateTime.now();
 
           GetLocationResult result = await getLocation();
-          LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
+          if (result.change) {
+            LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
 
-          print('新位置: ${result.position}');
-          print('城市和鄉鎮: ${locationResult.cityTown}');
+            print('新位置: ${result.position}');
+            print('城市和鄉鎮: ${locationResult.cityTown}');
+          }
 
           stopPositionStream();
-          restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
         }
       });
       print('位置已開啟');
