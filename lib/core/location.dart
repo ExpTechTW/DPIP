@@ -118,10 +118,16 @@ void startPositionStream() async {
       positionStreamSubscription = positionStream.handleError((error) async {
         await positionStreamSubscription?.cancel();
         positionStreamSubscription = null;
-      }).listen((Position? position) {
+      }).listen((Position? position) async {
         if (position != null && shouldUpdatePosition(position)) {
           lastPosition = position;
           lastUpdateTime = DateTime.now();
+
+          GetLocationResult result = await getLocation();
+          LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
+
+          print('新位置: ${result.position}');
+          print('城市和鄉鎮: ${locationResult.cityTown}');
 
           stopPositionStream();
           restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
