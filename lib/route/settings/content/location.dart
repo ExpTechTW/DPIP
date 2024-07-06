@@ -86,7 +86,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           result = 3;
           shouldRetry = false;
         }
-      } else if (status.isGranted && value >= 2) {
+      } else if (status.isGranted && value >= 3) {
         result = 1;
         shouldRetry = false;
       } else {
