@@ -26,6 +26,7 @@ void main() async {
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
       await startBackgroundService();
+      startPositionStream();
     } else {
       await stopBackgroundService();
     }

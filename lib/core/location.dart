@@ -97,6 +97,54 @@ class LocationStatus {
   LocationStatus(this.locstatus, this.islocstatus);
 }
 
+final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
+StreamSubscription<Position>? positionStreamSubscription;
+Position? lastPosition;
+DateTime? lastUpdateTime;
+Timer? restartTimer;
+
+void startPositionStream() async {
+  if (await openLocationSettings(true)) {
+    if (positionStreamSubscription == null) {
+      final positionStream = Geolocator.getPositionStream(
+        locationSettings: AppleSettings(
+          accuracy: LocationAccuracy.medium,
+          activityType: ActivityType.other,
+          pauseLocationUpdatesAutomatically: true,
+          showBackgroundLocationIndicator: false,
+          allowBackgroundLocationUpdates: true,
+        ),
+      );
+      positionStreamSubscription = positionStream.handleError((error) async {
+        await positionStreamSubscription?.cancel();
+        positionStreamSubscription = null;
+      }).listen((Position? position) {
+        if (position != null && shouldUpdatePosition(position)) {
+          lastPosition = position;
+          lastUpdateTime = DateTime.now();
+
+          stopPositionStream();
+          restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
+        }
+      });
+      print('位置已開啟');
+    }
+  }
+}
+
+void stopPositionStream() {
+  positionStreamSubscription?.cancel();
+  positionStreamSubscription = null;
+}
+
+Future<bool> openLocationSettings(bool openSettings) async {
+  return true;
+}
+
+bool shouldUpdatePosition(Position position) {
+  return true;
+}
+
 Future<LocationStatus> requestLocationAlwaysPermission() async {
   String locstatus = "";
   bool islocGranted = false;
