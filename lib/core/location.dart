@@ -15,6 +15,13 @@ class GetLocationResult {
   GetLocationResult(this.position, this.change);
 }
 
+class LocationResult {
+  final String cityTown;
+  final bool change;
+
+  LocationResult(this.cityTown, this.change);
+}
+
 @pragma('vm:entry-point')
 Future<GetLocationResult> getLocation() async {
   final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -50,13 +57,6 @@ Future<GetLocationResult> getLocation() async {
   }
 
   return GetLocationResult(position, positionchange);
-}
-
-class LocationResult {
-  final String cityTown;
-  final bool change;
-
-  LocationResult(this.cityTown, this.change);
 }
 
 Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
@@ -122,8 +122,7 @@ void startPositionStream() async {
 
           GetLocationResult result = await getLocation();
           if (result.change) {
-            LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
-
+            LocationResult locationResult = await getLatLngLocation(result.position.latitude, result.position.longitude);
             print('新位置: ${result.position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
           }
