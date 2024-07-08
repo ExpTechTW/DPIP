@@ -20,7 +20,6 @@ class SettingsLocationView extends StatefulWidget {
 
 class _SettingsLocationViewState extends State<SettingsLocationView> {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
-  bool isAutoLocatingNotEnabled = false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationAlwaysPermission;
 
@@ -106,7 +105,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
     if (!value) {
       setState(() {
-        isAutoLocatingNotEnabled = false;
         isAutoLocatingEnabled = false;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
@@ -119,15 +117,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
       if (notification == 2 || location == 2) {
         setState(() {
-          isAutoLocatingNotEnabled = true;
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
         });
-        toggleAutoLocation(value);
         return;
       } else if (notification == 3 || location == 3 ) {
         setState(() {
-          isAutoLocatingNotEnabled = false;
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
         });
@@ -137,7 +132,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       await startBackgroundService();
 
       setState(() {
-        isAutoLocatingNotEnabled = false;
         isAutoLocatingEnabled = true;
         Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
@@ -155,7 +149,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         if (!value.isGranted) {
           await stopBackgroundService();
           setState(() {
-            isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
             Global.preference.setBool("auto-location", isAutoLocatingEnabled);
           });
@@ -170,7 +163,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         if (!value.isGranted) {
           await stopBackgroundService();
           setState(() {
-            isAutoLocatingNotEnabled = false;
             isAutoLocatingEnabled = false;
             Global.preference.setBool("auto-location", isAutoLocatingEnabled);
           });
@@ -190,128 +182,54 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Material(
-              borderRadius: BorderRadius.circular(16),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "啟用自動定位",
-                        style: TextStyle(
-                          color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
-                        )
-                      ),
-                      Platform.isIOS
-                        ? CupertinoSwitch(
-                            value: isAutoLocatingEnabled,
-                            onChanged: (value) => toggleAutoLocation(value),
-                          )
-                        : Switch(
-                            value: isAutoLocatingEnabled,
-                            onChanged: (value) => toggleAutoLocation(value),
-                          ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
           // Padding(
           //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          //   child: SwitchListTile(
-          //     tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
-          //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          //     title: Text(
-          //       "啟用自動定位",
-          //       style: TextStyle(
-          //         color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
+          //   child: Material(
+          //     borderRadius: BorderRadius.circular(16),
+          //     child: InkWell(
+          //       borderRadius: BorderRadius.circular(16),
+          //       child: Padding(
+          //         padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //           children: [
+          //             Text(
+          //               "啟用自動定位",
+          //               style: TextStyle(
+          //                 color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
+          //               )
+          //             ),
+          //             Platform.isIOS
+          //               ? CupertinoSwitch(
+          //                   value: isAutoLocatingEnabled,
+          //                   onChanged: (value) => toggleAutoLocation(value),
+          //                 )
+          //               : Switch(
+          //                   value: isAutoLocatingEnabled,
+          //                   onChanged: (value) => toggleAutoLocation(value),
+          //                 ),
+          //           ],
+          //         ),
           //       ),
           //     ),
-          //     contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-          //     value: isAutoLocatingEnabled,
-          //     onChanged: (value) => toggleAutoLocation(value),
           //   ),
           // ),
-          if (locationAlwaysPermission != null)
-            Visibility(
-              visible: isAutoLocatingNotEnabled && !locationAlwaysPermission!.isGranted,
-              maintainAnimation: true,
-              maintainState: true,
-              child: AnimatedOpacity(
-                opacity: isAutoLocatingNotEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
-                curve: const Interval(0.2, 1, curve: Easing.standard),
-                duration: Durations.medium2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        Platform.isAndroid
-                            ? "自動定位功能需要將位置權限提升至「一律允許」以在背景使用。"
-                            : "自動定位功能需要將位置權限提升至「永遠」以在背景使用。",
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
-                      child: const Text("設定"),
-                      onPressed: () async {
-                        await openAppSettings();
-                      },
-                    ),
-                  ]),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: SwitchListTile(
+              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                "啟用自動定位",
+                style: TextStyle(
+                  color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
                 ),
               ),
+              contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
+              value: isAutoLocatingEnabled,
+              onChanged: (value) => toggleAutoLocation(value),
             ),
-          if (notificationPermission != null)
-            Visibility(
-              visible: isAutoLocatingNotEnabled && !notificationPermission!.isGranted,
-              maintainAnimation: true,
-              maintainState: true,
-              child: AnimatedOpacity(
-                opacity: isAutoLocatingNotEnabled && !notificationPermission!.isGranted ? 1 : 0,
-                curve: const Interval(0.2, 1, curve: Easing.standard),
-                duration: Durations.medium2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        '通知功能已被拒絕，請移至設定允許權限',
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
-                      child: const Text("設定"),
-                      onPressed: () async {
-                        await openAppSettings();
-                      },
-                    ),
-                  ]),
-                ),
-              ),
-            ),
+          ),
           const Padding(
             padding: EdgeInsets.all(16),
             child: Row(children: [
