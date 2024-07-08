@@ -119,6 +119,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         setState(() {
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+          toggleAutoLocation(value);
         });
         return;
       } else if (notification == 3 || location == 3 ) {
