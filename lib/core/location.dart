@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -126,8 +127,13 @@ void startPositionStream() async {
             print('新位置: ${result.position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
           }
-
-          stopPositionStream();
+          String lat = result.position.latitude.toStringAsFixed(4);
+          String lon = result.position.longitude.toStringAsFixed(4);
+          String fcmToken = Global.preference.getString("fcm-token") ?? "";
+          if (result.change && fcmToken != "") {
+            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+            print(body);
+          }
         }
       });
       print('位置已開啟');
