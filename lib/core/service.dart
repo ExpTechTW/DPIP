@@ -136,8 +136,8 @@ void onStart(ServiceInstance service) async {
           );
 
           service.setForegroundNotificationInfo(
-            title: "My App Service",
-            content: "Updated at ${DateTime.now()}",
+            title: 'COOL SERVICE',
+            content: 'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
           );
         }
       }
