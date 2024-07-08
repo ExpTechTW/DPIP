@@ -29,6 +29,7 @@ void main() async {
       startPositionStream();
     } else {
       await stopBackgroundService();
+      stopPositionStream();
     }
   }
   initializeTimeZones();

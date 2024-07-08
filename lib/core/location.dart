@@ -127,6 +127,7 @@ void startPositionStream() async {
             print('新位置: ${result.position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
           }
+          stopPositionStream();
           String lat = result.position.latitude.toStringAsFixed(4);
           String lon = result.position.longitude.toStringAsFixed(4);
           String fcmToken = Global.preference.getString("fcm-token") ?? "";
@@ -282,17 +283,32 @@ Widget getnotificationActionButton(int value, PermissionStatus status, Function(
 }
 
 Future<PermissionStatus> requestlocationPermission(int value) async {
-  switch (value) {
-    case 0:
-      return await Permission.locationAlways.status;
-    case 1:
-      return await Permission.locationAlways.request();
-    case 2:
-      return await Permission.location.request();
-    case 3:
-      return await Permission.locationAlways.request();
-    default:
-      return await Permission.locationAlways.status;
+  if (Platform.isIOS) {
+    switch (value) {
+      case 0:
+        return await Permission.location.status;
+      case 1:
+        return await Permission.location.request();
+      case 2:
+        return await Permission.location.request();
+      case 3:
+        return await Permission.locationAlways.request();
+      default:
+        return await Permission.location.status;
+    }
+  } else {
+    switch (value) {
+      case 0:
+        return await Permission.locationAlways.status;
+      case 1:
+        return await Permission.locationAlways.request();
+      case 2:
+        return await Permission.location.request();
+      case 3:
+        return await Permission.locationAlways.request();
+      default:
+        return await Permission.locationAlways.status;
+    }
   }
 }
 
