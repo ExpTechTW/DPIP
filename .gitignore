@@ -47,3 +47,4 @@ app.*.map.json
 /ios/Flutter
 /windows
 /.vscode
+!lib/model/map_style.g.dart
