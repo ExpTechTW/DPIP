@@ -32,7 +32,8 @@ Future<GetLocationResult> getLocation() async {
 
   double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
 
-  int lastLocationUpdate = Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
+  int lastLocationUpdate =
+      Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
   int now = DateTime.now().toUtc().millisecondsSinceEpoch;
   int nowtemp = now - lastLocationUpdate;
 
@@ -123,7 +124,8 @@ void startPositionStream() async {
 
           GetLocationResult result = await getLocation();
           if (result.change) {
-            LocationResult locationResult = await getLatLngLocation(result.position.latitude, result.position.longitude);
+            LocationResult locationResult =
+                await getLatLngLocation(result.position.latitude, result.position.longitude);
             print('新位置: ${result.position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
           }
@@ -345,14 +347,12 @@ Widget getlocationDialogContent(int value, PermissionStatus status) {
   if (value == 0) {
     return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
   } else if (value == 3) {
-    return Text(
-      "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}"
-    );
+    return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}");
   } else {
     return Text(
-        Platform.isAndroid
-            ? "為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"
-            : "為了獲得更好的自動定位體驗，您需要將位置權限提升至「永遠」以讓 DPIP 在背景自動設定所在地資訊。",
+      Platform.isAndroid
+          ? "為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"
+          : "為了獲得更好的自動定位體驗，您需要將位置權限提升至「永遠」以讓 DPIP 在背景自動設定所在地資訊。",
     );
   }
 }
