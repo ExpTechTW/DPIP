@@ -122,7 +122,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
           toggleAutoLocation(value);
         });
         return;
-      } else if (notification == 3 || location == 3 ) {
+      } else if (notification == 3 || location == 3) {
         setState(() {
           isAutoLocatingEnabled = false;
           Global.preference.setBool("auto-location", isAutoLocatingEnabled);
@@ -179,94 +179,60 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          //   child: Material(
-          //     borderRadius: BorderRadius.circular(16),
-          //     child: InkWell(
-          //       borderRadius: BorderRadius.circular(16),
-          //       child: Padding(
-          //         padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
-          //         child: Row(
-          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //           children: [
-          //             Text(
-          //               "啟用自動定位",
-          //               style: TextStyle(
-          //                 color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
-          //               )
-          //             ),
-          //             Platform.isIOS
-          //               ? CupertinoSwitch(
-          //                   value: isAutoLocatingEnabled,
-          //                   onChanged: (value) => toggleAutoLocation(value),
-          //                 )
-          //               : Switch(
-          //                   value: isAutoLocatingEnabled,
-          //                   onChanged: (value) => toggleAutoLocation(value),
-          //                 ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SwitchListTile(
-              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text(
-                "啟用自動定位",
-                style: TextStyle(
-                  color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SwitchListTile(
+            tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Text(
+              "啟用自動定位",
+              style: TextStyle(
+                color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
               ),
-              contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-              value: isAutoLocatingEnabled,
-              onChanged: (value) => toggleAutoLocation(value),
             ),
+            contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
+            value: isAutoLocatingEnabled,
+            onChanged: (value) => toggleAutoLocation(value),
           ),
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Row(children: [
-              Padding(
-                padding: EdgeInsets.all(8),
-                child: Icon(Symbols.info),
-              ),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text("自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"),
-              )
-            ]),
-          ),
-          const ListTileGroupHeader(title: "所在地"),
-          ListTile(
-            leading: const Padding(
+        ),
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(children: [
+            Padding(
               padding: EdgeInsets.all(8),
-              child: Icon(Symbols.location_city),
+              child: Icon(Symbols.info),
             ),
-            title: Text("縣市"),
-            subtitle: Text(city),
-            enabled: !isAutoLocatingEnabled,
-            onTap: () {},
+            SizedBox(width: 8),
+            Expanded(
+              child: Text("自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"),
+            )
+          ]),
+        ),
+        const ListTileGroupHeader(title: "所在地"),
+        ListTile(
+          leading: const Padding(
+            padding: EdgeInsets.all(8),
+            child: Icon(Symbols.location_city),
           ),
-          ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(Symbols.forest),
-            ),
-            title: Text("鄉鎮"),
-            subtitle: Text(town),
-            enabled: !isAutoLocatingEnabled,
-            onTap: () {},
-          )
-        ],
-      ),
+          title: Text("縣市"),
+          subtitle: Text(city),
+          enabled: !isAutoLocatingEnabled,
+          onTap: () {},
+        ),
+        ListTile(
+          leading: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Symbols.forest),
+          ),
+          title: Text("鄉鎮"),
+          subtitle: Text(town),
+          enabled: !isAutoLocatingEnabled,
+          onTap: () {},
+        )
+      ],
     );
   }
 }
