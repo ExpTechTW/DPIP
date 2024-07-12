@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.0.0
+version: 2.0.5
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -30,8 +30,11 @@ dependencies:
   dynamic_color: ^1.7.0
   simple_icons: ^10.1.3
   url_launcher: ^6.3.0
-  flutter_map: 6.1.0
-  latlong2: ^0.9.1
+  maplibre_gl: ^0.20.0
+  flutter_hooks: ^0.20.5
+  hooks_riverpod: ^2.5.1
+  freezed_annotation: ^2.4.2
+  riverpod_annotation: ^2.3.5
 
 dev_dependencies:
   flutter_test:

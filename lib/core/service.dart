@@ -9,26 +9,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-void startBackgroundService() async {
-  final service = FlutterBackgroundService();
-  var isRunning = await service.isRunning();
-  if (isRunning) {
-    service.invoke("stopService");
+final service = FlutterBackgroundService();
+bool isservicerun = false;
+
+Future<void> startBackgroundService() async {
+  if (!isservicerun) {
+    initializeService();
+  } else if (isservicerun) {
+    var isRunning = await service.isRunning();
+    print("Background Service running $isRunning");
+    if (!isRunning) {
+      service.startService();
+    }
   }
-  service.startService();
 }
 
-void stopBackgroundService() async {
-  final service = FlutterBackgroundService();
+Future<void> stopBackgroundService() async {
   var isRunning = await service.isRunning();
+  print("Background Service running $isRunning");
   if (isRunning) {
     service.invoke("stopService");
   }
 }
 
 Future<void> initializeService() async {
-  final service = FlutterBackgroundService();
-
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'my_foreground', // id
     'MY FOREGROUND SERVICE', // title
@@ -67,6 +71,7 @@ Future<void> initializeService() async {
       onBackground: onIosBackground,
     ),
   );
+  isservicerun = true;
 }
 
 @pragma('vm:entry-point')
@@ -84,6 +89,8 @@ void onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   if (service is AndroidServiceInstance) {
+    service.setAutoStartOnBootMode(true);
+
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
     });
@@ -95,40 +102,45 @@ void onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) {
     service.stopSelf();
+    print("stop");
     debugPrint("background process is now stopped");
   });
 
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    if (service is AndroidServiceInstance) {
-      if (await service.isForegroundService()) {
-        final position = await getLocation();
-        String lat = position.latitude.toStringAsFixed(4);
-        String lon = position.longitude.toStringAsFixed(4);
-        LocationResult country = await getLocationcitytown(position.latitude, position.longitude);
-        String fcmToken = Global.preference.getString("fcm-token") ?? "";
-        if (country.change && fcmToken != "") {
-          final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-          print(body);
-        }
-        flutterLocalNotificationsPlugin.show(
-          888,
-          'COOL SERVICE',
-          'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'my_foreground',
-              'MY FOREGROUND SERVICE',
-              icon: 'ic_bg_service_small',
-              ongoing: true,
+  if (Platform.isIOS) {
+    startPositionStream();
+  } else {
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (service is AndroidServiceInstance) {
+        if (await service.isForegroundService()) {
+          final position = await getLocation();
+          String lat = position.position.latitude.toStringAsFixed(4);
+          String lon = position.position.longitude.toStringAsFixed(4);
+          LocationResult country = await getLatLngLocation(position.position.latitude, position.position.longitude);
+          String fcmToken = Global.preference.getString("fcm-token") ?? "";
+          if (position.change && fcmToken != "") {
+            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+            print(body);
+          }
+          flutterLocalNotificationsPlugin.show(
+            888,
+            'COOL SERVICE',
+            'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
+            const NotificationDetails(
+              android: AndroidNotificationDetails(
+                'my_foreground',
+                'MY FOREGROUND SERVICE',
+                icon: 'ic_bg_service_small',
+                ongoing: true,
+              ),
             ),
-          ),
-        );
+          );
 
-        service.setForegroundNotificationInfo(
-          title: "My App Service",
-          content: "Updated at ${DateTime.now()}",
-        );
+          service.setForegroundNotificationInfo(
+            title: 'COOL SERVICE',
+            content: 'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
+          );
+        }
       }
-    }
-  });
+    });
+  }
 }
