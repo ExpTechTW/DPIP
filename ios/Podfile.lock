@@ -1,7 +1,4 @@
 PODS:
-  - connectivity_plus (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - Firebase/CoreOnly (10.27.0):
     - FirebaseCore (= 10.27.0)
   - Firebase/Messaging (10.27.0):
@@ -79,9 +76,6 @@ PODS:
   - nanopb/encode (2.30910.0)
   - package_info_plus (0.4.5):
     - Flutter
-  - path_provider_foundation (0.0.1):
-    - Flutter
-    - FlutterMacOS
   - permission_handler_apple (9.3.0):
     - Flutter
   - PromisesObjC (2.4.0)
@@ -92,7 +86,6 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
-  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/darwin`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
@@ -101,7 +94,6 @@ DEPENDENCIES:
   - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
@@ -119,8 +111,6 @@ SPEC REPOS:
     - PromisesObjC
 
 EXTERNAL SOURCES:
-  connectivity_plus:
-    :path: ".symlinks/plugins/connectivity_plus/darwin"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_messaging:
@@ -137,8 +127,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/geolocator_apple/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
-  path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   shared_preferences_foundation:
@@ -147,7 +135,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
-  connectivity_plus: ddd7f30999e1faaef5967c23d5b6d503d10434db
   Firebase: 26b040b20866a55f55eb3611b9fcf3ae64816b86
   firebase_core: f8d0424c45e0f1e596811085fc12c638d628457c
   firebase_messaging: 8b29edaf5adfd3b52b5bfa5af8128c44164670c6
@@ -164,7 +151,6 @@ SPEC CHECKSUMS:
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
-  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
