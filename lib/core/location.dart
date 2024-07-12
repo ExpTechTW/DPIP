@@ -25,7 +25,7 @@ class LocationResult {
 
 @pragma('vm:entry-point')
 Future<GetLocationResult> getLocation() async {
-  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
   final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
   final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
   bool positionchange = false;
@@ -33,29 +33,24 @@ Future<GetLocationResult> getLocation() async {
   double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
 
   int lastLocationUpdate =
-      Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
-  int now = DateTime.now().toUtc().millisecondsSinceEpoch;
+      Global.preference.getInt("last-location-update") ?? DateTime
+          .now()
+          .toUtc()
+          .millisecondsSinceEpoch;
+  int now = DateTime
+      .now()
+      .toUtc()
+      .millisecondsSinceEpoch;
   int nowtemp = now - lastLocationUpdate;
-
-  if (nowtemp == 0) {
-    await Global.preference.setInt("last-location-update", now);
-  }
-
-  if (positionlattemp == 0.0 && positionlontemp == 0.0) {
-    await Global.preference.setDouble("loc-position-lat", position.latitude);
-    await Global.preference.setDouble("loc-position-lon", position.longitude);
-    positionchange = true;
-    print('距離: $distance 間距: $nowtemp 初始');
-  }
 
   if (distance >= 250 && nowtemp > 300000) {
     await Global.preference.setDouble("loc-position-lat", position.latitude);
     await Global.preference.setDouble("loc-position-lon", position.longitude);
     await Global.preference.setInt("last-location-update", now);
     positionchange = true;
-    print('距離: $distance 間距: $nowtemp 確定');
+    print('距離: $distance 間距: $nowtemp 更新位置');
   } else {
-    print('距離: $distance 間距: $nowtemp');
+    print('距離: $distance 間距: $nowtemp 不更新位置');
   }
 
   return GetLocationResult(position, positionchange);
@@ -86,8 +81,6 @@ Future<LocationResult> getLatLngLocation(double latitude, double longitude) asyn
     } else {
       locationGet = LocationResult(citytowntemp, false);
     }
-    // print('縣市: $city');
-    // print('鄉鎮市區: $town');
   }
   return locationGet;
 }
@@ -110,36 +103,37 @@ void startPositionStream() async {
         locationSettings: AppleSettings(
           accuracy: LocationAccuracy.medium,
           activityType: ActivityType.other,
-          pauseLocationUpdatesAutomatically: true,
+          pauseLocationUpdatesAutomatically: false,
           showBackgroundLocationIndicator: false,
           allowBackgroundLocationUpdates: true,
         ),
       );
       positionStreamSubscription = positionStream.handleError((error) async {
+        print('位置流錯誤: $error');
         await positionStreamSubscription?.cancel();
         positionStreamSubscription = null;
       }).listen((Position? position) async {
-        if (position != null && shouldUpdatePosition(position)) {
+        if (position != null) {
           lastPosition = position;
 
           GetLocationResult result = await getLocation();
           if (result.change) {
             LocationResult locationResult =
-                await getLatLngLocation(result.position.latitude, result.position.longitude);
+            await getLatLngLocation(result.position.latitude, result.position.longitude);
             print('新位置: ${result.position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
-          }
-          stopPositionStream();
-          String lat = result.position.latitude.toStringAsFixed(4);
-          String lon = result.position.longitude.toStringAsFixed(4);
-          String fcmToken = Global.preference.getString("fcm-token") ?? "";
-          if (result.change && fcmToken != "") {
-            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-            print(body);
+
+            String lat = result.position.latitude.toStringAsFixed(4);
+            String lon = result.position.longitude.toStringAsFixed(4);
+            String fcmToken = Global.preference.getString("fcm-token") ?? "";
+            if (fcmToken != "") {
+              final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+              print(body);
+            }
           }
         }
       });
-      print('位置已開啟');
+      print('位置流已開啟');
     }
   }
 }
@@ -147,77 +141,55 @@ void startPositionStream() async {
 void stopPositionStream() {
   positionStreamSubscription?.cancel();
   positionStreamSubscription = null;
+  print('位置流已停止');
 }
 
 Future<bool> openLocationSettings(bool openSettings) async {
-  return true;
-}
-
-bool shouldUpdatePosition(Position position) {
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    if (openSettings) {
+      await Geolocator.openLocationSettings();
+      return await Geolocator.isLocationServiceEnabled();
+    }
+    return false;
+  }
   return true;
 }
 
 Future<LocationStatus> requestLocationAlwaysPermission() async {
   String locstatus = "";
   bool islocGranted = false;
-  if (Platform.isAndroid) {
+
+  if (Platform.isIOS) {
+    PermissionStatus status = await Permission.locationWhenInUse.request();
+    if (status.isGranted) {
+      status = await Permission.locationAlways.request();
+      if (status.isGranted) {
+        print('背景位置權限已授予');
+        islocGranted = true;
+      } else {
+        print('背景位置權限被拒絕');
+        locstatus = "拒絕";
+      }
+    } else {
+      print('位置權限被拒絕');
+      locstatus = "拒絕";
+    }
+  } else if (Platform.isAndroid) {
     PermissionStatus status = await Permission.location.request();
     if (status.isGranted) {
-      print('位置權限已授予');
-
       status = await Permission.locationAlways.request();
       if (status.isGranted) {
         print('背景位置權限已授予');
         islocGranted = true;
       } else {
-        print('位置權限被拒絕');
+        print('背景位置權限被拒絕');
         locstatus = "拒絕";
       }
-    } else if (status.isDenied) {
+    } else {
       print('位置權限被拒絕');
-
-      status = await Permission.locationAlways.request();
-      if (status.isGranted) {
-        print('背景位置權限已授予');
-        islocGranted = true;
-      } else {
-        print('位置權限被拒絕');
-        locstatus = "拒絕";
-      }
-    } else if (status.isPermanentlyDenied) {
-      print('位置權限被永久拒絕');
-
-      status = await Permission.locationAlways.request();
-      if (status.isGranted) {
-        print('背景位置權限已授予');
-        islocGranted = true;
-      } else if (status.isDenied) {
-        print('位置權限被拒絕');
-
-        status = await Permission.location.request();
-
-        if (status.isGranted) {
-          print('背景位置權限已授予');
-          islocGranted = true;
-        } else if (status.isDenied) {
-          print('位置權限被拒絕');
-          locstatus = "拒絕";
-        } else if (status.isPermanentlyDenied) {
-          print('位置權限被永久拒絕');
-          locstatus = "永久拒絕";
-        }
-      } else if (status.isPermanentlyDenied) {
-        print('位置權限被拒絕');
-        locstatus = "拒絕";
-      }
+      locstatus = "拒絕";
     }
-    // } else if (Platform.isIOS) {
-    //   const urlIOS = 'app-settings:';
-    //   final uriIOS = Uri.parse(urlIOS);
-    //   if (await canLaunchUrl(uriIOS)) {
-    //     await launchUrl(uriIOS);
-    //     islocGranted = true;
-    //   }
   }
 
   return LocationStatus(locstatus, islocGranted);
@@ -243,7 +215,9 @@ Future<int> shownotificationPermissionDialog(int value, PermissionStatus status,
         icon: const Icon(Symbols.error),
         title: Text("${(value >= 1) ? "無法" : "請求"}取得通知權限"),
         content: Text(
-          "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
+          "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied
+              ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。"
+              : ""}",
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
@@ -347,7 +321,9 @@ Widget getlocationDialogContent(int value, PermissionStatus status) {
   if (value == 0) {
     return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
   } else if (value == 3) {
-    return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}");
+    return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied
+        ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。"
+        : ""}");
   } else {
     return Text(
       Platform.isAndroid
