@@ -49,7 +49,7 @@ Future<GetLocationResult> getLocation() async {
   GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
   if (nowtemp > 300000 || nowtemp == 0) {
     await Global.preference.setInt("last-location-update", now);
-    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
     positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
     await Global.preference.setString("loc-position-country", country.cityTown);
