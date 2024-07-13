@@ -16,14 +16,29 @@ void main() async {
   await fcmInit();
   await notifyInit();
   await Global.init();
+  String thisVersion = Global.preference.getString("this-version") ?? "";
+  print(thisVersion);
+  if (thisVersion == "") {
+    thisVersion = Global.packageInfo.version;
+    Global.preference.setString("this-version", thisVersion);
+    print(thisVersion);
+  }
   messaging.getToken().then((value) async {
     print(value);
     if (value == null) return;
-    Global.preference.setString("fcm-token", value);
-    final lat = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-    final lon = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-    final body = await ExpTech().getNotifyLocation(value, lat.toStringAsFixed(4), lon.toStringAsFixed(4));
-    print(body);
+    String fcmToken = Global.preference.getString("fcm-token") ?? "";
+    print(fcmToken);
+    if (fcmToken != "" && thisVersion != Global.packageInfo.version) {
+      thisVersion = Global.packageInfo.version;
+      Global.preference.setString("this-version", thisVersion);
+      print(thisVersion);
+      final lat = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+      final lon = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+      final body = await ExpTech().getNotifyLocation(fcmToken, lat.toStringAsFixed(4), lon.toStringAsFixed(4));
+      print(body);
+    } else if (fcmToken == "") {
+      Global.preference.setString("fcm-token", value);
+    }
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
