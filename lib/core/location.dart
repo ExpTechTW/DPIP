@@ -46,13 +46,13 @@ Future<GetLocationResult> getLocation() async {
   final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
   GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp);
   if (nowtemp > 300000 || nowtemp == 0) {
+    await Global.preference.setInt("last-location-update", now);
     final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
     positionlast = GetLocationPosition(position.latitude, position.longitude);
     double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
     if (distance >= 250 || nowtemp == 0) {
       await Global.preference.setDouble("loc-position-lat", position.latitude);
       await Global.preference.setDouble("loc-position-lon", position.longitude);
-      await Global.preference.setInt("last-location-update", now);
       positionchange = true;
       print('距離: $distance 間距: $nowtemp 更新位置');
     } else {
