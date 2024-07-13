@@ -25,13 +25,6 @@ class LocationResult {
 
 @pragma('vm:entry-point')
 Future<GetLocationResult> getLocation() async {
-  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-  final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-  final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-  bool positionchange = false;
-
-  double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-
   int lastLocationUpdate =
       Global.preference.getInt("last-location-update") ?? DateTime
           .now()
@@ -42,15 +35,24 @@ Future<GetLocationResult> getLocation() async {
       .toUtc()
       .millisecondsSinceEpoch;
   int nowtemp = now - lastLocationUpdate;
+  bool positionchange = false;
+  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
 
-  if (distance >= 250 && nowtemp > 300000) {
-    await Global.preference.setDouble("loc-position-lat", position.latitude);
-    await Global.preference.setDouble("loc-position-lon", position.longitude);
-    await Global.preference.setInt("last-location-update", now);
-    positionchange = true;
-    print('距離: $distance 間距: $nowtemp 更新位置');
-  } else {
-    print('距離: $distance 間距: $nowtemp 不更新位置');
+  if (nowtemp > 300000 || nowtemp == 0) {
+    final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+    final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+
+    double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+
+    if (distance >= 250 || nowtemp == 0) {
+      await Global.preference.setDouble("loc-position-lat", position.latitude);
+      await Global.preference.setDouble("loc-position-lon", position.longitude);
+      await Global.preference.setInt("last-location-update", now);
+      positionchange = true;
+      print('距離: $distance 間距: $nowtemp 更新位置');
+    } else {
+      print('距離: $distance 間距: $nowtemp 不更新位置');
+    }
   }
 
   return GetLocationResult(position, positionchange);
@@ -120,20 +122,29 @@ void startPositionStream() async {
           stopPositionStream();
           restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
 
-          GetLocationResult result = await getLocation();
-          if (result.change) {
+          final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+          final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+
+          double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+
+          if (distance >= 250) {
+            await Global.preference.setDouble("loc-position-lat", position.latitude);
+            await Global.preference.setDouble("loc-position-lon", position.longitude);
             LocationResult locationResult =
-            await getLatLngLocation(result.position.latitude, result.position.longitude);
-            print('新位置: ${result.position}');
+            await getLatLngLocation(position.latitude, position.longitude);
+            print('新位置: ${position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
 
-            String lat = result.position.latitude.toStringAsFixed(4);
-            String lon = result.position.longitude.toStringAsFixed(4);
+            String lat = position.latitude.toStringAsFixed(4);
+            String lon = position.longitude.toStringAsFixed(4);
             String fcmToken = Global.preference.getString("fcm-token") ?? "";
             if (fcmToken != "") {
               final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
               print(body);
             }
+            print('距離: $distance 更新位置');
+          } else {
+            print('距離: $distance 不更新位置');
           }
         }
       });
