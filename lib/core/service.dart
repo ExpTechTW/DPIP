@@ -14,21 +14,34 @@ bool isservicerun = false;
 
 Future<void> startBackgroundService() async {
   if (!isservicerun) {
-    initializeService();
+    if (Platform.isIOS) {
+      startPositionStream();
+    } else {
+      initializeService();
+    }
   } else if (isservicerun) {
-    var isRunning = await service.isRunning();
-    print("Background Service running $isRunning");
-    if (!isRunning) {
-      service.startService();
+    if (Platform.isIOS) {
+      stopPositionStream();
+      startPositionStream();
+    } else {
+      var isRunning = await service.isRunning();
+      print("Background Service running $isRunning");
+      if (!isRunning) {
+        service.startService();
+      }
     }
   }
 }
 
 Future<void> stopBackgroundService() async {
-  var isRunning = await service.isRunning();
-  print("Background Service running $isRunning");
-  if (isRunning) {
-    service.invoke("stopService");
+  if (Platform.isIOS) {
+    stopPositionStream();
+  } else {
+    var isRunning = await service.isRunning();
+    print("Background Service running $isRunning");
+    if (isRunning) {
+      service.invoke("stopService");
+    }
   }
 }
 
@@ -106,41 +119,37 @@ void onStart(ServiceInstance service) async {
     debugPrint("background process is now stopped");
   });
 
-  if (Platform.isIOS) {
-    startPositionStream();
-  } else {
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
-      if (service is AndroidServiceInstance) {
-        if (await service.isForegroundService()) {
-          final position = await getLocation();
-          String lat = position.position.latitude.toStringAsFixed(4);
-          String lon = position.position.longitude.toStringAsFixed(4);
-          LocationResult country = await getLatLngLocation(position.position.latitude, position.position.longitude);
-          String fcmToken = Global.preference.getString("fcm-token") ?? "";
-          if (position.change && fcmToken != "") {
-            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-            print(body);
-          }
-          flutterLocalNotificationsPlugin.show(
-            888,
-            'COOL SERVICE',
-            'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
-            const NotificationDetails(
-              android: AndroidNotificationDetails(
-                'my_foreground',
-                'MY FOREGROUND SERVICE',
-                icon: 'ic_bg_service_small',
-                ongoing: true,
-              ),
-            ),
-          );
-
-          service.setForegroundNotificationInfo(
-            title: 'COOL SERVICE',
-            content: 'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
-          );
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
+    if (service is AndroidServiceInstance) {
+      if (await service.isForegroundService()) {
+        final position = await getLocation();
+        String lat = position.position.latitude.toStringAsFixed(4);
+        String lon = position.position.longitude.toStringAsFixed(4);
+        LocationResult country = await getLatLngLocation(position.position.latitude, position.position.longitude);
+        String fcmToken = Global.preference.getString("fcm-token") ?? "";
+        if (position.change && fcmToken != "") {
+          final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+          print(body);
         }
+        flutterLocalNotificationsPlugin.show(
+          888,
+          'COOL SERVICE',
+          'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'my_foreground',
+              'MY FOREGROUND SERVICE',
+              icon: 'ic_bg_service_small',
+              ongoing: true,
+            ),
+          ),
+        );
+
+        service.setForegroundNotificationInfo(
+          title: 'COOL SERVICE',
+          content: 'Awesome ${DateTime.now()}\n$lat,$lon ${country.cityTown}',
+        );
       }
-    });
-  }
+    }
+  });
 }

@@ -98,10 +98,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   Future toggleAutoLocation(bool value) async {
     await stopBackgroundService();
 
-    if (Platform.isIOS) {
-      stopPositionStream();
-    }
-
     if (!value) {
       setState(() {
         isAutoLocatingEnabled = false;
