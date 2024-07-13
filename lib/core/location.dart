@@ -95,6 +95,7 @@ class LocationStatus {
 final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
 Position? lastPosition;
+Timer? restartTimer;
 
 void startPositionStream() async {
   if (await openLocationSettings(true)) {
@@ -115,6 +116,9 @@ void startPositionStream() async {
       }).listen((Position? position) async {
         if (position != null) {
           lastPosition = position;
+
+          stopPositionStream();
+          restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
 
           GetLocationResult result = await getLocation();
           if (result.change) {
