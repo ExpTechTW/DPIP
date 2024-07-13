@@ -16,6 +16,7 @@ Future<void> startBackgroundService() async {
   if (!isservicerun) {
     if (Platform.isIOS) {
       startPositionStream();
+      isservicerun = true;
     } else {
       initializeService();
     }
