@@ -12,8 +12,9 @@ import 'package:permission_handler/permission_handler.dart';
 class GetLocationPosition {
   double latitude;
   double longitude;
+  String country;
 
-  GetLocationPosition(this.latitude, this.longitude);
+  GetLocationPosition(this.latitude, this.longitude, this.country);
 }
 class GetLocationResult {
   final GetLocationPosition position;
@@ -44,11 +45,14 @@ Future<GetLocationResult> getLocation() async {
   bool positionchange = false;
   final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
   final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-  GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp);
+  final positioncountrytemp = Global.preference.getString("loc-position-country") ?? "";
+  GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
   if (nowtemp > 300000 || nowtemp == 0) {
     await Global.preference.setInt("last-location-update", now);
     final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-    positionlast = GetLocationPosition(position.latitude, position.longitude);
+    LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
+    positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
+    await Global.preference.setString("loc-position-country", country.cityTown);
     double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
     if (distance >= 250 || nowtemp == 0) {
       await Global.preference.setDouble("loc-position-lat", position.latitude);
