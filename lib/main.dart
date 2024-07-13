@@ -18,7 +18,6 @@ void main() async {
   await notifyInit();
   await Global.init();
   messaging.getToken().then((value) async {
-    print('初始: $value');
     if (value == null) return;
     String fcmToken = Global.preference.getString("fcm-token") ?? "";
     print('提取: $fcmToken');
@@ -30,7 +29,7 @@ void main() async {
       }
     } else if (fcmToken == "") {
       Global.preference.setString("fcm-token", value);
-      print('更新: $value');
+      print('初始: $value');
     }
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
