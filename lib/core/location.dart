@@ -107,7 +107,6 @@ class LocationStatus {
 
 final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
-Position? lastPosition;
 Timer? restartTimer;
 
 void startPositionStream() async {
@@ -117,6 +116,8 @@ void startPositionStream() async {
         locationSettings: AppleSettings(
           accuracy: LocationAccuracy.medium,
           activityType: ActivityType.other,
+          distanceFilter: 500,
+          timeLimit: const Duration(minutes: 5),
           pauseLocationUpdatesAutomatically: false,
           showBackgroundLocationIndicator: false,
           allowBackgroundLocationUpdates: true,
@@ -128,16 +129,9 @@ void startPositionStream() async {
         positionStreamSubscription = null;
       }).listen((Position? position) async {
         if (position != null) {
-          lastPosition = position;
-
-          stopPositionStream();
-          restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
-
           final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
           final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-
           double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-
           if (distance >= 250) {
             await Global.preference.setDouble("loc-position-lat", position.latitude);
             await Global.preference.setDouble("loc-position-lon", position.longitude);
