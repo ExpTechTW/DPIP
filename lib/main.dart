@@ -29,7 +29,14 @@ void main() async {
     if (value == null) return;
     String fcmToken = Global.preference.getString("fcm-token") ?? "";
     print('提取: $fcmToken');
-    if (fcmToken != "" && thisVersion != Global.packageInfo.version) {
+    if (fcmToken != value) {
+      fcmToken = value;
+      Global.preference.setString("fcm-token", fcmToken);
+      print('更新: $value');
+    }
+    bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+    print('提取自動開關: $isAutoLocatingEnabled');
+    if (fcmToken != "" && thisVersion != Global.packageInfo.version && isAutoLocatingEnabled) {
       thisVersion = Global.packageInfo.version;
       Global.preference.setString("this-version", thisVersion);
       print('版本更新: $thisVersion');
