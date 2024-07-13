@@ -1,6 +1,6 @@
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/dpip.dart';
 import 'package:dpip/core/fcm.dart';
-import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
@@ -16,10 +16,14 @@ void main() async {
   await fcmInit();
   await notifyInit();
   await Global.init();
-  messaging.getToken().then((value) {
+  messaging.getToken().then((value) async {
     print(value);
     if (value == null) return;
     Global.preference.setString("fcm-token", value);
+    final lat = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+    final lon = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+    final body = await ExpTech().getNotifyLocation(value, lat.toStringAsFixed(4), lon.toStringAsFixed(4));
+    print(body);
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
