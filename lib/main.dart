@@ -32,19 +32,23 @@ void main() async {
     if (fcmToken != value) {
       fcmToken = value;
       Global.preference.setString("fcm-token", fcmToken);
-      print('更新: $value');
+      print('更新: $fcmToken');
     }
     bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
     print('提取自動開關: $isAutoLocatingEnabled');
-    if (fcmToken != "" && thisVersion != Global.packageInfo.version && isAutoLocatingEnabled) {
-      thisVersion = Global.packageInfo.version;
-      Global.preference.setString("this-version", thisVersion);
-      print('版本更新: $thisVersion');
-      final position = await getLocation();
-      String lat = position.position.latitude.toStringAsFixed(4);
-      String lon = position.position.longitude.toStringAsFixed(4);
-      final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-      print(body);
+    if (fcmToken != "") {
+      if (thisVersion != Global.packageInfo.version) {
+        thisVersion = Global.packageInfo.version;
+        Global.preference.setString("this-version", thisVersion);
+        print('版本更新: $thisVersion');
+        if (isAutoLocatingEnabled) {
+          final position = await getLocation();
+          String lat = position.position.latitude.toStringAsFixed(4);
+          String lon = position.position.longitude.toStringAsFixed(4);
+          final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+          print(body);
+        }
+      }
     } else if (fcmToken == "") {
       Global.preference.setString("fcm-token", value);
       print('更新: $value');
