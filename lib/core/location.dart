@@ -42,22 +42,18 @@ Future<GetLocationResult> getLocation() async {
       .millisecondsSinceEpoch;
   int nowtemp = now - lastLocationUpdate;
   bool positionchange = false;
-  GetLocationPosition positionlast = GetLocationPosition(0.0, 0.0);
-
+  final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+  final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+  GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp);
   if (nowtemp > 300000 || nowtemp == 0) {
     final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-    final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-    final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-
+    positionlast = GetLocationPosition(position.latitude, position.longitude);
     double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-
     if (distance >= 250 || nowtemp == 0) {
       await Global.preference.setDouble("loc-position-lat", position.latitude);
       await Global.preference.setDouble("loc-position-lon", position.longitude);
       await Global.preference.setInt("last-location-update", now);
       positionchange = true;
-      positionlast.latitude = position.latitude;
-      positionlast.longitude = position.longitude;
       print('距離: $distance 間距: $nowtemp 更新位置');
     } else {
       print('距離: $distance 間距: $nowtemp 不更新位置');
