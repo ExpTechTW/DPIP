@@ -9,8 +9,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+class GetLocationPosition {
+  double latitude;
+  double longitude;
+
+  GetLocationPosition(this.latitude, this.longitude);
+}
 class GetLocationResult {
-  final Position position;
+  final GetLocationPosition position;
   final bool change;
 
   GetLocationResult(this.position, this.change);
@@ -36,9 +42,10 @@ Future<GetLocationResult> getLocation() async {
       .millisecondsSinceEpoch;
   int nowtemp = now - lastLocationUpdate;
   bool positionchange = false;
-  final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+  GetLocationPosition positionlast = GetLocationPosition(0.0, 0.0);
 
   if (nowtemp > 300000 || nowtemp == 0) {
+    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
     final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
     final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
 
@@ -49,13 +56,17 @@ Future<GetLocationResult> getLocation() async {
       await Global.preference.setDouble("loc-position-lon", position.longitude);
       await Global.preference.setInt("last-location-update", now);
       positionchange = true;
+      positionlast.latitude = position.latitude;
+      positionlast.longitude = position.longitude;
       print('距離: $distance 間距: $nowtemp 更新位置');
     } else {
       print('距離: $distance 間距: $nowtemp 不更新位置');
     }
+  } else {
+    print('間距: $nowtemp 不更新位置');
   }
 
-  return GetLocationResult(position, positionchange);
+  return GetLocationResult(positionlast, positionchange);
 }
 
 Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {

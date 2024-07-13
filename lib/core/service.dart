@@ -17,14 +17,14 @@ Future<void> startBackgroundService() async {
     if (Platform.isIOS) {
       startPositionStream();
       isservicerun = true;
-    } else {
+    } else if (Platform.isAndroid) {
       initializeService();
     }
   } else if (isservicerun) {
     if (Platform.isIOS) {
       stopPositionStream();
       startPositionStream();
-    } else {
+    } else if (Platform.isAndroid) {
       var isRunning = await service.isRunning();
       print("Background Service running $isRunning");
       if (!isRunning) {
@@ -37,7 +37,7 @@ Future<void> startBackgroundService() async {
 Future<void> stopBackgroundService() async {
   if (Platform.isIOS) {
     stopPositionStream();
-  } else {
+  } else if (Platform.isAndroid) {
     var isRunning = await service.isRunning();
     print("Background Service running $isRunning");
     if (isRunning) {
