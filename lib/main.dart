@@ -1,6 +1,7 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/dpip.dart';
 import 'package:dpip/core/fcm.dart';
+import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
@@ -17,27 +18,29 @@ void main() async {
   await notifyInit();
   await Global.init();
   String thisVersion = Global.preference.getString("this-version") ?? "";
-  print(thisVersion);
+  print('初始: $thisVersion');
   if (thisVersion == "") {
     thisVersion = Global.packageInfo.version;
     Global.preference.setString("this-version", thisVersion);
-    print(thisVersion);
+    print('更新: $thisVersion');
   }
   messaging.getToken().then((value) async {
-    print(value);
+    print('初始: $value');
     if (value == null) return;
     String fcmToken = Global.preference.getString("fcm-token") ?? "";
-    print(fcmToken);
+    print('提取: $fcmToken');
     if (fcmToken != "" && thisVersion != Global.packageInfo.version) {
       thisVersion = Global.packageInfo.version;
       Global.preference.setString("this-version", thisVersion);
-      print(thisVersion);
-      final lat = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-      final lon = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-      final body = await ExpTech().getNotifyLocation(fcmToken, lat.toStringAsFixed(4), lon.toStringAsFixed(4));
+      print('版本更新: $thisVersion');
+      final position = await getLocation();
+      String lat = position.position.latitude.toStringAsFixed(4);
+      String lon = position.position.longitude.toStringAsFixed(4);
+      final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
       print(body);
     } else if (fcmToken == "") {
       Global.preference.setString("fcm-token", value);
+      print('更新: $value');
     }
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
