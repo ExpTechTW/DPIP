@@ -33,14 +33,12 @@ class _SettingsAudioViewState extends State<SettingsAudioView> {
         text: '強震即時警報(警報)',
         subtitle: '地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上',
         soundPath: 'eew_alert.wav',
-        colors: const [Color(0x33FF0000), Color(0xFFFF0000)],
         playSound: playSound,
       ),
       SoundButton(
         text: '地震速報(注意)',
         subtitle: '地震速報 所在地預估震度 2 以上',
         soundPath: 'eew.wav',
-        colors: const [Color(0x33FF0000), Color(0xFFFF0000)],
         playSound: playSound,
       ),
       const TitleText(text: eqTitle),
@@ -48,21 +46,18 @@ class _SettingsAudioViewState extends State<SettingsAudioView> {
         text: '震度速報',
         subtitle: 'TREM觀測網 所在地實測震度 1 以上',
         soundPath: 'Int_report.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '強震監視器',
         subtitle: 'TREM觀測網 偵測到晃動',
         soundPath: 'eq.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '地震報告',
         subtitle: '地震報告 所在地震度 1 以上',
         soundPath: 'report.wav',
-        colors: const [Color(0x330063C6), Color(0xFF0063C6)],
         playSound: playSound,
       ),
       const TitleText(text: weatherTitle),
@@ -70,56 +65,48 @@ class _SettingsAudioViewState extends State<SettingsAudioView> {
         text: '大雷雨即時訊息',
         subtitle: '所在地發布 大雷雨即時訊息',
         soundPath: 'rain.wav',
-        colors: const [Color(0x33FF0000), Color(0xFFFF0000)],
         playSound: playSound,
       ),
       SoundButton(
         text: '豪雨特報',
         subtitle: '所在地發布 豪雨特報',
         soundPath: 'weather.wav',
-        colors: const [Color(0x33FF0000), Color(0xFFFF0000)],
         playSound: playSound,
       ),
       SoundButton(
         text: '海嘯警報(警報)',
         subtitle: '所在地發布 海嘯警報(警報)\n預估浪高 1公尺 以上',
         soundPath: 'tsunami.wav',
-        colors: const [Color(0x33FF0000), Color(0xFFFF0000)],
         playSound: playSound,
       ),
       SoundButton(
         text: '海嘯警報(注意)',
         subtitle: '所在地發布 海嘯警報(注意)\n預估浪高 1公尺 以下',
         soundPath: 'warn.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '火山資訊',
         subtitle: '所在地發布 火山資訊',
         soundPath: 'warn.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '大雨特報',
         subtitle: '所在地發布 大雨特報',
         soundPath: 'normal.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '高溫資訊',
         subtitle: '所在地發布 高溫資訊',
         soundPath: 'normal.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '陸上強風特報',
         subtitle: '所在地發布 陸上強風特報',
         soundPath: 'normal.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       const TitleText(text: otherTitle),
@@ -127,14 +114,12 @@ class _SettingsAudioViewState extends State<SettingsAudioView> {
         text: '防空核子警報',
         subtitle: '所在地發布 防空核子警報',
         soundPath: 'warn.wav',
-        colors: const [Color(0x33FFC901), Color(0xFFFFC901)],
         playSound: playSound,
       ),
       SoundButton(
         text: '伺服器公告',
         subtitle: 'ExpTech發布之公告',
         soundPath: 'info.wav',
-        colors: const [Color(0x330063C6), Color(0xFF0063C6)],
         playSound: playSound,
       ),
     ];
@@ -227,7 +212,6 @@ class SoundButton extends StatelessWidget {
   final String text;
   final String subtitle;
   final String soundPath;
-  final List<Color> colors;
   final Future<void> Function(String soundPath) playSound;
 
   const SoundButton({
@@ -235,7 +219,6 @@ class SoundButton extends StatelessWidget {
     required this.text,
     required this.subtitle,
     required this.soundPath,
-    required this.colors,
     required this.playSound,
   }) : super(key: key);
 
@@ -243,12 +226,12 @@ class SoundButton extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color borderColor = isDarkMode ? Colors.white : Colors.black;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.only(left: 15, right: 10, top: 5, bottom: 5),
       decoration: BoxDecoration(
-        border: Border.all(color: borderColor, width: 1),  // 設置邊框顏色和寬度
-        color: Colors.transparent,  // 背景設為透明
+        border: Border.all(color: borderColor, width: 1),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: Row(
@@ -269,18 +252,18 @@ class SoundButton extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.normal,
-
                   ),
                 ),
               ],
             ),
           ),
-            PlayButton(soundPath: soundPath, playSound: playSound),
+          PlayButton(soundPath: soundPath, playSound: playSound),
         ],
       ),
     );
   }
 }
+
 class TitleText extends StatelessWidget {
   final String text;
 
