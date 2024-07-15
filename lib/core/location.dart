@@ -116,8 +116,7 @@ void startPositionStream() async {
         locationSettings: AppleSettings(
           accuracy: LocationAccuracy.medium,
           activityType: ActivityType.other,
-          distanceFilter: 250,
-          pauseLocationUpdatesAutomatically: false,
+          pauseLocationUpdatesAutomatically: true,
           showBackgroundLocationIndicator: false,
           allowBackgroundLocationUpdates: true,
         ),
