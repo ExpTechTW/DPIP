@@ -9,7 +9,7 @@ import Firebase
 
     override func application(
       _ application: UIApplication,
-      didFinishLaunchingWithOptions launch options: [UIApplication.LaunchOptionsKey: Any]?
+      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
       FirebaseApp.configure()
       GeneratedPluginRegistrant.register(with: self)
@@ -23,7 +23,7 @@ import Firebase
           locationManager?.startUpdatingLocation()
       }
 
-      return super.application(application, didFinishLaunchingWithOptions: launch options)
+      return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

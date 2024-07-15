@@ -123,7 +123,6 @@ void startPositionStream() async {
         await positionStreamSubscription?.cancel();
         positionStreamSubscription = null;
       }).listen((Position? position) async {
-        // if (Platform.isIOS) restartTimer = Timer(const Duration(minutes: 1), startPositionStream);
         if (position != null) {
           final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
           final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
@@ -148,6 +147,8 @@ void startPositionStream() async {
             print('距離: $distance 不更新位置');
           }
         }
+        restartTimer = Timer(const Duration(minutes: 1), startPositionStream);
+        stopPositionStream();
       });
       print('位置流已開啟');
     }
