@@ -69,6 +69,7 @@ Future<GetLocationResult> getLocation() async {
   return GetLocationResult(positionlast, positionchange);
 }
 
+@pragma('vm:entry-point')
 Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
   LocationResult locationGet = LocationResult('', false);
@@ -90,6 +91,8 @@ Future<LocationResult> getLatLngLocation(double latitude, double longitude) asyn
 
     if (citytowntemp == "" || citytowntemp != citytown) {
       await Global.preference.setString("loc-city-town", citytown);
+      await Global.preference.setString("location-city", city!);
+      await Global.preference.setString("location-town", town!);
       locationGet = LocationResult(citytown, true);
     } else {
       locationGet = LocationResult(citytowntemp, false);
