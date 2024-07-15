@@ -182,20 +182,8 @@ class PlayButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color textColor = isDarkMode ? Color(0xFFCEBBFD) : Color(0xFF654EA2);
-    return Platform.isIOS
-        ? CupertinoButton(
-      onPressed: () {
-        playSound(soundPath);
-      },
-      padding: EdgeInsets.zero,
-      child: Icon(
-        CupertinoIcons.play_circle_fill,
-        color: textColor,  // 使用根據主題變化的顏色
-        size: 32,
-      ),
-    )
-        : IconButton(
+    Color textColor = isDarkMode ? const Color(0xFFCEBBFD) : const Color(0xFF654EA2);
+    return IconButton(
       onPressed: () {
         playSound(soundPath);
       },
@@ -275,7 +263,7 @@ class TitleText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    Color textColor = isDarkMode ? Color(0xFFCEBBFD) : Color(0xFF654EA2);
+    Color textColor = isDarkMode ? const Color(0xFFCEBBFD) : const Color(0xFF654EA2);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Text(
