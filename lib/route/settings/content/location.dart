@@ -29,15 +29,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     bool shouldRetry = true;
     int statusRetry = 0;
 
+    LocationService locationService = LocationService();
+
     while (shouldRetry) {
-      status = await requestnotificationPermission(value);
+      status = await locationService.requestnotificationPermission(value);
 
       if (!mounted) return 0;
 
       setState(() => locationAlwaysPermission = status);
 
       if (!status.isGranted) {
-        statusRetry = await shownotificationPermissionDialog(value, status, context);
+        statusRetry = await locationService.shownotificationPermissionDialog(value, status, context);
         if (statusRetry == 1) {
           value += 1;
         } else if (statusRetry == 2) {
@@ -64,15 +66,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     bool shouldRetry = true;
     int statusRetry = 0;
 
+    LocationService locationService = LocationService();
+
     while (shouldRetry) {
-      status = await requestlocationPermission(value);
+      status = await locationService.requestlocationPermission(value);
 
       if (!mounted) return 0;
 
       setState(() => locationAlwaysPermission = status);
 
       if (!status.isGranted) {
-        statusRetry = await showlocationPermissionDialog(value, status, context);
+        statusRetry = await locationService.showlocationPermissionDialog(value, status, context);
         if (statusRetry == 1) {
           value += 1;
         } else if (statusRetry == 2) {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/app/dpip.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
@@ -9,6 +11,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart';
+
+import 'core/location.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,10 +35,12 @@ void main() async {
     }
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+  LocationService locationService = LocationService();
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await Permission.notification.status;
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
+      if (Platform.isIOS) locationService.startPositionStream();
       await startBackgroundService();
     } else {
       await stopBackgroundService();

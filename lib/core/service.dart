@@ -13,17 +13,15 @@ final service = FlutterBackgroundService();
 bool isservicerun = false;
 
 Future<void> startBackgroundService() async {
+  LocationService locationService = LocationService();
   if (!isservicerun) {
-    if (Platform.isIOS) {
-      startPositionStream();
-      isservicerun = true;
-    } else if (Platform.isAndroid) {
+    if (Platform.isAndroid) {
       initializeService();
     }
   } else if (isservicerun) {
     if (Platform.isIOS) {
-      stopPositionStream();
-      startPositionStream();
+      locationService.stopPositionStream();
+      locationService.startPositionStream();
     } else if (Platform.isAndroid) {
       var isRunning = await service.isRunning();
       print("Background Service running $isRunning");
@@ -35,8 +33,9 @@ Future<void> startBackgroundService() async {
 }
 
 Future<void> stopBackgroundService() async {
+  LocationService locationService = LocationService();
   if (Platform.isIOS) {
-    stopPositionStream();
+    locationService.stopPositionStream();
   } else if (Platform.isAndroid) {
     var isRunning = await service.isRunning();
     print("Background Service running $isRunning");
@@ -121,9 +120,10 @@ void onStart(ServiceInstance service) async {
   });
 
   Timer.periodic(const Duration(seconds: 1), (timer) async {
+    LocationService locationService = LocationService();
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
-        final position = await getLocation();
+        final position = await locationService.getLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
         String country = position.position.country;
