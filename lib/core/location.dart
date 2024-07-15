@@ -49,7 +49,7 @@ Future<GetLocationResult> getLocation() async {
   GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
   if (nowtemp > 300000 || nowtemp == 0) {
     await Global.preference.setInt("last-location-update", now);
-    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
     positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
     await Global.preference.setString("loc-position-country", country.cityTown);
@@ -107,7 +107,6 @@ class LocationStatus {
 
 final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 StreamSubscription<Position>? positionStreamSubscription;
-Position? lastPosition;
 Timer? restartTimer;
 
 void startPositionStream() async {
@@ -117,7 +116,7 @@ void startPositionStream() async {
         locationSettings: AppleSettings(
           accuracy: LocationAccuracy.medium,
           activityType: ActivityType.other,
-          pauseLocationUpdatesAutomatically: false,
+          pauseLocationUpdatesAutomatically: true,
           showBackgroundLocationIndicator: false,
           allowBackgroundLocationUpdates: true,
         ),
@@ -128,16 +127,9 @@ void startPositionStream() async {
         positionStreamSubscription = null;
       }).listen((Position? position) async {
         if (position != null) {
-          lastPosition = position;
-
-          stopPositionStream();
-          restartTimer = Timer(const Duration(minutes: 5), startPositionStream);
-
           final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
           final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-
           double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-
           if (distance >= 250) {
             await Global.preference.setDouble("loc-position-lat", position.latitude);
             await Global.preference.setDouble("loc-position-lon", position.longitude);

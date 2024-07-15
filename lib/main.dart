@@ -1,7 +1,5 @@
-import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/dpip.dart';
 import 'package:dpip/core/fcm.dart';
-import 'package:dpip/core/location.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
