@@ -1,4 +1,5 @@
 import 'package:dpip/app/page/home/home.dart';
+import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
@@ -39,6 +40,11 @@ class _DpipState extends State<Dpip> {
             label: context.i18n.report,
           ),
           NavigationDestination(
+            icon: const Icon(Symbols.map),
+            selectedIcon: const Icon(Symbols.map, fill: 1),
+            label: context.i18n.map,
+          ),
+          NavigationDestination(
             icon: const Icon(Symbols.person),
             selectedIcon: const Icon(Symbols.person, fill: 1),
             label: context.i18n.me,
@@ -59,6 +65,7 @@ class _DpipState extends State<Dpip> {
           HomePage(),
           MonitorPage(),
           ReportListPage(),
+          MapPage(),
           MePage(),
         ],
       ),
