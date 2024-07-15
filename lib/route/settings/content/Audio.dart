@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'dart:io';
 
 class SettingsAudioView extends StatefulWidget {
   const SettingsAudioView({super.key});
@@ -123,49 +121,26 @@ class _SettingsAudioViewState extends State<SettingsAudioView> {
         playSound: playSound,
       ),
     ];
-    if (Platform.isIOS) {
-      return MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.2)),
-        child: CupertinoPageScaffold(
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: CustomScrollView(
-                slivers: [
-                  SliverList(
-                    delegate: SliverChildListDelegate(soundButtons),
-                  ),
-                ],
-              ),
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.2)),
+      child: Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
+            child: CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildListDelegate(soundButtons),
+                ),
+              ],
             ),
           ),
         ),
-      );
-    } else {
-      return MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.2)),
-        child: Scaffold(
-         // appBar: AppBar(
-         //   title: const Text("音效測試"),
-         // ),
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: CustomScrollView(
-                slivers: [
-                  SliverList(
-                    delegate: SliverChildListDelegate(soundButtons),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+      ),
+    );
   }
 }
 
@@ -184,12 +159,10 @@ class PlayButton extends StatelessWidget {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     Color textColor = isDarkMode ? const Color(0xFFCEBBFD) : const Color(0xFF654EA2);
     return IconButton(
-      onPressed: () {
-        playSound(soundPath);
-      },
+      onPressed: () => playSound(soundPath),
       icon: Icon(
         Icons.play_circle,
-        color: textColor,  // 使用根據主題變化的顏色
+        color: textColor, // 使用根據主題變化的顏色
         size: 32,
       ),
     );
