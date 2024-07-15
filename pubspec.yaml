@@ -49,4 +49,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/DPIP.png
+    - assets/location.json
   

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/route/location_selector/location_selector.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +21,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   PermissionStatus? notificationPermission;
   PermissionStatus? locationAlwaysPermission;
 
-  String city = "";
-  String town = "";
+  String? city = Global.preference.getString("location-city");
+  String? town = Global.preference.getString("location-town");
 
   Future<int> checkNotificationPermission(int value) async {
     PermissionStatus status;
@@ -214,20 +215,48 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
             padding: EdgeInsets.all(8),
             child: Icon(Symbols.location_city),
           ),
-          title: Text("縣市"),
-          subtitle: Text(city),
+          title: const Text("縣市"),
+          subtitle: Text(city ?? "尚未設定"),
           enabled: !isAutoLocatingEnabled,
-          onTap: () {},
+          onTap: () async {
+            await Navigator.of(
+              context,
+              rootNavigator: true,
+            ).push(
+              MaterialPageRoute(
+                builder: (context) => LocationSelectorRoute(city: null, town: town),
+              ),
+            );
+
+            setState(() {
+              city = Global.preference.getString("location-city");
+              town = Global.preference.getString("location-town");
+            });
+          },
         ),
         ListTile(
           leading: const Padding(
             padding: EdgeInsets.all(8.0),
             child: Icon(Symbols.forest),
           ),
-          title: Text("鄉鎮"),
-          subtitle: Text(town),
-          enabled: !isAutoLocatingEnabled,
-          onTap: () {},
+          title: const Text("鄉鎮"),
+          subtitle: Text(town ?? "尚未設定"),
+          enabled: !isAutoLocatingEnabled && city != null,
+          onTap: () async {
+            await Navigator.of(
+              context,
+              rootNavigator: true,
+            ).push(
+              MaterialPageRoute(
+                builder: (context) => LocationSelectorRoute(city: city, town: town),
+              ),
+            );
+
+            setState(() {
+              city = Global.preference.getString("location-city");
+              town = Global.preference.getString("location-town");
+            });
+          },
         )
       ],
     );
