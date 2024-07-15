@@ -16,6 +16,7 @@ class GetLocationPosition {
 
   GetLocationPosition(this.latitude, this.longitude, this.country);
 }
+
 class GetLocationResult {
   final GetLocationPosition position;
   final bool change;
@@ -33,14 +34,8 @@ class LocationResult {
 @pragma('vm:entry-point')
 Future<GetLocationResult> getLocation() async {
   int lastLocationUpdate =
-      Global.preference.getInt("last-location-update") ?? DateTime
-          .now()
-          .toUtc()
-          .millisecondsSinceEpoch;
-  int now = DateTime
-      .now()
-      .toUtc()
-      .millisecondsSinceEpoch;
+      Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
+  int now = DateTime.now().toUtc().millisecondsSinceEpoch;
   int nowtemp = now - lastLocationUpdate;
   bool positionchange = false;
   final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
@@ -53,7 +48,8 @@ Future<GetLocationResult> getLocation() async {
     LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
     positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
     await Global.preference.setString("loc-position-country", country.cityTown);
-    double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+    double distance =
+        Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
     if (distance >= 250 || nowtemp == 0) {
       await Global.preference.setDouble("loc-position-lat", position.latitude);
       await Global.preference.setDouble("loc-position-lon", position.longitude);
@@ -116,6 +112,7 @@ void startPositionStream() async {
         locationSettings: AppleSettings(
           accuracy: LocationAccuracy.medium,
           activityType: ActivityType.other,
+          distanceFilter: 250,
           pauseLocationUpdatesAutomatically: true,
           showBackgroundLocationIndicator: false,
           allowBackgroundLocationUpdates: true,
@@ -126,15 +123,16 @@ void startPositionStream() async {
         await positionStreamSubscription?.cancel();
         positionStreamSubscription = null;
       }).listen((Position? position) async {
+        // if (Platform.isIOS) restartTimer = Timer(const Duration(minutes: 1), startPositionStream);
         if (position != null) {
           final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
           final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-          double distance = Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+          double distance =
+              Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
           if (distance >= 250) {
             await Global.preference.setDouble("loc-position-lat", position.latitude);
             await Global.preference.setDouble("loc-position-lon", position.longitude);
-            LocationResult locationResult =
-            await getLatLngLocation(position.latitude, position.longitude);
+            LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
             print('新位置: ${position}');
             print('城市和鄉鎮: ${locationResult.cityTown}');
 
@@ -233,9 +231,7 @@ Future<int> shownotificationPermissionDialog(int value, PermissionStatus status,
         icon: const Icon(Symbols.error),
         title: Text("${(value >= 1) ? "無法" : "請求"}取得通知權限"),
         content: Text(
-          "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied
-              ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。"
-              : ""}",
+          "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
@@ -339,9 +335,7 @@ Widget getlocationDialogContent(int value, PermissionStatus status) {
   if (value == 0) {
     return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
   } else if (value == 3) {
-    return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied
-        ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。"
-        : ""}");
+    return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}");
   } else {
     return Text(
       Platform.isAndroid
