@@ -35,12 +35,10 @@ void main() async {
     }
   });
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
-  LocationService locationService = LocationService();
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await Permission.notification.status;
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
-      if (Platform.isIOS) locationService.startPositionStream();
       await startBackgroundService();
     } else {
       await stopBackgroundService();
@@ -64,6 +62,7 @@ class DpipApp extends StatefulWidget {
 }
 
 class DpipAppState extends State<DpipApp> {
+  LocationService locationService = LocationService();
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
@@ -87,6 +86,12 @@ class DpipAppState extends State<DpipApp> {
           break;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isIOS) locationService.startPositionStream();
   }
 
   @override
