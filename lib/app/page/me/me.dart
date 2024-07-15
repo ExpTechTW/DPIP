@@ -25,7 +25,13 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.tune),
           title: Text(context.i18n.settings),
           subtitle: Text(context.i18n.settingsDescription),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsRoute())),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              settings: const RouteSettings(name: "/settings"),
+              builder: (context) => const SettingsRoute(),
+            ),
+          ),
         ),
 
         /**
