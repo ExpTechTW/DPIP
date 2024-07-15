@@ -1,5 +1,6 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/model/location/location.dart';
 import 'package:dpip/route/location_selector/search.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -16,6 +17,17 @@ class LocationSelectorRoute extends StatefulWidget {
 
 class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
   late List<String> data;
+
+  Future<void> setLocation(Location location) async {
+    await Global.preference.setString("location-city", location.city);
+    await Global.preference.setString("location-town", location.town);
+
+    String fcmToken = Global.preference.getString("fcm-token") ?? "";
+    await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");
+
+    if (!mounted) return;
+    Navigator.popUntil(context, ModalRoute.withName("/settings"));
+  }
 
   @override
   void initState() {
@@ -34,12 +46,16 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
         title: Text(widget.city ?? "選擇所在地"),
         actions: [
           IconButton(
-            icon: Icon(Symbols.search),
+            icon: const Icon(Symbols.search),
             onPressed: () async {
-              final result = await showSearch<String>(
+              final result = await showSearch<Location>(
                 context: context,
                 delegate: LocationSelectorSearchDelegate(),
               );
+
+              if (result == null) return;
+
+              await setLocation(result);
             },
           )
         ],
@@ -70,16 +86,9 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
               onChanged: (value) async {
                 if (value == null) return;
 
-                await Global.preference.setString("location-city", widget.city!);
-                await Global.preference.setString("location-town", value);
+                final location = Global.location.entries.firstWhere((e) => e.value.town == value).value;
 
-                final town = Global.location.entries.firstWhere((e) => e.value.town == value).value;
-
-                String fcmToken = Global.preference.getString("fcm-token") ?? "";
-                await ExpTech().getNotifyLocation(fcmToken, "${town.lat}", "${town.lng}");
-
-                if (!context.mounted) return;
-                Navigator.popUntil(context, ModalRoute.withName("/settings"));
+                await setLocation(location);
               },
             );
           }
