@@ -1,4 +1,5 @@
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/map/tsunami_estimate_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -118,6 +119,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                             tsunami != null
                                 ? tsunami?.info.type == "estimate"
                                     ? Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             "預估海嘯到達時間及波高",
@@ -128,6 +130,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                               color: context.colors.onSurface,
                                             ),
                                           ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          TsunamiEstimateList(tsunamiList: tsunami!.info.data),
                                         ],
                                       )
                                     : Text(
