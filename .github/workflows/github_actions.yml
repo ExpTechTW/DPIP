@@ -25,6 +25,14 @@ jobs:
           distribution: "zulu"
           java-version: "17"
 
+      - name: Create key.properties
+        run: |
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> key.properties
+          echo "storeFile=${{ secrets.STORE_FILE }}" >> key.properties
+          echo "storePassword=${{ secrets.STORE_PASSWORD }}" >> key.properties
+          mv key.properties android/app/
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
