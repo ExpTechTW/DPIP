@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/map/tsunami_estimate_list.dart';
 import 'package:dpip/app/page/map/tsunami_observed_list.dart';
@@ -24,7 +26,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     var idList = await ExpTech().getTsunamiList();
     var id = "";
     if (idList.isNotEmpty) {
-      id = idList[0];
+      id = idList[2];
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
           ? tsunamiStatus = "發布"
@@ -45,6 +47,28 @@ class _TsunamiMapState extends State<TsunamiMap> {
     DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
     String formattedDate = formatter.format(dateTime);
     return formattedDate;
+  }
+
+  convertLatLon(double lat, double lon) {
+    var latFormat = "";
+    var lonFormat = "";
+    if (lat > 90) {
+      lat = lat - 180;
+    }
+    if (lon > 180) {
+      lat = lat - 360;
+    }
+    if (lat < 0) {
+      latFormat = "南緯 ${lat.abs()} 度";
+    } else {
+      latFormat = "北緯 $lat 度";
+    }
+    if (lon < 0) {
+      lonFormat = "西經 ${lon.abs()} 度";
+    } else {
+      lonFormat = "東經 $lon 度";
+    }
+    return "$latFormat　$lonFormat";
   }
 
   @override
@@ -171,6 +195,137 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                             ),
                                       const SizedBox(
                                         height: 15,
+                                      ),
+                                      Text(
+                                        "地震資訊",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 2,
+                                          color: context.colors.onSurface,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "發生時間",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              letterSpacing: 2,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
+                                          Text(
+                                            convertTimestamp(tsunami!.eq.time),
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 2,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 4,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "震央",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              letterSpacing: 2,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                tsunami!.eq.loc,
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 2,
+                                                  color: context.colors.onSurface,
+                                                ),
+                                              ),
+                                              Text(
+                                                convertLatLon(tsunami!.eq.lat, tsunami!.eq.lon),
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 2,
+                                                  color: context.colors.onSurface,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 4,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "規模",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    letterSpacing: 2,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "${tsunami!.eq.mag}",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 2,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  "深度",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    letterSpacing: 2,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "${tsunami!.eq.depth}km",
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 2,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   )
