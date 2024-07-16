@@ -8,38 +8,44 @@ import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final service = FlutterBackgroundService();
-bool isservicerun = false;
 
-Future<void> startBackgroundService() async {
-  if (!isservicerun) {
-    if (Platform.isIOS) {
-      startPositionStream();
-      isservicerun = true;
-    } else if (Platform.isAndroid) {
-      initializeService();
-    }
-  } else if (isservicerun) {
-    if (Platform.isIOS) {
-      stopPositionStream();
-      startPositionStream();
-    } else if (Platform.isAndroid) {
-      var isRunning = await service.isRunning();
-      print("Background Service running $isRunning");
-      if (!isRunning) {
-        service.startService();
-      }
+void initService() async {
+  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+  if (isAutoLocatingEnabled) {
+    final isNotificationEnabled = await Permission.notification.status;
+    final isLocationAlwaysEnabled = await Permission.locationAlways.status;
+    if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
+      startBackgroundService();
+    } else {
+      stopBackgroundService();
     }
   }
 }
 
-Future<void> stopBackgroundService() async {
+void startBackgroundService() async {
+  LocationService locationService = LocationService();
+
   if (Platform.isIOS) {
-    stopPositionStream();
+    locationService.iosStartPositionStream();
   } else if (Platform.isAndroid) {
     var isRunning = await service.isRunning();
-    print("Background Service running $isRunning");
+    if (!isRunning) {
+      service.startService();
+    } else {
+      initializeService();
+    }
+  }
+}
+
+void stopBackgroundService() async {
+  LocationService locationService = LocationService();
+  if (Platform.isIOS) {
+    locationService.stopPositionStream();
+  } else if (Platform.isAndroid) {
+    var isRunning = await service.isRunning();
     if (isRunning) {
       service.invoke("stopService");
     }
@@ -48,22 +54,20 @@ Future<void> stopBackgroundService() async {
 
 Future<void> initializeService() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'my_foreground', // id
-    'MY FOREGROUND SERVICE', // title
-    description: 'This channel is used for important notifications.', // description
-    importance: Importance.low, // importance must be at low or higher level
+    'my_foreground',
+    'MY FOREGROUND SERVICE',
+    description: 'This channel is used for important notifications.',
+    importance: Importance.low,
   );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  if (Platform.isIOS || Platform.isAndroid) {
-    await flutterLocalNotificationsPlugin.initialize(
-      const InitializationSettings(
-        iOS: DarwinInitializationSettings(),
-        android: AndroidInitializationSettings('ic_bg_service_small'),
-      ),
-    );
-  }
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      iOS: DarwinInitializationSettings(),
+      android: AndroidInitializationSettings('ic_bg_service_small'),
+    ),
+  );
 
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
@@ -85,7 +89,6 @@ Future<void> initializeService() async {
       onBackground: onIosBackground,
     ),
   );
-  isservicerun = true;
 }
 
 @pragma('vm:entry-point')
@@ -102,6 +105,11 @@ void onStart(ServiceInstance service) async {
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+    print("background process is now stopped");
+  });
+
   if (service is AndroidServiceInstance) {
     service.setAutoStartOnBootMode(true);
 
@@ -112,18 +120,11 @@ void onStart(ServiceInstance service) async {
     service.on('setAsBackground').listen((event) {
       service.setAsBackgroundService();
     });
-  }
 
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-    print("stop");
-    debugPrint("background process is now stopped");
-  });
-
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    if (service is AndroidServiceInstance) {
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      LocationService locationService = LocationService();
       if (await service.isForegroundService()) {
-        final position = await getLocation();
+        final position = await locationService.getLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
         String country = position.position.country;
@@ -151,6 +152,6 @@ void onStart(ServiceInstance service) async {
           content: 'Awesome ${DateTime.now()}\n$lat,$lon $country',
         );
       }
-    }
-  });
+    });
+  }
 }

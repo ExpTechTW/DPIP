@@ -7,39 +7,13 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart';
+
+import 'core/location.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await fcmInit();
-  await notifyInit();
   await Global.init();
-  messaging.getToken().then((value) async {
-    if (value == null) return;
-    String fcmToken = Global.preference.getString("fcm-token") ?? "";
-    print('提取: $fcmToken');
-    if (fcmToken != "") {
-      if (fcmToken != value) {
-        fcmToken = value;
-        Global.preference.setString("fcm-token", fcmToken);
-        print('更新: $fcmToken');
-      }
-    } else if (fcmToken == "") {
-      Global.preference.setString("fcm-token", value);
-      print('初始: $value');
-    }
-  });
-  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
-  if (isAutoLocatingEnabled) {
-    final isNotificationEnabled = await Permission.notification.status;
-    final isLocationAlwaysEnabled = await Permission.locationAlways.status;
-    if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
-      await startBackgroundService();
-    } else {
-      await stopBackgroundService();
-    }
-  }
   initializeTimeZones();
   runApp(
     const ProviderScope(
@@ -58,6 +32,7 @@ class DpipApp extends StatefulWidget {
 }
 
 class DpipAppState extends State<DpipApp> {
+  LocationService locationService = LocationService();
   ThemeMode _themeMode = {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
@@ -81,6 +56,14 @@ class DpipAppState extends State<DpipApp> {
           break;
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fcmInit();
+    notifyInit();
+    initService();
   }
 
   @override
