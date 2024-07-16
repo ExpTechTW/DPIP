@@ -11,7 +11,7 @@ import 'map_config.dart';
 
 part 'map_style.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 MapStyle mapStyle(MapStyleRef ref) => MapStyle();
 
 class MapStyle {
@@ -173,5 +173,4 @@ enum BaseLayer {
   areaForecastLocalEewLine,
   areaForecastLocalELine,
   areaInformationCityQuakeLine,
-  ;
 }
