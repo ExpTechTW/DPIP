@@ -1,20 +1,30 @@
 import UIKit
 import Flutter
+import Firebase
+import CoreLocation
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
     var locationManager: YourLocationManagerClass?
 
     override func application(
-      _ application: UIApplication,
-      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-      FirebaseApp.configure()
-      GeneratedPluginRegistrant.register(with: self)
+        FirebaseApp.configure()
+        GeneratedPluginRegistrant.register(with: self)
 
-      locationManager = YourLocationManagerClass()
-      locationManager?.startMonitoringSignificantLocationChanges()
+        locationManager = YourLocationManagerClass.shared
+        locationManager?.startMonitoringSignificantLocationChanges()
 
-      return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    override func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        super.application(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
+
+        let backgroundConfigObject = URLSessionConfiguration.background(withIdentifier: identifier)
+        let backgroundSession = URLSession(configuration: backgroundConfigObject, delegate: self, delegateQueue: nil)
+        locationManager?.backgroundCompletionHandler = completionHandler
     }
 }

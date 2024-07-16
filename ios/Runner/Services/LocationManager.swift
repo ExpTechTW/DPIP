@@ -1,13 +1,22 @@
 import UIKit
 import CoreLocation
+import Firebase
+
+// MARK: - YourLocationManagerClass
 
 class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
-    var locationManager: CLLocationManager?
-    var lastLocation: CLLocation?
-    var lastRequestTime: Date?
+    static let shared = YourLocationManagerClass()
 
-    override init() {
+    private var locationManager: CLLocationManager?
+    private var lastLocation: CLLocation?
+    private var lastRequestTime: Date?
+
+    private override init() {
         super.init()
+        setupLocationManager()
+    }
+
+    private func setupLocationManager() {
         locationManager = CLLocationManager()
         locationManager?.delegate = self
         locationManager?.desiredAccuracy = kCLLocationAccuracyBest
@@ -23,7 +32,7 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }
         let now = Date()
-        let minInterval = 300.0 // seconds
+        let minInterval = 300.0 // 5 minutes
 
         if let lastLoc = lastLocation, let lastTime = lastRequestTime {
             let distance = newLocation.distance(from: lastLoc)
@@ -42,12 +51,13 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     }
 
     private func sendLocationToServer(latitude: Double, longitude: Double) {
-        FirebaseService.fetchToken { token in
-            guard let token = token, let version = FirebaseService.fetchVersion() else {
-                print("Error: Token or Version is unavailable")
+        FirebaseService.shared.fetchToken { token in
+            guard let token = token else {
+                print("Error: Token is unavailable")
                 return
             }
 
+            let version = FirebaseService.shared.fetchVersion()
             let platform = 1 // iOS
             let urlString = "https://api-1.exptech.dev/v1/notify/location/\(version)/\(platform)/\(latitude),\(longitude)/\(token)"
             guard let url = URL(string: urlString) else {
@@ -59,15 +69,20 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
             request.httpMethod = "GET"
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                guard let data = data, error == nil else {
-                    print("HTTP Request Failed \(error?.localizedDescription ?? "")")
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("HTTP Request Failed: \(error.localizedDescription)")
+                    return
+                }
+                guard let data = data else {
+                    print("No data received")
                     return
                 }
                 if let responseString = String(data: data, encoding: .utf8) {
                     print("Response: \(responseString)")
                 }
-            }.resume()
+            }
+            task.resume()
         }
     }
 
