@@ -1,9 +1,17 @@
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TsunamiMap extends StatelessWidget {
   const TsunamiMap({super.key});
+
+  refreshTsunami() async {
+    var idList = await ExpTech().getTsunamiList();
+    var id = idList[0];
+    var tsunami = ExpTech().getTsunami(id);
+    return tsunami;
+  }
 
   @override
   Widget build(BuildContext context) {
