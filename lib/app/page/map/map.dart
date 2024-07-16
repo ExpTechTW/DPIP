@@ -40,7 +40,6 @@ class _MapPageState extends State<MapPage> {
             minMaxZoomPreference: const MinMaxZoomPreference(0, 10),
             initialCameraPosition: const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
           ),
-          _getContent(selected, context),
           Padding(
             padding: const EdgeInsets.all(10),
             child: Align(
@@ -74,6 +73,7 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
+          _getContent(selected, context),
         ],
       ),
     );
