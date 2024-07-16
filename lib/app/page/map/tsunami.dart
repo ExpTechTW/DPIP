@@ -24,7 +24,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     var idList = await ExpTech().getTsunamiList();
     var id = "";
     if (idList.isNotEmpty) {
-      id = idList[2];
+      id = idList[0];
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
           ? tsunamiStatus = "發布"
