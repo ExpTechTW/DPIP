@@ -72,6 +72,7 @@ android {
             minifyEnabled true
         }
         debug {
+            signingConfig null
             minifyEnabled false
         }
     }
