@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/map/tsunami.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -16,6 +17,17 @@ class _MapPageState extends State<MapPage> {
     super.initState();
   }
 
+  Widget _getContent(int value, context) {
+    switch (value) {
+      case 0:
+        return TsunamiMap();
+      case 1:
+        return Container();
+      default:
+        return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +40,7 @@ class _MapPageState extends State<MapPage> {
             minMaxZoomPreference: const MinMaxZoomPreference(0, 10),
             initialCameraPosition: const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
           ),
+          _getContent(selected, context),
           Padding(
             padding: const EdgeInsets.all(10),
             child: Align(
