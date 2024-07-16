@@ -65,8 +65,8 @@ class LocationService {
     );
     positionStreamSubscription = positionStream.handleError((error) async {
       print('位置流錯誤: $error');
-      restartTimer = Timer(const Duration(minutes: 1), iosStartPositionStream);
       stopPositionStream();
+      restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
     }).listen((Position? position) async {
       if (position != null) {
         final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
@@ -92,8 +92,8 @@ class LocationService {
           print('距離: $distance 不更新位置');
         }
       }
-      restartTimer = Timer(const Duration(minutes: 1), iosStartPositionStream);
       stopPositionStream();
+      restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
     });
     print('位置流已開啟');
   }
@@ -102,6 +102,7 @@ class LocationService {
     positionStreamSubscription?.cancel();
     positionStreamSubscription = null;
     print('位置流已停止');
+    restartTimer?.cancel();
   }
 
   @pragma('vm:entry-point')
