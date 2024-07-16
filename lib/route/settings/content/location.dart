@@ -64,19 +64,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                child: const Text("設定"),
-                onPressed: () {
-                  openAppSettings();
-                  Navigator.pop(context);
-                },
-              )
+                      child: const Text("設定"),
+                      onPressed: () {
+                        openAppSettings();
+                        Navigator.pop(context);
+                      },
+                    )
                   : FilledButton(
-                child: const Text("再試一次"),
-                onPressed: () {
-                  checkNotificationPermission();
-                  Navigator.pop(context);
-                },
-              ),
+                      child: const Text("再試一次"),
+                      onPressed: () {
+                        checkNotificationPermission();
+                        Navigator.pop(context);
+                      },
+                    ),
             ],
           );
         },
@@ -114,19 +114,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                child: const Text("設定"),
-                onPressed: () {
-                  openAppSettings();
-                  Navigator.pop(context);
-                },
-              )
+                      child: const Text("設定"),
+                      onPressed: () {
+                        openAppSettings();
+                        Navigator.pop(context);
+                      },
+                    )
                   : FilledButton(
-                child: const Text("再試一次"),
-                onPressed: () {
-                  checkLocationPermission();
-                  Navigator.pop(context);
-                },
-              ),
+                      child: const Text("再試一次"),
+                      onPressed: () {
+                        checkLocationPermission();
+                        Navigator.pop(context);
+                      },
+                    ),
             ],
           );
         },
@@ -149,40 +149,40 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       if (!mounted) return false;
 
       final status = await showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            icon: const Icon(Symbols.my_location),
-            title: const Text("一律允許位置權限"),
-            content: const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: const Text("取消"),
-                onPressed: () {
-                  Navigator.pop(context, false);
-                },
-              ),
-              FilledButton(
-                child: const Text("確定"),
-                onPressed: () async {
-                  final status = await Permission.locationAlways.request();
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                icon: const Icon(Symbols.my_location),
+                title: const Text("一律允許位置權限"),
+                content: const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: const Text("取消"),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  FilledButton(
+                    child: const Text("確定"),
+                    onPressed: () async {
+                      final status = await Permission.locationAlways.request();
 
-                  setState(() => locationAlwaysPermission = status);
+                      setState(() => locationAlwaysPermission = status);
 
-                  if (status.isPermanentlyDenied) {
-                    openAppSettings();
-                  }
+                      if (status.isPermanentlyDenied) {
+                        openAppSettings();
+                      }
 
-                  if (!context.mounted) return;
+                      if (!context.mounted) return;
 
-                  Navigator.pop(context, status.isGranted);
-                },
-              ),
-            ],
-          );
-        },
-      ) ??
+                      Navigator.pop(context, status.isGranted);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
           false;
 
       return status;
@@ -226,21 +226,21 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   void initState() {
     super.initState();
     Permission.notification.status.then(
-          (value) {
+      (value) {
         setState(() {
           notificationPermission = value;
         });
       },
     );
     Permission.location.status.then(
-          (value) {
+      (value) {
         setState(() {
           locationPermission = value;
         });
       },
     );
     Permission.locationAlways.status.then(
-          (value) {
+      (value) {
         setState(() {
           locationAlwaysPermission = value;
         });
