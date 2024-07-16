@@ -38,6 +38,34 @@ class ExpTech {
     return json.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  Future<EarthquakeReport> getTsunami(String tsuId) async {
+    final requestUrl = Route.tsunami(tsuId);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final json = jsonDecode(res.body);
+
+    return EarthquakeReport.fromJson(json);
+  }
+
+  Future<List<PartialEarthquakeReport>> getTsunamiList({int? limit = 10}) async {
+    final requestUrl = Route.tsunamiList(limit: limit);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final json = jsonDecode(res.body) as List;
+
+    return json.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   Future<String> getNotifyLocation(String token, String lat, String lng) async {
     final requestUrl = Route.location(token, lat, lng);
 
