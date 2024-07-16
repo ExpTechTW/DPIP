@@ -228,6 +228,16 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     Permission.notification.status.then(
       (value) {
         setState(() {
@@ -242,23 +252,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
-    Permission.locationAlways.status.then(
-      (value) {
-        setState(() {
-          locationAlwaysPermission = value;
-        });
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
     Permission.locationAlways.status.then(
       (value) {
         setState(() {
