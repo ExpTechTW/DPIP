@@ -65,7 +65,7 @@ class LocationService {
     );
     positionStreamSubscription = positionStream.handleError((error) async {
       print('位置流錯誤: $error');
-      stopPositionStream();
+      iosStopPositionStream();
       restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
     }).listen((Position? position) async {
       if (position != null) {
@@ -92,13 +92,13 @@ class LocationService {
           print('距離: $distance 不更新位置');
         }
       }
-      stopPositionStream();
+      iosStopPositionStream();
       restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
     });
     print('位置流已開啟');
   }
 
-  void stopPositionStream() {
+  void iosStopPositionStream() {
     positionStreamSubscription?.cancel();
     positionStreamSubscription = null;
     print('位置流已停止');
@@ -207,17 +207,6 @@ class LocationService {
     return LocationStatus(locstatus, islocGranted);
   }
 
-  Future<PermissionStatus> requestnotificationPermission(int value) async {
-    switch (value) {
-      case 0:
-        return await Permission.notification.status;
-      case 1:
-        return await Permission.notification.request();
-      default:
-        return await Permission.notification.status;
-    }
-  }
-
   Future<int> shownotificationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
     int retry = 0;
     await showDialog(
@@ -242,30 +231,27 @@ class LocationService {
               retry = shouldRetry;
               Navigator.pop(context);
             }),
+        if (value == 2) {
+        return FilledButton(
+        child: const Text("設定"),
+        onPressed: () {
+        openAppSettings();
+        onPressed(2);
+        },
+        );
+        } else {
+        return FilledButton(
+        child: Text((value >= 1) ? "再試一次" : "請求權限"),
+        onPressed: () {
+        onPressed(1);
+        },
+        );
+        }
           ],
         );
       },
     );
     return retry;
-  }
-
-  Widget getnotificationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
-    if (value == 2) {
-      return FilledButton(
-        child: const Text("設定"),
-        onPressed: () {
-          openAppSettings();
-          onPressed(2);
-        },
-      );
-    } else {
-      return FilledButton(
-        child: Text((value >= 1) ? "再試一次" : "請求權限"),
-        onPressed: () {
-          onPressed(1);
-        },
-      );
-    }
   }
 
   Future<PermissionStatus> requestLocationPermission(int value) async {
