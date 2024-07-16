@@ -9,6 +9,13 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  int selected = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +27,39 @@ class _MapPageState extends State<MapPage> {
           MapLibreMap(
             minMaxZoomPreference: const MinMaxZoomPreference(0, 10),
             initialCameraPosition: const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: FloatingActionButton(
+                onPressed: () {},
+                child: PopupMenuButton<int>(
+                  icon: const Icon(Icons.menu),
+                  onSelected: (value) {
+                    setState(() {
+                      selected = value;
+                    });
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                    const PopupMenuItem<int>(
+                      value: 0,
+                      child: ListTile(
+                        leading: Icon(Icons.tsunami),
+                        title: Text('海嘯資訊'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 1,
+                      child: ListTile(
+                        leading: Icon(Icons.radar),
+                        title: Text('雷達回波'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
