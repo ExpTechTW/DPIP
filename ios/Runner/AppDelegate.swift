@@ -1,22 +1,8 @@
 import UIKit
-import CoreLocation
 import Flutter
-import Firebase
-
-class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
-    var locationManager: CLLocationManager?
-
-    override init() {
-        super.init()
-    }
-
-    func startMonitoringSignificantLocationChanges() {
-        locationManager?.startMonitoringSignificantLocationChanges()
-    }
-}
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
+@objc class AppDelegate: FlutterAppDelegate {
     var locationManager: YourLocationManagerClass?
 
     override func application(
