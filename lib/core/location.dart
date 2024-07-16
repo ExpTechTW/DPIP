@@ -51,6 +51,59 @@ class LocationService {
   StreamSubscription<Position>? positionStreamSubscription;
   Timer? restartTimer;
 
+  void iosStartPositionStream() async {
+    if (positionStreamSubscription != null) return;
+    final positionStream = Geolocator.getPositionStream(
+      locationSettings: AppleSettings(
+        accuracy: LocationAccuracy.medium,
+        activityType: ActivityType.other,
+        distanceFilter: 250,
+        pauseLocationUpdatesAutomatically: true,
+        showBackgroundLocationIndicator: false,
+        allowBackgroundLocationUpdates: true,
+      ),
+    );
+    positionStreamSubscription = positionStream.handleError((error) async {
+      print('位置流錯誤: $error');
+      restartTimer = Timer(const Duration(minutes: 1), iosStartPositionStream);
+      stopPositionStream();
+    }).listen((Position? position) async {
+      if (position != null) {
+        final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+        final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+        double distance =
+            Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+        if (distance >= 250) {
+          Global.preference.setDouble("loc-position-lat", position.latitude);
+          Global.preference.setDouble("loc-position-lon", position.longitude);
+          LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
+          print('新位置: ${position}');
+          print('城市和鄉鎮: ${locationResult.cityTown}');
+
+          String lat = position.latitude.toStringAsFixed(4);
+          String lon = position.longitude.toStringAsFixed(4);
+          String? fcmToken = Global.preference.getString("fcm-token");
+          if (fcmToken != null) {
+            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+            print(body);
+          }
+          print('距離: $distance 更新位置');
+        } else {
+          print('距離: $distance 不更新位置');
+        }
+      }
+      restartTimer = Timer(const Duration(minutes: 1), iosStartPositionStream);
+      stopPositionStream();
+    });
+    print('位置流已開啟');
+  }
+
+  void stopPositionStream() {
+    positionStreamSubscription?.cancel();
+    positionStreamSubscription = null;
+    print('位置流已停止');
+  }
+
   @pragma('vm:entry-point')
   Future<GetLocationResult> getLocation() async {
     int lastLocationUpdate =
@@ -62,21 +115,21 @@ class LocationService {
     final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
     final positioncountrytemp = Global.preference.getString("loc-position-country") ?? "";
     GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
+
     if (nowtemp > 300000 || nowtemp == 0) {
-      await Global.preference.setInt("last-location-update", now);
+      Global.preference.setInt("last-location-update", now);
       final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
       positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
-      await Global.preference.setString("loc-position-country", country.cityTown);
       double distance =
           Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
       if (distance >= 250 || nowtemp == 0) {
-        await Global.preference.setDouble("loc-position-lat", position.latitude);
-        await Global.preference.setDouble("loc-position-lon", position.longitude);
+        Global.preference.setDouble("loc-position-lat", position.latitude);
+        Global.preference.setDouble("loc-position-lon", position.longitude);
         positionchange = true;
-        print('距離: $distance 間距: $nowtemp 更新位置');
+        print('距離: $distance 更新位置');
       } else {
-        print('距離: $distance 間距: $nowtemp 不更新位置');
+        print('距離: $distance 不更新位置');
       }
     } else {
       print('間距: $nowtemp 不更新位置');
@@ -112,74 +165,6 @@ class LocationService {
       }
     }
     return locationGet;
-  }
-
-  void startPositionStream() async {
-    if (await openLocationSettings(true)) {
-      if (positionStreamSubscription == null) {
-        final positionStream = Geolocator.getPositionStream(
-          locationSettings: AppleSettings(
-            accuracy: LocationAccuracy.medium,
-            activityType: ActivityType.other,
-            distanceFilter: 250,
-            pauseLocationUpdatesAutomatically: true,
-            showBackgroundLocationIndicator: false,
-            allowBackgroundLocationUpdates: true,
-          ),
-        );
-        positionStreamSubscription = positionStream.handleError((error) async {
-          print('位置流錯誤: $error');
-          await positionStreamSubscription?.cancel();
-          positionStreamSubscription = null;
-        }).listen((Position? position) async {
-          if (position != null) {
-            final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-            final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-            double distance =
-                Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-            if (distance >= 250) {
-              await Global.preference.setDouble("loc-position-lat", position.latitude);
-              await Global.preference.setDouble("loc-position-lon", position.longitude);
-              LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
-              print('新位置: ${position}');
-              print('城市和鄉鎮: ${locationResult.cityTown}');
-
-              String lat = position.latitude.toStringAsFixed(4);
-              String lon = position.longitude.toStringAsFixed(4);
-              String fcmToken = Global.preference.getString("fcm-token") ?? "";
-              if (fcmToken != "") {
-                final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-                print(body);
-              }
-              print('距離: $distance 更新位置');
-            } else {
-              print('距離: $distance 不更新位置');
-            }
-          }
-          restartTimer = Timer(const Duration(minutes: 1), startPositionStream);
-          stopPositionStream();
-        });
-        print('位置流已開啟');
-      }
-    }
-  }
-
-  void stopPositionStream() {
-    positionStreamSubscription?.cancel();
-    positionStreamSubscription = null;
-    print('位置流已停止');
-  }
-
-  Future<bool> openLocationSettings(bool openSettings) async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (openSettings) {
-        await Geolocator.openLocationSettings();
-        return await Geolocator.isLocationServiceEnabled();
-      }
-      return false;
-    }
-    return true;
   }
 
   Future<LocationStatus> requestLocationAlwaysPermission() async {

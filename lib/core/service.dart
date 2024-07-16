@@ -29,7 +29,7 @@ void startBackgroundService() async {
   LocationService locationService = LocationService();
 
   if (Platform.isIOS) {
-    locationService.startPositionStream();
+    locationService.iosStartPositionStream();
   } else if (Platform.isAndroid) {
     var isRunning = await service.isRunning();
     if (!isRunning) {
