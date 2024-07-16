@@ -190,7 +190,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Future toggleAutoLocation() async {
-    await stopBackgroundService();
+    stopBackgroundService();
 
     if (isAutoLocatingEnabled) {
       setState(() {
