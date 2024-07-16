@@ -16,16 +16,6 @@ class TsunamiMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const sheetInitialSize = 0.2;
-    final decorationTween = DecorationTween(
-      begin: BoxDecoration(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-        color: context.colors.surface,
-      ),
-      end: BoxDecoration(
-        borderRadius: BorderRadius.zero,
-        color: context.colors.surface,
-      ),
-    ).chain(CurveTween(curve: Curves.linear));
     return Positioned.fill(
       child: DraggableScrollableSheet(
         initialChildSize: sheetInitialSize,
@@ -53,6 +43,7 @@ class TsunamiMap extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         "近期無海嘯資訊",
@@ -66,9 +57,9 @@ class TsunamiMap extends StatelessWidget {
                       Text(
                         "2024/07/01 00:00 更新",
                         style: TextStyle(
-                          fontSize: 12,
-                          letterSpacing: 2,
-                          color: Color.lerp(context.colors.onSurface, context.colors.surface, 0.2),
+                          fontSize: 14,
+                          letterSpacing: 1,
+                          color: context.colors.onSurfaceVariant,
                         ),
                       ),
                     ],
