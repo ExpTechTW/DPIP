@@ -114,6 +114,9 @@ void onStart(ServiceInstance service) async {
   }
 
   service.on('stopService').listen((event) {
+    if (service is AndroidServiceInstance) {
+      service.setAutoStartOnBootMode(false);
+    }
     service.stopSelf();
     print("stop");
     debugPrint("background process is now stopped");
