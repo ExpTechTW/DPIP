@@ -106,6 +106,9 @@ void onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   service.on('stopService').listen((event) {
+    if (service is AndroidServiceInstance) {
+      service.setAutoStartOnBootMode(false);
+    }
     service.stopSelf();
     print("background process is now stopped");
   });
