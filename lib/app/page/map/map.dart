@@ -1,6 +1,7 @@
 import 'package:dpip/app/page/map/tsunami.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -47,7 +48,7 @@ class _MapPageState extends State<MapPage> {
               child: FloatingActionButton(
                 onPressed: () {},
                 child: PopupMenuButton<int>(
-                  icon: const Icon(Icons.menu),
+                  icon: const Icon(Symbols.menu),
                   onSelected: (value) {
                     setState(() {
                       selected = value;
@@ -57,14 +58,14 @@ class _MapPageState extends State<MapPage> {
                     const PopupMenuItem<int>(
                       value: 0,
                       child: ListTile(
-                        leading: Icon(Icons.tsunami),
+                        leading: Icon(Symbols.tsunami),
                         title: Text('海嘯資訊'),
                       ),
                     ),
                     const PopupMenuItem<int>(
                       value: 1,
                       child: ListTile(
-                        leading: Icon(Icons.radar),
+                        leading: Icon(Symbols.radar),
                         title: Text('雷達回波'),
                       ),
                     ),
