@@ -20,7 +20,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     var idList = await ExpTech().getTsunamiList();
     var id = "";
     if (idList.isNotEmpty) {
-      id = idList[0];
+      id = idList[2];
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
           ? tsunamiStatus = "發布"
@@ -101,6 +101,45 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                 color: context.colors.onSurfaceVariant,
                               ),
                             ),
+                            const SizedBox(
+                              height: 30,
+                            ),
+                            Text(
+                              "${tsunami?.content}",
+                              style: TextStyle(
+                                fontSize: 18,
+                                letterSpacing: 2,
+                                color: context.colors.onSurface,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            tsunami != null
+                                ? tsunami?.info.type == "estimate"
+                                    ? Column(
+                                        children: [
+                                          Text(
+                                            "預估海嘯到達時間及波高",
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 2,
+                                              color: context.colors.onSurface,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Text(
+                                        "各地觀測到的海嘯",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 2,
+                                          color: context.colors.onSurface,
+                                        ),
+                                      )
+                                : Container(),
                           ],
                         ),
                 )
