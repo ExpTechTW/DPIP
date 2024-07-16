@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class TsunamiEstimateList extends StatelessWidget {
   final List tsunamiList;
@@ -10,7 +11,8 @@ class TsunamiEstimateList extends StatelessWidget {
   });
 
   convertTimestamp(int timestamp) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    var location = tz.getLocation('Asia/Taipei');
+    DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
     DateFormat formatter = DateFormat('dd日HH:mm');
     String formattedDate = formatter.format(dateTime);
