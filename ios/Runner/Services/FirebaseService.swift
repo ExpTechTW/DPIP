@@ -2,27 +2,18 @@ import Firebase
 import FirebaseMessaging
 
 class FirebaseService {
-    static let shared = FirebaseService()
-
-    private init() {
-        FirebaseApp.configure()
-    }
-
-    func fetchToken(completion: @escaping (String?) -> Void) {
-        Auth.auth().currentUser?.getIDTokenForcingRefresh(true) { token, error in
+    static func fetchToken(completion: @escaping (String?) -> Void) {
+        Messaging.messaging().token { token, error in
             if let error = error {
-                print("Error fetching token: \(error.localizedDescription)")
+                print("Error fetching FCM registration token: \(error)")
                 completion(nil)
-                return
+            } else {
+                completion(token)
             }
-            completion(token)
         }
     }
 
-    func fetchVersion() -> String {
-        guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
-            return "Unknown"
-        }
-        return version
+    static func fetchVersion() -> String? {
+        return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
     }
 }

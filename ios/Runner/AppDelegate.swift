@@ -4,7 +4,7 @@ import Firebase
 import CoreLocation
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, URLSessionDelegate {
     var locationManager: YourLocationManagerClass?
 
     override func application(
@@ -25,6 +25,7 @@ import CoreLocation
 
         let backgroundConfigObject = URLSessionConfiguration.background(withIdentifier: identifier)
         let backgroundSession = URLSession(configuration: backgroundConfigObject, delegate: self, delegateQueue: nil)
-        locationManager?.backgroundCompletionHandler = completionHandler
+        // Store the completion handler for later use
+//        YourLocationManagerClass.shared.setBackgroundCompletionHandler(completionHandler)
     }
 }

@@ -32,7 +32,7 @@ class YourLocationManagerClass: NSObject, CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let newLocation = locations.last else { return }
         let now = Date()
-        let minInterval = 300.0 // 5 minutes
+        let minInterval = 30.0 // 5 minutes
 
         if let lastLoc = lastLocation, let lastTime = lastRequestTime {
             let distance = newLocation.distance(from: lastLoc)
