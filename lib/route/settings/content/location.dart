@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
@@ -200,20 +201,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       });
     } else {
       final notification = await checkNotificationPermission();
-
-      if (!notification) {
-        return;
-      }
+      if (!notification) return;
 
       final location = await checkLocationPermission();
-
-      if (!location) {
-        return;
-      }
+      if (!location) return;
 
       await checkLocationAlwaysPermission();
 
-      await initializeService();
+      startBackgroundService();
 
       setState(() {
         isAutoLocatingEnabled = true;
