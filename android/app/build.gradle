@@ -55,14 +55,17 @@ android {
 
     signingConfigs {
         release {
-            def keystorePropsFile = rootProject.file("key.properties")
-            def keystoreProps = new Properties()
-            keystoreProps.load(new FileInputStream(keystorePropsFile))
+            if (file("key.properties").exists()) {
+                def keystoreProps = new Properties()
+                keystoreProps.load(new FileInputStream("key.properties"))
 
-            keyAlias keystoreProps['keyAlias']
-            keyPassword keystoreProps['keyPassword']
-            storeFile file(keystoreProps['storeFile'])
-            storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+            } else {
+                println("key.properties not found")
+            }
         }
     }
 
