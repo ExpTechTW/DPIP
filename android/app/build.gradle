@@ -55,9 +55,10 @@ android {
 
     signingConfigs {
         release {
-            if (file("key.properties").exists()) {
+            def keystorePropsFile = rootProject.file("key.properties")
+            if (keystorePropsFile.exists()) {
                 def keystoreProps = new Properties()
-                keystoreProps.load(new FileInputStream("key.properties"))
+                keystoreProps.load(new FileInputStream(keystorePropsFile))
 
                 keyAlias keystoreProps['keyAlias']
                 keyPassword keystoreProps['keyPassword']
