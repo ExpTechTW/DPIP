@@ -1,9 +1,10 @@
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 
 class TsunamiMap extends StatelessWidget {
+  const TsunamiMap({super.key});
+
   @override
   Widget build(BuildContext context) {
     const sheetInitialSize = 0.2;
@@ -24,7 +25,7 @@ class TsunamiMap extends StatelessWidget {
         snap: true,
         builder: (context, scrollController) {
           return Container(
-            color: context.colors.surface.withOpacity(0.7),
+            color: context.colors.surface.withOpacity(0.9),
             child: ListView(
               controller: scrollController,
               children: [
@@ -41,6 +42,30 @@ class TsunamiMap extends StatelessWidget {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Column(
+                    children: [
+                      Text(
+                        "近期無海嘯資訊",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                          color: context.colors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        "2024/07/01 00:00 更新",
+                        style: TextStyle(
+                          fontSize: 12,
+                          letterSpacing: 2,
+                          color: Color.lerp(context.colors.onSurface, context.colors.surface, 0.2),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           );
