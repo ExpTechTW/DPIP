@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -190,7 +191,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   Future toggleAutoLocation() async {
-    await stopBackgroundService();
+    stopBackgroundService();
+
+    final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+    final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+    String fcmToken = Global.preference.getString("fcm-token") ?? "";
+    String lat = positionlattemp.toStringAsFixed(4);
+    String lon = positionlontemp.toStringAsFixed(4);
+    if (fcmToken != "" && positionlattemp != 0.0 && positionlontemp != 0.0) {
+      final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+      print(body);
+    }
 
     if (isAutoLocatingEnabled) {
       setState(() {
