@@ -164,12 +164,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         }
       },
     );
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
-      setState(() {
-        city = Global.preference.getString("location-city");
-        town = Global.preference.getString("location-town");
-      });
-    });
   }
 
   @override

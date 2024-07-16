@@ -39,8 +39,6 @@ void main() async {
     } else {
       await stopBackgroundService();
     }
-  } else {
-    await stopBackgroundService();
   }
   initializeTimeZones();
   runApp(
