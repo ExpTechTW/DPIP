@@ -21,7 +21,7 @@ class _MapPageState extends State<MapPage> {
   Widget _getContent(int value, context) {
     switch (value) {
       case 0:
-        return TsunamiMap();
+        return const TsunamiMap();
       case 1:
         return Container();
       default:
@@ -33,7 +33,7 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("地圖"),
+        title: const Text("地圖"),
       ),
       body: Stack(
         children: [

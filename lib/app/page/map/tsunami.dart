@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/map/tsunami_estimate_list.dart';
 import 'package:dpip/app/page/map/tsunami_observed_list.dart';
