@@ -17,7 +17,7 @@ class SettingsLocationView extends StatefulWidget {
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
 }
 
-class _SettingsLocationViewState extends State<SettingsLocationView> {
+class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
@@ -227,6 +227,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Permission.notification.status.then(
       (value) {
         setState(() {
@@ -241,6 +242,23 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
         });
       },
     );
+    Permission.locationAlways.status.then(
+      (value) {
+        setState(() {
+          locationAlwaysPermission = value;
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     Permission.locationAlways.status.then(
       (value) {
         setState(() {
