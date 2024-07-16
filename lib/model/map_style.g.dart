@@ -15,8 +15,7 @@ String _$mapStyleHash() => r'0c91efbd2feb55baabb14a4974da1bc2e8c35b36';
 final mapStyleProvider = Provider<MapStyle>.internal(
   mapStyle,
   name: r'mapStyleProvider',
-  debugGetCreateSourceHash:
-  const bool.fromEnvironment('dart.vm.product') ? null : _$mapStyleHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product') ? null : _$mapStyleHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

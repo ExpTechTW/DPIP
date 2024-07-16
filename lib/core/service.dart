@@ -8,14 +8,30 @@ import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final service = FlutterBackgroundService();
 bool isservicerun = false;
 
+void initService() async {
+  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+  if (isAutoLocatingEnabled) {
+    final isNotificationEnabled = await Permission.notification.status;
+    final isLocationAlwaysEnabled = await Permission.locationAlways.status;
+    if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
+      await startBackgroundService();
+    } else {
+      await stopBackgroundService();
+    }
+  }
+}
+
 Future<void> startBackgroundService() async {
   LocationService locationService = LocationService();
   if (!isservicerun) {
-    if (Platform.isAndroid) {
+    if (Platform.isIOS) {
+      locationService.startPositionStream();
+    } else if (Platform.isAndroid) {
       initializeService();
     }
   } else if (isservicerun) {
