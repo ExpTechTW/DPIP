@@ -198,7 +198,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       setState(() {
         isAutoLocatingEnabled = false;
       });
-      return;
     } else {
       final notification = await checkNotificationPermission();
 
