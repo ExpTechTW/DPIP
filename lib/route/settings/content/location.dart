@@ -190,7 +190,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     }
   }
 
-  Future toggleAutoLocation() async {
+  Future toggleAutoLocation(bool value) async {
     stopBackgroundService();
 
     final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
@@ -203,7 +203,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       print(body);
     }
 
-    if (isAutoLocatingEnabled) {
+    if (!value) {
       setState(() {
         isAutoLocatingEnabled = false;
       });
@@ -283,7 +283,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               ),
               contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
               value: isAutoLocatingEnabled,
-              onChanged: (value) => toggleAutoLocation(),
+              onChanged: (value) => toggleAutoLocation(value),
             ),
           ),
           if (locationAlwaysPermission != null)
