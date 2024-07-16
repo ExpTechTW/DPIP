@@ -126,7 +126,6 @@ void onStart(ServiceInstance service) async {
         final position = await getLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
-        String country = position.position.country;
         String fcmToken = Global.preference.getString("fcm-token") ?? "";
         if (position.change && fcmToken != "") {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
@@ -135,7 +134,7 @@ void onStart(ServiceInstance service) async {
         flutterLocalNotificationsPlugin.show(
           888,
           'COOL SERVICE',
-          'Awesome ${DateTime.now()}\n$lat,$lon $country',
+          'Awesome ${DateTime.now()}\n$lat,$lon ${position.position.country}',
           const NotificationDetails(
             android: AndroidNotificationDetails(
               'my_foreground',
@@ -148,7 +147,7 @@ void onStart(ServiceInstance service) async {
 
         service.setForegroundNotificationInfo(
           title: 'COOL SERVICE',
-          content: 'Awesome ${DateTime.now()}\n$lat,$lon $country',
+          content: 'Awesome ${DateTime.now()}\n$lat,$lon ${position.position.country}',
         );
       }
     }
