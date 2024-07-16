@@ -63,7 +63,7 @@ class DpipAppState extends State<DpipApp> {
     super.initState();
     fcmInit();
     notifyInit();
-    initService();
+    initBackgroundService();
   }
 
   @override

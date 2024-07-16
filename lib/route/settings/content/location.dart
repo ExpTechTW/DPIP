@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../location_selector/location_selector.dart';
+
 class SettingsLocationView extends StatefulWidget {
   const SettingsLocationView({super.key});
 
@@ -21,8 +23,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
 
-  String city = "";
-  String town = "";
+  String? city = Global.preference.getString("location-city");
+  String? town = Global.preference.getString("location-town");
 
   Future<bool> requestLocationAlwaysPermission() async {
     var status = await Permission.locationWhenInUse.status;
@@ -198,15 +200,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       });
       return;
     } else {
-      final location = await checkLocationPermission();
-
-      if (!location) {
-        return;
-      }
-
       final notification = await checkNotificationPermission();
 
       if (!notification) {
+        return;
+      }
+
+      final location = await checkLocationPermission();
+
+      if (!location) {
         return;
       }
 
@@ -249,14 +251,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    return Material(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -342,8 +339,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                     ),
                     TextButton(
                       child: const Text("設定"),
-                      onPressed: () async {
-                        await openAppSettings();
+                      onPressed: () {
+                        openAppSettings();
                       },
                     ),
                   ]),
@@ -369,20 +366,48 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.location_city),
             ),
-            title: Text("縣市"),
-            subtitle: Text(city),
+            title: const Text("縣市"),
+            subtitle: Text(city ?? "尚未設定"),
             enabled: !isAutoLocatingEnabled,
-            onTap: () {},
+            onTap: () async {
+              await Navigator.of(
+                context,
+                rootNavigator: true,
+              ).push(
+                MaterialPageRoute(
+                  builder: (context) => LocationSelectorRoute(city: null, town: town),
+                ),
+              );
+
+              setState(() {
+                city = Global.preference.getString("location-city");
+                town = Global.preference.getString("location-town");
+              });
+            },
           ),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(Symbols.forest),
             ),
-            title: Text("鄉鎮"),
-            subtitle: Text(town),
-            enabled: !isAutoLocatingEnabled,
-            onTap: () {},
+            title: const Text("鄉鎮"),
+            subtitle: Text(town ?? "尚未設定"),
+            enabled: !isAutoLocatingEnabled && city != null,
+            onTap: () async {
+              await Navigator.of(
+                context,
+                rootNavigator: true,
+              ).push(
+                MaterialPageRoute(
+                  builder: (context) => LocationSelectorRoute(city: city, town: town),
+                ),
+              );
+
+              setState(() {
+                city = Global.preference.getString("location-city");
+                town = Global.preference.getString("location-town");
+              });
+            },
           )
         ],
       ),

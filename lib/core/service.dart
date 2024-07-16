@@ -12,7 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 final service = FlutterBackgroundService();
 
-void initService() async {
+void initBackgroundService() async {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await Permission.notification.status;
@@ -121,15 +121,15 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
 
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
+    Timer.periodic(const Duration(seconds: 30), (timer) async {
       LocationService locationService = LocationService();
       if (await service.isForegroundService()) {
-        final position = await locationService.getLocation();
+        final position = await locationService.androidGetLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
         String country = position.position.country;
-        String fcmToken = Global.preference.getString("fcm-token") ?? "";
-        if (position.change && fcmToken != "") {
+        String? fcmToken = Global.preference.getString("fcm-token");
+        if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
           print(body);
         }
