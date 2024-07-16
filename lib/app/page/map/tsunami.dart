@@ -1,8 +1,11 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/map/tsunami_estimate_list.dart';
+import 'package:dpip/app/page/map/tsunami_observed_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../../model/tsunami/tsunami.dart';
 
@@ -21,7 +24,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     var idList = await ExpTech().getTsunamiList();
     var id = "";
     if (idList.isNotEmpty) {
-      id = idList[2];
+      id = idList[0];
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
           ? tsunamiStatus = "發布"
@@ -33,6 +36,15 @@ class _TsunamiMapState extends State<TsunamiMap> {
       refreshingTsunami = false;
     });
     return tsunami;
+  }
+
+  convertTimestamp(int timestamp) {
+    var location = tz.getLocation('Asia/Taipei');
+    DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
+
+    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+    String formattedDate = formatter.format(dateTime);
+    return formattedDate;
   }
 
   @override
@@ -105,46 +117,63 @@ class _TsunamiMapState extends State<TsunamiMap> {
                             const SizedBox(
                               height: 30,
                             ),
-                            Text(
-                              "${tsunami?.content}",
-                              style: TextStyle(
-                                fontSize: 18,
-                                letterSpacing: 2,
-                                color: context.colors.onSurface,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
                             tsunami != null
-                                ? tsunami?.info.type == "estimate"
-                                    ? Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "預估海嘯到達時間及波高",
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 2,
-                                              color: context.colors.onSurface,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: 10,
-                                          ),
-                                          TsunamiEstimateList(tsunamiList: tsunami!.info.data),
-                                        ],
-                                      )
-                                    : Text(
-                                        "各地觀測到的海嘯",
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${tsunami?.content}",
                                         style: TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
                                           letterSpacing: 2,
                                           color: context.colors.onSurface,
                                         ),
-                                      )
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      tsunami?.info.type == "estimate"
+                                          ? Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "預估海嘯到達時間及波高",
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 2,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                TsunamiEstimateList(tsunamiList: tsunami!.info.data),
+                                              ],
+                                            )
+                                          : Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "各地觀測到的海嘯",
+                                                  style: TextStyle(
+                                                    fontSize: 22,
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 2,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                                const SizedBox(
+                                                  height: 10,
+                                                ),
+                                                TsunamiObservedList(tsunamiList: tsunami!.info.data),
+                                              ],
+                                            ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                    ],
+                                  )
                                 : Container(),
                           ],
                         ),
