@@ -282,7 +282,7 @@ class LocationService {
     }
   }
 
-  Future<PermissionStatus> requestlocationPermission(int value) async {
+  Future<PermissionStatus> requestLocationPermission(int value) async {
     if (Platform.isIOS) {
       switch (value) {
         case 0:
@@ -312,7 +312,7 @@ class LocationService {
     }
   }
 
-  Future<int> showlocationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
+  Future<int> showLocationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
     int retry = 0;
     await showDialog(
       context: context,
@@ -320,7 +320,7 @@ class LocationService {
         return AlertDialog(
           icon: const Icon(Symbols.error),
           title: Text("${(value >= 1) ? "無法" : "請求"}取得位置權限"),
-          content: getlocationDialogContent(value, status),
+          content: getLocationDialogContent(value, status),
           actionsAlignment: MainAxisAlignment.spaceBetween,
           actions: [
             TextButton(
@@ -330,7 +330,7 @@ class LocationService {
                 Navigator.pop(context);
               },
             ),
-            getlocationActionButton(value, status, (shouldRetry) {
+            getLocationActionButton(value, status, (shouldRetry) {
               retry = shouldRetry;
               Navigator.pop(context);
             }),
@@ -341,21 +341,19 @@ class LocationService {
     return retry;
   }
 
-  Widget getlocationDialogContent(int value, PermissionStatus status) {
+  Widget getLocationDialogContent(int value, PermissionStatus status) {
     if (value == 0) {
       return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
     } else if (value == 3) {
       return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}");
     } else {
       return Text(
-        Platform.isAndroid
-            ? "為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"
-            : "為了獲得更好的自動定位體驗，您需要將位置權限提升至「永遠」以讓 DPIP 在背景自動設定所在地資訊。",
+        "為了獲得更好的自動定位體驗，您需要將位置權限提升至「${(Platform.isAndroid) ? "一律允許" : "永遠"}」以讓 DPIP 在背景自動設定所在地資訊。",
       );
     }
   }
 
-  Widget getlocationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
+  Widget getLocationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
     if (value == 3) {
       return FilledButton(
         child: const Text("設定"),
