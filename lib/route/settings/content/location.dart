@@ -206,6 +206,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
     if (!value) {
       setState(() {
         isAutoLocatingEnabled = false;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
       return;
     } else {
@@ -227,10 +228,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
 
       setState(() {
         isAutoLocatingEnabled = true;
+        Global.preference.setBool("auto-location", isAutoLocatingEnabled);
       });
     }
-
-    Global.preference.setBool("auto-location", isAutoLocatingEnabled);
   }
 
   @override
