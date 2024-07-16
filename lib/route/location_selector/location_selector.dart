@@ -86,7 +86,9 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
               onChanged: (value) async {
                 if (value == null) return;
 
-                final location = Global.location.entries.firstWhere((e) => e.value.town == value).value;
+                final location = Global.location.entries.firstWhere((e) {
+                  return (e.value.city == widget.city) && (e.value.town == value);
+                }).value;
 
                 await setLocation(location);
               },
