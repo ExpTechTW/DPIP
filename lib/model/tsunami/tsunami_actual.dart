@@ -26,7 +26,7 @@ class TsunamiActual {
   /// ```
   /// 23.98
   /// ```
-  final double lat;
+  final double? lat;
 
   /// - 海嘯實測地區經度
   ///
@@ -34,7 +34,7 @@ class TsunamiActual {
   /// ```
   /// 121.62
   /// ```
-  final double lon;
+  final double? lon;
 
   /// - 海嘯實測高度
   ///
