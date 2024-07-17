@@ -25,10 +25,10 @@ class TsunamiEstimate {
   ///
   /// 範例
   /// ```
-  /// "小於1公尺"
+  /// 0
   /// ```
   @JsonKey(name: "wave_height")
-  final String waveHeight;
+  final int waveHeight;
 
   TsunamiEstimate({
     required this.area,
