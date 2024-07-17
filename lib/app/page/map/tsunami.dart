@@ -87,7 +87,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
 
   @override
   Widget build(BuildContext context) {
-    const sheetInitialSize = 0.2;
+    const sheetInitialSize = 0.16;
     return Positioned.fill(
       child: DraggableScrollableSheet(
         initialChildSize: sheetInitialSize,
