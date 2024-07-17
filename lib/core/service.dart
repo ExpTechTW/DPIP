@@ -42,7 +42,7 @@ void startBackgroundService() async {
       var isRunning = await service.isRunning();
       if (!isRunning) {
         service.startService();
-      } else {
+      } else if (isRunning) {
         timer?.cancel();
         service.invoke("stopService");
         service.startService();
