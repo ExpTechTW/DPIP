@@ -150,14 +150,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       return true;
     } else {
       if (!mounted) return false;
+      final permissionType = Platform.isAndroid ? "一律允許" : "永遠";
 
       final status = await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: const Text("一律允許位置權限"),
-                content: const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
+                title: Text("$permissionType位置權限"),
+                content: Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以讓 DPIP 在背景自動設定所在地資訊。"),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
@@ -299,7 +300,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "自動定位功能需要將位置權限提升至「一律允許」以在背景使用。",
+                        "自動定位功能需要將位置權限提升至「${(Platform.isAndroid) ? "一律允許" : "永遠"}」以在背景使用。",
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),
