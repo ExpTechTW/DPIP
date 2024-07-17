@@ -39,6 +39,9 @@ void startBackgroundService() async {
     var isRunning = await service.isRunning();
     if (!isRunning) {
       service.startService();
+    } else {
+      stopBackgroundService();
+      service.startService();
     }
   }
 }
