@@ -15,7 +15,10 @@ dependencies:
   package_info_plus: ^8.0.0
   shared_preferences: ^2.2.3
   timezone: ^0.9.3
-  flutter_background_service: ^5.0.6
+  flutter_background_service:
+    git:
+      url: https://github.com/ExpTechTW/flutter_background_service.git
+      path: packages/flutter_background_service
   flutter_local_notifications: ^17.1.2
   permission_handler: ^11.3.1
   firebase_messaging: ^15.0.2

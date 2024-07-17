@@ -51,7 +51,6 @@ void stopBackgroundService() async {
     LocationService locationService = LocationService();
     locationService.iosStopPositionStream();
   } else if (Platform.isAndroid) {
-    timer?.cancel();
     if (await service.isRunning()) {
       service.invoke("stopService");
     }
@@ -115,6 +114,7 @@ void onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   service.on('stopService').listen((event) {
+    timer?.cancel();
     if (service is AndroidServiceInstance) {
       service.setAutoStartOnBootMode(false);
     }
