@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 Timer? timer;
 final service = FlutterBackgroundService();
+LocationService locationService = LocationService();
 
 void initBackgroundService() async {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
@@ -20,10 +21,11 @@ void initBackgroundService() async {
     final isNotificationEnabled = await Permission.notification.status;
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
-      if (Platform.isAndroid) {
+      if (Platform.isIOS) {
+        locationService.iosStartPositionStream();
+      } else if (Platform.isAndroid) {
         initializeService();
       }
-      startBackgroundService();
     } else {
       stopBackgroundService();
     }
@@ -31,8 +33,6 @@ void initBackgroundService() async {
 }
 
 void startBackgroundService() async {
-  LocationService locationService = LocationService();
-
   if (Platform.isIOS) {
     locationService.iosStartPositionStream();
   } else if (Platform.isAndroid) {
@@ -44,7 +44,6 @@ void startBackgroundService() async {
 }
 
 void stopBackgroundService() async {
-  LocationService locationService = LocationService();
   if (Platform.isIOS) {
     locationService.iosStopPositionStream();
   } else if (Platform.isAndroid) {
