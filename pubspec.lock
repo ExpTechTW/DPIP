@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  autostarter:
+    dependency: "direct main"
+    description:
+      name: autostarter
+      sha256: "7aac4cbf4fba208eefbcd5046e716b3c86387da82b319b4fc7cb8db0c7153ec3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   boolean_selector:
     dependency: transitive
     description:
