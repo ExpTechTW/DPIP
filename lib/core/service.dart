@@ -38,10 +38,15 @@ void startBackgroundService() async {
   } else if (Platform.isAndroid) {
     if (!androidServiceInit) {
       androidForegroundService();
-    }
-    var isRunning = await service.isRunning();
-    if (!isRunning) {
-      service.startService();
+    } else {
+      var isRunning = await service.isRunning();
+      if (!isRunning) {
+        service.startService();
+      } else {
+        timer?.cancel();
+        service.invoke("stopService");
+        service.startService();
+      }
     }
   }
 }
