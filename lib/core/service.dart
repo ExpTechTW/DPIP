@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
-import 'package:dpip/core/notify.dart';
 import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
