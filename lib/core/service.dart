@@ -115,7 +115,6 @@ void onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   service.on('stopService').listen((event) {
-    timer?.cancel();
     if (service is AndroidServiceInstance) {
       service.setAutoStartOnBootMode(false);
     }

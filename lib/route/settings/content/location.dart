@@ -233,7 +233,25 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             return true;
           }
         } else {
-          return false;
+          return await showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    icon: const Icon(Symbols.error),
+                    title: const Text("錯誤"),
+                    content: const Text("無法在此設備上啟用自動定位服務。"),
+                    actions: [
+                      TextButton(
+                        child: const Text("知道了"),
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ) ??
+              false;
         }
       } else {
         return true;
