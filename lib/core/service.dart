@@ -11,8 +11,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Timer? timer;
-final service = FlutterBackgroundService();
-LocationService locationService = LocationService();
+FlutterBackgroundService service = FlutterBackgroundService();
+bool androidServiceInit = false;
 
 void initBackgroundService() async {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
@@ -20,11 +20,10 @@ void initBackgroundService() async {
     final isNotificationEnabled = await Permission.notification.status;
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
-      if (Platform.isIOS) {
-        locationService.iosStartPositionStream();
-      } else if (Platform.isAndroid) {
-        initializeService();
+      if (Platform.isAndroid) {
+        androidForegroundService();
       }
+      startBackgroundService();
     } else {
       stopBackgroundService();
     }
@@ -32,20 +31,23 @@ void initBackgroundService() async {
 }
 
 void startBackgroundService() async {
+  LocationService locationService = LocationService();
+
   if (Platform.isIOS) {
     locationService.iosStartPositionStream();
   } else if (Platform.isAndroid) {
+    if (!androidServiceInit) {
+      androidForegroundService();
+    }
     var isRunning = await service.isRunning();
     if (!isRunning) {
-      service.startService();
-    } else {
-      stopBackgroundService();
       service.startService();
     }
   }
 }
 
 void stopBackgroundService() async {
+  LocationService locationService = LocationService();
   if (Platform.isIOS) {
     locationService.iosStopPositionStream();
   } else if (Platform.isAndroid) {
@@ -57,7 +59,8 @@ void stopBackgroundService() async {
   }
 }
 
-Future<void> initializeService() async {
+Future<void> androidForegroundService() async {
+  androidServiceInit = true;
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'my_foreground',
     '前景自動定位',
@@ -84,8 +87,8 @@ Future<void> initializeService() async {
       autoStart: true,
       isForegroundMode: true,
       notificationChannelId: 'my_foreground',
-      initialNotificationTitle: '',
-      initialNotificationContent: '',
+      initialNotificationTitle: 'DPIP',
+      initialNotificationContent: '前景服務啟動中...',
       foregroundServiceNotificationId: 888,
     ),
     iosConfiguration: IosConfiguration(
@@ -107,6 +110,8 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   await Global.init();
+
+  print("--- foreground ---");
 
   LocationService locationService = LocationService();
 
@@ -169,7 +174,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer=Timer.periodic(const Duration(seconds: 30), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
       task();
     });
   }
