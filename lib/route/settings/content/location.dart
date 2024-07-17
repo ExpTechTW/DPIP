@@ -236,7 +236,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
           return false;
         }
       } else {
-        return false;
+        return true;
       }
     } catch (err) {
       print(err);
@@ -264,7 +264,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (!autoStart) return;
 
-      startBackgroundService();
+      startBackgroundService(false);
 
       setState(() {
         isAutoLocatingEnabled = true;

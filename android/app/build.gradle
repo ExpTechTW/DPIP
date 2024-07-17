@@ -46,7 +46,7 @@ android {
 
     defaultConfig {
         applicationId "com.exptech.dpip"
-        minSdkVersion 26
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -74,6 +74,7 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
+            shrinkResources true
         }
         debug {
             signingConfig null
