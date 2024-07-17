@@ -11,6 +11,7 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+Timer? timer;
 final service = FlutterBackgroundService();
 
 void initBackgroundService() async {
@@ -19,6 +20,9 @@ void initBackgroundService() async {
     final isNotificationEnabled = await Permission.notification.status;
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
+      if (Platform.isAndroid) {
+        initializeService();
+      }
       startBackgroundService();
     } else {
       stopBackgroundService();
@@ -35,8 +39,6 @@ void startBackgroundService() async {
     var isRunning = await service.isRunning();
     if (!isRunning) {
       service.startService();
-    } else {
-      initializeService();
     }
   }
 }
@@ -46,6 +48,7 @@ void stopBackgroundService() async {
   if (Platform.isIOS) {
     locationService.iosStopPositionStream();
   } else if (Platform.isAndroid) {
+    timer?.cancel();
     var isRunning = await service.isRunning();
     if (isRunning) {
       service.invoke("stopService");
@@ -109,6 +112,7 @@ void onStart(ServiceInstance service) async {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   service.on('stopService').listen((event) {
+    timer?.cancel();
     if (service is AndroidServiceInstance) {
       service.setAutoStartOnBootMode(false);
     }
@@ -164,7 +168,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    Timer.periodic(const Duration(seconds: 30), (timer) async {
+    timer=Timer.periodic(const Duration(seconds: 30), (timer) async {
       task();
     });
   }
