@@ -8,62 +8,75 @@ import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-final service = FlutterBackgroundService();
-bool isservicerun = false;
+Timer? timer;
+FlutterBackgroundService service = FlutterBackgroundService();
+bool androidServiceInit = false;
 
-Future<void> startBackgroundService() async {
-  if (!isservicerun) {
-    if (Platform.isIOS) {
-      startPositionStream();
-      isservicerun = true;
-    } else if (Platform.isAndroid) {
-      initializeService();
-    }
-  } else if (isservicerun) {
-    if (Platform.isIOS) {
-      stopPositionStream();
-      startPositionStream();
-    } else if (Platform.isAndroid) {
-      var isRunning = await service.isRunning();
-      print("Background Service running $isRunning");
-      if (!isRunning) {
-        service.startService();
+void initBackgroundService() async {
+  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
+  if (isAutoLocatingEnabled) {
+    final isNotificationEnabled = await Permission.notification.status;
+    final isLocationAlwaysEnabled = await Permission.locationAlways.status;
+    if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
+      if (Platform.isAndroid) {
+        androidForegroundService();
       }
+      startBackgroundService();
+    } else {
+      stopBackgroundService();
     }
   }
 }
 
-Future<void> stopBackgroundService() async {
+void startBackgroundService() async {
   if (Platform.isIOS) {
-    stopPositionStream();
+    LocationService locationService = LocationService();
+    locationService.iosStartPositionStream();
   } else if (Platform.isAndroid) {
+    if (!androidServiceInit) {
+      androidForegroundService();
+    }
     var isRunning = await service.isRunning();
-    print("Background Service running $isRunning");
-    if (isRunning) {
+    if (!isRunning) {
+      service.startService();
+    } else if (isRunning) {
+      stopBackgroundService();
+      service.startService();
+    }
+  }
+}
+
+void stopBackgroundService() async {
+  if (Platform.isIOS) {
+    LocationService locationService = LocationService();
+    locationService.iosStopPositionStream();
+  } else if (Platform.isAndroid) {
+    timer?.cancel();
+    if (await service.isRunning()) {
       service.invoke("stopService");
     }
   }
 }
 
-Future<void> initializeService() async {
+Future<void> androidForegroundService() async {
+  androidServiceInit = true;
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'my_foreground', // id
-    'MY FOREGROUND SERVICE', // title
-    description: 'This channel is used for important notifications.', // description
-    importance: Importance.low, // importance must be at low or higher level
+    'my_foreground',
+    '前景自動定位',
+    description: '前景自動定位',
+    importance: Importance.low,
   );
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  if (Platform.isIOS || Platform.isAndroid) {
-    await flutterLocalNotificationsPlugin.initialize(
-      const InitializationSettings(
-        iOS: DarwinInitializationSettings(),
-        android: AndroidInitializationSettings('ic_bg_service_small'),
-      ),
-    );
-  }
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      iOS: DarwinInitializationSettings(),
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+    ),
+  );
 
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
@@ -75,8 +88,8 @@ Future<void> initializeService() async {
       autoStart: true,
       isForegroundMode: true,
       notificationChannelId: 'my_foreground',
-      initialNotificationTitle: 'AWESOME SERVICE',
-      initialNotificationContent: 'Initializing',
+      initialNotificationTitle: 'DPIP',
+      initialNotificationContent: '前景服務啟動中...',
       foregroundServiceNotificationId: 888,
     ),
     iosConfiguration: IosConfiguration(
@@ -85,7 +98,6 @@ Future<void> initializeService() async {
       onBackground: onIosBackground,
     ),
   );
-  isservicerun = true;
 }
 
 @pragma('vm:entry-point')
@@ -100,7 +112,18 @@ void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   await Global.init();
 
+  LocationService locationService = LocationService();
+
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  service.on('stopService').listen((event) {
+    timer?.cancel();
+    if (service is AndroidServiceInstance) {
+      service.setAutoStartOnBootMode(false);
+    }
+    service.stopSelf();
+    print("background process is now stopped");
+  });
 
   if (service is AndroidServiceInstance) {
     service.setAutoStartOnBootMode(true);
@@ -112,45 +135,46 @@ void onStart(ServiceInstance service) async {
     service.on('setAsBackground').listen((event) {
       service.setAsBackgroundService();
     });
-  }
 
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-    print("stop");
-    debugPrint("background process is now stopped");
-  });
-
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    if (service is AndroidServiceInstance) {
+    void task() async {
       if (await service.isForegroundService()) {
-        final position = await getLocation();
+        final position = await locationService.androidGetLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
         String country = position.position.country;
-        String fcmToken = Global.preference.getString("fcm-token") ?? "";
-        if (position.change && fcmToken != "") {
+        String? fcmToken = Global.preference.getString("fcm-token");
+        if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
           print(body);
         }
+
+        String notifyTitle = 'COOL SERVICE';
+        String notifyBody = 'Awesome ${DateTime.now()}\n$lat,$lon $country';
+
         flutterLocalNotificationsPlugin.show(
           888,
-          'COOL SERVICE',
-          'Awesome ${DateTime.now()}\n$lat,$lon $country',
+          notifyTitle,
+          notifyBody,
           const NotificationDetails(
             android: AndroidNotificationDetails(
               'my_foreground',
-              'MY FOREGROUND SERVICE',
-              icon: 'ic_bg_service_small',
+              '前景自動定位',
+              icon: '@mipmap/ic_launcher',
               ongoing: true,
             ),
           ),
         );
 
         service.setForegroundNotificationInfo(
-          title: 'COOL SERVICE',
-          content: 'Awesome ${DateTime.now()}\n$lat,$lon $country',
+          title: notifyTitle,
+          content: notifyBody,
         );
       }
     }
-  });
+
+    task();
+    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+      task();
+    });
+  }
 }

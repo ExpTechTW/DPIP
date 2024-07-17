@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
+import 'package:dpip/model/tsunami/tsunami.dart';
+import 'package:dpip/model/tsunami/tsunami_list.dart';
 import 'package:http/http.dart';
 
 class ExpTech {
@@ -36,6 +38,34 @@ class ExpTech {
     final json = jsonDecode(res.body) as List;
 
     return json.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<Tsunami> getTsunami(String tsuId) async {
+    final requestUrl = Route.tsunami(tsuId);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final json = jsonDecode(res.body);
+
+    return Tsunami.fromJson(json);
+  }
+
+  Future<List<String>> getTsunamiList() async {
+    final requestUrl = Route.tsunamiList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final json = jsonDecode(res.body) as List;
+
+    return json.map((e) => e as String).toList();
   }
 
   Future<String> getNotifyLocation(String token, String lat, String lng) async {

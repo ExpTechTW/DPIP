@@ -56,24 +56,28 @@ android {
     signingConfigs {
         release {
             def keystorePropsFile = rootProject.file("key.properties")
-            def keystoreProps = new Properties()
-            keystoreProps.load(new FileInputStream(keystorePropsFile))
+            if (keystorePropsFile.exists()) {
+                def keystoreProps = new Properties()
+                keystoreProps.load(new FileInputStream(keystorePropsFile))
 
-            keyAlias keystoreProps['keyAlias']
-            keyPassword keystoreProps['keyPassword']
-            storeFile file(keystoreProps['storeFile'])
-            storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+                storeFile file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+            } else {
+                println("key.properties not found")
+            }
         }
     }
 
     buildTypes {
         release {
             signingConfig signingConfigs.release
-//            minifyEnabled true
+            minifyEnabled true
         }
         debug {
-            signingConfig signingConfigs.debug
-//            minifyEnabled true
+            signingConfig null
+            minifyEnabled false
         }
     }
 }

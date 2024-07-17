@@ -13,6 +13,10 @@
   "@report": {
     "description": "「地震報告」頁面標題"
   },
+  "map": "地圖",
+  "@map": {
+    "description": "「地圖」頁面標題"
+  },
   "me": "我",
   "@me": {
     "description": "「我」頁面標題"

@@ -33,7 +33,7 @@ Future<void> notifyInit() async {
     },
   );
   final initializationSettings = InitializationSettings(
-    android: const AndroidInitializationSettings('ic_launcher'),
+    android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
     iOS: initializationSettingsDarwin,
   );
   flutterLocalNotificationsPlugin.initialize(
@@ -99,7 +99,6 @@ Future<PermissionStatus> requestNotificationPermission() async {
   if (status.isGranted) {
     print('通知權限已授予');
   }
-
   print('通知權限被拒絕');
   return status;
 }

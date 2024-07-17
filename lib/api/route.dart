@@ -24,6 +24,8 @@ class Route {
 
   static Uri reportList({int? limit = 50}) => Uri.parse("$api/v2/eq/report?limit=$limit");
   static Uri report(String reportId) => Uri.parse("$api/v2/eq/report/$reportId");
+  static Uri tsunamiList() => Uri.parse("$onlyapi/v1/tsunami/list");
+  static Uri tsunami(String tsuId) => Uri.parse("$onlyapi/v1/tsunami/$tsuId");
   static Uri rts() => Uri.parse("$lb/v1/trem/rts");
   static Uri eew() => Uri.parse("$lb/v1/eq/eew");
   static Uri weatherRealtime(String postalCode) => Uri.parse("$onlyapi/v1/weather/realtime/$postalCode");

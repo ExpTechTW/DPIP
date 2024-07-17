@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
 import '../../model/map_style.dart';
 
 class ReportRoute extends HookConsumerWidget {
@@ -18,13 +19,13 @@ class ReportRoute extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mapStyle = ref.watch(mapStyleProvider);
     final sheetController = useRef(DraggableScrollableController()).value;
-    final sheetInitialSize = 0.2;
+    const sheetInitialSize = 0.2;
     final animController = useAnimationController(duration: const Duration(milliseconds: 300));
     final reportState = useState<EarthquakeReport?>(null);
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final styleJsonFuture = useMemoized(
-          () => mapStyle.getStyle(isDark: isDark, scheme: Theme.of(context).colorScheme),
+      () => mapStyle.getStyle(isDark: isDark, scheme: Theme.of(context).colorScheme),
       [isDark],
     );
     final path = useFuture(styleJsonFuture).data;
@@ -65,7 +66,7 @@ class ReportRoute extends HookConsumerWidget {
     ).chain(CurveTween(curve: Curves.linear));
 
     useEffect(() {
-      ExpTech().getReport(this.report.id).then((data) {
+      ExpTech().getReport(report.id).then((data) {
         reportState.value = data;
       });
 
@@ -83,7 +84,7 @@ class ReportRoute extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.report.hasNumber ? "編號 ${this.report.number}" : "小區域有感地震"),
+        title: Text(report.hasNumber ? "編號 ${report.number}" : "小區域有感地震"),
       ),
       body: Stack(children: [
         MapLibreMap(
@@ -94,7 +95,7 @@ class ReportRoute extends HookConsumerWidget {
             mapController.value = controller;
           },
           onStyleLoadedCallback: () {
-              addTileLayer(mapController.value!);
+            addTileLayer(mapController.value!);
           },
         ),
         Positioned.fill(
@@ -110,41 +111,41 @@ class ReportRoute extends HookConsumerWidget {
                   child: reportState.value == null
                       ? const Center(child: CircularProgressIndicator())
                       : ListView(
-                    controller: scrollController,
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        child: Center(
-                          child: Container(
-                            width: 32,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: context.colors.onSurfaceVariant.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Row(
+                          controller: scrollController,
                           children: [
-                            IntensityBox(intensity: reportState.value!.getMaxIntensity()),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  reportState.value!.getLocation(),
-                                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            SizedBox(
+                              height: 24,
+                              child: Center(
+                                child: Container(
+                                  width: 32,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: context.colors.onSurfaceVariant.withOpacity(0.4),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
                                 ),
-                              ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                children: [
+                                  IntensityBox(intensity: reportState.value!.getMaxIntensity()),
+                                  const SizedBox(width: 16),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        reportState.value!.getLocation(),
+                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             )
                           ],
                         ),
-                      )
-                    ],
-                  ),
                 ),
               );
             },
