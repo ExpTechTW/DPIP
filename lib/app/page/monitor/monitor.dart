@@ -10,6 +10,6 @@ class MonitorPage extends StatefulWidget {
 class _MonitorPageState extends State<MonitorPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Material(child: Text("monitor"));
   }
 }

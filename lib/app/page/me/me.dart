@@ -73,8 +73,8 @@ class _MePageState extends State<MePage> {
                     alignment: WrapAlignment.center,
                     spacing: 12,
                     children: [
-                      ActionChip(
-                        avatar: const Icon(Symbols.group),
+                      const ActionChip(
+                        avatar: Icon(Symbols.group),
                         label: Text("貢獻者"),
                       ),
                       ActionChip(
