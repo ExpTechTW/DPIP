@@ -80,10 +80,9 @@ class TsunamiEstimateList extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         color: heightToColor(item.waveHeight),
-                        borderRadius: BorderRadius.circular(8), // 設置圓角半徑
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       width: 75,
-                      height: 25,
                       child: Center(
                         child: Text(
                           heightToString(item.waveHeight),
