@@ -29,16 +29,16 @@ class _DpipState extends State<Dpip> {
             selectedIcon: const Icon(Symbols.home, fill: 1),
             label: context.i18n.home,
           ),
-          NavigationDestination(
-            icon: const Icon(Symbols.monitor_heart),
-            selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-            label: context.i18n.monitor,
-          ),
-          NavigationDestination(
-            icon: const Icon(Symbols.summarize),
-            selectedIcon: const Icon(Symbols.summarize, fill: 1),
-            label: context.i18n.report,
-          ),
+          // NavigationDestination(
+          //   icon: const Icon(Symbols.monitor_heart),
+          //   selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+          //   label: context.i18n.monitor,
+          // ),
+          // NavigationDestination(
+          //   icon: const Icon(Symbols.summarize),
+          //   selectedIcon: const Icon(Symbols.summarize, fill: 1),
+          //   label: context.i18n.report,
+          // ),
           NavigationDestination(
             icon: const Icon(Symbols.map),
             selectedIcon: const Icon(Symbols.map, fill: 1),
@@ -62,8 +62,8 @@ class _DpipState extends State<Dpip> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          HomePage(),
-          MonitorPage(),
+          // HomePage(),
+          // MonitorPage(),
           ReportListPage(),
           MapPage(),
           MePage(),

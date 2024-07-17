@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
@@ -8,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../location_selector/location_selector.dart';
+
 class SettingsLocationView extends StatefulWidget {
   const SettingsLocationView({super.key});
 
@@ -15,14 +18,14 @@ class SettingsLocationView extends StatefulWidget {
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
 }
 
-class _SettingsLocationViewState extends State<SettingsLocationView> {
+class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
 
-  String city = "";
-  String town = "";
+  String? city = Global.preference.getString("location-city");
+  String? town = Global.preference.getString("location-town");
 
   Future<bool> requestLocationAlwaysPermission() async {
     var status = await Permission.locationWhenInUse.status;
@@ -147,14 +150,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       return true;
     } else {
       if (!mounted) return false;
+      final permissionType = Platform.isAndroid ? "一律允許" : "永遠";
 
       final status = await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: const Text("一律允許位置權限"),
-                content: const Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「一律允許」以讓 DPIP 在背景自動設定所在地資訊。"),
+                title: Text("$permissionType位置權限"),
+                content: Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以讓 DPIP 在背景自動設定所在地資訊。"),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
@@ -196,23 +200,16 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
       setState(() {
         isAutoLocatingEnabled = false;
       });
-      return;
     } else {
-      final location = await checkLocationPermission();
-
-      if (!location) {
-        return;
-      }
-
       final notification = await checkNotificationPermission();
+      if (!notification) return;
 
-      if (!notification) {
-        return;
-      }
+      final location = await checkLocationPermission();
+      if (!location) return;
 
       await checkLocationAlwaysPermission();
 
-      await initializeService();
+      startBackgroundService();
 
       setState(() {
         isAutoLocatingEnabled = true;
@@ -225,6 +222,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
     Permission.notification.status.then(
       (value) {
         setState(() {
@@ -249,14 +257,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
+    return Material(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
@@ -297,7 +300,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "自動定位功能需要將位置權限提升至「一律允許」以在背景使用。",
+                        "自動定位功能需要將位置權限提升至「${(Platform.isAndroid) ? "一律允許" : "永遠"}」以在背景使用。",
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),
@@ -342,8 +345,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
                     ),
                     TextButton(
                       child: const Text("設定"),
-                      onPressed: () async {
-                        await openAppSettings();
+                      onPressed: () {
+                        openAppSettings();
                       },
                     ),
                   ]),
@@ -369,20 +372,48 @@ class _SettingsLocationViewState extends State<SettingsLocationView> {
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.location_city),
             ),
-            title: Text("縣市"),
-            subtitle: Text(city),
+            title: const Text("縣市"),
+            subtitle: Text(city ?? "尚未設定"),
             enabled: !isAutoLocatingEnabled,
-            onTap: () {},
+            onTap: () async {
+              await Navigator.of(
+                context,
+                rootNavigator: true,
+              ).push(
+                MaterialPageRoute(
+                  builder: (context) => LocationSelectorRoute(city: null, town: town),
+                ),
+              );
+
+              setState(() {
+                city = Global.preference.getString("location-city");
+                town = Global.preference.getString("location-town");
+              });
+            },
           ),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(Symbols.forest),
             ),
-            title: Text("鄉鎮"),
-            subtitle: Text(town),
-            enabled: !isAutoLocatingEnabled,
-            onTap: () {},
+            title: const Text("鄉鎮"),
+            subtitle: Text(town ?? "尚未設定"),
+            enabled: !isAutoLocatingEnabled && city != null,
+            onTap: () async {
+              await Navigator.of(
+                context,
+                rootNavigator: true,
+              ).push(
+                MaterialPageRoute(
+                  builder: (context) => LocationSelectorRoute(city: city, town: town),
+                ),
+              );
+
+              setState(() {
+                city = Global.preference.getString("location-city");
+                town = Global.preference.getString("location-town");
+              });
+            },
           )
         ],
       ),

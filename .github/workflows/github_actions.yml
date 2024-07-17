@@ -29,7 +29,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: "3.22.0"
 
       - name: Flutter get
         run: flutter pub get --no-example
@@ -43,7 +42,7 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           flutter build apk --debug
-          flutter build appbundle --debug
+          flutter build aab --debug
 
       - name: Build iOS application (app)
         if: matrix.platform == 'macos-latest'

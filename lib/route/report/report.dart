@@ -19,7 +19,7 @@ class ReportRoute extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mapStyle = ref.watch(mapStyleProvider);
     final sheetController = useRef(DraggableScrollableController()).value;
-    final sheetInitialSize = 0.2;
+    const sheetInitialSize = 0.2;
     final animController = useAnimationController(duration: const Duration(milliseconds: 300));
     final reportState = useState<EarthquakeReport?>(null);
 
@@ -66,7 +66,7 @@ class ReportRoute extends HookConsumerWidget {
     ).chain(CurveTween(curve: Curves.linear));
 
     useEffect(() {
-      ExpTech().getReport(this.report.id).then((data) {
+      ExpTech().getReport(report.id).then((data) {
         reportState.value = data;
       });
 
@@ -84,7 +84,7 @@ class ReportRoute extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(this.report.hasNumber ? "編號 ${this.report.number}" : "小區域有感地震"),
+        title: Text(report.hasNumber ? "編號 ${report.number}" : "小區域有感地震"),
       ),
       body: Stack(children: [
         MapLibreMap(

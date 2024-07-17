@@ -3,11 +3,8 @@ import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
-import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class GetLocationPosition {
   double latitude;
@@ -65,7 +62,7 @@ class LocationService {
     );
     positionStreamSubscription = positionStream.handleError((error) async {
       print('位置流錯誤: $error');
-      stopPositionStream();
+      iosStopPositionStream();
       restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
     }).listen((Position? position) async {
       if (position != null) {
@@ -92,51 +89,17 @@ class LocationService {
           print('距離: $distance 不更新位置');
         }
       }
-      stopPositionStream();
+      iosStopPositionStream();
       restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
     });
     print('位置流已開啟');
   }
 
-  void stopPositionStream() {
+  void iosStopPositionStream() {
     positionStreamSubscription?.cancel();
     positionStreamSubscription = null;
     print('位置流已停止');
     restartTimer?.cancel();
-  }
-
-  @pragma('vm:entry-point')
-  Future<GetLocationResult> getLocation() async {
-    int lastLocationUpdate =
-        Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
-    int now = DateTime.now().toUtc().millisecondsSinceEpoch;
-    int nowtemp = now - lastLocationUpdate;
-    bool positionchange = false;
-    final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-    final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-    final positioncountrytemp = Global.preference.getString("loc-position-country") ?? "";
-    GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
-
-    if (nowtemp > 300000 || nowtemp == 0) {
-      Global.preference.setInt("last-location-update", now);
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
-      positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
-      double distance =
-          Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-      if (distance >= 250 || nowtemp == 0) {
-        Global.preference.setDouble("loc-position-lat", position.latitude);
-        Global.preference.setDouble("loc-position-lon", position.longitude);
-        positionchange = true;
-        print('距離: $distance 更新位置');
-      } else {
-        print('距離: $distance 不更新位置');
-      }
-    } else {
-      print('間距: $nowtemp 不更新位置');
-    }
-
-    return GetLocationResult(positionlast, positionchange);
   }
 
   Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
@@ -168,193 +131,37 @@ class LocationService {
     return locationGet;
   }
 
-  Future<LocationStatus> requestLocationAlwaysPermission() async {
-    String locstatus = "";
-    bool islocGranted = false;
+  @pragma('vm:entry-point')
+  Future<GetLocationResult> androidGetLocation() async {
+    int lastLocationUpdate =
+        Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
+    int now = DateTime.now().toUtc().millisecondsSinceEpoch;
+    int nowtemp = now - lastLocationUpdate;
+    bool positionchange = false;
+    final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+    final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+    final positioncountrytemp = Global.preference.getString("loc-position-country") ?? "";
+    GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
 
-    if (Platform.isIOS) {
-      PermissionStatus status = await Permission.locationWhenInUse.request();
-      if (status.isGranted) {
-        status = await Permission.locationAlways.request();
-        if (status.isGranted) {
-          print('背景位置權限已授予');
-          islocGranted = true;
-        } else {
-          print('背景位置權限被拒絕');
-          locstatus = "拒絕";
-        }
+    if (nowtemp > 300000 || nowtemp == 0) {
+      Global.preference.setInt("last-location-update", now);
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
+      positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
+      double distance =
+          Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+      if (distance >= 250 || nowtemp == 0) {
+        Global.preference.setDouble("loc-position-lat", position.latitude);
+        Global.preference.setDouble("loc-position-lon", position.longitude);
+        positionchange = true;
+        print('距離: $distance 更新位置');
       } else {
-        print('位置權限被拒絕');
-        locstatus = "拒絕";
-      }
-    } else if (Platform.isAndroid) {
-      PermissionStatus status = await Permission.location.request();
-      if (status.isGranted) {
-        status = await Permission.locationAlways.request();
-        if (status.isGranted) {
-          print('背景位置權限已授予');
-          islocGranted = true;
-        } else {
-          print('背景位置權限被拒絕');
-          locstatus = "拒絕";
-        }
-      } else {
-        print('位置權限被拒絕');
-        locstatus = "拒絕";
-      }
-    }
-
-    return LocationStatus(locstatus, islocGranted);
-  }
-
-  Future<PermissionStatus> requestnotificationPermission(int value) async {
-    switch (value) {
-      case 0:
-        return await Permission.notification.status;
-      case 1:
-        return await Permission.notification.request();
-      default:
-        return await Permission.notification.status;
-    }
-  }
-
-  Future<int> shownotificationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
-    int retry = 0;
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: const Icon(Symbols.error),
-          title: Text("${(value >= 1) ? "無法" : "請求"}取得通知權限"),
-          content: Text(
-            "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
-          ),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            TextButton(
-              child: const Text("取消"),
-              onPressed: () {
-                retry = 3;
-                Navigator.pop(context);
-              },
-            ),
-            getnotificationActionButton(value, status, (shouldRetry) {
-              retry = shouldRetry;
-              Navigator.pop(context);
-            }),
-          ],
-        );
-      },
-    );
-    return retry;
-  }
-
-  Widget getnotificationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
-    if (value == 2) {
-      return FilledButton(
-        child: const Text("設定"),
-        onPressed: () {
-          openAppSettings();
-          onPressed(2);
-        },
-      );
-    } else {
-      return FilledButton(
-        child: Text((value >= 1) ? "再試一次" : "請求權限"),
-        onPressed: () {
-          onPressed(1);
-        },
-      );
-    }
-  }
-
-  Future<PermissionStatus> requestLocationPermission(int value) async {
-    if (Platform.isIOS) {
-      switch (value) {
-        case 0:
-          return await Permission.location.status;
-        case 1:
-          return await Permission.location.request();
-        case 2:
-          return await Permission.location.request();
-        case 3:
-          return await Permission.locationAlways.request();
-        default:
-          return await Permission.location.status;
+        print('距離: $distance 不更新位置');
       }
     } else {
-      switch (value) {
-        case 0:
-          return await Permission.locationAlways.status;
-        case 1:
-          return await Permission.locationAlways.request();
-        case 2:
-          return await Permission.location.request();
-        case 3:
-          return await Permission.locationAlways.request();
-        default:
-          return await Permission.locationAlways.status;
-      }
+      print('間距: $nowtemp 不更新位置');
     }
-  }
 
-  Future<int> showLocationPermissionDialog(int value, PermissionStatus status, BuildContext context) async {
-    int retry = 0;
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: const Icon(Symbols.error),
-          title: Text("${(value >= 1) ? "無法" : "請求"}取得位置權限"),
-          content: getLocationDialogContent(value, status),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            TextButton(
-              child: const Text("取消"),
-              onPressed: () {
-                retry = 3;
-                Navigator.pop(context);
-              },
-            ),
-            getLocationActionButton(value, status, (shouldRetry) {
-              retry = shouldRetry;
-              Navigator.pop(context);
-            }),
-          ],
-        );
-      },
-    );
-    return retry;
-  }
-
-  Widget getLocationDialogContent(int value, PermissionStatus status) {
-    if (value == 0) {
-      return const Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。");
-    } else if (value == 3) {
-      return Text("自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}");
-    } else {
-      return Text(
-        "為了獲得更好的自動定位體驗，您需要將位置權限提升至「${(Platform.isAndroid) ? "一律允許" : "永遠"}」以讓 DPIP 在背景自動設定所在地資訊。",
-      );
-    }
-  }
-
-  Widget getLocationActionButton(int value, PermissionStatus status, Function(int) onPressed) {
-    if (value == 3) {
-      return FilledButton(
-        child: const Text("設定"),
-        onPressed: () {
-          openAppSettings();
-          onPressed(2);
-        },
-      );
-    } else {
-      return FilledButton(
-        child: Text((value >= 1) ? "再試一次" : "請求權限"),
-        onPressed: () {
-          onPressed(1);
-        },
-      );
-    }
+    return GetLocationResult(positionlast, positionchange);
   }
 }
