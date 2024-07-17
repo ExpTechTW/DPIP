@@ -31,9 +31,8 @@ void initBackgroundService() async {
 }
 
 void startBackgroundService() async {
-  LocationService locationService = LocationService();
-
   if (Platform.isIOS) {
+    LocationService locationService = LocationService();
     locationService.iosStartPositionStream();
   } else if (Platform.isAndroid) {
     if (!androidServiceInit) {
@@ -43,21 +42,19 @@ void startBackgroundService() async {
     if (!isRunning) {
       service.startService();
     } else if (isRunning) {
-      timer?.cancel();
-      service.invoke("stopService");
+      stopBackgroundService();
       service.startService();
     }
   }
 }
 
 void stopBackgroundService() async {
-  LocationService locationService = LocationService();
   if (Platform.isIOS) {
+    LocationService locationService = LocationService();
     locationService.iosStopPositionStream();
   } else if (Platform.isAndroid) {
     timer?.cancel();
-    var isRunning = await service.isRunning();
-    if (isRunning) {
+    if (await service.isRunning()) {
       service.invoke("stopService");
     }
   }
@@ -114,8 +111,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   await Global.init();
-
-  print("--- foreground ---");
 
   LocationService locationService = LocationService();
 
