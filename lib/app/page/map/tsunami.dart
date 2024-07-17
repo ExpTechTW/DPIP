@@ -69,6 +69,16 @@ class _TsunamiMapState extends State<TsunamiMap> {
     return "$latFormat　$lonFormat";
   }
 
+  getTime() {
+    DateTime now = DateTime.now();
+
+    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+
+    String formattedDate = formatter.format(now);
+
+    return (formattedDate);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -129,7 +139,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                   )
                                 : Container(),
                             Text(
-                              "2024/07/01 00:00 $tsunamiStatus",
+                              tsunami != null ? "2024/07/01 00:00 $tsunamiStatus" : "${getTime()} 更新",
                               style: TextStyle(
                                 fontSize: 14,
                                 letterSpacing: 1,
