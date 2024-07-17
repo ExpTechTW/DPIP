@@ -2,26 +2,20 @@
           xmlns:tools="http://schemas.android.com/tools">
     android:installLocation="internalOnly"
 
-    <!-- 網絡訪問權限 -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- 從 Android 10 開始推薦使用 Scoped Storage -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
-    <!-- 在設備啟動後自動啟動應用（如果需要） -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
-    <!-- 精確位置和粗略位置訪問權限 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-
-    <!-- 後台位置訪問權限（僅 API 29+ 適用） -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
-    <!-- 前台服務權限 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"
+                     android:minSdkVersion="34" />
 
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 

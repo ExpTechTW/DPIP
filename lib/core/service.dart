@@ -10,7 +10,6 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();
 bool androidServiceInit = false;
 
@@ -109,12 +108,7 @@ void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   await Global.init();
 
-  LocationService locationService = LocationService();
-
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
   service.on('stopService').listen((event) {
-    timer?.cancel();
     if (service is AndroidServiceInstance) {
       service.setAutoStartOnBootMode(false);
     }
@@ -133,8 +127,11 @@ void onStart(ServiceInstance service) async {
       service.setAsBackgroundService();
     });
 
-    void task() async {
+    Timer.periodic(const Duration(seconds: 30), (timer) async {
       if (await service.isForegroundService()) {
+        LocationService locationService = LocationService();
+        final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
         final position = await locationService.androidGetLocation();
         String lat = position.position.latitude.toStringAsFixed(4);
         String lon = position.position.longitude.toStringAsFixed(4);
@@ -167,11 +164,6 @@ void onStart(ServiceInstance service) async {
           content: notifyBody,
         );
       }
-    }
-
-    task();
-    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
-      task();
     });
   }
 }
