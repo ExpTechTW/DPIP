@@ -38,10 +38,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
+          const ListTileGroupHeader(title: "音效"),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
-              child: Icon(Symbols.pin_drop),
+              child: Icon(Symbols.audiotrack_sharp),
             ),
             title: const Text(
               "音效測試",
