@@ -14,7 +14,7 @@ class TsunamiEstimateList extends StatelessWidget {
     var location = tz.getLocation('Asia/Taipei');
     DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat('dd日HH:mm');
+    DateFormat formatter = DateFormat('d日HH:mm');
     String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
