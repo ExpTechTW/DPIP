@@ -1,6 +1,6 @@
-import 'package:dpip/route/settings/content/Audio.dart';
 import 'package:dpip/route/settings/content/location.dart';
 import 'package:dpip/route/settings/content/root.dart';
+import 'package:dpip/route/settings/content/sound.dart';
 import 'package:dpip/route/settings/content/theme.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +50,8 @@ class _SettingsRouteState extends State<SettingsRoute> {
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar.large(
+                pinned: true,
+                floating: true,
                 title: Builder(
                   builder: (context) {
                     return Text(routeTitle[history.last] ?? context.i18n.settings);
@@ -75,8 +77,8 @@ class _SettingsRouteState extends State<SettingsRoute> {
                 case "/location":
                   child = const SettingsLocationView();
                   break;
-                case "/Audio":
-                  child = const SettingsAudioView();
+                case "/sound":
+                  child = const SettingsSoundView();
                   break;
                 case "/theme":
                   child = const SettingsThemeView();
