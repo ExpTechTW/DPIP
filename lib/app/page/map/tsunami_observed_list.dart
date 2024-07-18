@@ -14,7 +14,7 @@ class TsunamiObservedList extends StatelessWidget {
     var location = tz.getLocation('Asia/Taipei');
     DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat('dd日HH:mm');
+    DateFormat formatter = DateFormat('d日HH:mm');
     String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
@@ -72,10 +72,9 @@ class TsunamiObservedList extends StatelessWidget {
                     Container(
                       decoration: BoxDecoration(
                         color: heightToColor(item.waveHeight),
-                        borderRadius: BorderRadius.circular(8), // 設置圓角半徑
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      width: 90,
-                      height: 25,
+                      width: 95,
                       child: Center(
                         child: Text(
                           "${item.waveHeight}cm",
