@@ -5,6 +5,11 @@ import 'package:dpip/global.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../api/exptech.dart';
+
+StreamSubscription<Position>? positionStreamSubscription;
+Timer? restartTimer;
+
 class GetLocationPosition {
   double latitude;
   double longitude;
@@ -44,6 +49,60 @@ class LocationService {
   LocationService._internal();
 
   final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
+
+  void iosStartPositionStream() async {
+    if (positionStreamSubscription != null) return;
+    final positionStream = Geolocator.getPositionStream(
+      locationSettings: AppleSettings(
+        accuracy: LocationAccuracy.medium,
+        activityType: ActivityType.other,
+        distanceFilter: 250,
+        pauseLocationUpdatesAutomatically: false,
+        showBackgroundLocationIndicator: false,
+        allowBackgroundLocationUpdates: true,
+      ),
+    );
+    positionStreamSubscription = positionStream.handleError((error) async {
+      print('位置流錯誤: $error');
+      iosStopPositionStream();
+      restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
+    }).listen((Position? position) async {
+      if (position != null) {
+        final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+        final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+        double distance =
+            Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+        if (distance >= 250) {
+          Global.preference.setDouble("loc-position-lat", position.latitude);
+          Global.preference.setDouble("loc-position-lon", position.longitude);
+          LocationResult locationResult = await getLatLngLocation(position.latitude, position.longitude);
+          print('新位置: ${position}');
+          print('城市和鄉鎮: ${locationResult.cityTown}');
+
+          String lat = position.latitude.toStringAsFixed(4);
+          String lon = position.longitude.toStringAsFixed(4);
+          String? fcmToken = Global.preference.getString("fcm-token");
+          if (fcmToken != null) {
+            final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
+            print(body);
+          }
+          print('距離: $distance 更新位置');
+        } else {
+          print('距離: $distance 不更新位置');
+        }
+      }
+      iosStopPositionStream();
+      restartTimer = Timer(const Duration(minutes: 2), iosStartPositionStream);
+    });
+    print('位置流已開啟');
+  }
+
+  void iosStopPositionStream() {
+    positionStreamSubscription?.cancel();
+    positionStreamSubscription = null;
+    print('位置流已停止');
+    restartTimer?.cancel();
+  }
 
   Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
     List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);

@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../main.dart';
+import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 class SettingsLocationView extends StatefulWidget {
