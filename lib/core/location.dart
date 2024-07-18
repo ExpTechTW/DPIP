@@ -55,7 +55,7 @@ class LocationService {
         accuracy: LocationAccuracy.medium,
         activityType: ActivityType.other,
         distanceFilter: 250,
-        pauseLocationUpdatesAutomatically: true,
+        pauseLocationUpdatesAutomatically: false,
         showBackgroundLocationIndicator: false,
         allowBackgroundLocationUpdates: true,
       ),
