@@ -12,6 +12,18 @@
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		632125292C2EA17900A088F8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 632125282C2EA17900A088F8 /* GoogleService-Info.plist */; };
+		63276A562C48F431002C151A /* eq.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4C2C48F431002C151A /* eq.wav */; };
+		63276A572C48F431002C151A /* normal.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4F2C48F431002C151A /* normal.wav */; };
+		63276A582C48F431002C151A /* rain.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A502C48F431002C151A /* rain.wav */; };
+		63276A592C48F431002C151A /* eew_alert.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4B2C48F431002C151A /* eew_alert.wav */; };
+		63276A5A2C48F431002C151A /* report.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A512C48F431002C151A /* report.wav */; };
+		63276A5B2C48F431002C151A /* weather.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A552C48F431002C151A /* weather.wav */; };
+		63276A5C2C48F431002C151A /* info.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4D2C48F431002C151A /* info.wav */; };
+		63276A5D2C48F431002C151A /* tsunami.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A522C48F431002C151A /* tsunami.wav */; };
+		63276A5E2C48F431002C151A /* eew.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4A2C48F431002C151A /* eew.wav */; };
+		63276A5F2C48F431002C151A /* Int_report.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4E2C48F431002C151A /* Int_report.wav */; };
+		63276A602C48F431002C151A /* update.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A532C48F431002C151A /* update.wav */; };
+		63276A612C48F431002C151A /* warn.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A542C48F431002C151A /* warn.wav */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -55,6 +67,18 @@
 		529BD5D22C48C28B00EFE088 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		632125282C2EA17900A088F8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6321252A2C2EA20700A088F8 /* RunnerProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerProfile.entitlements; sourceTree = "<group>"; };
+		63276A4A2C48F431002C151A /* eew.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eew.wav; sourceTree = "<group>"; };
+		63276A4B2C48F431002C151A /* eew_alert.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eew_alert.wav; sourceTree = "<group>"; };
+		63276A4C2C48F431002C151A /* eq.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eq.wav; sourceTree = "<group>"; };
+		63276A4D2C48F431002C151A /* info.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = info.wav; sourceTree = "<group>"; };
+		63276A4E2C48F431002C151A /* Int_report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Int_report.wav; sourceTree = "<group>"; };
+		63276A4F2C48F431002C151A /* normal.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = normal.wav; sourceTree = "<group>"; };
+		63276A502C48F431002C151A /* rain.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rain.wav; sourceTree = "<group>"; };
+		63276A512C48F431002C151A /* report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = report.wav; sourceTree = "<group>"; };
+		63276A522C48F431002C151A /* tsunami.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tsunami.wav; sourceTree = "<group>"; };
+		63276A532C48F431002C151A /* update.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = update.wav; sourceTree = "<group>"; };
+		63276A542C48F431002C151A /* warn.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = warn.wav; sourceTree = "<group>"; };
+		63276A552C48F431002C151A /* weather.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = weather.wav; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
@@ -149,6 +173,18 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				63276A4A2C48F431002C151A /* eew.wav */,
+				63276A4B2C48F431002C151A /* eew_alert.wav */,
+				63276A4C2C48F431002C151A /* eq.wav */,
+				63276A4D2C48F431002C151A /* info.wav */,
+				63276A4E2C48F431002C151A /* Int_report.wav */,
+				63276A4F2C48F431002C151A /* normal.wav */,
+				63276A502C48F431002C151A /* rain.wav */,
+				63276A512C48F431002C151A /* report.wav */,
+				63276A522C48F431002C151A /* tsunami.wav */,
+				63276A532C48F431002C151A /* update.wav */,
+				63276A542C48F431002C151A /* warn.wav */,
+				63276A552C48F431002C151A /* weather.wav */,
 				5228AD5A2C2EE45D007635F5 /* Runner.entitlements */,
 				6321252A2C2EA20700A088F8 /* RunnerProfile.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
@@ -270,6 +306,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63276A562C48F431002C151A /* eq.wav in Resources */,
+				63276A572C48F431002C151A /* normal.wav in Resources */,
+				63276A582C48F431002C151A /* rain.wav in Resources */,
+				63276A592C48F431002C151A /* eew_alert.wav in Resources */,
+				63276A5A2C48F431002C151A /* report.wav in Resources */,
+				63276A5B2C48F431002C151A /* weather.wav in Resources */,
+				63276A5C2C48F431002C151A /* info.wav in Resources */,
+				63276A5D2C48F431002C151A /* tsunami.wav in Resources */,
+				63276A5E2C48F431002C151A /* eew.wav in Resources */,
+				63276A5F2C48F431002C151A /* Int_report.wav in Resources */,
+				63276A602C48F431002C151A /* update.wav in Resources */,
+				63276A612C48F431002C151A /* warn.wav in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				632125292C2EA17900A088F8 /* GoogleService-Info.plist in Resources */,

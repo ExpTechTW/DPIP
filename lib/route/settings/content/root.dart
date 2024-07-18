@@ -54,7 +54,7 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               "音效測試",
               style: tileTitleTextStyle,
             ),
-            subtitle: const Text("測試所在地接收即時天氣資訊、地震速報度等音效"),
+            subtitle: const Text("測試即時天氣資訊、地震速報等音效"),
             onTap: () {
               Navigator.pushNamed(
                 context,

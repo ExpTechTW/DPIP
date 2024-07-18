@@ -62,7 +62,7 @@ flutter:
     - assets/location.json
     - assets/eew.wav
     - assets/eq.wav
-    - assets/Int_report.wav
+    - assets/int_report.wav
     - assets/normal.wav
     - assets/rain.wav
     - assets/update.wav
