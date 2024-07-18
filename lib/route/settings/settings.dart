@@ -23,7 +23,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
     final routeTitle = {
       "/": context.i18n.settings,
       "/location": "所在地",
-      "/Audio": "音效測試",
+      "/sound": "音效測試",
       "/theme": "主題色",
     };
 
