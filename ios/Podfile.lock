@@ -89,6 +89,7 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - Siren (5.7.1)
   - url_launcher_ios (0.0.1):
     - Flutter
 
@@ -105,6 +106,7 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
+  - Siren
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -119,6 +121,7 @@ SPEC REPOS:
     - MapLibre
     - nanopb
     - PromisesObjC
+    - Siren
 
 EXTERNAL SOURCES:
   firebase_core:
@@ -171,8 +174,9 @@ SPEC CHECKSUMS:
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  Siren: 76ac728f4f2f4a3576c322272e94a0e37955664f
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: c437744d2e4f07b3af0fafdcda0f38e051c2953c
+PODFILE CHECKSUM: 65b23a82e97577a16257b8bf6d44471abc2761a5
 
 COCOAPODS: 1.15.2
