@@ -73,7 +73,28 @@ class _SettingsRootViewState extends State<SettingsRootView> {
                 "/theme",
               );
             },
-          )
+          ),
+          const ListTileGroupHeader(title: "複製 FCM Token"),
+          ListTile(
+            leading: const Icon(Icons.bug_report_rounded),
+            title: const Text("複製 FCM Token"),
+            onTap: () {
+              messaging.getToken().then((value) {
+                FlutterClipboard.copy(value ?? "");
+                context.scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('已複製 FCM Token'),
+                  ),
+                );
+              }).catchError((error) {
+                context.scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text('複製 FCM Token 時發生錯誤：$error'),
+                  ),
+                );
+              });
+            },
+          ),
         ],
       ),
     );
