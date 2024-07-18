@@ -36,16 +36,13 @@ import CoreLocation
             }
         }
 
-        // 初始化定位管理器
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
         
-        // 設置 FCM delegate
         Messaging.messaging().delegate = self
 
-        // 獲取 FCM token
         Messaging.messaging().token { token, error in
             if let error = error {
                 print("Error fetching FCM token: \(error)")
@@ -55,11 +52,9 @@ import CoreLocation
             }
         }
 
-        // 從 UserDefaults 讀取位置服務狀態
         isLocationEnabled = UserDefaults.standard.bool(forKey: "locationSendingEnabled")
         updateLocationService()
 
-        // 檢查是否是因為位置更新而啟動的應用
         if let locationKey = launchOptions?[UIApplication.LaunchOptionsKey.location] as? NSNumber,
            locationKey.boolValue {
             print("App launched due to location update")
@@ -131,7 +126,6 @@ import CoreLocation
         updateLocationService()
     }
 
-    // iOS 14 以下版本使用的方法
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         updateLocationService()
     }
@@ -195,7 +189,6 @@ import CoreLocation
         print("FCM token received: \(String(describing: fcmToken))")
     }
 
-    // 處理後台 URL session 事件
     override func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         print("Handling background URL session events")
         completionHandler()
