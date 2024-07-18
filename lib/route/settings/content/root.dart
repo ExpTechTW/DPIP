@@ -1,3 +1,5 @@
+import 'package:clipboard/clipboard.dart';
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -81,13 +83,13 @@ class _SettingsRootViewState extends State<SettingsRootView> {
             onTap: () {
               messaging.getToken().then((value) {
                 FlutterClipboard.copy(value ?? "");
-                context.scaffoldMessenger.showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('已複製 FCM Token'),
                   ),
                 );
               }).catchError((error) {
-                context.scaffoldMessenger.showSnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('複製 FCM Token 時發生錯誤：$error'),
                   ),

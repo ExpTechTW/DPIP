@@ -42,6 +42,7 @@ dependencies:
   audioplayers: ^5.0.0
   riverpod: ^2.0.0
   autostarter: ^0.0.1
+  clipboard: ^0.1.3
 
 dev_dependencies:
   flutter_test:
