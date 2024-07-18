@@ -1,5 +1,4 @@
 import 'package:dpip/model/report/partial_earthquake_report.dart';
-import 'package:dpip/route/report/report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/widget/report/intensity_box.dart';

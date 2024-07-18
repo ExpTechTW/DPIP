@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
-import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';

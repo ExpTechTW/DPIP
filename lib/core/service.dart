@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
@@ -8,54 +7,10 @@ import 'package:dpip/global.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();
 bool androidServiceInit = false;
-
-void initBackgroundService() async {
-  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
-  if (isAutoLocatingEnabled) {
-    final isNotificationEnabled = await Permission.notification.status;
-    final isLocationAlwaysEnabled = await Permission.locationAlways.status;
-    if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
-      if (Platform.isAndroid) {
-        androidForegroundService();
-      }
-      startBackgroundService(true);
-    }
-  }
-}
-
-void startBackgroundService(bool init) async {
-  if (Platform.isIOS) {
-    LocationService locationService = LocationService();
-    locationService.iosStartPositionStream();
-  } else if (Platform.isAndroid) {
-    if (!androidServiceInit) {
-      androidForegroundService();
-    }
-    var isRunning = await service.isRunning();
-    if (!isRunning) {
-      service.startService();
-    } else if (!init) {
-      stopBackgroundService();
-      service.startService();
-    }
-  }
-}
-
-void stopBackgroundService() async {
-  if (Platform.isIOS) {
-    LocationService locationService = LocationService();
-    locationService.iosStopPositionStream();
-  } else if (Platform.isAndroid) {
-    if (await service.isRunning()) {
-      service.invoke("stopService");
-    }
-  }
-}
 
 Future<void> androidForegroundService() async {
   androidServiceInit = true;

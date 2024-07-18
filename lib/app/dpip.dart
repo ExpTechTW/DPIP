@@ -1,7 +1,4 @@
-import 'package:dpip/app/page/home/home.dart';
-import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
-import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';

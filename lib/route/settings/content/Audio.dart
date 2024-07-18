@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
 
 class SettingsAudioView extends StatefulWidget {
   const SettingsAudioView({super.key});

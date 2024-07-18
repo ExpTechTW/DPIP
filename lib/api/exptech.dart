@@ -5,7 +5,6 @@ import 'package:dpip/api/route.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/model/tsunami/tsunami_list.dart';
 import 'package:http/http.dart';
 
 class ExpTech {
