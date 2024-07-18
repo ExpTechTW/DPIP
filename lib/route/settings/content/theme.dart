@@ -27,9 +27,10 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
