@@ -313,13 +313,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: ListView(
+        padding: EdgeInsets.zero,
+        controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SwitchListTile(
-              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
+              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceVariant,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 "啟用自動定位",

@@ -21,9 +21,10 @@ class _SettingsRootViewState extends State<SettingsRootView> {
       fontWeight: FontWeight.bold,
     );
 
-    return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Material(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           const ListTileGroupHeader(title: "位置"),
           ListTile(
@@ -57,7 +58,7 @@ class _SettingsRootViewState extends State<SettingsRootView> {
             onTap: () {
               Navigator.pushNamed(
                 context,
-                "/Audio",
+                "/sound",
               );
             },
           ),
