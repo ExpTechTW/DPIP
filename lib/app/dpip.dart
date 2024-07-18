@@ -39,11 +39,11 @@ class _DpipState extends State<Dpip> {
           //   selectedIcon: const Icon(Symbols.summarize, fill: 1),
           //   label: context.i18n.report,
           // ),
-          NavigationDestination(
-            icon: const Icon(Symbols.map),
-            selectedIcon: const Icon(Symbols.map, fill: 1),
-            label: context.i18n.map,
-          ),
+          // NavigationDestination(
+          //   icon: const Icon(Symbols.map),
+          //   selectedIcon: const Icon(Symbols.map, fill: 1),
+          //   label: context.i18n.map,
+          // ),
           NavigationDestination(
             icon: const Icon(Symbols.person),
             selectedIcon: const Icon(Symbols.person, fill: 1),
@@ -65,7 +65,7 @@ class _DpipState extends State<Dpip> {
           // HomePage(),
           // MonitorPage(),
           ReportListPage(),
-          MapPage(),
+          // MapPage(),
           MePage(),
         ],
       ),

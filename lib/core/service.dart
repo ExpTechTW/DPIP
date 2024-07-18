@@ -23,14 +23,12 @@ void initBackgroundService() async {
       if (Platform.isAndroid) {
         androidForegroundService();
       }
-      startBackgroundService();
-    } else {
-      stopBackgroundService();
+      startBackgroundService(true);
     }
   }
 }
 
-void startBackgroundService() async {
+void startBackgroundService(bool init) async {
   if (Platform.isIOS) {
     LocationService locationService = LocationService();
     locationService.iosStartPositionStream();
@@ -41,7 +39,7 @@ void startBackgroundService() async {
     var isRunning = await service.isRunning();
     if (!isRunning) {
       service.startService();
-    } else if (isRunning) {
+    } else if (!init) {
       stopBackgroundService();
       service.startService();
     }
@@ -53,7 +51,6 @@ void stopBackgroundService() async {
     LocationService locationService = LocationService();
     locationService.iosStopPositionStream();
   } else if (Platform.isAndroid) {
-    timer?.cancel();
     if (await service.isRunning()) {
       service.invoke("stopService");
     }

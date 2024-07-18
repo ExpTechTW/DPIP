@@ -74,6 +74,7 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
+            shrinkResources true
         }
         debug {
             signingConfig null

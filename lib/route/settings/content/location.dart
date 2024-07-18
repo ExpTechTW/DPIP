@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:autostarter/autostarter.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -193,6 +194,55 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
   }
 
+  Future<bool> androidCheckAutoStartPermission() async {
+    if (Platform.isIOS) return true;
+    try {
+      bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
+      if (isAvailable == true) {
+        bool? status = await Autostarter.checkAutoStartState();
+        if (status != null) {
+          if (status == false) {
+            return await showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      icon: const Icon(Symbols.my_location),
+                      title: const Text("自啟動權限"),
+                      content: const Text("為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以讓 DPIP 在背景自動設定所在地資訊。"),
+                      actionsAlignment: MainAxisAlignment.spaceBetween,
+                      actions: [
+                        TextButton(
+                          child: const Text("取消"),
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                        FilledButton(
+                          child: const Text("確定"),
+                          onPressed: () async {
+                            await Autostarter.getAutoStartPermission(newTask: true);
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ) ??
+                false;
+          } else {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } catch (err) {
+      return false;
+    }
+  }
+
   Future toggleAutoLocation() async {
     stopBackgroundService();
 
@@ -209,7 +259,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       await checkLocationAlwaysPermission();
 
-      startBackgroundService();
+      bool autoStart = await androidCheckAutoStartPermission();
+
+      if (!autoStart) return;
+
+      startBackgroundService(false);
 
       setState(() {
         isAutoLocatingEnabled = true;
