@@ -38,6 +38,24 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
+          const ListTileGroupHeader(title: "音效"),
+          ListTile(
+            leading: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(Symbols.audiotrack_sharp),
+            ),
+            title: const Text(
+              "音效測試",
+              style: tileTitleTextStyle,
+            ),
+            subtitle: const Text("測試所在地接收即時天氣資訊、地震速報度等音效"),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                "/Audio",
+              );
+            },
+          ),
           const ListTileGroupHeader(title: "個人化"),
           ListTile(
             leading: const Padding(

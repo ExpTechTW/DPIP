@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.0.20
+version: 2.0.22
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -15,7 +15,10 @@ dependencies:
   package_info_plus: ^8.0.0
   shared_preferences: ^2.2.3
   timezone: ^0.9.3
-  flutter_background_service: ^5.0.6
+  flutter_background_service:
+    git:
+      url: https://github.com/ExpTechTW/flutter_background_service.git
+      path: packages/flutter_background_service
   flutter_local_notifications: ^17.1.2
   permission_handler: ^11.3.1
   firebase_messaging: ^15.0.2
@@ -36,7 +39,9 @@ dependencies:
   freezed_annotation: ^2.4.2
   riverpod_annotation: ^2.3.5
   path_provider: ^2.1.3
+  audioplayers: ^5.0.0
   riverpod: ^2.0.0
+  autostarter: ^0.0.1
 
 dev_dependencies:
   flutter_test:
@@ -52,3 +57,15 @@ flutter:
   assets:
     - assets/DPIP.png
     - assets/location.json
+    - assets/eew.wav
+    - assets/eq.wav
+    - assets/Int_report.wav
+    - assets/normal.wav
+    - assets/rain.wav
+    - assets/update.wav
+    - assets/warn.wav
+    - assets/weather.wav
+    - assets/info.wav
+    - assets/report.wav
+    - assets/eew_alert.wav
+    - assets/tsunami.wav
