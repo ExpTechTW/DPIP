@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:clipboard/clipboard.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +81,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
           ),
           const ListTileGroupHeader(title: "複製 FCM Token"),
           ListTile(
-            leading: const Icon(Icons.bug_report_rounded),
+            leading: Icon(
+              Platform.isAndroid
+                ? Icons.bug_report_rounded
+                : CupertinoIcons.square_on_square,
+            ),
             title: const Text("複製 FCM Token"),
             onTap: () {
               messaging.getToken().then((value) {
