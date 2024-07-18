@@ -9,6 +9,8 @@ import CoreLocation
     var locationManager: CLLocationManager!
     var lastSentLocation: CLLocation?
     var fcmToken: String?
+    var locationChannel: FlutterMethodChannel?
+    var isLocationEnabled: Bool = false
 
     override func application(
         _ application: UIApplication,
@@ -18,9 +20,10 @@ import CoreLocation
         GeneratedPluginRegistrant.register(with: self)
 
         let controller = window?.rootViewController as! FlutterViewController
-        let locationChannel = FlutterMethodChannel(name: "com.exptech.dpip/location", binaryMessenger: controller.binaryMessenger)
+        locationChannel = FlutterMethodChannel(name: "com.exptech.dpip/location", binaryMessenger: controller.binaryMessenger)
 
-        locationChannel.setMethodCallHandler { (call, result) in
+        locationChannel?.setMethodCallHandler { [weak self] (call, result) in
+            guard let self = self else { return }
             if call.method == "toggleLocation" {
                 if let args = call.arguments as? [String: Any], let isEnabled = args["isEnabled"] as? Bool {
                     self.toggleLocation(isEnabled: isEnabled)
@@ -33,12 +36,16 @@ import CoreLocation
             }
         }
 
+        // 初始化定位管理器
         locationManager = CLLocationManager()
         locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
-
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
+        
+        // 設置 FCM delegate
         Messaging.messaging().delegate = self
 
+        // 獲取 FCM token
         Messaging.messaging().token { token, error in
             if let error = error {
                 print("Error fetching FCM token: \(error)")
@@ -48,22 +55,89 @@ import CoreLocation
             }
         }
 
+        // 從 UserDefaults 讀取位置服務狀態
+        isLocationEnabled = UserDefaults.standard.bool(forKey: "locationSendingEnabled")
+        updateLocationService()
+
+        // 檢查是否是因為位置更新而啟動的應用
+        if let locationKey = launchOptions?[UIApplication.LaunchOptionsKey.location] as? NSNumber,
+           locationKey.boolValue {
+            print("App launched due to location update")
+            startLocationUpdates()
+        }
+
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
     func toggleLocation(isEnabled: Bool) {
+        isLocationEnabled = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "locationSendingEnabled")
-        if isEnabled {
-            if CLLocationManager.locationServicesEnabled() {
-                locationManager.startMonitoringSignificantLocationChanges()
-            }
+        updateLocationService()
+    }
+
+    func updateLocationService() {
+        if isLocationEnabled {
+            requestLocationAuthorization()
         } else {
-            locationManager.stopMonitoringSignificantLocationChanges()
+            stopLocationUpdates()
         }
     }
 
+    func requestLocationAuthorization() {
+        if CLLocationManager.locationServicesEnabled() {
+            if #available(iOS 14.0, *) {
+                switch locationManager.authorizationStatus {
+                case .notDetermined:
+                    locationManager.requestAlwaysAuthorization()
+                case .authorizedWhenInUse, .authorizedAlways:
+                    startLocationUpdates()
+                case .restricted, .denied:
+                    print("Location services are not authorized")
+                @unknown default:
+                    break
+                }
+            } else {
+                switch CLLocationManager.authorizationStatus() {
+                case .notDetermined:
+                    locationManager.requestAlwaysAuthorization()
+                case .authorizedWhenInUse, .authorizedAlways:
+                    startLocationUpdates()
+                case .restricted, .denied:
+                    print("Location services are not authorized")
+                @unknown default:
+                    break
+                }
+            }
+        } else {
+            print("Location services are not enabled")
+        }
+    }
+
+    func startLocationUpdates() {
+        if CLLocationManager.significantLocationChangeMonitoringAvailable() {
+            locationManager.startMonitoringSignificantLocationChanges()
+            print("Started monitoring significant location changes")
+        } else {
+            print("Significant location change monitoring is not available")
+        }
+    }
+
+    func stopLocationUpdates() {
+        locationManager.stopMonitoringSignificantLocationChanges()
+        print("Stopped monitoring significant location changes")
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        updateLocationService()
+    }
+
+    // iOS 14 以下版本使用的方法
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        updateLocationService()
+    }
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
+        guard isLocationEnabled, let location = locations.last else { return }
         if shouldSendLocationUpdate(newLocation: location) {
             sendLocationToServer(location: location)
             lastSentLocation = location
@@ -75,14 +149,15 @@ import CoreLocation
             return true
         }
         let distance = newLocation.distance(from: lastLocation)
-        return distance > 100 && isSendingEnabled()
-    }
-
-    func isSendingEnabled() -> Bool {
-        return UserDefaults.standard.bool(forKey: "locationSendingEnabled")
+        return distance > 100
     }
 
     func sendLocationToServer(location: CLLocation) {
+        guard isLocationEnabled else {
+            print("Location services are disabled, skipping location update")
+            return
+        }
+
         guard let token = fcmToken else {
             print("FCM token not available")
             return
@@ -99,7 +174,12 @@ import CoreLocation
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
 
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self, self.isLocationEnabled else {
+                print("Location services were disabled during the request, discarding result")
+                return
+            }
+
             if let error = error {
                 print("Error sending location: \(error)")
                 return
@@ -114,12 +194,10 @@ import CoreLocation
         self.fcmToken = fcmToken
         print("FCM token received: \(String(describing: fcmToken))")
     }
-}
 
-//// 設置開關狀態
-//UserDefaults.standard.set(true, forKey: "locationSendingEnabled") // 開啟發送
-//UserDefaults.standard.set(false, forKey: "locationSendingEnabled") // 關閉發送
-//
-//// 讀取開關狀態
-//let isEnabled = UserDefaults.standard.bool(forKey: "locationSendingEnabled")
-//print("Location sending is enabled: \(isEnabled)")
+    // 處理後台 URL session 事件
+    override func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        print("Handling background URL session events")
+        completionHandler()
+    }
+}

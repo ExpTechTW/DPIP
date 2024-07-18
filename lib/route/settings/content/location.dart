@@ -249,7 +249,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     stopBackgroundService();
 
     try {
-      await platform.invokeMethod('toggleLocation', {'isEnabled': isAutoLocatingEnabled});
+      await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
     } on PlatformException catch (e) {
       print("Failed to toggle location: '${e.message}'.");
     }
