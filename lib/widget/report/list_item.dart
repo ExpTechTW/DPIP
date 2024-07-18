@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart';
 
+import '../../route/report/report.dart';
+
 class ReportListItem extends StatelessWidget {
   final PartialEarthquakeReport report;
   final double height;
