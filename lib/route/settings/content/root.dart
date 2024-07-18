@@ -1,3 +1,8 @@
+import 'dart:io';
+
+import 'package:clipboard/clipboard.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -73,7 +78,32 @@ class _SettingsRootViewState extends State<SettingsRootView> {
                 "/theme",
               );
             },
-          )
+          ),
+          const ListTileGroupHeader(title: "複製 FCM Token"),
+          ListTile(
+            leading: Icon(
+              Platform.isAndroid
+                ? Icons.bug_report_rounded
+                : CupertinoIcons.square_on_square,
+            ),
+            title: const Text("複製 FCM Token"),
+            onTap: () {
+              messaging.getToken().then((value) {
+                FlutterClipboard.copy(value ?? "");
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('已複製 FCM Token'),
+                  ),
+                );
+              }).catchError((error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('複製 FCM Token 時發生錯誤：$error'),
+                  ),
+                );
+              });
+            },
+          ),
         ],
       ),
     );
