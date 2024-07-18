@@ -9,6 +9,7 @@ class Global {
   static late PackageInfo packageInfo;
   static late SharedPreferences preference;
   static late Map<String, Location> location;
+  static late Map<String, dynamic> geojson;
 
   static loadLocationData() async {
     final json = await rootBundle.loadString("assets/location.json");
@@ -17,10 +18,21 @@ class Global {
     location = data.map((key, value) => MapEntry(key, Location.fromJson(value)));
   }
 
+  static loadGeoJsonData() async {
+    final twCounty = await rootBundle.loadString("assets/map/tw_county.json");
+    final twTown = await rootBundle.loadString("assets/map/tw_town.json");
+
+    geojson = {
+      "tw_county": jsonDecode(twCounty),
+      "tw_town": jsonDecode(twTown),
+    };
+  }
+
   static Future init() async {
     packageInfo = await PackageInfo.fromPlatform();
     preference = await SharedPreferences.getInstance();
 
     await loadLocationData();
+    await loadGeoJsonData();
   }
 }
