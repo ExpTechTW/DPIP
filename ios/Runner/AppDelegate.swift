@@ -11,6 +11,7 @@ import CoreLocation
     var fcmToken: String?
     var locationChannel: FlutterMethodChannel?
     var isLocationEnabled: Bool = false
+    var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     override func application(
         _ application: UIApplication,
@@ -40,7 +41,7 @@ import CoreLocation
         locationManager.delegate = self
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
-        
+
         Messaging.messaging().delegate = self
 
         Messaging.messaging().token { token, error in
@@ -109,15 +110,45 @@ import CoreLocation
     }
 
     func startLocationUpdates() {
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 250
-        locationManager.startUpdatingLocation()
-        print("Started standard location updates")
+        if CLLocationManager.significantLocationChangeMonitoringAvailable() {
+            locationManager.startMonitoringSignificantLocationChanges()
+            print("Started monitoring significant location changes")
+
+            if let lastLocation = locationManager.location {
+                updateRegionMonitoring(for: lastLocation)
+            }
+
+            if CLLocationManager.authorizationStatus() == .authorizedAlways {
+                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+                locationManager.distanceFilter = 250
+                locationManager.startUpdatingLocation()
+            }
+        } else {
+            print("Significant location change monitoring is not available")
+        }
     }
 
     func stopLocationUpdates() {
         locationManager.stopMonitoringSignificantLocationChanges()
-        print("Stopped monitoring significant location changes")
+        locationManager.stopUpdatingLocation()
+        for region in locationManager.monitoredRegions {
+            locationManager.stopMonitoring(for: region)
+        }
+        print("Stopped all location updates")
+    }
+
+    func updateRegionMonitoring(for location: CLLocation) {
+        for region in locationManager.monitoredRegions {
+            locationManager.stopMonitoring(for: region)
+        }
+
+        let region = CLCircularRegion(center: location.coordinate, radius: 20, identifier: "currentRegion")
+        region.notifyOnEntry = false
+        region.notifyOnExit = true
+
+        locationManager.startMonitoring(for: region)
+
+        print("Updated region monitoring for location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -130,18 +161,15 @@ import CoreLocation
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard isLocationEnabled, let location = locations.last else { return }
-        if shouldSendLocationUpdate(newLocation: location) {
-            sendLocationToServer(location: location)
-            lastSentLocation = location
-        }
+        sendLocationToServer(location: location)
+        lastSentLocation = location
     }
 
-    func shouldSendLocationUpdate(newLocation: CLLocation) -> Bool {
-        guard let lastLocation = lastSentLocation else {
-            return true
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        print("Exited region: \(region.identifier)")
+        if let location = manager.location {
+            sendLocationToServer(location: location)
         }
-        let distance = newLocation.distance(from: lastLocation)
-        return distance > 100
     }
 
     func sendLocationToServer(location: CLLocation) {
@@ -177,6 +205,10 @@ import CoreLocation
                 return
             }
             print("Location sent successfully")
+
+            DispatchQueue.main.async {
+                self.updateRegionMonitoring(for: location)
+            }
         }
 
         task.resume()
@@ -190,5 +222,31 @@ import CoreLocation
     override func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
         print("Handling background URL session events")
         completionHandler()
+    }
+
+    override func applicationDidEnterBackground(_ application: UIApplication) {
+        let backgroundTask = application.beginBackgroundTask { [weak self] in
+            self?.endBackgroundTask()
+        }
+
+        self.backgroundTask = backgroundTask
+
+        DispatchQueue.global().async {
+            self.performExtendedBackgroundTasks()
+            self.endBackgroundTask()
+        }
+    }
+
+    func performExtendedBackgroundTasks() {
+        if let location = locationManager.location {
+            sendLocationToServer(location: location)
+        }
+    }
+
+    func endBackgroundTask() {
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        }
     }
 }
