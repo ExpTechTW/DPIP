@@ -5,6 +5,11 @@ import 'package:dpip/global.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../api/exptech.dart';
+
+StreamSubscription<Position>? positionStreamSubscription;
+Timer? restartTimer;
+
 class GetLocationPosition {
   double latitude;
   double longitude;
