@@ -3,6 +3,7 @@ import Flutter
 import Firebase
 import FirebaseMessaging
 import CoreLocation
+import BackgroundTasks
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate, MessagingDelegate {
@@ -11,7 +12,8 @@ import CoreLocation
     var fcmToken: String?
     var locationChannel: FlutterMethodChannel?
     var isLocationEnabled: Bool = false
-    var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+
+    let backgroundTaskIdentifier = "com.exptech.dpip.locationUpdate"
 
     override func application(
         _ application: UIApplication,
@@ -56,6 +58,8 @@ import CoreLocation
         isLocationEnabled = UserDefaults.standard.bool(forKey: "locationSendingEnabled")
         updateLocationService()
 
+        registerBackgroundTask()
+
         if let locationKey = launchOptions?[UIApplication.LaunchOptionsKey.location] as? NSNumber,
            locationKey.boolValue {
             print("App launched due to location update")
@@ -69,6 +73,12 @@ import CoreLocation
         isLocationEnabled = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "locationSendingEnabled")
         updateLocationService()
+
+        if isEnabled && lastSentLocation == nil {
+            if let currentLocation = locationManager.location {
+                sendLocationToServer(location: currentLocation)
+            }
+        }
     }
 
     func updateLocationService() {
@@ -114,15 +124,7 @@ import CoreLocation
             locationManager.startMonitoringSignificantLocationChanges()
             print("Started monitoring significant location changes")
 
-            if let lastLocation = locationManager.location {
-                updateRegionMonitoring(for: lastLocation)
-            }
-
-            if CLLocationManager.authorizationStatus() == .authorizedAlways {
-                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                locationManager.distanceFilter = 250
-                locationManager.startUpdatingLocation()
-            }
+            scheduleBackgroundLocationTask()
         } else {
             print("Significant location change monitoring is not available")
         }
@@ -130,46 +132,25 @@ import CoreLocation
 
     func stopLocationUpdates() {
         locationManager.stopMonitoringSignificantLocationChanges()
-        locationManager.stopUpdatingLocation()
-        for region in locationManager.monitoredRegions {
-            locationManager.stopMonitoring(for: region)
-        }
-        print("Stopped all location updates")
-    }
+        print("Stopped monitoring significant location changes")
 
-    func updateRegionMonitoring(for location: CLLocation) {
-        for region in locationManager.monitoredRegions {
-            locationManager.stopMonitoring(for: region)
-        }
-
-        let region = CLCircularRegion(center: location.coordinate, radius: 20, identifier: "currentRegion")
-        region.notifyOnEntry = false
-        region.notifyOnExit = true
-
-        locationManager.startMonitoring(for: region)
-
-        print("Updated region monitoring for location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-    }
-
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        updateLocationService()
-    }
-
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        updateLocationService()
+        BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: backgroundTaskIdentifier)
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard isLocationEnabled, let location = locations.last else { return }
-        sendLocationToServer(location: location)
-        lastSentLocation = location
+        if shouldSendLocationUpdate(newLocation: location) {
+            sendLocationToServer(location: location)
+            lastSentLocation = location
+        }
     }
 
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        print("Exited region: \(region.identifier)")
-        if let location = manager.location {
-            sendLocationToServer(location: location)
+    func shouldSendLocationUpdate(newLocation: CLLocation) -> Bool {
+        guard let lastLocation = lastSentLocation else {
+            return true
         }
+        let distance = newLocation.distance(from: lastLocation)
+        return distance > 100
     }
 
     func sendLocationToServer(location: CLLocation) {
@@ -205,10 +186,6 @@ import CoreLocation
                 return
             }
             print("Location sent successfully")
-
-            DispatchQueue.main.async {
-                self.updateRegionMonitoring(for: location)
-            }
         }
 
         task.resume()
@@ -219,34 +196,53 @@ import CoreLocation
         print("FCM token received: \(String(describing: fcmToken))")
     }
 
-    override func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
-        print("Handling background URL session events")
-        completionHandler()
-    }
-
-    override func applicationDidEnterBackground(_ application: UIApplication) {
-        let backgroundTask = application.beginBackgroundTask { [weak self] in
-            self?.endBackgroundTask()
-        }
-
-        self.backgroundTask = backgroundTask
-
-        DispatchQueue.global().async {
-            self.performExtendedBackgroundTasks()
-            self.endBackgroundTask()
+    func registerBackgroundTask() {
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: backgroundTaskIdentifier, using: nil) { task in
+            self.handleBackgroundLocationTask(task: task as! BGProcessingTask)
         }
     }
 
-    func performExtendedBackgroundTasks() {
-        if let location = locationManager.location {
-            sendLocationToServer(location: location)
+    func scheduleBackgroundLocationTask() {
+        let request = BGProcessingTaskRequest(identifier: backgroundTaskIdentifier)
+        request.requiresNetworkConnectivity = true
+        request.requiresExternalPower = false
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 3 * 60)
+
+        do {
+            try BGTaskScheduler.shared.submit(request)
+            print("Background location task scheduled")
+        } catch {
+            print("Could not schedule background location task: \(error)")
         }
     }
 
-    func endBackgroundTask() {
-        if backgroundTask != .invalid {
-            UIApplication.shared.endBackgroundTask(backgroundTask)
-            backgroundTask = .invalid
+    func handleBackgroundLocationTask(task: BGProcessingTask) {
+        scheduleBackgroundLocationTask() // Schedule the next task
+
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 1
+
+        let operation = BlockOperation {
+            if let location = self.locationManager.location {
+                if self.shouldSendLocationUpdate(newLocation: location) {
+                    self.sendLocationToServer(location: location)
+                    self.lastSentLocation = location
+                } else {
+                    print("Location update not needed based on distance threshold")
+                }
+            } else {
+                print("No location available for background task")
+            }
         }
+
+        operation.completionBlock = {
+            task.setTaskCompleted(success: !operation.isCancelled)
+        }
+
+        task.expirationHandler = {
+            queue.cancelAllOperations()
+        }
+
+        queue.addOperation(operation)
     }
 }
