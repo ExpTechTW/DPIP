@@ -134,14 +134,14 @@ class ReportListItem extends StatelessWidget {
           ),
         ),
         onTap: () async {
-          await Navigator.push(
+          /*await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) {
                 return ReportRoute(report: report);
               },
             ),
-          );
+          );*/
           refreshReportList();
         },
       ),
