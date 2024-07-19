@@ -1,12 +1,15 @@
-import UIKit
-import Siren
-import Flutter
+import CoreLocation
 import Firebase
 import FirebaseMessaging
-import CoreLocation
+import Flutter
+import Siren
+import UIKit
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate, MessagingDelegate {
+@objc
+class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
+    MessagingDelegate
+{
     var locationManager: CLLocationManager!
     var lastSentLocation: CLLocation?
     var fcmToken: String?
@@ -16,7 +19,8 @@ import CoreLocation
 
     override func application(
         _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+        didFinishLaunchingWithOptions launchOptions: [UIApplication
+            .LaunchOptionsKey: Any]?
     ) -> Bool {
         FirebaseApp.configure()
         GeneratedPluginRegistrant.register(with: self)
@@ -24,16 +28,23 @@ import CoreLocation
         Siren.shared.wail()
 
         let controller = window?.rootViewController as! FlutterViewController
-        locationChannel = FlutterMethodChannel(name: "com.exptech.dpip/location", binaryMessenger: controller.binaryMessenger)
+        locationChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/location",
+            binaryMessenger: controller.binaryMessenger)
 
         locationChannel?.setMethodCallHandler { [weak self] (call, result) in
             guard let self = self else { return }
             if call.method == "toggleLocation" {
-                if let args = call.arguments as? [String: Any], let isEnabled = args["isEnabled"] as? Bool {
+                if let args = call.arguments as? [String: Any],
+                    let isEnabled = args["isEnabled"] as? Bool
+                {
                     self.toggleLocation(isEnabled: isEnabled)
                     result("Location toggled")
                 } else {
-                    result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid argument", details: nil))
+                    result(
+                        FlutterError(
+                            code: "INVALID_ARGUMENT",
+                            message: "Invalid argument", details: nil))
                 }
             } else {
                 result(FlutterMethodNotImplemented)
@@ -56,65 +67,38 @@ import CoreLocation
             }
         }
 
-        isLocationEnabled = UserDefaults.standard.bool(forKey: "locationSendingEnabled")
-        updateLocationService()
+        isLocationEnabled = UserDefaults.standard.bool(
+            forKey: "locationSendingEnabled")
 
-        if let locationKey = launchOptions?[UIApplication.LaunchOptionsKey.location] as? NSNumber,
-           locationKey.boolValue {
+        if let locationKey = launchOptions?[
+            UIApplication.LaunchOptionsKey.location] as? NSNumber,
+            locationKey.boolValue
+        {
             print("App launched due to location update")
             startLocationUpdates()
+        } else {
+            if isLocationEnabled {
+                startLocationUpdates()
+            }
         }
 
-        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        return super.application(
+            application, didFinishLaunchingWithOptions: launchOptions)
     }
 
     func toggleLocation(isEnabled: Bool) {
         isLocationEnabled = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "locationSendingEnabled")
-        updateLocationService()
+        startLocationUpdates()
 
-        if isEnabled && lastSentLocation == nil {
-            if let currentLocation = locationManager.location {
-                sendLocationToServer(location: currentLocation)
+        if isEnabled {
+            if lastSentLocation == nil {
+                if let currentLocation = locationManager.location {
+                    sendLocationToServer(location: currentLocation)
+                }
             }
-        }
-    }
-
-    func updateLocationService() {
-        if isLocationEnabled {
-            requestLocationAuthorization()
         } else {
             stopLocationUpdates()
-        }
-    }
-
-    func requestLocationAuthorization() {
-        if CLLocationManager.locationServicesEnabled() {
-            if #available(iOS 14.0, *) {
-                switch locationManager.authorizationStatus {
-                case .notDetermined:
-                    locationManager.requestAlwaysAuthorization()
-                case .authorizedWhenInUse, .authorizedAlways:
-                    startLocationUpdates()
-                case .restricted, .denied:
-                    print("Location services are not authorized")
-                @unknown default:
-                    break
-                }
-            } else {
-                switch CLLocationManager.authorizationStatus() {
-                case .notDetermined:
-                    locationManager.requestAlwaysAuthorization()
-                case .authorizedWhenInUse, .authorizedAlways:
-                    startLocationUpdates()
-                case .restricted, .denied:
-                    print("Location services are not authorized")
-                @unknown default:
-                    break
-                }
-            }
-        } else {
-            print("Location services are not enabled")
         }
     }
 
@@ -145,30 +129,30 @@ import CoreLocation
             locationManager.stopMonitoring(for: region)
         }
 
-        let region = CLCircularRegion(center: location.coordinate, radius: 250, identifier: "currentRegion")
+        let region = CLCircularRegion(
+            center: location.coordinate, radius: 250,
+            identifier: "currentRegion")
         region.notifyOnEntry = false
         region.notifyOnExit = true
 
         locationManager.startMonitoring(for: region)
 
-        print("Updated region monitoring for location: \(location.coordinate.latitude), \(location.coordinate.longitude)")
+        print(
+            "Updated region monitoring for location: \(location.coordinate.latitude), \(location.coordinate.longitude)"
+        )
     }
 
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        updateLocationService()
-    }
-
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        updateLocationService()
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(
+        _ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]
+    ) {
         guard isLocationEnabled, let location = locations.last else { return }
         sendLocationToServer(location: location)
         lastSentLocation = location
     }
 
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+    func locationManager(
+        _ manager: CLLocationManager, didExitRegion region: CLRegion
+    ) {
         print("Exited region: \(region.identifier)")
         if let location = manager.location {
             sendLocationToServer(location: location)
@@ -188,18 +172,25 @@ import CoreLocation
 
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
-        let appVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+        let appVersion =
+            Bundle.main.object(
+                forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+            ?? "Unknown"
 
-        let urlString = "https://api-1.exptech.dev/api/v1/notify/location/\(appVersion)/1/\(latitude),\(longitude)/\(token)"
+        let urlString =
+            "https://api-1.exptech.dev/api/v1/notify/location/\(appVersion)/1/\(latitude),\(longitude)/\(token)"
         print(urlString)
         guard let url = URL(string: urlString) else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
 
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        let task = URLSession.shared.dataTask(with: request) {
+            [weak self] data, response, error in
             guard let self = self, self.isLocationEnabled else {
-                print("Location services were disabled during the request, discarding result")
+                print(
+                    "Location services were disabled during the request, discarding result"
+                )
                 return
             }
 
@@ -217,12 +208,18 @@ import CoreLocation
         task.resume()
     }
 
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    func messaging(
+        _ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?
+    ) {
         self.fcmToken = fcmToken
         print("FCM token received: \(String(describing: fcmToken))")
     }
 
-    override func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+    override func application(
+        _ application: UIApplication,
+        handleEventsForBackgroundURLSession identifier: String,
+        completionHandler: @escaping () -> Void
+    ) {
         print("Handling background URL session events")
         completionHandler()
     }
@@ -252,18 +249,20 @@ import CoreLocation
             backgroundTask = .invalid
         }
     }
-    
+
     func hyperCriticalRulesExample() {
         let siren = Siren.shared
-        siren.rulesManager = RulesManager(globalRules: .critical, showAlertAfterCurrentVersionHasBeenReleasedForDays: 3)
-            siren.wail {results in
+        siren.rulesManager = RulesManager(
+            globalRules: .critical,
+            showAlertAfterCurrentVersionHasBeenReleasedForDays: 3)
+        siren.wail { results in
             switch results {
             case .success(let updateResults):
                 print("AlerAction ", updateResults.alertAction)
                 print("Localization ", updateResults.localization)
                 print("Model ", updateResults.model)
                 print("UPdateType ", updateResults.updateType)
-            case.failure(let error):
+            case .failure(let error):
                 print(error.localizedDescription)
             }
         }
