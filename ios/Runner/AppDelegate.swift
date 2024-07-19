@@ -72,6 +72,12 @@ import CoreLocation
         isLocationEnabled = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "locationSendingEnabled")
         updateLocationService()
+
+        if isEnabled && lastSentLocation == nil {
+            if let currentLocation = locationManager.location {
+                sendLocationToServer(location: currentLocation)
+            }
+        }
     }
 
     func updateLocationService() {
@@ -120,12 +126,6 @@ import CoreLocation
             if let lastLocation = locationManager.location {
                 updateRegionMonitoring(for: lastLocation)
             }
-
-            if CLLocationManager.authorizationStatus() == .authorizedAlways {
-                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                locationManager.distanceFilter = 250
-                locationManager.startUpdatingLocation()
-            }
         } else {
             print("Significant location change monitoring is not available")
         }
@@ -145,7 +145,7 @@ import CoreLocation
             locationManager.stopMonitoring(for: region)
         }
 
-        let region = CLCircularRegion(center: location.coordinate, radius: 20, identifier: "currentRegion")
+        let region = CLCircularRegion(center: location.coordinate, radius: 250, identifier: "currentRegion")
         region.notifyOnEntry = false
         region.notifyOnExit = true
 
