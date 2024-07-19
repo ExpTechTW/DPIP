@@ -109,12 +109,10 @@ import CoreLocation
     }
 
     func startLocationUpdates() {
-        if CLLocationManager.significantLocationChangeMonitoringAvailable() {
-            locationManager.startMonitoringSignificantLocationChanges()
-            print("Started monitoring significant location changes")
-        } else {
-            print("Significant location change monitoring is not available")
-        }
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = 250
+        locationManager.startUpdatingLocation()
+        print("Started standard location updates")
     }
 
     func stopLocationUpdates() {
