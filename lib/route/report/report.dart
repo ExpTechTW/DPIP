@@ -9,7 +9,6 @@ import 'package:dpip/widget/map/marker/custom_marker.dart';
 import 'package:dpip/widget/map/marker/intensity_marker.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class ReportRoute extends StatefulWidget {

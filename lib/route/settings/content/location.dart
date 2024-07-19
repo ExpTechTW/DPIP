@@ -6,10 +6,11 @@ import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../main.dart';
+import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 class SettingsLocationView extends StatefulWidget {
@@ -20,6 +21,7 @@ class SettingsLocationView extends StatefulWidget {
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
+  static const platform = MethodChannel('com.exptech.dpip/location');
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
@@ -246,6 +248,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Future toggleAutoLocation() async {
     stopBackgroundService();
 
+    try {
+      await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
+    } on PlatformException catch (e) {
+      print("Failed to toggle location: '${e.message}'.");
+    }
+
     if (isAutoLocatingEnabled) {
       setState(() {
         isAutoLocatingEnabled = false;
@@ -277,6 +285,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    permissionStatusUpdate();
   }
 
   @override
@@ -287,22 +296,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    permissionStatusUpdate();
+  }
+
+  void permissionStatusUpdate(){
     Permission.notification.status.then(
-      (value) {
+          (value) {
         setState(() {
           notificationPermission = value;
         });
       },
     );
     Permission.location.status.then(
-      (value) {
+          (value) {
         setState(() {
           locationPermission = value;
         });
       },
     );
     Permission.locationAlways.status.then(
-      (value) {
+          (value) {
+        print(value);
         setState(() {
           locationAlwaysPermission = value;
         });
