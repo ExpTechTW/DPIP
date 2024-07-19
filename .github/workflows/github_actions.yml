@@ -15,58 +15,67 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      # Setup Environment
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: "zulu"
+        java-version: "17"
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: "zulu"
-          java-version: "17"
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
+    - name: Flutter get
+      run: flutter pub get --no-example
 
-      - name: Flutter get
-        run: flutter pub get --no-example
+    - name: Prebuild
+      run: dart run build_runner build --delete-conflicting-outputs
 
-      # Build
+    - name: Build Android application (apk, aab)
+      if: matrix.platform == 'ubuntu-latest'
+      run: |
+        flutter build apk --debug
+        flutter build aab --debug
 
-      - name: Prebuild
-        run: dart run build_runner build --delete-conflicting-outputs
+    - name: Build iOS application (app)
+      if: matrix.platform == 'macos-latest'
+      run: flutter build ios --debug --no-codesign
 
-      - name: Build Android application (apk, aab)
-        if: matrix.platform == 'ubuntu-latest'
-        run: |
-          flutter build apk --debug
-          flutter build aab --debug
+    - name: Package IPA
+      if: matrix.platform == 'macos-latest'
+      run: |
+        mkdir -p Payload
+        cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
+        zip -r DPIP.ipa Payload
 
-      - name: Build iOS application (app)
-        if: matrix.platform == 'macos-latest'
-        run: flutter build ios --debug --no-codesign
+    - name: Upload (apk)
 
-      # Upload Artifacts
+      if: matrix.platform == 'ubuntu-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: "DPIP.apk"
+        path: build/app/outputs/flutter-apk/*.apk
 
-      - name: Upload (apk)
-        if: matrix.platform == 'ubuntu-latest'
-        uses: actions/upload-artifact@master
-        with:
-          name: "DPIP.apk"
-          path: build/app/outputs/flutter-apk/*.apk
+    - name: Upload (aab)
+      if: matrix.platform == 'ubuntu-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: "DPIP.aab"
+        path: build/app/outputs/bundle/release/*.aab
 
-      - name: Upload (aab)
-        if: matrix.platform == 'ubuntu-latest'
-        uses: actions/upload-artifact@master
-        with:
-          name: "DPIP.aab"
-          path: build/app/outputs/bundle/release/*.aab
+    - name: Upload (app)
+      if: matrix.platform == 'macos-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: "DPIP.app"
+        path: /Users/runner/work/DPIP/DPIP/build/ios/iphoneos/Runner.app
 
-      - name: Upload (app)
-        if: matrix.platform == 'macos-latest'
-        uses: actions/upload-artifact@master
-        with:
-          name: "DPIP.app"
-          path: /Users/runner/work/DPIP/DPIP/build/ios/iphoneos/Runner.app
+    - name: Upload (ipa)
+      if: matrix.platform == 'macos-latest'
+      uses: actions/upload-artifact@master
+      with:
+        name: "DPIP.ipa"
+        path: DPIP.ipa
