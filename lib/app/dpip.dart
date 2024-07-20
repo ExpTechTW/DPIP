@@ -1,5 +1,7 @@
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/route/welcome/welcome.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -17,6 +19,10 @@ class _DpipState extends State<Dpip> {
 
   @override
   Widget build(BuildContext context) {
+    if (Global.preference.getBool("show-welcome-page") ?? true) {
+      return const WelcomeRoute();
+    }
+
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentActivePage,
