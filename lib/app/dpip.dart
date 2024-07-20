@@ -19,9 +19,9 @@ class _DpipState extends State<Dpip> {
 
   @override
   Widget build(BuildContext context) {
-    if (Global.preference.getBool("show-welcome-page") ?? true) {
-      return const WelcomeRoute();
-    }
+    // if (Global.preference.getBool("show-welcome-page") ?? true) {
+    //   return const WelcomeRoute();
+    // }
 
     return Scaffold(
       bottomNavigationBar: NavigationBar(

@@ -46,7 +46,11 @@
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
   "third_party_libraries": "第三方套件授權",
-  "@instthird_party_librariesagram": {
+  "@third_party_librariesagram": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
+  },
+  "share": "分享應用程式",
+  "@share": {
+    "description": ""
   }
 }
