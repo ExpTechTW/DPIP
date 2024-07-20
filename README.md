@@ -1,4 +1,4 @@
-<img alt="Logo" src="https://github.com/ExpTechTW/DPIP/blob/main/assets/app_icon.png" width="128px" height="128px" align="left"/>
+<img alt="Logo" src="https://github.com/ExpTechTW/DPIP/blob/main/assets/DPIP.png" width="128px" height="128px" align="left"/>
 
 # Disaster Prevention Information Platform
 防災資訊平台
