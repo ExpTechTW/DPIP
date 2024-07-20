@@ -1,6 +1,6 @@
 import 'package:dpip/app/dpip.dart';
-import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/route/welcome/pages/hello_page.dart';
+import 'package:dpip/route/welcome/pages/permission_page.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -16,7 +16,7 @@ class _WelcomeRouteState extends State<WelcomeRoute> {
   int currentPageIndex = 0;
   List<Widget> pages = const [
     WelcomeHelloPage(),
-    WelcomeHelloPage(),
+    WelcomePermissionPage(),
   ];
 
   @override
