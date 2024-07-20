@@ -1,3 +1,5 @@
+import 'package:dpip/app/dpip.dart';
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/route/welcome/pages/hello_page.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -48,8 +50,15 @@ class _WelcomeRouteState extends State<WelcomeRoute> {
                   FilledButton(
                     child: const Text("Next"),
                     onPressed: () {
-                      setState(() => currentPageIndex++);
-                      controller.animateToPage(currentPageIndex, duration: Durations.medium2, curve: Easing.standard);
+                      if (currentPageIndex == pages.length - 1) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Dpip()),
+                        );
+                      } else {
+                        setState(() => currentPageIndex++);
+                        controller.animateToPage(currentPageIndex, duration: Durations.medium2, curve: Easing.standard);
+                      }
                     },
                   ),
                 ],
