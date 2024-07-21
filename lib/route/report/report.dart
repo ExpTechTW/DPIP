@@ -5,6 +5,9 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:intl/intl.dart';
+
+import 'package:timezone/timezone.dart' as tz;
 import 'package:dpip/widget/map/marker/custom_marker.dart';
 import 'package:dpip/widget/map/marker/intensity_marker.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
@@ -58,9 +61,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震"),
-      ),
+      appBar: AppBar(title: Text("")),
       body: Stack(children: [
         DpipMap(
           key: mapKey,
@@ -116,22 +117,53 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  IntensityBox(intensity: report!.getMaxIntensity()),
-                                  const SizedBox(width: 16),
+                                  Row(
+                                    children: [
+                                      IntensityBox(intensity: report!.getMaxIntensity()),
+                                      const SizedBox(width: 16),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震",
+                                            style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
+                                          ),
+                                          Text(
+                                            report!.getLocation(),
+                                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        report!.getLocation(),
-                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                        "發震時間",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: context.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      Text(
+                                        "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), report!.time))}",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
                 ),
