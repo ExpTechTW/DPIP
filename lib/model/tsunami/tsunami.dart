@@ -54,6 +54,9 @@ class Tsunami {
   /// ```
   final String content;
 
+  /// - 發布時間
+  final int time;
+
   /// - 海嘯實測地區編碼
   final TsunamiEarthquake eq;
 
@@ -67,6 +70,7 @@ class Tsunami {
     required this.status,
     required this.author,
     required this.content,
+    required this.time,
     required this.eq,
     required this.info,
   });
