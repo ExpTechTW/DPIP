@@ -153,9 +153,28 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                         ),
                                       ),
                                       Text(
-                                        "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), report!.time))}",
+                                        DateFormat('yyyy/MM/dd HH:mm:ss').format(
+                                            tz.TZDateTime.fromMillisecondsSinceEpoch(
+                                                tz.getLocation("Asia/Taipei"), report!.time)),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "位於",
                                         style: TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
+                                          color: context.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      Text(
+                                        report!.convertLatLon(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
