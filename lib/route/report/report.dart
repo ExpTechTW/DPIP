@@ -14,6 +14,8 @@ import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+import '../../widget/report/intensity_list.dart';
+
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
 
@@ -118,6 +120,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Column(
+                                mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
@@ -274,6 +277,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: context.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      Container(
+                                        child: IntensityList(
+                                          report: report!,
                                         ),
                                       ),
                                     ],
