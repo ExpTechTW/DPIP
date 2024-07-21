@@ -128,7 +128,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震",
+                                            widget.report.hasNumber ? "編號 ${widget.report.number} 顯著有感地震" : "小區域有感地震",
                                             style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                                           ),
                                           Text(
