@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "home": "主頁",
   "@home": {
@@ -13,7 +13,7 @@
   "@report": {
     "description": "「地震報告」頁面標題"
   },
-  "map": "地圖",
+  "map": "地图",
   "@map": {
     "description": "「地圖」頁面標題"
   },
@@ -21,7 +21,7 @@
   "@me": {
     "description": "「我」頁面標題"
   },
-  "settings": "設定",
+  "settings": "设置",
   "@settings": {
     "description": "「設定」頁面標題"
   },
