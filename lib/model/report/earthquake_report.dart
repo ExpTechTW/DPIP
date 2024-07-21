@@ -132,4 +132,26 @@ class EarthquakeReport {
       return loc.substring(0, loc.indexOf("方") + 1);
     }
   }
+
+  String convertLatLon(double lat, double lon) {
+    var latFormat = "";
+    var lonFormat = "";
+    if (lat > 90) {
+      lat = lat - 180;
+    }
+    if (lon > 180) {
+      lat = lat - 360;
+    }
+    if (lat < 0) {
+      latFormat = "南緯 ${lat.abs()} 度";
+    } else {
+      latFormat = "北緯 $lat 度";
+    }
+    if (lon < 0) {
+      lonFormat = "西經 ${lon.abs()} 度";
+    } else {
+      lonFormat = "東經 $lon 度";
+    }
+    return "$latFormat　$lonFormat";
+  }
 }
