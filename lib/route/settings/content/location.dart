@@ -71,7 +71,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () {
                         openAppSettings();
                         Navigator.pop(context);
@@ -121,7 +121,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () {
                         openAppSettings();
                         Navigator.pop(context);
@@ -423,7 +423,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       ),
                     ),
                     TextButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () async {
                         final status = await Permission.locationAlways.request();
                         if (status.isPermanentlyDenied) {
@@ -462,7 +462,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       ),
                     ),
                     TextButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () {
                         openAppSettings();
                       },
