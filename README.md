@@ -1,4 +1,4 @@
-<img alt="Logo" src="./.github/assets/DPIP.png" width="84" height="84" align="left"/>
+<img alt="Logo" src="./.github/assets/DPIP.png" width="128" height="128" align="left"/>
 
 # Disaster Prevention Information Platform
 
