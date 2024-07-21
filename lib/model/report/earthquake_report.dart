@@ -133,24 +133,26 @@ class EarthquakeReport {
     }
   }
 
-  String convertLatLon(double lat, double lon) {
+  String convertLatLon() {
     var latFormat = "";
     var lonFormat = "";
-    if (lat > 90) {
-      lat = lat - 180;
+    var latTemp = lat;
+    var lonTemp = lon;
+    if (latTemp > 90) {
+      latTemp = latTemp - 180;
     }
-    if (lon > 180) {
-      lat = lat - 360;
+    if (lonTemp > 180) {
+      lonTemp = lonTemp - 360;
     }
-    if (lat < 0) {
-      latFormat = "南緯 ${lat.abs()} 度";
+    if (latTemp < 0) {
+      latFormat = "南緯 ${latTemp.abs()} 度";
     } else {
-      latFormat = "北緯 $lat 度";
+      latFormat = "北緯 $latTemp 度";
     }
-    if (lon < 0) {
-      lonFormat = "西經 ${lon.abs()} 度";
+    if (lonTemp < 0) {
+      lonFormat = "西經 ${lonTemp.abs()} 度";
     } else {
-      lonFormat = "東經 $lon 度";
+      lonFormat = "東經 $lonTemp 度";
     }
     return "$latFormat　$lonFormat";
   }
