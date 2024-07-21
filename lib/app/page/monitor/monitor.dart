@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/model/rts.dart';
 import 'package:dpip/model/station.dart';
-import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
@@ -16,16 +18,15 @@ class MonitorPage extends StatefulWidget {
 class _MonitorPageState extends State<MonitorPage> {
   late MapLibreMapController controller;
   late Map<String, Station> stations;
+  Timer? timer;
 
-  void setupStation() async {
-    final data = await ExpTech().getStations();
+  Map<String, dynamic> generateStationGeoJson([Rts? rtsData]) {
+    print(rtsData == null ? {} : rtsData.station);
 
-    setState(() => stations = data);
-
-    final features = data.entries.map((e) {
+    final features = stations.entries.map((e) {
       return {
         "type": "Feature",
-        "properties": {},
+        "properties": rtsData == null ? {} : rtsData.station[e.key] ?? {},
         "id": e.key,
         "geometry": {
           "coordinates": [e.value.info[0].lon, e.value.info[0].lat],
@@ -34,15 +35,21 @@ class _MonitorPageState extends State<MonitorPage> {
       };
     }).toList();
 
-    final geojson = {
+    return {
       "type": "FeatureCollection",
       "features": features,
     };
+  }
+
+  void setupStation() async {
+    final data = await ExpTech().getStations();
+
+    setState(() => stations = data);
 
     controller.addSource(
       "station-geojson",
       GeojsonSourceProperties(
-        data: geojson,
+        data: generateStationGeoJson(),
       ),
     );
 
@@ -50,44 +57,61 @@ class _MonitorPageState extends State<MonitorPage> {
       "station-geojson",
       "station",
       CircleLayerProperties(
-        circleColor:  [
+        circleColor: [
           Expressions.interpolate,
           ["linear"],
           ["get", "i"],
           -3,
-          Color(0xff0005d0).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity_3.toHexStringRGB(),
           -2,
-          Color(0xff004bf8).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity_2.toHexStringRGB(),
           -1,
-          Color(0xff009EF8).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity_1.toHexStringRGB(),
           0,
-          Color(0xff79E5FD).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity0.toHexStringRGB(),
           1,
-          Color(0xff49E9AD).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity1.toHexStringRGB(),
           2,
-          Color(0xff44fa34).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity2.toHexStringRGB(),
           3,
-          Color(0xffbeff0c).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity3.toHexStringRGB(),
           4,
-          Color(0xfffff000).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity4.toHexStringRGB(),
           5,
-          Color(0xffff9300).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity5.toHexStringRGB(),
           6,
-          Color(0xfffc5235).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity6.toHexStringRGB(),
           7,
-          Color(0xffb720e9).toHexStringRGB(),
+          InstrumentalIntensityColor.intensity7.toHexStringRGB(),
         ],
-        circleRadius: 4,
+        circleRadius: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          4,
+          2,
+          12,
+          8
+        ],
       ),
     );
+
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      updateRtsData();
+    });
   }
 
   void updateRtsData() async {
     final data = await ExpTech().getRts();
+    controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
+  }
 
-    for (final MapEntry(key: key, value: value) in data.station.entries) {
-      controller.state
+  @override
+  void dispose() {
+    if (timer != null) {
+      timer!.cancel();
     }
+    super.dispose();
   }
 
   @override
