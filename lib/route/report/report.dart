@@ -61,7 +61,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text("")),
+      appBar: AppBar(title: const Text("地震報告")),
       body: Stack(children: [
         DpipMap(
           key: mapKey,
