@@ -5,11 +5,11 @@
   "@home": {
     "description": "「首頁」頁面標題"
   },
-  "monitor": "지진감시기",
+  "monitor": "지진 감시",
   "@monitor": {
     "description": "「強震監視器」頁面標題"
   },
-  "report": "지진보고",
+  "report": "지진 보고",
   "@report": {
     "description": "「地震報告」頁面標題"
   },
@@ -25,7 +25,7 @@
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "DPIP 콘텐츠를 더 자세히 설정하세요.",
+  "settingsDescription": "DPIP 콘텐츠를설정하세요",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
