@@ -142,6 +142,14 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                   const SizedBox(
                                     height: 10,
                                   ),
+                                  Container(
+                                    width: double.infinity,
+                                    height: 1.5,
+                                    color: context.colors.onSurface,
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -249,7 +257,25 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                             ),
                                           ),
                                         ],
-                                      )
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Container(
+                                        width: double.infinity,
+                                        height: 1.5,
+                                        color: context.colors.onSurface,
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "各地震度",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: context.colors.onSurfaceVariant,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
