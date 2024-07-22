@@ -131,17 +131,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    height: 1.5,
-                                    color: context.colors.onSurface,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
+                                  const Divider(),
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -250,17 +240,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Container(
-                                        width: double.infinity,
-                                        height: 1.5,
-                                        color: context.colors.onSurface,
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
+                                      const Divider(),
                                       Text(
                                         "各地震度",
                                         style: TextStyle(
