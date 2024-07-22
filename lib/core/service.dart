@@ -130,8 +130,8 @@ void onStart(ServiceInstance service) async {
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
-        String lat = position.position.latitude.toStringAsFixed(4);
-        String lon = position.position.longitude.toStringAsFixed(4);
+        String lat = position.position.latitude.toStringAsFixed(6);
+        String lon = position.position.longitude.toStringAsFixed(6);
         String country = position.position.country;
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
