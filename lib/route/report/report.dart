@@ -16,6 +16,8 @@ import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+import '../../util/intensity_color.dart';
+
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
 
@@ -213,46 +215,70 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
                                         for (final MapEntry(key: areaName, value: area) in report!.list.entries)
-                                          Row(
+                                          Column(
                                             children: [
-                                              Text(areaName),
                                               const SizedBox(
-                                                width: 20,
+                                                height: 10,
                                               ),
-                                              Expanded(
-                                                child: Wrap(
-                                                  children: [
-                                                    for (final MapEntry(key: townName, value: town)
-                                                        in area.town.entries)
-                                                      Container(
-                                                        padding: const EdgeInsets.all(5),
-                                                        margin: const EdgeInsets.symmetric(
-                                                          vertical: 4,
-                                                          horizontal: 2,
-                                                        ),
-                                                        decoration: BoxDecoration(
-                                                          border: Border.all(color: Colors.grey),
-                                                          borderRadius: BorderRadius.circular(8),
-                                                        ),
-                                                        child: IntrinsicWidth(
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
-                                                                townName,
-                                                                style: const TextStyle(
-                                                                    fontSize: 16, fontWeight: FontWeight.bold),
+                                              Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    padding: EdgeInsets.only(top: 5),
+                                                    child: Text(areaName),
+                                                  ),
+                                                  const SizedBox(
+                                                    width: 20,
+                                                  ),
+                                                  Expanded(
+                                                    child: Wrap(
+                                                      children: [
+                                                        for (final MapEntry(key: townName, value: town)
+                                                            in area.town.entries)
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                                                            margin: const EdgeInsets.symmetric(
+                                                              vertical: 2,
+                                                              horizontal: 2,
+                                                            ),
+                                                            decoration: BoxDecoration(
+                                                              border: Border.all(color: Colors.grey),
+                                                              borderRadius: BorderRadius.circular(10),
+                                                            ),
+                                                            child: IntrinsicWidth(
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(
+                                                                    townName,
+                                                                    style: const TextStyle(
+                                                                        fontSize: 16, fontWeight: FontWeight.bold),
+                                                                  ),
+                                                                  const SizedBox(width: 4),
+                                                                  Container(
+                                                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                                                    decoration: BoxDecoration(
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                      color: IntensityColor.intensity(town.intensity),
+                                                                    ),
+                                                                    child: Text(
+                                                                      '${town.intensity}',
+                                                                      style: TextStyle(
+                                                                        fontSize: 16,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        color:
+                                                                            IntensityColor.onIntensity(town.intensity),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
-                                                              const SizedBox(width: 4),
-                                                              Text(
-                                                                '${town.intensity}',
-                                                                style: const TextStyle(fontSize: 14),
-                                                              ),
-                                                            ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ),
-                                                  ],
-                                                ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
