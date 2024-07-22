@@ -44,6 +44,18 @@ class _MonitorPageState extends State<MonitorPage> {
   void setupStation() async {
     final data = await ExpTech().getStations();
 
+    Map<String, dynamic> latestStations = {};
+    data.forEach((key, station) {
+      if (station.work == true) {
+        List<dynamic> info = station.info;
+        info.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
+        Map<String, dynamic> stationData = {
+          'latestTime': info.first.time // 存取 info 中第一個物件的 time 屬性
+        };
+        latestStations[key] = stationData;
+      }
+    });
+
     setState(() => stations = data);
 
     controller.addSource(
