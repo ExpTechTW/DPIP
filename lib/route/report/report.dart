@@ -166,9 +166,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
+                                      const SizedBox(height: 10),
                                       Row(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
