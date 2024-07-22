@@ -5,6 +5,7 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:dpip/widget/report/report_detail_field.dart';
 import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:intl/intl.dart';
 
@@ -130,149 +131,117 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                     ],
                                   ),
                                   const Divider(),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                  ReportDetailField(
+                                    label: "發震時間",
+                                    child: Text(
+                                      DateFormat('yyyy/MM/dd HH:mm:ss').format(
+                                        tz.TZDateTime.fromMillisecondsSinceEpoch(
+                                          tz.getLocation("Asia/Taipei"),
+                                          report!.time,
+                                        ),
+                                      ),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  ReportDetailField(
+                                    label: "位於",
+                                    child: Text(
+                                      report!.convertLatLon(),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
                                     children: [
-                                      Text(
-                                        "發震時間",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: context.colors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      Text(
-                                        DateFormat('yyyy/MM/dd HH:mm:ss').format(
-                                            tz.TZDateTime.fromMillisecondsSinceEpoch(
-                                                tz.getLocation("Asia/Taipei"), report!.time)),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        "位於",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: context.colors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      Text(
-                                        report!.convertLatLon(),
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "地震規模",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: context.colors.onSurfaceVariant,
-                                                  ),
+                                      Expanded(
+                                        child: ReportDetailField(
+                                          label: "地震規模",
+                                          child: Row(
+                                            children: [
+                                              const Text(
+                                                "M ",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    const Text(
-                                                      "M ",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "${report!.mag}",
-                                                      style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
+                                              ),
+                                              Text(
+                                                "${report!.mag}",
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "震源深度",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: context.colors.onSurfaceVariant,
-                                                  ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ReportDetailField(
+                                          label: "震源深度",
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                "${report!.depth}",
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "${report!.depth}",
-                                                      style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    const Text(
-                                                      " km",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              ],
-                                            ),
+                                              ),
+                                              const Text(
+                                                " km",
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                      const Divider(),
-                                      Text(
-                                        "各地震度",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: context.colors.onSurfaceVariant,
                                         ),
                                       ),
-                                      for (final MapEntry(key: areaName, value: area) in report!.list.entries)
-                                        Column(
-                                          children: [
-                                            for (final MapEntry(key: townName, value: town) in area.town.entries)
-                                              Container(
-                                                padding: EdgeInsets.all(8),
-                                                margin: EdgeInsets.symmetric(vertical: 4),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(color: Colors.grey),
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      townName,
-                                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                                    ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      '${town.intensity}',
-                                                      style: TextStyle(fontSize: 14),
-                                                    ),
-                                                  ],
-                                                ),
-                                              )
-                                          ],
-                                        ),
                                     ],
+                                  ),
+                                  ReportDetailField(
+                                    label: "各地震度",
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        for (final MapEntry(key: areaName, value: area) in report!.list.entries)
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            children: [
+                                              for (final MapEntry(key: townName, value: town) in area.town.entries)
+                                                Container(
+                                                  padding: EdgeInsets.all(8),
+                                                  margin: EdgeInsets.symmetric(vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(color: Colors.grey),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        townName,
+                                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                      ),
+                                                      SizedBox(height: 4),
+                                                      Text(
+                                                        '${town.intensity}',
+                                                        style: TextStyle(fontSize: 14),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                            ],
+                                          ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
