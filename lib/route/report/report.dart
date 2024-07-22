@@ -5,6 +5,7 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:intl/intl.dart';
 
 import 'package:timezone/timezone.dart' as tz;
@@ -104,19 +105,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       : ListView(
                           controller: scrollController,
                           children: [
-                            SizedBox(
-                              height: 24,
-                              child: Center(
-                                child: Container(
-                                  width: 32,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                    color: context.colors.onSurfaceVariant.withOpacity(0.4),
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            const BottomSheetDragHandle(),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Column(
