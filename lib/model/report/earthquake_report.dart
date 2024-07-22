@@ -160,10 +160,10 @@ class EarthquakeReport {
   }
 
   Color getMagnitudeColor() {
-    const List<double> magList = [0.0, 1.5, 3.0, 4.5, 6.0, 7.0];
+    const List<double> magList = [2.5, 3.5, 4.5, 6.0, 7.0];
 
     List<Color> magColors = [
-      const Color(0xFF0000C8),
+      // const Color(0xFF0080CC),
       const Color(0xFF00C8C8),
       const Color(0xFF00C800),
       const Color(0xFFFFC800),
@@ -172,9 +172,9 @@ class EarthquakeReport {
     ];
 
     if (mag <= magList.first) {
-      return const Color(0xFF006060);
+      return const Color(0xFF00C8C8);
     } else if (mag >= magList.last) {
-      return const Color(0xFF6040B0);
+      return const Color(0xFF9600FF);
     } else {
       for (int i = 0; i < magList.length - 1; i++) {
         if (mag >= magList[i] && mag < magList[i + 1]) {
