@@ -206,38 +206,54 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                       ),
                                     ],
                                   ),
+                                  const Divider(),
                                   ReportDetailField(
                                     label: "各地震度",
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
                                         for (final MapEntry(key: areaName, value: area) in report!.list.entries)
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                          Row(
                                             children: [
-                                              for (final MapEntry(key: townName, value: town) in area.town.entries)
-                                                Container(
-                                                  padding: EdgeInsets.all(8),
-                                                  margin: EdgeInsets.symmetric(vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(color: Colors.grey),
-                                                    borderRadius: BorderRadius.circular(8),
-                                                  ),
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        townName,
-                                                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                              Text(areaName),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              Expanded(
+                                                child: Wrap(
+                                                  children: [
+                                                    for (final MapEntry(key: townName, value: town)
+                                                        in area.town.entries)
+                                                      Container(
+                                                        padding: const EdgeInsets.all(5),
+                                                        margin: const EdgeInsets.symmetric(
+                                                          vertical: 4,
+                                                          horizontal: 2,
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                          border: Border.all(color: Colors.grey),
+                                                          borderRadius: BorderRadius.circular(8),
+                                                        ),
+                                                        child: IntrinsicWidth(
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                townName,
+                                                                style: const TextStyle(
+                                                                    fontSize: 16, fontWeight: FontWeight.bold),
+                                                              ),
+                                                              const SizedBox(width: 4),
+                                                              Text(
+                                                                '${town.intensity}',
+                                                                style: const TextStyle(fontSize: 14),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
                                                       ),
-                                                      SizedBox(height: 4),
-                                                      Text(
-                                                        '${town.intensity}',
-                                                        style: TextStyle(fontSize: 14),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
+                                                  ],
+                                                ),
+                                              ),
                                             ],
                                           ),
                                       ],
