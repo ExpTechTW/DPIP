@@ -165,6 +165,17 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                           label: "地震規模",
                                           child: Row(
                                             children: [
+                                              Container(
+                                                height: 10,
+                                                width: 10,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  color: report!.getMagnitudeColor(),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
                                               const Text(
                                                 "M ",
                                                 style: TextStyle(
@@ -188,6 +199,17 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                           label: "震源深度",
                                           child: Row(
                                             children: [
+                                              Container(
+                                                height: 10,
+                                                width: 10,
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  color: report!.getDepthColor(),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
                                               Text(
                                                 "${report!.depth}",
                                                 style: const TextStyle(
