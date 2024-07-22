@@ -41,7 +41,7 @@
   "@youtube": {
     "description": "「我」頁面 → 應用程式資訊 → 「Youtube 直播」按鈕"
   },
-  "server_status": "伺服器狀態",
+  "server_status": "サーバー状態",
   "@server_status": {
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
