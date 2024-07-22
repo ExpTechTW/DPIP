@@ -246,8 +246,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Padding(
-                                                    padding: EdgeInsets.only(top: 5),
-                                                    child: Text(areaName),
+                                                    padding: const EdgeInsets.only(top: 4),
+                                                    child: Text(
+                                                      areaName,
+                                                      style: const TextStyle(fontSize: 16),
+                                                    ),
                                                   ),
                                                   const SizedBox(
                                                     width: 20,
