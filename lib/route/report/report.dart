@@ -15,8 +15,6 @@ import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-import '../../widget/report/intensity_list.dart';
-
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
 
@@ -248,11 +246,34 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                           color: context.colors.onSurfaceVariant,
                                         ),
                                       ),
-                                      Container(
-                                        child: IntensityList(
-                                          report: report!,
+                                      for (final MapEntry(key: areaName, value: area) in report!.list.entries)
+                                        Column(
+                                          children: [
+                                            for (final MapEntry(key: townName, value: town) in area.town.entries)
+                                              Container(
+                                                padding: EdgeInsets.all(8),
+                                                margin: EdgeInsets.symmetric(vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: Colors.grey),
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      townName,
+                                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                                    ),
+                                                    SizedBox(height: 4),
+                                                    Text(
+                                                      '${town.intensity}',
+                                                      style: TextStyle(fontSize: 14),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                          ],
                                         ),
-                                      ),
                                     ],
                                   ),
                                 ],
