@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dpip/model/report/area_intensity.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -157,59 +155,5 @@ class EarthquakeReport {
       lonFormat = "東經 $lonTemp 度";
     }
     return "$latFormat　$lonFormat";
-  }
-
-  Color getMagnitudeColor() {
-    const List<double> magList = [2.5, 3.5, 4.5, 6.0, 7.0];
-
-    List<Color> magColors = [
-      // const Color(0xFF0080CC),
-      const Color(0xFF00C8C8),
-      const Color(0xFF00C800),
-      const Color(0xFFFFC800),
-      const Color(0xFFFF0000),
-      const Color(0xFF9600FF),
-    ];
-
-    if (mag <= magList.first) {
-      return const Color(0xFF00C8C8);
-    } else if (mag >= magList.last) {
-      return const Color(0xFF9600FF);
-    } else {
-      for (int i = 0; i < magList.length - 1; i++) {
-        if (mag >= magList[i] && mag < magList[i + 1]) {
-          double localT = (mag - magList[i]) / (magList[i + 1] - magList[i]);
-          return Color.lerp(magColors[i], magColors[i + 1], localT)!;
-        }
-      }
-    }
-    return const Color(0xFF000000);
-  }
-
-  Color getDepthColor() {
-    const List<int> depList = [5, 15, 30, 50, 100, 150];
-
-    List<Color> depColors = [
-      const Color(0xFFFF0000),
-      const Color(0xFFFF6400),
-      const Color(0xFFFFC800),
-      const Color(0xFF00C800),
-      const Color(0xFF00C8C8),
-      const Color(0xFF0000C8),
-    ];
-
-    if (depth <= depList.first) {
-      return const Color(0xFFFF0000);
-    } else if (depth >= depList.last) {
-      return const Color(0xFF0000C8);
-    } else {
-      for (int i = 0; i < depList.length - 1; i++) {
-        if (depth >= depList[i] && depth < depList[i + 1]) {
-          double localT = (depth - depList[i]) / (depList[i + 1] - depList[i]);
-          return Color.lerp(depColors[i], depColors[i + 1], localT)!;
-        }
-      }
-    }
-    return const Color(0xFF000000);
   }
 }

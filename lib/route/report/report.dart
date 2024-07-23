@@ -3,19 +3,20 @@ import 'dart:async';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
+import 'package:dpip/util/depth_color.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/int.dart';
+import 'package:dpip/util/magnitude_color.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:dpip/widget/report/report_detail_field.dart';
-import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
-import 'package:intl/intl.dart';
-
-import 'package:timezone/timezone.dart' as tz;
 import 'package:dpip/widget/map/marker/custom_marker.dart';
 import 'package:dpip/widget/map/marker/intensity_marker.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
+import 'package:dpip/widget/report/report_detail_field.dart';
+import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../util/intensity_color.dart';
 
@@ -171,7 +172,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                                 width: 10,
                                                 decoration: BoxDecoration(
                                                   borderRadius: BorderRadius.circular(10),
-                                                  color: report!.getMagnitudeColor(),
+                                                  color: MagnitudeColor.magnitude(report!.mag),
                                                 ),
                                               ),
                                               const SizedBox(
@@ -198,7 +199,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                                 width: 10,
                                                 decoration: BoxDecoration(
                                                   borderRadius: BorderRadius.circular(10),
-                                                  color: report!.getDepthColor(),
+                                                  color: DepthColor.depth(report!.depth),
                                                 ),
                                               ),
                                               const SizedBox(
