@@ -55,8 +55,7 @@ class ReportSheetContent extends StatelessWidget {
                 avatar: const Icon(Symbols.link),
                 label: const Text("報告頁面"),
                 onPressed: () {
-                  launchUrl(Uri.parse(
-                      "https://www.cwa.gov.tw/V8/C/E/EQ/EQ${report.id.substring(0, 6)}${report.id.substring(11)}.html"));
+                  launchUrl(report.cwaUrl);
                 },
               ),
             ],
