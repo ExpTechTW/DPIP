@@ -145,15 +145,28 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       ? const Center(child: CircularProgressIndicator())
                       : report == null
                           ? Padding(
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.all(20),
                               child: Row(
                                 children: [
-                                  Text("取得地震報告時發生錯誤，請檢查網路狀況後重試"),
-                                  ElevatedButton(
-                                    child: Icon(Symbols.refresh),
-                                    onPressed: () {
-                                      refreshReport();
-                                    },
+                                  const Flexible(
+                                    flex: 8,
+                                    child: Text(
+                                      "取得地震報告時發生錯誤，請檢查網路狀況後重試",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    flex: 2,
+                                    child: IconButton(
+                                      icon: const Icon(Symbols.refresh),
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: context.colors.onSurface,
+                                      ),
+                                      onPressed: () {
+                                        refreshReport();
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
