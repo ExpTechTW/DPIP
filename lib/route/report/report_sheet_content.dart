@@ -219,6 +219,7 @@ class ReportSheetContent extends StatelessWidget {
             ],
           ),
         ),
+        const Divider(),
         ReportDetailField(
           label: "地震報告圖",
           child: EnlargeableImage(
