@@ -248,10 +248,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Future toggleAutoLocation() async {
     stopBackgroundService();
 
-    try {
-      await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
-    } on PlatformException catch (e) {
-      print("Failed to toggle location: '${e.message}'.");
+    if (Platform.isIOS) {
+      try {
+        await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
+      } on PlatformException catch (e) {
+        print("Failed to toggle location: '${e.message}'.");
+      }
     }
 
     if (isAutoLocatingEnabled) {
@@ -299,23 +301,23 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     permissionStatusUpdate();
   }
 
-  void permissionStatusUpdate(){
+  void permissionStatusUpdate() {
     Permission.notification.status.then(
-          (value) {
+      (value) {
         setState(() {
           notificationPermission = value;
         });
       },
     );
     Permission.location.status.then(
-          (value) {
+      (value) {
         setState(() {
           locationPermission = value;
         });
       },
     );
     Permission.locationAlways.status.then(
-          (value) {
+      (value) {
         print(value);
         setState(() {
           locationAlwaysPermission = value;
