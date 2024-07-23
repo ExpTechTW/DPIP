@@ -38,45 +38,18 @@ class DpipMapState extends State<DpipMap> {
 
   late String style = jsonEncode(
     {
-      "version": 8,
-      "name": "TREM Map",
-      "sources": {
-        "tw_county": {
-          "type": "geojson",
-          "data": Global.geojson["tw_county"],
-          "tolerance": 1,
+      'version': 8,
+      'name': 'ExpTech Studio',
+      'center': [120.2, 23.6],
+      'zoom': 7,
+      'sources': {
+        'map': {
+          'type': 'vector',
+          'url': 'https://api-1.exptech.dev/api/v1/map/tiles/tiles.json',
         },
-        "tw_town": {
-          "type": "geojson",
-          "data": Global.geojson["tw_town"],
-        },
-        /*
-          "cn": {
-            "type": "geojson",
-            "data": "./map/cn.json",
-            "tolerance": 1,
-          },
-          "jp": {
-            "type": "geojson",
-            "data": "./map/jp.json",
-            "tolerance": 1,
-          },
-          "kp": {
-            "type": "geojson",
-            "data": "./map/kp.json",
-            "tolerance": 1,
-          },
-          "kr": {
-            "type": "geojson",
-            "data": "./map/kr.json",
-            "tolerance": 1,
-          },
-          "box": {
-            "type": "geojson",
-            "data": "./map/box.json",
-          }, 
-          */
       },
+      'sprite': '',
+      'glyphs': 'https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf',
       "layers": [
         {
           "id": "background",
@@ -88,7 +61,8 @@ class DpipMapState extends State<DpipMap> {
         {
           "id": "county",
           "type": "fill",
-          "source": "tw_county",
+          "source": "map",
+          "source-layer": "city",
           "paint": {
             "fill-color": [
               "match",
@@ -122,12 +96,22 @@ class DpipMapState extends State<DpipMap> {
         },
         {
           "id": "county-outline",
-          "source": "tw_county",
+          "source": "map",
+          "source-layer": "city",
           "type": "line",
           "paint": {
             "line-color": context.colors.outline.toHexStringRGB(),
           }
-        }
+        },
+        {
+          "id": "global",
+          "type": "line",
+          "source": "map",
+          "source-layer": "global",
+          "paint": {
+            "line-color": context.colors.outline.toHexStringRGB(),
+          }
+        },
       ],
     },
   );
