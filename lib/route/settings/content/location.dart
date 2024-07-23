@@ -251,8 +251,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     if (Platform.isIOS) {
       try {
         await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
-      } on PlatformException catch (e) {
-        print("Failed to toggle location: '${e.message}'.");
+      } catch (e) {
+        return;
       }
     }
 
