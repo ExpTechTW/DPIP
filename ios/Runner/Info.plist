@@ -45,6 +45,8 @@
 	<string>DPIP 在開啟和後台執行時需要位置資訊，用以自動設定所在地並在地震發生時能較準確地預估所在地的最大震度。</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>DPIP 將利用你的位置資訊，用以自動設定所在地並在地震發生時能較準確地預估所在地的最大震度。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>用於保存地震報告圖片。</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
