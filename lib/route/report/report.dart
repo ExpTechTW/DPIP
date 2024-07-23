@@ -4,6 +4,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/extension/int.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:dpip/widget/report/report_detail_field.dart';
 import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
@@ -287,7 +288,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                                                       color: IntensityColor.intensity(town.intensity),
                                                                     ),
                                                                     child: Text(
-                                                                      '${town.intensity}',
+                                                                      town.intensity.asIntensityLabel,
+                                                                      // "5+",
                                                                       style: TextStyle(
                                                                         fontSize: 16,
                                                                         fontWeight: FontWeight.bold,
