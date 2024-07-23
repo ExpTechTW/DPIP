@@ -71,15 +71,45 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       body: Stack(children: [
         DpipMap(
           key: mapKey,
-          onMapCreated: (controller) {
+          onMapCreated: (controller) async {
             mapController.complete(controller);
+            await controller.setSymbolIconAllowOverlap(true);
+            await controller.setSymbolIconIgnorePlacement(true);
 
             ExpTech().getReport(widget.report.id).then((data) async {
               setState(() {
                 report = data;
               });
 
-              for (var MapEntry(key: _, value: area) in data.list.entries) {
+              // 首先,定義一個函數來獲取強度對應的顏色
+              String getIntensityColor(int intensity) {
+                switch (intensity) {
+                  case 9:
+                    return IntensityColor.intensity9.toHexStringRGB();
+                  case 8:
+                    return IntensityColor.intensity8.toHexStringRGB();
+                  case 7:
+                    return IntensityColor.intensity7.toHexStringRGB();
+                  case 6:
+                    return IntensityColor.intensity6.toHexStringRGB();
+                  case 5:
+                    return IntensityColor.intensity5.toHexStringRGB();
+                  case 4:
+                    return IntensityColor.intensity4.toHexStringRGB();
+                  case 3:
+                    return IntensityColor.intensity3.toHexStringRGB();
+                  case 2:
+                    return IntensityColor.intensity2.toHexStringRGB();
+                  case 1:
+                    return IntensityColor.intensity1.toHexStringRGB();
+                  default:
+                    return context.colors.surfaceContainerHighest.toHexStringRGB();
+                }
+              }
+
+              Map<String, int> cityMaxIntensity = {};
+
+              for (var MapEntry(key: city, value: area) in data.list.entries) {
                 for (var MapEntry(key: _, value: town) in area.town.entries) {
                   map.addMarker(CustomMarker(
                     zIndex: town.intensity,
@@ -88,8 +118,27 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       intensity: town.intensity,
                     ),
                   ));
+                  if (cityMaxIntensity[city] == null || cityMaxIntensity[city]! < town.intensity) {
+                    cityMaxIntensity[city] = town.intensity;
+                  }
                 }
               }
+
+              controller.setLayerProperties(
+                'county',
+                FillLayerProperties(
+                  fillColor: [
+                    'match',
+                    ['get', 'NAME_2014'],
+                    ...cityMaxIntensity.entries.expand((entry) => [
+                      entry.key,
+                      getIntensityColor(entry.value),
+                    ]),
+                    context.colors.outlineVariant.toHexStringRGB(),
+                  ],
+                  fillOpacity: 1,
+                ),
+              );
             });
           },
         ),

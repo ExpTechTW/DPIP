@@ -63,36 +63,6 @@ class DpipMapState extends State<DpipMap> {
           "type": "fill",
           "source": "map",
           "source-layer": "city",
-          "paint": {
-            "fill-color": [
-              "match",
-              [
-                "number",
-                ["feature-state", "intensity"],
-                0
-              ],
-              9,
-              IntensityColor.intensity9.toHexStringRGB(),
-              8,
-              IntensityColor.intensity8.toHexStringRGB(),
-              7,
-              IntensityColor.intensity7.toHexStringRGB(),
-              6,
-              IntensityColor.intensity6.toHexStringRGB(),
-              5,
-              IntensityColor.intensity5.toHexStringRGB(),
-              4,
-              IntensityColor.intensity4.toHexStringRGB(),
-              3,
-              IntensityColor.intensity3.toHexStringRGB(),
-              2,
-              IntensityColor.intensity2.toHexStringRGB(),
-              1,
-              IntensityColor.intensity1.toHexStringRGB(),
-              context.colors.surfaceContainerHighest.toHexStringRGB(),
-            ],
-            "fill-opacity": 1,
-          },
         },
         {
           "id": "county-outline",
@@ -105,12 +75,10 @@ class DpipMapState extends State<DpipMap> {
         },
         {
           "id": "global",
-          "type": "line",
+          "type": "fill",
           "source": "map",
           "source-layer": "global",
-          "paint": {
-            "line-color": context.colors.outline.toHexStringRGB(),
-          }
+          "paint": {"fill-color": context.colors.outlineVariant.toHexStringRGB(), "fill-opacity": 1}
         },
       ],
     },
