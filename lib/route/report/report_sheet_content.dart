@@ -10,6 +10,7 @@ import 'package:dpip/widget/report/report_detail_field.dart';
 import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,11 +18,13 @@ import 'package:url_launcher/url_launcher.dart';
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;
   final EarthquakeReport report;
+  final void Function(LatLng target) focus;
 
   const ReportSheetContent({
     super.key,
     required this.report,
     required this.controller,
+    required this.focus,
   });
 
   @override
@@ -167,47 +170,35 @@ class ReportSheetContent extends StatelessWidget {
                           Expanded(
                             child: Wrap(
                               spacing: 8,
-                              runSpacing: 8,
                               children: [
                                 for (final MapEntry(key: townName, value: town) in area.town.entries)
-                                  Container(
+                                  ActionChip(
                                     padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: context.colors.outline),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: IntrinsicHeight(
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          AspectRatio(
-                                            aspectRatio: 1,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(6),
-                                                color: IntensityColor.intensity(town.intensity),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  town.intensity.asIntensityDisplayLabel,
-                                                  style: TextStyle(
-                                                    height: 1,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: IntensityColor.onIntensity(town.intensity),
-                                                  ),
-                                                ),
-                                              ),
+                                    side: BorderSide(color: IntensityColor.intensity(town.intensity)),
+                                    backgroundColor: IntensityColor.intensity(town.intensity).withOpacity(0.12),
+                                    avatar: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(6),
+                                          color: IntensityColor.intensity(town.intensity),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            town.intensity.asIntensityDisplayLabel,
+                                            style: TextStyle(
+                                              height: 1,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: IntensityColor.onIntensity(town.intensity),
                                             ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            child: Text(townName),
-                                          ),
-                                        ],
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                    label: Text(townName),
+                                    onPressed: () => focus(LatLng(town.lat, town.lon)),
+                                  )
                               ],
                             ),
                           ),

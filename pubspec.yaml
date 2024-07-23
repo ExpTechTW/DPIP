@@ -60,6 +60,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/map/
+    - assets/map/icons/
     - assets/DPIP.png
     - assets/location.json
     - assets/eew.wav

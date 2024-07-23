@@ -5,11 +5,9 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:dpip/widget/map/marker/custom_marker.dart';
-import 'package:dpip/widget/map/marker/intensity_marker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -25,11 +23,6 @@ class ReportRoute extends StatefulWidget {
 class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin {
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
-  List<CustomMarker> mapMarkers = [];
-
-  final mapKey = GlobalKey<DpipMapState>();
-
-  DpipMapState get map => mapKey.currentState!;
 
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
@@ -44,29 +37,143 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
   final sheetInitialSize = 0.2;
   final sheetController = DraggableScrollableController();
+  late ScrollController scrollController;
 
-  bool refreshing = true;
+  bool isLoading = true;
 
-  refreshReport() {
-    setState(() {
-      refreshing = true;
-    });
-    ExpTech().getReport(widget.report.id).then((data) async {
+  void refreshReport() async {
+    setState(() => isLoading = true);
+
+    try {
+      final data = await ExpTech().getReport(widget.report.id);
+      final controller = await mapController.future;
+
+      List features = [];
+
+      for (var MapEntry(key: _, value: area) in data.list.entries) {
+        for (var MapEntry(key: _, value: town) in area.town.entries) {
+          features.add({
+            "type": "Feature",
+            "properties": {
+              "intensity": town.intensity,
+            },
+            "geometry": {
+              "coordinates": [town.lon, town.lat],
+              "type": "Point"
+            }
+          });
+        }
+      }
+
+      features.add({
+        "type": "Feature",
+        "properties": {
+          "intensity": 10,
+        },
+        "geometry": {
+          "coordinates": [data.lon, data.lat],
+          "type": "Point"
+        }
+      });
+
+      await controller.addGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": features,
+        },
+      );
+
+      if (!mounted) return;
+
+      final isDark = context.theme.brightness == Brightness.dark;
+
+      for (var i = 1; i < 10; i++) {
+        final path = "assets/map/icons/intensity-$i${isDark ? "" : "-dark"}.png";
+
+        await controller.addImage("intensity-$i", Uint8List.sublistView(await rootBundle.load(path)));
+      }
+
+      await controller.addImage("cross", Uint8List.sublistView(await rootBundle.load("assets/map/icons/cross.png")));
+
+      await controller.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolSortKey: [Expressions.get, "intensity"],
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            6,
+            0.5,
+            12,
+            1,
+          ],
+          iconImage: [
+            Expressions.match,
+            [Expressions.get, "intensity"],
+            1,
+            "intensity-1",
+            2,
+            "intensity-2",
+            3,
+            "intensity-3",
+            4,
+            "intensity-4",
+            5,
+            "intensity-5",
+            6,
+            "intensity-6",
+            7,
+            "intensity-7",
+            8,
+            "intensity-8",
+            9,
+            "intensity-9",
+            "cross",
+          ],
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+
+      /* 
+      await controller.setLayerProperties(
+        'county',
+        FillLayerProperties(
+          fillColor: [
+            'match',
+            ['get', 'NAME_2014'],
+            ...cityMaxIntensity.entries.expand((entry) => [
+                  entry.key,
+                  IntensityColor.intensity(entry.value).toHexStringRGB(),
+                ]),
+            context.colors.surfaceVariant.toHexStringRGB(),
+          ],
+          fillOpacity: 1,
+        ),
+      ); */
+
       setState(() {
         report = data;
-        refreshing = false;
+        isLoading = false;
       });
-    }).catchError((error) {
-      setState(() {
-        refreshing = false;
-      });
-    });
+    } catch (e) {
+      print(e);
+      setState(() => isLoading = false);
+    }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    refreshReport();
+  void focus(LatLng target) async {
+    final controller = await mapController.future;
+    sheetController.animateTo(sheetInitialSize, duration: Durations.short4, curve: Easing.standard);
+    scrollController.jumpTo(0);
+    controller.animateCamera(
+      CameraUpdate.newLatLngZoom(LatLng(target.latitude - 0.03, target.longitude), 10),
+      duration: const Duration(seconds: 1),
+    );
   }
 
   @override
@@ -85,50 +192,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       ),
       body: Stack(children: [
         DpipMap(
-          key: mapKey,
           onMapCreated: (controller) async {
             mapController.complete(controller);
             await controller.setSymbolIconAllowOverlap(true);
             await controller.setSymbolIconIgnorePlacement(true);
-
-            ExpTech().getReport(widget.report.id).then((data) async {
-              setState(() {
-                report = data;
-              });
-
-              Map<String, int> cityMaxIntensity = {};
-
-              for (var MapEntry(key: city, value: area) in data.list.entries) {
-                for (var MapEntry(key: _, value: town) in area.town.entries) {
-                  map.addMarker(CustomMarker(
-                    zIndex: town.intensity,
-                    coordinate: LatLng(town.lat, town.lon),
-                    child: IntensityMarker(
-                      intensity: town.intensity,
-                    ),
-                  ));
-                  if (cityMaxIntensity[city] == null || cityMaxIntensity[city]! < town.intensity) {
-                    cityMaxIntensity[city] = town.intensity;
-                  }
-                }
-              }
-
-              controller.setLayerProperties(
-                'county',
-                FillLayerProperties(
-                  fillColor: [
-                    'match',
-                    ['get', 'NAME_2014'],
-                    ...cityMaxIntensity.entries.expand((entry) => [
-                          entry.key,
-                          IntensityColor.intensity(entry.value).toHexStringRGB(),
-                        ]),
-                    context.colors.outlineVariant.toHexStringRGB(),
-                  ],
-                  fillOpacity: 1,
-                ),
-              );
-            });
+            refreshReport();
           },
         ),
         Positioned.fill(
@@ -137,42 +205,42 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             minChildSize: sheetInitialSize,
             controller: sheetController,
             snap: true,
-            builder: (context, scrollController) {
+            builder: (context, controller) {
+              scrollController = controller;
+
               return DecoratedBoxTransition(
                 decoration: animController.drive(decorationTween),
-                child: Container(
-                  child: refreshing == true
-                      ? const Center(child: CircularProgressIndicator())
-                      : report == null
-                          ? Padding(
-                              padding: EdgeInsets.all(20),
-                              child: Row(
-                                children: [
-                                  const Flexible(
-                                    flex: 8,
-                                    child: Text(
-                                      "取得地震報告時發生錯誤，請檢查網路狀況後重試",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : report == null
+                        ? Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                const Flexible(
+                                  flex: 8,
+                                  child: Text(
+                                    "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+                                    style: TextStyle(fontSize: 16),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Flexible(
-                                    flex: 2,
-                                    child: IconButton(
-                                      icon: const Icon(Symbols.refresh),
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: context.colors.onSurface,
-                                      ),
-                                      onPressed: () {
-                                        refreshReport();
-                                      },
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  flex: 2,
+                                  child: IconButton(
+                                    icon: const Icon(Symbols.refresh),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: context.colors.onSurface,
                                     ),
+                                    onPressed: () {
+                                      refreshReport();
+                                    },
                                   ),
-                                ],
-                              ),
-                            )
-                          : ReportSheetContent(report: report!, controller: scrollController),
-                ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ReportSheetContent(report: report!, controller: controller, focus: focus),
               );
             },
           ),

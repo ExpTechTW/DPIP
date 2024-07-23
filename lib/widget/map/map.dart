@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/widget/map/marker/custom_marker.dart';
 import 'package:dpip/widget/map/marker/marker.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +49,7 @@ class DpipMapState extends State<DpipMap> {
         },
       },
       'sprite': '',
-      'glyphs': 'https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf',
+      'glyphs': 'https://orangemug.github.io/font-glyphs-v2/glyphs/{fontstack}/{range}.pbf',
       "layers": [
         {
           "id": "background",
@@ -65,6 +63,10 @@ class DpipMapState extends State<DpipMap> {
           "type": "fill",
           "source": "map",
           "source-layer": "city",
+          "paint": {
+            "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
+            "fill-opacity": 1,
+          },
         },
         {
           "id": "county-outline",
@@ -73,14 +75,17 @@ class DpipMapState extends State<DpipMap> {
           "type": "line",
           "paint": {
             "line-color": context.colors.outline.toHexStringRGB(),
-          }
+          },
         },
         {
           "id": "global",
           "type": "fill",
           "source": "map",
           "source-layer": "global",
-          "paint": {"fill-color": context.colors.outlineVariant.toHexStringRGB(), "fill-opacity": 1}
+          "paint": {
+            "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
+            "fill-opacity": 1,
+          },
         },
       ],
     },
@@ -120,9 +125,11 @@ class DpipMapState extends State<DpipMap> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  removeMarkers() {
+    setState(() {
+      _markers.clear();
+      _markerStates.clear();
+    });
   }
 
   @override
