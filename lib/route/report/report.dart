@@ -177,15 +177,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                               const SizedBox(
                                                 width: 5,
                                               ),
-                                              const Text(
-                                                "M ",
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
                                               Text(
-                                                "${report!.mag}",
+                                                "M ${report!.mag}",
                                                 style: const TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
