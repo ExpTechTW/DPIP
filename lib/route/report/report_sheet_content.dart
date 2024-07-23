@@ -4,6 +4,7 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/int.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/magnitude_color.dart';
+import 'package:dpip/widget/report/enlargeable_image.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:dpip/widget/report/report_detail_field.dart';
 import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
@@ -219,6 +220,45 @@ class ReportSheetContent extends StatelessWidget {
             ],
           ),
         ),
+        ReportDetailField(
+          label: "地震報告圖",
+          child: EnlargeableImage(
+            aspectRatio: 4 / 3,
+            heroTag: "report-image-${report.id}",
+            imageUrl: report.reportImageUrl,
+            imageName: report.reportImageName,
+          ),
+        ),
+        if (report.hasNumber)
+          ReportDetailField(
+            label: "震度圖",
+            child: EnlargeableImage(
+              aspectRatio: 2334 / 2977,
+              heroTag: "intensity-image-${report.id}",
+              imageUrl: report.intensityMapImageUrl!,
+              imageName: report.intensityMapImageName!,
+            ),
+          ),
+        if (report.hasNumber)
+          ReportDetailField(
+            label: "最大地動加速度圖",
+            child: EnlargeableImage(
+              aspectRatio: 2334 / 2977,
+              heroTag: "pga-image-${report.id}",
+              imageUrl: report.pgaMapImageUrl!,
+              imageName: report.pgaMapImageName!,
+            ),
+          ),
+        if (report.hasNumber)
+          ReportDetailField(
+            label: "最大地動速度圖",
+            child: EnlargeableImage(
+              aspectRatio: 2334 / 2977,
+              heroTag: "pgv-image-${report.id}",
+              imageUrl: report.pgvMapImageUrl!,
+              imageName: report.pgvMapImageName!,
+            ),
+          )
       ],
     );
   }
