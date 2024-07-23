@@ -9,7 +9,9 @@ import 'package:dpip/widget/report/report_detail_field.dart';
 import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;
@@ -46,6 +48,16 @@ class ReportSheetContent extends StatelessWidget {
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
+              ),
+              Expanded(child: Container()),
+              ActionChip(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                avatar: const Icon(Symbols.link),
+                label: const Text("報告頁面"),
+                onPressed: () {
+                  launchUrl(Uri.parse(
+                      "https://www.cwa.gov.tw/V8/C/E/EQ/EQ${report.id.substring(0, 6)}${report.id.substring(11)}.html"));
+                },
               ),
             ],
           ),
