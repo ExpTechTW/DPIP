@@ -205,16 +205,9 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                                 width: 5,
                                               ),
                                               Text(
-                                                "${report!.depth}",
+                                                "${report!.depth} km",
                                                 style: const TextStyle(
                                                   fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const Text(
-                                                " km",
-                                                style: TextStyle(
-                                                  fontSize: 14,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
