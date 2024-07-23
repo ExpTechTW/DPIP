@@ -45,7 +45,7 @@
   "@server_status": {
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
-  "third_party_libraries": "타사라이센스",
+  "third_party_libraries": "제3자 라이브러리 라이선스",
   "@instthird_party_librariesagram": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   }
