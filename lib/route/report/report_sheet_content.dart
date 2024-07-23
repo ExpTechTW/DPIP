@@ -54,6 +54,7 @@ class ReportSheetContent extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Symbols.open_in_new),
+                tooltip: "報告頁面",
                 onPressed: () {
                   launchUrl(report.cwaUrl);
                 },
@@ -95,15 +96,13 @@ class ReportSheetContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      height: 10,
-                      width: 10,
+                      height: 12,
+                      width: 12,
+                      margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: MagnitudeColor.magnitude(report.mag),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 5,
                     ),
                     Text(
                       "M ${report.mag}",
@@ -122,15 +121,13 @@ class ReportSheetContent extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      height: 10,
-                      width: 10,
+                      height: 12,
+                      width: 12,
+                      margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: DepthColor.depth(report.depth),
                       ),
-                    ),
-                    const SizedBox(
-                      width: 5,
                     ),
                     Text(
                       "${report.depth} km",
@@ -161,7 +158,10 @@ class ReportSheetContent extends StatelessWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(top: 6),
-                            child: Text(areaName),
+                            child: Text(
+                              areaName,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                           const SizedBox(width: 20),
                           Expanded(
@@ -180,10 +180,6 @@ class ReportSheetContent extends StatelessWidget {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            child: Text(townName),
-                                          ),
                                           AspectRatio(
                                             aspectRatio: 1,
                                             child: Container(
@@ -203,6 +199,10 @@ class ReportSheetContent extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            child: Text(townName),
                                           ),
                                         ],
                                       ),
