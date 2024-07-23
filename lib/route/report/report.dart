@@ -81,7 +81,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                 report = data;
               });
 
-              // 首先,定義一個函數來獲取強度對應的顏色
               String getIntensityColor(int intensity) {
                 switch (intensity) {
                   case 9:

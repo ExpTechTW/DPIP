@@ -46,6 +46,8 @@ class DpipMapState extends State<DpipMap> {
         'map': {
           'type': 'vector',
           'url': 'https://api-1.exptech.dev/api/v1/map/tiles/tiles.json',
+          'tileSize': 512,
+          'buffer': 64
         },
       },
       'sprite': '',
