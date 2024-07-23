@@ -18,40 +18,43 @@ class EnlargeableImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: aspectRatio,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Stack(
-          children: [
-            Hero(
-              tag: heroTag,
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-              ),
-            ),
-            Positioned.fill(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return ImageViewerRoute(
-                            heroTag: heroTag,
-                            imageUrl: imageUrl,
-                            imageName: imageName,
-                          );
-                        },
-                      ),
-                    );
-                  },
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: AspectRatio(
+        aspectRatio: aspectRatio,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Stack(
+            children: [
+              Hero(
+                tag: heroTag,
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
                 ),
               ),
-            ),
-          ],
+              Positioned.fill(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return ImageViewerRoute(
+                              heroTag: heroTag,
+                              imageUrl: imageUrl,
+                              imageName: imageName,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
