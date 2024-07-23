@@ -67,10 +67,10 @@ class LocationService {
       }
 
       String citytown = '$city $town';
-      String citytowntemp = Global.preference.getString("loc-city-town") ?? "";
+      String citytowntemp = Global.preference.getString("loc-position-country") ?? "";
 
       if (citytowntemp == "" || citytowntemp != citytown) {
-        await Global.preference.setString("loc-city-town", citytown);
+        await Global.preference.setString("loc-position-country", citytown);
         locationGet = LocationResult(citytown, true);
       } else {
         locationGet = LocationResult(citytowntemp, false);
