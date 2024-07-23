@@ -11,6 +11,7 @@ import 'package:dpip/widget/map/marker/custom_marker.dart';
 import 'package:dpip/widget/map/marker/intensity_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -44,9 +45,28 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   final sheetInitialSize = 0.2;
   final sheetController = DraggableScrollableController();
 
+  bool refreshing = true;
+
+  refreshReport() {
+    setState(() {
+      refreshing = true;
+    });
+    ExpTech().getReport(widget.report.id).then((data) async {
+      setState(() {
+        report = data;
+        refreshing = false;
+      });
+    }).catchError((error) {
+      setState(() {
+        refreshing = false;
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    refreshReport();
   }
 
   @override
@@ -121,9 +141,24 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
               return DecoratedBoxTransition(
                 decoration: animController.drive(decorationTween),
                 child: Container(
-                  child: report == null
+                  child: refreshing == true
                       ? const Center(child: CircularProgressIndicator())
-                      : ReportSheetContent(report: report!, controller: scrollController),
+                      : report == null
+                          ? Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Row(
+                                children: [
+                                  Text("取得地震報告時發生錯誤，請檢查網路狀況後重試"),
+                                  ElevatedButton(
+                                    child: Icon(Symbols.refresh),
+                                    onPressed: () {
+                                      refreshReport();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ReportSheetContent(report: report!, controller: scrollController),
                 ),
               );
             },
