@@ -37,24 +37,23 @@ class ReportSheetContent extends StatelessWidget {
             children: [
               IntensityBox(intensity: report.getMaxIntensity()),
               const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    report.hasNumber ? "編號 ${report.number} 顯著有感地震" : "小區域有感地震",
-                    style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
-                  ),
-                  Text(
-                    report.getLocation(),
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      report.hasNumber ? "編號 ${report.number} 顯著有感地震" : "小區域有感地震",
+                      style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
+                    ),
+                    Text(
+                      report.getLocation(),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
-              Expanded(child: Container()),
-              ActionChip(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                avatar: const Icon(Symbols.link),
-                label: const Text("報告頁面"),
+              IconButton(
+                icon: const Icon(Symbols.open_in_new),
                 onPressed: () {
                   launchUrl(report.cwaUrl);
                 },
