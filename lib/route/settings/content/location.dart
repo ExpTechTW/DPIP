@@ -336,6 +336,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SwitchListTile(
+              // FIXME: workaround waiting for upstream PR to merge
+              // https://github.com/material-foundation/flutter-packages/pull/599
               tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceVariant,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
