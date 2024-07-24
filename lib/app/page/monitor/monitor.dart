@@ -143,7 +143,7 @@ class _MonitorPageState extends State<MonitorPage> {
               }
 
               testTimer = Timer.periodic(Duration(milliseconds: 100), (t) {
-                radius += 0.5;
+                radius += 0.1;
                 final c = circle(const LatLng(25.299654949482424, 121.53697911932383), /* 384.63 */ radius, steps: 128);
                 controller.setGeoJsonSource("circle", {
                   "type": "FeatureCollection",
