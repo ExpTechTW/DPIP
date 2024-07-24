@@ -124,6 +124,9 @@ class _MonitorPageState extends State<MonitorPage> {
     if (timer != null) {
       timer!.cancel();
     }
+    if (testTimer != null) {
+      testTimer!.cancel();
+    }
     super.dispose();
   }
 
