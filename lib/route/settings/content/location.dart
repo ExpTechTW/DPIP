@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
+import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
@@ -70,7 +71,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () {
                         openAppSettings();
                         Navigator.pop(context);
@@ -120,7 +121,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () {
                         openAppSettings();
                         Navigator.pop(context);
@@ -245,6 +246,46 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
   }
 
+  Future<bool> androidCheckBatteryOptimizationPermission() async {
+    if (Platform.isIOS) return true;
+    try {
+      bool? isAvailable = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
+      if (isAvailable == false) {
+        return await showDialog<bool>(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  icon: const Icon(Symbols.my_location),
+                  title: const Text("省電策略"),
+                  content: const Text("為了獲得更好的自動定位體驗，您需要給予「無限制」以讓 DPIP 在背景自動設定所在地資訊。"),
+                  actionsAlignment: MainAxisAlignment.spaceBetween,
+                  actions: [
+                    TextButton(
+                      child: const Text("取消"),
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                    ),
+                    FilledButton(
+                      child: const Text("確定"),
+                      onPressed: () async {
+                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                        Navigator.pop(context, false);
+                      },
+                    ),
+                  ],
+                );
+              },
+            ) ??
+            false;
+      } else {
+        return true;
+      }
+    } catch (err) {
+      return false;
+    }
+  }
+
   Future toggleAutoLocation() async {
     stopBackgroundService();
 
@@ -272,6 +313,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       bool autoStart = await androidCheckAutoStartPermission();
 
       if (!autoStart) return;
+
+      bool batteryOptimization = await androidCheckBatteryOptimizationPermission();
+
+      if (!batteryOptimization) return;
 
       startBackgroundService(false);
 
@@ -378,7 +423,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       ),
                     ),
                     TextButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () async {
                         final status = await Permission.locationAlways.request();
                         if (status.isPermanentlyDenied) {
@@ -417,7 +462,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       ),
                     ),
                     TextButton(
-                      child: const Text("設定"),
+                      child: Text(context.i18n.settings),
                       onPressed: () {
                         openAppSettings();
                       },
