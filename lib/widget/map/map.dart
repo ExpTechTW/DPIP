@@ -1,11 +1,11 @@
-import 'dart:convert';
-import 'dart:math';
+import "dart:convert";
+import "dart:io";
+import "dart:math";
 
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/widget/map/marker/custom_marker.dart';
-import 'package:dpip/widget/map/marker/marker.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:path_provider/path_provider.dart";
 
 class DpipMap extends StatefulWidget {
   final CameraPosition initialCameraPosition;
@@ -30,26 +30,22 @@ class DpipMap extends StatefulWidget {
 }
 
 class DpipMapState extends State<DpipMap> {
-  final _markers = <Marker>[];
-  final _markerStates = <MarkerState>[];
-  late MapLibreMapController _mapController;
-
   late String style = jsonEncode(
     {
-      'version': 8,
-      'name': 'ExpTech Studio',
-      'center': [120.2, 23.6],
-      'zoom': 7,
-      'sources': {
-        'map': {
-          'type': 'vector',
-          'url': 'https://api-1.exptech.dev/api/v1/map/tiles/tiles.json',
-          'tileSize': 512,
-          'buffer': 64
+      "version": 8,
+      "name": "ExpTech Studio",
+      "center": [120.2, 23.6],
+      "zoom": 7,
+      "sources": {
+        "map": {
+          "type": "vector",
+          "url": "https://api-1.exptech.dev/api/v1/map/tiles/tiles.json",
+          "tileSize": 512,
+          "buffer": 64
         },
       },
-      'sprite': '',
-      'glyphs': 'https://orangemug.github.io/font-glyphs-v2/glyphs/{fontstack}/{range}.pbf',
+      "sprite": "",
+      "glyphs": "https://orangemug.github.io/font-glyphs-v2/glyphs/{fontstack}/{range}.pbf",
       "layers": [
         {
           "id": "background",
@@ -95,80 +91,47 @@ class DpipMapState extends State<DpipMap> {
     },
   );
 
-  void _updateMarkerPosition() {
-    final coordinates = <LatLng>[];
+  String? styleAbsoluteFilePath;
 
-    for (final markerState in _markerStates) {
-      coordinates.add(markerState.getCoordinate());
-    }
+  @override
+  void initState() {
+    super.initState();
 
-    _mapController.toScreenLocationBatch(coordinates).then((points) {
-      _markerStates.asMap().forEach((i, state) {
-        state.updatePosition(points[i]);
+    getApplicationDocumentsDirectory().then((dir) async {
+      final documentDir = dir.path;
+      final stylesDir = "$documentDir/styles";
+
+      await Directory(stylesDir).create(recursive: true);
+
+      final styleFile = File("$stylesDir/style.json");
+
+      await styleFile.writeAsString(style);
+
+      setState(() {
+        styleAbsoluteFilePath = styleFile.path;
       });
-    });
-  }
-
-  void addMarker(CustomMarker m) async {
-    final point = await _mapController.toScreenLocation(m.coordinate);
-
-    setState(() {
-      _markers.add(
-        Marker(
-          initialPosition: point,
-          coordinate: m.coordinate,
-          size: m.size,
-          zIndex: m.zIndex,
-          addMarkerState: (state) {
-            _markerStates.add(state);
-          },
-          child: m.child,
-        ),
-      );
-      _markers.sort((a, b) => a.zIndex - b.zIndex);
-    });
-  }
-
-  removeMarkers() {
-    setState(() {
-      _markers.clear();
-      _markerStates.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        MapLibreMap(
-          trackCameraPosition: true,
-          initialCameraPosition: widget.initialCameraPosition,
-          styleString: style,
-          onMapCreated: (controller) {
-            setState(() => _mapController = controller);
-            controller.addListener(() {
-              if (controller.isCameraMoving) {
-                _updateMarkerPosition();
-              }
-            });
-            if (widget.onMapCreated != null) {
-              widget.onMapCreated!(controller);
-            }
-          },
-          onMapClick: widget.onMapClick,
-          onMapIdle: widget.onMapIdle,
-          onMapLongClick: widget.onMapLongClick,
-          onCameraIdle: () {
-            _updateMarkerPosition();
-          },
-          tiltGesturesEnabled: false,
-          rotateGesturesEnabled: false,
-          onStyleLoadedCallback: widget.onStyleLoadedCallback,
-        ),
-        Stack(
-          children: _markers,
-        )
-      ],
+    if (styleAbsoluteFilePath == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return MapLibreMap(
+      trackCameraPosition: true,
+      initialCameraPosition: widget.initialCameraPosition,
+      styleString: styleAbsoluteFilePath!,
+      onMapCreated: widget.onMapCreated,
+      onMapClick: widget.onMapClick,
+      onMapIdle: widget.onMapIdle,
+      onMapLongClick: widget.onMapLongClick,
+      tiltGesturesEnabled: false,
+      rotateGesturesEnabled: false,
+      onStyleLoadedCallback: widget.onStyleLoadedCallback,
     );
   }
 }

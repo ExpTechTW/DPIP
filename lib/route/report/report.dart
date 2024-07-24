@@ -5,6 +5,7 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,18 +42,27 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
   final sheetInitialSize = 0.2;
   final sheetController = DraggableScrollableController();
+  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
 
   bool isLoading = true;
+  bool isLoaded = false;
 
   void refreshReport() async {
+    if (isLoaded) {
+      return;
+    }
+
     setState(() => isLoading = true);
 
     try {
+      final isDark = context.theme.brightness == Brightness.dark;
+
       final data = await ExpTech().getReport(widget.report.id);
       final controller = await mapController.future;
 
       List features = [];
+      List<double> bounds = [];
 
       for (var MapEntry(key: _, value: area) in data.list.entries) {
         for (var MapEntry(key: _, value: town) in area.town.entries) {
@@ -66,19 +76,44 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
               "type": "Point"
             }
           });
+
+          if (bounds.isEmpty) {
+            bounds.addAll([town.lat, town.lon, town.lat, town.lon]);
+          }
+
+          expandBounds(bounds, LatLng(town.lat, town.lon));
         }
       }
 
       features.add({
         "type": "Feature",
         "properties": {
-          "intensity": 10,
+          "intensity": 10, // 10 is for classifying epicenter cross
         },
         "geometry": {
           "coordinates": [data.lon, data.lat],
           "type": "Point"
         }
       });
+
+      expandBounds(bounds, LatLng(data.lat, data.lon));
+
+      await controller.moveCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(bounds[0], bounds[1]),
+            northeast: LatLng(bounds[2], bounds[3]),
+          ),
+          left: 32,
+          right: 32,
+          top: 32,
+          bottom: 212,
+        ),
+      );
+
+      if (controller.cameraPosition!.zoom > 9) {
+        await controller.moveCamera(CameraUpdate.zoomTo(9));
+      }
 
       await controller.addGeoJsonSource(
         "markers-geojson",
@@ -90,15 +125,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
       if (!mounted) return;
 
-      final isDark = context.theme.brightness == Brightness.dark;
-
-      for (var i = 1; i < 10; i++) {
-        final path = "assets/map/icons/intensity-$i${isDark ? "" : "-dark"}.png";
-
-        await controller.addImage("intensity-$i", Uint8List.sublistView(await rootBundle.load(path)));
-      }
-
-      await controller.addImage("cross", Uint8List.sublistView(await rootBundle.load("assets/map/icons/cross.png")));
+      await loadIntensityImage(controller, isDark);
+      await loadCrossImage(controller);
 
       await controller.addLayer(
         "markers-geojson",
@@ -163,6 +191,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       setState(() {
         report = data;
         isLoading = false;
+        isLoaded = true;
       });
     } catch (e) {
       print(e);
@@ -181,15 +210,18 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   }
 
   @override
-  Widget build(BuildContext context) {
-    final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+  void initState() {
+    super.initState();
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
