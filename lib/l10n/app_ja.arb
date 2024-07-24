@@ -1,11 +1,11 @@
 {
   "@@locale": "ja",
   "@@context": "App level localization strings.",
-  "home": "ホーム",
+  "home": "ホームページ",
   "@home": {
     "description": "「首頁」頁面標題"
   },
-  "monitor": "強震モニター",
+  "monitor": "強震モニタ",
   "@monitor": {
     "description": "「強震監視器」頁面標題"
   },
@@ -17,7 +17,7 @@
   "@map": {
     "description": "「地圖」頁面標題"
   },
-  "me": "我",
+  "me": "自分",
   "@me": {
     "description": "「我」頁面標題"
   },
@@ -25,27 +25,27 @@
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "調整 DPIP 的運作方式。",
+  "settingsDescription": "DPIPの運営方法の調整",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
-  "donate": "贊助我們",
+  "donate": "寄付する",
   "@donate": {
     "description": "「我」頁面 → 應用程式資訊 → 「贊助我們」按鈕"
   },
-  "instagram": "在 Instagram 上追蹤我們",
+  "instagram": "Instagramのフォロー",
   "@instagram": {
     "description": "「我」頁面 → 應用程式資訊 → 「在 Instagram 上追蹤我們」按鈕"
   },
-  "youtube": "YouTubeライブ",
+  "youtube": "YouTubeライブ配信",
   "@youtube": {
     "description": "「我」頁面 → 應用程式資訊 → 「Youtube 直播」按鈕"
   },
-  "server_status": "サーバー状態",
+  "server_status": "サーバーステータス",
   "@server_status": {
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
-  "third_party_libraries": "第三方套件授權",
+  "third_party_libraries": "サードパーティライブラリ",
   "@instthird_party_librariesagram": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   }
