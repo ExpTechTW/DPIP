@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -40,10 +43,10 @@ class ThemeRadioTile extends StatelessWidget {
               child: Center(
                 child: Icon(
                   value == "light"
-                      ? Symbols.light_mode
+                      ? Platform.isAndroid ? Symbols.light_mode : CupertinoIcons.sun_max
                       : value == "dark"
-                          ? Symbols.dark_mode
-                          : Symbols.smartphone,
+                          ? Platform.isAndroid ? Symbols.dark_mode : CupertinoIcons.moon
+                          : Platform.isAndroid ? Symbols.smartphone : CupertinoIcons.device_phone_portrait,
                   color: theme.colorScheme.onSurface,
                   size: 32,
                 ),

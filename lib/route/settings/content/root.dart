@@ -28,9 +28,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
         children: [
           const ListTileGroupHeader(title: "位置"),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.pin_drop),
+            leading: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                  Platform.isAndroid ? Symbols.pin_drop : CupertinoIcons.placemark,
+              ),
             ),
             title: const Text(
               "所在地",
@@ -46,9 +48,10 @@ class _SettingsRootViewState extends State<SettingsRootView> {
           ),
           const ListTileGroupHeader(title: "音效"),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.audiotrack_sharp),
+            leading: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Icon(Platform.isAndroid ? Symbols.audiotrack_sharp : CupertinoIcons.music_note,
+              ),
             ),
             title: const Text(
               "音效測試",
@@ -64,9 +67,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
           ),
           const ListTileGroupHeader(title: "個人化"),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.format_paint),
+            leading: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                  Platform.isAndroid ? Symbols.format_paint : CupertinoIcons.paintbrush,
+              ),
             ),
             title: const Text(
               "主題色",

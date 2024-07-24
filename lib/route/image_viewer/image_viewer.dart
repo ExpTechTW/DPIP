@@ -211,7 +211,8 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                               ),
                             ),
                           )
-                        : const Icon(Symbols.save_rounded),
+                        : Icon(Platform.isAndroid ? Symbols.save_rounded : CupertinoIcons.floppy_disk,
+                    ),
                     label: const Text("儲存"),
                     style: ButtonStyle(
                       foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),

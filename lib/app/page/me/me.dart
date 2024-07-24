@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:dpip/global.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:simple_icons/simple_icons.dart';
@@ -22,7 +25,7 @@ class _MePageState extends State<MePage> {
          * 設定
          */
         ListTile(
-          leading: const Icon(Symbols.tune),
+          leading: Icon(Platform.isAndroid ? Symbols.tune : CupertinoIcons.settings),
           title: Text(context.i18n.settings),
           subtitle: Text(context.i18n.settingsDescription),
           onTap: () => Navigator.push(
@@ -73,9 +76,9 @@ class _MePageState extends State<MePage> {
                     alignment: WrapAlignment.center,
                     spacing: 12,
                     children: [
-                      const ActionChip(
-                        avatar: Icon(Symbols.group),
-                        label: Text("貢獻者"),
+                      ActionChip(
+                        avatar: Icon(Platform.isAndroid ? Symbols.group : CupertinoIcons.person_2),
+                        label: const Text("貢獻者"),
                       ),
                       ActionChip(
                         avatar: const Icon(Symbols.favorite),

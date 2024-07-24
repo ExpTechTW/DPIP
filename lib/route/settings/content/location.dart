@@ -6,6 +6,7 @@ import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -411,7 +412,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Icon(
-                        Symbols.warning,
+                        Platform.isAndroid ? Symbols.warning : CupertinoIcons.exclamationmark_triangle,
                         color: context.colors.error,
                       ),
                     ),
@@ -450,7 +451,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Icon(
-                        Symbols.warning,
+                        Platform.isAndroid ? Symbols.warning : CupertinoIcons.exclamationmark_triangle,
                         color: context.colors.error,
                       ),
                     ),
@@ -471,15 +472,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 ),
               ),
             ),
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Row(children: [
               Padding(
-                padding: EdgeInsets.all(8),
-                child: Icon(Symbols.info),
+                padding: const EdgeInsets.all(8),
+                child: Icon(Platform.isAndroid ? Symbols.info : CupertinoIcons.exclamationmark_circle),
               ),
-              SizedBox(width: 8),
-              Expanded(
+              const SizedBox(width: 8),
+              const Expanded(
                 child: Text("自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"),
               )
             ]),

@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -22,8 +25,8 @@ class _DpipState extends State<Dpip> {
         selectedIndex: currentActivePage,
         destinations: [
           NavigationDestination(
-            icon: const Icon(Symbols.home),
-            selectedIcon: const Icon(Symbols.home, fill: 1),
+            icon: Icon(Platform.isAndroid ? Symbols.home : CupertinoIcons.home),
+            selectedIcon: Icon(Platform.isAndroid ? Symbols.home : CupertinoIcons.house_fill, fill: 1),
             label: context.i18n.home,
           ),
           // NavigationDestination(
@@ -42,8 +45,8 @@ class _DpipState extends State<Dpip> {
           //   label: context.i18n.map,
           // ),
           NavigationDestination(
-            icon: const Icon(Symbols.person),
-            selectedIcon: const Icon(Symbols.person, fill: 1),
+            icon: Icon(Platform.isAndroid ? Symbols.person : CupertinoIcons.person),
+            selectedIcon: Icon(Platform.isAndroid ? Symbols.person : CupertinoIcons.person_fill, fill: 1),
             label: context.i18n.me,
           ),
         ],
