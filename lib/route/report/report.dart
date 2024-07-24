@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
@@ -7,6 +8,7 @@ import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -272,7 +274,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                 Flexible(
                                   flex: 2,
                                   child: IconButton(
-                                    icon: const Icon(Symbols.refresh),
+                                    icon: Icon(Platform.isAndroid ? Symbols.refresh : CupertinoIcons.refresh),
                                     style: ElevatedButton.styleFrom(
                                       foregroundColor: context.colors.onSurface,
                                     ),
