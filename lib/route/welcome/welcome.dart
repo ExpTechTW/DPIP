@@ -1,4 +1,5 @@
 import 'package:dpip/app/dpip.dart';
+import 'package:dpip/route/welcome/pages/disclaimer.dart';
 import 'package:dpip/route/welcome/pages/hello_page.dart';
 import 'package:dpip/route/welcome/pages/permission_page.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +15,7 @@ class WelcomeRoute extends StatefulWidget {
 class _WelcomeRouteState extends State<WelcomeRoute> {
   PageController controller = PageController();
   int currentPageIndex = 0;
-  List<Widget> pages = const [
-    WelcomeHelloPage(),
-    WelcomePermissionPage(),
-  ];
+  List<Widget> pages = const [WelcomeHelloPage(), WelcomePermissionPage(), WelcomeDisclaimerPage()];
 
   @override
   Widget build(BuildContext context) {
