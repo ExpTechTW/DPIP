@@ -139,7 +139,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                   )
                                 : Container(),
                             Text(
-                              tsunami != null ? "2024/07/01 00:00 $tsunamiStatus" : "${getTime()} 更新",
+                              tsunami != null ? "${convertTimestamp(tsunami!.time)} $tsunamiStatus" : "${getTime()} 更新",
                               style: TextStyle(
                                 fontSize: 14,
                                 letterSpacing: 1,

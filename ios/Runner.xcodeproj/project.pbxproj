@@ -21,7 +21,7 @@
 		63276A5C2C48F431002C151A /* info.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4D2C48F431002C151A /* info.wav */; };
 		63276A5D2C48F431002C151A /* tsunami.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A522C48F431002C151A /* tsunami.wav */; };
 		63276A5E2C48F431002C151A /* eew.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4A2C48F431002C151A /* eew.wav */; };
-		63276A5F2C48F431002C151A /* Int_report.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4E2C48F431002C151A /* Int_report.wav */; };
+		63276A5F2C48F431002C151A /* int_report.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A4E2C48F431002C151A /* int_report.wav */; };
 		63276A602C48F431002C151A /* update.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A532C48F431002C151A /* update.wav */; };
 		63276A612C48F431002C151A /* warn.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63276A542C48F431002C151A /* warn.wav */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -71,7 +71,7 @@
 		63276A4B2C48F431002C151A /* eew_alert.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eew_alert.wav; sourceTree = "<group>"; };
 		63276A4C2C48F431002C151A /* eq.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eq.wav; sourceTree = "<group>"; };
 		63276A4D2C48F431002C151A /* info.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = info.wav; sourceTree = "<group>"; };
-		63276A4E2C48F431002C151A /* Int_report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Int_report.wav; sourceTree = "<group>"; };
+		63276A4E2C48F431002C151A /* int_report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = int_report.wav; sourceTree = "<group>"; };
 		63276A4F2C48F431002C151A /* normal.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = normal.wav; sourceTree = "<group>"; };
 		63276A502C48F431002C151A /* rain.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rain.wav; sourceTree = "<group>"; };
 		63276A512C48F431002C151A /* report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = report.wav; sourceTree = "<group>"; };
@@ -177,7 +177,7 @@
 				63276A4B2C48F431002C151A /* eew_alert.wav */,
 				63276A4C2C48F431002C151A /* eq.wav */,
 				63276A4D2C48F431002C151A /* info.wav */,
-				63276A4E2C48F431002C151A /* Int_report.wav */,
+				63276A4E2C48F431002C151A /* int_report.wav */,
 				63276A4F2C48F431002C151A /* normal.wav */,
 				63276A502C48F431002C151A /* rain.wav */,
 				63276A512C48F431002C151A /* report.wav */,
@@ -315,7 +315,7 @@
 				63276A5C2C48F431002C151A /* info.wav in Resources */,
 				63276A5D2C48F431002C151A /* tsunami.wav in Resources */,
 				63276A5E2C48F431002C151A /* eew.wav in Resources */,
-				63276A5F2C48F431002C151A /* Int_report.wav in Resources */,
+				63276A5F2C48F431002C151A /* int_report.wav in Resources */,
 				63276A602C48F431002C151A /* update.wav in Resources */,
 				63276A612C48F431002C151A /* warn.wav in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
