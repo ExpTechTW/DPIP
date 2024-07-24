@@ -160,7 +160,7 @@ class ReportSheetContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 6),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text(
                               areaName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -170,12 +170,14 @@ class ReportSheetContent extends StatelessWidget {
                           Expanded(
                             child: Wrap(
                               spacing: 8,
+                              runSpacing: 8,
                               children: [
                                 for (final MapEntry(key: townName, value: town) in area.town.entries)
                                   ActionChip(
                                     padding: const EdgeInsets.all(4),
                                     side: BorderSide(color: IntensityColor.intensity(town.intensity)),
                                     backgroundColor: IntensityColor.intensity(town.intensity).withOpacity(0.16),
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     avatar: AspectRatio(
                                       aspectRatio: 1,
                                       child: Container(
