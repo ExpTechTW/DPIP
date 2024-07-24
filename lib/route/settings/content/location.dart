@@ -320,6 +320,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       startBackgroundService(false);
 
+      Global.preference.remove("location-city");
+      Global.preference.remove("location-town");
+
+      city = null;
+      town = null;
+
       setState(() {
         isAutoLocatingEnabled = true;
       });
