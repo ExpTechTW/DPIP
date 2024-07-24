@@ -12,6 +12,8 @@ import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../util/intensity_color.dart';
+
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
 
@@ -64,8 +66,14 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       List features = [];
       List<double> bounds = [];
 
-      for (var MapEntry(key: _, value: area) in data.list.entries) {
+      Map<String, int> cityMaxIntensity = {};
+
+      for (var MapEntry(key: areaName, value: area) in data.list.entries) {
         for (var MapEntry(key: _, value: town) in area.town.entries) {
+          if (cityMaxIntensity[areaName] == null || cityMaxIntensity[areaName]! < town.intensity) {
+            cityMaxIntensity[areaName] = town.intensity;
+          }
+
           features.add({
             "type": "Feature",
             "properties": {
@@ -171,7 +179,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         ),
       );
 
-      /* 
       await controller.setLayerProperties(
         'county',
         FillLayerProperties(
@@ -186,7 +193,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           ],
           fillOpacity: 1,
         ),
-      ); */
+      );
 
       setState(() {
         report = data;
