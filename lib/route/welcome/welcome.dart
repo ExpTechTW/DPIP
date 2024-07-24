@@ -20,49 +20,63 @@ class _WelcomeRouteState extends State<WelcomeRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView(
-                controller: controller,
-                physics: const NeverScrollableScrollPhysics(),
-                children: pages,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF009E8B),
+              Color(0xFF203864),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView(
+                  controller: controller,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: pages,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Visibility(
-                    visible: currentPageIndex > 0,
-                    child: IconButton(
-                      icon: const Icon(Symbols.arrow_back),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Visibility(
+                      visible: currentPageIndex > 0,
+                      child: IconButton(
+                        icon: const Icon(Symbols.arrow_back),
+                        onPressed: () {
+                          setState(() => currentPageIndex--);
+                          controller.animateToPage(currentPageIndex,
+                              duration: Durations.medium2, curve: Easing.standard);
+                        },
+                      ),
+                    ),
+                    FilledButton(
+                      child: const Text("下一頁"),
                       onPressed: () {
-                        setState(() => currentPageIndex--);
-                        controller.animateToPage(currentPageIndex, duration: Durations.medium2, curve: Easing.standard);
+                        if (currentPageIndex == pages.length - 1) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const Dpip()),
+                          );
+                        } else {
+                          setState(() => currentPageIndex++);
+                          controller.animateToPage(currentPageIndex,
+                              duration: Durations.medium2, curve: Easing.standard);
+                        }
                       },
                     ),
-                  ),
-                  FilledButton(
-                    child: const Text("Next"),
-                    onPressed: () {
-                      if (currentPageIndex == pages.length - 1) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const Dpip()),
-                        );
-                      } else {
-                        setState(() => currentPageIndex++);
-                        controller.animateToPage(currentPageIndex, duration: Durations.medium2, curve: Easing.standard);
-                      }
-                    },
-                  ),
-                ],
-              ),
-            )
-          ],
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
