@@ -109,7 +109,7 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       ActionChip(
-                        avatar: const Icon(Symbols.pulse_alert),
+                        avatar: Icon(Platform.isAndroid ? Symbols.pulse_alert : CupertinoIcons.graph_square),
                         label: Text(context.i18n.server_status),
                         onPressed: () {
                           launchUrl(Uri.parse("https://status.exptech.dev"));

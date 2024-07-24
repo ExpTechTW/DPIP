@@ -477,7 +477,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             child: Row(children: [
               Padding(
                 padding: const EdgeInsets.all(8),
-                child: Icon(Platform.isAndroid ? Symbols.info : CupertinoIcons.exclamationmark_circle),
+                child: Icon(Platform.isAndroid ? Symbols.info : CupertinoIcons.info),
               ),
               const SizedBox(width: 8),
               const Expanded(
@@ -487,9 +487,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
           ),
           const ListTileGroupHeader(title: "所在地"),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.location_city),
+            leading: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Icon(Platform.isAndroid ? Symbols.location_city : CupertinoIcons.building_2_fill),
             ),
             title: const Text("縣市"),
             subtitle: Text(city ?? "尚未設定"),
@@ -511,9 +511,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             },
           ),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(Symbols.forest),
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Platform.isAndroid ? Symbols.forest : CupertinoIcons.tree),
             ),
             title: const Text("鄉鎮"),
             subtitle: Text(town ?? "尚未設定"),
