@@ -1,13 +1,17 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ImageViewerRoute extends StatefulWidget {
   final String heroTag;
@@ -28,29 +32,84 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
   Future<void> saveImageToDownloads() async {
     try {
-      final folder =
-          Platform.isAndroid ? "/storage/emulated/0/Download" : (await getApplicationDocumentsDirectory()).path;
-      final file = File("$folder/${widget.imageName}");
+      PermissionStatus status;
+
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt <= 32) {
+          status = await Permission.storage.request();
+        } else {
+          status = await Permission.photos.request();
+        }
+      } else {
+        status = await Permission.storage.request();
+      }
+
+      if (!mounted) return;
+
+      if (status.isDenied || status.isPermanentlyDenied) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              icon: const Icon(Symbols.error),
+              title: const Text("無法取得權限"),
+              content: Text(
+                "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。" : ""}",
+              ),
+              actionsAlignment: MainAxisAlignment.spaceBetween,
+              actions: [
+                TextButton(
+                  child: const Text("取消"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                FilledButton(
+                  child: Text(status.isPermanentlyDenied ? "設定" : "再試一次"),
+                  onPressed: () {
+                    if (status.isPermanentlyDenied) {
+                      openAppSettings();
+                    } else {
+                      saveImageToDownloads();
+                    }
+
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
       final res = await get(Uri.parse(widget.imageUrl));
-      await file.writeAsBytes(res.bodyBytes);
+
+      final result = await ImageGallerySaver.saveImage(
+        res.bodyBytes,
+        quality: 100,
+        name: widget.imageName,
+      );
+
+      if (!result["isSuccess"]) {
+        throw Exception(result["errorMessage"]);
+      }
+
       Fluttertoast.showToast(msg: "已儲存圖片");
     } catch (e) {
       if (!mounted) return;
 
       if (Platform.isIOS) {
-        showCupertinoDialog(
+        showDialog(
           context: context,
-          barrierDismissible: true,
           builder: (context) {
-            return CupertinoAlertDialog(
-              title: const Text(
-                "儲存圖片時發生錯誤",
-                style: TextStyle(fontSize: 16),
-              ),
+            return AlertDialog(
+              icon: const Icon(Symbols.error),
+              title: const Text("儲存圖片時發生錯誤"),
               content: Text(e.toString()),
               actions: [
-                CupertinoDialogAction(
-                  isDefaultAction: true,
+                TextButton(
                   child: const Text("確定"),
                   onPressed: () {
                     Navigator.pop(context);
@@ -66,7 +125,6 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
             content: Text("儲存圖片時發生錯誤：${e.toString()}"),
           ),
         );
-        Navigator.pop(context);
       }
     }
   }
