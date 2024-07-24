@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/rts.dart';
 import 'package:dpip/model/station.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class MonitorPage extends StatefulWidget {
   const MonitorPage({super.key});
@@ -21,8 +24,6 @@ class _MonitorPageState extends State<MonitorPage> {
   Timer? timer;
 
   Map<String, dynamic> generateStationGeoJson([Rts? rtsData]) {
-    print(rtsData == null ? {} : rtsData.station);
-
     final features = stations.entries.map((e) {
       return {
         "type": "Feature",
@@ -126,24 +127,84 @@ class _MonitorPageState extends State<MonitorPage> {
     super.dispose();
   }
 
+  double radius = 120;
+  Timer? testTimer;
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DpipMap(
-          onMapCreated: (c) {
-            setState(() => controller = c);
-            setupStation();
-          },
-        ),
-        Positioned.fill(
-          child: DraggableScrollableSheet(
-            builder: (context, scrollController) {
-              return Container();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.i18n.monitor),
+        actions: [
+          IconButton(
+            onPressed: () {
+              if (testTimer != null) {
+                testTimer!.cancel();
+              }
+
+              testTimer = Timer.periodic(Duration(milliseconds: 100), (t) {
+                radius += 0.5;
+                final c = circle(const LatLng(25.299654949482424, 121.53697911932383), /* 384.63 */ radius, steps: 128);
+                controller.setGeoJsonSource("circle", {
+                  "type": "FeatureCollection",
+                  "features": [c],
+                });
+              });
+            },
+            icon: const Icon(Symbols.update),
+          ),
+          IconButton(
+            onPressed: () {
+              final c = circle(const LatLng(25.299654949482424, 121.53697911932383), /* 384.63 */ radius, steps: 128);
+
+              controller.addSource(
+                "circle",
+                GeojsonSourceProperties(
+                  data: {
+                    "type": "FeatureCollection",
+                    "features": [c],
+                  },
+                  tolerance: 1,
+                ),
+              );
+
+              controller.addLineLayer(
+                "circle",
+                "wave-outline",
+                const LineLayerProperties(lineColor: "#fa0", lineWidth: 2),
+              );
+
+              controller.addFillLayer(
+                "circle",
+                "wave-bg",
+                const FillLayerProperties(
+                  fillColor: "#fa0",
+                  fillOpacity: 0.25,
+                ),
+                belowLayerId: "county",
+              );
+            },
+            icon: const Icon(Symbols.add),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          DpipMap(
+            onMapCreated: (c) {
+              setState(() => controller = c);
+              setupStation();
             },
           ),
-        ),
-      ],
+          Positioned.fill(
+            child: DraggableScrollableSheet(
+              builder: (context, scrollController) {
+                return Container();
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
