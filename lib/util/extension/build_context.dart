@@ -5,4 +5,5 @@ extension CommonContext on BuildContext {
   AppLocalizations get i18n => AppLocalizations.of(this)!;
   ThemeData get theme => Theme.of(this);
   ColorScheme get colors => Theme.of(this).colorScheme;
+  ScaffoldMessengerState get scaffoldMessenger => ScaffoldMessenger.of(this);
 }

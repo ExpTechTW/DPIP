@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
+import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:dpip/widget/map/marker/custom_marker.dart';
-import 'package:dpip/widget/map/marker/intensity_marker.dart';
-import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -23,67 +24,216 @@ class ReportRoute extends StatefulWidget {
 class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin {
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
-  List<CustomMarker> mapMarkers = [];
 
-  final mapKey = GlobalKey<DpipMapState>();
-
-  DpipMapState get map => mapKey.currentState!;
+  // FIXME: workaround waiting for upstream PR to merge
+  // https://github.com/material-foundation/flutter-packages/pull/599
+  late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-      color: context.colors.surface,
+      color: backgroundColor,
     ),
     end: BoxDecoration(
       borderRadius: BorderRadius.zero,
-      color: context.colors.surface,
+      color: backgroundColor,
     ),
   ).chain(CurveTween(curve: Curves.linear));
+
+  final sheetInitialSize = 0.2;
+  final sheetController = DraggableScrollableController();
+  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+  late ScrollController scrollController;
+
+  bool isLoading = true;
+  bool isLoaded = false;
+
+  void refreshReport() async {
+    if (isLoaded) {
+      return;
+    }
+
+    setState(() => isLoading = true);
+
+    try {
+      final isDark = context.theme.brightness == Brightness.dark;
+
+      final data = await ExpTech().getReport(widget.report.id);
+      final controller = await mapController.future;
+
+      List features = [];
+      List<double> bounds = [];
+
+      for (var MapEntry(key: _, value: area) in data.list.entries) {
+        for (var MapEntry(key: _, value: town) in area.town.entries) {
+          features.add({
+            "type": "Feature",
+            "properties": {
+              "intensity": town.intensity,
+            },
+            "geometry": {
+              "coordinates": [town.lon, town.lat],
+              "type": "Point"
+            }
+          });
+
+          if (bounds.isEmpty) {
+            bounds.addAll([town.lat, town.lon, town.lat, town.lon]);
+          }
+
+          expandBounds(bounds, LatLng(town.lat, town.lon));
+        }
+      }
+
+      features.add({
+        "type": "Feature",
+        "properties": {
+          "intensity": 10, // 10 is for classifying epicenter cross
+        },
+        "geometry": {
+          "coordinates": [data.lon, data.lat],
+          "type": "Point"
+        }
+      });
+
+      expandBounds(bounds, LatLng(data.lat, data.lon));
+
+      await controller.moveCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(bounds[0], bounds[1]),
+            northeast: LatLng(bounds[2], bounds[3]),
+          ),
+          left: 32,
+          right: 32,
+          top: 32,
+          bottom: 212,
+        ),
+      );
+
+      if (controller.cameraPosition!.zoom > 9) {
+        await controller.moveCamera(CameraUpdate.zoomTo(9));
+      }
+
+      await controller.addGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": features,
+        },
+      );
+
+      if (!mounted) return;
+
+      await loadIntensityImage(controller, isDark);
+      await loadCrossImage(controller);
+
+      await controller.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolSortKey: [Expressions.get, "intensity"],
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: [
+            Expressions.match,
+            [Expressions.get, "intensity"],
+            1,
+            "intensity-1",
+            2,
+            "intensity-2",
+            3,
+            "intensity-3",
+            4,
+            "intensity-4",
+            5,
+            "intensity-5",
+            6,
+            "intensity-6",
+            7,
+            "intensity-7",
+            8,
+            "intensity-8",
+            9,
+            "intensity-9",
+            "cross",
+          ],
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+
+      /* 
+      await controller.setLayerProperties(
+        'county',
+        FillLayerProperties(
+          fillColor: [
+            'match',
+            ['get', 'NAME_2014'],
+            ...cityMaxIntensity.entries.expand((entry) => [
+                  entry.key,
+                  IntensityColor.intensity(entry.value).toHexStringRGB(),
+                ]),
+            context.colors.surfaceVariant.toHexStringRGB(),
+          ],
+          fillOpacity: 1,
+        ),
+      ); */
+
+      setState(() {
+        report = data;
+        isLoading = false;
+        isLoaded = true;
+      });
+    } catch (e) {
+      print(e);
+      setState(() => isLoading = false);
+    }
+  }
+
+  void focus(LatLng target) async {
+    final controller = await mapController.future;
+    sheetController.animateTo(sheetInitialSize, duration: Durations.short4, curve: Easing.standard);
+    scrollController.jumpTo(0);
+    controller.animateCamera(
+      CameraUpdate.newLatLngZoom(LatLng(target.latitude - 0.03, target.longitude), 10),
+      duration: const Duration(seconds: 1),
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    const sheetInitialSize = 0.2;
-    final sheetController = DraggableScrollableController();
-    final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.report.hasNumber ? "編號 ${widget.report.number}" : "小區域有感地震"),
+        backgroundColor: Colors.transparent,
+        title: Text(context.i18n.report),
       ),
       body: Stack(children: [
         DpipMap(
-          key: mapKey,
-          onMapCreated: (controller) {
+          onMapCreated: (controller) async {
             mapController.complete(controller);
-
-            ExpTech().getReport(widget.report.id).then((data) async {
-              setState(() {
-                report = data;
-              });
-
-              for (var MapEntry(key: _, value: area) in data.list.entries) {
-                for (var MapEntry(key: _, value: town) in area.town.entries) {
-                  map.addMarker(CustomMarker(
-                    zIndex: town.intensity,
-                    coordinate: LatLng(town.lat, town.lon),
-                    child: IntensityMarker(
-                      intensity: town.intensity,
-                    ),
-                  ));
-                }
-              }
-            });
+            await controller.setSymbolIconAllowOverlap(true);
+            await controller.setSymbolIconIgnorePlacement(true);
+            refreshReport();
           },
         ),
         Positioned.fill(
@@ -92,49 +242,42 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             minChildSize: sheetInitialSize,
             controller: sheetController,
             snap: true,
-            builder: (context, scrollController) {
+            builder: (context, controller) {
+              scrollController = controller;
+
               return DecoratedBoxTransition(
                 decoration: animController.drive(decorationTween),
-                child: Container(
-                  child: report == null
-                      ? const Center(child: CircularProgressIndicator())
-                      : ListView(
-                          controller: scrollController,
-                          children: [
-                            SizedBox(
-                              height: 24,
-                              child: Center(
-                                child: Container(
-                                  width: 32,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                    color: context.colors.onSurfaceVariant.withOpacity(0.4),
-                                    borderRadius: BorderRadius.circular(16),
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : report == null
+                        ? Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                const Flexible(
+                                  flex: 8,
+                                  child: Text(
+                                    "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+                                    style: TextStyle(fontSize: 16),
                                   ),
                                 ),
-                              ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  flex: 2,
+                                  child: IconButton(
+                                    icon: const Icon(Symbols.refresh),
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: context.colors.onSurface,
+                                    ),
+                                    onPressed: () {
+                                      refreshReport();
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Row(
-                                children: [
-                                  IntensityBox(intensity: report!.getMaxIntensity()),
-                                  const SizedBox(width: 16),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        report!.getLocation(),
-                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                ),
+                          )
+                        : ReportSheetContent(report: report!, controller: controller, focus: focus),
               );
             },
           ),
