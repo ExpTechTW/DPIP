@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh-CN",
+  "@@locale": "zh",
   "@@context": "App level localization strings.",
   "home": "主頁",
   "@home": {
