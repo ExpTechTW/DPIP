@@ -47,6 +47,8 @@ dependencies:
   cached_network_image: ^3.3.1
   fluttertoast: ^8.2.6
   disable_battery_optimization: ^1.1.1
+  device_info_plus: ^10.1.0
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:
