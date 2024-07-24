@@ -160,7 +160,7 @@ class ReportSheetContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 6),
+                            padding: const EdgeInsets.only(top: 16),
                             child: Text(
                               areaName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
