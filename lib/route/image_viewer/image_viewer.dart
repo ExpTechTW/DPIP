@@ -156,8 +156,10 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                         : const Icon(Symbols.save_rounded),
                     label: const Text("儲存"),
                     style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(context.colors.onSurfaceVariant),
-                      backgroundColor: MaterialStateProperty.all(context.colors.surfaceVariant.withOpacity(0.8)),
+                      foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
+                      // FIXME: workaround waiting for upstream PR to merge
+                      // https://github.com/material-foundation/flutter-packages/pull/599
+                      backgroundColor: WidgetStatePropertyAll(context.colors.surfaceVariant.withOpacity(0.8)),
                     ),
                     onPressed: isDownloading
                         ? null

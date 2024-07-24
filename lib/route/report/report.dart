@@ -24,14 +24,18 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
 
+  // FIXME: workaround waiting for upstream PR to merge
+  // https://github.com/material-foundation/flutter-packages/pull/599
+  late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
+
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-      color: context.colors.surfaceContainer,
+      color: backgroundColor,
     ),
     end: BoxDecoration(
       borderRadius: BorderRadius.zero,
-      color: context.colors.surfaceContainer,
+      color: backgroundColor,
     ),
   ).chain(CurveTween(curve: Curves.linear));
 
@@ -106,10 +110,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             Expressions.interpolate,
             ["linear"],
             [Expressions.zoom],
-            6,
+            5,
             0.5,
-            12,
-            1,
+            10,
+            1.5,
           ],
           iconImage: [
             Expressions.match,
@@ -188,6 +192,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(context.i18n.report),
       ),
       body: Stack(children: [

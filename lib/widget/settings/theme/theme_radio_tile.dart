@@ -33,7 +33,9 @@ class ThemeRadioTile extends StatelessWidget {
             Container(
               height: 96,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainer,
+                // FIXME: workaround waiting for upstream PR to merge
+                // https://github.com/material-foundation/flutter-packages/pull/599
+                color: theme.colorScheme.surfaceVariant,
               ),
               child: Center(
                 child: Icon(
