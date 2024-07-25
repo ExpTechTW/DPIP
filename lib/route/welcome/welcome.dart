@@ -5,6 +5,8 @@ import 'package:dpip/route/welcome/pages/permission_page.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../global.dart';
+
 class WelcomeRoute extends StatefulWidget {
   const WelcomeRoute({super.key});
 
@@ -59,8 +61,9 @@ class _WelcomeRouteState extends State<WelcomeRoute> {
                     ),
                     FilledButton(
                       child: const Text("下一頁"),
-                      onPressed: () {
+                      onPressed: () async {
                         if (currentPageIndex == pages.length - 1) {
+                          await Global.preference.setString("welcomeContentVersion", "1.0.0");
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(builder: (context) => const Dpip()),

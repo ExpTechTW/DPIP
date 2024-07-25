@@ -23,55 +23,57 @@ class _DpipState extends State<Dpip> {
     //   return const WelcomeRoute();
     // }
 
-    return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentActivePage,
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Symbols.home),
-            selectedIcon: const Icon(Symbols.home, fill: 1),
-            label: context.i18n.home,
-          ),
-          // NavigationDestination(
-          //   icon: const Icon(Symbols.monitor_heart),
-          //   selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-          //   label: context.i18n.monitor,
-          // ),
-          // NavigationDestination(
-          //   icon: const Icon(Symbols.summarize),
-          //   selectedIcon: const Icon(Symbols.summarize, fill: 1),
-          //   label: context.i18n.report,
-          // ),
-          // NavigationDestination(
-          //   icon: const Icon(Symbols.map),
-          //   selectedIcon: const Icon(Symbols.map, fill: 1),
-          //   label: context.i18n.map,
-          // ),
-          NavigationDestination(
-            icon: const Icon(Symbols.person),
-            selectedIcon: const Icon(Symbols.person, fill: 1),
-            label: context.i18n.me,
-          ),
-        ],
-        onDestinationSelected: (value) {
-          setState(() {
-            currentActivePage = value;
-          });
+    return Global.preference.getString("welcomeContentVersion") != "1.0.0"
+        ? const WelcomeRoute()
+        : Scaffold(
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: currentActivePage,
+              destinations: [
+                NavigationDestination(
+                  icon: const Icon(Symbols.home),
+                  selectedIcon: const Icon(Symbols.home, fill: 1),
+                  label: context.i18n.home,
+                ),
+                // NavigationDestination(
+                //   icon: const Icon(Symbols.monitor_heart),
+                //   selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+                //   label: context.i18n.monitor,
+                // ),
+                // NavigationDestination(
+                //   icon: const Icon(Symbols.summarize),
+                //   selectedIcon: const Icon(Symbols.summarize, fill: 1),
+                //   label: context.i18n.report,
+                // ),
+                // NavigationDestination(
+                //   icon: const Icon(Symbols.map),
+                //   selectedIcon: const Icon(Symbols.map, fill: 1),
+                //   label: context.i18n.map,
+                // ),
+                NavigationDestination(
+                  icon: const Icon(Symbols.person),
+                  selectedIcon: const Icon(Symbols.person, fill: 1),
+                  label: context.i18n.me,
+                ),
+              ],
+              onDestinationSelected: (value) {
+                setState(() {
+                  currentActivePage = value;
+                });
 
-          controller.jumpToPage(currentActivePage);
-        },
-      ),
-      body: PageView(
-        controller: controller,
-        physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          // HomePage(),
-          // MonitorPage(),
-          ReportListPage(),
-          // MapPage(),
-          MePage(),
-        ],
-      ),
-    );
+                controller.jumpToPage(currentActivePage);
+              },
+            ),
+            body: PageView(
+              controller: controller,
+              physics: const NeverScrollableScrollPhysics(),
+              children: const [
+                // HomePage(),
+                // MonitorPage(),
+                ReportListPage(),
+                // MapPage(),
+                MePage(),
+              ],
+            ),
+          );
   }
 }
