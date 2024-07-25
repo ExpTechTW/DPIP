@@ -66,6 +66,7 @@ flutter:
     - assets/map/icons/
     - assets/DPIP.png
     - assets/location.json
+    - assets/time.json
     - assets/eew.wav
     - assets/eew_alert.wav
     - assets/eq.wav

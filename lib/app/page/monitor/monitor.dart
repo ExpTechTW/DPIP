@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/eew.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/model/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -11,6 +14,10 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../model/eew.dart';
+import '../../../model/location/location.dart';
+import '../../../util/intensity_color.dart';
+
 class MonitorPage extends StatefulWidget {
   const MonitorPage({super.key});
 
@@ -18,10 +25,19 @@ class MonitorPage extends StatefulWidget {
   State<MonitorPage> createState() => _MonitorPageState();
 }
 
-class _MonitorPageState extends State<MonitorPage> {
+class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
   late MapLibreMapController controller;
   late Map<String, Station> stations;
   Timer? timer;
+  Timer? eewTimer;
+  int timeOffset = 0;
+  List<String> eewIdList = [];
+  List<Eew> eewData = [];
+  int replayTimeStamp = 0;
+  int timeReplay = 1712255730000;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  Map<String, dynamic> eewIntensityArea = {};
 
   Map<String, dynamic> generateStationGeoJson([Rts? rtsData]) {
     final features = stations.entries.map((e) {
@@ -111,6 +127,7 @@ class _MonitorPageState extends State<MonitorPage> {
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       updateRtsData();
+      updateEewData();
     });
   }
 
@@ -119,77 +136,172 @@ class _MonitorPageState extends State<MonitorPage> {
     controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
   }
 
+  void updateEewData() async {
+    final data = await ExpTech().getEew(timeReplay);
+    eewData = data;
+    if (data.isNotEmpty) {
+      for (var i = 0; i < data.length; i++) {
+        var json = data[i];
+
+        if (!eewIdList.contains(json.id)) {
+          eewIdList.add(json.id);
+          final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ 0, steps: 256);
+
+          controller.addSource(
+            "${json.id}-circle",
+            GeojsonSourceProperties(
+              data: {
+                "type": "FeatureCollection",
+                "features": [c],
+              },
+              tolerance: 1,
+            ),
+          );
+
+          controller.addLineLayer(
+            "${json.id}-circle",
+            "${json.id}-wave-outline",
+            LineLayerProperties(lineColor: (json.status == 1) ? "#ff0000" : "#ffaa00", lineWidth: 2),
+          );
+
+          controller.addFillLayer(
+            "${json.id}-circle",
+            "${json.id}-wave-bg",
+            FillLayerProperties(
+              fillColor: (json.status == 1) ? "#ff0000" : "#ffaa00",
+              fillOpacity: 0.25,
+            ),
+            belowLayerId: "county",
+          );
+
+          eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, 6, Global.location);
+
+          Map<String, int> eewArea = {};
+          Global.location.forEach((String key, Location info) {
+            eewIntensityArea.forEach((String key, intensity) {
+              intensity.forEach((name, value) {
+                if (name != "max_i") {
+                  int I = intensityFloatToInt(value["i"]);
+                  String city = info.city.replaceAll("桃園市", "桃園縣");
+                  if (eewArea['$city${info.town}'] == null || eewArea['$city${info.town}']! < I) {
+                    eewArea['$city${info.town}'] = I;
+                  }
+                }
+              });
+            });
+          });
+
+          await controller.setLayerProperties(
+            'town',
+            FillLayerProperties(
+              fillColor: [
+                'match',
+                [
+                  'concat',
+                  [
+                    'concat',
+                    ['get', 'COUNTY'],
+                    ['get', 'TOWN']
+                  ],
+                ],
+                ...eewArea.entries.expand((entry) => [
+                      entry.key,
+                      IntensityColor.intensity(entry.value).toHexStringRGB(),
+                    ]),
+                context.colors.surfaceVariant.toHexStringRGB(),
+              ],
+              fillOpacity: 1,
+            ),
+          );
+        }
+      }
+
+      eewTimer ??= Timer.periodic(const Duration(milliseconds: 100), (t) {
+        for (var i = 0; i < eewData.length; i++) {
+          var json = eewData[i];
+          Map<String, double> dist = psWaveDist(json.eq.depth, json.eq.time,
+              (timeReplay != 0) ? timeReplay : DateTime.now().millisecondsSinceEpoch + timeOffset);
+          final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ dist["s_dist"]!, steps: 256);
+          controller.setGeoJsonSource("${json.id}-circle", {
+            "type": "FeatureCollection",
+            "features": [c],
+          });
+        }
+
+        if (timeReplay != 0) {
+          timeReplay += (replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - replayTimeStamp;
+          replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
+        }
+      });
+    } else {
+      if (eewTimer != null) {
+        eewTimer!.cancel();
+      }
+    }
+
+    Iterable<String> fetchEewIdList = data.map((e) => e.id);
+    for (var i = 0; i < eewIdList.length; i++) {
+      if (!fetchEewIdList.contains(eewIdList[i])) {
+        controller.removeLayer("${eewIdList[i]}-wave-outline");
+        controller.removeLayer("${eewIdList[i]}-wave-bg");
+        controller.removeSource("${eewIdList[i]}-circle");
+        eewIntensityArea.remove(eewIdList[i]);
+        eewIdList.removeAt(i);
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ExpTech().getNtp().then((data) {
+      timeOffset = DateTime.now().millisecondsSinceEpoch - data;
+    });
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
+  }
+
   @override
   void dispose() {
+    _controller.dispose();
     if (timer != null) {
       timer!.cancel();
     }
-    if (testTimer != null) {
-      testTimer!.cancel();
+    if (eewTimer != null) {
+      eewTimer!.cancel();
     }
     super.dispose();
   }
-
-  double radius = 120;
-  Timer? testTimer;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.i18n.monitor),
-        actions: [
-          IconButton(
-            onPressed: () {
-              if (testTimer != null) {
-                testTimer!.cancel();
-              }
-
-              testTimer = Timer.periodic(Duration(milliseconds: 100), (t) {
-                radius += 0.1;
-                final c = circle(const LatLng(25.299654949482424, 121.53697911932383), /* 384.63 */ radius, steps: 128);
-                controller.setGeoJsonSource("circle", {
-                  "type": "FeatureCollection",
-                  "features": [c],
-                });
-              });
-            },
-            icon: const Icon(Symbols.update),
-          ),
-          IconButton(
-            onPressed: () {
-              final c = circle(const LatLng(25.299654949482424, 121.53697911932383), /* 384.63 */ radius, steps: 128);
-
-              controller.addSource(
-                "circle",
-                GeojsonSourceProperties(
-                  data: {
-                    "type": "FeatureCollection",
-                    "features": [c],
-                  },
-                  tolerance: 1,
-                ),
-              );
-
-              controller.addLineLayer(
-                "circle",
-                "wave-outline",
-                const LineLayerProperties(lineColor: "#fa0", lineWidth: 2),
-              );
-
-              controller.addFillLayer(
-                "circle",
-                "wave-bg",
-                const FillLayerProperties(
-                  fillColor: "#fa0",
-                  fillOpacity: 0.25,
-                ),
-                belowLayerId: "county",
-              );
-            },
-            icon: const Icon(Symbols.add),
-          ),
-        ],
+        title: Row(
+          children: [
+            Text(context.i18n.monitor),
+            Visibility(
+              visible: timeReplay != 0,
+              maintainAnimation: true,
+              maintainState: true,
+              child: Row(
+                children: [
+                  const SizedBox(width: 10),
+                  FadeTransition(
+                    opacity: _animation,
+                    child: const Icon(Icons.error, color: Colors.red),
+                  ),
+                  const SizedBox(width: 5),
+                  const Text('重播'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       body: Stack(
         children: [
