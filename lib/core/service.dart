@@ -40,6 +40,22 @@ void startBackgroundService(bool init) async {
       stopBackgroundService();
       service.startService();
     }
+    service.on('sendposition').listen((event) {
+      if (event != null) {
+        var positionData = event.values.first;
+        var position = positionData['position'];
+        String country = position['country'];
+        List<String> parts = country.split(' ');
+
+        if (parts.length == 2) {
+          String city = parts[0];
+          String town = parts[1];
+
+          Global.preference.setString("location-city", city);
+          Global.preference.setString("location-town", town);
+        }
+      }
+    });
   }
 }
 
@@ -130,6 +146,7 @@ void onStart(ServiceInstance service) async {
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
+        service.invoke("sendposition",{"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
         String country = position.position.country;
