@@ -32,7 +32,7 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
           ListTileGroupHeader(title: "地震資訊"),
           SoundListTile(
             title: "震度速報",
-            subtitle: "TREM 觀測網 所在地震度 3 以上",
+            subtitle: "TREM 觀測網 所在地實測震度 3 以上",
             file: "int_report.wav",
           ),
           SoundListTile(
