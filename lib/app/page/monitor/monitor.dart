@@ -139,9 +139,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       "station-geojson",
       "station",
       CircleLayerProperties(
-        circleColor: _getStationColorExpression(),
-        circleRadius: _getStationRadiusExpression(),
-      ),
+          circleColor: _getStationColorExpression(),
+          circleRadius: _getStationRadiusExpression(),
+      )
     );
   }
 
@@ -332,10 +332,22 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     final features = _stations.entries.where((e) {
       return rtsData.station.containsKey(e.key);
+    }).where((e) {
+      if (_rtsData!.box.keys.isNotEmpty) {
+        return rtsData.station[e.key]?.alert == true;
+      }
+      return true;
     }).map((e) {
+      Map<String, dynamic> properties = {};
+      if (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true) {
+        properties = {"i": rtsData.station[e.key]?.I};
+      } else {
+        properties = {"i": rtsData.station[e.key]?.i};
+      }
+
       return {
         "type": "Feature",
-        "properties": rtsData.station[e.key] ?? {},
+        "properties": properties,
         "id": e.key,
         "geometry": {
           "coordinates": [e.value.info[0].lon, e.value.info[0].lat],
