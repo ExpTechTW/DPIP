@@ -44,8 +44,14 @@ class ExpTech {
     return json.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<Rts> getRts() async {
-    final requestUrl = Route.rts();
+  Future<Rts> getRts(int time) async {
+    var requestUrl = Route.rts();
+
+    if (time != 0) {
+      requestUrl = Uri.parse(requestUrl.toString().replaceAll("rts", "rts/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+    }
+
+    print(requestUrl);
 
     var res = await get(requestUrl);
 
@@ -63,7 +69,6 @@ class ExpTech {
       requestUrl = Uri.parse(requestUrl.toString().replaceAll("eew", "eew/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
     }
 
-    print(requestUrl);
     var res = await get(requestUrl);
 
     if (res.statusCode == 200) {

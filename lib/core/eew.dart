@@ -67,7 +67,7 @@ Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag
     if (i > eewMaxI) {
       eewMaxI = i;
     }
-    json['${info.city}${info.town}'] = {'dist': dist, 'i': i};
+    json[key] = {'dist': dist, 'i': i};
   });
 
   json['max_i'] = eewMaxI;
@@ -75,11 +75,11 @@ Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag
 }
 
 double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, double depth, double magW) {
-  double long = pow(10, 0.5 * magW - 1.85) / 2;
+  double long = pow(10, 0.5 * magW - 1.85).toDouble() / 2;
   double epicenterDistance = distance(epicenterLocation[0], epicenterLocation[1], pointLocation[0], pointLocation[1]);
   double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   double x = max(hypocenterDistance, 3);
-  num gpv600 = pow(10, 0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) - 0.002 * x);
+  double gpv600 = pow(10, 0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x).toDouble();
   double pgv400 = gpv600 * 1.31;
   double pgv = pgv400 * 1.0;
   return 2.68 + 1.72 * log(pgv) / ln10;

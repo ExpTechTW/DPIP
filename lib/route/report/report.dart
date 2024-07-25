@@ -184,7 +184,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         FillLayerProperties(
           fillColor: [
             'match',
-            ['get', 'NAME_2014'],
+            ['get', 'NAME'],
             ...cityMaxIntensity.entries.expand((entry) => [
                   entry.key,
                   IntensityColor.intensity(entry.value).toHexStringRGB(),
@@ -193,6 +193,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           ],
           fillOpacity: 1,
         ),
+      );
+      await controller.setLayerProperties(
+        'town',
+        const FillLayerProperties(fillOpacity: 0),
       );
 
       setState(() {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/eew.dart';
@@ -34,16 +35,25 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   List<String> eewIdList = [];
   List<Eew> eewData = [];
   int replayTimeStamp = 0;
-  int timeReplay = 1712255730000;
+  int timeReplay = 1721770570342;
   late AnimationController _controller;
   late Animation<double> _animation;
   Map<String, dynamic> eewIntensityArea = {};
 
   Map<String, dynamic> generateStationGeoJson([Rts? rtsData]) {
-    final features = stations.entries.map((e) {
+    if (rtsData == null) {
+      return {
+        "type": "FeatureCollection",
+        "features": [],
+      };
+    }
+
+    final features = stations.entries.where((e) {
+      return rtsData.station.containsKey(e.key);
+    }).map((e) {
       return {
         "type": "Feature",
-        "properties": rtsData == null ? {} : rtsData.station[e.key] ?? {},
+        "properties": rtsData.station[e.key] ?? {},
         "id": e.key,
         "geometry": {
           "coordinates": [e.value.info[0].lon, e.value.info[0].lat],
@@ -132,23 +142,25 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void updateRtsData() async {
-    final data = await ExpTech().getRts();
+    final data = await ExpTech().getRts(timeReplay);
     controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
+
+    if (timeReplay != 0) {
+      timeReplay += (replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - replayTimeStamp;
+      replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
+    }
   }
 
-  void updateMapArea() async{
+  void updateMapArea() async {
     Map<String, int> eewArea = {};
-    Global.location.forEach((String key, Location info) {
-      eewIntensityArea.forEach((String key, intensity) {
-        intensity.forEach((name, value) {
-          if (name != "max_i") {
-            int I = intensityFloatToInt(value["i"]);
-            String city = info.city.replaceAll("桃園市", "桃園縣");
-            if (eewArea['$city${info.town}'] == null || eewArea['$city${info.town}']! < I) {
-              eewArea['$city${info.town}'] = I;
-            }
+    eewIntensityArea.forEach((String key, intensity) {
+      intensity.forEach((name, value) {
+        if (name != "max_i") {
+          int I = intensityFloatToInt(value["i"]);
+          if (eewArea[name] == null || eewArea[name]! < I) {
+            eewArea[name] = I;
           }
-        });
+        }
       });
     });
 
@@ -157,18 +169,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       FillLayerProperties(
         fillColor: [
           'match',
-          [
-            'concat',
-            [
-              'concat',
-              ['get', 'COUNTY'],
-              ['get', 'TOWN']
-            ],
-          ],
+          ['get', 'CODE'],
           ...eewArea.entries.expand((entry) => [
-            entry.key,
-            IntensityColor.intensity(entry.value).toHexStringRGB(),
-          ]),
+                int.parse(entry.key),
+                IntensityColor.intensity(entry.value).toHexStringRGB(),
+              ]),
           context.colors.surfaceVariant.toHexStringRGB(),
         ],
         fillOpacity: 1,
@@ -214,7 +219,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             belowLayerId: "county",
           );
 
-          eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, 6, Global.location);
+          eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, 10, 6.8, Global.location);
 
           updateMapArea();
         }
@@ -230,11 +235,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             "type": "FeatureCollection",
             "features": [c],
           });
-        }
-
-        if (timeReplay != 0) {
-          timeReplay += (replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - replayTimeStamp;
-          replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
         }
       });
     } else {

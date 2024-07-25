@@ -1,5 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import '../util/parser.dart';
+
 part 'rts_station.g.dart';
 
 @JsonSerializable()
@@ -17,6 +19,7 @@ class RtsStation {
   final double I;
 
   /// 測站是否觸發
+  @JsonKey(fromJson: parseBoolishInt)
   final bool? alert;
 
   RtsStation({
