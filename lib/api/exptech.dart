@@ -56,8 +56,6 @@ class ExpTech {
           .replaceAll("-4", "-2"));
     }
 
-    print(requestUrl);
-
     var res = await get(requestUrl);
 
     if (res.statusCode != 200) {

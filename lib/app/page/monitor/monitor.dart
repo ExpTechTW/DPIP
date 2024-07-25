@@ -58,6 +58,29 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       };
     }).toList();
 
+    List markers_features = [];
+    for (var i = 0; i < eewData.length; i++) {
+      var json = eewData[i];
+      markers_features.add({
+        "type": "Feature",
+        "properties": {
+          "intensity": 10, // 10 is for classifying epicenter cross
+        },
+        "geometry": {
+          "coordinates": [json.eq.lon, json.eq.lat],
+          "type": "Point"
+        }
+      });
+    }
+
+    controller.setGeoJsonSource(
+      "markers-geojson",
+      {
+        "type": "FeatureCollection",
+        "features": markers_features,
+      },
+    );
+
     return {
       "type": "FeatureCollection",
       "features": features,
@@ -65,7 +88,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void setupStation() async {
+    final isDark = context.theme.brightness == Brightness.dark;
     final data = await ExpTech().getStations();
+
+    await loadIntensityImage(controller, isDark);
+    await loadCrossImage(controller);
 
     Map<String, dynamic> latestStations = {};
     data.forEach((key, station) {
@@ -85,6 +112,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       "station-geojson",
       GeojsonSourceProperties(
         data: generateStationGeoJson(),
+      ),
+    );
+
+    controller.addSource(
+      "markers-geojson",
+      const GeojsonSourceProperties(
+        data: {
+          "type": "FeatureCollection",
+          "features": [],
+        },
       ),
     );
 
@@ -138,12 +175,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void updateRtsData() async {
-    final data = await ExpTech().getRts(timeReplay);
-    controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
+    try {
+      final data = await ExpTech().getRts(timeReplay);
+      controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
 
-    if (timeReplay != 0) {
-      timeReplay += (replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - replayTimeStamp;
-      replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
+      if (timeReplay != 0) {
+        timeReplay += (replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - replayTimeStamp;
+        replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
+      }
+    } catch (err) {
+      print(err);
     }
   }
 
@@ -178,86 +219,91 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void updateEewData() async {
-    final data = await ExpTech().getEew(timeReplay);
-    eewData = data;
-    if (data.isNotEmpty) {
-      for (var i = 0; i < data.length; i++) {
-        var json = data[i];
+    try {
+      final data = await ExpTech().getEew(timeReplay);
+      eewData = data;
+      if (data.isNotEmpty) {
+        for (var i = 0; i < data.length; i++) {
+          var json = data[i];
 
-        if (!eewIdList.contains(json.id)) {
-          eewIdList.add(json.id);
-          final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ 0, steps: 256);
+          if (!eewIdList.contains(json.id)) {
+            eewIdList.add(json.id);
+            final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ 0, steps: 256);
 
-          controller.addSource(
-            "${json.id}-circle",
-            GeojsonSourceProperties(
-              data: {
-                "type": "FeatureCollection",
-                "features": [c],
-              },
-              tolerance: 1,
-            ),
-          );
+            controller.addSource(
+              "${json.id}-circle",
+              GeojsonSourceProperties(
+                data: {
+                  "type": "FeatureCollection",
+                  "features": [c],
+                },
+                tolerance: 1,
+              ),
+            );
 
-          controller.addLineLayer(
-            "${json.id}-circle",
-            "${json.id}-wave-outline",
-            LineLayerProperties(lineColor: (json.status == 1) ? "#ff0000" : "#ffaa00", lineWidth: 2),
-          );
+            controller.addLineLayer(
+              "${json.id}-circle",
+              "${json.id}-wave-outline",
+              LineLayerProperties(lineColor: (json.status == 1) ? "#ff0000" : "#ffaa00", lineWidth: 2),
+            );
 
-          controller.addFillLayer(
-            "${json.id}-circle",
-            "${json.id}-wave-bg",
-            FillLayerProperties(
-              fillColor: (json.status == 1) ? "#ff0000" : "#ffaa00",
-              fillOpacity: 0.25,
-            ),
-            belowLayerId: "county",
-          );
+            controller.addFillLayer(
+              "${json.id}-circle",
+              "${json.id}-wave-bg",
+              FillLayerProperties(
+                fillColor: (json.status == 1) ? "#ff0000" : "#ffaa00",
+                fillOpacity: 0.25,
+              ),
+              belowLayerId: "county",
+            );
 
-          eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, json.eq.mag, Global.location);
+            eewIntensityArea[json.id] =
+                eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, json.eq.mag, Global.location);
+
+            updateMapArea();
+          }
+        }
+
+        eewTimer ??= Timer.periodic(const Duration(milliseconds: 100), (t) {
+          for (var i = 0; i < eewData.length; i++) {
+            var json = eewData[i];
+            Map<String, double> dist = psWaveDist(json.eq.depth, json.eq.time,
+                (timeReplay != 0) ? timeReplay : DateTime.now().millisecondsSinceEpoch + timeOffset);
+            final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ dist["s_dist"]!, steps: 256);
+            controller.setGeoJsonSource("${json.id}-circle", {
+              "type": "FeatureCollection",
+              "features": [c],
+            });
+          }
+        });
+      } else {
+        if (eewTimer != null) {
+          eewTimer!.cancel();
+        }
+
+        await controller.setLayerProperties(
+          'town',
+          FillLayerProperties(
+            fillColor: context.colors.surfaceVariant.toHexStringRGB(),
+            fillOpacity: 1,
+          ),
+        );
+      }
+
+      Iterable<String> fetchEewIdList = data.map((e) => e.id);
+      for (var i = 0; i < eewIdList.length; i++) {
+        if (!fetchEewIdList.contains(eewIdList[i])) {
+          controller.removeLayer("${eewIdList[i]}-wave-outline");
+          controller.removeLayer("${eewIdList[i]}-wave-bg");
+          controller.removeSource("${eewIdList[i]}-circle");
+          eewIntensityArea.remove(eewIdList[i]);
+          eewIdList.removeAt(i);
 
           updateMapArea();
         }
       }
-
-      eewTimer ??= Timer.periodic(const Duration(milliseconds: 100), (t) {
-        for (var i = 0; i < eewData.length; i++) {
-          var json = eewData[i];
-          Map<String, double> dist = psWaveDist(json.eq.depth, json.eq.time,
-              (timeReplay != 0) ? timeReplay : DateTime.now().millisecondsSinceEpoch + timeOffset);
-          final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ dist["s_dist"]!, steps: 256);
-          controller.setGeoJsonSource("${json.id}-circle", {
-            "type": "FeatureCollection",
-            "features": [c],
-          });
-        }
-      });
-    } else {
-      if (eewTimer != null) {
-        eewTimer!.cancel();
-      }
-
-      await controller.setLayerProperties(
-        'town',
-        FillLayerProperties(
-          fillColor: context.colors.surfaceVariant.toHexStringRGB(),
-          fillOpacity: 1,
-        ),
-      );
-    }
-
-    Iterable<String> fetchEewIdList = data.map((e) => e.id);
-    for (var i = 0; i < eewIdList.length; i++) {
-      if (!fetchEewIdList.contains(eewIdList[i])) {
-        controller.removeLayer("${eewIdList[i]}-wave-outline");
-        controller.removeLayer("${eewIdList[i]}-wave-bg");
-        controller.removeSource("${eewIdList[i]}-circle");
-        eewIntensityArea.remove(eewIdList[i]);
-        eewIdList.removeAt(i);
-
-        updateMapArea();
-      }
+    } catch (err) {
+      print(err);
     }
   }
 
