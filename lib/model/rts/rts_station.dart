@@ -1,6 +1,5 @@
+import 'package:dpip/util/parser.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../util/parser.dart';
 
 part 'rts_station.g.dart';
 

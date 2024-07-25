@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
-import 'package:dpip/model/rts.dart';
+import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
 import 'package:http/http.dart';
@@ -48,7 +48,12 @@ class ExpTech {
     var requestUrl = Route.rts();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl.toString().replaceAll("rts", "rts/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+      requestUrl = Uri.parse(requestUrl
+          .toString()
+          .replaceAll("rts", "rts/$time")
+          .replaceAll("lb-", "api-")
+          .replaceAll("-3", "-1")
+          .replaceAll("-4", "-2"));
     }
 
     print(requestUrl);
@@ -66,7 +71,12 @@ class ExpTech {
     var requestUrl = Route.eew();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl.toString().replaceAll("eew", "eew/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+      requestUrl = Uri.parse(requestUrl
+          .toString()
+          .replaceAll("eew", "eew/$time")
+          .replaceAll("lb-", "api-")
+          .replaceAll("-3", "-1")
+          .replaceAll("-4", "-2"));
     }
 
     var res = await get(requestUrl);
