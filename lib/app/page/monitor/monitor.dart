@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/global.dart';
@@ -9,34 +11,233 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
-import '../../../model/eew.dart';
-import '../../../util/intensity_color.dart';
+import 'package:dpip/model/eew.dart';
+import 'package:dpip/util/intensity_color.dart';
 
 class MonitorPage extends StatefulWidget {
-  const MonitorPage({super.key});
+  const MonitorPage({Key? key}) : super(key: key);
 
   @override
   State<MonitorPage> createState() => _MonitorPageState();
 }
 
 class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
-  late MapLibreMapController controller;
-  late Map<String, Station> stations;
-  Timer? timer;
-  Timer? eewTimer;
-  int timeOffset = 0;
-  List<String> eewIdList = [];
-  List<Eew> eewData = [];
-  int replayTimeStamp = 0;
-  int timeReplay = 1721770570342;
-  late AnimationController _controller;
+  late MapLibreMapController _mapController;
+  late Map<String, Station> _stations;
+  late AnimationController _animationController;
   late Animation<double> _animation;
-  Map<String, dynamic> eewIntensityArea = {};
 
-  Map<String, dynamic> generateStationGeoJson([Rts? rtsData]) {
+  Timer? _dataUpdateTimer;
+  Timer? _eewUpdateTimer;
+  int _timeOffset = 0;
+  List<String> _eewIdList = [];
+  List<Eew> _eewData = [];
+  int _replayTimeStamp = 0;
+  int _timeReplay = 1721770570342;
+  Map<String, dynamic> _eewIntensityArea = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _initAnimation();
+    _initTimeOffset();
+  }
+
+  void _initAnimation() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(_animationController);
+  }
+
+  void _initTimeOffset() async {
+    final data = await ExpTech().getNtp();
+    setState(() => _timeOffset = DateTime.now().millisecondsSinceEpoch - data);
+  }
+
+  void _initMap(MapLibreMapController controller) {
+    _mapController = controller;
+    _initStations();
+  }
+
+  void _initStations() async {
+    final data = await ExpTech().getStations();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    await _loadMapImages(isDark);
+    _setupStationSource(data);
+    _startDataUpdates();
+  }
+
+  Future<void> _loadMapImages(bool isDark) async {
+    await loadIntensityImage(_mapController, isDark);
+    await loadCrossImage(_mapController);
+  }
+
+  void _setupStationSource(Map<String, Station> data) {
+    setState(() => _stations = data);
+    _mapController.addSource("station-geojson", GeojsonSourceProperties(data: _generateStationGeoJson()));
+    _mapController.addSource(
+        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    _addStationLayer();
+  }
+
+  void _addStationLayer() {
+    _mapController.addCircleLayer(
+      "station-geojson",
+      "station",
+      CircleLayerProperties(
+        circleColor: _getStationColorExpression(),
+        circleRadius: _getStationRadiusExpression(),
+      ),
+    );
+  }
+
+  void _startDataUpdates() {
+    _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _updateRtsData();
+      _updateEewData();
+    });
+  }
+
+  void _updateRtsData() async {
+    try {
+      final data = await ExpTech().getRts(_timeReplay);
+      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(data));
+      _updateReplayTime();
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void _updateReplayTime() {
+    if (_timeReplay != 0) {
+      _timeReplay += (_replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
+      _replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
+    }
+  }
+
+  void _updateEewData() async {
+    try {
+      final data = await ExpTech().getEew(_timeReplay);
+      _eewData = data;
+      _processEewData(data);
+      _updateEewVisuals();
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  void _processEewData(List<Eew> data) {
+    for (var eew in data) {
+      if (!_eewIdList.contains(eew.id)) {
+        _eewIdList.add(eew.id);
+        _addEewCircle(eew);
+        _updateEewIntensityArea(eew);
+      }
+    }
+    _updateMapArea();
+  }
+
+  void _addEewCircle(Eew eew) {
+    final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), 0, steps: 256);
+    _mapController.addSource(
+        "${eew.id}-circle",
+        GeojsonSourceProperties(data: {
+          "type": "FeatureCollection",
+          "features": [circleData]
+        }, tolerance: 1));
+    _addEewLayers(eew);
+  }
+
+  void _addEewLayers(Eew eew) {
+    final color = (eew.status == 1) ? "#ff0000" : "#ffaa00";
+    _mapController.addLineLayer(
+        "${eew.id}-circle", "${eew.id}-wave-outline", LineLayerProperties(lineColor: color, lineWidth: 2));
+    _mapController.addFillLayer(
+        "${eew.id}-circle", "${eew.id}-wave-bg", FillLayerProperties(fillColor: color, fillOpacity: 0.25),
+        belowLayerId: "county");
+  }
+
+  void _updateEewIntensityArea(Eew eew) {
+    _eewIntensityArea[eew.id] = eewAreaPga(eew.eq.lat, eew.eq.lon, eew.eq.depth, eew.eq.mag, Global.location);
+  }
+
+  void _updateEewVisuals() {
+    _eewUpdateTimer ??= Timer.periodic(const Duration(milliseconds: 100), (_) => _updateEewCircles());
+    _removeOldEews();
+  }
+
+  void _updateEewCircles() {
+    _updateReplayTime();
+    for (var eew in _eewData) {
+      final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
+      final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["s_dist"]!, steps: 256);
+      _mapController.setGeoJsonSource("${eew.id}-circle", {
+        "type": "FeatureCollection",
+        "features": [circleData]
+      });
+    }
+  }
+
+  int _getCurrentTime() => (_timeReplay != 0) ? _timeReplay : DateTime.now().millisecondsSinceEpoch + _timeOffset;
+
+  void _removeOldEews() {
+    final currentEewIds = _eewData.map((e) => e.id).toSet();
+    _eewIdList.removeWhere((id) {
+      if (!currentEewIds.contains(id)) {
+        _removeEewLayers(id);
+        _eewIntensityArea.remove(id);
+        return true;
+      }
+      return false;
+    });
+    _updateMapArea();
+  }
+
+  void _removeEewLayers(String id) {
+    _mapController.removeLayer("$id-wave-outline");
+    _mapController.removeLayer("$id-wave-bg");
+    _mapController.removeSource("$id-circle");
+  }
+
+  void _updateMapArea() async {
+    Map<String, int> eewArea = {};
+    _eewIntensityArea.forEach((String key, dynamic intensity) {
+      intensity.forEach((name, value) {
+        if (name != "max_i") {
+          int I = intensityFloatToInt(value["i"]);
+          if (eewArea[name] == null || eewArea[name]! < I) {
+            eewArea[name] = I;
+          }
+        }
+      });
+    });
+
+    print(eewArea.entries.expand((entry) => [
+      int.parse(entry.key),
+      IntensityColor.intensity(entry.value).toHexStringRGB(),
+    ]));
+
+    await _mapController.setLayerProperties(
+      'town',
+      FillLayerProperties(
+        fillColor: [
+          'match',
+          ['get', 'CODE'],
+          ...eewArea.entries.expand((entry) => [
+                int.parse(entry.key),
+                IntensityColor.intensity(entry.value).toHexStringRGB(),
+              ]),
+          Theme.of(context).colorScheme.surfaceVariant.toHexStringRGB(),
+        ],
+        fillOpacity: 1,
+      ),
+    );
+  }
+
+  Map<String, dynamic> _generateStationGeoJson([Rts? rtsData]) {
     if (rtsData == null) {
       return {
         "type": "FeatureCollection",
@@ -44,7 +245,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       };
     }
 
-    final features = stations.entries.where((e) {
+    final features = _stations.entries.where((e) {
       return rtsData.station.containsKey(e.key);
     }).map((e) {
       return {
@@ -59,21 +260,20 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     }).toList();
 
     List markers_features = [];
-    for (var i = 0; i < eewData.length; i++) {
-      var json = eewData[i];
+    for (var eew in _eewData) {
       markers_features.add({
         "type": "Feature",
         "properties": {
           "intensity": 10, // 10 is for classifying epicenter cross
         },
         "geometry": {
-          "coordinates": [json.eq.lon, json.eq.lat],
+          "coordinates": [eew.eq.lon, eew.eq.lat],
           "type": "Point"
         }
       });
     }
 
-    controller.setGeoJsonSource(
+    _mapController.setGeoJsonSource(
       "markers-geojson",
       {
         "type": "FeatureCollection",
@@ -87,249 +287,53 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     };
   }
 
-  void setupStation() async {
-    final isDark = context.theme.brightness == Brightness.dark;
-    final data = await ExpTech().getStations();
-
-    await loadIntensityImage(controller, isDark);
-    await loadCrossImage(controller);
-
-    Map<String, dynamic> latestStations = {};
-    data.forEach((key, station) {
-      if (station.work == true) {
-        List<dynamic> info = station.info;
-        info.sort((a, b) => DateTime.parse(b.time).compareTo(DateTime.parse(a.time)));
-        Map<String, dynamic> stationData = {
-          'latestTime': info.first.time // 存取 info 中第一個物件的 time 屬性
-        };
-        latestStations[key] = stationData;
-      }
-    });
-
-    setState(() => stations = data);
-
-    controller.addSource(
-      "station-geojson",
-      GeojsonSourceProperties(
-        data: generateStationGeoJson(),
-      ),
-    );
-
-    controller.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(
-        data: {
-          "type": "FeatureCollection",
-          "features": [],
-        },
-      ),
-    );
-
-    controller.addCircleLayer(
-      "station-geojson",
-      "station",
-      CircleLayerProperties(
-        circleColor: [
-          Expressions.interpolate,
-          ["linear"],
-          ["get", "i"],
-          -3,
-          InstrumentalIntensityColor.intensity_3.toHexStringRGB(),
-          -2,
-          InstrumentalIntensityColor.intensity_2.toHexStringRGB(),
-          -1,
-          InstrumentalIntensityColor.intensity_1.toHexStringRGB(),
-          0,
-          InstrumentalIntensityColor.intensity0.toHexStringRGB(),
-          1,
-          InstrumentalIntensityColor.intensity1.toHexStringRGB(),
-          2,
-          InstrumentalIntensityColor.intensity2.toHexStringRGB(),
-          3,
-          InstrumentalIntensityColor.intensity3.toHexStringRGB(),
-          4,
-          InstrumentalIntensityColor.intensity4.toHexStringRGB(),
-          5,
-          InstrumentalIntensityColor.intensity5.toHexStringRGB(),
-          6,
-          InstrumentalIntensityColor.intensity6.toHexStringRGB(),
-          7,
-          InstrumentalIntensityColor.intensity7.toHexStringRGB(),
-        ],
-        circleRadius: [
-          Expressions.interpolate,
-          ["linear"],
-          [Expressions.zoom],
-          4,
-          2,
-          12,
-          8
-        ],
-      ),
-    );
-
-    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      updateRtsData();
-      updateEewData();
-    });
+  dynamic _getStationColorExpression() {
+    return [
+      Expressions.interpolate,
+      ["linear"],
+      ["get", "i"],
+      -3,
+      InstrumentalIntensityColor.intensity_3.toHexStringRGB(),
+      -2,
+      InstrumentalIntensityColor.intensity_2.toHexStringRGB(),
+      -1,
+      InstrumentalIntensityColor.intensity_1.toHexStringRGB(),
+      0,
+      InstrumentalIntensityColor.intensity0.toHexStringRGB(),
+      1,
+      InstrumentalIntensityColor.intensity1.toHexStringRGB(),
+      2,
+      InstrumentalIntensityColor.intensity2.toHexStringRGB(),
+      3,
+      InstrumentalIntensityColor.intensity3.toHexStringRGB(),
+      4,
+      InstrumentalIntensityColor.intensity4.toHexStringRGB(),
+      5,
+      InstrumentalIntensityColor.intensity5.toHexStringRGB(),
+      6,
+      InstrumentalIntensityColor.intensity6.toHexStringRGB(),
+      7,
+      InstrumentalIntensityColor.intensity7.toHexStringRGB(),
+    ];
   }
 
-  void updateRtsData() async {
-    try {
-      final data = await ExpTech().getRts(timeReplay);
-      controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
-
-      if (timeReplay != 0) {
-        timeReplay += (replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - replayTimeStamp;
-        replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
-      }
-    } catch (err) {
-      print(err);
-    }
-  }
-
-  void updateMapArea() async {
-    Map<String, int> eewArea = {};
-    eewIntensityArea.forEach((String key, intensity) {
-      intensity.forEach((name, value) {
-        if (name != "max_i") {
-          int I = intensityFloatToInt(value["i"]);
-          if (eewArea[name] == null || eewArea[name]! < I) {
-            eewArea[name] = I;
-          }
-        }
-      });
-    });
-
-    await controller.setLayerProperties(
-      'town',
-      FillLayerProperties(
-        fillColor: [
-          'match',
-          ['get', 'CODE'],
-          ...eewArea.entries.expand((entry) => [
-                int.parse(entry.key),
-                IntensityColor.intensity(entry.value).toHexStringRGB(),
-              ]),
-          context.colors.surfaceVariant.toHexStringRGB(),
-        ],
-        fillOpacity: 1,
-      ),
-    );
-  }
-
-  void updateEewData() async {
-    try {
-      final data = await ExpTech().getEew(timeReplay);
-      eewData = data;
-      if (data.isNotEmpty) {
-        for (var i = 0; i < data.length; i++) {
-          var json = data[i];
-
-          if (!eewIdList.contains(json.id)) {
-            eewIdList.add(json.id);
-            final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ 0, steps: 256);
-
-            controller.addSource(
-              "${json.id}-circle",
-              GeojsonSourceProperties(
-                data: {
-                  "type": "FeatureCollection",
-                  "features": [c],
-                },
-                tolerance: 1,
-              ),
-            );
-
-            controller.addLineLayer(
-              "${json.id}-circle",
-              "${json.id}-wave-outline",
-              LineLayerProperties(lineColor: (json.status == 1) ? "#ff0000" : "#ffaa00", lineWidth: 2),
-            );
-
-            controller.addFillLayer(
-              "${json.id}-circle",
-              "${json.id}-wave-bg",
-              FillLayerProperties(
-                fillColor: (json.status == 1) ? "#ff0000" : "#ffaa00",
-                fillOpacity: 0.25,
-              ),
-              belowLayerId: "county",
-            );
-
-            eewIntensityArea[json.id] =
-                eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, json.eq.mag, Global.location);
-
-            updateMapArea();
-          }
-        }
-
-        eewTimer ??= Timer.periodic(const Duration(milliseconds: 100), (t) {
-          for (var i = 0; i < eewData.length; i++) {
-            var json = eewData[i];
-            Map<String, double> dist = psWaveDist(json.eq.depth, json.eq.time,
-                (timeReplay != 0) ? timeReplay : DateTime.now().millisecondsSinceEpoch + timeOffset);
-            final c = circle(LatLng(json.eq.lat, json.eq.lon), /* 384.63 */ dist["s_dist"]!, steps: 256);
-            controller.setGeoJsonSource("${json.id}-circle", {
-              "type": "FeatureCollection",
-              "features": [c],
-            });
-          }
-        });
-      } else {
-        if (eewTimer != null) {
-          eewTimer!.cancel();
-        }
-
-        await controller.setLayerProperties(
-          'town',
-          FillLayerProperties(
-            fillColor: context.colors.surfaceVariant.toHexStringRGB(),
-            fillOpacity: 1,
-          ),
-        );
-      }
-
-      Iterable<String> fetchEewIdList = data.map((e) => e.id);
-      for (var i = 0; i < eewIdList.length; i++) {
-        if (!fetchEewIdList.contains(eewIdList[i])) {
-          controller.removeLayer("${eewIdList[i]}-wave-outline");
-          controller.removeLayer("${eewIdList[i]}-wave-bg");
-          controller.removeSource("${eewIdList[i]}-circle");
-          eewIntensityArea.remove(eewIdList[i]);
-          eewIdList.removeAt(i);
-
-          updateMapArea();
-        }
-      }
-    } catch (err) {
-      print(err);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    ExpTech().getNtp().then((data) {
-      timeOffset = DateTime.now().millisecondsSinceEpoch - data;
-    });
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    )..repeat(reverse: true);
-
-    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(_controller);
+  dynamic _getStationRadiusExpression() {
+    return [
+      Expressions.interpolate,
+      ["linear"],
+      [Expressions.zoom],
+      4,
+      2,
+      12,
+      8
+    ];
   }
 
   @override
   void dispose() {
-    _controller.dispose();
-    if (timer != null) {
-      timer!.cancel();
-    }
-    if (eewTimer != null) {
-      eewTimer!.cancel();
-    }
+    _animationController.dispose();
+    _dataUpdateTimer?.cancel();
+    _eewUpdateTimer?.cancel();
     super.dispose();
   }
 
@@ -340,42 +344,34 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         title: Row(
           children: [
             Text(context.i18n.monitor),
-            Visibility(
-              visible: timeReplay != 0,
-              maintainAnimation: true,
-              maintainState: true,
-              child: Row(
-                children: [
-                  const SizedBox(width: 10),
-                  FadeTransition(
-                    opacity: _animation,
-                    child: const Icon(Icons.error, color: Colors.red),
-                  ),
-                  const SizedBox(width: 5),
-                  const Text('重播'),
-                ],
-              ),
-            ),
+            if (_timeReplay != 0) _buildReplayIndicator(),
           ],
         ),
       ),
       body: Stack(
         children: [
-          DpipMap(
-            onMapCreated: (c) {
-              setState(() => controller = c);
-              setupStation();
-            },
-          ),
+          DpipMap(onMapCreated: _initMap),
           Positioned.fill(
             child: DraggableScrollableSheet(
-              builder: (context, scrollController) {
-                return Container();
-              },
+              builder: (context, scrollController) => Container(),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildReplayIndicator() {
+    return Row(
+      children: [
+        const SizedBox(width: 10),
+        FadeTransition(
+          opacity: _animation,
+          child: const Icon(Icons.error, color: Colors.red),
+        ),
+        const SizedBox(width: 5),
+        const Text('重播'),
+      ],
     );
   }
 }
