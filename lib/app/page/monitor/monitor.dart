@@ -128,7 +128,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _setupStationSource(Map<String, Station> data) {
     setState(() => _stations = data);
-    _mapController.addSource("station-geojson", GeojsonSourceProperties(data: _generateStationGeoJson()));
+    _mapController.addSource(
+        "station-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    _mapController.addSource("station-geojson-intensity-0",
+        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
     _mapController.addSource(
         "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
     _addStationLayer();
@@ -136,13 +139,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _addStationLayer() {
     _mapController.addCircleLayer(
-      "station-geojson",
-      "station",
-      CircleLayerProperties(
+        "station-geojson",
+        "station",
+        CircleLayerProperties(
           circleColor: _getStationColorExpression(),
           circleRadius: _getStationRadiusExpression(),
-      )
-    );
+        ));
+    _mapController.addCircleLayer(
+        "station-geojson-intensity-0",
+        "station-intensity-0",
+        CircleLayerProperties(
+          circleColor: "#7B7B7B",
+          circleRadius: _getStationRadiusExpression(),
+        ));
   }
 
   void _startDataUpdates() {
@@ -157,6 +166,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       final data = await ExpTech().getRts(_timeReplay);
       _rtsData = data;
       _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(data));
+      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(data));
+
       _updateReplayTime();
     } catch (err) {
       print(err);
@@ -198,6 +209,22 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         });
       }
     }
+
+    _rtsData?.station.forEach((key,value){
+      int intensity=intensityFloatToInt(value.I);
+      if(value.alert==true&&intensity>0){
+        markers_features.add({
+          "type": "Feature",
+          "properties": {
+            "intensity": intensity, // 10 is for classifying epicenter cross
+          },
+          "geometry": {
+            "coordinates": [_stations[key]?.info.last.lon, _stations[key]?.info.last.lat],
+            "type": "Point"
+          }
+        });
+      }
+    });
 
     _mapController.setGeoJsonSource(
       "markers-geojson",
@@ -322,7 +349,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     );
   }
 
-  Map<String, dynamic> _generateStationGeoJson([Rts? rtsData]) {
+  Map<String, dynamic> _generateStationGeoJsonIntensity0([Rts? rtsData]) {
     if (rtsData == null) {
       return {
         "type": "FeatureCollection",
@@ -334,8 +361,39 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       return rtsData.station.containsKey(e.key);
     }).where((e) {
       if (_rtsData!.box.keys.isNotEmpty) {
-        return rtsData.station[e.key]?.alert == true;
+        return rtsData.station[e.key]?.alert == true && intensityFloatToInt(rtsData.station[e.key]!.I) < 1;
       }
+      return false;
+    }).map((e) {
+      return {
+        "type": "Feature",
+        "properties": {},
+        "id": e.key,
+        "geometry": {
+          "coordinates": [e.value.info[0].lon, e.value.info[0].lat],
+          "type": "Point"
+        }
+      };
+    }).toList();
+
+    return {
+      "type": "FeatureCollection",
+      "features": features,
+    };
+  }
+
+  Map<String, dynamic> _generateStationGeoJson([Rts? rtsData]) {
+    if (rtsData == null) {
+      return {
+        "type": "FeatureCollection",
+        "features": [],
+      };
+    }
+
+    final features = _stations.entries.where((e) {
+      return rtsData.station.containsKey(e.key);
+    }).where((e) {
+      if (_rtsData!.box.keys.isNotEmpty) return false;
       return true;
     }).map((e) {
       Map<String, dynamic> properties = {};
