@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/model/location/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -47,12 +48,22 @@ void startBackgroundService(bool init) async {
         String country = position['country'];
         List<String> parts = country.split(' ');
 
-        if (parts.length == 2) {
-          String city = parts[0];
-          String town = parts[1];
+        if (parts.length == 3) {
+          String code = parts[2];
 
-          Global.preference.setString("location-city", city);
-          Global.preference.setString("location-town", town);
+          if (Global.location.containsKey(code)) {
+            Location locationInfo = Global.location[code]!;
+
+            Global.preference.setString("location-city", locationInfo.city);
+            Global.preference.setString("location-town", locationInfo.town);
+
+            print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
+          } else {
+            print('Code $code not found in location data');
+
+            Global.preference.setString("location-city", "解析失敗");
+            Global.preference.setString("location-town", "解析失敗");
+          }
         }
       }
     });

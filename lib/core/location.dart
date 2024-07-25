@@ -70,6 +70,7 @@ class LocationService {
       Placemark placemark = placemarks.first;
       String? city;
       String? town;
+      String? code;
 
       if (Platform.isIOS) {
         city = placemark.subAdministrativeArea;
@@ -77,9 +78,10 @@ class LocationService {
       } else if (Platform.isAndroid) {
         city = placemark.administrativeArea;
         town = placemark.subAdministrativeArea;
+        code = placemark.postalCode;
       }
 
-      String citytown = '$city $town';
+      String citytown = '$city $town $code';
       String citytowntemp = Global.preference.getString("loc-position-country") ?? "";
 
       if (citytowntemp == "" || citytowntemp != citytown) {
