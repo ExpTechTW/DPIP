@@ -215,7 +215,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             belowLayerId: "county",
           );
 
-          eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, 10, 6.8, Global.location);
+          eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, json.eq.mag, Global.location);
 
           updateMapArea();
         }
