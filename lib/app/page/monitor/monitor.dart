@@ -29,12 +29,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   Timer? _dataUpdateTimer;
   Timer? _eewUpdateTimer;
+  Timer? _blinkTimer;
   int _timeOffset = 0;
   List<String> _eewIdList = [];
   List<Eew> _eewData = [];
+  Rts? _rtsData;
   int _replayTimeStamp = 0;
   int _timeReplay = 1721770570342;
   Map<String, dynamic> _eewIntensityArea = {};
+  bool _isMarkerVisible = true;
 
   @override
   void initState() {
@@ -56,7 +59,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     setState(() => _timeOffset = DateTime.now().millisecondsSinceEpoch - data);
   }
 
-  void _initMap(MapLibreMapController controller) {
+  void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
     _initStations();
   }
@@ -68,6 +71,54 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     await _loadMapImages(isDark);
     _setupStationSource(data);
     _startDataUpdates();
+
+    await _mapController.addLayer(
+      "markers-geojson",
+      "markers",
+      const SymbolLayerProperties(
+        symbolSortKey: [Expressions.get, "intensity"],
+        symbolZOrder: "source",
+        iconSize: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          5,
+          0.5,
+          10,
+          1.5,
+        ],
+        iconImage: [
+          Expressions.match,
+          [Expressions.get, "intensity"],
+          1,
+          "intensity-1",
+          2,
+          "intensity-2",
+          3,
+          "intensity-3",
+          4,
+          "intensity-4",
+          5,
+          "intensity-5",
+          6,
+          "intensity-6",
+          7,
+          "intensity-7",
+          8,
+          "intensity-8",
+          9,
+          "intensity-9",
+          "cross",
+        ],
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+      ),
+    );
+
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      _isMarkerVisible = !_isMarkerVisible;
+      _updateCrossMarker(_isMarkerVisible ? true : false);
+    });
   }
 
   Future<void> _loadMapImages(bool isDark) async {
@@ -104,6 +155,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _updateRtsData() async {
     try {
       final data = await ExpTech().getRts(_timeReplay);
+      _rtsData = data;
       _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(data));
       _updateReplayTime();
     } catch (err) {
@@ -127,6 +179,33 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     } catch (err) {
       print(err);
     }
+  }
+
+  void _updateCrossMarker(bool show) {
+    List markers_features = [];
+
+    if (show) {
+      for (var eew in _eewData) {
+        markers_features.add({
+          "type": "Feature",
+          "properties": {
+            "intensity": 10, // 10 is for classifying epicenter cross
+          },
+          "geometry": {
+            "coordinates": [eew.eq.lon, eew.eq.lat],
+            "type": "Point"
+          }
+        });
+      }
+    }
+
+    _mapController.setGeoJsonSource(
+      "markers-geojson",
+      {
+        "type": "FeatureCollection",
+        "features": markers_features,
+      },
+    );
   }
 
   void _processEewData(List<Eew> data) {
@@ -189,11 +268,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       if (!currentEewIds.contains(id)) {
         _removeEewLayers(id);
         _eewIntensityArea.remove(id);
+        _updateMapArea();
         return true;
       }
       return false;
     });
-    _updateMapArea();
   }
 
   void _removeEewLayers(String id) {
@@ -215,10 +294,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       });
     });
 
-    print(eewArea.entries.expand((entry) => [
-      int.parse(entry.key),
-      IntensityColor.intensity(entry.value).toHexStringRGB(),
-    ]));
+    if (eewArea.keys.isEmpty) {
+      await _mapController.setLayerProperties(
+        'town',
+        FillLayerProperties(
+          fillColor: Theme.of(context).colorScheme.surfaceVariant.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
+      );
+      return;
+    }
 
     await _mapController.setLayerProperties(
       'town',
@@ -258,28 +343,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         }
       };
     }).toList();
-
-    List markers_features = [];
-    for (var eew in _eewData) {
-      markers_features.add({
-        "type": "Feature",
-        "properties": {
-          "intensity": 10, // 10 is for classifying epicenter cross
-        },
-        "geometry": {
-          "coordinates": [eew.eq.lon, eew.eq.lat],
-          "type": "Point"
-        }
-      });
-    }
-
-    _mapController.setGeoJsonSource(
-      "markers-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": markers_features,
-      },
-    );
 
     return {
       "type": "FeatureCollection",
@@ -334,6 +397,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _animationController.dispose();
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
+    _blinkTimer?.cancel();
     super.dispose();
   }
 
