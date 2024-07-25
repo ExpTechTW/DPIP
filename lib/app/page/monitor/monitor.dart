@@ -136,6 +136,46 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     controller.setGeoJsonSource("station-geojson", generateStationGeoJson(data));
   }
 
+  void updateMapArea() async{
+    Map<String, int> eewArea = {};
+    Global.location.forEach((String key, Location info) {
+      eewIntensityArea.forEach((String key, intensity) {
+        intensity.forEach((name, value) {
+          if (name != "max_i") {
+            int I = intensityFloatToInt(value["i"]);
+            String city = info.city.replaceAll("桃園市", "桃園縣");
+            if (eewArea['$city${info.town}'] == null || eewArea['$city${info.town}']! < I) {
+              eewArea['$city${info.town}'] = I;
+            }
+          }
+        });
+      });
+    });
+
+    await controller.setLayerProperties(
+      'town',
+      FillLayerProperties(
+        fillColor: [
+          'match',
+          [
+            'concat',
+            [
+              'concat',
+              ['get', 'COUNTY'],
+              ['get', 'TOWN']
+            ],
+          ],
+          ...eewArea.entries.expand((entry) => [
+            entry.key,
+            IntensityColor.intensity(entry.value).toHexStringRGB(),
+          ]),
+          context.colors.surfaceVariant.toHexStringRGB(),
+        ],
+        fillOpacity: 1,
+      ),
+    );
+  }
+
   void updateEewData() async {
     final data = await ExpTech().getEew(timeReplay);
     eewData = data;
@@ -176,43 +216,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
           eewIntensityArea[json.id] = eewAreaPga(json.eq.lat, json.eq.lon, json.eq.depth, 6, Global.location);
 
-          Map<String, int> eewArea = {};
-          Global.location.forEach((String key, Location info) {
-            eewIntensityArea.forEach((String key, intensity) {
-              intensity.forEach((name, value) {
-                if (name != "max_i") {
-                  int I = intensityFloatToInt(value["i"]);
-                  String city = info.city.replaceAll("桃園市", "桃園縣");
-                  if (eewArea['$city${info.town}'] == null || eewArea['$city${info.town}']! < I) {
-                    eewArea['$city${info.town}'] = I;
-                  }
-                }
-              });
-            });
-          });
-
-          await controller.setLayerProperties(
-            'town',
-            FillLayerProperties(
-              fillColor: [
-                'match',
-                [
-                  'concat',
-                  [
-                    'concat',
-                    ['get', 'COUNTY'],
-                    ['get', 'TOWN']
-                  ],
-                ],
-                ...eewArea.entries.expand((entry) => [
-                      entry.key,
-                      IntensityColor.intensity(entry.value).toHexStringRGB(),
-                    ]),
-                context.colors.surfaceVariant.toHexStringRGB(),
-              ],
-              fillOpacity: 1,
-            ),
-          );
+          updateMapArea();
         }
       }
 
@@ -237,6 +241,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       if (eewTimer != null) {
         eewTimer!.cancel();
       }
+
+      await controller.setLayerProperties(
+        'town',
+        FillLayerProperties(
+          fillColor: context.colors.surfaceVariant.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
+      );
     }
 
     Iterable<String> fetchEewIdList = data.map((e) => e.id);
@@ -247,6 +259,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         controller.removeSource("${eewIdList[i]}-circle");
         eewIntensityArea.remove(eewIdList[i]);
         eewIdList.removeAt(i);
+
+        updateMapArea();
       }
     }
   }
