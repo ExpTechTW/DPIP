@@ -71,7 +71,7 @@ void startBackgroundService(bool init) async {
   }
 }
 
-void stopBackgroundService(isAutoLocatingEnabled) async {
+void stopBackgroundService(bool isAutoLocatingEnabled) async {
   if (Platform.isAndroid) {
     if (await service.isRunning()) {
       if (isAutoLocatingEnabled) {
@@ -162,7 +162,6 @@ void onStart(ServiceInstance service) async {
       Global.preference.remove("loc-position-lat");
       Global.preference.remove("loc-position-lon");
       Global.preference.remove("loc-position-country");
-      Global.preference.remove("last-location-update");
     });
 
     void task() async {
