@@ -265,12 +265,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateBoxLine() {
-    Map<String, int> box = _rtsData?.box ?? {};
+    List<String> boxSkipList = [];
     for (var area in Global.box["features"]) {
       int id = area["properties"]["ID"];
       bool skip = checkBoxSkip(_eewData, _eewDist, area["geometry"]["coordinates"][0]);
       if (skip) {
-        box.remove(id.toString());
+        boxSkipList.add(id.toString());
       }
     }
     _mapController.setLayerProperties(
@@ -278,13 +278,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         LineLayerProperties(lineColor: [
           'match',
           ['get', 'ID'],
-          ...box.entries.expand((entry) => [
+          ...?_rtsData?.box.entries.expand((entry) => [
                 int.parse(entry.key),
-                (entry.value > 3)
-                    ? "#FF0000"
-                    : (entry.value > 1)
-                        ? "#EAC100"
-                        : "#00DB00",
+                (boxSkipList.contains(entry.key))
+                    ? "rgba(0,0,0,0)"
+                    : (entry.value > 3)
+                        ? "#FF0000"
+                        : (entry.value > 1)
+                            ? "#EAC100"
+                            : "#00DB00",
               ]),
           "rgba(0,0,0,0)",
         ], lineOpacity: (_isBoxVisible) ? 1 : 0));
