@@ -1,6 +1,18 @@
 {
   "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
+  "datetime_format": "yyyy/MM/dd HH:mm:ss",
+  "@datetime_format": {
+    "description": "日期時間顯示格式"
+  },
+  "date_format": "yyyy/MM/dd",
+  "@date_format": {
+    "description": "日期顯示格式"
+  },
+  "time_format": "HH:mm:ss",
+  "@time_format": {
+    "description": "時間顯示格式"
+  },
   "home": "主頁",
   "@home": {
     "description": "「首頁」頁面標題"
@@ -37,9 +49,9 @@
   "@threads": {
     "description": "「我」頁面 → 應用程式資訊 → 「在 Threads 上追蹤我們」按鈕"
   },
-  "youtube": "油管直播",
+  "youtube": "YouTube 直播",
   "@youtube": {
-    "description": "「我」頁面 → 應用程式資訊 → 「Youtube 直播」按鈕"
+    "description": "「我」頁面 → 應用程式資訊 → 「YouTube 直播」按鈕"
   },
   "server_status": "服务器状态",
   "@server_status": {
@@ -48,5 +60,72 @@
   "third_party_libraries": "第三方套件授权",
   "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
+  },
+  "report_list_item_subtitle": "M {magnitude}　深度 {depth} km",
+  "@report_list_item_subtitle": {
+    "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",
+    "placeholders": {
+      "magnitude": {
+        "type": "String",
+        "description": "規模數值"
+      },
+      "depth": {
+        "type": "String",
+        "description": "深度數值"
+      }
+    }
+  },
+  "report_with_number": "編號 {reportNumber} 顯著有感地震",
+  "@report_with_number": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
+    "placeholders": {
+      "reportNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "report_without_number": "小區域有感地震",
+  "@report_without_number": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
+  },
+  "open_report_url": "報告頁面",
+  "@open_report_url": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
+  },
+  "report_event_time": "發震時間",
+  "@report_event_time": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
+  },
+  "report_location": "位於",
+  "@report_location": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
+  },
+  "report_magnitude": "地震規模",
+  "@report_magnitude": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
+  },
+  "report_depth": "震源深度",
+  "@report_depth": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
+  },
+  "report_image": "地震報告圖",
+  "@report_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
+  },
+  "report_intensity_image": "震度圖",
+  "@report_intensity_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
+  },
+  "report_pga_image": "最大地動加速度圖",
+  "@report_pga_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
+  },
+  "report_pgv_image": "最大地動速度圖",
+  "@report_pgv_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
+  },
+  "report_intensity": "各地震度",
+  "@report_intensity": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   }
 }
