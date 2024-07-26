@@ -1,3 +1,4 @@
+import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timezone/timezone.dart';
@@ -7,28 +8,42 @@ part 'partial_earthquake_report.g.dart';
 @JsonSerializable()
 class PartialEarthquakeReport {
   final String id;
-  final double lon;
-  final double lat;
-  final String loc;
+
+  @JsonKey(name: "lon")
+  final double longitude;
+
+  @JsonKey(name: "lat")
+  final double latitude;
+
+  @JsonKey(name: "loc")
+  final String location;
+
   final double depth;
-  final double mag;
+
+  @JsonKey(name: "mag")
+  final double magnitude;
+
   @JsonKey(name: "int")
   final int intensity;
-  final int time;
+
+  @JsonKey(fromJson: parseDateTime, toJson: dateTimeToJson)
+  final TZDateTime time;
+
   final int trem;
   final String md5;
 
-  PartialEarthquakeReport(
-      {required this.id,
-      required this.lon,
-      required this.lat,
-      required this.loc,
-      required this.depth,
-      required this.mag,
-      required this.intensity,
-      required this.time,
-      required this.trem,
-      required this.md5});
+  PartialEarthquakeReport({
+    required this.id,
+    required this.longitude,
+    required this.latitude,
+    required this.location,
+    required this.depth,
+    required this.magnitude,
+    required this.intensity,
+    required this.time,
+    required this.trem,
+    required this.md5,
+  });
 
   factory PartialEarthquakeReport.fromJson(Map<String, dynamic> json) => _$PartialEarthquakeReportFromJson(json);
 
@@ -44,96 +59,98 @@ class PartialEarthquakeReport {
     return null;
   }
 
-  TZDateTime get dateTime => TZDateTime.fromMillisecondsSinceEpoch(getLocation("Asia/Taipei"), time);
-
   bool get hasNumber => number != null;
 
-  Uri get cwaUrl {
+  Uri get reportUrl {
     final arr = id.split("-");
-    arr.removeAt(1);
-    return Uri.parse("https://www.cwa.gov.tw/V8/C/E/EQ/EQ${arr.join('-')}.html");
-  }
-
-  String get reportImageName {
-    final date = dateTime;
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    final mag = "${(this.mag * 10).floor()}";
+    arr.removeAt(0);
+    final mag = "${(magnitude * 10).floor()}";
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return "EC$month$day$hour$minute$mag${id}_H.png";
-    } else {
-      final year = date.year.toString();
-      final second = date.second.toString().padLeft(2, '0');
-      return "ECL$year$month$day$hour$minute$second${mag}_H.png";
+      return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag$id");
     }
+
+    return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag");
   }
 
-  String get reportImageUrl => "https://www.cwa.gov.tw/Data/earthquake/img/$reportImageName";
+  String get reportImageName {
+    final year = time.year.toString();
+    final month = time.month.toString().padLeft(2, '0');
+    final day = time.day.toString().padLeft(2, '0');
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    final second = time.second.toString().padLeft(2, '0');
+    final mag = "${(magnitude * 10).floor()}";
 
-  String get zipName {
-    final date = dateTime;
-    final year = date.year.toString();
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    final second = date.second.toString().padLeft(2, '0');
+    if (hasNumber) {
+      final id = number!.substring(3);
+      return "$year$month$day$hour$minute$second$mag${id}_H.png";
+    }
 
-    return "EQ$number-$year-$month$day-$hour$minute$second";
+    return "$year$month$day$hour$minute$second${mag}_H.png";
   }
 
-  String get zipUrl => "https://www.cwa.gov.tw/Data/earthquake/zip/$zipName";
+  String get reportImageUrl {
+    final name = reportImageName;
+    final time = name.substring(0, 6);
+    return "https://scweb.cwa.gov.tw/webdata/OLDEQ/$time/$reportImageName";
+  }
+
+  String? get mapImageBaseName {
+    if (!hasNumber) return null;
+
+    final year = time.year.toString();
+    final id = number!.substring(3);
+
+    return "$year$id";
+  }
+
+  String get traceBaseUrl {
+    final year = time.year.toString();
+    return "https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year/";
+  }
 
   String? get intensityMapImageName {
     if (!hasNumber) return null;
 
-    final date = dateTime;
-    final year = date.year.toString();
-    return "$year${number!.substring(3)}i.png";
+    return "${mapImageBaseName}i.png";
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null ? null : "$zipUrl/$intensityMapImageName";
+  String? get intensityMapImageUrl => intensityMapImageName == null ? null : "$traceBaseUrl/$intensityMapImageName";
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
 
-    final date = dateTime;
-    final year = date.year.toString();
-    return "$year${number!.substring(3)}a.png";
+    return "${mapImageBaseName}a.png";
   }
 
-  String? get pgaMapImageUrl => pgaMapImageName == null ? null : "$zipUrl/$pgaMapImageName";
+  String? get pgaMapImageUrl => pgaMapImageName == null ? null : "$traceBaseUrl/$pgaMapImageName";
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
 
-    final date = dateTime;
-    final year = date.year.toString();
-    return "$year${number!.substring(3)}v.png";
+    return "${mapImageBaseName}v.png";
   }
 
-  String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$zipUrl/$pgvMapImageName";
+  String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$traceBaseUrl/$pgvMapImageName";
 
   String extractLocation() {
-    if (loc.contains("(")) {
-      return loc.substring(loc.indexOf("(") + 3, loc.indexOf(")"));
+    if (location.contains("(")) {
+      return location.substring(location.indexOf("(") + 3, location.indexOf(")"));
     } else {
-      return loc.substring(0, loc.indexOf("方") + 1);
+      return location.substring(0, location.indexOf("方") + 1);
     }
   }
 
   Color getReportColor() {
-    if (mag > 6.5 && intensity >= 7) {
+    if (magnitude > 6.5 && intensity >= 7) {
       return Colors.red;
     }
-    if (mag > 6.0 && intensity >= 5) {
+    if (magnitude > 6.0 && intensity >= 5) {
       return Colors.orange;
     }
-    if (mag > 5.5 && intensity >= 4) {
+    if (magnitude > 5.5 && intensity >= 4) {
       return Colors.yellow;
     }
     return Colors.green;

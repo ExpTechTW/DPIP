@@ -98,12 +98,12 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           "intensity": 10, // 10 is for classifying epicenter cross
         },
         "geometry": {
-          "coordinates": [data.lon, data.lat],
-          "type": "Point"
+          "coordinates": data.latlng.toGeoJsonCoordinates(),
+          "type": "Point",
         }
       });
 
-      expandBounds(bounds, LatLng(data.lat, data.lon));
+      expandBounds(bounds, data.latlng);
 
       await controller.moveCamera(
         CameraUpdate.newLatLngBounds(

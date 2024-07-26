@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ReportSheetContent extends StatelessWidget {
@@ -62,7 +61,7 @@ class ReportSheetContent extends StatelessWidget {
                 icon: const Icon(Symbols.open_in_new),
                 tooltip: context.i18n.open_report_url,
                 onPressed: () {
-                  launchUrl(report.cwaUrl);
+                  launchUrl(report.reportUrl);
                 },
               ),
               IconButton(
@@ -70,7 +69,8 @@ class ReportSheetContent extends StatelessWidget {
                 tooltip: "重播",
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => MonitorPage(data: report.time - 5000)),
+                    MaterialPageRoute(
+                        builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
                   );
                 },
               ),
@@ -81,12 +81,7 @@ class ReportSheetContent extends StatelessWidget {
         ReportDetailField(
           label: context.i18n.report_event_time,
           child: Text(
-            DateFormat(context.i18n.datetime_format).format(
-              TZDateTime.fromMillisecondsSinceEpoch(
-                getLocation("Asia/Taipei"),
-                report.time,
-              ),
-            ),
+            DateFormat(context.i18n.datetime_format).format(report.time),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -116,11 +111,11 @@ class ReportSheetContent extends StatelessWidget {
                       margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: MagnitudeColor.magnitude(report.mag),
+                        color: MagnitudeColor.magnitude(report.magnitude),
                       ),
                     ),
                     Text(
-                      "M ${report.mag}",
+                      "M ${report.magnitude}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
