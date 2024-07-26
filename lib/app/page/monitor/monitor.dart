@@ -14,7 +14,10 @@ import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -618,6 +621,71 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
+                        ),
+                      ),
+                      // for (final eew in _eewData) Text(eew.id),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: context.colors.onSurface,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "地震速報", // 地震速報 4|5- 緊急地震速報
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: context.colors.onSurface,
+                                        ),
+                                      ),
+                                      Text(
+                                        "第 1 報",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: context.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "花蓮縣秀林鄉",
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          color: context.colors.onSurface,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(),
+                                  Text("所在地預估"),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
