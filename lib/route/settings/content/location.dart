@@ -318,7 +318,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (!batteryOptimization) return;
 
-      startBackgroundService(false);
+      if (Platform.isAndroid) {
+        androidStartBackgroundService(false);
+      }
 
       Global.preference.remove("location-city");
       Global.preference.remove("location-town");

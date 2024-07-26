@@ -50,24 +50,22 @@ void initBackgroundService() async {
             }
           }
         });
+        androidStartBackgroundService(true);
       }
-      startBackgroundService(true);
     }
   }
 }
 
-void startBackgroundService(bool init) async {
-  if (Platform.isAndroid) {
-    if (!androidServiceInit) {
-      androidForegroundService();
-    }
-    var isRunning = await service.isRunning();
-    if (!isRunning) {
-      service.startService();
-    } else if (!init) {
-      stopBackgroundService(false);
-      service.startService();
-    }
+void androidStartBackgroundService(bool init) async {
+  if (!androidServiceInit) {
+    androidForegroundService();
+  }
+  var isRunning = await service.isRunning();
+  if (!isRunning) {
+    service.startService();
+  } else if (!init) {
+    stopBackgroundService(false);
+    service.startService();
   }
 }
 
