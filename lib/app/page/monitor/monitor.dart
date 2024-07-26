@@ -46,6 +46,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
   int _isTsunamiVisible = 0;
+  final sheetController = DraggableScrollableController();
+  final sheetInitialSize = 0.2;
+  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+  late ScrollController scrollController;
 
   @override
   void initState() {
@@ -549,6 +553,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
+    sheetController.addListener(() {
+      final newSize = sheetController.size;
+      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      animController.animateTo(scrollPosition, duration: Duration.zero);
+    });
     super.dispose();
   }
 
@@ -566,6 +575,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             child: DraggableScrollableSheet(
               initialChildSize: sheetInitialSize,
               minChildSize: sheetInitialSize,
+              controller: sheetController,
               builder: (context, scrollController) {
                 return Container(
                   color: context.colors.surface.withOpacity(0.9),
