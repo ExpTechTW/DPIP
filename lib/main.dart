@@ -9,7 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timezone/data/latest.dart';
 
-import 'core/service.dart';
+import 'package:dpip/core/service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

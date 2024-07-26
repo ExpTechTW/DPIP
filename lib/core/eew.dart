@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
 
-import '../model/wave_time.dart';
+import 'package:dpip/model/wave_time.dart';
 
 Map<String, double> psWaveDist(double depth, int time, int now) {
   double pDist = 0;
