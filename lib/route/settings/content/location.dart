@@ -381,7 +381,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Widget build(BuildContext context) {
     return Material(
       child: ListView(
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           Padding(
