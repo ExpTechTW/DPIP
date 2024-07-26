@@ -1,3 +1,4 @@
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:dpip/widget/settings/sound/sound_list_tile.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
   Widget build(BuildContext context) {
     return Material(
       child: ListView(
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: const [
           ListTileGroupHeader(title: "地震速報音效"),
