@@ -30,8 +30,6 @@ class MonitorPage extends StatefulWidget {
 class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
 
   Timer? _dataUpdateTimer;
   Timer? _eewUpdateTimer;
@@ -49,17 +47,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _initAnimation();
     _initTimeOffset();
     _timeReplay = widget.data;
-  }
-
-  void _initAnimation() {
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 1.0, end: 0.0).animate(_animationController);
   }
 
   void _initTimeOffset() async {
@@ -280,6 +269,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           "type": "FeatureCollection",
           "features": [circleData]
         }, tolerance: 1));
+    _mapController.addSource(
+        "${eew.id}-circle-p",
+        GeojsonSourceProperties(data: {
+          "type": "FeatureCollection",
+          "features": [circleData]
+        }, tolerance: 1));
     _addEewLayers(eew);
   }
 
@@ -290,6 +285,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _mapController.addFillLayer(
         "${eew.id}-circle", "${eew.id}-wave-bg", FillLayerProperties(fillColor: color, fillOpacity: 0.25),
         belowLayerId: "county");
+    _mapController.addLineLayer(
+        "${eew.id}-circle-p", "${eew.id}-wave-outline-p", const LineLayerProperties(lineColor: "#00CACA", lineWidth: 2));
   }
 
   void _updateEewIntensityArea(Eew eew) {
@@ -309,6 +306,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _mapController.setGeoJsonSource("${eew.id}-circle", {
         "type": "FeatureCollection",
         "features": [circleData]
+      });
+      final circleDataP = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["p_dist"]!, steps: 256);
+      _mapController.setGeoJsonSource("${eew.id}-circle-p", {
+        "type": "FeatureCollection",
+        "features": [circleDataP]
       });
     }
   }
@@ -330,8 +332,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _removeEewLayers(String id) {
     _mapController.removeLayer("$id-wave-outline");
+    _mapController.removeLayer("$id-wave-outline-p");
     _mapController.removeLayer("$id-wave-bg");
     _mapController.removeSource("$id-circle");
+    _mapController.removeSource("$id-circle-p");
   }
 
   void _updateMapArea() async {
@@ -492,7 +496,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   @override
   void dispose() {
-    _animationController.dispose();
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
