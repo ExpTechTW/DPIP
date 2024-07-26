@@ -1,25 +1,27 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/eew.dart';
 import 'package:dpip/core/rts.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/model/eew.dart';
+import 'package:dpip/model/rts/rts.dart';
+import 'package:dpip/model/station.dart';
 import 'package:dpip/model/station_info.dart';
+import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/instrumental_intensity_color.dart';
+import 'package:dpip/util/intensity_color.dart';
+import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/eew.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/rts/rts.dart';
-import 'package:dpip/model/station.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/instrumental_intensity_color.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:dpip/model/eew.dart';
-import 'package:dpip/util/intensity_color.dart';
-import 'dart:ui' as ui;
 
 class MonitorPage extends StatefulWidget {
-  const MonitorPage({Key? key}) : super(key: key);
+  const MonitorPage({super.key, required this.data});
+
+  final int data;
 
   @override
   State<MonitorPage> createState() => _MonitorPageState();
@@ -35,12 +37,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _eewUpdateTimer;
   Timer? _blinkTimer;
   int _timeOffset = 0;
-  List<String> _eewIdList = [];
+  final List<String> _eewIdList = [];
   List<Eew> _eewData = [];
   Rts? _rtsData;
   int _replayTimeStamp = 0;
-  int _timeReplay = 1721770570342;
-  Map<String, dynamic> _eewIntensityArea = {};
+  int _timeReplay = 0;
+  final Map<String, dynamic> _eewIntensityArea = {};
   bool _isMarkerVisible = true;
   int _isTsunamiVisible = 0;
 
@@ -49,6 +51,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     super.initState();
     _initAnimation();
     _initTimeOffset();
+    _timeReplay = widget.data;
   }
 
   void _initAnimation() {

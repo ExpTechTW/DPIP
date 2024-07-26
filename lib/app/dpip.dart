@@ -61,8 +61,8 @@ class _DpipState extends State<Dpip> {
         physics: const NeverScrollableScrollPhysics(),
         children: const [
           // HomePage(),
-          MonitorPage(),
           ReportListPage(),
+          MonitorPage(data: 0),
           // MapPage(),
           MePage(),
         ],

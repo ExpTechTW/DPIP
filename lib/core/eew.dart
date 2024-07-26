@@ -79,7 +79,9 @@ double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, do
   double epicenterDistance = distance(epicenterLocation[0], epicenterLocation[1], pointLocation[0], pointLocation[1]);
   double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   double x = max(hypocenterDistance, 3);
-  double gpv600 = pow(10, 0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x).toDouble();
+  double gpv600 =
+      pow(10, 0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x)
+          .toDouble();
   double pgv400 = gpv600 * 1.31;
   double pgv = pgv400 * 1.0;
   return 2.68 + 1.72 * log(pgv) / ln10;
@@ -178,4 +180,3 @@ WaveTime calculateWaveTime(double depth, double distance) {
   }
   return WaveTime(p: ptime, s: stime);
 }
-

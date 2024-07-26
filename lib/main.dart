@@ -4,10 +4,10 @@ import 'package:dpip/core/notify.dart';
 import 'package:dpip/global.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:timezone/data/latest.dart';
-import 'package:flutter/services.dart';
 
 import 'core/service.dart';
 

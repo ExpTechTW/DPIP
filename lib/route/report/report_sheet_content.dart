@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/util/depth_color.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -60,6 +61,15 @@ class ReportSheetContent extends StatelessWidget {
                 tooltip: "報告頁面",
                 onPressed: () {
                   launchUrl(report.cwaUrl);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.replay),
+                tooltip: "重播",
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => MonitorPage(data: report.time - 5000)),
+                  );
                 },
               ),
             ],
