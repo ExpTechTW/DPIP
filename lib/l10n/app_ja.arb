@@ -37,7 +37,7 @@
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "DPIPの運営方法の調整",
+  "settingsDescription": "DPIPの作動方法を調整",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
@@ -100,11 +100,11 @@
   "@report_location": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
   },
-  "report_magnitude": "地震規模",
+  "report_magnitude": "マグニチュード",
   "@report_magnitude": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
   },
-  "report_depth": "震源深度",
+  "report_depth": "深さ",
   "@report_depth": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
   },
