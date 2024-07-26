@@ -592,7 +592,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    const sheetInitialSize = 0.16;
+    const sheetInitialSize = 0.2;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.monitor),
@@ -635,8 +635,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: context.colors.onSurface,
-                                  width: 1.5,
+                                  color: true ? Color(0xFFC80000) : Color(0xFFFFC800),
+                                  width: 2,
                                 ),
                               ),
                               child: Column(
@@ -645,7 +645,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        "地震速報", // 地震速報 4|5- 緊急地震速報
+                                        true ? "緊急地震速報" : "地震速報", // 地震速報 4|5- 緊急地震速報
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: context.colors.onSurface,
@@ -659,6 +659,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                         ),
                                       ),
                                     ],
+                                  ),
+                                  SizedBox(
+                                    height: 5,
                                   ),
                                   Row(
                                     children: [
