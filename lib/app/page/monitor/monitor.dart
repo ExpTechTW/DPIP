@@ -601,6 +601,64 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap),
+          Positioned(
+            left: 10,
+            top: 10,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black12.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    DateFormat('yyyy-MM-dd HH:mm:ss').format((!_dataStatus())
+                        ? DateTime.fromMillisecondsSinceEpoch(_lsatGetRtsDataTime)
+                        : (_timeReplay == 0)
+                            ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
+                            : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: (!_dataStatus())
+                            ? Colors.red
+                            : (_timeReplay == 0)
+                                ? context.colors.onSurface
+                                : Colors.orangeAccent),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 10,
+            top: 40,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black12.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    (!_dataStatus()) ? "999+ms" : "${_ping}ms",
+                    style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: (!_dataStatus())
+                            ? Colors.red
+                            : (_ping > 250)
+                                ? Colors.orange
+                                : Colors.green),
+                  ),
+                ),
+              ),
+            ),
+          ),
           Positioned.fill(
             child: DraggableScrollableSheet(
               initialChildSize: sheetInitialSize,
@@ -774,64 +832,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                   ),
                 );
               },
-            ),
-          ),
-          Positioned(
-            left: 10,
-            top: 10,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black12.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    DateFormat('yyyy-MM-dd HH:mm:ss').format((!_dataStatus())
-                        ? DateTime.fromMillisecondsSinceEpoch(_lsatGetRtsDataTime)
-                        : (_timeReplay == 0)
-                            ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
-                            : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: (!_dataStatus())
-                            ? Colors.red
-                            : (_timeReplay == 0)
-                                ? context.colors.onSurface
-                                : Colors.orangeAccent),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 10,
-            top: 40,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black12.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    (!_dataStatus()) ? "999+ms" : "${_ping}ms",
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: (!_dataStatus())
-                            ? Colors.red
-                            : (_ping > 250)
-                                ? Colors.orange
-                                : Colors.green),
-                  ),
-                ),
-              ),
             ),
           ),
         ],
