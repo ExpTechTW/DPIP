@@ -67,7 +67,7 @@ class ReportSheetContent extends StatelessWidget {
                 icon: const Icon(Icons.replay),
                 tooltip: "重播",
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(
+                  Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => MonitorPage(data: report.time - 5000)),
                   );
                 },

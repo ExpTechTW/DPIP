@@ -168,6 +168,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _updateRtsData();
       _updateEewData();
       setState(() {});
+      print(_timeReplay);
     });
   }
 
@@ -247,17 +248,17 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateTsunamiLine() {
-    _mapController.setLayerProperties(
-        "tsunami",
-        LineLayerProperties(lineColor: [
-          "match",
-          ["get", "AREANAME"],
-          "東部沿海地區",
-          "#FF0000",
-          "#EAC100"
-        ], lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0));
-    _isTsunamiVisible++;
-    if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
+    // _mapController.setLayerProperties(
+    //     "tsunami",
+    //     LineLayerProperties(lineColor: [
+    //       "match",
+    //       ["get", "AREANAME"],
+    //       "東部沿海地區",
+    //       "#FF0000",
+    //       "#EAC100"
+    //     ], lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0));
+    // _isTsunamiVisible++;
+    // if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
   }
 
   void _processEewData(List<Eew> data) {
@@ -502,12 +503,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text(context.i18n.monitor),
-            if (_timeReplay != 0) _buildReplayIndicator(),
-          ],
-        ),
+        title: Text(context.i18n.monitor),
       ),
       body: Stack(
         children: [
@@ -531,9 +527,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                   ),
                   child: Text(
                     DateFormat('yyyy-MM-dd HH:mm:ss').format((_timeReplay == 0)
-                        ? DateTime(_getCurrentTime())
+                        ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
                         : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: (_timeReplay == 0) ? context.colors.surface : Colors.orangeAccent),
                   ),
                 ),
               ),
@@ -541,20 +540,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildReplayIndicator() {
-    return Row(
-      children: [
-        const SizedBox(width: 10),
-        FadeTransition(
-          opacity: _animation,
-          child: const Icon(Icons.error, color: Colors.red),
-        ),
-        const SizedBox(width: 5),
-        const Text('重播'),
-      ],
     );
   }
 }
