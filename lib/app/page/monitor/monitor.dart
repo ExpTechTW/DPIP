@@ -61,7 +61,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _initTimeOffset() async {
     final data = await ExpTech().getNtp();
-    setState(() => _timeOffset = DateTime.now().millisecondsSinceEpoch - data);
+    _timeOffset = DateTime.now().millisecondsSinceEpoch - data;
   }
 
   void _initMap(MapLibreMapController controller) async {
@@ -76,6 +76,47 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     await _loadMapImages(isDark);
     _setupStationSource(data);
     _startDataUpdates();
+
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+      _isMarkerVisible = !_isMarkerVisible;
+      _isBoxVisible = !_isBoxVisible;
+      await _updateTsunamiLine();
+      await _updateBoxLine();
+      await _updateCrossMarker();
+    });
+  }
+
+  Future<void> _loadMapImages(bool isDark) async {
+    await loadIntensityImage(_mapController, isDark);
+    await loadCrossImage(_mapController);
+  }
+
+  void _setupStationSource(Map<String, Station> data) async {
+    _stations = data;
+    await _mapController.addSource(
+        "station-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    await _mapController.addSource("station-geojson-intensity-0",
+        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    await _mapController.addSource(
+        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    _addStationLayer();
+  }
+
+  void _addStationLayer() async {
+    await _mapController.addCircleLayer(
+        "station-geojson",
+        "station",
+        CircleLayerProperties(
+          circleColor: _getStationColorExpression(),
+          circleRadius: _getStationRadiusExpression(),
+        ));
+    await _mapController.addCircleLayer(
+        "station-geojson-intensity-0",
+        "station-intensity-0",
+        CircleLayerProperties(
+          circleColor: "#7B7B7B",
+          circleRadius: _getStationRadiusExpression(),
+        ));
 
     await _mapController.addLayer(
       "markers-geojson",
@@ -119,47 +160,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         iconIgnorePlacement: true,
       ),
     );
-
-    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
-      _isMarkerVisible = !_isMarkerVisible;
-      _isBoxVisible = !_isBoxVisible;
-      await _updateCrossMarker();
-      await _updateTsunamiLine();
-      await _updateBoxLine();
-    });
-  }
-
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadIntensityImage(_mapController, isDark);
-    await loadCrossImage(_mapController);
-  }
-
-  void _setupStationSource(Map<String, Station> data) async {
-    setState(() => _stations = data);
-    await _mapController.addSource(
-        "station-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    await _mapController.addSource("station-geojson-intensity-0",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    await _mapController.addSource(
-        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    _addStationLayer();
-  }
-
-  void _addStationLayer() async {
-    await _mapController.addCircleLayer(
-        "station-geojson",
-        "station",
-        CircleLayerProperties(
-          circleColor: _getStationColorExpression(),
-          circleRadius: _getStationRadiusExpression(),
-        ));
-    await _mapController.addCircleLayer(
-        "station-geojson-intensity-0",
-        "station-intensity-0",
-        CircleLayerProperties(
-          circleColor: "#7B7B7B",
-          circleRadius: _getStationRadiusExpression(),
-        ));
   }
 
   void _startDataUpdates() {
@@ -168,14 +168,21 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _updateEewData();
       setState(() {});
     });
+    _eewUpdateTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      _updateEewCircles();
+      if (_timeReplay != 0) {
+        _timeReplay += (_replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
+        _replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
+      }
+    });
   }
 
   bool _dataStatus() {
     bool status = (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) - _lsatGetRtsDataTime) < 3000;
     if (!status && _rtsData != null) {
       _rtsData = null;
-      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
-      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
+      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(null));
+      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(null));
     }
     return status;
   }
@@ -187,31 +194,24 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _ping = DateTime.now().millisecondsSinceEpoch - t;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
-      _updateReplayTime();
-      _updateMarkers();
     } catch (err) {
       print(err);
+    } finally {
+      await _updateMarkers();
     }
   }
 
-  void _updateMarkers() async {
+  Future<void> _updateMarkers() async {
     await _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
     await _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
-  }
-
-  void _updateReplayTime() {
-    if (_timeReplay != 0) {
-      _timeReplay += (_replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
-      _replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
-    }
   }
 
   void _updateEewData() async {
     try {
       final data = await ExpTech().getEew(_timeReplay);
       _eewData = data;
-      _processEewData(data);
-      _updateEewVisuals();
+      _processEewData(_eewData);
+      _removeOldEews();
     } catch (err) {
       print(err);
     }
@@ -324,10 +324,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _eewIdList.add(eew.id);
         _addEewCircle(eew);
         _updateEewIntensityArea(eew);
-        _updateMarkers();
+        _updateMapArea();
       }
     }
-    _updateMapArea();
   }
 
   void _addEewCircle(Eew eew) async {
@@ -362,13 +361,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _eewIntensityArea[eew.id] = eewAreaPga(eew.eq.lat, eew.eq.lon, eew.eq.depth, eew.eq.mag, Global.location);
   }
 
-  void _updateEewVisuals() {
-    _eewUpdateTimer ??= Timer.periodic(const Duration(milliseconds: 100), (_) => _updateEewCircles());
-    _removeOldEews();
-  }
-
   void _updateEewCircles() async {
-    _updateReplayTime();
+    if (_eewData.isEmpty) return;
     for (var eew in _eewData) {
       final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
       _eewDist[eew.id] = dist["s_dist"]!;
@@ -496,15 +490,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     final features = _stations.entries.where((e) {
       return rtsData.station.containsKey(e.key);
     }).where((e) {
-      if (_eewData.isNotEmpty) return false;
+      if (_eewData.isNotEmpty || (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true)) return false;
       return true;
     }).map((e) {
-      Map<String, dynamic> properties = {};
-      if (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true) {
-        properties = {"i": rtsData.station[e.key]?.I};
-      } else {
-        properties = {"i": rtsData.station[e.key]?.i};
-      }
+      Map<String, dynamic> properties = {"i": rtsData.station[e.key]?.i};
 
       StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
       return {
