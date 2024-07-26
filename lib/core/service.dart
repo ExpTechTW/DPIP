@@ -75,17 +75,9 @@ void stopBackgroundService(isAutoLocatingEnabled) async {
   if (Platform.isAndroid) {
     if (await service.isRunning()) {
       if (isAutoLocatingEnabled) {
-        removePosition();
+        service.invoke("removeposition");
       }
       service.invoke("stopService");
-    }
-  }
-}
-
-void removePosition() async {
-  if (Platform.isAndroid) {
-    if (await service.isRunning()) {
-      service.invoke("removeposition");
     }
   }
 }
