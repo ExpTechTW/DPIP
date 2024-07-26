@@ -6,6 +6,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
+import 'package:dpip/route/settings/content/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -36,6 +37,8 @@ void initBackgroundService() async {
 
               if (Global.location.containsKey(code)) {
                 Location locationInfo = Global.location[code]!;
+
+                SettingsLocationView.updatePosition(locationInfo.city,locationInfo.town);
 
                 Global.preference.setString("location-city", locationInfo.city);
                 Global.preference.setString("location-town", locationInfo.town);

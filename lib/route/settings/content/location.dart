@@ -15,10 +15,16 @@ import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 class SettingsLocationView extends StatefulWidget {
+  static final GlobalKey<_SettingsLocationViewState> globalKey = GlobalKey<_SettingsLocationViewState>();
+
   const SettingsLocationView({super.key});
 
   @override
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
+
+  static void updatePosition(String? city, String? town) {
+    globalKey.currentState?.sendpositionUpdate(city, town);
+  }
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
@@ -377,6 +383,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
+  }
+
+  void sendpositionUpdate(String? cityUpdate,String? townUpdate) {
+    setState(() {
+      city = cityUpdate;
+      town = townUpdate;
+    });
   }
 
   @override
