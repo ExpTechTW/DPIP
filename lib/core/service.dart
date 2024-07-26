@@ -64,12 +64,12 @@ void androidStartBackgroundService(bool init) async {
   if (!isRunning) {
     service.startService();
   } else if (!init) {
-    stopBackgroundService(false);
+    androidstopBackgroundService(false);
     service.startService();
   }
 }
 
-void stopBackgroundService(bool isAutoLocatingEnabled) async {
+void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
   if (Platform.isAndroid) {
     if (await service.isRunning()) {
       if (isAutoLocatingEnabled) {
