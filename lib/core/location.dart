@@ -5,8 +5,6 @@ import 'package:dpip/global.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 
-import '../api/exptech.dart';
-
 StreamSubscription<Position>? positionStreamSubscription;
 Timer? restartTimer;
 
@@ -16,6 +14,14 @@ class GetLocationPosition {
   String country;
 
   GetLocationPosition(this.latitude, this.longitude, this.country);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'country': country,
+    };
+  }
 }
 
 class GetLocationResult {
@@ -23,6 +29,13 @@ class GetLocationResult {
   final bool change;
 
   GetLocationResult(this.position, this.change);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'position': position.toJson(),
+      'change': change,
+    };
+  }
 }
 
 class LocationResult {
@@ -57,6 +70,7 @@ class LocationService {
       Placemark placemark = placemarks.first;
       String? city;
       String? town;
+      String? code;
 
       if (Platform.isIOS) {
         city = placemark.subAdministrativeArea;
@@ -64,9 +78,10 @@ class LocationService {
       } else if (Platform.isAndroid) {
         city = placemark.administrativeArea;
         town = placemark.subAdministrativeArea;
+        code = placemark.postalCode;
       }
 
-      String citytown = '$city $town';
+      String citytown = '$city $town $code';
       String citytowntemp = Global.preference.getString("loc-position-country") ?? "";
 
       if (citytowntemp == "" || citytowntemp != citytown) {
