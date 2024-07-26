@@ -10,6 +10,8 @@ class Global {
   static late SharedPreferences preference;
   static late Map<String, Location> location;
   static late Map<String, dynamic> geojson;
+  static late Map<String, dynamic> timeTable;
+  static late Map<String, dynamic> box;
 
   static loadLocationData() async {
     final json = await rootBundle.loadString("assets/location.json");
@@ -31,6 +33,8 @@ class Global {
   static Future init() async {
     packageInfo = await PackageInfo.fromPlatform();
     preference = await SharedPreferences.getInstance();
+    timeTable = jsonDecode(await rootBundle.loadString("assets/time.json"));
+    box = jsonDecode(await rootBundle.loadString("assets/box.json"));
 
     await loadLocationData();
     await loadGeoJsonData();

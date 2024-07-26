@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/util/depth_color.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -45,7 +46,9 @@ class ReportSheetContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      report.hasNumber ? "編號 ${report.number} 顯著有感地震" : "小區域有感地震",
+                      report.hasNumber
+                          ? context.i18n.report_with_number(report.number!)
+                          : context.i18n.report_without_number,
                       style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                     ),
                     Text(
@@ -57,9 +60,18 @@ class ReportSheetContent extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Symbols.open_in_new),
-                tooltip: "報告頁面",
+                tooltip: context.i18n.open_report_url,
                 onPressed: () {
                   launchUrl(report.cwaUrl);
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.replay),
+                tooltip: "重播",
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => MonitorPage(data: report.time - 5000)),
+                  );
                 },
               ),
             ],
@@ -67,9 +79,9 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         ReportDetailField(
-          label: "發震時間",
+          label: context.i18n.report_event_time,
           child: Text(
-            DateFormat('yyyy/MM/dd HH:mm:ss').format(
+            DateFormat(context.i18n.datetime_format).format(
               TZDateTime.fromMillisecondsSinceEpoch(
                 getLocation("Asia/Taipei"),
                 report.time,
@@ -82,7 +94,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         ),
         ReportDetailField(
-          label: "位於",
+          label: context.i18n.report_location,
           child: Text(
             report.convertLatLon(),
             style: const TextStyle(
@@ -95,7 +107,7 @@ class ReportSheetContent extends StatelessWidget {
           children: [
             Expanded(
               child: ReportDetailField(
-                label: "地震規模",
+                label: context.i18n.report_magnitude,
                 child: Row(
                   children: [
                     Container(
@@ -120,7 +132,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
             Expanded(
               child: ReportDetailField(
-                label: "震源深度",
+                label: context.i18n.report_depth,
                 child: Row(
                   children: [
                     Container(
@@ -147,7 +159,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         ReportDetailField(
-          label: "各地震度",
+          label: context.i18n.report_intensity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -214,7 +226,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         ReportDetailField(
-          label: "地震報告圖",
+          label: context.i18n.report_image,
           child: EnlargeableImage(
             aspectRatio: 4 / 3,
             heroTag: "report-image-${report.id}",
@@ -224,7 +236,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         if (report.hasNumber)
           ReportDetailField(
-            label: "震度圖",
+            label: context.i18n.report_intensity_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: "intensity-image-${report.id}",
@@ -234,7 +246,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         if (report.hasNumber)
           ReportDetailField(
-            label: "最大地動加速度圖",
+            label: context.i18n.report_pga_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: "pga-image-${report.id}",
@@ -244,7 +256,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         if (report.hasNumber)
           ReportDetailField(
-            label: "最大地動速度圖",
+            label: context.i18n.report_pgv_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: "pgv-image-${report.id}",

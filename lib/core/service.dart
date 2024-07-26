@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/model/location/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -40,6 +41,32 @@ void startBackgroundService(bool init) async {
       stopBackgroundService();
       service.startService();
     }
+    service.on('sendposition').listen((event) {
+      if (event != null) {
+        var positionData = event.values.first;
+        var position = positionData['position'];
+        String country = position['country'];
+        List<String> parts = country.split(' ');
+
+        if (parts.length == 3) {
+          String code = parts[2];
+
+          if (Global.location.containsKey(code)) {
+            Location locationInfo = Global.location[code]!;
+
+            Global.preference.setString("location-city", locationInfo.city);
+            Global.preference.setString("location-town", locationInfo.town);
+
+            print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
+          } else {
+            print('Code $code not found in location data');
+
+            Global.preference.setString("location-city", "解析失敗");
+            Global.preference.setString("location-town", "解析失敗");
+          }
+        }
+      }
+    });
   }
 }
 
@@ -130,6 +157,7 @@ void onStart(ServiceInstance service) async {
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
+        service.invoke("sendposition",{"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
         String country = position.position.country;

@@ -27,7 +27,8 @@ class Route {
   static Uri tsunamiList() => Uri.parse("$onlyapi/v1/tsunami/list");
   static Uri tsunami(String tsuId) => Uri.parse("$onlyapi/v1/tsunami/$tsuId");
   static Uri rts() => Uri.parse("$lb/v1/trem/rts");
-  static Uri eew() => Uri.parse("$lb/v1/eq/eew");
+  static Uri ntp() => Uri.parse("${lb.replaceAll("api", "")}ntp");
+  static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
   static Uri weatherRealtime(String postalCode) => Uri.parse("$onlyapi/v1/weather/realtime/$postalCode");
   static Uri station() => Uri.parse("$api/v1/trem/station");
   static Uri location(String token, String lat, String lng) =>
