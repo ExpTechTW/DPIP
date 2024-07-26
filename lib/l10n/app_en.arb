@@ -37,7 +37,7 @@
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "Adjust DPIP's operation mode",
+  "settingsDescription": "Adjust how DPIP should function.",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
