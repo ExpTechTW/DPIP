@@ -67,6 +67,7 @@ flutter:
     - assets/DPIP.png
     - assets/location.json
     - assets/time.json
+    - assets/box.json
     - assets/eew.wav
     - assets/eew_alert.wav
     - assets/eq.wav

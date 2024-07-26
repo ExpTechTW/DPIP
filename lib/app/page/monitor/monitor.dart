@@ -262,6 +262,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateBoxLine() {
+    print(Global.box);
     _mapController.setLayerProperties(
         "box",
         LineLayerProperties(lineColor: [
