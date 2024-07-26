@@ -9,7 +9,7 @@ import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
 import 'package:http/http.dart';
 
-import '../model/eew.dart';
+import 'package:dpip/model/eew.dart';
 
 class ExpTech {
   String? apikey;
