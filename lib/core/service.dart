@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:ui';
 
@@ -39,7 +40,7 @@ void startBackgroundService(bool init) async {
     if (!isRunning) {
       service.startService();
     } else if (!init) {
-      stopBackgroundService();
+      stopBackgroundService(false);
       service.startService();
     }
     service.on('sendposition').listen((event) {
@@ -71,9 +72,12 @@ void startBackgroundService(bool init) async {
   }
 }
 
-void stopBackgroundService() async {
+void stopBackgroundService(isAutoLocatingEnabled) async {
   if (Platform.isAndroid) {
     if (await service.isRunning()) {
+      if (isAutoLocatingEnabled) {
+        removePosition();
+      }
       service.invoke("stopService");
     }
   }

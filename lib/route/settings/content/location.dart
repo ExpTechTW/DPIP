@@ -287,7 +287,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   }
 
   Future toggleAutoLocation() async {
-    stopBackgroundService();
+    stopBackgroundService(isAutoLocatingEnabled);
 
     if (Platform.isIOS) {
       try {
@@ -298,7 +298,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
 
     if (isAutoLocatingEnabled) {
-      removePosition();
       setState(() {
         isAutoLocatingEnabled = false;
       });
