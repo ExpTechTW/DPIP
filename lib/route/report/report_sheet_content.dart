@@ -30,7 +30,7 @@ class ReportSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.only(bottom: context.padding.bottom).copyWith(left: 16, right: 16),
       controller: controller,
       children: [
         const BottomSheetDragHandle(),
@@ -57,25 +57,33 @@ class ReportSheetContent extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Symbols.open_in_new),
-                tooltip: context.i18n.open_report_url,
-                onPressed: () {
-                  launchUrl(report.reportUrl);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.replay),
-                tooltip: "重播",
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
-                  );
-                },
-              ),
             ],
           ),
+        ),
+        Wrap(
+          direction: Axis.horizontal,
+          spacing: 8,
+          children: [
+            ActionChip(
+              avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
+              label: Text(context.i18n.open_report_url),
+              backgroundColor: context.colors.primary,
+              labelStyle: TextStyle(color: context.colors.onPrimary),
+              side: BorderSide(color: context.colors.primary),
+              onPressed: () {
+                launchUrl(report.reportUrl);
+              },
+            ),
+            ActionChip(
+              avatar: const Icon(Symbols.replay),
+              label: const Text("重播"),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
+                );
+              },
+            ),
+          ],
         ),
         const Divider(),
         ReportDetailField(

@@ -41,11 +41,17 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
     ),
   ).chain(CurveTween(curve: Curves.linear));
 
-  final sheetInitialSize = 0.2;
+  final opacityTween = Tween(
+    begin: 0.0,
+    end: 1.0,
+  ).chain(CurveTween(curve: Curves.linear));
+
+  late final sheetInitialSize = context.padding.bottom / context.dimension.height + 0.2;
   final sheetController = DraggableScrollableController();
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
 
+  bool isAppBarVisible = false;
   bool isLoading = true;
   bool isLoaded = false;
 
@@ -225,74 +231,109 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
-      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+
+      if (scrollPosition > 0) {
+        if (!isAppBarVisible) {
+          setState(() => isAppBarVisible = true);
+        }
+      } else {
+        if (isAppBarVisible) {
+          setState(() => isAppBarVisible = false);
+        }
+      }
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(context.i18n.report),
-      ),
-      body: Stack(children: [
-        DpipMap(
-          onMapCreated: (controller) async {
-            mapController.complete(controller);
-            await controller.setSymbolIconAllowOverlap(true);
-            await controller.setSymbolIconIgnorePlacement(true);
-            refreshReport();
-          },
-        ),
-        Positioned.fill(
-          child: DraggableScrollableSheet(
-            initialChildSize: sheetInitialSize,
-            minChildSize: sheetInitialSize,
-            controller: sheetController,
-            snap: true,
-            builder: (context, controller) {
-              scrollController = controller;
+    final appBar = AppBar(
+      elevation: 4,
+      title: Text(context.i18n.report),
+    );
 
-              return DecoratedBoxTransition(
-                decoration: animController.drive(decorationTween),
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : report == null
-                        ? Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              children: [
-                                const Flexible(
-                                  flex: 8,
-                                  child: Text(
-                                    "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Flexible(
-                                  flex: 2,
-                                  child: IconButton(
-                                    icon: const Icon(Symbols.refresh),
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: context.colors.onSurface,
-                                    ),
-                                    onPressed: () {
-                                      refreshReport();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ReportSheetContent(report: report!, controller: controller, focus: focus),
-              );
+    return Scaffold(
+      body: Stack(
+        children: [
+          DpipMap(
+            onMapCreated: (controller) async {
+              mapController.complete(controller);
+              await controller.setSymbolIconAllowOverlap(true);
+              await controller.setSymbolIconIgnorePlacement(true);
+              refreshReport();
             },
           ),
-        ),
-      ]),
+          Positioned(
+            top: context.padding.top + 4,
+            left: 4,
+            child: BackButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainer),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            top: context.padding.top + appBar.preferredSize.height - 24,
+            child: DraggableScrollableSheet(
+              initialChildSize: sheetInitialSize,
+              minChildSize: sheetInitialSize,
+              controller: sheetController,
+              snap: true,
+              builder: (context, controller) {
+                scrollController = controller;
+
+                return DecoratedBoxTransition(
+                  decoration: animController.drive(decorationTween),
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : report == null
+                          ? Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Row(
+                                children: [
+                                  const Flexible(
+                                    flex: 8,
+                                    child: Text(
+                                      "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    flex: 2,
+                                    child: IconButton(
+                                      icon: const Icon(Symbols.refresh),
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: context.colors.onSurface,
+                                      ),
+                                      onPressed: () {
+                                        refreshReport();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ReportSheetContent(report: report!, controller: controller, focus: focus),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Visibility(
+              visible: isAppBarVisible,
+              child: FadeTransition(
+                opacity: animController.drive(opacityTween),
+                child: appBar,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
