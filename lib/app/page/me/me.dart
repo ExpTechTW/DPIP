@@ -92,10 +92,10 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       ActionChip(
-                        avatar: const Icon(SimpleIcons.instagram),
-                        label: Text(context.i18n.instagram),
+                        avatar: const Icon(SimpleIcons.threads),
+                        label: Text(context.i18n.threads),
                         onPressed: () {
-                          launchUrl(Uri.parse("https://www.instagram.com/exptech.tw"));
+                          launchUrl(Uri.parse("https://www.threads.net/@dpip.tw"));
                         },
                       ),
                       ActionChip(
