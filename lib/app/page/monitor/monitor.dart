@@ -80,8 +80,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
       _isMarkerVisible = !_isMarkerVisible;
       _isBoxVisible = !_isBoxVisible;
-      await _updateTsunamiLine();
       await _updateBoxLine();
+      await _updateTsunamiLine();
       await _updateCrossMarker();
     });
   }
@@ -160,6 +160,41 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         iconIgnorePlacement: true,
       ),
     );
+
+    await _mapController.addGeoJsonSource(
+      "box-geojson",
+      {
+        "type": "FeatureCollection",
+        "features": [],
+      },
+    );
+
+    await _mapController.addLayer(
+        "box-geojson",
+        "box-geojson",
+        const LineLayerProperties(lineWidth: 2, lineColor: [
+          'match',
+          ['get', 'i'],
+          9,
+          "#FF0000",
+          8,
+          "#FF0000",
+          7,
+          "#FF0000",
+          6,
+          "#FF0000",
+          5,
+          "#FF0000",
+          4,
+          "#FF0000",
+          3,
+          "#EAC100",
+          2,
+          "#EAC100",
+          1,
+          "#00DB00",
+          "#00DB00"
+        ]));
   }
 
   void _startDataUpdates() {
@@ -277,45 +312,27 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   Future<void> _updateBoxLine() async {
     if (_rtsData == null) return;
-    List<String> boxSkipList = [];
-    for (var area in Global.box["features"]) {
-      int id = area["properties"]["ID"];
-      bool skip = checkBoxSkip(_eewData, _eewDist, area["geometry"]["coordinates"][0]);
-      if (skip) {
-        boxSkipList.add(id.toString());
+    List features = [];
+    if (_isBoxVisible) {
+      for (var area in Global.box["features"]) {
+        int id = area["properties"]["ID"];
+        if (_rtsData!.box[id.toString()] == null) continue;
+        bool skip = checkBoxSkip(_eewData, _eewDist, area["geometry"]["coordinates"][0]);
+        if (!skip) {
+          features.add({
+            "type": "Feature",
+            "properties": {
+              "i": _rtsData!.box[id.toString()], // 10 is for classifying epicenter cross
+            },
+            "geometry": {"coordinates": area["geometry"]["coordinates"], "type": "Polygon"}
+          });
+        }
       }
     }
-    await _mapController.setLayerProperties(
-      "box",
-      LineLayerProperties(
-        lineColor: (_rtsData!.box.keys.isEmpty || !_isBoxVisible)
-            ? "#000000"
-            : [
-                'match',
-                ['get', 'ID'],
-                ..._rtsData!.box.entries.expand((entry) => [
-                      int.parse(entry.key),
-                      (entry.value > 3)
-                          ? "#FF0000"
-                          : (entry.value > 1)
-                              ? "#EAC100"
-                              : "#00DB00",
-                    ]),
-                "#000000",
-              ],
-        lineOpacity: (_rtsData!.box.keys.isEmpty || !_isBoxVisible)
-            ? 0
-            : [
-                'match',
-                ['get', 'ID'],
-                ..._rtsData!.box.entries.expand((entry) => [
-                      int.parse(entry.key),
-                      (boxSkipList.contains(entry.key)) ? 0 : 1,
-                    ]),
-                0,
-              ],
-      ),
-    );
+    await _mapController.setGeoJsonSource("box-geojson", {
+      "type": "FeatureCollection",
+      "features": features,
+    });
   }
 
   void _processEewData(List<Eew> data) {
@@ -325,6 +342,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _addEewCircle(eew);
         _updateEewIntensityArea(eew);
         _updateMapArea();
+        _updateMarkers();
       }
     }
   }
