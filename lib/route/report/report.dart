@@ -33,10 +33,12 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+      boxShadow: kElevationToShadow[4],
       color: backgroundColor,
     ),
     end: BoxDecoration(
       borderRadius: BorderRadius.zero,
+      boxShadow: kElevationToShadow[4],
       color: backgroundColor,
     ),
   ).chain(CurveTween(curve: Curves.linear));
@@ -233,7 +235,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       final newSize = sheetController.size;
       double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
 
-      if (scrollPosition > 0) {
+      if (scrollPosition > 1e-5) {
         if (!isAppBarVisible) {
           setState(() => isAppBarVisible = true);
         }
