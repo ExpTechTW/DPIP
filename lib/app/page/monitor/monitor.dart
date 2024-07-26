@@ -190,7 +190,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     }
   }
 
-  void _updateMarkers(){
+  void _updateMarkers() {
     _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
     _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
   }
@@ -272,6 +272,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateBoxLine() {
+    if (_rtsData == null) return;
     List<String> boxSkipList = [];
     for (var area in Global.box["features"]) {
       int id = area["properties"]["ID"];
@@ -281,22 +282,36 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       }
     }
     _mapController.setLayerProperties(
-        "box",
-        LineLayerProperties(lineColor: [
-          'match',
-          ['get', 'ID'],
-          ...?_rtsData?.box.entries.expand((entry) => [
-                int.parse(entry.key),
-                (boxSkipList.contains(entry.key))
-                    ? "rgba(0,0,0,0)"
-                    : (entry.value > 3)
-                        ? "#FF0000"
-                        : (entry.value > 1)
-                            ? "#EAC100"
-                            : "#00DB00",
-              ]),
-          "rgba(0,0,0,0)",
-        ], lineOpacity: (_isBoxVisible) ? 1 : 0));
+      "box",
+      LineLayerProperties(
+        lineColor: (_rtsData!.box.keys.isEmpty)
+            ? "#000000"
+            : [
+                'match',
+                ['get', 'ID'],
+                ..._rtsData!.box.entries.expand((entry) => [
+                      int.parse(entry.key),
+                      (entry.value > 3)
+                          ? "#FF0000"
+                          : (entry.value > 1)
+                              ? "#EAC100"
+                              : "#00DB00",
+                    ]),
+                "#000000",
+              ],
+        lineOpacity: (_rtsData!.box.keys.isEmpty)
+            ? 0
+            : [
+                'match',
+                ['get', 'ID'],
+                ..._rtsData!.box.entries.expand((entry) => [
+                      int.parse(entry.key),
+                      (boxSkipList.contains(entry.key)) ? 0 : 1,
+                    ]),
+                0,
+              ],
+      ),
+    );
     _isBoxVisible = !_isBoxVisible;
   }
 
