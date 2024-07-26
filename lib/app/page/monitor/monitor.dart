@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dpip/core/rts.dart';
 import 'package:dpip/model/station_info.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/eew.dart';
@@ -15,6 +16,7 @@ import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:dpip/model/eew.dart';
 import 'package:dpip/util/intensity_color.dart';
+import 'dart:ui' as ui;
 
 class MonitorPage extends StatefulWidget {
   const MonitorPage({Key? key}) : super(key: key);
@@ -162,6 +164,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       _updateRtsData();
       _updateEewData();
+      setState(() {});
     });
   }
 
@@ -509,6 +512,28 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           Positioned.fill(
             child: DraggableScrollableSheet(
               builder: (context, scrollController) => Container(),
+            ),
+          ),
+          Positioned(
+            left: 10,
+            bottom: 10,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    DateFormat('yyyy-MM-dd HH:mm:ss').format((_timeReplay == 0)
+                        ? DateTime(_getCurrentTime())
+                        : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
