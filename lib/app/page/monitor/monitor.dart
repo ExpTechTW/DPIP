@@ -119,11 +119,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ),
     );
 
-    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
       _isMarkerVisible = !_isMarkerVisible;
-      _updateCrossMarker(_isMarkerVisible ? true : false);
-      _updateTsunamiLine();
-      _updateBoxLine();
+      _isBoxVisible = !_isBoxVisible;
+      await _updateCrossMarker();
+      await _updateTsunamiLine();
+      await _updateBoxLine();
     });
   }
 
@@ -132,26 +133,26 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     await loadCrossImage(_mapController);
   }
 
-  void _setupStationSource(Map<String, Station> data) {
+  void _setupStationSource(Map<String, Station> data) async {
     setState(() => _stations = data);
-    _mapController.addSource(
+    await _mapController.addSource(
         "station-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    _mapController.addSource("station-geojson-intensity-0",
+    await _mapController.addSource("station-geojson-intensity-0",
         const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    _mapController.addSource(
+    await _mapController.addSource(
         "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
     _addStationLayer();
   }
 
-  void _addStationLayer() {
-    _mapController.addCircleLayer(
+  void _addStationLayer() async{
+    await _mapController.addCircleLayer(
         "station-geojson",
         "station",
         CircleLayerProperties(
           circleColor: _getStationColorExpression(),
           circleRadius: _getStationRadiusExpression(),
         ));
-    _mapController.addCircleLayer(
+    await _mapController.addCircleLayer(
         "station-geojson-intensity-0",
         "station-intensity-0",
         CircleLayerProperties(
@@ -190,9 +191,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     }
   }
 
-  void _updateMarkers() {
-    _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
-    _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
+  void _updateMarkers() async{
+    await _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
+    await _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
   }
 
   void _updateReplayTime() {
@@ -213,10 +214,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     }
   }
 
-  void _updateCrossMarker(bool show) {
+  Future<void> _updateCrossMarker() async {
     List markers_features = [];
 
-    if (show) {
+    if (_isMarkerVisible) {
       for (var eew in _eewData) {
         markers_features.add({
           "type": "Feature",
@@ -248,7 +249,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       }
     });
 
-    _mapController.setGeoJsonSource(
+    await _mapController.setGeoJsonSource(
       "markers-geojson",
       {
         "type": "FeatureCollection",
@@ -257,8 +258,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     );
   }
 
-  void _updateTsunamiLine() {
-    // _mapController.setLayerProperties(
+  Future<void> _updateTsunamiLine() async {
+    // await _mapController.setLayerProperties(
     //     "tsunami",
     //     LineLayerProperties(lineColor: [
     //       "match",
@@ -271,7 +272,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     // if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
   }
 
-  void _updateBoxLine() {
+  Future<void> _updateBoxLine() async {
     if (_rtsData == null) return;
     List<String> boxSkipList = [];
     for (var area in Global.box["features"]) {
@@ -281,10 +282,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         boxSkipList.add(id.toString());
       }
     }
-    _mapController.setLayerProperties(
+    await _mapController.setLayerProperties(
       "box",
       LineLayerProperties(
-        lineColor: (_rtsData!.box.keys.isEmpty)
+        lineColor: (_rtsData!.box.keys.isEmpty || !_isBoxVisible)
             ? "#000000"
             : [
                 'match',
@@ -299,7 +300,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     ]),
                 "#000000",
               ],
-        lineOpacity: (_rtsData!.box.keys.isEmpty)
+        lineOpacity: (_rtsData!.box.keys.isEmpty || !_isBoxVisible)
             ? 0
             : [
                 'match',
@@ -312,7 +313,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ],
       ),
     );
-    _isBoxVisible = !_isBoxVisible;
   }
 
   void _processEewData(List<Eew> data) {
@@ -327,15 +327,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _updateMapArea();
   }
 
-  void _addEewCircle(Eew eew) {
+  void _addEewCircle(Eew eew) async{
     final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), 0, steps: 256);
-    _mapController.addSource(
+    await _mapController.addSource(
         "${eew.id}-circle",
         GeojsonSourceProperties(data: {
           "type": "FeatureCollection",
           "features": [circleData]
         }, tolerance: 1));
-    _mapController.addSource(
+    await _mapController.addSource(
         "${eew.id}-circle-p",
         GeojsonSourceProperties(data: {
           "type": "FeatureCollection",
@@ -344,14 +344,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _addEewLayers(eew);
   }
 
-  void _addEewLayers(Eew eew) {
+  void _addEewLayers(Eew eew) async{
     final color = (eew.status == 1) ? "#ff0000" : "#ffaa00";
-    _mapController.addLineLayer(
+    await _mapController.addLineLayer(
         "${eew.id}-circle", "${eew.id}-wave-outline", LineLayerProperties(lineColor: color, lineWidth: 2));
-    _mapController.addFillLayer(
+    await _mapController.addFillLayer(
         "${eew.id}-circle", "${eew.id}-wave-bg", FillLayerProperties(fillColor: color, fillOpacity: 0.25),
         belowLayerId: "county");
-    _mapController.addLineLayer("${eew.id}-circle-p", "${eew.id}-wave-outline-p",
+    await _mapController.addLineLayer("${eew.id}-circle-p", "${eew.id}-wave-outline-p",
         const LineLayerProperties(lineColor: "#00CACA", lineWidth: 2));
   }
 
@@ -364,18 +364,18 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _removeOldEews();
   }
 
-  void _updateEewCircles() {
+  void _updateEewCircles() async{
     _updateReplayTime();
     for (var eew in _eewData) {
       final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
       _eewDist[eew.id] = dist["s_dist"]!;
       final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["s_dist"]!, steps: 256);
-      _mapController.setGeoJsonSource("${eew.id}-circle", {
+      await _mapController.setGeoJsonSource("${eew.id}-circle", {
         "type": "FeatureCollection",
         "features": [circleData]
       });
       final circleDataP = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["p_dist"]!, steps: 256);
-      _mapController.setGeoJsonSource("${eew.id}-circle-p", {
+      await _mapController.setGeoJsonSource("${eew.id}-circle-p", {
         "type": "FeatureCollection",
         "features": [circleDataP]
       });
@@ -399,12 +399,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     });
   }
 
-  void _removeEewLayers(String id) {
-    _mapController.removeLayer("$id-wave-outline");
-    _mapController.removeLayer("$id-wave-outline-p");
-    _mapController.removeLayer("$id-wave-bg");
-    _mapController.removeSource("$id-circle");
-    _mapController.removeSource("$id-circle-p");
+  void _removeEewLayers(String id) async{
+    await _mapController.removeLayer("$id-wave-outline");
+    await _mapController.removeLayer("$id-wave-outline-p");
+    await _mapController.removeLayer("$id-wave-bg");
+    await _mapController.removeSource("$id-circle");
+    await _mapController.removeSource("$id-circle-p");
   }
 
   void _updateMapArea() async {
