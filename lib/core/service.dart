@@ -157,12 +157,12 @@ void onStart(ServiceInstance service) async {
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
+        service.invoke("sendposition",{"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
         String country = position.position.country;
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
-          service.invoke("sendposition",{"position": position.toJson()});
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
           print(body);
         }
