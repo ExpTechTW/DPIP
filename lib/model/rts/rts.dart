@@ -1,4 +1,5 @@
-import 'package:dpip/model/rts_station.dart';
+import 'package:dpip/model/rts/rts_intensity.dart';
+import 'package:dpip/model/rts/rts_station.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rts.g.dart';
@@ -16,7 +17,7 @@ class Rts {
 
   /// 震度列表
   @JsonKey(name: "int")
-  final List<int> intensity;
+  final List<RtsIntensity> intensity;
 
   Rts({required this.station, required this.box, required this.time, required this.intensity});
 

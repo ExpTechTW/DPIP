@@ -1,4 +1,5 @@
 import 'package:dpip/app/page/me/me.dart';
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +27,11 @@ class _DpipState extends State<Dpip> {
             selectedIcon: const Icon(Symbols.home, fill: 1),
             label: context.i18n.home,
           ),
-          // NavigationDestination(
-          //   icon: const Icon(Symbols.monitor_heart),
-          //   selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-          //   label: context.i18n.monitor,
-          // ),
+          NavigationDestination(
+            icon: const Icon(Symbols.monitor_heart),
+            selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+            label: context.i18n.monitor,
+          ),
           // NavigationDestination(
           //   icon: const Icon(Symbols.summarize),
           //   selectedIcon: const Icon(Symbols.summarize, fill: 1),
@@ -60,8 +61,8 @@ class _DpipState extends State<Dpip> {
         physics: const NeverScrollableScrollPhysics(),
         children: const [
           // HomePage(),
-          // MonitorPage(),
           ReportListPage(),
+          MonitorPage(data: 0),
           // MapPage(),
           MePage(),
         ],

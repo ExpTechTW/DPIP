@@ -1,3 +1,4 @@
+import 'package:dpip/util/parser.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rts_station.g.dart';
@@ -17,6 +18,7 @@ class RtsStation {
   final double I;
 
   /// 測站是否觸發
+  @JsonKey(fromJson: parseBoolishInt)
   final bool? alert;
 
   RtsStation({

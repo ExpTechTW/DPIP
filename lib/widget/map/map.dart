@@ -67,6 +67,18 @@ class DpipMapState extends State<DpipMap> {
           },
         },
         {
+          "id": "town",
+          "type": "fill",
+          "source": "map",
+          "source-layer": "town",
+          "paint": {
+            // FIXME: workaround waiting for upstream PR to merge
+            // https://github.com/material-foundation/flutter-packages/pull/599
+            "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
+            "fill-opacity": 1,
+          },
+        },
+        {
           "id": "county-outline",
           "source": "map",
           "source-layer": "city",
@@ -85,6 +97,31 @@ class DpipMapState extends State<DpipMap> {
             // https://github.com/material-foundation/flutter-packages/pull/599
             "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
             "fill-opacity": 1,
+          },
+        },
+        {
+          "id": "tsunami",
+          "type": "line",
+          "source": "map",
+          "source-layer": "tsunami",
+          "paint": {
+            // FIXME: workaround waiting for upstream PR to merge
+            // https://github.com/material-foundation/flutter-packages/pull/599
+            "line-opacity": 0,
+            "line-width": 10,
+          },
+        },
+        {
+          "id": "box",
+          "type": "line",
+          "source": "map",
+          "source-layer": "box",
+          "paint": {
+            // FIXME: workaround waiting for upstream PR to merge
+            // https://github.com/material-foundation/flutter-packages/pull/599
+            "line-color": "#000000",
+            "line-opacity": 0,
+            "line-width": 2,
           },
         },
       ],
