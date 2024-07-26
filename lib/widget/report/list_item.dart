@@ -44,7 +44,7 @@ class ReportListItem extends StatelessWidget {
                   children: [
                     if (showDate)
                       Text(
-                        DateFormat("yyyy/MM/dd").format(
+                        DateFormat(context.i18n.date_format).format(
                           TZDateTime.fromMillisecondsSinceEpoch(
                             getLocation("Asia/Taipei"),
                             report.time,
@@ -58,7 +58,7 @@ class ReportListItem extends StatelessWidget {
                         ),
                       ),
                     Text(
-                      DateFormat("HH:mm:ss").format(
+                      DateFormat(context.i18n.time_format).format(
                         TZDateTime.fromMillisecondsSinceEpoch(
                           getLocation("Asia/Taipei"),
                           report.time,
@@ -123,7 +123,7 @@ class ReportListItem extends StatelessWidget {
                      * 規模、深度
                      */
                     Text(
-                      "M ${report.mag.toStringAsFixed(1)}　深度 ${report.depth} km",
+                      context.i18n.report_list_item_subtitle(report.mag.toStringAsFixed(1), report.depth.toString()),
                       style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
                   ],

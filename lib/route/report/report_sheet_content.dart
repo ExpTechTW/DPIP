@@ -81,7 +81,7 @@ class ReportSheetContent extends StatelessWidget {
         ReportDetailField(
           label: context.i18n.report_event_time,
           child: Text(
-            DateFormat(context.i18n.time_format).format(
+            DateFormat(context.i18n.datetime_format).format(
               TZDateTime.fromMillisecondsSinceEpoch(
                 getLocation("Asia/Taipei"),
                 report.time,
