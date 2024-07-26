@@ -164,9 +164,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   bool _dataStatus() {
-    bool status = (DateTime.now().millisecondsSinceEpoch - _lsatGetRtsDataTime) < 3000;
-    if (!status) {
+    bool status = (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) - _lsatGetRtsDataTime) < 3000;
+    if (!status && _rtsData != null) {
       _rtsData = null;
+      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
+      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
     }
     return status;
   }
@@ -175,9 +177,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     try {
       final data = await ExpTech().getRts(_timeReplay);
       _rtsData = data;
-      _lsatGetRtsDataTime = DateTime.now().millisecondsSinceEpoch;
-      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(data));
-      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(data));
+      _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
+      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
+      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
 
       _updateReplayTime();
     } catch (err) {
