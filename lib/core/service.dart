@@ -9,6 +9,7 @@ import 'package:dpip/model/location/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Timer? timer;
@@ -167,8 +168,9 @@ void onStart(ServiceInstance service) async {
           print(body);
         }
 
-        String notifyTitle = 'COOL SERVICE';
-        String notifyBody = 'Awesome ${DateTime.now()}\n$lat,$lon $country';
+        String notifyTitle = '自動定位中';
+        String date=DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+        String notifyBody = '$date\n$lat,$lon $country';
 
         flutterLocalNotificationsPlugin.show(
           888,
