@@ -179,13 +179,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       final data = await ExpTech().getRts(_timeReplay);
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
-      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
-      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
-
       _updateReplayTime();
+      _updateMarkers();
     } catch (err) {
       print(err);
     }
+  }
+
+  void _updateMarkers(){
+    _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
+    _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
   }
 
   void _updateReplayTime() {
@@ -299,6 +302,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _eewIdList.add(eew.id);
         _addEewCircle(eew);
         _updateEewIntensityArea(eew);
+        _updateMarkers();
       }
     }
     _updateMapArea();
@@ -369,6 +373,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _eewIntensityArea.remove(id);
         _eewDist.remove(id);
         _updateMapArea();
+        _updateMarkers();
         return true;
       }
       return false;
@@ -469,7 +474,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     final features = _stations.entries.where((e) {
       return rtsData.station.containsKey(e.key);
     }).where((e) {
-      if (_rtsData!.box.keys.isNotEmpty) return false;
+      if (_eewData.isNotEmpty) return false;
       return true;
     }).map((e) {
       Map<String, dynamic> properties = {};
