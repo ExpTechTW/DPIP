@@ -79,6 +79,14 @@ void stopBackgroundService() async {
   }
 }
 
+void removePosition() async {
+  if (Platform.isAndroid) {
+    if (await service.isRunning()) {
+      service.invoke("removeposition");
+    }
+  }
+}
+
 Future<void> androidForegroundService() async {
   androidServiceInit = true;
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
@@ -153,6 +161,13 @@ void onStart(ServiceInstance service) async {
 
     service.on('setAsBackground').listen((event) {
       service.setAsBackgroundService();
+    });
+
+    service.on('removeposition').listen((event) {
+      Global.preference.remove("loc-position-lat");
+      Global.preference.remove("loc-position-lon");
+      Global.preference.remove("loc-position-country");
+      Global.preference.remove("last-location-update");
     });
 
     void task() async {
