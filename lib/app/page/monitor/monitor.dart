@@ -17,6 +17,7 @@ import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -629,7 +630,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         child: Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               width: double.infinity,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
@@ -646,14 +647,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                       Text(
                                         "地震速報", // 地震速報 4|5- 緊急地震速報
                                         style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 18,
                                           color: context.colors.onSurface,
                                         ),
                                       ),
                                       Text(
                                         "第 1 報",
                                         style: TextStyle(
-                                          fontSize: 20,
+                                          fontSize: 18,
                                           color: context.colors.onSurfaceVariant,
                                         ),
                                       ),
@@ -661,17 +662,78 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                   ),
                                   Row(
                                     children: [
-                                      Text(
-                                        "花蓮縣秀林鄉",
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          color: context.colors.onSurface,
-                                          fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "花蓮縣秀林鄉",
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    color: context.colors.onSurface,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "2024/07/25 00:00:00 發生",
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: context.colors.onSurfaceVariant,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  "M6.0",
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    color: context.colors.onSurface,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "20km",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: context.colors.onSurface,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
+                                        //最大震度
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: IntensityColor.intensity(5),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "5-",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 28,
+                                                color: IntensityColor.onIntensity(5)),
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const Divider(),
+                                  Divider(color: context.colors.onSurface),
                                   Text("所在地預估"),
                                   Row(
                                     children: [
