@@ -37,6 +37,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   int _timeOffset = 0;
   final List<String> _eewIdList = [];
   List<Eew> _eewData = [];
+  Map<String, double> _eewDist = {};
   Rts? _rtsData;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
@@ -264,13 +265,20 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateBoxLine() {
-    print(Global.box);
+    Map<String, int> box = _rtsData?.box ?? {};
+    for (var area in Global.box["features"]) {
+      int id = area["properties"]["ID"];
+      bool skip = checkBoxSkip(_eewData, _eewDist, area["geometry"]["coordinates"][0]);
+      if (skip) {
+        box.remove(id.toString());
+      }
+    }
     _mapController.setLayerProperties(
         "box",
         LineLayerProperties(lineColor: [
           'match',
           ['get', 'ID'],
-          ...?_rtsData?.box.entries.expand((entry) => [
+          ...box.entries.expand((entry) => [
                 int.parse(entry.key),
                 (entry.value > 3)
                     ? "#FF0000"
@@ -335,6 +343,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _updateReplayTime();
     for (var eew in _eewData) {
       final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
+      _eewDist[eew.id] = dist["s_dist"]!;
       final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["s_dist"]!, steps: 256);
       _mapController.setGeoJsonSource("${eew.id}-circle", {
         "type": "FeatureCollection",
@@ -356,6 +365,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       if (!currentEewIds.contains(id)) {
         _removeEewLayers(id);
         _eewIntensityArea.remove(id);
+        _eewDist.remove(id);
         _updateMapArea();
         return true;
       }
