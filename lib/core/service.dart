@@ -24,6 +24,32 @@ void initBackgroundService() async {
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
       if (Platform.isAndroid) {
         androidForegroundService();
+        service.on('sendposition').listen((event) {
+          if (event != null) {
+            var positionData = event.values.first;
+            var position = positionData['position'];
+            String country = position['country'];
+            List<String> parts = country.split(' ');
+
+            if (parts.length == 3) {
+              String code = parts[2];
+
+              if (Global.location.containsKey(code)) {
+                Location locationInfo = Global.location[code]!;
+
+                Global.preference.setString("location-city", locationInfo.city);
+                Global.preference.setString("location-town", locationInfo.town);
+
+                print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
+              } else {
+                print('Code $code not found in location data');
+
+                Global.preference.setString("location-city", "解析失敗");
+                Global.preference.setString("location-town", "解析失敗");
+              }
+            }
+          }
+        });
       }
       startBackgroundService(true);
     }
@@ -42,32 +68,6 @@ void startBackgroundService(bool init) async {
       stopBackgroundService(false);
       service.startService();
     }
-    service.on('sendposition').listen((event) {
-      if (event != null) {
-        var positionData = event.values.first;
-        var position = positionData['position'];
-        String country = position['country'];
-        List<String> parts = country.split(' ');
-
-        if (parts.length == 3) {
-          String code = parts[2];
-
-          if (Global.location.containsKey(code)) {
-            Location locationInfo = Global.location[code]!;
-
-            Global.preference.setString("location-city", locationInfo.city);
-            Global.preference.setString("location-town", locationInfo.town);
-
-            print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
-          } else {
-            print('Code $code not found in location data');
-
-            Global.preference.setString("location-city", "解析失敗");
-            Global.preference.setString("location-town", "解析失敗");
-          }
-        }
-      }
-    });
   }
 }
 
