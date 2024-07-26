@@ -1,5 +1,6 @@
 import 'package:dpip/global.dart';
 import 'package:dpip/main.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/settings/theme/theme_radio_tile.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
   Widget build(BuildContext context) {
     return Material(
       child: ListView(
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           Padding(

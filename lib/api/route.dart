@@ -22,7 +22,7 @@ class Route {
     return "https://lb-$i.exptech.dev/api";
   }
 
-  static Uri reportList({int? limit = 50}) => Uri.parse("$api/v2/eq/report?limit=$limit");
+  static Uri reportList({int? limit = 50, int? page = 1}) => Uri.parse("$api/v2/eq/report?limit=$limit&page=$page");
   static Uri report(String reportId) => Uri.parse("$api/v2/eq/report/$reportId");
   static Uri tsunamiList() => Uri.parse("$onlyapi/v1/tsunami/list");
   static Uri tsunami(String tsuId) => Uri.parse("$onlyapi/v1/tsunami/$tsuId");

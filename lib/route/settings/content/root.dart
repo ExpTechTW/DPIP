@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:dpip/core/notify.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class _SettingsRootViewState extends State<SettingsRootView> {
 
     return Material(
       child: ListView(
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           const ListTileGroupHeader(title: "位置"),
