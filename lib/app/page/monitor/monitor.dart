@@ -549,6 +549,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    const sheetInitialSize = 0.16;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.monitor),
@@ -558,7 +559,31 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           DpipMap(onMapCreated: _initMap),
           Positioned.fill(
             child: DraggableScrollableSheet(
-              builder: (context, scrollController) => Container(),
+              initialChildSize: sheetInitialSize,
+              minChildSize: sheetInitialSize,
+              builder: (context, scrollController) {
+                return Container(
+                  color: context.colors.surface.withOpacity(0.9),
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        child: Center(
+                          child: Container(
+                            width: 32,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: context.colors.onSurfaceVariant.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
           Positioned(
