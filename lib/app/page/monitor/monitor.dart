@@ -35,6 +35,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _eewUpdateTimer;
   Timer? _blinkTimer;
   int _timeOffset = 0;
+  int _ping = 0;
   final List<String> _eewIdList = [];
   List<Eew> _eewData = [];
   Map<String, double> _eewDist = {};
@@ -144,7 +145,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _addStationLayer();
   }
 
-  void _addStationLayer() async{
+  void _addStationLayer() async {
     await _mapController.addCircleLayer(
         "station-geojson",
         "station",
@@ -181,7 +182,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _updateRtsData() async {
     try {
+      int t = DateTime.now().millisecondsSinceEpoch;
       final data = await ExpTech().getRts(_timeReplay);
+      _ping = DateTime.now().millisecondsSinceEpoch - t;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
       _updateReplayTime();
@@ -191,7 +194,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     }
   }
 
-  void _updateMarkers() async{
+  void _updateMarkers() async {
     await _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
     await _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
   }
@@ -327,7 +330,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _updateMapArea();
   }
 
-  void _addEewCircle(Eew eew) async{
+  void _addEewCircle(Eew eew) async {
     final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), 0, steps: 256);
     await _mapController.addSource(
         "${eew.id}-circle",
@@ -344,7 +347,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _addEewLayers(eew);
   }
 
-  void _addEewLayers(Eew eew) async{
+  void _addEewLayers(Eew eew) async {
     final color = (eew.status == 1) ? "#ff0000" : "#ffaa00";
     await _mapController.addLineLayer(
         "${eew.id}-circle", "${eew.id}-wave-outline", LineLayerProperties(lineColor: color, lineWidth: 2));
@@ -364,7 +367,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _removeOldEews();
   }
 
-  void _updateEewCircles() async{
+  void _updateEewCircles() async {
     _updateReplayTime();
     for (var eew in _eewData) {
       final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
@@ -399,7 +402,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     });
   }
 
-  void _removeEewLayers(String id) async{
+  void _removeEewLayers(String id) async {
     await _mapController.removeLayer("$id-wave-outline");
     await _mapController.removeLayer("$id-wave-outline-p");
     await _mapController.removeLayer("$id-wave-bg");
@@ -618,7 +621,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           ),
           Positioned(
             left: 10,
-            bottom: 10,
+            top: 10,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -640,8 +643,29 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         color: (!_dataStatus())
                             ? Colors.red
                             : (_timeReplay == 0)
-                                ? context.colors.surface
+                                ? context.colors.onSurface
                                 : Colors.orangeAccent),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 10,
+            top: 40,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    (!_dataStatus()) ? "999+ms" : "${_ping}ms",
+                    style: TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.bold, color: (!_dataStatus()) ? Colors.red : Colors.green),
                   ),
                 ),
               ),
