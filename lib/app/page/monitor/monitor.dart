@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:dpip/api/exptech.dart';
@@ -10,6 +11,7 @@ import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/station_info.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/extension/int.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
@@ -692,10 +694,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: true ? Color(0xFFC80000) : Color(0xFFFFC800),
-                                  width: 2,
+                                  width: 3,
                                 ),
                               ),
                               child: Column(
@@ -786,7 +788,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                         ),
                                         child: Center(
                                           child: Text(
-                                            "5-",
+                                            5.asIntensityLabel,
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 28,
@@ -796,32 +798,95 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                       ),
                                     ],
                                   ),
-                                  Divider(color: context.colors.onSurface),
-                                  const Text("所在地預估"),
+                                  Divider(
+                                    color: context.colors.onSurface,
+                                    height: 30,
+                                  ),
                                   Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Flexible(
-                                        flex: 1,
-                                        child: Center(
-                                          child: Container(
-                                            width: 100,
-                                            height: 100,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(12),
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          color: IntensityColor.intensity(2),
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "所在地預估",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                  color: IntensityColor.onIntensity(2)),
                                             ),
-                                          ),
+                                            Text(
+                                              2.asIntensityLabel,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 40,
+                                                  color: IntensityColor.onIntensity(2)),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      Flexible(
-                                        flex: 1,
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
+                                      SizedBox(
+                                        height: 80,
+                                        width: 150,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "震波",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: context.colors.onSurfaceVariant,
+                                              ),
+                                            ),
+                                            false //震波抵達?
+                                                ? Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Text(
+                                                        "抵達",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 36,
+                                                            color: IntensityColor.onIntensity(2)),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      Text(
+                                                        "5",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 36,
+                                                            color: context.colors.onSurface),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Text(
+                                                        "秒後抵達",
+                                                        style: TextStyle(
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 14,
+                                                            color: context.colors.onSurface),
+                                                      ),
+                                                    ],
+                                                  ),
+                                          ],
                                         ),
-                                      ),
+                                      )
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
                             ),
