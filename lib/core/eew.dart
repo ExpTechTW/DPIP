@@ -178,3 +178,4 @@ WaveTime calculateWaveTime(double depth, double distance) {
   }
   return WaveTime(p: ptime, s: stime);
 }
+

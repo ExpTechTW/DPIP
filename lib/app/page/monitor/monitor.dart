@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:dpip/core/rts.dart';
+import 'package:dpip/model/station_info.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
@@ -210,16 +212,17 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       }
     }
 
-    _rtsData?.station.forEach((key,value){
-      int intensity=intensityFloatToInt(value.I);
-      if(value.alert==true&&intensity>0){
+    _rtsData?.station.forEach((key, value) {
+      int intensity = intensityFloatToInt(value.I);
+      if (value.alert == true && intensity > 0) {
+        StationInfo info = findAppropriateItem(_stations[key]!.info, _timeReplay);
         markers_features.add({
           "type": "Feature",
           "properties": {
             "intensity": intensity, // 10 is for classifying epicenter cross
           },
           "geometry": {
-            "coordinates": [_stations[key]?.info.last.lon, _stations[key]?.info.last.lat],
+            "coordinates": [info.lon, info.lat],
             "type": "Point"
           }
         });
@@ -365,12 +368,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       }
       return false;
     }).map((e) {
+      StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
       return {
         "type": "Feature",
         "properties": {},
         "id": e.key,
         "geometry": {
-          "coordinates": [e.value.info[0].lon, e.value.info[0].lat],
+          "coordinates": [info.lon, info.lat],
           "type": "Point"
         }
       };
@@ -403,12 +407,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         properties = {"i": rtsData.station[e.key]?.i};
       }
 
+      StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
       return {
         "type": "Feature",
         "properties": properties,
         "id": e.key,
         "geometry": {
-          "coordinates": [e.value.info[0].lon, e.value.info[0].lat],
+          "coordinates": [info.lon, info.lat],
           "type": "Point"
         }
       };
