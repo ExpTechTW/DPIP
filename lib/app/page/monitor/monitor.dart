@@ -38,10 +38,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   final List<String> _eewIdList = [];
   List<Eew> _eewData = [];
   Rts? _rtsData;
+  int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
   int _timeReplay = 0;
   final Map<String, dynamic> _eewIntensityArea = {};
   bool _isMarkerVisible = true;
+  bool _isBoxVisible = true;
   int _isTsunamiVisible = 0;
 
   @override
@@ -116,6 +118,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _isMarkerVisible = !_isMarkerVisible;
       _updateCrossMarker(_isMarkerVisible ? true : false);
       _updateTsunamiLine();
+      _updateBoxLine();
     });
   }
 
@@ -157,14 +160,22 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _updateRtsData();
       _updateEewData();
       setState(() {});
-      print(_timeReplay);
     });
+  }
+
+  bool _dataStatus() {
+    bool status = (DateTime.now().millisecondsSinceEpoch - _lsatGetRtsDataTime) < 3000;
+    if (!status) {
+      _rtsData = null;
+    }
+    return status;
   }
 
   void _updateRtsData() async {
     try {
       final data = await ExpTech().getRts(_timeReplay);
       _rtsData = data;
+      _lsatGetRtsDataTime = DateTime.now().millisecondsSinceEpoch;
       _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(data));
       _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(data));
 
@@ -250,6 +261,25 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     // if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
   }
 
+  void _updateBoxLine() {
+    _mapController.setLayerProperties(
+        "box",
+        LineLayerProperties(lineColor: [
+          'match',
+          ['get', 'ID'],
+          ...?_rtsData?.box.entries.expand((entry) => [
+                int.parse(entry.key),
+                (entry.value > 3)
+                    ? "#FF0000"
+                    : (entry.value > 1)
+                        ? "#EAC100"
+                        : "#00DB00",
+              ]),
+          "rgba(0,0,0,0)",
+        ], lineOpacity: (_isBoxVisible) ? 1 : 0));
+    _isBoxVisible = !_isBoxVisible;
+  }
+
   void _processEewData(List<Eew> data) {
     for (var eew in data) {
       if (!_eewIdList.contains(eew.id)) {
@@ -285,8 +315,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _mapController.addFillLayer(
         "${eew.id}-circle", "${eew.id}-wave-bg", FillLayerProperties(fillColor: color, fillOpacity: 0.25),
         belowLayerId: "county");
-    _mapController.addLineLayer(
-        "${eew.id}-circle-p", "${eew.id}-wave-outline-p", const LineLayerProperties(lineColor: "#00CACA", lineWidth: 2));
+    _mapController.addLineLayer("${eew.id}-circle-p", "${eew.id}-wave-outline-p",
+        const LineLayerProperties(lineColor: "#00CACA", lineWidth: 2));
   }
 
   void _updateEewIntensityArea(Eew eew) {
@@ -529,13 +559,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: Colors.white.withOpacity(0.5),
                   ),
                   child: Text(
-                    DateFormat('yyyy-MM-dd HH:mm:ss').format((_timeReplay == 0)
-                        ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
-                        : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
+                    DateFormat('yyyy-MM-dd HH:mm:ss').format((!_dataStatus())
+                        ? DateTime.fromMillisecondsSinceEpoch(_lsatGetRtsDataTime)
+                        : (_timeReplay == 0)
+                            ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
+                            : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: (_timeReplay == 0) ? context.colors.surface : Colors.orangeAccent),
+                        color: (!_dataStatus())
+                            ? Colors.red
+                            : (_timeReplay == 0)
+                                ? context.colors.surface
+                                : Colors.orangeAccent),
                   ),
                 ),
               ),

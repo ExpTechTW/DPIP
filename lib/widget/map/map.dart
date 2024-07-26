@@ -111,6 +111,19 @@ class DpipMapState extends State<DpipMap> {
             "line-width": 10,
           },
         },
+        {
+          "id": "box",
+          "type": "line",
+          "source": "map",
+          "source-layer": "box",
+          "paint": {
+            // FIXME: workaround waiting for upstream PR to merge
+            // https://github.com/material-foundation/flutter-packages/pull/599
+            "line-color": "rgba(0,0,0,0)",
+            "line-opacity": 0,
+            "line-width": 2,
+          },
+        },
       ],
     },
   );
