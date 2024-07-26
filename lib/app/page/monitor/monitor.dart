@@ -40,6 +40,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   int _timeReplay = 1721770570342;
   Map<String, dynamic> _eewIntensityArea = {};
   bool _isMarkerVisible = true;
+  int _isTsunamiVisible = 0;
 
   @override
   void initState() {
@@ -120,6 +121,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       _isMarkerVisible = !_isMarkerVisible;
       _updateCrossMarker(_isMarkerVisible ? true : false);
+      _updateTsunamiLine();
     });
   }
 
@@ -236,6 +238,20 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         "features": markers_features,
       },
     );
+  }
+
+  void _updateTsunamiLine() {
+    _mapController.setLayerProperties(
+        "tsunami",
+        LineLayerProperties(lineColor: [
+          "match",
+          ["get", "AREANAME"],
+          "東部沿海地區",
+          "#FF0000",
+          "#EAC100"
+        ], lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0));
+    _isTsunamiVisible++;
+    if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
   }
 
   void _processEewData(List<Eew> data) {
