@@ -37,6 +37,10 @@ Future<void> loadCrossImage(MapLibreMapController controller) async {
   await controller.addImage("cross", Uint8List.sublistView(await rootBundle.load("assets/map/icons/cross.png")));
 }
 
+Future<void> loadGPSImage(MapLibreMapController controller) async {
+  await controller.addImage("gps", Uint8List.sublistView(await rootBundle.load("assets/map/icons/gps.png")));
+}
+
 enum Units {
   meters,
   metres,

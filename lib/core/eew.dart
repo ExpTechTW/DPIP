@@ -101,6 +101,58 @@ double distance(double latA, double lngA, double latB, double lngB) {
   return acos(sinLatA * sinLatB + cosLatA * cosLatB * cos(lngA - lngB)) * 6371.008;
 }
 
+double sWaveTimeByDistance(double depth, double sDist) {
+  double sTime = 0.0;
+
+  var timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
+  var prevTable;
+
+  for (var table in timeTable) {
+    if (sTime == 0 && table['R'].toDouble() >= sDist) {
+      if (prevTable != null) {
+        double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
+        double tDiff = table['S'].toDouble() - prevTable['S'].toDouble();
+        double rOffset = sDist - prevTable['R'].toDouble();
+        double tOffset = (rOffset / rDiff) * tDiff;
+        sTime = prevTable['S'].toDouble() + tOffset;
+      } else {
+        sTime = table['S'].toDouble();
+      }
+    }
+
+    if (sTime != 0) break;
+    prevTable = table;
+  }
+
+  return sTime * 1000;
+}
+
+double pWaveTimeByDistance(double depth, double pDist) {
+  double pTime = 0.0;
+
+  var timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
+  var prevTable;
+
+  for (var table in timeTable) {
+    if (pTime == 0 && table['R'].toDouble() >= pDist) {
+      if (prevTable != null) {
+        double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
+        double tDiff = table['P'].toDouble() - prevTable['P'].toDouble();
+        double rOffset = pDist - prevTable['R'].toDouble();
+        double tOffset = (rOffset / rDiff) * tDiff;
+        pTime = prevTable['P'].toDouble() + tOffset;
+      } else {
+        pTime = table['P'].toDouble();
+      }
+    }
+
+    if (pTime != 0) break;
+    prevTable = table;
+  }
+
+  return pTime * 1000;
+}
+
 double pgaToFloat(double pga) {
   return 2 * (log(pga) / log(10)) + 0.7;
 }
@@ -179,4 +231,19 @@ WaveTime calculateWaveTime(double depth, double distance) {
     stime = distance / 4;
   }
   return WaveTime(p: ptime, s: stime);
+}
+
+Map<String, dynamic> eewLocationInfo(
+    double mag, double depth, double eqLat, double eqLng, double userLat, double userLon) {
+  final distSurface = distance(eqLat, eqLng, userLat, userLon);
+  final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
+  final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
+  var intensity = pgaToFloat(pga);
+  if (intensity > 4.5) {
+    intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
+  }
+  return {
+    'dist': dist,
+    'i': intensity,
+  };
 }
