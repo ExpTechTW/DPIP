@@ -26,6 +26,8 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+import 'eew_info.dart';
+
 class MonitorPage extends StatefulWidget {
   const MonitorPage({super.key, required this.data});
 
@@ -61,7 +63,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   bool isUserLocationValid = false;
   int _isTsunamiVisible = 0;
   final Map<String, dynamic> _eewIntensityArea = {};
-  final sheetController = DraggableScrollableController();
+  final DraggableScrollableController sheetController = DraggableScrollableController();
   final sheetInitialSize = 0.2;
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
@@ -108,6 +110,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _startDataUpdates();
 
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+      if (!mounted) return;
       _isMarkerVisible = !_isMarkerVisible;
       _isBoxVisible = !_isBoxVisible;
       await _updateBoxLine();
@@ -232,11 +235,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _startDataUpdates() {
     _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
       _updateRtsData();
       _updateEewData();
       setState(() {});
     });
     _eewUpdateTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      if (!mounted) return;
       _updateEewCircles();
       if (_timeReplay != 0) {
         _timeReplay += (_replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
@@ -912,11 +917,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
-    sheetController.removeListener(() {
-      final newSize = sheetController.size;
-      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
-      animController.animateTo(scrollPosition, duration: Duration.zero);
-    });
     super.dispose();
   }
 
@@ -998,35 +998,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ),
             ),
           Positioned.fill(
-            child: DraggableScrollableSheet(
-              initialChildSize: sheetInitialSize,
-              minChildSize: sheetInitialSize,
-              controller: sheetController,
-              builder: (context, scrollController) {
-                return Container(
-                  color: context.colors.surface.withOpacity(0.9),
-                  child: ListView(
-                    controller: scrollController,
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        child: Center(
-                          child: Container(
-                            width: 32,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: context.colors.onSurfaceVariant.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      ),
-                      ..._eewUI,
-                    ],
-                  ),
-                );
-              },
-            ),
+            child: EewDraggableSheet(eewUI: _eewUI),
           ),
         ],
       ),
