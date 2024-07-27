@@ -1,11 +1,23 @@
 {
   "@@locale": "ko",
   "@@context": "App level localization strings.",
+  "datetime_format": "yyyy/MM/dd HH:mm:ss",
+  "@datetime_format": {
+    "description": "日期時間顯示格式"
+  },
+  "date_format": "yyyy/MM/dd",
+  "@date_format": {
+    "description": "日期顯示格式"
+  },
+  "time_format": "HH:mm:ss",
+  "@time_format": {
+    "description": "時間顯示格式"
+  },
   "home": "홈",
   "@home": {
     "description": "「首頁」頁面標題"
   },
-  "monitor": "지진 감시",
+  "monitor": "강진 모니터링",
   "@monitor": {
     "description": "「強震監視器」頁面標題"
   },
@@ -17,7 +29,7 @@
   "@map": {
     "description": "「地圖」頁面標題"
   },
-  "me": "나",
+  "me": "내 계정",
   "@me": {
     "description": "「我」頁面標題"
   },
@@ -25,28 +37,95 @@
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "DPIP 조정 작업",
+  "settingsDescription": "DPIP의 동작을 조정합니다.",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
-  "donate": "저희 에게 기부해주세요",
+  "donate": "저희에게 후원해주세요.",
   "@donate": {
     "description": "「我」頁面 → 應用程式資訊 → 「贊助我們」按鈕"
   },
-  "instagram": "Instagram에서 우리를 팔로우하세요.",
-  "@instagram": {
-    "description": "「我」頁面 → 應用程式資訊 → 「在 Instagram 上追蹤我們」按鈕"
+  "threads": "Threads 팔로우",
+  "@threads": {
+    "description": "「我」頁面 → 應用程式資訊 → 「在 Threads 上追蹤我們」按鈕"
   },
   "youtube": "Youtube 생방송",
   "@youtube": {
-    "description": "「我」頁面 → 應用程式資訊 → 「Youtube 直播」按鈕"
+    "description": "「我」頁面 → 應用程式資訊 → 「YouTube 直播」按鈕"
   },
   "server_status": "서버 상태",
   "@server_status": {
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
-  "third_party_libraries": "제3자 라이브러리 라이선스",
-  "@instthird_party_librariesagram": {
+  "third_party_libraries": "서드파티 라이브러리 라이선스",
+  "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
+  },
+  "report_list_item_subtitle": "규모 {magnitude} 발생깊이 {depth} km",
+  "@report_list_item_subtitle": {
+    "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",
+    "placeholders": {
+      "magnitude": {
+        "type": "String",
+        "description": "規模數值"
+      },
+      "depth": {
+        "type": "String",
+        "description": "深度數值"
+      }
+    }
+  },
+  "report_with_number": "고유번호 {reportNumber} 의 현저한 유감 지진",
+  "@report_with_number": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
+    "placeholders": {
+      "reportNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "report_without_number": "소규모 유감 지진",
+  "@report_without_number": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
+  },
+  "open_report_url": "보고서 페이지",
+  "@open_report_url": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
+  },
+  "report_event_time": "발생 시각",
+  "@report_event_time": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
+  },
+  "report_location": "에서의 지진",
+  "@report_location": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
+  },
+  "report_magnitude": "지진의 규모",
+  "@report_magnitude": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
+  },
+  "report_depth": "진원 깊이",
+  "@report_depth": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
+  },
+  "report_image": "지진 보고",
+  "@report_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
+  },
+  "report_intensity_image": "진도",
+  "@report_intensity_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
+  },
+  "report_pga_image": "최대 지반 가속도",
+  "@report_pga_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
+  },
+  "report_pgv_image": "최대 지반 속도",
+  "@report_pgv_image": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
+  },
+  "report_intensity": "각지의 진도",
+  "@report_intensity": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   }
 }
