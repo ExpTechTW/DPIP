@@ -43,6 +43,13 @@ class LocationResult {
   final bool change;
 
   LocationResult(this.cityTown, this.change);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'cityTown': cityTown,
+      'change': change,
+    };
+  }
 }
 
 class LocationStatus {
