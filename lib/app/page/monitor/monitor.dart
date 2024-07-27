@@ -46,6 +46,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   final List<String> _eewIdList = [];
   List<Eew> _eewData = [];
   Map<String, double> _eewDist = {};
+  Map<String, List<String>> _eewUpdateList = {};
+  Map<String, int> _userEewArriveTime = {};
+  Map<String, int> _userEewIntensity = {};
   Rts? _rtsData;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
@@ -345,17 +348,28 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _processEewData(List<Eew> data) {
-    _eewUI = [];
+    List<Widget> eewUI = [];
     for (var eew in data) {
       if (!_eewIdList.contains(eew.id)) {
         _eewIdList.add(eew.id);
         _addEewCircle(eew);
-        _updateEewIntensityArea(eew);
-        _updateMapArea();
         _updateMarkers();
       }
 
-      _eewUI.add(Padding(
+      if (_eewUpdateList[eew.id] == null) {
+        _eewUpdateList[eew.id] = [];
+      }
+      if (!_eewUpdateList[eew.id]!.contains("${eew.id}-${eew.serial}")) {
+        _eewUpdateList[eew.id]?.add("${eew.id}-${eew.serial}");
+        _userEewIntensity[eew.id] = 0;
+        _updateEewIntensityArea(eew);
+        _updateMapArea();
+
+        final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
+        final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+      }
+
+      eewUI.add(Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
         child: Column(
           children: [
@@ -475,7 +489,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         height: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: IntensityColor.intensity(2),
+                          color: IntensityColor.intensity(_userEewIntensity[eew.id] ?? 0),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -484,12 +498,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                             Text(
                               "所在地預估",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 12, color: IntensityColor.onIntensity(2)),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
                             ),
                             Text(
-                              2.asIntensityLabel,
+                              (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 40, color: IntensityColor.onIntensity(2)),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 40,
+                                  color: IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
                             ),
                           ],
                         ),
@@ -551,8 +569,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         ),
       ));
     }
-    if (_eewUI.isEmpty) {
-      _eewUI.add(Padding(
+    if (eewUI.isEmpty) {
+      eewUI.add(Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -580,6 +598,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     } else {
       _isEewBoxVisible = !_isEewBoxVisible;
     }
+    _eewUI = eewUI;
   }
 
   void _addEewCircle(Eew eew) async {
@@ -640,6 +659,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       if (!currentEewIds.contains(id)) {
         _removeEewLayers(id);
         _eewIntensityArea.remove(id);
+        _eewUpdateList.remove(id);
         _eewDist.remove(id);
         _updateMapArea();
         _updateMarkers();
