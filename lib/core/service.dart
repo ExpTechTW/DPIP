@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
@@ -78,6 +79,12 @@ void androidSendPositionlisten(){
           Global.preference.setString("location-city", "解析失敗");
           Global.preference.setString("location-town", "解析失敗");
         }
+
+        var latitude = position['latitude'];
+        var longitude = position['longitude'];
+        Global.preference.setDouble("user-lat", latitude);
+        Global.preference.setDouble("user-lon", longitude);
+        const MonitorPage(data: 0).createState();
       }
     }
   });
