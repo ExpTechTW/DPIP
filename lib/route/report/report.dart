@@ -11,7 +11,6 @@ import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/util/intensity_color.dart';
 
 class ReportRoute extends StatefulWidget {
