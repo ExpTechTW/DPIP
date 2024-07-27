@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../util/intensity_color.dart';
+import 'package:dpip/util/intensity_color.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -255,6 +255,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       title: Text(context.i18n.report),
     );
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -270,26 +272,33 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             top: context.padding.top + 50,
             left: 0,
             right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
               children: [
                 if (report != null &&
                     report!.magnitude >= 6 &&
                     report!.magnitude < 7 &&
                     report!.getLocation().contains("海"))
                   Chip(
-                    avatar: const Icon(Symbols.tsunami_rounded),
-                    label: const Text("可能引起若干海面變動"),
+                    avatar: Icon(
+                      Symbols.tsunami_rounded,
+                      color: isDark ? Colors.lightBlueAccent[400] : Colors.lightBlueAccent[600],
+                    ),
+                    label: Text(
+                      "此地震可能引起若干海面變動",
+                      style: TextStyle(
+                        color: isDark ? Colors.lightBlueAccent[400] : Colors.lightBlueAccent[600],
+                      ),
+                    ),
                     backgroundColor: Colors.blue.withOpacity(0.16),
                     labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                     side: const BorderSide(color: Colors.blue),
                   ),
                 if (report != null && report!.magnitude >= 7 && report!.getLocation().contains("海"))
                   Chip(
-                    avatar: const Icon(Symbols.tsunami_rounded, color: Colors.white),
-                    label: const Text("可能引起海嘯 應注意後續資訊"),
+                    avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
+                    label: Text("此地震可能引起海嘯 注意後續資訊", style: TextStyle(color: context.colors.error)),
                     backgroundColor: Colors.red.withOpacity(0.16),
-                    labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                     side: const BorderSide(color: Colors.red),
                   ),
               ],
