@@ -5,6 +5,7 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
@@ -255,8 +256,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       title: Text(context.i18n.report),
     );
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -274,32 +273,32 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             right: 0,
             child: Column(
               children: [
-                if (report != null &&
-                    report!.magnitude >= 6 &&
-                    report!.magnitude < 7 &&
-                    report!.getLocation().contains("海"))
+                // if (report != null &&
+                //     report!.magnitude >= 6 &&
+                //     report!.magnitude < 7 &&
+                //     report!.getLocation().contains("海"))
                   Chip(
                     avatar: Icon(
                       Symbols.tsunami_rounded,
-                      color: isDark ? Colors.lightBlueAccent[400] : Colors.lightBlueAccent[600],
+                      color: context.theme.extendedColors.blue,
                     ),
                     label: Text(
                       "此地震可能引起若干海面變動",
                       style: TextStyle(
-                        color: isDark ? Colors.lightBlueAccent[400] : Colors.lightBlueAccent[600],
+                        color: context.theme.extendedColors.blue,
                       ),
                     ),
                     backgroundColor: Colors.blue.withOpacity(0.16),
                     labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                    side: const BorderSide(color: Colors.blue),
+                    side: BorderSide(color: context.theme.extendedColors.blue),
                   ),
-                if (report != null && report!.magnitude >= 7 && report!.getLocation().contains("海"))
+                // if (report != null && report!.magnitude >= 7 && report!.getLocation().contains("海"))
                   Chip(
                     avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
                     label: Text("此地震可能引起海嘯 注意後續資訊", style: TextStyle(color: context.colors.error)),
                     backgroundColor: Colors.red.withOpacity(0.16),
                     labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                    side: const BorderSide(color: Colors.red),
+                    side: BorderSide(color: context.colors.error),
                   ),
               ],
             ),
