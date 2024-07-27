@@ -92,7 +92,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _mapController = controller;
     _initStations();
 
-    if (Platform.isIOS) {
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
@@ -504,7 +504,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                   ),
                                 ),
                                 Text(
-                                  "${DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(eew.eq.time))} 發震",
+                                  "${DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(_eewLastInfo[eew.id]!.eq.time))} 發震",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: context.colors.onSurfaceVariant,
@@ -546,7 +546,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         ),
                         child: Center(
                           child: Text(
-                            eew.eq.max.asIntensityLabel,
+                            _eewLastInfo[eew.id]!.eq.max.asIntensityLabel,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 28,
