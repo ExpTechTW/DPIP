@@ -27,7 +27,7 @@ class _EewDraggableSheetState extends State<EewDraggableSheet> {
       controller: _controller,
       builder: (context, scrollController) {
         return Container(
-          color: context.colors.surface.withOpacity(0.9),
+          color: context.colors.surface,
           child: ListView(
             controller: scrollController,
             children: [
