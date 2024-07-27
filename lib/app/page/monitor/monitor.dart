@@ -491,36 +491,31 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                   Row(
                     children: [
                       Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _eewLastInfo[eew.id]!.eq.loc,
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    color: context.colors.onSurface,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _eewLastInfo[eew.id]!.eq.time))} 發震",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: context.colors.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              _eewLastInfo[eew.id]!.eq.loc,
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: context.colors.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            Text(
+                              "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _eewLastInfo[eew.id]!.eq.time))} 發震",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   "M ${_eewLastInfo[eew.id]?.eq.mag}",
                                   style: TextStyle(
-                                    fontSize: 24,
+                                    fontSize: 20,
                                     color: context.colors.onSurface,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -528,7 +523,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                 Text(
                                   "${_eewLastInfo[eew.id]?.eq.depth} km",
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 20,
                                     color: context.colors.onSurface,
                                     fontWeight: FontWeight.bold,
                                   ),
