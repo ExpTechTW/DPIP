@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/eew.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/rts.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/eew.dart';
@@ -43,12 +44,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _blinkTimer;
   int _timeOffset = 0;
   int _ping = 0;
-  final List<String> _eewIdList = [];
-  List<Eew> _eewData = [];
   Map<String, double> _eewDist = {};
-  Map<String, List<String>> _eewUpdateList = {};
+  Map<String, int> _eewUpdateList = {};
   Map<String, int> _userEewArriveTime = {};
   Map<String, int> _userEewIntensity = {};
+  Map<String, Eew> _eewLastInfo = {};
   Rts? _rtsData;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
@@ -256,9 +256,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _updateEewData() async {
     try {
       final data = await ExpTech().getEew(_timeReplay);
-      _eewData = data;
-      _processEewData(_eewData);
-      _removeOldEews();
+      _processEewData(data);
+      _removeOldEews(data);
     } catch (err) {
       print(err);
     }
@@ -268,14 +267,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     List markers_features = [];
 
     if (_isMarkerVisible) {
-      for (var eew in _eewData) {
+      for (var id in _eewLastInfo.keys) {
         markers_features.add({
           "type": "Feature",
           "properties": {
             "intensity": 10, // 10 is for classifying epicenter cross
           },
           "geometry": {
-            "coordinates": [eew.eq.lon, eew.eq.lat],
+            "coordinates": [_eewLastInfo[id]!.eq.lon, _eewLastInfo[id]!.eq.lat],
             "type": "Point"
           }
         });
@@ -329,7 +328,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       for (var area in Global.box["features"]) {
         int id = area["properties"]["ID"];
         if (_rtsData!.box[id.toString()] == null) continue;
-        bool skip = checkBoxSkip(_eewData, _eewDist, area["geometry"]["coordinates"][0]);
+        bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
         if (!skip) {
           features.add({
             "type": "Feature",
@@ -347,26 +346,30 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     });
   }
 
-  void _processEewData(List<Eew> data) {
+  void _processEewData(List<Eew> data) async {
+    if (Platform.isIOS) {
+      await getSavedLocation();
+    }
+    final userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    final userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    bool isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
     List<Widget> eewUI = [];
     for (var eew in data) {
-      if (!_eewIdList.contains(eew.id)) {
-        _eewIdList.add(eew.id);
-        _addEewCircle(eew);
-        _updateMarkers();
-      }
-
-      if (_eewUpdateList[eew.id] == null) {
-        _eewUpdateList[eew.id] = [];
-      }
-      if (!_eewUpdateList[eew.id]!.contains("${eew.id}-${eew.serial}")) {
-        _eewUpdateList[eew.id]?.add("${eew.id}-${eew.serial}");
-        _userEewIntensity[eew.id] = 0;
+      if ((_eewUpdateList[eew.id] ?? 0) < eew.serial) {
+        if (_eewUpdateList[eew.id] == null) {
+          _addEewCircle(eew);
+          _updateMarkers();
+        }
+        _eewUpdateList[eew.id] = eew.serial;
+        _eewLastInfo[eew.id] = eew;
         _updateEewIntensityArea(eew);
         _updateMapArea();
 
-        final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-        final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
+        Map<String, dynamic> info = eewLocationInfo(eew.eq.mag, eew.eq.depth, eew.eq.lat, eew.eq.lon, userLat, userLon);
+        _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
+        _userEewArriveTime[eew.id] = 0;
       }
 
       eewUI.add(Padding(
@@ -381,7 +384,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 border: Border.all(
                   color: !_isEewBoxVisible
                       ? Colors.grey
-                      : eew.status == 1
+                      : _eewLastInfo[eew.id]?.status == 1
                           ? const Color(0xFFC80000)
                           : const Color(0xFFFFC800),
                   width: 3,
@@ -394,14 +397,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        eew.status == 1 ? "緊急地震速報" : "地震速報",
+                        _eewLastInfo[eew.id]?.status == 1 ? "緊急地震速報" : "地震速報",
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurface,
                         ),
                       ),
                       Text(
-                        "第 ${eew.serial} 報",
+                        "第 ${_eewLastInfo[eew.id]?.serial} 報",
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurfaceVariant,
@@ -420,7 +423,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  eew.eq.loc,
+                                  _eewLastInfo[eew.id]!.eq.loc,
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: context.colors.onSurface,
@@ -440,7 +443,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  "M ${eew.eq.mag}",
+                                  "M ${_eewLastInfo[eew.id]?.eq.mag}",
                                   style: TextStyle(
                                     fontSize: 24,
                                     color: context.colors.onSurface,
@@ -448,7 +451,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                   ),
                                 ),
                                 Text(
-                                  "${eew.eq.depth} km",
+                                  "${_eewLastInfo[eew.id]?.eq.depth} km",
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: context.colors.onSurface,
@@ -466,7 +469,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: IntensityColor.intensity(eew.eq.max),
+                          color: IntensityColor.intensity(_eewLastInfo[eew.id]!.eq.max),
                         ),
                         child: Center(
                           child: Text(
@@ -474,7 +477,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 28,
-                                color: IntensityColor.onIntensity(eew.eq.max)),
+                                color: IntensityColor.onIntensity(_eewLastInfo[eew.id]!.eq.max)),
                           ),
                         ),
                       ),
@@ -489,7 +492,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         height: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: IntensityColor.intensity(_userEewIntensity[eew.id] ?? 0),
+                          color: IntensityColor.intensity((!isUserLocationValid) ? 0 : _userEewIntensity[eew.id] ?? 0),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -500,14 +503,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
-                                  color: IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
+                                  color: IntensityColor.onIntensity(
+                                      (!isUserLocationValid) ? 0 : _userEewIntensity[eew.id] ?? 0)),
                             ),
                             Text(
-                              (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
+                              (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40,
-                                  color: IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
+                                  color: IntensityColor.onIntensity(
+                                      (!isUserLocationValid) ? 0 : _userEewIntensity[eew.id] ?? 0)),
                             ),
                           ],
                         ),
@@ -543,7 +548,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text(
-                                        "5",
+                                        (!isUserLocationValid) ? "?" : "5",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
                                       ),
@@ -634,17 +639,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateEewCircles() async {
-    if (_eewData.isEmpty) return;
-    for (var eew in _eewData) {
-      final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
-      _eewDist[eew.id] = dist["s_dist"]!;
-      final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["s_dist"]!, steps: 256);
-      await _mapController.setGeoJsonSource("${eew.id}-circle", {
+    if (_eewLastInfo.keys.isEmpty) return;
+    for (var id in _eewLastInfo.keys) {
+      final dist = psWaveDist(_eewLastInfo[id]!.eq.depth, _eewLastInfo[id]!.eq.time, _getCurrentTime());
+      _eewDist[id] = dist["s_dist"]!;
+      final circleData =
+          circle(LatLng(_eewLastInfo[id]!.eq.lat, _eewLastInfo[id]!.eq.lon), dist["s_dist"]!, steps: 256);
+      await _mapController.setGeoJsonSource("${id}-circle", {
         "type": "FeatureCollection",
         "features": [circleData]
       });
-      final circleDataP = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["p_dist"]!, steps: 256);
-      await _mapController.setGeoJsonSource("${eew.id}-circle-p", {
+      final circleDataP =
+          circle(LatLng(_eewLastInfo[id]!.eq.lat, _eewLastInfo[id]!.eq.lon), dist["p_dist"]!, steps: 256);
+      await _mapController.setGeoJsonSource("${id}-circle-p", {
         "type": "FeatureCollection",
         "features": [circleDataP]
       });
@@ -653,13 +660,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   int _getCurrentTime() => (_timeReplay != 0) ? _timeReplay : DateTime.now().millisecondsSinceEpoch + _timeOffset;
 
-  void _removeOldEews() {
-    final currentEewIds = _eewData.map((e) => e.id).toSet();
-    _eewIdList.removeWhere((id) {
+  void _removeOldEews(List<Eew> data) {
+    final currentEewIds = data.map((e) => e.id).toSet();
+    _eewLastInfo.keys.toList().removeWhere((id) {
       if (!currentEewIds.contains(id)) {
         _removeEewLayers(id);
         _eewIntensityArea.remove(id);
         _eewUpdateList.remove(id);
+        _userEewArriveTime.remove(id);
+        _userEewIntensity.remove(id);
         _eewDist.remove(id);
         _updateMapArea();
         _updateMarkers();
@@ -763,7 +772,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     final features = _stations.entries.where((e) {
       return rtsData.station.containsKey(e.key);
     }).where((e) {
-      if (_eewData.isNotEmpty || (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true)) return false;
+      if (_eewLastInfo.keys.isNotEmpty || (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true))
+        return false;
       return true;
     }).map((e) {
       Map<String, dynamic> properties = {"i": rtsData.station[e.key]?.i};

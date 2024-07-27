@@ -180,3 +180,18 @@ WaveTime calculateWaveTime(double depth, double distance) {
   }
   return WaveTime(p: ptime, s: stime);
 }
+
+Map<String, dynamic> eewLocationInfo(
+    double mag, double depth, double eqLat, double eqLng, double userLat, double userLon) {
+  final distSurface = distance(eqLat, eqLng, userLat, userLon);
+  final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
+  final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
+  var intensity = pgaToFloat(pga);
+  if (intensity > 4.5) {
+    intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
+  }
+  return {
+    'dist': dist,
+    'i': intensity,
+  };
+}
