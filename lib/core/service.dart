@@ -69,8 +69,11 @@ void androidSendPositionlisten(){
         if (Global.location.containsKey(code)) {
           Location locationInfo = Global.location[code]!;
 
-          Global.preference.setString("location-city", locationInfo.city);
-          Global.preference.setString("location-town", locationInfo.town);
+          String city = locationInfo.city + "(自動定位)";
+          String town = locationInfo.town + "(自動定位)";
+
+          Global.preference.setString("location-city", city);
+          Global.preference.setString("location-town", town);
 
           print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
         } else {
