@@ -32,6 +32,7 @@ Future<void> getSavedLocation() async {
       } else {
         print('Code $code not found in location data');
 
+        Global.preference.setString("location-auto", " (解析失敗)");
         Global.preference.setString("location-city", "解析失敗");
         Global.preference.setString("location-town", "解析失敗");
       }
