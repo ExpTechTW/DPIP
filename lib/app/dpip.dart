@@ -1,10 +1,10 @@
+import 'package:dpip/app/page/history-list/history-list.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/app/page/history_list/history-list.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});
@@ -69,7 +69,8 @@ class _DpipState extends State<Dpip> {
           // HomePage(),
           MonitorPage(data: 0),
           ReportListPage(),
-          HistoryListPage(),// MapPage(),
+          HistoryListPage(),
+          // MapPage(),
           MePage(),
         ],
       ),
