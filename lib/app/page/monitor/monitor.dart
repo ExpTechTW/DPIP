@@ -25,10 +25,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:timezone/timezone.dart' as tz;
-
-import 'eew_info.dart';
+import 'package:dpip/app/page/monitor/eew_info.dart';
 
 class MonitorPage extends StatefulWidget {
   const MonitorPage({super.key, required this.data});
@@ -920,7 +918,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    const sheetInitialSize = 0.2;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.monitor),
@@ -938,7 +935,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black12.withOpacity(0.5),
+                    color: context.colors.surfaceVariant.withOpacity(0.5),
                   ),
                   child: Text(
                     DateFormat('yyyy/MM/dd HH:mm:ss').format((!_dataStatus())
@@ -969,7 +966,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black12.withOpacity(0.5),
+                    color: context.colors.surfaceVariant.withOpacity(0.5),
                   ),
                   child: Text(
                     (!_dataStatus()) ? "999+ms" : "${_ping}ms",
