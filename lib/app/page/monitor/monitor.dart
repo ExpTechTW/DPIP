@@ -778,7 +778,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       await _mapController.setLayerProperties(
         'town',
         FillLayerProperties(
-          fillColor: context.colors.surfaceVariant.toHexStringRGB(),
+          fillColor: context.colors.surfaceContainerHighest.toHexStringRGB(),
           fillOpacity: 1,
         ),
       );
@@ -795,7 +795,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 int.parse(entry.key),
                 IntensityColor.intensity(entry.value).toHexStringRGB(),
               ]),
-          context.colors.surfaceVariant.toHexStringRGB(),
+          context.colors.surfaceContainerHighest.toHexStringRGB(),
         ],
         fillOpacity: 1,
       ),
