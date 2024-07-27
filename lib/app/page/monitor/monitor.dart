@@ -435,6 +435,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           _updateMarkers();
         }
         _eewUpdateList[eew.id] = eew.serial;
+        await _updateCrossMarker();
         _eewLastInfo[eew.id] = eew;
         _updateEewIntensityArea(eew);
         _updateMapArea();
