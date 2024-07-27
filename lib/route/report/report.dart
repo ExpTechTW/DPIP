@@ -291,7 +291,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                     labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                     side: BorderSide(color: context.theme.extendedColors.blue),
                   ),
-                if (report != null && report!.magnitude >= 7 && report!.getLocation().contains("海"))
+                if (report!.magnitude >= 7 && report!.getLocation().contains("海"))
                   Chip(
                     avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
                     label: Text("此地震可能引起海嘯 注意後續資訊", style: TextStyle(color: context.colors.error)),
