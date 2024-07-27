@@ -44,20 +44,23 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _blinkTimer;
   int _timeOffset = 0;
   int _ping = 0;
-  Map<String, double> _eewDist = {};
-  Map<String, int> _eewUpdateList = {};
-  Map<String, int> _userEewArriveTime = {};
-  Map<String, int> _userEewIntensity = {};
-  Map<String, Eew> _eewLastInfo = {};
-  Rts? _rtsData;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
   int _timeReplay = 0;
-  final Map<String, dynamic> _eewIntensityArea = {};
+  double userLat = 0;
+  double userLon = 0;
+  Map<String, double> _eewDist = {};
+  Map<String, int> _eewUpdateList = {};
+  Map<String, Map<String, int>> _userEewArriveTime = {};
+  Map<String, int> _userEewIntensity = {};
+  Map<String, Eew> _eewLastInfo = {};
+  Rts? _rtsData;
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
   bool _isEewBoxVisible = true;
+  bool isUserLocationValid = false;
   int _isTsunamiVisible = 0;
+  final Map<String, dynamic> _eewIntensityArea = {};
   final sheetController = DraggableScrollableController();
   final sheetInitialSize = 0.2;
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
@@ -79,6 +82,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
     _initStations();
+
+    if (Platform.isIOS) {
+      await getSavedLocation();
+    }
+    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
   }
 
   void _initStations() async {
@@ -101,6 +112,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Future<void> _loadMapImages(bool isDark) async {
     await loadIntensityImage(_mapController, isDark);
     await loadCrossImage(_mapController);
+    await loadGPSImage(_mapController);
   }
 
   void _setupStationSource(Map<String, Station> data) async {
@@ -166,7 +178,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           "intensity-8",
           9,
           "intensity-9",
+          10,
           "cross",
+          "gps"
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -266,12 +280,25 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Future<void> _updateCrossMarker() async {
     List markers_features = [];
 
+    if (isUserLocationValid) {
+      markers_features.add({
+        "type": "Feature",
+        "properties": {
+          "intensity": 11,
+        },
+        "geometry": {
+          "coordinates": [userLon, userLat],
+          "type": "Point"
+        }
+      });
+    }
+
     if (_isMarkerVisible) {
       for (var id in _eewLastInfo.keys) {
         markers_features.add({
           "type": "Feature",
           "properties": {
-            "intensity": 10, // 10 is for classifying epicenter cross
+            "intensity": 10,
           },
           "geometry": {
             "coordinates": [_eewLastInfo[id]!.eq.lon, _eewLastInfo[id]!.eq.lat],
@@ -347,14 +374,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _processEewData(List<Eew> data) async {
-    if (Platform.isIOS) {
-      await getSavedLocation();
-    }
-    final userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    final userLon = Global.preference.getDouble("user-lon") ?? 0.0;
-
-    bool isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
     List<Widget> eewUI = [];
     for (var eew in data) {
       if ((_eewUpdateList[eew.id] ?? 0) < eew.serial) {
@@ -369,7 +388,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
         Map<String, dynamic> info = eewLocationInfo(eew.eq.mag, eew.eq.depth, eew.eq.lat, eew.eq.lon, userLat, userLon);
         _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
-        _userEewArriveTime[eew.id] = 0;
+        _userEewArriveTime[eew.id] = {
+          "s": (_getCurrentTime() + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+          "p": (_getCurrentTime() + pWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+        };
       }
 
       eewUI.add(Padding(
@@ -530,12 +552,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                 color: context.colors.onSurfaceVariant,
                               ),
                             ),
-                            false //震波抵達?
+                            (!isUserLocationValid ||
+                                    ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000).round() <= 0)
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "抵達",
+                                        (!isUserLocationValid) ? "未知" : "抵達",
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 36,
@@ -548,7 +571,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text(
-                                        (!isUserLocationValid) ? "?" : "5",
+                                        ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000)
+                                            .round()
+                                            .toString(),
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
                                       ),
@@ -660,25 +685,24 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   int _getCurrentTime() => (_timeReplay != 0) ? _timeReplay : DateTime.now().millisecondsSinceEpoch + _timeOffset;
 
-  void _removeOldEews(List<Eew> data) {
+  void _removeOldEews(List<Eew> data) async {
     final currentEewIds = data.map((e) => e.id).toSet();
-    _eewLastInfo.keys.toList().removeWhere((id) {
-      if (!currentEewIds.contains(id)) {
-        _removeEewLayers(id);
-        _eewIntensityArea.remove(id);
-        _eewUpdateList.remove(id);
-        _userEewArriveTime.remove(id);
-        _userEewIntensity.remove(id);
-        _eewDist.remove(id);
-        _updateMapArea();
-        _updateMarkers();
-        return true;
-      }
-      return false;
-    });
+    final idsToRemove = _eewLastInfo.keys.where((id) => !currentEewIds.contains(id)).toList();
+
+    for (var id in idsToRemove) {
+      _eewLastInfo.remove(id);
+      await _removeEewLayers(id);
+      _eewIntensityArea.remove(id);
+      _eewUpdateList.remove(id);
+      _userEewArriveTime.remove(id);
+      _userEewIntensity.remove(id);
+      _eewDist.remove(id);
+      _updateMapArea();
+      _updateMarkers();
+    }
   }
 
-  void _removeEewLayers(String id) async {
+  Future<void> _removeEewLayers(String id) async {
     await _mapController.removeLayer("$id-wave-outline");
     await _mapController.removeLayer("$id-wave-outline-p");
     await _mapController.removeLayer("$id-wave-bg");
