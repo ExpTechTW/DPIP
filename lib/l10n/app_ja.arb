@@ -92,11 +92,11 @@
   "@open_report_url": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
-  "report_event_time": "發震時間",
+  "report_event_time": "発生日時",
   "@report_event_time": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
   },
-  "report_location": "位於",
+  "report_location": "緯度/経度",
   "@report_location": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
   },
@@ -108,23 +108,23 @@
   "@report_depth": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
   },
-  "report_image": "地震報告圖",
+  "report_image": "地震情報",
   "@report_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
   },
-  "report_intensity_image": "震度圖",
+  "report_intensity_image": "震度分布図",
   "@report_intensity_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
   },
-  "report_pga_image": "最大地動加速度圖",
+  "report_pga_image": "地動最大加速度",
   "@report_pga_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
   },
-  "report_pgv_image": "最大地動速度圖",
+  "report_pgv_image": "地動最大加速度",
   "@report_pgv_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
   },
-  "report_intensity": "各地震度",
+  "report_intensity": "各地の震度",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   }
