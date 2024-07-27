@@ -26,6 +26,8 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+import 'package:timezone/timezone.dart' as tz;
+
 import 'eew_info.dart';
 
 class MonitorPage extends StatefulWidget {
@@ -504,7 +506,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                   ),
                                 ),
                                 Text(
-                                  "${DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(_eewLastInfo[eew.id]!.eq.time))} 發震",
+                                  "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _eewLastInfo[eew.id]!.eq.time))} 發震",
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: context.colors.onSurfaceVariant,
@@ -930,10 +932,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                   ),
                   child: Text(
                     DateFormat('yyyy/MM/dd HH:mm:ss').format((!_dataStatus())
-                        ? DateTime.fromMillisecondsSinceEpoch(_lsatGetRtsDataTime)
+                        ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _lsatGetRtsDataTime)
                         : (_timeReplay == 0)
-                            ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
-                            : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
+                            ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _getCurrentTime())
+                            : tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _timeReplay)),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
