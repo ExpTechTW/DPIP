@@ -88,7 +88,7 @@
   "@report_without_number": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
   },
-  "open_report_url": "Report Page",
+  "open_report_url": "CWA Report Page",
   "@open_report_url": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
@@ -124,7 +124,7 @@
   "@report_pgv_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
   },
-  "report_intensity": "Seismic Intensity in Various Locations",
+  "report_intensity": "Intensity in Locations",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   }
