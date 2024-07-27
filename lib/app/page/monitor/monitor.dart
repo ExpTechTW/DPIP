@@ -562,7 +562,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         height: 100,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
-                          color: IntensityColor.intensity((!isUserLocationValid) ? 0 : _userEewIntensity[eew.id] ?? 0),
+                          color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
+                              ? Colors.transparent
+                              : IntensityColor.intensity(
+                                  (_userEewIntensity[eew.id] ?? 0),
+                                ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -573,16 +577,18 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
-                                  color: IntensityColor.onIntensity(
-                                      (!isUserLocationValid) ? 0 : _userEewIntensity[eew.id] ?? 0)),
+                                  color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
+                                      ? context.colors.onSurface
+                                      : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
                             ),
                             Text(
                               (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40,
-                                  color: IntensityColor.onIntensity(
-                                      (!isUserLocationValid) ? 0 : _userEewIntensity[eew.id] ?? 0)),
+                                  color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
+                                      ? context.colors.onSurface
+                                      : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
                             ),
                           ],
                         ),
