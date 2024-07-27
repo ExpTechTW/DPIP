@@ -14,6 +14,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     var lastSentLocation: CLLocation?
     var fcmToken: String?
     var locationChannel: FlutterMethodChannel?
+    var methodChannel: FlutterMethodChannel?
     var isLocationEnabled: Bool = false
     var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
@@ -51,17 +52,19 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
             }
         }
 
-         methodChannel = FlutterMethodChannel(name: "com.exptech.dpip/data",
-                                                     binaryMessenger: controller.binaryMessenger)
+        methodChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/data",
+            binaryMessenger: controller.binaryMessenger)
 
-                methodChannel?.setMethodCallHandler({
-                    (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-                    if call.method == "getSavedLocation" {
-                        self.handleGetSavedLocation(result: result)
-                    } else {
-                        result(FlutterMethodNotImplemented)
-                    }
-                })
+        methodChannel?.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void
+            in
+            if call.method == "getSavedLocation" {
+                self.handleGetSavedLocation(result: result)
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        })
 
         locationManager = CLLocationManager()
         locationManager.delegate = self
@@ -99,13 +102,13 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     }
 
     private func handleGetSavedLocation(result: FlutterResult) {
-            let latitude = UserDefaults.standard.double(forKey: "user-lat")
-            let longitude = UserDefaults.standard.double(forKey: "user-lon")
-            if latitude != 0 && longitude != 0 {
-                result(["lat": latitude, "lon": longitude])
-            } else {
-                result(nil)
-            }
+        let latitude = UserDefaults.standard.double(forKey: "user-lat")
+        let longitude = UserDefaults.standard.double(forKey: "user-lon")
+        if latitude != 0 && longitude != 0 {
+            result(["lat": latitude, "lon": longitude])
+        } else {
+            result(nil)
+        }
     }
 
     func toggleLocation(isEnabled: Bool) {
