@@ -63,32 +63,32 @@ Future<void> showNotify(RemoteMessage message) async {
       NotificationDetails(
         android: AndroidNotificationDetails(
           data["channel"]!,
-          (data["level"] == "0")
+          (data["level"] == null)
               ? '一般訊息'
-              : (data["level"] == "1")
+              : (data["level"] == "0")
                   ? '警訊通知'
                   : '緊急警報',
-          channelDescription: (data["level"] == "0")
+          channelDescription: (data["level"] == null)
               ? '一般通知'
-              : (data["level"] == "1")
+              : (data["level"] == "0")
                   ? '重要通知'
                   : '有立即危險',
-          importance: (data["level"] == "0")
+          importance: (data["level"] == null)
               ? Importance.low
-              : (data["level"] == "1")
+              : (data["level"] == "0")
                   ? Importance.defaultImportance
                   : Importance.max,
-          priority: (data["level"] == "0")
+          priority: (data["level"] == null)
               ? Priority.low
-              : (data["level"] == "1")
+              : (data["level"] == "0")
                   ? Priority.defaultPriority
                   : Priority.max,
-          sound: data["sound"] != "default" ? RawResourceAndroidNotificationSound(data["sound"]) : null,
-          styleInformation: const BigTextStyleInformation(''),
+          playSound: true,
+          sound: data["sound"] != null ? RawResourceAndroidNotificationSound(data["sound"]) : null,
         ),
         iOS: DarwinNotificationDetails(
           categoryIdentifier: darwinNotificationCategoryPlain,
-          sound: data["sound"] != "default" ? "${data["sound"]}.wav" : "default",
+          sound: data["sound"] != null ? "${data["sound"]}.wav" : "default",
           interruptionLevel: InterruptionLevel.timeSensitive,
         ),
       ));
