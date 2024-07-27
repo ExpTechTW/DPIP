@@ -64,34 +64,6 @@ class ReportSheetContent extends StatelessWidget {
           direction: Axis.horizontal,
           spacing: 8,
           children: [
-            Visibility(
-              visible: report.magnitude >= 6 && report.magnitude < 7 && report.getLocation().contains("海"),
-              child: ActionChip(
-                avatar: const Icon(Symbols.tsunami_rounded, color: Colors.white),
-                label: const Text("可能引起若干海面變動"),
-                backgroundColor: Colors.blue.withOpacity(0.16),
-                labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-                side: const BorderSide(color: Colors.blue),
-                onPressed: () {},
-              ),
-            ),
-            Visibility(
-              visible: report.magnitude >= 7 && report.getLocation().contains("海"),
-              child: ActionChip(
-                avatar: const Icon(Symbols.tsunami_rounded, color: Colors.white),
-                label: const Text("可能引起海嘯 應注意後續資訊"),
-                backgroundColor: Colors.red.withOpacity(0.16),
-                labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-                side: const BorderSide(color: Colors.red),
-                onPressed: () {},
-              ),
-            ),
-          ],
-        ),
-        Wrap(
-          direction: Axis.horizontal,
-          spacing: 8,
-          children: [
             ActionChip(
               avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
               label: Text(context.i18n.open_report_url),
