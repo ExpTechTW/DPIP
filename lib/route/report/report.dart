@@ -273,8 +273,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             right: 0,
             child: Column(
               children: [
-                if (report != null &&
-                    report!.magnitude >= 6 &&
+                if (report!.magnitude >= 6 &&
                     report!.magnitude < 7 &&
                     report!.getLocation().contains("海"))
                   Chip(
