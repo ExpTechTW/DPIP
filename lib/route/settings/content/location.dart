@@ -28,6 +28,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
 
+  String? location_auto = Global.preference.getString("location-auto");
+
   String? city = Global.preference.getString("location-city");
   String? town = Global.preference.getString("location-town");
 
@@ -298,6 +300,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
 
     if (isAutoLocatingEnabled) {
+      Global.preference.remove("location-auto");
+
+      location_auto = "";
       setState(() {
         isAutoLocatingEnabled = false;
       });
@@ -492,7 +497,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               )
             ]),
           ),
-          const ListTileGroupHeader(title: "所在地"),
+          ListTileGroupHeader(
+            title: "所在地 $location_auto",
+          ),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),

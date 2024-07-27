@@ -69,11 +69,9 @@ void androidSendPositionlisten(){
         if (Global.location.containsKey(code)) {
           Location locationInfo = Global.location[code]!;
 
-          String city = locationInfo.city + " (自動定位)";
-          String town = locationInfo.town + " (自動定位)";
-
-          Global.preference.setString("location-city", city);
-          Global.preference.setString("location-town", town);
+          Global.preference.setString("location-auto", " (啟用自動定位)");
+          Global.preference.setString("location-city", locationInfo.city);
+          Global.preference.setString("location-town", locationInfo.town);
 
           print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
         } else {
@@ -86,8 +84,8 @@ void androidSendPositionlisten(){
 
       var latitude = position['latitude'];
       var longitude = position['longitude'];
-      Global.preference.setDouble("user-lat", latitude);
-      Global.preference.setDouble("user-lon", longitude);
+      Global.preference.setDouble("user-lat", (latitude as num?)?.toDouble() ?? 0.0);
+      Global.preference.setDouble("user-lon", (longitude as num?)?.toDouble() ?? 0.0);
       const MonitorPage(data: 0).createState();
     }
   });
