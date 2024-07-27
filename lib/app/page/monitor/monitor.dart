@@ -75,6 +75,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
+
     _initTimeOffset();
     _timeReplay = widget.data;
 
@@ -101,6 +102,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+    _eewUI.add(Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: Text(
+        "暫時無法取得地震速報資料",
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 20, color: context.colors.error),
+      ),
+    ));
   }
 
   void _initStations() async {
@@ -649,16 +659,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ));
     }
     if (eewUI.isEmpty) {
-      eewUI.add(
-        const Padding(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: Text(
-            "目前無生效中的地震速報",
-            textAlign: TextAlign.left,
-            style: TextStyle(fontSize: 20),
-          ),
+      eewUI.add(const Padding(
+        padding: EdgeInsets.only(left: 20, right: 20),
+        child: Text(
+          "目前無生效中的地震速報",
+          textAlign: TextAlign.left,
+          style: TextStyle(fontSize: 20),
         ),
-      );
+      ));
     } else {
       _isEewBoxVisible = !_isEewBoxVisible;
     }
