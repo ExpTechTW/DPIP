@@ -66,12 +66,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
   List<Widget> _eewUI = [];
+  List<Widget> _rtsUI = [];
 
   @override
   void initState() {
     super.initState();
     _initTimeOffset();
     _timeReplay = widget.data;
+
+    sheetController.addListener(() {
+      final newSize = sheetController.size;
+      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      animController.animateTo(scrollPosition, duration: Duration.zero);
+    });
   }
 
   void _initTimeOffset() async {
@@ -280,19 +287,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Future<void> _updateCrossMarker() async {
     List markers_features = [];
 
-    if (isUserLocationValid) {
-      markers_features.add({
-        "type": "Feature",
-        "properties": {
-          "intensity": 11,
-        },
-        "geometry": {
-          "coordinates": [userLon, userLat],
-          "type": "Point"
-        }
-      });
-    }
-
     if (_isMarkerVisible) {
       for (var id in _eewLastInfo.keys) {
         markers_features.add({
@@ -325,6 +319,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       }
     });
 
+    if (isUserLocationValid) {
+      markers_features.add({
+        "type": "Feature",
+        "properties": {
+          "intensity": 11,
+        },
+        "geometry": {
+          "coordinates": [userLon, userLat],
+          "type": "Point"
+        }
+      });
+    }
+
     await _mapController.setGeoJsonSource(
       "markers-geojson",
       {
@@ -351,26 +358,64 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Future<void> _updateBoxLine() async {
     if (_rtsData == null) return;
     List features = [];
-    if (_isBoxVisible) {
-      for (var area in Global.box["features"]) {
-        int id = area["properties"]["ID"];
-        if (_rtsData!.box[id.toString()] == null) continue;
-        bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
-        if (!skip) {
-          features.add({
-            "type": "Feature",
-            "properties": {
-              "i": _rtsData!.box[id.toString()], // 10 is for classifying epicenter cross
-            },
-            "geometry": {"coordinates": area["geometry"]["coordinates"], "type": "Polygon"}
-          });
+    List<Widget> rtsUI = [];
+    if (_rtsData!.box.keys.isNotEmpty) {
+      if (_isBoxVisible) {
+        for (var area in Global.box["features"]) {
+          int id = area["properties"]["ID"];
+          if (_rtsData!.box[id.toString()] == null) continue;
+          bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
+          if (!skip) {
+            features.add({
+              "type": "Feature",
+              "properties": {
+                "i": _rtsData!.box[id.toString()], // 10 is for classifying epicenter cross
+              },
+              "geometry": {"coordinates": area["geometry"]["coordinates"], "type": "Polygon"}
+            });
+          }
         }
+      }
+
+      int count = 0;
+      for (var area in _rtsData!.intensity) {
+        rtsUI.add(Chip(
+          padding: const EdgeInsets.all(4),
+          side: BorderSide(color: IntensityColor.intensity(area.i)),
+          backgroundColor: IntensityColor.intensity(area.i).withOpacity(0.16),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          avatar: AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: IntensityColor.intensity(area.i),
+              ),
+              child: Center(
+                child: Text(
+                  area.i.asIntensityDisplayLabel,
+                  style: TextStyle(
+                    height: 1,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: IntensityColor.onIntensity(area.i),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          label: Text(Global.location[area.code.toString()]!.city + Global.location[area.code.toString()]!.town),
+        ));
+        rtsUI.add(const SizedBox(height: 5));
+        count++;
+        if (count == 3) break;
       }
     }
     await _mapController.setGeoJsonSource("box-geojson", {
       "type": "FeatureCollection",
       "features": features,
     });
+    _rtsUI = rtsUI;
   }
 
   void _processEewData(List<Eew> data) async {
@@ -867,7 +912,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
-    sheetController.addListener(() {
+    sheetController.removeListener(() {
       final newSize = sheetController.size;
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
@@ -886,8 +931,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         children: [
           DpipMap(onMapCreated: _initMap),
           Positioned(
-            left: 10,
-            top: 10,
+            left: 4,
+            top: 4,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -917,8 +962,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             ),
           ),
           Positioned(
-            left: 10,
-            top: 40,
+            left: 4,
+            top: 34,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -943,6 +988,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ),
             ),
           ),
+          if (_rtsUI.isNotEmpty)
+            Positioned(
+              right: 4,
+              top: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [..._rtsUI],
+              ),
+            ),
           Positioned.fill(
             child: DraggableScrollableSheet(
               initialChildSize: sheetInitialSize,
