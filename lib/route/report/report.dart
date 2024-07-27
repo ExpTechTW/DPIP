@@ -266,38 +266,35 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
               refreshReport();
             },
           ),
-          (report != null)
-              ? Positioned(
-                  right: 4,
-                  top: context.padding.top + 4,
-                  child: Row(
-                    children: [
-                      Visibility(
-                        visible: report!.magnitude >= 6 && report!.magnitude < 7 && report!.getLocation().contains("海"),
-                        child: ActionChip(
-                          avatar: const Icon(Symbols.tsunami_rounded),
-                          label: const Text("可能引起若干海面變動"),
-                          backgroundColor: Colors.blue.withOpacity(0.16),
-                          labelStyle: const TextStyle(fontWeight: FontWeight.w900),
-                          side: const BorderSide(color: Colors.blue),
-                          onPressed: () {},
-                        ),
-                      ),
-                      Visibility(
-                        visible: report!.magnitude >= 7 && report!.getLocation().contains("海"),
-                        child: ActionChip(
-                          avatar: const Icon(Symbols.tsunami_rounded, color: Colors.white),
-                          label: const Text("可能引起海嘯 應注意後續資訊"),
-                          backgroundColor: Colors.red.withOpacity(0.16),
-                          labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-                          side: const BorderSide(color: Colors.red),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
+          Positioned(
+            top: context.padding.top + 4,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (report != null &&
+                    report!.magnitude >= 6 &&
+                    report!.magnitude < 7 &&
+                    report!.getLocation().contains("海"))
+                  Chip(
+                    avatar: const Icon(Symbols.tsunami_rounded),
+                    label: const Text("可能引起若干海面變動"),
+                    backgroundColor: Colors.blue.withOpacity(0.16),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.w900),
+                    side: const BorderSide(color: Colors.blue),
                   ),
-                )
-              : const SizedBox(),
+                if (report != null && report!.magnitude >= 7 && report!.getLocation().contains("海"))
+                  Chip(
+                    avatar: const Icon(Symbols.tsunami_rounded, color: Colors.white),
+                    label: const Text("可能引起海嘯 應注意後續資訊"),
+                    backgroundColor: Colors.red.withOpacity(0.16),
+                    labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+                    side: const BorderSide(color: Colors.red),
+                  ),
+              ],
+            ),
+          ),
           Positioned(
             top: context.padding.top + 4,
             left: 4,
