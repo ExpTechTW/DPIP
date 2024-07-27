@@ -6,6 +6,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
+import 'package:dpip/route/settings/content/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,58 +25,59 @@ void initBackgroundService() async {
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
       if (Platform.isAndroid) {
         androidForegroundService();
-      }
-      startBackgroundService(true);
-    }
-  }
-}
+        service.on('sendposition').listen((event) {
+          if (event != null) {
+            var positionData = event.values.first;
+            var position = positionData['position'];
+            String country = position['country'];
+            List<String> parts = country.split(' ');
 
-void startBackgroundService(bool init) async {
-  if (Platform.isAndroid) {
-    if (!androidServiceInit) {
-      androidForegroundService();
-    }
-    var isRunning = await service.isRunning();
-    if (!isRunning) {
-      service.startService();
-    } else if (!init) {
-      stopBackgroundService();
-      service.startService();
-    }
-    service.on('sendposition').listen((event) {
-      if (event != null) {
-        var positionData = event.values.first;
-        var position = positionData['position'];
-        String country = position['country'];
-        List<String> parts = country.split(' ');
+            if (parts.length == 3) {
+              String code = parts[2];
 
-        if (parts.length == 3) {
-          String code = parts[2];
+              if (Global.location.containsKey(code)) {
+                Location locationInfo = Global.location[code]!;
 
-          if (Global.location.containsKey(code)) {
-            Location locationInfo = Global.location[code]!;
+                SettingsLocationView.updatePosition(locationInfo.city,locationInfo.town);
 
-            Global.preference.setString("location-city", locationInfo.city);
-            Global.preference.setString("location-town", locationInfo.town);
+                Global.preference.setString("location-city", locationInfo.city);
+                Global.preference.setString("location-town", locationInfo.town);
 
-            print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
-          } else {
-            print('Code $code not found in location data');
+                print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
+              } else {
+                print('Code $code not found in location data');
 
-            Global.preference.setString("location-city", "解析失敗");
-            Global.preference.setString("location-town", "解析失敗");
+                Global.preference.setString("location-city", "解析失敗");
+                Global.preference.setString("location-town", "解析失敗");
+              }
+            }
           }
-        }
+        });
+        androidStartBackgroundService(true);
       }
-    });
+    }
   }
 }
 
-void stopBackgroundService() async {
-  if (Platform.isAndroid) {
-    if (await service.isRunning()) {
-      service.invoke("stopService");
+void androidStartBackgroundService(bool init) async {
+  if (!androidServiceInit) {
+    androidForegroundService();
+  }
+  var isRunning = await service.isRunning();
+  if (!isRunning) {
+    service.startService();
+  } else if (!init) {
+    androidstopBackgroundService(false);
+    service.startService();
+  }
+}
+
+void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
+  if (await service.isRunning()) {
+    if (isAutoLocatingEnabled) {
+      service.invoke("removeposition");
     }
+    service.invoke("stopService");
   }
 }
 
@@ -153,6 +155,12 @@ void onStart(ServiceInstance service) async {
 
     service.on('setAsBackground').listen((event) {
       service.setAsBackgroundService();
+    });
+
+    service.on('removeposition').listen((event) {
+      Global.preference.remove("loc-position-lat");
+      Global.preference.remove("loc-position-lon");
+      Global.preference.remove("loc-position-country");
     });
 
     void task() async {

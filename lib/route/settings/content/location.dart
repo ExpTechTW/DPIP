@@ -15,10 +15,16 @@ import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 class SettingsLocationView extends StatefulWidget {
+  static final GlobalKey<_SettingsLocationViewState> globalKey = GlobalKey<_SettingsLocationViewState>();
+
   const SettingsLocationView({super.key});
 
   @override
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
+
+  static void updatePosition(String? city, String? town) {
+    globalKey.currentState?.sendpositionUpdate(city, town);
+  }
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
@@ -287,14 +293,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   }
 
   Future toggleAutoLocation() async {
-    stopBackgroundService();
-
     if (Platform.isIOS) {
       try {
         await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
       } catch (e) {
         return;
       }
+    } else if (Platform.isAndroid) {
+      androidstopBackgroundService(isAutoLocatingEnabled);
     }
 
     if (isAutoLocatingEnabled) {
@@ -318,7 +324,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (!batteryOptimization) return;
 
-      startBackgroundService(false);
+      if (Platform.isAndroid) {
+        androidStartBackgroundService(false);
+      }
 
       Global.preference.remove("location-city");
       Global.preference.remove("location-town");
@@ -375,6 +383,13 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
+  }
+
+  void sendpositionUpdate(String? cityUpdate,String? townUpdate) {
+    setState(() {
+      city = cityUpdate;
+      town = townUpdate;
+    });
   }
 
   @override
