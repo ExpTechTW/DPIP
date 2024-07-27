@@ -82,13 +82,13 @@ void androidSendPositionlisten(){
           Global.preference.setString("location-city", "解析失敗");
           Global.preference.setString("location-town", "解析失敗");
         }
-
-        var latitude = position['latitude'];
-        var longitude = position['longitude'];
-        Global.preference.setDouble("user-lat", latitude);
-        Global.preference.setDouble("user-lon", longitude);
-        const MonitorPage(data: 0).createState();
       }
+
+      var latitude = position['latitude'];
+      var longitude = position['longitude'];
+      Global.preference.setDouble("user-lat", latitude);
+      Global.preference.setDouble("user-lon", longitude);
+      const MonitorPage(data: 0).createState();
     }
   });
 }
