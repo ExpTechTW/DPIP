@@ -651,31 +651,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ));
     }
     if (eewUI.isEmpty) {
-      eewUI.add(Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.grey,
-                  width: 3,
-                ),
-              ),
-              child: const Text(
-                "無生效中的地震速報",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ],
+      eewUI.add(
+        const Padding(
+          padding: EdgeInsets.only(left: 20, right: 20),
+          child: Text(
+            "目前無生效中的地震速報",
+            textAlign: TextAlign.left,
+            style: TextStyle(fontSize: 20),
+          ),
         ),
-      ));
+      );
     } else {
       _isEewBoxVisible = !_isEewBoxVisible;
     }
