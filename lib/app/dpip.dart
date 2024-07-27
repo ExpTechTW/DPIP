@@ -4,6 +4,7 @@ import 'package:dpip/app/page/report_list/report_list.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/app/page/history_list/history-list.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});
@@ -37,6 +38,11 @@ class _DpipState extends State<Dpip> {
             selectedIcon: const Icon(Symbols.summarize, fill: 1),
             label: context.i18n.report,
           ),
+          NavigationDestination(
+            icon: const Icon(Symbols.timeline),
+            selectedIcon: const Icon(Symbols.timeline, fill: 1),
+            label: context.i18n.report,
+          ),
           // NavigationDestination(
           //   icon: const Icon(Symbols.map),
           //   selectedIcon: const Icon(Symbols.map, fill: 1),
@@ -63,7 +69,7 @@ class _DpipState extends State<Dpip> {
           // HomePage(),
           MonitorPage(data: 0),
           ReportListPage(),
-          // MapPage(),
+          HistoryListPage(),// MapPage(),
           MePage(),
         ],
       ),
