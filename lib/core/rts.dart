@@ -17,14 +17,14 @@ StationInfo findAppropriateItem(List<StationInfo> infos, int date) {
   return sortedItems.last;
 }
 
-bool checkBoxSkip(List<Eew> eewData, Map<String, double> eewDist, List box) {
+bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, List box) {
   bool passed = false;
 
-  for (var eew in eewData) {
+  for (var eew in eewLastInfo.keys) {
     int skip = 0;
     for (int i = 0; i < 4; i++) {
-      final dist = distance(eew.eq.lat, eew.eq.lon, box[i][1], box[i][0]);
-      if (eewDist[eew.id]! > dist) {
+      final dist = distance(eewLastInfo[eew]!.eq.lat, eewLastInfo[eew]!.eq.lon, box[i][1], box[i][0]);
+      if (eewDist[eew]! > dist) {
         skip++;
       }
     }

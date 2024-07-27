@@ -14,6 +14,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     var lastSentLocation: CLLocation?
     var fcmToken: String?
     var locationChannel: FlutterMethodChannel?
+    var methodChannel: FlutterMethodChannel?
     var isLocationEnabled: Bool = false
     var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
@@ -51,6 +52,20 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
             }
         }
 
+        methodChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/data",
+            binaryMessenger: controller.binaryMessenger)
+
+        methodChannel?.setMethodCallHandler({
+            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void
+            in
+            if call.method == "getSavedLocation" {
+                self.handleGetSavedLocation(result: result)
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+        })
+
         locationManager = CLLocationManager()
         locationManager.delegate = self
         locationManager.allowsBackgroundLocationUpdates = true
@@ -84,6 +99,16 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
 
         return super.application(
             application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    private func handleGetSavedLocation(result: FlutterResult) {
+        let latitude = UserDefaults.standard.double(forKey: "user-lat")
+        let longitude = UserDefaults.standard.double(forKey: "user-lon")
+        if latitude != 0 && longitude != 0 {
+            result(["lat": latitude, "lon": longitude])
+        } else {
+            result(nil)
+        }
     }
 
     func toggleLocation(isEnabled: Bool) {
@@ -181,6 +206,8 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
             "https://api-1.exptech.dev/api/v1/notify/location/\(appVersion)/1/\(latitude),\(longitude)/\(token)"
         print(urlString)
         guard let url = URL(string: urlString) else { return }
+        UserDefaults.standard.set(latitude, forKey: "user-lat")
+        UserDefaults.standard.set(longitude, forKey: "user-lon")
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

@@ -116,6 +116,8 @@ class LocationService {
       if (distance >= 250 || nowtemp == 0) {
         Global.preference.setDouble("loc-position-lat", position.latitude);
         Global.preference.setDouble("loc-position-lon", position.longitude);
+        Global.preference.setDouble("user-lat", position.latitude);
+        Global.preference.setDouble("user-lon", position.longitude);
         positionchange = true;
         print('距離: $distance 更新位置');
       } else {

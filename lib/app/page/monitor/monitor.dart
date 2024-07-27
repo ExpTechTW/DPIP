@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/eew.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/rts.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/eew.dart';
@@ -10,13 +12,23 @@ import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/station_info.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/extension/int.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:timezone/timezone.dart' as tz;
+
+import 'eew_info.dart';
 
 class MonitorPage extends StatefulWidget {
   const MonitorPage({super.key, required this.data});
@@ -36,27 +48,42 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _blinkTimer;
   int _timeOffset = 0;
   int _ping = 0;
-  final List<String> _eewIdList = [];
-  List<Eew> _eewData = [];
-  Map<String, double> _eewDist = {};
-  Rts? _rtsData;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
   int _timeReplay = 0;
-  final Map<String, dynamic> _eewIntensityArea = {};
+  double userLat = 0;
+  double userLon = 0;
+  Map<String, double> _eewDist = {};
+  Map<String, int> _eewUpdateList = {};
+  Map<String, Map<String, int>> _userEewArriveTime = {};
+  Map<String, int> _userEewIntensity = {};
+  Map<String, Eew> _eewLastInfo = {};
+  Rts? _rtsData;
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
+  bool _isEewBoxVisible = true;
+  bool isUserLocationValid = false;
   int _isTsunamiVisible = 0;
-  final sheetController = DraggableScrollableController();
+  final Map<String, dynamic> _eewIntensityArea = {};
+  final DraggableScrollableController sheetController = DraggableScrollableController();
   final sheetInitialSize = 0.2;
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
+  List<Widget> _eewUI = [];
+  List<Widget> _rtsUI = [];
 
   @override
   void initState() {
     super.initState();
+
     _initTimeOffset();
     _timeReplay = widget.data;
+
+    sheetController.addListener(() {
+      final newSize = sheetController.size;
+      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      animController.animateTo(scrollPosition, duration: Duration.zero);
+    });
   }
 
   void _initTimeOffset() async {
@@ -67,6 +94,23 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
     _initStations();
+
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
+    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+    _eewUI.add(Padding(
+      padding: const EdgeInsets.only(left: 20, right: 20),
+      child: Text(
+        "暫時無法取得地震速報資料",
+        textAlign: TextAlign.left,
+        style: TextStyle(fontSize: 20, color: context.colors.error),
+      ),
+    ));
   }
 
   void _initStations() async {
@@ -78,6 +122,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _startDataUpdates();
 
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+      if (!mounted) return;
       _isMarkerVisible = !_isMarkerVisible;
       _isBoxVisible = !_isBoxVisible;
       await _updateBoxLine();
@@ -89,6 +134,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Future<void> _loadMapImages(bool isDark) async {
     await loadIntensityImage(_mapController, isDark);
     await loadCrossImage(_mapController);
+    await loadGPSImage(_mapController);
   }
 
   void _setupStationSource(Map<String, Station> data) async {
@@ -154,7 +200,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           "intensity-8",
           9,
           "intensity-9",
+          10,
           "cross",
+          "gps"
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -199,11 +247,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _startDataUpdates() {
     _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
       _updateRtsData();
       _updateEewData();
       setState(() {});
     });
     _eewUpdateTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      if (!mounted) return;
       _updateEewCircles();
       if (_timeReplay != 0) {
         _timeReplay += (_replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
@@ -226,6 +276,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     try {
       int t = DateTime.now().millisecondsSinceEpoch;
       final data = await ExpTech().getRts(_timeReplay);
+      if (data.time < (_rtsData?.time ?? 0)) return;
       _ping = DateTime.now().millisecondsSinceEpoch - t;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
@@ -244,9 +295,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _updateEewData() async {
     try {
       final data = await ExpTech().getEew(_timeReplay);
-      _eewData = data;
-      _processEewData(_eewData);
-      _removeOldEews();
+      _processEewData(data);
+      _removeOldEews(data);
     } catch (err) {
       print(err);
     }
@@ -256,14 +306,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     List markers_features = [];
 
     if (_isMarkerVisible) {
-      for (var eew in _eewData) {
+      for (var id in _eewLastInfo.keys) {
         markers_features.add({
           "type": "Feature",
           "properties": {
-            "intensity": 10, // 10 is for classifying epicenter cross
+            "intensity": 10,
           },
           "geometry": {
-            "coordinates": [eew.eq.lon, eew.eq.lat],
+            "coordinates": [_eewLastInfo[id]!.eq.lon, _eewLastInfo[id]!.eq.lat],
             "type": "Point"
           }
         });
@@ -286,6 +336,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         });
       }
     });
+
+    if (isUserLocationValid) {
+      markers_features.add({
+        "type": "Feature",
+        "properties": {
+          "intensity": 11,
+        },
+        "geometry": {
+          "coordinates": [userLon, userLat],
+          "type": "Point"
+        }
+      });
+    }
 
     await _mapController.setGeoJsonSource(
       "markers-geojson",
@@ -313,38 +376,307 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Future<void> _updateBoxLine() async {
     if (_rtsData == null) return;
     List features = [];
-    if (_isBoxVisible) {
-      for (var area in Global.box["features"]) {
-        int id = area["properties"]["ID"];
-        if (_rtsData!.box[id.toString()] == null) continue;
-        bool skip = checkBoxSkip(_eewData, _eewDist, area["geometry"]["coordinates"][0]);
-        if (!skip) {
-          features.add({
-            "type": "Feature",
-            "properties": {
-              "i": _rtsData!.box[id.toString()], // 10 is for classifying epicenter cross
-            },
-            "geometry": {"coordinates": area["geometry"]["coordinates"], "type": "Polygon"}
-          });
+    List<Widget> rtsUI = [];
+    if (_rtsData!.box.keys.isNotEmpty) {
+      if (_isBoxVisible) {
+        for (var area in Global.box["features"]) {
+          int id = area["properties"]["ID"];
+          if (_rtsData!.box[id.toString()] == null) continue;
+          bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
+          if (!skip) {
+            features.add({
+              "type": "Feature",
+              "properties": {
+                "i": _rtsData!.box[id.toString()], // 10 is for classifying epicenter cross
+              },
+              "geometry": {"coordinates": area["geometry"]["coordinates"], "type": "Polygon"}
+            });
+          }
         }
+      }
+
+      int count = 0;
+      for (var area in _rtsData!.intensity) {
+        rtsUI.add(Chip(
+          padding: const EdgeInsets.all(4),
+          side: BorderSide(color: IntensityColor.intensity(area.i)),
+          backgroundColor: IntensityColor.intensity(area.i).withOpacity(0.16),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          avatar: AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: IntensityColor.intensity(area.i),
+              ),
+              child: Center(
+                child: Text(
+                  area.i.asIntensityDisplayLabel,
+                  style: TextStyle(
+                    height: 1,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: IntensityColor.onIntensity(area.i),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          label: Text(Global.location[area.code.toString()]!.city + Global.location[area.code.toString()]!.town),
+        ));
+        rtsUI.add(const SizedBox(height: 5));
+        count++;
+        if (count == 3) break;
       }
     }
     await _mapController.setGeoJsonSource("box-geojson", {
       "type": "FeatureCollection",
       "features": features,
     });
+    _rtsUI = rtsUI;
   }
 
-  void _processEewData(List<Eew> data) {
+  void _processEewData(List<Eew> data) async {
+    List<Widget> eewUI = [];
     for (var eew in data) {
-      if (!_eewIdList.contains(eew.id)) {
-        _eewIdList.add(eew.id);
-        _addEewCircle(eew);
+      if ((_eewUpdateList[eew.id] ?? 0) < eew.serial) {
+        if (_eewUpdateList[eew.id] == null) {
+          _addEewCircle(eew);
+          _updateMarkers();
+        }
+        _eewUpdateList[eew.id] = eew.serial;
+        await _updateCrossMarker();
+        _eewLastInfo[eew.id] = eew;
         _updateEewIntensityArea(eew);
         _updateMapArea();
-        _updateMarkers();
+
+        Map<String, dynamic> info = eewLocationInfo(eew.eq.mag, eew.eq.depth, eew.eq.lat, eew.eq.lon, userLat, userLon);
+        _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
+        _userEewArriveTime[eew.id] = {
+          "s": (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+          "p": (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+        };
       }
+
+      eewUI.add(Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: !_isEewBoxVisible
+                      ? Colors.grey
+                      : _eewLastInfo[eew.id]?.status == 1
+                          ? const Color(0xFFC80000)
+                          : const Color(0xFFFFC800),
+                  width: 3,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _eewLastInfo[eew.id]?.status == 1 ? "緊急地震速報" : "地震速報",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: context.colors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        "第 ${_eewLastInfo[eew.id]?.serial} 報",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _eewLastInfo[eew.id]!.eq.loc,
+                              style: TextStyle(
+                                fontSize: 24,
+                                color: context.colors.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _eewLastInfo[eew.id]!.eq.time))} 發震",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "M ${_eewLastInfo[eew.id]?.eq.mag}",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: context.colors.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "${_eewLastInfo[eew.id]?.eq.depth} km",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: context.colors.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: IntensityColor.intensity(_eewLastInfo[eew.id]!.eq.max),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _eewLastInfo[eew.id]!.eq.max.asIntensityLabel,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28,
+                                color: IntensityColor.onIntensity(_eewLastInfo[eew.id]!.eq.max)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(color: context.colors.onSurface, height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
+                              ? Colors.transparent
+                              : IntensityColor.intensity(
+                                  (_userEewIntensity[eew.id] ?? 0),
+                                ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "所在地預估",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
+                                      ? context.colors.onSurface
+                                      : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
+                            ),
+                            Text(
+                              (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 40,
+                                  color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
+                                      ? context.colors.onSurface
+                                      : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 80,
+                        width: 150,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "震波",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                            ),
+                            (!isUserLocationValid ||
+                                    ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000).floor() <= 0)
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        (!isUserLocationValid) ? "未知" : "抵達",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 36,
+                                            color: IntensityColor.onIntensity(2)),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000)
+                                            .floor()
+                                            .toString(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        "秒後抵達",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold, fontSize: 14, color: context.colors.onSurface),
+                                      ),
+                                    ],
+                                  ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ));
     }
+    if (eewUI.isEmpty) {
+      eewUI.add(const Padding(
+        padding: EdgeInsets.only(left: 20, right: 20),
+        child: Text(
+          "目前無生效中的地震速報",
+          textAlign: TextAlign.left,
+          style: TextStyle(fontSize: 20),
+        ),
+      ));
+    } else {
+      _isEewBoxVisible = !_isEewBoxVisible;
+    }
+    _eewUI = eewUI;
   }
 
   void _addEewCircle(Eew eew) async {
@@ -380,17 +712,19 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateEewCircles() async {
-    if (_eewData.isEmpty) return;
-    for (var eew in _eewData) {
-      final dist = psWaveDist(eew.eq.depth, eew.eq.time, _getCurrentTime());
-      _eewDist[eew.id] = dist["s_dist"]!;
-      final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["s_dist"]!, steps: 256);
-      await _mapController.setGeoJsonSource("${eew.id}-circle", {
+    if (_eewLastInfo.keys.isEmpty) return;
+    for (var id in _eewLastInfo.keys) {
+      final dist = psWaveDist(_eewLastInfo[id]!.eq.depth, _eewLastInfo[id]!.eq.time, _getCurrentTime());
+      _eewDist[id] = dist["s_dist"]!;
+      final circleData =
+          circle(LatLng(_eewLastInfo[id]!.eq.lat, _eewLastInfo[id]!.eq.lon), dist["s_dist"]!, steps: 256);
+      await _mapController.setGeoJsonSource("${id}-circle", {
         "type": "FeatureCollection",
         "features": [circleData]
       });
-      final circleDataP = circle(LatLng(eew.eq.lat, eew.eq.lon), dist["p_dist"]!, steps: 256);
-      await _mapController.setGeoJsonSource("${eew.id}-circle-p", {
+      final circleDataP =
+          circle(LatLng(_eewLastInfo[id]!.eq.lat, _eewLastInfo[id]!.eq.lon), dist["p_dist"]!, steps: 256);
+      await _mapController.setGeoJsonSource("${id}-circle-p", {
         "type": "FeatureCollection",
         "features": [circleDataP]
       });
@@ -399,22 +733,24 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   int _getCurrentTime() => (_timeReplay != 0) ? _timeReplay : DateTime.now().millisecondsSinceEpoch + _timeOffset;
 
-  void _removeOldEews() {
-    final currentEewIds = _eewData.map((e) => e.id).toSet();
-    _eewIdList.removeWhere((id) {
-      if (!currentEewIds.contains(id)) {
-        _removeEewLayers(id);
-        _eewIntensityArea.remove(id);
-        _eewDist.remove(id);
-        _updateMapArea();
-        _updateMarkers();
-        return true;
-      }
-      return false;
-    });
+  void _removeOldEews(List<Eew> data) async {
+    final currentEewIds = data.map((e) => e.id).toSet();
+    final idsToRemove = _eewLastInfo.keys.where((id) => !currentEewIds.contains(id)).toList();
+
+    for (var id in idsToRemove) {
+      _eewLastInfo.remove(id);
+      await _removeEewLayers(id);
+      _eewIntensityArea.remove(id);
+      _eewUpdateList.remove(id);
+      _userEewArriveTime.remove(id);
+      _userEewIntensity.remove(id);
+      _eewDist.remove(id);
+      _updateMapArea();
+      _updateMarkers();
+    }
   }
 
-  void _removeEewLayers(String id) async {
+  Future<void> _removeEewLayers(String id) async {
     await _mapController.removeLayer("$id-wave-outline");
     await _mapController.removeLayer("$id-wave-outline-p");
     await _mapController.removeLayer("$id-wave-bg");
@@ -439,7 +775,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       await _mapController.setLayerProperties(
         'town',
         FillLayerProperties(
-          fillColor: Theme.of(context).colorScheme.surfaceVariant.toHexStringRGB(),
+          fillColor: context.colors.surfaceContainerHighest.toHexStringRGB(),
           fillOpacity: 1,
         ),
       );
@@ -456,7 +792,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 int.parse(entry.key),
                 IntensityColor.intensity(entry.value).toHexStringRGB(),
               ]),
-          Theme.of(context).colorScheme.surfaceVariant.toHexStringRGB(),
+          context.colors.surfaceContainerHighest.toHexStringRGB(),
         ],
         fillOpacity: 1,
       ),
@@ -508,7 +844,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     final features = _stations.entries.where((e) {
       return rtsData.station.containsKey(e.key);
     }).where((e) {
-      if (_eewData.isNotEmpty || (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true)) return false;
+      if (_eewLastInfo.keys.isNotEmpty || (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true))
+        return false;
       return true;
     }).map((e) {
       Map<String, dynamic> properties = {"i": rtsData.station[e.key]?.i};
@@ -578,17 +915,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
-    sheetController.addListener(() {
-      final newSize = sheetController.size;
-      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
-      animController.animateTo(scrollPosition, duration: Duration.zero);
-    });
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    const sheetInitialSize = 0.16;
+    const sheetInitialSize = 0.2;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.monitor),
@@ -596,39 +928,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap),
-          Positioned.fill(
-            child: DraggableScrollableSheet(
-              initialChildSize: sheetInitialSize,
-              minChildSize: sheetInitialSize,
-              controller: sheetController,
-              builder: (context, scrollController) {
-                return Container(
-                  color: context.colors.surface.withOpacity(0.9),
-                  child: ListView(
-                    controller: scrollController,
-                    children: [
-                      SizedBox(
-                        height: 24,
-                        child: Center(
-                          child: Container(
-                            width: 32,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: context.colors.onSurfaceVariant.withOpacity(0.4),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
           Positioned(
-            left: 10,
-            top: 10,
+            left: 4,
+            top: 4,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -639,11 +941,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: Colors.black12.withOpacity(0.5),
                   ),
                   child: Text(
-                    DateFormat('yyyy-MM-dd HH:mm:ss').format((!_dataStatus())
-                        ? DateTime.fromMillisecondsSinceEpoch(_lsatGetRtsDataTime)
+                    DateFormat('yyyy/MM/dd HH:mm:ss').format((!_dataStatus())
+                        ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _lsatGetRtsDataTime)
                         : (_timeReplay == 0)
-                            ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
-                            : DateTime.fromMillisecondsSinceEpoch(_timeReplay)),
+                            ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _getCurrentTime())
+                            : tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _timeReplay)),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -658,8 +960,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             ),
           ),
           Positioned(
-            left: 10,
-            top: 40,
+            left: 4,
+            top: 34,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -683,6 +985,18 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 ),
               ),
             ),
+          ),
+          if (_rtsUI.isNotEmpty)
+            Positioned(
+              right: 4,
+              top: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [..._rtsUI],
+              ),
+            ),
+          Positioned.fill(
+            child: EewDraggableSheet(eewUI: _eewUI),
           ),
         ],
       ),
