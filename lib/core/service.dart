@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
-import 'package:dpip/route/settings/content/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -17,44 +15,40 @@ Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();
 bool androidServiceInit = false;
 
-void initBackgroundService() async {
+void androidInitBackgroundService() async {
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   if (isAutoLocatingEnabled) {
     final isNotificationEnabled = await Permission.notification.status;
     final isLocationAlwaysEnabled = await Permission.locationAlways.status;
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
-      if (Platform.isAndroid) {
-        androidForegroundService();
-        service.on('sendposition').listen((event) {
-          if (event != null) {
-            var positionData = event.values.first;
-            var position = positionData['position'];
-            String country = position['country'];
-            List<String> parts = country.split(' ');
+      androidForegroundService();
+      service.on('sendposition').listen((event) {
+        if (event != null) {
+          var positionData = event.values.first;
+          var position = positionData['position'];
+          String country = position['country'];
+          List<String> parts = country.split(' ');
 
-            if (parts.length == 3) {
-              String code = parts[2];
+          if (parts.length == 3) {
+            String code = parts[2];
 
-              if (Global.location.containsKey(code)) {
-                Location locationInfo = Global.location[code]!;
+            if (Global.location.containsKey(code)) {
+              Location locationInfo = Global.location[code]!;
 
-                SettingsLocationView.updatePosition(locationInfo.city,locationInfo.town);
+              Global.preference.setString("location-city", locationInfo.city);
+              Global.preference.setString("location-town", locationInfo.town);
 
-                Global.preference.setString("location-city", locationInfo.city);
-                Global.preference.setString("location-town", locationInfo.town);
+              print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
+            } else {
+              print('Code $code not found in location data');
 
-                print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
-              } else {
-                print('Code $code not found in location data');
-
-                Global.preference.setString("location-city", "解析失敗");
-                Global.preference.setString("location-town", "解析失敗");
-              }
+              Global.preference.setString("location-city", "解析失敗");
+              Global.preference.setString("location-town", "解析失敗");
             }
           }
-        });
-        androidStartBackgroundService(true);
-      }
+        }
+      });
+      androidStartBackgroundService(true);
     }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/app/dpip.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
@@ -68,7 +70,9 @@ class DpipAppState extends State<DpipApp> {
     super.initState();
     fcmInit();
     notifyInit();
-    initBackgroundService();
+    if (Platform.isAndroid) {
+      androidInitBackgroundService();
+    }
   }
 
   @override
