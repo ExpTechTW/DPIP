@@ -82,10 +82,10 @@ class LocationService {
       }
 
       String citytown = '$city $town $code';
-      String citytowntemp = Global.preference.getString("loc-position-country") ?? "";
+      String citytowntemp = Global.preference.getString("user-country") ?? "";
 
       if (citytowntemp == "" || citytowntemp != citytown) {
-        await Global.preference.setString("loc-position-country", citytown);
+        await Global.preference.setString("user-country", citytown);
         locationGet = LocationResult(citytown, true);
       } else {
         locationGet = LocationResult(citytowntemp, false);
@@ -101,9 +101,9 @@ class LocationService {
     int now = DateTime.now().toUtc().millisecondsSinceEpoch;
     int nowtemp = now - lastLocationUpdate;
     bool positionchange = false;
-    final positionlattemp = Global.preference.getDouble("loc-position-lat") ?? 0.0;
-    final positionlontemp = Global.preference.getDouble("loc-position-lon") ?? 0.0;
-    final positioncountrytemp = Global.preference.getString("loc-position-country") ?? "";
+    final positionlattemp = Global.preference.getDouble("user-lat") ?? 0.0;
+    final positionlontemp = Global.preference.getDouble("user-lon") ?? 0.0;
+    final positioncountrytemp = Global.preference.getString("user-country") ?? "";
     GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
 
     if (nowtemp > 300000 || nowtemp == 0) {
@@ -114,8 +114,6 @@ class LocationService {
       double distance =
           Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
       if (distance >= 250 || nowtemp == 0) {
-        Global.preference.setDouble("loc-position-lat", position.latitude);
-        Global.preference.setDouble("loc-position-lon", position.longitude);
         Global.preference.setDouble("user-lat", position.latitude);
         Global.preference.setDouble("user-lon", position.longitude);
         positionchange = true;
