@@ -267,7 +267,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             },
           ),
           Positioned(
-            top: context.padding.top + 4,
+            top: context.padding.top + 10,
             left: 0,
             right: 0,
             child: Row(
