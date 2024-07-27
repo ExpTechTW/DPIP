@@ -68,7 +68,7 @@ class _ReportListPageState extends State<ReportListPage> {
 
     list = reportList + list;
 
-    list.sort((a, b) => b.time - a.time);
+    list.sort((a, b) => b.time.difference(a.time).inMilliseconds);
 
     setState(() {
       reportList = list;
@@ -126,7 +126,7 @@ class _ReportListPageState extends State<ReportListPage> {
 
                 if (index != 0) {
                   final prev = reportList[index - 1];
-                  if (current.dateTime.day != prev.dateTime.day) {
+                  if (current.time.day != prev.time.day) {
                     showDate = true;
                   }
                 } else {

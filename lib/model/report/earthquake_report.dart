@@ -1,31 +1,47 @@
 import 'package:dpip/model/report/area_intensity.dart';
+import 'package:dpip/util/parser.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:timezone/timezone.dart' as tz;
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:timezone/timezone.dart';
 
 part 'earthquake_report.g.dart';
 
 @JsonSerializable()
 class EarthquakeReport {
   final String id;
-  final double lon;
-  final double lat;
-  final String loc;
+
+  @JsonKey(name: "lon")
+  final double longitude;
+
+  @JsonKey(name: "lat")
+  final double latitude;
+
+  @JsonKey(name: "loc")
+  final String location;
+
   final double depth;
-  final double mag;
+
+  @JsonKey(name: "mag")
+  final double magnitude;
+
   final Map<String, AreaIntensity> list;
-  final int time;
+
+  @JsonKey(fromJson: parseDateTime, toJson: dateTimeToJson)
+  final TZDateTime time;
+
   final int trem;
 
-  EarthquakeReport(
-      {required this.id,
-      required this.lon,
-      required this.lat,
-      required this.loc,
-      required this.depth,
-      required this.mag,
-      required this.list,
-      required this.time,
-      required this.trem});
+  EarthquakeReport({
+    required this.id,
+    required this.longitude,
+    required this.latitude,
+    required this.location,
+    required this.depth,
+    required this.magnitude,
+    required this.list,
+    required this.time,
+    required this.trem,
+  });
 
   factory EarthquakeReport.fromJson(Map<String, dynamic> json) => _$EarthquakeReportFromJson(json);
 
@@ -41,77 +57,83 @@ class EarthquakeReport {
     return null;
   }
 
+  LatLng get latlng => LatLng(latitude, longitude);
+
   bool get hasNumber => number != null;
 
-  Uri get cwaUrl {
+  Uri get reportUrl {
     final arr = id.split("-");
-    arr.removeAt(1);
-    return Uri.parse("https://www.cwa.gov.tw/V8/C/E/EQ/EQ${arr.join('-')}.html");
-  }
-
-  String get reportImageName {
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    final mag = "${(this.mag * 10).floor()}";
+    arr.removeAt(0);
+    final mag = "${(magnitude * 10).floor()}";
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return "EC$month$day$hour$minute$mag${id}_H.png";
-    } else {
-      final year = date.year.toString();
-      final second = date.second.toString().padLeft(2, '0');
-      return "ECL$year$month$day$hour$minute$second${mag}_H.png";
+      return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag$id");
     }
+
+    return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag");
   }
 
-  String get reportImageUrl => "https://www.cwa.gov.tw/Data/earthquake/img/$reportImageName";
+  String get reportImageName {
+    final year = time.year.toString();
+    final month = time.month.toString().padLeft(2, '0');
+    final day = time.day.toString().padLeft(2, '0');
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    final second = time.second.toString().padLeft(2, '0');
+    final mag = "${(magnitude * 10).floor()}";
 
-  String get zipName {
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
-    final year = date.year.toString();
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    final second = date.second.toString().padLeft(2, '0');
+    if (hasNumber) {
+      final id = number!.substring(3);
+      return "$year$month$day$hour$minute$second$mag${id}_H.png";
+    }
 
-    return "EQ$number-$year-$month$day-$hour$minute$second";
+    return "$year$month$day$hour$minute$second${mag}_H.png";
   }
 
-  String get zipUrl => "https://www.cwa.gov.tw/Data/earthquake/zip/$zipName";
+  String get reportImageUrl {
+    final name = reportImageName;
+    final time = name.substring(0, 6);
+    return "https://scweb.cwa.gov.tw/webdata/OLDEQ/$time/$reportImageName";
+  }
+
+  String? get mapImageBaseName {
+    if (!hasNumber) return null;
+
+    final year = time.year.toString();
+    final id = number!.substring(3);
+
+    return "$year$id";
+  }
+
+  String get traceBaseUrl {
+    final year = time.year.toString();
+    return "https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year/";
+  }
 
   String? get intensityMapImageName {
     if (!hasNumber) return null;
 
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
-    final year = date.year.toString();
-    return "$year${number!.substring(3)}i.png";
+    return "${mapImageBaseName}i.png";
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null ? null : "$zipUrl/$intensityMapImageName";
+  String? get intensityMapImageUrl => intensityMapImageName == null ? null : "$traceBaseUrl/$intensityMapImageName";
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
 
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
-    final year = date.year.toString();
-    return "$year${number!.substring(3)}a.png";
+    return "${mapImageBaseName}a.png";
   }
 
-  String? get pgaMapImageUrl => pgaMapImageName == null ? null : "$zipUrl/$pgaMapImageName";
+  String? get pgaMapImageUrl => pgaMapImageName == null ? null : "$traceBaseUrl/$pgaMapImageName";
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
 
-    final date = tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), time);
-    final year = date.year.toString();
-    return "$year${number!.substring(3)}v.png";
+    return "${mapImageBaseName}v.png";
   }
 
-  String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$zipUrl/$pgvMapImageName";
+  String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$traceBaseUrl/$pgvMapImageName";
 
   int getMaxIntensity() {
     int max = 0;
@@ -126,18 +148,18 @@ class EarthquakeReport {
   }
 
   String getLocation() {
-    if (loc.contains("(")) {
-      return loc.substring(loc.indexOf("(") + 3, loc.indexOf(")"));
+    if (location.contains("(")) {
+      return location.substring(location.indexOf("(") + 3, location.indexOf(")"));
     } else {
-      return loc.substring(0, loc.indexOf("方") + 1);
+      return location.substring(0, location.indexOf("方") + 1);
     }
   }
 
   String convertLatLon() {
     var latFormat = "";
     var lonFormat = "";
-    var latTemp = lat;
-    var lonTemp = lon;
+    var latTemp = latitude;
+    var lonTemp = longitude;
     if (latTemp > 90) {
       latTemp = latTemp - 180;
     }

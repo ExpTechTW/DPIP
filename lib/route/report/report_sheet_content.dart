@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ReportSheetContent extends StatelessWidget {
@@ -31,7 +30,7 @@ class ReportSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.only(bottom: context.padding.bottom).copyWith(left: 16, right: 16),
       controller: controller,
       children: [
         const BottomSheetDragHandle(),
@@ -58,35 +57,39 @@ class ReportSheetContent extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Symbols.open_in_new),
-                tooltip: context.i18n.open_report_url,
-                onPressed: () {
-                  launchUrl(report.cwaUrl);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.replay),
-                tooltip: "重播",
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => MonitorPage(data: report.time - 5000)),
-                  );
-                },
-              ),
             ],
           ),
+        ),
+        Wrap(
+          direction: Axis.horizontal,
+          spacing: 8,
+          children: [
+            ActionChip(
+              avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
+              label: Text(context.i18n.open_report_url),
+              backgroundColor: context.colors.primary,
+              labelStyle: TextStyle(color: context.colors.onPrimary),
+              side: BorderSide(color: context.colors.primary),
+              onPressed: () {
+                launchUrl(report.reportUrl);
+              },
+            ),
+            ActionChip(
+              avatar: const Icon(Symbols.replay),
+              label: const Text("重播"),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
+                );
+              },
+            ),
+          ],
         ),
         const Divider(),
         ReportDetailField(
           label: context.i18n.report_event_time,
           child: Text(
-            DateFormat(context.i18n.datetime_format).format(
-              TZDateTime.fromMillisecondsSinceEpoch(
-                getLocation("Asia/Taipei"),
-                report.time,
-              ),
-            ),
+            DateFormat(context.i18n.datetime_format).format(report.time),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -116,11 +119,11 @@ class ReportSheetContent extends StatelessWidget {
                       margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: MagnitudeColor.magnitude(report.mag),
+                        color: MagnitudeColor.magnitude(report.magnitude),
                       ),
                     ),
                     Text(
-                      "M ${report.mag}",
+                      "M ${report.magnitude}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
