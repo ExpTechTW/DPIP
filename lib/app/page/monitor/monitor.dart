@@ -264,6 +264,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     try {
       int t = DateTime.now().millisecondsSinceEpoch;
       final data = await ExpTech().getRts(_timeReplay);
+      if (data.time < (_rtsData?.time ?? 0)) return;
       _ping = DateTime.now().millisecondsSinceEpoch - t;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
@@ -777,7 +778,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       await _mapController.setLayerProperties(
         'town',
         FillLayerProperties(
-          fillColor: Theme.of(context).colorScheme.surfaceVariant.toHexStringRGB(),
+          fillColor: context.colors.surfaceVariant.toHexStringRGB(),
           fillOpacity: 1,
         ),
       );
@@ -794,7 +795,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 int.parse(entry.key),
                 IntensityColor.intensity(entry.value).toHexStringRGB(),
               ]),
-          Theme.of(context).colorScheme.surfaceVariant.toHexStringRGB(),
+          context.colors.surfaceVariant.toHexStringRGB(),
         ],
         fillOpacity: 1,
       ),
