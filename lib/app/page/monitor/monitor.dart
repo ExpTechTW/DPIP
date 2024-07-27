@@ -53,11 +53,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   final Map<String, dynamic> _eewIntensityArea = {};
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
+  bool _isEewBoxVisible = true;
   int _isTsunamiVisible = 0;
   final sheetController = DraggableScrollableController();
   final sheetInitialSize = 0.2;
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
+  List<Widget> _eewUI = [];
 
   @override
   void initState() {
@@ -343,6 +345,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _processEewData(List<Eew> data) {
+    _eewUI = [];
     for (var eew in data) {
       if (!_eewIdList.contains(eew.id)) {
         _eewIdList.add(eew.id);
@@ -351,6 +354,231 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _updateMapArea();
         _updateMarkers();
       }
+
+      _eewUI.add(Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: !_isEewBoxVisible
+                      ? Colors.grey
+                      : eew.status == 1
+                          ? const Color(0xFFC80000)
+                          : const Color(0xFFFFC800),
+                  width: 3,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        eew.status == 1 ? "緊急地震速報" : "地震速報",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: context.colors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        "第 ${eew.serial} 報",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: context.colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  eew.eq.loc,
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: context.colors.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "${DateFormat('yyyy/MM/dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(eew.eq.time))} 發震",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: context.colors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "M ${eew.eq.mag}",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    color: context.colors.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "${eew.eq.depth} km",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: context.colors.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: IntensityColor.intensity(eew.eq.max),
+                        ),
+                        child: Center(
+                          child: Text(
+                            eew.eq.max.asIntensityLabel,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28,
+                                color: IntensityColor.onIntensity(eew.eq.max)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Divider(color: context.colors.onSurface, height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: IntensityColor.intensity(2),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "所在地預估",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 12, color: IntensityColor.onIntensity(2)),
+                            ),
+                            Text(
+                              2.asIntensityLabel,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 40, color: IntensityColor.onIntensity(2)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 80,
+                        width: 150,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "震波",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: context.colors.onSurfaceVariant,
+                              ),
+                            ),
+                            false //震波抵達?
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "抵達",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 36,
+                                            color: IntensityColor.onIntensity(2)),
+                                      ),
+                                    ],
+                                  )
+                                : Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "5",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        "秒後抵達",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold, fontSize: 14, color: context.colors.onSurface),
+                                      ),
+                                    ],
+                                  ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ));
+    }
+    if (_eewUI.isEmpty) {
+      _eewUI.add(Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.grey,
+                  width: 3,
+                ),
+              ),
+              child: const Text(
+                "無生效中的地震速報",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+          ],
+        ),
+      ));
+    } else {
+      _isEewBoxVisible = !_isEewBoxVisible;
     }
   }
 
@@ -616,7 +844,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: Colors.black12.withOpacity(0.5),
                   ),
                   child: Text(
-                    DateFormat('yyyy-MM-dd HH:mm:ss').format((!_dataStatus())
+                    DateFormat('yyyy/MM/dd HH:mm:ss').format((!_dataStatus())
                         ? DateTime.fromMillisecondsSinceEpoch(_lsatGetRtsDataTime)
                         : (_timeReplay == 0)
                             ? DateTime.fromMillisecondsSinceEpoch(_getCurrentTime())
@@ -685,214 +913,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                           ),
                         ),
                       ),
-                      // for (final eew in _eewData) Text(eew.id),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: true ? Color(0xFFC80000) : Color(0xFFFFC800),
-                                  width: 3,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        true ? "緊急地震速報" : "地震速報", // 地震速報 4|5- 緊急地震速報
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: context.colors.onSurface,
-                                        ),
-                                      ),
-                                      Text(
-                                        "第 1 報",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: context.colors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "花蓮縣秀林鄉",
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    color: context.colors.onSurface,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "2024/07/25 00:00:00 發生",
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: context.colors.onSurfaceVariant,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  "M6.0",
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    color: context.colors.onSurface,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "20km",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: context.colors.onSurface,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Container(
-                                        //最大震度
-                                        width: 50,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: IntensityColor.intensity(5),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            5.asIntensityLabel,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 28,
-                                                color: IntensityColor.onIntensity(5)),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Divider(
-                                    color: context.colors.onSurface,
-                                    height: 30,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        width: 100,
-                                        height: 100,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
-                                          color: IntensityColor.intensity(2),
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              "所在地預估",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12,
-                                                  color: IntensityColor.onIntensity(2)),
-                                            ),
-                                            Text(
-                                              2.asIntensityLabel,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 40,
-                                                  color: IntensityColor.onIntensity(2)),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 80,
-                                        width: 150,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "震波",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: context.colors.onSurfaceVariant,
-                                              ),
-                                            ),
-                                            false //震波抵達?
-                                                ? Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Text(
-                                                        "抵達",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 36,
-                                                            color: IntensityColor.onIntensity(2)),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                    mainAxisAlignment: MainAxisAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                        "5",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 36,
-                                                            color: context.colors.onSurface),
-                                                      ),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Text(
-                                                        "秒後抵達",
-                                                        style: TextStyle(
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 14,
-                                                            color: context.colors.onSurface),
-                                                      ),
-                                                    ],
-                                                  ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ..._eewUI,
                     ],
                   ),
                 );
