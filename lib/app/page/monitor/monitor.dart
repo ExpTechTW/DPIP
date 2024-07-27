@@ -627,7 +627,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 36,
-                                            color: IntensityColor.onIntensity(2)),
+                                            color: context.colors.onSurface),
                                       ),
                                     ],
                                   )
@@ -938,7 +938,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black12.withOpacity(0.5),
+                    color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
                     DateFormat('yyyy/MM/dd HH:mm:ss').format((!_dataStatus())
@@ -969,7 +969,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black12.withOpacity(0.5),
+                    color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
                     (!_dataStatus()) ? "999+ms" : "${_ping}ms",
