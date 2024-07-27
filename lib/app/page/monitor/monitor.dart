@@ -440,8 +440,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         Map<String, dynamic> info = eewLocationInfo(eew.eq.mag, eew.eq.depth, eew.eq.lat, eew.eq.lon, userLat, userLon);
         _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
         _userEewArriveTime[eew.id] = {
-          "s": (_getCurrentTime() + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
-          "p": (_getCurrentTime() + pWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+          "s": (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+          "p": (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
         };
       }
 
@@ -604,7 +604,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               ),
                             ),
                             (!isUserLocationValid ||
-                                    ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000).round() <= 0)
+                                    ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000).floor() <= 0)
                                 ? Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -623,7 +623,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     children: [
                                       Text(
                                         ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000)
-                                            .round()
+                                            .floor()
                                             .toString(),
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
