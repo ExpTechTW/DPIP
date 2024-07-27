@@ -24,37 +24,7 @@ void initBackgroundService() async {
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
       if (Platform.isAndroid) {
         androidForegroundService();
-        service.on('sendposition').listen((event) {
-          if (event != null) {
-            var positionData = event.values.first;
-            var position = positionData['position'];
-            String country = position['country'];
-            List<String> parts = country.split(' ');
-
-            if (parts.length == 3) {
-              String code = parts[2];
-
-              if (Global.location.containsKey(code)) {
-                Location locationInfo = Global.location[code]!;
-
-                Global.preference.setString("location-city", locationInfo.city);
-                Global.preference.setString("location-town", locationInfo.town);
-
-                print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
-              } else {
-                print('Code $code not found in location data');
-
-                Global.preference.setString("location-city", "解析失敗");
-                Global.preference.setString("location-town", "解析失敗");
-              }
-            }
-
-            var latitude = position['latitude'];
-            var longitude = position['longitude'];
-            Global.preference.setDouble("user-lat", latitude);
-            Global.preference.setDouble("user-lon", longitude);
-          }
-        });
+        androidSendPositionlisten();
         androidStartBackgroundService(true);
       }
     }
@@ -64,6 +34,7 @@ void initBackgroundService() async {
 void androidStartBackgroundService(bool init) async {
   if (!androidServiceInit) {
     androidForegroundService();
+    androidSendPositionlisten();
   }
   var isRunning = await service.isRunning();
   if (!isRunning) {
@@ -81,6 +52,35 @@ void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
     }
     service.invoke("stopService");
   }
+}
+
+void androidSendPositionlisten(){
+  service.on('sendposition').listen((event) {
+    if (event != null) {
+      var positionData = event.values.first;
+      var position = positionData['position'];
+      String country = position['country'];
+      List<String> parts = country.split(' ');
+
+      if (parts.length == 3) {
+        String code = parts[2];
+
+        if (Global.location.containsKey(code)) {
+          Location locationInfo = Global.location[code]!;
+
+          Global.preference.setString("location-city", locationInfo.city);
+          Global.preference.setString("location-town", locationInfo.town);
+
+          print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
+        } else {
+          print('Code $code not found in location data');
+
+          Global.preference.setString("location-city", "解析失敗");
+          Global.preference.setString("location-town", "解析失敗");
+        }
+      }
+    }
+  });
 }
 
 Future<void> androidForegroundService() async {
