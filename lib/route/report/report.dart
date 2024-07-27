@@ -312,6 +312,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           Positioned.fill(
             top: context.padding.top + appBar.preferredSize.height - 24,
             child: DraggableScrollableSheet(
+              key: const GlobalObjectKey("DraggableScrollableSheet"),
               initialChildSize: sheetInitialSize,
               minChildSize: sheetInitialSize,
               controller: sheetController,
