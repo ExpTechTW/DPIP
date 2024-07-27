@@ -25,7 +25,6 @@ class ReportRoute extends StatefulWidget {
 class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin {
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
-  final key = GlobalKey();
 
   // FIXME: workaround waiting for upstream PR to merge
   // https://github.com/material-foundation/flutter-packages/pull/599
@@ -313,7 +312,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           Positioned.fill(
             top: context.padding.top + appBar.preferredSize.height - 24,
             child: DraggableScrollableSheet(
-              key: key,
+              key: GlobalObjectKey("DraggableScrollableSheet"),
               initialChildSize: sheetInitialSize,
               minChildSize: sheetInitialSize,
               controller: sheetController,
