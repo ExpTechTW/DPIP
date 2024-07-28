@@ -2,7 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-class SoundListTile extends StatelessWidget {
+class SoundListTile extends StatefulWidget {
   final String title;
   final String subtitle;
   final String file;
@@ -15,17 +15,39 @@ class SoundListTile extends StatelessWidget {
   });
 
   @override
+  SoundListTileState createState() => SoundListTileState();
+}
+
+class SoundListTileState extends State<SoundListTile> {
+  static final AudioPlayer audioPlayer = AudioPlayer();
+  bool isPlaying = false;
+
+  void playSound() async {
+    if (isPlaying) {
+      await audioPlayer.stop();
+    }
+
+    await audioPlayer.setSource(AssetSource(widget.file));
+    await audioPlayer.resume();
+
+    setState(() {
+      isPlaying = true;
+    });
+
+    audioPlayer.onPlayerComplete.listen((_) {
+      setState(() {
+        isPlaying = false;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListTile(
       trailing: const Icon(Symbols.play_circle, fill: 1),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      onTap: () async {
-        final audioPlayer = AudioPlayer();
-
-        await audioPlayer.setSource(AssetSource(file));
-        await audioPlayer.resume();
-      },
+      title: Text(widget.title),
+      subtitle: Text(widget.subtitle),
+      onTap: playSound,
     );
   }
 }
