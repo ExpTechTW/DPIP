@@ -35,9 +35,11 @@ class SoundListTileState extends State<SoundListTile> {
     });
 
     audioPlayer.onPlayerComplete.listen((_) {
-      setState(() {
-        isPlaying = false;
-      });
+      if (mounted) {
+        setState(() {
+          isPlaying = false;
+        });
+      }
     });
   }
 
