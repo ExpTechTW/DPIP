@@ -41,7 +41,7 @@ class _DpipState extends State<Dpip> {
           NavigationDestination(
             icon: const Icon(Symbols.timeline),
             selectedIcon: const Icon(Symbols.timeline, fill: 1),
-            label: context.i18n.report,
+            label: context.i18n.history,
           ),
           // NavigationDestination(
           //   icon: const Icon(Symbols.map),
