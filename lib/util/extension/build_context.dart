@@ -6,4 +6,6 @@ extension CommonContext on BuildContext {
   ThemeData get theme => Theme.of(this);
   ColorScheme get colors => Theme.of(this).colorScheme;
   ScaffoldMessengerState get scaffoldMessenger => ScaffoldMessenger.of(this);
+  Size get dimension => MediaQuery.sizeOf(this);
+  EdgeInsets get padding => MediaQuery.paddingOf(this);
 }

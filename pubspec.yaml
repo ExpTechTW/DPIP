@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.0.26
+version: 2.1.1
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -46,6 +46,9 @@ dependencies:
   url_launcher: ^6.3.0
   cached_network_image: ^3.3.1
   fluttertoast: ^8.2.6
+  disable_battery_optimization: ^1.1.1
+  device_info_plus: ^10.1.0
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +66,8 @@ flutter:
     - assets/map/icons/
     - assets/DPIP.png
     - assets/location.json
+    - assets/time.json
+    - assets/box.json
     - assets/eew.wav
     - assets/eew_alert.wav
     - assets/eq.wav

@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/util/depth_color.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -12,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ReportSheetContent extends StatelessWidget {
@@ -30,7 +30,7 @@ class ReportSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.only(bottom: context.padding.bottom).copyWith(left: 16, right: 16),
       controller: controller,
       children: [
         const BottomSheetDragHandle(),
@@ -45,7 +45,9 @@ class ReportSheetContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      report.hasNumber ? "編號 ${report.number} 顯著有感地震" : "小區域有感地震",
+                      report.hasNumber
+                          ? context.i18n.report_with_number(report.number!)
+                          : context.i18n.report_without_number,
                       style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                     ),
                     Text(
@@ -55,26 +57,39 @@ class ReportSheetContent extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Symbols.open_in_new),
-                tooltip: "報告頁面",
-                onPressed: () {
-                  launchUrl(report.cwaUrl);
-                },
-              ),
             ],
           ),
         ),
+        Wrap(
+          direction: Axis.horizontal,
+          spacing: 8,
+          children: [
+            ActionChip(
+              avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
+              label: Text(context.i18n.open_report_url),
+              backgroundColor: context.colors.primary,
+              labelStyle: TextStyle(color: context.colors.onPrimary),
+              side: BorderSide(color: context.colors.primary),
+              onPressed: () {
+                launchUrl(report.reportUrl);
+              },
+            ),
+            ActionChip(
+              avatar: const Icon(Symbols.replay),
+              label: const Text("重播"),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
+                );
+              },
+            ),
+          ],
+        ),
         const Divider(),
         ReportDetailField(
-          label: "發震時間",
+          label: context.i18n.report_event_time,
           child: Text(
-            DateFormat('yyyy/MM/dd HH:mm:ss').format(
-              TZDateTime.fromMillisecondsSinceEpoch(
-                getLocation("Asia/Taipei"),
-                report.time,
-              ),
-            ),
+            DateFormat(context.i18n.datetime_format).format(report.time),
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -82,7 +97,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         ),
         ReportDetailField(
-          label: "位於",
+          label: context.i18n.report_location,
           child: Text(
             report.convertLatLon(),
             style: const TextStyle(
@@ -95,7 +110,7 @@ class ReportSheetContent extends StatelessWidget {
           children: [
             Expanded(
               child: ReportDetailField(
-                label: "地震規模",
+                label: context.i18n.report_magnitude,
                 child: Row(
                   children: [
                     Container(
@@ -104,11 +119,11 @@ class ReportSheetContent extends StatelessWidget {
                       margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: MagnitudeColor.magnitude(report.mag),
+                        color: MagnitudeColor.magnitude(report.magnitude),
                       ),
                     ),
                     Text(
-                      "M ${report.mag}",
+                      "M ${report.magnitude}",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -120,7 +135,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
             Expanded(
               child: ReportDetailField(
-                label: "震源深度",
+                label: context.i18n.report_depth,
                 child: Row(
                   children: [
                     Container(
@@ -147,7 +162,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         ReportDetailField(
-          label: "各地震度",
+          label: context.i18n.report_intensity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -160,7 +175,7 @@ class ReportSheetContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 6),
+                            padding: const EdgeInsets.only(top: 8),
                             child: Text(
                               areaName,
                               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -170,12 +185,14 @@ class ReportSheetContent extends StatelessWidget {
                           Expanded(
                             child: Wrap(
                               spacing: 8,
+                              runSpacing: 8,
                               children: [
                                 for (final MapEntry(key: townName, value: town) in area.town.entries)
                                   ActionChip(
                                     padding: const EdgeInsets.all(4),
                                     side: BorderSide(color: IntensityColor.intensity(town.intensity)),
                                     backgroundColor: IntensityColor.intensity(town.intensity).withOpacity(0.16),
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     avatar: AspectRatio(
                                       aspectRatio: 1,
                                       child: Container(
@@ -212,7 +229,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         ReportDetailField(
-          label: "地震報告圖",
+          label: context.i18n.report_image,
           child: EnlargeableImage(
             aspectRatio: 4 / 3,
             heroTag: "report-image-${report.id}",
@@ -222,7 +239,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         if (report.hasNumber)
           ReportDetailField(
-            label: "震度圖",
+            label: context.i18n.report_intensity_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: "intensity-image-${report.id}",
@@ -232,7 +249,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         if (report.hasNumber)
           ReportDetailField(
-            label: "最大地動加速度圖",
+            label: context.i18n.report_pga_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: "pga-image-${report.id}",
@@ -242,7 +259,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         if (report.hasNumber)
           ReportDetailField(
-            label: "最大地動速度圖",
+            label: context.i18n.report_pgv_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: "pgv-image-${report.id}",

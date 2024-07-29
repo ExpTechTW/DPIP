@@ -1,3 +1,4 @@
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:dpip/widget/settings/sound/sound_list_tile.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
   Widget build(BuildContext context) {
     return Material(
       child: ListView(
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: const [
           ListTileGroupHeader(title: "地震速報音效"),
@@ -31,7 +32,7 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
           ListTileGroupHeader(title: "地震資訊"),
           SoundListTile(
             title: "震度速報",
-            subtitle: "TREM 觀測網 所在地實測震度 1 以上",
+            subtitle: "TREM 觀測網 所在地實測震度 3 以上",
             file: "int_report.wav",
           ),
           SoundListTile(
@@ -41,7 +42,7 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
           ),
           SoundListTile(
             title: "地震報告",
-            subtitle: "地震報告 所在地震度 1 以上",
+            subtitle: "地震報告 所在地震度 3 以上",
             file: "report.wav",
           ),
           ListTileGroupHeader(title: "防災資訊"),
@@ -51,9 +52,19 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
             file: "rain.wav",
           ),
           SoundListTile(
+            title: "大雨特報",
+            subtitle: "所在地發布 大雨特報",
+            file: "normal.wav",
+          ),
+          SoundListTile(
             title: "豪雨特報",
             subtitle: "所在地發布 豪雨特報",
             file: "weather.wav",
+          ),
+          SoundListTile(
+            title: "淹水警戒",
+            subtitle: "所在地發布 淹水警戒",
+            file: "warn.wav",
           ),
           SoundListTile(
             title: "海嘯警報（警報）",
@@ -71,11 +82,6 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
             file: "warn.wav",
           ),
           SoundListTile(
-            title: "大雨特報",
-            subtitle: "所在地發布 大雨特報",
-            file: "normal.wav",
-          ),
-          SoundListTile(
             title: "高溫資訊",
             subtitle: "所在地發布 高溫資訊",
             file: "normal.wav",
@@ -87,8 +93,8 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
           ),
           ListTileGroupHeader(title: "其他"),
           SoundListTile(
-            title: "防空核子警報",
-            subtitle: "所在地發布 防空核子警報",
+            title: "其他類型警報",
+            subtitle: "所在地發布 其他類型警報",
             file: "warn.wav",
           ),
           SoundListTile(

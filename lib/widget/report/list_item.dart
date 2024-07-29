@@ -5,7 +5,6 @@ import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/widget/report/intensity_box.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:timezone/timezone.dart';
 
 class ReportListItem extends StatelessWidget {
   final PartialEarthquakeReport report;
@@ -44,12 +43,7 @@ class ReportListItem extends StatelessWidget {
                   children: [
                     if (showDate)
                       Text(
-                        DateFormat("yyyy/MM/dd").format(
-                          TZDateTime.fromMillisecondsSinceEpoch(
-                            getLocation("Asia/Taipei"),
-                            report.time,
-                          ),
-                        ),
+                        DateFormat(context.i18n.date_format).format(report.time),
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           color: context.colors.onSurfaceVariant,
@@ -58,12 +52,7 @@ class ReportListItem extends StatelessWidget {
                         ),
                       ),
                     Text(
-                      DateFormat("HH:mm:ss").format(
-                        TZDateTime.fromMillisecondsSinceEpoch(
-                          getLocation("Asia/Taipei"),
-                          report.time,
-                        ),
-                      ),
+                      DateFormat(context.i18n.time_format).format(report.time),
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         color: context.colors.onSurfaceVariant,
@@ -123,7 +112,8 @@ class ReportListItem extends StatelessWidget {
                      * 規模、深度
                      */
                     Text(
-                      "M ${report.mag.toStringAsFixed(1)}　深度 ${report.depth} km",
+                      context.i18n
+                          .report_list_item_subtitle(report.magnitude.toStringAsFixed(1), report.depth.toString()),
                       style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
                   ],

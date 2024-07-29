@@ -5,12 +5,13 @@ import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/util/intensity_color.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -32,19 +33,27 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   late final decorationTween = DecorationTween(
     begin: BoxDecoration(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+      boxShadow: kElevationToShadow[4],
       color: backgroundColor,
     ),
     end: BoxDecoration(
       borderRadius: BorderRadius.zero,
+      boxShadow: kElevationToShadow[4],
       color: backgroundColor,
     ),
   ).chain(CurveTween(curve: Curves.linear));
 
-  final sheetInitialSize = 0.2;
+  final opacityTween = Tween(
+    begin: 0.0,
+    end: 1.0,
+  ).chain(CurveTween(curve: Curves.linear));
+
+  late final sheetInitialSize = context.padding.bottom / context.dimension.height + 0.2;
   final sheetController = DraggableScrollableController();
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   late ScrollController scrollController;
 
+  bool isAppBarVisible = false;
   bool isLoading = true;
   bool isLoaded = false;
 
@@ -64,8 +73,14 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       List features = [];
       List<double> bounds = [];
 
-      for (var MapEntry(key: _, value: area) in data.list.entries) {
+      Map<String, int> cityMaxIntensity = {};
+
+      for (var MapEntry(key: areaName, value: area) in data.list.entries) {
         for (var MapEntry(key: _, value: town) in area.town.entries) {
+          if (cityMaxIntensity[areaName] == null || cityMaxIntensity[areaName]! < town.intensity) {
+            cityMaxIntensity[areaName] = town.intensity;
+          }
+
           features.add({
             "type": "Feature",
             "properties": {
@@ -91,12 +106,12 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           "intensity": 10, // 10 is for classifying epicenter cross
         },
         "geometry": {
-          "coordinates": [data.lon, data.lat],
-          "type": "Point"
+          "coordinates": data.latlng.toGeoJsonCoordinates(),
+          "type": "Point",
         }
       });
 
-      expandBounds(bounds, LatLng(data.lat, data.lon));
+      expandBounds(bounds, data.latlng);
 
       await controller.moveCamera(
         CameraUpdate.newLatLngBounds(
@@ -171,13 +186,12 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         ),
       );
 
-      /* 
       await controller.setLayerProperties(
         'county',
         FillLayerProperties(
           fillColor: [
             'match',
-            ['get', 'NAME_2014'],
+            ['get', 'NAME'],
             ...cityMaxIntensity.entries.expand((entry) => [
                   entry.key,
                   IntensityColor.intensity(entry.value).toHexStringRGB(),
@@ -186,7 +200,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           ],
           fillOpacity: 1,
         ),
-      ); */
+      );
+      await controller.setLayerProperties(
+        'town',
+        const FillLayerProperties(fillOpacity: 0),
+      );
 
       setState(() {
         report = data;
@@ -215,74 +233,144 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
-      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+
+      if (scrollPosition > 1e-5) {
+        if (!isAppBarVisible) {
+          setState(() => isAppBarVisible = true);
+        }
+      } else {
+        if (isAppBarVisible) {
+          setState(() => isAppBarVisible = false);
+        }
+      }
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(context.i18n.report),
-      ),
-      body: Stack(children: [
-        DpipMap(
-          onMapCreated: (controller) async {
-            mapController.complete(controller);
-            await controller.setSymbolIconAllowOverlap(true);
-            await controller.setSymbolIconIgnorePlacement(true);
-            refreshReport();
-          },
-        ),
-        Positioned.fill(
-          child: DraggableScrollableSheet(
-            initialChildSize: sheetInitialSize,
-            minChildSize: sheetInitialSize,
-            controller: sheetController,
-            snap: true,
-            builder: (context, controller) {
-              scrollController = controller;
+    final appBar = AppBar(
+      elevation: 4,
+      title: Text(context.i18n.report),
+    );
 
-              return DecoratedBoxTransition(
-                decoration: animController.drive(decorationTween),
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : report == null
-                        ? Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Row(
-                              children: [
-                                const Flexible(
-                                  flex: 8,
-                                  child: Text(
-                                    "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Flexible(
-                                  flex: 2,
-                                  child: IconButton(
-                                    icon: const Icon(Symbols.refresh),
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: context.colors.onSurface,
-                                    ),
-                                    onPressed: () {
-                                      refreshReport();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ReportSheetContent(report: report!, controller: controller, focus: focus),
-              );
+    return Scaffold(
+      body: Stack(
+        children: [
+          DpipMap(
+            onMapCreated: (controller) async {
+              mapController.complete(controller);
+              await controller.setSymbolIconAllowOverlap(true);
+              await controller.setSymbolIconIgnorePlacement(true);
+              refreshReport();
             },
           ),
-        ),
-      ]),
+          if (report != null)
+            Positioned(
+              top: context.padding.top + 50,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: [
+                  if (report!.magnitude >= 6 && report!.magnitude < 7 && report!.getLocation().contains("海"))
+                    Chip(
+                      avatar: Icon(
+                        Symbols.tsunami_rounded,
+                        color: context.theme.extendedColors.blue,
+                      ),
+                      label: Text(
+                        "此地震可能引起若干海面變動",
+                        style: TextStyle(
+                          color: context.theme.extendedColors.blue,
+                        ),
+                      ),
+                      backgroundColor: Colors.blue.withOpacity(0.16),
+                      labelStyle: const TextStyle(fontWeight: FontWeight.w900),
+                      side: BorderSide(color: context.theme.extendedColors.blue),
+                    ),
+                  if (report!.magnitude >= 7 && report!.getLocation().contains("海"))
+                    Chip(
+                      avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
+                      label: Text("此地震可能引起海嘯 注意後續資訊", style: TextStyle(color: context.colors.error)),
+                      backgroundColor: Colors.red.withOpacity(0.16),
+                      labelStyle: const TextStyle(fontWeight: FontWeight.w900),
+                      side: BorderSide(color: context.colors.error),
+                    ),
+                ],
+              ),
+            ),
+          Positioned(
+            top: context.padding.top + 4,
+            left: 4,
+            child: BackButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainer),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            top: context.padding.top + appBar.preferredSize.height - 24,
+            child: DraggableScrollableSheet(
+              key: const GlobalObjectKey("DraggableScrollableSheet"),
+              initialChildSize: sheetInitialSize,
+              minChildSize: sheetInitialSize,
+              controller: sheetController,
+              snap: true,
+              builder: (context, controller) {
+                scrollController = controller;
+
+                return DecoratedBoxTransition(
+                  decoration: animController.drive(decorationTween),
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : report == null
+                          ? Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Row(
+                                children: [
+                                  const Flexible(
+                                    flex: 8,
+                                    child: Text(
+                                      "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    flex: 2,
+                                    child: IconButton(
+                                      icon: const Icon(Symbols.refresh),
+                                      style: ElevatedButton.styleFrom(
+                                        foregroundColor: context.colors.onSurface,
+                                      ),
+                                      onPressed: () {
+                                        refreshReport();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ReportSheetContent(report: report!, controller: controller, focus: focus),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Visibility(
+              visible: isAppBarVisible,
+              child: FadeTransition(
+                opacity: animController.drive(opacityTween),
+                child: appBar,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

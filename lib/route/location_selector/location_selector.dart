@@ -24,7 +24,8 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
 
     String fcmToken = Global.preference.getString("fcm-token") ?? "";
     await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");
-
+    Global.preference.setDouble("user-lat", location.lat);
+    Global.preference.setDouble("user-lon", location.lng);
     if (!mounted) return;
     Navigator.popUntil(context, ModalRoute.withName("/settings"));
   }
