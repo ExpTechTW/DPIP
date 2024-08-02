@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -13,7 +13,7 @@
   "@time_format": {
     "description": "時間顯示格式"
   },
-  "home": "主頁",
+  "home": "首页",
   "@home": {
     "description": "「首頁」頁面標題"
   },
@@ -45,7 +45,7 @@
   "@donate": {
     "description": "「我」頁面 → 應用程式資訊 → 「贊助我們」按鈕"
   },
-  "threads": "于 Threads 上追踪我们",
+  "threads": "在Threads关注我们",
   "@threads": {
     "description": "「我」頁面 → 應用程式資訊 → 「在 Threads 上追蹤我們」按鈕"
   },
