@@ -20,24 +20,44 @@ class SoundListTile extends StatefulWidget {
 
 class SoundListTileState extends State<SoundListTile> {
   static final AudioPlayer audioPlayer = AudioPlayer();
+  static String? currentlyPlayingFile;
   bool isPlaying = false;
 
   void playSound() async {
-    if (isPlaying) {
-      await audioPlayer.stop();
+    if (currentlyPlayingFile == widget.file) {
+      if (isPlaying) {
+        await audioPlayer.stop();
+        setState(() {
+          isPlaying = false;
+        });
+      } else {
+        await audioPlayer.resume();
+        setState(() {
+          isPlaying = true;
+        });
+      }
+    } else {
+      if (currentlyPlayingFile != null) {
+        await audioPlayer.stop();
+        setState(() {
+          isPlaying = false;
+        });
+      }
+
+      await audioPlayer.setSource(AssetSource(widget.file));
+      await audioPlayer.resume();
+
+      setState(() {
+        currentlyPlayingFile = widget.file;
+        isPlaying = true;
+      });
     }
-
-    await audioPlayer.setSource(AssetSource(widget.file));
-    await audioPlayer.resume();
-
-    setState(() {
-      isPlaying = true;
-    });
 
     audioPlayer.onPlayerComplete.listen((_) {
       if (mounted) {
         setState(() {
           isPlaying = false;
+          currentlyPlayingFile = null;
         });
       }
     });
@@ -46,7 +66,7 @@ class SoundListTileState extends State<SoundListTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      trailing: const Icon(Symbols.play_circle, fill: 1),
+      trailing: Icon(isPlaying ? Symbols.stop_circle : Symbols.play_circle, fill: 1),
       title: Text(widget.title),
       subtitle: Text(widget.subtitle),
       onTap: playSound,
