@@ -20,7 +20,7 @@ class SoundListTile extends StatefulWidget {
 
 class SoundListTileState extends State<SoundListTile> {
   static final AudioPlayer audioPlayer = AudioPlayer();
-  static String? currentlyPlayingFile;
+  String? currentlyPlayingFile;
   bool isPlaying = false;
 
   void playSound() async {
@@ -37,12 +37,10 @@ class SoundListTileState extends State<SoundListTile> {
         });
       }
     } else {
-      if (currentlyPlayingFile != null) {
-        await audioPlayer.stop();
-        setState(() {
-          isPlaying = false;
-        });
-      }
+      await audioPlayer.stop();
+      setState(() {
+        isPlaying = false;
+      });
 
       await audioPlayer.setSource(AssetSource(widget.file));
       await audioPlayer.resume();
