@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh_TW",
+  "@@locale": "zh_CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -13,19 +13,19 @@
   "@time_format": {
     "description": "時間顯示格式"
   },
-  "home": "首頁",
+  "home": "主頁",
   "@home": {
     "description": "「首頁」頁面標題"
   },
-  "monitor": "強震監視器",
+  "monitor": "强震监视器",
   "@monitor": {
     "description": "「強震監視器」頁面標題"
   },
-  "report": "地震報告",
+  "report": "地震报告",
   "@report": {
     "description": "「地震報告」頁面標題"
   },
-  "map": "地圖",
+  "map": "地图",
   "@map": {
     "description": "「地圖」頁面標題"
   },
@@ -33,19 +33,19 @@
   "@me": {
     "description": "「我」頁面標題"
   },
-  "settings": "設定",
+  "settings": "设置",
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "調整 DPIP 的運作方式。",
+  "settingsDescription": "调整 DPIP 的运行方式",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
-  "donate": "贊助我們",
+  "donate": "赞助我们",
   "@donate": {
     "description": "「我」頁面 → 應用程式資訊 → 「贊助我們」按鈕"
   },
-  "threads": "在 Threads 上追蹤我們",
+  "threads": "于 Threads 上追踪我们",
   "@threads": {
     "description": "「我」頁面 → 應用程式資訊 → 「在 Threads 上追蹤我們」按鈕"
   },
@@ -53,11 +53,11 @@
   "@youtube": {
     "description": "「我」頁面 → 應用程式資訊 → 「YouTube 直播」按鈕"
   },
-  "server_status": "伺服器狀態",
+  "server_status": "服务器状态",
   "@server_status": {
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
-  "third_party_libraries": "第三方套件授權",
+  "third_party_libraries": "第三方套件授权",
   "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   },
@@ -75,7 +75,7 @@
       }
     }
   },
-  "report_with_number": "編號 {reportNumber} 顯著有感地震",
+  "report_with_number": "编号 {reportNumber} 显著有感地震",
   "@report_with_number": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
     "placeholders": {
@@ -84,23 +84,23 @@
       }
     }
   },
-  "report_without_number": "小區域有感地震",
+  "report_without_number": "小区域有感地震",
   "@report_without_number": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
   },
-  "open_report_url": "報告頁面",
+  "open_report_url": "报告页面",
   "@open_report_url": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
-  "report_event_time": "發震時間",
+  "report_event_time": "发震时间",
   "@report_event_time": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
   },
-  "report_location": "位於",
+  "report_location": "位于",
   "@report_location": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
   },
-  "report_magnitude": "地震規模",
+  "report_magnitude": "地震规模",
   "@report_magnitude": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
   },
@@ -108,64 +108,24 @@
   "@report_depth": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
   },
-  "report_image": "地震報告圖",
+  "report_image": "地震报告图",
   "@report_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
   },
-  "report_intensity_image": "震度圖",
+  "report_intensity_image": "震度图",
   "@report_intensity_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
   },
-  "report_pga_image": "最大地動加速度圖",
+  "report_pga_image": "峰值地震动加速度图",
   "@report_pga_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
   },
-  "report_pgv_image": "最大地動速度圖",
+  "report_pgv_image": "峰值最大地震动速度图",
   "@report_pgv_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
   },
   "report_intensity": "各地震度",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
-  },
-  "settings_locale": "語言",
-  "@settings_locale": {
-    "description": "「設定」路徑 → 「語言」標題"
-  },
-  "settings_locale_description": "調整 DPIP 的顯示語言",
-  "@settings_locale_description": {
-    "description": "「設定」路徑 → 「語言」副標題敘述"
-  },
-  "settings_display_locale": "顯示語言",
-  "@settings_display_locale": {
-    "description": "「設定」路徑 → 「顯示語言」標題"
-  },
-  "settings_locale_translated": "已翻譯 {percentage}",
-  "@settings_locale_translated": {
-    "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
-    "placeholder": {
-      "percentage": {
-        "type": "string",
-        "description": "已翻譯百分比"
-      }
-    }
-  },
-  "settings_locale_approved": "已校對 {percentage}",
-  "@settings_locale_approved": {
-    "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
-    "placeholder": {
-      "percentage": {
-        "type": "string",
-        "description": "已翻譯百分比"
-      }
-    }
-  },
-  "settings_locale_crowdin": "協助翻譯",
-  "@settings_locale_crowdin": {
-    "description": "「設定」路徑 → 「協助翻譯」標題"
-  },
-  "settings_locale_crowdin_description": "點擊這裡來幫助我們改進 DPIP 的翻譯",
-  "@settings_locale_crowdin_description": {
-    "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   }
 }
