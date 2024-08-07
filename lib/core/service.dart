@@ -36,6 +36,7 @@ void initBackgroundService() async {
 void androidStartBackgroundService(bool init) async {
   if (!androidServiceInit) {
     androidForegroundService();
+    androidSendPositionlisten();
   }
   var isRunning = await service.isRunning();
   if (!isRunning) {
@@ -44,7 +45,6 @@ void androidStartBackgroundService(bool init) async {
     androidstopBackgroundService(false);
     service.startService();
   }
-  androidSendPositionlisten();
 }
 
 void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
