@@ -14,11 +14,18 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
+final stateSettingsLocationView = _SettingsLocationViewState();
+
 class SettingsLocationView extends StatefulWidget {
   const SettingsLocationView({super.key});
 
   @override
-  State<SettingsLocationView> createState() => _SettingsLocationViewState();
+  State<SettingsLocationView> createState() => stateSettingsLocationView;
+
+  static void updatePosition(String? city, String? town, String? locationAuto) {
+    print('Position: $city, $town');
+    stateSettingsLocationView.sendpositionUpdate(city, town, locationAuto);
+  }
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
@@ -382,6 +389,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
+  }
+
+  void sendpositionUpdate(String? cityUpdate, String? townUpdate, String? locationAutoUpdate) {
+    if (mounted) {
+      setState(() {
+        city = cityUpdate;
+        town = townUpdate;
+        locationAuto = locationAutoUpdate;
+      });
+      print('Position updated: $city, $town');
+    }
   }
 
   @override

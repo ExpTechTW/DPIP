@@ -7,6 +7,7 @@ import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
+import 'package:dpip/route/settings/content/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -35,7 +36,6 @@ void initBackgroundService() async {
 void androidStartBackgroundService(bool init) async {
   if (!androidServiceInit) {
     androidForegroundService();
-    androidSendPositionlisten();
   }
   var isRunning = await service.isRunning();
   if (!isRunning) {
@@ -44,6 +44,7 @@ void androidStartBackgroundService(bool init) async {
     androidstopBackgroundService(false);
     service.startService();
   }
+  androidSendPositionlisten();
 }
 
 void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
@@ -72,6 +73,8 @@ void androidSendPositionlisten(){
           Global.preference.setString("location-auto", " (啟用自動定位)");
           Global.preference.setString("location-city", locationInfo.city);
           Global.preference.setString("location-town", locationInfo.town);
+
+          SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town, " (啟用自動定位)");
 
           print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
         } else {
