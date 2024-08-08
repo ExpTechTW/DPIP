@@ -23,11 +23,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await Global.init();
   initializeTimeZones();
-  runApp(
-    const ProviderScope(
-      child: DpipApp(),
-    ),
-  );
+  runApp(const DpipApp());
 }
 
 class DpipApp extends StatefulWidget {

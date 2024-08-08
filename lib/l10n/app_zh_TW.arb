@@ -61,6 +61,10 @@
   "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   },
+  "share": "分享應用程式",
+  "@share": {
+    "description": ""
+  },
   "report_list_item_subtitle": "M {magnitude}　深度 {depth} km",
   "@report_list_item_subtitle": {
     "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",

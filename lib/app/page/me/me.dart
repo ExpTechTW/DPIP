@@ -123,6 +123,13 @@ class _MePageState extends State<MePage> {
                           ));
                         },
                       ),
+                      ActionChip(
+                        avatar: const Icon(Symbols.share),
+                        label: Text(context.i18n.share),
+                        onPressed: () {
+                          launchUrl(Uri.parse("https://status.exptech.dev"));
+                        },
+                      ),
                     ],
                   )
                 ],
