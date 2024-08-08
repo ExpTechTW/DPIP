@@ -1,3 +1,4 @@
+import 'package:dpip/route/settings/content/locale.dart';
 import 'package:dpip/route/settings/content/location.dart';
 import 'package:dpip/route/settings/content/root.dart';
 import 'package:dpip/route/settings/content/sound.dart';
@@ -22,6 +23,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
   Widget build(BuildContext context) {
     final routeTitle = {
       "/": context.i18n.settings,
+      "/locale": context.i18n.settings_locale,
       "/location": "所在地",
       "/sound": "音效測試",
       "/theme": "主題色",
@@ -74,6 +76,9 @@ class _SettingsRouteState extends State<SettingsRoute> {
               }
 
               switch (settings.name) {
+                case "/locale":
+                  child = const SettingsLocaleView();
+                  break;
                 case "/location":
                   child = const SettingsLocationView();
                   break;

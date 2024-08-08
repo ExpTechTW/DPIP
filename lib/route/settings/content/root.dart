@@ -81,6 +81,23 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
+          ListTile(
+            leading: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(Symbols.translate),
+            ),
+            title: Text(
+              context.i18n.settings_locale,
+              style: tileTitleTextStyle,
+            ),
+            subtitle: Text(context.i18n.settings_locale_description),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                "/locale",
+              );
+            },
+          ),
           const ListTileGroupHeader(title: "複製 FCM Token"),
           ListTile(
             leading: Icon(
