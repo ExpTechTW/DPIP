@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
@@ -15,6 +16,7 @@ import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 final stateSettingsLocationView = _SettingsLocationViewState();
+Timer? timer;
 
 class SettingsLocationView extends StatefulWidget {
   const SettingsLocationView({super.key});
@@ -299,6 +301,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     if (Platform.isIOS) {
       try {
         await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
+        timer?.cancel();
       } catch (e) {
         return;
       }
@@ -332,6 +335,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (Platform.isAndroid) {
         androidStartBackgroundService(false);
+      } else if (Platform.isIOS) {
+        timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+          await getSavedLocation();
+        });
       }
 
       Global.preference.remove("location-city");
