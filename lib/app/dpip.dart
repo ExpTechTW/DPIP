@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/history-list/history-list.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
@@ -37,6 +38,11 @@ class _DpipState extends State<Dpip> {
             selectedIcon: const Icon(Symbols.summarize, fill: 1),
             label: context.i18n.report,
           ),
+          NavigationDestination(
+            icon: const Icon(Symbols.timeline),
+            selectedIcon: const Icon(Symbols.timeline, fill: 1),
+            label: context.i18n.history,
+          ),
           // NavigationDestination(
           //   icon: const Icon(Symbols.map),
           //   selectedIcon: const Icon(Symbols.map, fill: 1),
@@ -63,6 +69,7 @@ class _DpipState extends State<Dpip> {
           // HomePage(),
           MonitorPage(data: 0),
           ReportListPage(),
+          HistoryListPage(),
           // MapPage(),
           MePage(),
         ],
