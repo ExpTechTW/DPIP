@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
@@ -22,11 +23,11 @@ class _DpipState extends State<Dpip> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentActivePage,
         destinations: [
-          // NavigationDestination(
-          //   icon: const Icon(Symbols.home),
-          //   selectedIcon: const Icon(Symbols.home, fill: 1),
-          //   label: context.i18n.home,
-          // ),
+          NavigationDestination(
+            icon: const Icon(Symbols.home),
+            selectedIcon: const Icon(Symbols.home, fill: 1),
+            label: context.i18n.home,
+          ),
           NavigationDestination(
             icon: const Icon(Symbols.monitor_heart),
             selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
@@ -60,7 +61,7 @@ class _DpipState extends State<Dpip> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          // HomePage(),
+          HomePage(),
           MonitorPage(data: 0),
           ReportListPage(),
           // MapPage(),
