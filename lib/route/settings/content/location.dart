@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
@@ -14,11 +15,19 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
+final stateSettingsLocationView = _SettingsLocationViewState();
+Timer? timer;
+
 class SettingsLocationView extends StatefulWidget {
   const SettingsLocationView({super.key});
 
   @override
-  State<SettingsLocationView> createState() => _SettingsLocationViewState();
+  State<SettingsLocationView> createState() => stateSettingsLocationView;
+
+  static void updatePosition(String? city, String? town, String? locationAuto) {
+    print('Position: $city, $town');
+    stateSettingsLocationView.sendpositionUpdate(city, town, locationAuto);
+  }
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
@@ -27,6 +36,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
+
+  String? locationAuto = Global.preference.getString("location-auto");
 
   String? city = Global.preference.getString("location-city");
   String? town = Global.preference.getString("location-town");
@@ -290,6 +301,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     if (Platform.isIOS) {
       try {
         await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
+        timer?.cancel();
       } catch (e) {
         return;
       }
@@ -298,6 +310,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
 
     if (isAutoLocatingEnabled) {
+      Global.preference.remove("location-auto");
+
+      locationAuto = "";
       setState(() {
         isAutoLocatingEnabled = false;
       });
@@ -320,6 +335,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (Platform.isAndroid) {
         androidStartBackgroundService(false);
+      } else if (Platform.isIOS) {
+        timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+          await getSavedLocation();
+        });
       }
 
       Global.preference.remove("location-city");
@@ -377,6 +396,17 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
+  }
+
+  void sendpositionUpdate(String? cityUpdate, String? townUpdate, String? locationAutoUpdate) {
+    if (mounted) {
+      setState(() {
+        city = cityUpdate;
+        town = townUpdate;
+        locationAuto = locationAutoUpdate;
+      });
+      print('Position updated: $city, $town');
+    }
   }
 
   @override
@@ -492,7 +522,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               )
             ]),
           ),
-          const ListTileGroupHeader(title: "所在地"),
+          ListTileGroupHeader(
+            title: "所在地 ${locationAuto ?? ""}",
+          ),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
