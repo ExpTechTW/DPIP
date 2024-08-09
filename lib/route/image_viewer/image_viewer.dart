@@ -5,8 +5,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:http/http.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -81,17 +81,17 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
         return;
       }
 
-      final res = await get(Uri.parse(widget.imageUrl));
+      // final res = await get(Uri.parse(widget.imageUrl));
 
-      final result = await ImageGallerySaver.saveImage(
-        res.bodyBytes,
-        quality: 100,
-        name: widget.imageName,
-      );
+      // final result = await ImageGallerySaver.saveImage(
+      //   res.bodyBytes,
+      //   quality: 100,
+      //   name: widget.imageName,
+      // );
 
-      if (!result["isSuccess"]) {
-        throw Exception(result["errorMessage"]);
-      }
+      // if (!result["isSuccess"]) {
+      //   throw Exception(result["errorMessage"]);
+      // }
 
       Fluttertoast.showToast(msg: "已儲存圖片");
     } catch (e) {
