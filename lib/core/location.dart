@@ -82,6 +82,7 @@ class LocationService {
       if (Platform.isIOS) {
         city = placemark.subAdministrativeArea;
         town = placemark.locality;
+        code = placemark.isoCountryCode == "TW" ? placemark.postalCode?.substring(0, 3) : "";
       } else if (Platform.isAndroid) {
         city = placemark.administrativeArea;
         town = placemark.subAdministrativeArea;

@@ -17,16 +17,28 @@ import '../../location_selector/location_selector.dart';
 
 final stateSettingsLocationView = _SettingsLocationViewState();
 Timer? timer;
+typedef PositionUpdateCallback = void Function(String?, String?, String?);
 
 class SettingsLocationView extends StatefulWidget {
-  const SettingsLocationView({super.key});
+  final Function(String?, String?, String?)? onPositionUpdate;
+
+  const SettingsLocationView({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
-  State<SettingsLocationView> createState() => stateSettingsLocationView;
+  State<SettingsLocationView> createState() => _SettingsLocationViewState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
 
   static void updatePosition(String? city, String? town, String? locationAuto) {
-    print('Position: $city, $town');
-    stateSettingsLocationView.sendpositionUpdate(city, town, locationAuto);
+    _activeCallback?.call(city, town, locationAuto);
   }
 }
 
@@ -360,10 +372,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     permissionStatusUpdate();
+    SettingsLocationView.setActiveCallback(sendpositionUpdate);
   }
 
   @override
   void dispose() {
+    SettingsLocationView.clearActiveCallback();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -406,6 +420,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         locationAuto = locationAutoUpdate;
       });
       print('Position updated: $city, $town');
+
+      widget.onPositionUpdate?.call(city, town, locationAuto);
     }
   }
 
