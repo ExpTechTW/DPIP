@@ -143,9 +143,9 @@
   "settings_locale_translated": "Translated {percentage}",
   "@settings_locale_translated": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
-    "placeholder": {
+    "placeholders": {
       "percentage": {
-        "type": "string",
+        "type": "String",
         "description": "已翻譯百分比"
       }
     }
@@ -153,9 +153,9 @@
   "settings_locale_approved": "Approved {percentage}",
   "@settings_locale_approved": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
-    "placeholder": {
+    "placeholders": {
       "percentage": {
-        "type": "string",
+        "type": "String",
         "description": "已翻譯百分比"
       }
     }
