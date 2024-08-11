@@ -148,7 +148,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           data.time.millisecondsSinceEpoch + i * 5000,
         );
 
-        if (distance["s_dist"] == null) continue;
+        if (distance["s_dist"] == null || distance["s_dist"]! < 0) continue;
 
         waves.add(
           circle(
