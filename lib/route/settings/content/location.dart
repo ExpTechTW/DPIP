@@ -347,11 +347,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (Platform.isAndroid) {
         androidStartBackgroundService(false);
-      } else if (Platform.isIOS) {
-        await getSavedLocation();
-        timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
-          await getSavedLocation();
-        });
       }
 
       Global.preference.remove("location-city");
