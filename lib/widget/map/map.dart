@@ -17,7 +17,7 @@ class DpipMap extends StatefulWidget {
 
   const DpipMap({
     super.key,
-    this.initialCameraPosition = const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
+    this.initialCameraPosition = const CameraPosition(target: LatLng(23.2, 120.8), zoom: 6),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
