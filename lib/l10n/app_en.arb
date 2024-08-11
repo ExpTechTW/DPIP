@@ -132,7 +132,7 @@
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
   },
-  "settings_locale_description": "調整 DPIP 的顯示語言",
+  "settings_locale_description": "Adjust the display language of DPIP",
   "@settings_locale_description": {
     "description": "「設定」路徑 → 「語言」副標題敘述"
   },
