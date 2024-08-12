@@ -70,10 +70,10 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               child: Icon(Symbols.format_paint),
             ),
             title: Text(
-              context.i18n.settings_ThemeColor,
+              context.i18n.settings_theme,
               style: tileTitleTextStyle,
             ),
-            subtitle: Text(context.i18n.settings_ThemeColor_description),
+            subtitle: Text(context.i18n.settings_theme_description),
             onTap: () {
               Navigator.pushNamed(
                 context,
