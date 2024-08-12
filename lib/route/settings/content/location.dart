@@ -406,8 +406,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         city = cityUpdate;
         town = townUpdate;
       });
-      print('Position updated: $city, $town');
-
       widget.onPositionUpdate?.call(city, town);
     }
   }

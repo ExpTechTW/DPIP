@@ -74,8 +74,6 @@ void androidSendPositionlisten(){
           Global.preference.setString("location-town", locationInfo.town);
 
           SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
-
-          print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
         }
       }
 
