@@ -26,7 +26,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
       "/locale": context.i18n.settings_locale,
       "/location": context.i18n.settings_location,
       "/sound": "音效測試",
-      "/theme": "主題色",
+      "/theme": context.i18n.settings_theme,
     };
 
     return PopScope(
