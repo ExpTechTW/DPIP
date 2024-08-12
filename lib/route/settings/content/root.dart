@@ -27,7 +27,7 @@ class _SettingsRootViewState extends State<SettingsRootView> {
         padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
-          const ListTileGroupHeader(title: "位置"),
+          ListTileGroupHeader(title: context.i18n.settings_position),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
@@ -63,17 +63,17 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          const ListTileGroupHeader(title: "個人化"),
+          ListTileGroupHeader(title: context.i18n.settings_Personalization),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.format_paint),
             ),
-            title: const Text(
-              "主題色",
+            title: Text(
+              context.i18n.settings_ThemeColor,
               style: tileTitleTextStyle,
             ),
-            subtitle: const Text("調整 DPIP 整體的外觀與顏色"),
+            subtitle: Text(context.i18n.settings_ThemeColor_description),
             onTap: () {
               Navigator.pushNamed(
                 context,
@@ -98,12 +98,12 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          const ListTileGroupHeader(title: "複製 FCM Token"),
+          ListTileGroupHeader(title: context.i18n.settings_FCM),
           ListTile(
             leading: Icon(
               Platform.isAndroid ? Icons.bug_report_rounded : CupertinoIcons.square_on_square,
             ),
-            title: const Text("複製 FCM Token"),
+            title: Text(context.i18n.settings_FCM),
             onTap: () {
               messaging.getToken().then((value) {
                 FlutterClipboard.copy(value ?? "");
