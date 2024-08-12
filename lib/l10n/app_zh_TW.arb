@@ -132,13 +132,25 @@
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_ThemeColor": "主題色",
-  "@settings_ThemeColor": {
+  "settings_theme": "主題色",
+  "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_ThemeColor_description": "調整 DPIP 整體的外觀與顏色",
-  "@settings_ThemeColor_description": {
+  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
+  "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
+  },
+  "theme_light": "淺色",
+  "@theme_light": {
+    "description": "「設定」路徑 → 「主題色」設定 → 淺色"
+  },
+  "theme_dark": "深色",
+  "@theme_dark": {
+    "description": "「設定」路徑 → 「主題色」設定 → 深色"
+  },
+  "theme_system": "跟隨系統主題",
+  "@theme_system": {
+    "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
   "settings_locale": "語言",
   "@settings_locale": {
