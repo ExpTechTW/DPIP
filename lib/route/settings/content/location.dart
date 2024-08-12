@@ -16,7 +16,6 @@ import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 final stateSettingsLocationView = _SettingsLocationViewState();
-Timer? timer;
 typedef PositionUpdateCallback = void Function(String?, String?, String?);
 
 class SettingsLocationView extends StatefulWidget {
@@ -313,7 +312,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     if (Platform.isIOS) {
       try {
         await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
-        timer?.cancel();
       } catch (e) {
         return;
       }
