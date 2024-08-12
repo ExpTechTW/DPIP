@@ -33,4 +33,5 @@ class Route {
   static Uri station() => Uri.parse("$api/v1/trem/station");
   static Uri location(String token, String lat, String lng) =>
       Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
+  static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
 }
