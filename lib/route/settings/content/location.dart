@@ -492,7 +492,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               )
             ]),
           ),
-          const ListTileGroupHeader(title: "所在地"),
+          ListTileGroupHeader(title: context.i18n.settings_location),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),

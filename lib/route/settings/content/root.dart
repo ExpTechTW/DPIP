@@ -33,11 +33,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.pin_drop),
             ),
-            title: const Text(
-              "所在地",
+            title: Text(
+              context.i18n.settings_location,
               style: tileTitleTextStyle,
             ),
-            subtitle: const Text("調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等"),
+            subtitle: Text(context.i18n.settings_location_description),
             onTap: () {
               Navigator.pushNamed(
                 context,
