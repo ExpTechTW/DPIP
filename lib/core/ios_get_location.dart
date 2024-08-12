@@ -25,19 +25,12 @@ Future<void> getSavedLocation() async {
       if (Global.location.containsKey(code)) {
         Location locationInfo = Global.location[code]!;
 
-        Global.preference.setString("location-auto", " (啟用自動定位)");
         Global.preference.setString("location-city", locationInfo.city);
         Global.preference.setString("location-town", locationInfo.town);
 
-        SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town, " (啟用自動定位)");
+        SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
 
         print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
-      } else {
-        print('Code $code not found in location data');
-
-        Global.preference.setString("location-auto", " (解析失敗)");
-        Global.preference.setString("location-city", "解析失敗");
-        Global.preference.setString("location-town", "解析失敗");
       }
     }
     return;

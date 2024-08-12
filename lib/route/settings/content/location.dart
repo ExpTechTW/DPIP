@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
@@ -16,10 +15,10 @@ import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 final stateSettingsLocationView = _SettingsLocationViewState();
-typedef PositionUpdateCallback = void Function(String?, String?, String?);
+typedef PositionUpdateCallback = void Function(String?, String?);
 
 class SettingsLocationView extends StatefulWidget {
-  final Function(String?, String?, String?)? onPositionUpdate;
+  final Function(String?, String?)? onPositionUpdate;
 
   const SettingsLocationView({Key? key, this.onPositionUpdate}) : super(key: key);
 
@@ -36,8 +35,8 @@ class SettingsLocationView extends StatefulWidget {
     _activeCallback = null;
   }
 
-  static void updatePosition(String? city, String? town, String? locationAuto) {
-    _activeCallback?.call(city, town, locationAuto);
+  static void updatePosition(String? city, String? town) {
+    _activeCallback?.call(city, town);
   }
 }
 
@@ -47,8 +46,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
-
-  String? locationAuto = Global.preference.getString("location-auto");
 
   String? city = Global.preference.getString("location-city");
   String? town = Global.preference.getString("location-town");
@@ -320,9 +317,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
 
     if (isAutoLocatingEnabled) {
-      Global.preference.remove("location-auto");
-
-      locationAuto = "";
       setState(() {
         isAutoLocatingEnabled = false;
       });
@@ -406,16 +400,15 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     );
   }
 
-  void sendpositionUpdate(String? cityUpdate, String? townUpdate, String? locationAutoUpdate) {
+  void sendpositionUpdate(String? cityUpdate, String? townUpdate) {
     if (mounted) {
       setState(() {
         city = cityUpdate;
         town = townUpdate;
-        locationAuto = locationAutoUpdate;
       });
       print('Position updated: $city, $town');
 
-      widget.onPositionUpdate?.call(city, town, locationAuto);
+      widget.onPositionUpdate?.call(city, town);
     }
   }
 
@@ -533,7 +526,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             ]),
           ),
           ListTileGroupHeader(
-            title: "所在地 ${locationAuto ?? ""}",
+            title: "所在地",
           ),
           ListTile(
             leading: const Padding(
