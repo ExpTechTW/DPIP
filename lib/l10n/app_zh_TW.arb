@@ -128,6 +128,18 @@
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   },
+  "settings_Personalization": "個人化",
+  "@settings_Personalization": {
+    "description": "「設定」路徑 → 「個人化」標題"
+  },
+  "settings_ThemeColor": "主題色",
+  "@settings_ThemeColor": {
+    "description": "「設定」路徑 → 「主題色」副標題"
+  },
+  "settings_ThemeColor_description": "調整 DPIP 整體的外觀與顏色",
+  "@settings_ThemeColor_description": {
+    "description": "「設定」路徑 → 「主題色」副標題描述"
+  },
   "settings_locale": "語言",
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
@@ -168,9 +180,13 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
+  "settings_position": "位置",
+  "@settings_position": {
+    "description": "「設定」路徑 → 「位置」標題"
+  },
   "settings_location": "所在地",
   "@settings_location": {
-    "description": "「設定」路徑 → 「所在地」標題"
+    "description": "「設定」路徑 → 「所在地」副標題"
   },
   "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
   "@settings_location_description": {
@@ -183,5 +199,9 @@
   "settings_location_auto_description": "自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
+  },
+  "settings_FCM": "複製 FCM Token",
+  "@settings_FCM": {
+    "description": "「設定」路徑 → 「FCM」標題"
   }
 }
