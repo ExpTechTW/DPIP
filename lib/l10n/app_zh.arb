@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -128,7 +128,7 @@
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   },
-  "settings_locale": "語言",
+  "settings_locale": "语言",
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
   },
@@ -167,21 +167,5 @@
   "settings_locale_crowdin_description": "點擊這裡來幫助我們改進 DPIP 的翻譯",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
-  },
-  "settings_location": "所在地",
-  "@settings_location": {
-    "description": "「設定」路徑 → 「所在地」標題"
-  },
-  "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
-  "@settings_location_description": {
-    "description": "「設定」路徑 → 「所在地」副標題敘述"
-  },
-  "settings_location_auto": "啟用自動定位",
-  "@settings_location_auto": {
-    "description": "「設定」路徑 → 「啟用自動定位」標題"
-  },
-  "settings_location_auto_description": "自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。",
-  "@settings_location_auto_description": {
-    "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   }
 }
