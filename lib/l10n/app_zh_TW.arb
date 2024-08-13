@@ -92,6 +92,10 @@
   "@open_report_url": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
+  "report_replay": "重播",
+  "@report_replay": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
+  },
   "report_event_time": "發震時間",
   "@report_event_time": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
