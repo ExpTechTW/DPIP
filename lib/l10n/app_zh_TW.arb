@@ -92,10 +92,6 @@
   "@open_report_url": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
-  "report_replay": "重播",
-  "@report_replay": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
-  },
   "report_event_time": "發震時間",
   "@report_event_time": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
@@ -131,30 +127,6 @@
   "report_intensity": "各地震度",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
-  },
-  "settings_Personalization": "個人化",
-  "@settings_Personalization": {
-    "description": "「設定」路徑 → 「個人化」標題"
-  },
-  "settings_theme": "主題色",
-  "@settings_theme": {
-    "description": "「設定」路徑 → 「主題色」副標題"
-  },
-  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
-  "@settings_theme_description": {
-    "description": "「設定」路徑 → 「主題色」副標題描述"
-  },
-  "theme_light": "淺色",
-  "@theme_light": {
-    "description": "「設定」路徑 → 「主題色」設定 → 淺色"
-  },
-  "theme_dark": "深色",
-  "@theme_dark": {
-    "description": "「設定」路徑 → 「主題色」設定 → 深色"
-  },
-  "theme_system": "跟隨系統主題",
-  "@theme_system": {
-    "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
   "settings_locale": "語言",
   "@settings_locale": {
@@ -195,6 +167,34 @@
   "settings_locale_crowdin_description": "點擊這裡來幫助我們改進 DPIP 的翻譯",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
+  },
+  "report_replay": "重播",
+  "@report_replay": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
+  },
+  "settings_Personalization": "個人化",
+  "@settings_Personalization": {
+    "description": "「設定」路徑 → 「個人化」標題"
+  },
+  "settings_theme": "主題色",
+  "@settings_theme": {
+    "description": "「設定」路徑 → 「主題色」副標題"
+  },
+  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
+  "@settings_theme_description": {
+    "description": "「設定」路徑 → 「主題色」副標題描述"
+  },
+  "theme_light": "淺色",
+  "@theme_light": {
+    "description": "「設定」路徑 → 「主題色」設定 → 淺色"
+  },
+  "theme_dark": "深色",
+  "@theme_dark": {
+    "description": "「設定」路徑 → 「主題色」設定 → 深色"
+  },
+  "theme_system": "跟隨系統主題",
+  "@theme_system": {
+    "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
   "settings_position": "位置",
   "@settings_position": {
