@@ -216,6 +216,14 @@
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
+  "location_city": "縣市",
+  "@location_city": {
+    "description": "「設定」路徑 → 「所在地」設定 → 縣市"
+  },
+  "location_town": "鄉鎮",
+  "@location_town": {
+    "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
+  },
   "settings_FCM": "複製 FCM Token",
   "@settings_FCM": {
     "description": "「設定」路徑 → 「FCM」標題"
