@@ -498,7 +498,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.location_city),
             ),
-            title: const Text("縣市"),
+            title: Text(context.i18n.location_city),
             subtitle: Text(city ?? "尚未設定"),
             enabled: !isAutoLocatingEnabled,
             onTap: () async {
@@ -522,7 +522,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               padding: EdgeInsets.all(8.0),
               child: Icon(Symbols.forest),
             ),
-            title: const Text("鄉鎮"),
+            title: Text(context.i18n.location_town),
             subtitle: Text(town ?? "尚未設定"),
             enabled: !isAutoLocatingEnabled && city != null,
             onTap: () async {
