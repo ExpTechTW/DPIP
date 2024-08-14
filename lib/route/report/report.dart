@@ -1,18 +1,17 @@
 import 'dart:async';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/eew.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
-import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/util/intensity_color.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -71,7 +70,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       final data = await ExpTech().getReport(widget.report.id);
       final controller = await mapController.future;
 
-      List markers = [];
+      List features = [];
       List<double> bounds = [];
 
       Map<String, int> cityMaxIntensity = {};
@@ -82,7 +81,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             cityMaxIntensity[areaName] = town.intensity;
           }
 
-          markers.add({
+          features.add({
             "type": "Feature",
             "properties": {
               "intensity": town.intensity,
@@ -101,7 +100,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         }
       }
 
-      markers.add({
+      features.add({
         "type": "Feature",
         "properties": {
           "intensity": 10, // 10 is for classifying epicenter cross
@@ -135,46 +134,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         "markers-geojson",
         {
           "type": "FeatureCollection",
-          "features": markers,
-        },
-      );
-
-      List waves = [];
-
-      for (var i = 0; i < 10; i++) {
-        final distance = psWaveDist(
-          data.depth,
-          data.time.millisecondsSinceEpoch,
-          data.time.millisecondsSinceEpoch + i * 5000,
-        );
-
-        if (distance["s_dist"] == null || distance["s_dist"]! < 0) continue;
-
-        waves.add(
-          circle(
-            LatLng(data.latitude, data.longitude),
-            distance["s_dist"]!,
-          ),
-        );
-      }
-
-      await controller.addGeoJsonSource(
-        "waves-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": waves,
+          "features": features,
         },
       );
 
       if (!mounted) return;
-
-      await controller.addLayer(
-        "waves-geojson",
-        "waves",
-        LineLayerProperties(
-          lineColor: context.colors.outline.toHexStringRGB(),
-        ),
-      );
 
       await loadIntensityImage(controller, isDark);
       await loadCrossImage(controller);
@@ -237,7 +201,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           fillOpacity: 1,
         ),
       );
-
       await controller.setLayerProperties(
         'town',
         const FillLayerProperties(fillOpacity: 0),

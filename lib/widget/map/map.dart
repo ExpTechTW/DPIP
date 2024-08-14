@@ -146,7 +146,6 @@ class DpipMapState extends State<DpipMap> {
     }
 
     return MapLibreMap(
-      minMaxZoomPreference: const MinMaxZoomPreference(3, 9),
       trackCameraPosition: true,
       initialCameraPosition: widget.initialCameraPosition,
       styleString: styleAbsoluteFilePath!,
