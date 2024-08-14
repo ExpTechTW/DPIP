@@ -14,11 +14,30 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
+final stateSettingsLocationView = _SettingsLocationViewState();
+typedef PositionUpdateCallback = void Function(String?, String?);
+
 class SettingsLocationView extends StatefulWidget {
-  const SettingsLocationView({super.key});
+  final Function(String?, String?)? onPositionUpdate;
+
+  const SettingsLocationView({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition(String? city, String? town) {
+    _activeCallback?.call(city, town);
+  }
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
@@ -341,10 +360,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     permissionStatusUpdate();
+    SettingsLocationView.setActiveCallback(sendpositionUpdate);
   }
 
   @override
   void dispose() {
+    SettingsLocationView.clearActiveCallback();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -377,6 +398,16 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
+  }
+
+  void sendpositionUpdate(String? cityUpdate, String? townUpdate) {
+    if (mounted) {
+      setState(() {
+        city = cityUpdate;
+        town = townUpdate;
+      });
+      widget.onPositionUpdate?.call(city, town);
+    }
   }
 
   @override
