@@ -17,7 +17,7 @@ class DpipMap extends StatefulWidget {
 
   const DpipMap({
     super.key,
-    this.initialCameraPosition = const CameraPosition(target: LatLng(23.8, 120.1), zoom: 6),
+    this.initialCameraPosition = const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.4),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
@@ -34,8 +34,8 @@ class DpipMapState extends State<DpipMap> {
     {
       "version": 8,
       "name": "ExpTech Studio",
-      "center": [120.2, 23.6],
-      "zoom": 7,
+      "center": [120.85, 23.10],
+      "zoom": 6.4,
       "sources": {
         "map": {
           "type": "vector",
