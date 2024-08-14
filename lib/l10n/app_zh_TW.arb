@@ -172,6 +172,14 @@
   "@report_replay": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
   },
+  "image_save": "儲存",
+  "@image_save": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
+  },
+  "image_saved": "已儲存圖片",
+  "@image_saved": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
+  },
   "settings_Personalization": "個人化",
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
@@ -216,6 +224,10 @@
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
+  "location_Not_set": "尚未設定",
+  "@location_Not_set": {
+    "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
+  },
   "location_city": "縣市",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
@@ -226,6 +238,22 @@
   },
   "settings_FCM": "複製 FCM Token",
   "@settings_FCM": {
+    "description": "「設定」路徑 → 「FCM」標題"
+  },
+  "settings_copyFCM": "已複製 FCM Token",
+  "@settings_copyFCM": {
+    "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
+  },
+  "report_offing": "此地震可能引起若干海面變動",
+  "@report_offing": {
+    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
+  },
+  "report_tsunami_attention": "此地震可能引起海嘯 注意後續資訊",
+  "@report_tsunami_attention": {
+    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
+  },
+  "report_": "複製 FCM Token",
+  "@report_": {
     "description": "「設定」路徑 → 「FCM」標題"
   }
 }
