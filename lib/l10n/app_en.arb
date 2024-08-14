@@ -167,21 +167,5 @@
   "settings_locale_crowdin_description": "Click here to help us improve the translation of DPIP",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
-  },
-  "settings_location": "Location",
-  "@settings_location": {
-    "description": "「設定」路徑 → 「所在地」標題"
-  },
-  "settings_location_description": "Adjust your location to receive real-time weather information, estimated earthquake intensity, and estimated arrival seconds of seismic waves, etc.",
-  "@settings_location_description": {
-    "description": "「設定」路徑 → 「所在地」副標題敘述"
-  },
-  "settings_location_auto": "Enable automatic targeting",
-  "@settings_location_auto": {
-    "description": "「設定」路徑 → 「啟用自動定位」標題"
-  },
-  "settings_location_auto_description": "The automatic positioning feature will use the GPS on your device to automatically update your location based on your geographical location, providing real-time weather and earthquake information to keep you informed of the latest local conditions.",
-  "@settings_location_auto_description": {
-    "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   }
 }
