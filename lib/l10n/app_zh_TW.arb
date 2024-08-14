@@ -168,6 +168,42 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
+  "earthquake_warning_error": "暫時無法取得地震速報資料",
+  "@earthquake_warning_error": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
+  },
+  "no_earthquake_warning": "目前無生效中的地震速報",
+  "@no_earthquake_warning": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
+  },
+  "earthquake_warning": "地震速報",
+  "@earthquake_warning": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
+  },
+  "emergency_earthquake_warning": "緊急地震速報",
+  "@emergency_earthquake_warning": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
+  },
+  "location_estimate": "所在地預估",
+  "@location_estimate": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
+  },
+  "seismic_waves": "震波",
+  "@seismic_waves": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
+  },
+  "monitor_unknown": "未知",
+  "@monitor_unknown": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
+  },
+  "monitor_arrival": "抵達",
+  "@monitor_arrival": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
+  },
+  "monitor_after_seconds": "秒後抵達",
+  "@monitor_after_seconds": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
+  },
   "report_replay": "重播",
   "@report_replay": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
@@ -235,6 +271,10 @@
   "location_town": "鄉鎮",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
+  },
+  "location_select": "選擇所在地",
+  "@location_select": {
+    "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
   "settings_FCM": "複製 FCM Token",
   "@settings_FCM": {
