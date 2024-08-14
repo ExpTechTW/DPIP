@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -132,15 +132,15 @@
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
   },
-  "settings_locale_description": "調整 DPIP 的顯示語言",
+  "settings_locale_description": "更改 DPIP 的显示语言",
   "@settings_locale_description": {
     "description": "「設定」路徑 → 「語言」副標題敘述"
   },
-  "settings_display_locale": "顯示語言",
+  "settings_display_locale": "显示语言",
   "@settings_display_locale": {
     "description": "「設定」路徑 → 「顯示語言」標題"
   },
-  "settings_locale_translated": "已翻譯 {percentage}",
+  "settings_locale_translated": "已翻译 {percentage}",
   "@settings_locale_translated": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
     "placeholders": {
@@ -150,7 +150,7 @@
       }
     }
   },
-  "settings_locale_approved": "已校對 {percentage}",
+  "settings_locale_approved": "已校对 {percentage}",
   "@settings_locale_approved": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
     "placeholders": {
@@ -160,11 +160,11 @@
       }
     }
   },
-  "settings_locale_crowdin": "協助翻譯",
+  "settings_locale_crowdin": "协助翻译",
   "@settings_locale_crowdin": {
     "description": "「設定」路徑 → 「協助翻譯」標題"
   },
-  "settings_locale_crowdin_description": "點擊這裡來幫助我們改進 DPIP 的翻譯",
+  "settings_locale_crowdin_description": "点击这里来帮助我们改进 DPIP 的翻译",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   }
