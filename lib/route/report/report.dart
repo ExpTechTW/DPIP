@@ -280,7 +280,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                         color: context.theme.extendedColors.blue,
                       ),
                       label: Text(
-                        "此地震可能引起若干海面變動",
+                        context.i18n.report_offing,
                         style: TextStyle(
                           color: context.theme.extendedColors.blue,
                         ),
@@ -292,7 +292,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   if (report!.magnitude >= 7 && report!.getLocation().contains("海"))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
-                      label: Text("此地震可能引起海嘯 注意後續資訊", style: TextStyle(color: context.colors.error)),
+                      label: Text(context.i18n.report_tsunami_attention, style: TextStyle(color: context.colors.error)),
                       backgroundColor: Colors.red.withOpacity(0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.colors.error),
