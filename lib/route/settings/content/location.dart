@@ -499,7 +499,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               child: Icon(Symbols.location_city),
             ),
             title: Text(context.i18n.location_city),
-            subtitle: Text(city ?? "尚未設定"),
+            subtitle: Text(city ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled,
             onTap: () async {
               await Navigator.of(
@@ -523,7 +523,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               child: Icon(Symbols.forest),
             ),
             title: Text(context.i18n.location_town),
-            subtitle: Text(town ?? "尚未設定"),
+            subtitle: Text(town ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled && city != null,
             onTap: () async {
               await Navigator.of(
