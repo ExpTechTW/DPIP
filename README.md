@@ -49,11 +49,9 @@ DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果
 
 你可以通過[點擊這裡前往我們的 Crowdin 專案頁面](https://crowdin.com/project/dpip)，選擇你熟悉的語言並開始翻譯。每一點貢獻都將幫助我們將防災資訊傳遞給更多的人！
 
-沒有看見你熟悉的語言？我們歡迎你在我們的 [Issue](https://github.com/ExpTechTW/DPIP/issues) 中開新的語言請求，我們將會為你盡速開啟。
+沒有看見你熟悉的語言？我們歡迎你在我們的 [Issue](https://github.com/ExpTechTW/DPIP/issues) 中開新的語言請求，我們將會盡速為你開啟。
 
 ## 從原始碼建置
-
-以下是如何從原始碼建置這個 Flutter 應用程式的步驟。
 
 ### 條件
 
