@@ -97,7 +97,15 @@ DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果
    flutter pub get --no-example
    ```
 
-4. 建置應用程式
+4. 預組建置
+
+   使用以下指令來產生建置時需要的部分自動產生檔案：
+
+   ```bash
+   dart run build_runner build
+   ```
+
+5. 建置應用程式
 
    最後，你可以使用以下指令來建置應用程式：
 
