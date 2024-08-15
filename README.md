@@ -47,7 +47,71 @@ TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案�
 
 DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果您願意幫助我們將本項目翻譯成其他語言，請加入我們的 Crowdin 翻譯社群。
 
-你可以通過[點擊這裡訪問我們的 Crowdin 專案頁面](https://crowdin.com/project/dpip)，選擇你熟悉的語言並開始翻譯。每一點貢獻都將幫助我們將防災資訊傳遞給更多的人！
+你可以通過[點擊這裡前往我們的 Crowdin 專案頁面](https://crowdin.com/project/dpip)，選擇你熟悉的語言並開始翻譯。每一點貢獻都將幫助我們將防災資訊傳遞給更多的人！
+
+## 從原始碼建置
+
+以下是如何從原始碼建置這個 Flutter 應用程式的步驟。
+
+### 條件
+
+在開始之前，請確保您的環境已經安裝並配置了以下軟體：
+
+- **Flutter SDK**: [安裝指引](https://docs.flutter.dev/get-started/install)
+- **Dart SDK**: 已包含在 Flutter SDK 中
+- [**Android Studio**](https://developer.android.com/studio?hl=ja) 或 [**Xcode**](https://developer.apple.com/jp/xcode/) (適用於 iOS 開發)
+  - 也可以使用 [VSCode](https://code.visualstudio.com/) 或其他你喜歡的 IDE
+- _\*可選\*_ [**Git**](https://git-scm.com/): 用於複製存儲庫
+
+### 建置步驟
+
+1. 複製或下載存儲庫
+
+   - **下載壓縮檔**
+
+     你可以在 Github 上直接下載存儲庫壓縮檔
+
+     ![Download Source ZIP](/.github/assets/download_source.png)
+
+   - **使用 Git**
+
+     使用以下 git 指令來複製這個專案的原始碼
+
+     ```bash
+     git clone https://github.com/ExpTechTW/DPIP.git
+     ```
+
+2. 切換到專案目錄
+
+   接下來，進入到剛複製的專案目錄：
+
+   ```bash
+   cd DPIP
+   ```
+
+3. 安裝相依套件
+
+   使用以下指令來安裝專案所需的所有 Dart 和 Flutter 相依套件：
+
+   ```bash
+   flutter pub get --no-example
+   ```
+
+4. 建置應用程式
+
+   最後，你可以使用以下指令來建置應用程式：
+
+   - **Android APK**
+
+     ```bash
+     flutter build apk --release
+     ```
+
+   - **iOS**
+
+     ```bash
+     flutter build ios --release
+     ```
 
 ## 如何貢獻
 
