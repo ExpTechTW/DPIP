@@ -17,7 +17,7 @@ DPIP（Disaster prevention information platform）是一款由臺灣本土團隊
 
 ### 強震即時警報
 
-強震即時警報（Earthquake Early Warning, EEW），是藉由部署於各地之地震波觀測站，在地震發生時將測得之地震波回傳至伺服器計算並產生地震速報，為您爭取數秒甚至數十秒之時間，進行防災應變及避難措施。
+強震即時警報（Earthquake Early Warning, EEW），是藉由部署於各地之地震波觀測站，在地震發生時將測得之地震波回傳至伺服器計算並產生地震速報，為你爭取數秒甚至數十秒之時間，進行防災應變及避難措施。
 
 ### TREM-Net 臺灣即時地震觀測網
 
@@ -45,9 +45,11 @@ TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案�
 
 ## 翻譯
 
-DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果您願意幫助我們將這個專案翻譯成其他語言，歡迎加入我們的 Crowdin 翻譯社群。
+DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果你願意幫助我們將這個專案翻譯成其他語言，歡迎加入我們的 Crowdin 翻譯社群。
 
 你可以通過[點擊這裡前往我們的 Crowdin 專案頁面](https://crowdin.com/project/dpip)，選擇你熟悉的語言並開始翻譯。每一點貢獻都將幫助我們將防災資訊傳遞給更多的人！
+
+沒有看見你熟悉的語言？我們歡迎你在我們的 [Issue](https://github.com/ExpTechTW/DPIP/issues) 中開新的語言請求，我們將會為你盡速開啟。
 
 ## 從原始碼建置
 
@@ -55,7 +57,7 @@ DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果
 
 ### 條件
 
-在開始之前，請確保您的環境已經安裝並配置了以下軟體：
+在開始之前，請確保你的環境已經安裝並配置了以下軟體：
 
 - **Flutter SDK**: [安裝指引](https://docs.flutter.dev/get-started/install)
 - **Dart SDK**: 已包含在 Flutter SDK 中
