@@ -17,11 +17,11 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
-        children: const [
+        children: [
           ListTileGroupHeader(title: "地震速報音效"),
           SoundListTile(
-            title: "強震即時警報（警報）",
-            subtitle: "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
+            title: context.i18n.eew_alert_sound,
+            subtitle: context.i18n.eew_alert_description_sound,
             file: "eew_alert.wav",
           ),
           SoundListTile(

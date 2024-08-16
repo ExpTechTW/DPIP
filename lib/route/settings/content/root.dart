@@ -51,11 +51,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.audiotrack_sharp),
             ),
-            title: const Text(
-              "音效測試",
+            title: Text(
+              context.i18n.sound_test,
               style: tileTitleTextStyle,
             ),
-            subtitle: const Text("測試即時天氣資訊、地震速報等音效"),
+            subtitle: Text(context.i18n.sound_test_description),
             onTap: () {
               Navigator.pushNamed(
                 context,

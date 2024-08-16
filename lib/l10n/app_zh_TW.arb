@@ -299,5 +299,21 @@
   "me_version": "版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)"
+  },
+  "sound_test": "音效測試",
+  "@sound_test": {
+    "description": "「設定」路徑 → 「音效」標題 → 音效測試"
+  },
+  "sound_test_description": "測試即時天氣資訊、地震速報等音效",
+  "@sound_test_description": {
+    "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
+  },
+  "eew_alert_sound": "強震即時警報（警報）",
+  "@eew_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
+  },
+  "eew_alert_description_sound": "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
+  "@eew_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   }
 }
