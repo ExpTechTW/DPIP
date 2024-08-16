@@ -168,23 +168,23 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "暫時無法取得地震速報資料",
+  "earthquake_warning_error": "暂时无法取得地震速报资料",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "目前無生效中的地震速報",
+  "no_earthquake_warning": "目前无生效中的地震速报",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "地震速報",
+  "earthquake_warning": "地震速报",
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "緊急地震速報",
+  "emergency_earthquake_warning": "紧急地震速报",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "所在地預估",
+  "location_estimate": "所在地预估",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
@@ -196,11 +196,11 @@
   "@monitor_unknown": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_arrival": "抵達",
+  "monitor_arrival": "抵达",
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "秒後抵達",
+  "monitor_after_seconds": "秒后抵达",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
@@ -208,27 +208,27 @@
   "@report_replay": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
   },
-  "image_save": "儲存",
+  "image_save": "储存",
   "@image_save": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "已儲存圖片",
+  "image_saved": "已储存图片",
   "@image_saved": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
-  "settings_Personalization": "個人化",
+  "settings_Personalization": "个人化",
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_theme": "主題色",
+  "settings_theme": "主题色",
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
+  "settings_theme_description": "调整 DPIP 整体的外观与颜色",
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
-  "theme_light": "淺色",
+  "theme_light": "浅色",
   "@theme_light": {
     "description": "「設定」路徑 → 「主題色」設定 → 淺色"
   },
@@ -236,7 +236,7 @@
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
-  "theme_system": "跟隨系統主題",
+  "theme_system": "跟随系统主题",
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
@@ -248,51 +248,51 @@
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
+  "settings_location_description": "调整所在地来接收即时天气资讯、地震预估震度以及地震波预估抵达秒数等",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
-  "settings_location_auto": "啟用自動定位",
+  "settings_location_auto": "启用自动定位",
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。",
+  "settings_location_auto_description": "自动定位功能将使用您的装置上的 GPS ，根据您的地理位置，自动更新您的所在地，提供即时的天气和地震资讯，让您随时掌握当地最新状况。",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
-  "location_Not_set": "尚未設定",
+  "location_Not_set": "尚未设定",
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
-  "location_city": "縣市",
+  "location_city": "县市",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "鄉鎮",
+  "location_town": "乡镇",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
-  "location_select": "選擇所在地",
+  "location_select": "选择所在地",
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
-  "settings_FCM": "複製 FCM Token",
+  "settings_FCM": "复制 FCM Token",
   "@settings_FCM": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copyFCM": "已複製 FCM Token",
+  "settings_copyFCM": "已复制 FCM Token",
   "@settings_copyFCM": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "此地震可能引起若干海面變動",
+  "report_offing": "此地震可能引起若干海面变动",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "此地震可能引起海嘯 注意後續資訊",
+  "report_tsunami_attention": "此地震可能引起海啸 注意后续信息。",
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_": "複製 FCM Token",
+  "report_": "复制 FCM Token",
   "@report_": {
     "description": "「設定」路徑 → 「FCM」標題"
   }
