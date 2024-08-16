@@ -288,7 +288,7 @@
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "此地震可能引起海啸 注意后续信息。",
+  "report_tsunami_attention": "此地震可能引起海啸 注意后续信息",
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
