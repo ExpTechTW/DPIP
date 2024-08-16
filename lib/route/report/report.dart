@@ -366,11 +366,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                               padding: const EdgeInsets.all(20),
                               child: Row(
                                 children: [
-                                  const Flexible(
+                                  Flexible(
                                     flex: 8,
-                                    child: Text(
-                                      "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
-                                      style: TextStyle(fontSize: 16),
+                                    child: Text(context.i18n.report_error,
+                                      style: const TextStyle(fontSize: 16),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
