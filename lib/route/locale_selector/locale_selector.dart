@@ -34,7 +34,7 @@ class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("語言"),
+        title: Text(context.i18n.settings_locale),
       ),
       body: ListView.builder(
         itemCount: localeList.length,

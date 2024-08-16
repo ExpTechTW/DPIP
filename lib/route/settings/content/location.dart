@@ -425,7 +425,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceVariant,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
-                "啟用自動定位",
+                context.i18n.settings_location_auto,
                 style: TextStyle(
                   color: isAutoLocatingEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
                 ),
@@ -510,27 +510,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 ),
               ),
             ),
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Row(children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(8),
                 child: Icon(Symbols.info),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
-                child: Text("自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"),
+                child: Text(context.i18n.settings_location_auto_description),
               )
             ]),
           ),
-          const ListTileGroupHeader(title: "所在地"),
+          ListTileGroupHeader(title: context.i18n.settings_location),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.location_city),
             ),
-            title: const Text("縣市"),
-            subtitle: Text(city ?? "尚未設定"),
+            title: Text(context.i18n.location_city),
+            subtitle: Text(city ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled,
             onTap: () async {
               await Navigator.of(
@@ -553,8 +553,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               padding: EdgeInsets.all(8.0),
               child: Icon(Symbols.forest),
             ),
-            title: const Text("鄉鎮"),
-            subtitle: Text(town ?? "尚未設定"),
+            title: Text(context.i18n.location_town),
+            subtitle: Text(town ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled && city != null,
             onTap: () async {
               await Navigator.of(

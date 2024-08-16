@@ -76,7 +76,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
             ActionChip(
               avatar: const Icon(Symbols.replay),
-              label: const Text("重播"),
+              label: Text(context.i18n.report_replay),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),

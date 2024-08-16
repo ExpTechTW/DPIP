@@ -105,8 +105,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     _eewUI.add(Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
-      child: Text(
-        "暫時無法取得地震速報資料",
+      child: Text(context.i18n.earthquake_warning_error,
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 20, color: context.colors.error),
       ),
@@ -483,7 +482,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _eewLastInfo[eew.id]?.status == 1 ? "緊急地震速報" : "地震速報",
+                        _eewLastInfo[eew.id]?.status == 1 ? context.i18n.emergency_earthquake_warning : context.i18n.earthquake_warning,
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurface,
@@ -583,8 +582,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              "所在地預估",
+                            Text(context.i18n.location_estimate,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
@@ -610,8 +608,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "震波",
+                            Text(context.i18n.seismic_waves,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: context.colors.onSurfaceVariant,
@@ -623,7 +620,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        (!isUserLocationValid) ? "未知" : "抵達",
+                                        (!isUserLocationValid) ? context.i18n.monitor_unknown : context.i18n.monitor_arrival,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 36,
@@ -645,8 +642,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      Text(
-                                        "秒後抵達",
+                                      Text(context.i18n.monitor_after_seconds,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold, fontSize: 14, color: context.colors.onSurface),
                                       ),
@@ -665,12 +661,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ));
     }
     if (eewUI.isEmpty) {
-      eewUI.add(const Padding(
-        padding: EdgeInsets.only(left: 20, right: 20),
-        child: Text(
-          "目前無生效中的地震速報",
+      eewUI.add(Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20),
+        child: Text(context.i18n.no_earthquake_warning,
           textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 20),
         ),
       ));
     } else {

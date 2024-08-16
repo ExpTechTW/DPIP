@@ -24,9 +24,9 @@ class _SettingsRouteState extends State<SettingsRoute> {
     final routeTitle = {
       "/": context.i18n.settings,
       "/locale": context.i18n.settings_locale,
-      "/location": "所在地",
+      "/location": context.i18n.settings_location,
       "/sound": "音效測試",
-      "/theme": "主題色",
+      "/theme": context.i18n.settings_theme,
     };
 
     return PopScope(

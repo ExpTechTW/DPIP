@@ -93,7 +93,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
         throw Exception(result["errorMessage"]);
       }
 
-      Fluttertoast.showToast(msg: "已儲存圖片");
+      Fluttertoast.showToast(msg: context.i18n.image_saved);
     } catch (e) {
       if (!mounted) return;
 
@@ -209,7 +209,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                             ),
                           )
                         : const Icon(Symbols.save_rounded),
-                    label: const Text("儲存"),
+                    label: Text(context.i18n.image_save),
                     style: ButtonStyle(
                       foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
                       // FIXME: workaround waiting for upstream PR to merge
