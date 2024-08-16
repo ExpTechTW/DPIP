@@ -100,7 +100,7 @@
   "@report_location": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
   },
-  "report_magnitude": "規模",
+  "report_magnitude": "マグニチュード",
   "@report_magnitude": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
   },
@@ -120,7 +120,7 @@
   "@report_pga_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
   },
-  "report_pgv_image": "地動最大加速度",
+  "report_pgv_image": "地動最大速度",
   "@report_pgv_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
   },
@@ -168,11 +168,11 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "暫時無法取得地震速報資料",
+  "earthquake_warning_error": "最新の地震速報は取得できません",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "目前無生效中的地震速報",
+  "no_earthquake_warning": "地震速報が受信されていません",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
@@ -184,59 +184,59 @@
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "所在地預估",
+  "location_estimate": "現在地の予想",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
-  "seismic_waves": "震波",
+  "seismic_waves": "地震波",
   "@seismic_waves": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
   },
-  "monitor_unknown": "未知",
+  "monitor_unknown": "不明",
   "@monitor_unknown": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_arrival": "抵達",
+  "monitor_arrival": "到達",
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "秒後抵達",
+  "monitor_after_seconds": "秒までに到着",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
-  "report_replay": "重播",
+  "report_replay": "地震の状況を再生",
   "@report_replay": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
   },
-  "image_save": "儲存",
+  "image_save": "セーブ",
   "@image_save": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "已儲存圖片",
+  "image_saved": "セーブしました",
   "@image_saved": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
-  "settings_Personalization": "個人化",
+  "settings_Personalization": "個人用設定",
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_theme": "主題色",
+  "settings_theme": "テーマ色",
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
+  "settings_theme_description": "DPIPの外観とテーマ色を変更する",
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
-  "theme_light": "淺色",
+  "theme_light": "ライト",
   "@theme_light": {
     "description": "「設定」路徑 → 「主題色」設定 → 淺色"
   },
-  "theme_dark": "深色",
+  "theme_dark": "ダーク",
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
-  "theme_system": "跟隨系統主題",
+  "theme_system": "システムのテーマに従う",
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
@@ -244,55 +244,55 @@
   "@settings_position": {
     "description": "「設定」路徑 → 「位置」標題"
   },
-  "settings_location": "所在地",
+  "settings_location": "現在地",
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
+  "settings_location_description": "現在地を変更して、リアルタイムの天気情報や地震情報を取得する",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
-  "settings_location_auto": "啟用自動定位",
+  "settings_location_auto": "自動で位置情報を取得する",
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。",
+  "settings_location_auto_description": "この機能はデバイスのGPSを使用して、地理的な位置情報に基づいて、所在地を更新します。リアルタイムの天気情報や地震情報を提供して、最新の地域の状況を取得します。",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
-  "location_Not_set": "尚未設定",
+  "location_Not_set": "未設定",
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
-  "location_city": "縣市",
+  "location_city": "都道府県",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "鄉鎮",
+  "location_town": "市町村",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
-  "location_select": "選擇所在地",
+  "location_select": "現在地を選択",
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
-  "settings_FCM": "複製 FCM Token",
+  "settings_FCM": "FCM Tokenをコピーする",
   "@settings_FCM": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copyFCM": "已複製 FCM Token",
+  "settings_copyFCM": "FCM Tokenはコピーしました",
   "@settings_copyFCM": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "此地震可能引起若干海面變動",
+  "report_offing": "この地震により若干の海面変動があります",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "此地震可能引起海嘯 注意後續資訊",
+  "report_tsunami_attention": "この地震による津波の恐れがあります　情報をご注意してください",
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_": "複製 FCM Token",
+  "report_": "FCM Tokenをコピーする",
   "@report_": {
     "description": "「設定」路徑 → 「FCM」標題"
   }
