@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/main.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -24,6 +25,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
     setState(() {
       themeMode = theme;
     });
+    const MonitorPage(data: 0).createState();
   }
 
   @override
