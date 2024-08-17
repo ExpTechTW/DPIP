@@ -264,7 +264,7 @@
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
-  "location_city": "Country",
+  "location_city": "County",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
