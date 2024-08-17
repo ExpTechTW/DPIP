@@ -207,7 +207,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
       task();
     });
   }
