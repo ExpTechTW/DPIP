@@ -1,4 +1,3 @@
-import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/model/location/location.dart';
 import 'package:dpip/route/settings/content/location.dart';
@@ -14,8 +13,6 @@ Future<void> getSavedLocation() async {
     final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
     Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
     Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
-
-    const MonitorPage(data: 0).createState();
 
     LocationResult positionData = await LocationService().getLatLngLocation(data?["lat"] ?? 0.0, data?["lon"] ?? 0.0);
     var position = positionData.toJson();
