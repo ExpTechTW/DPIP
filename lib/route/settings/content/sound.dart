@@ -67,8 +67,8 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
             file: "warn.wav",
           ),
           SoundListTile(
-            title: "海嘯警報（警報）",
-            subtitle: "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上",
+            title: context.i18n.tsunami_alert2_sound,
+            subtitle: context.i18n.tsunami_alert2_description_sound,
             file: "tsunami.wav",
           ),
           SoundListTile(
