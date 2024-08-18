@@ -196,11 +196,11 @@
   "@monitor_unknown": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_arrival": "Arrive",
+  "monitor_arrival": "Arrived",
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "Arrive after %d second",
+  "monitor_after_seconds": "秒後抵達",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
@@ -236,7 +236,7 @@
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
-  "theme_system": "Follow system theme",
+  "theme_system": "Use system defaults",
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
