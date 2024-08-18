@@ -45,7 +45,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.city ?? context.i18n.settings_position),
+        title: Text(widget.city ?? context.i18n.location_select),
         actions: [
           IconButton(
             icon: const Icon(Symbols.search),
