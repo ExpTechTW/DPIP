@@ -172,7 +172,7 @@
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "There are currently no active earthquake alerts",
+  "no_earthquake_warning": "No active earthquake alerts",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
@@ -256,15 +256,15 @@
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "The automatic positioning feature will use the GPS on your device to automatically update your location based on your geographical position, providing real-time weather and earthquake information, allowing you to stay informed about the latest local conditions.",
+  "settings_location_auto_description": "The \"Automatic Positioning\" feature use the GPS of your device to automatically update your location according to your geographical position, providing real-time weather and earthquake information, allowing you to stay informed about the latest conditions.",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
-  "location_Not_set": "Not set yet",
+  "location_Not_set": "Not set",
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
-  "location_city": "County",
+  "location_city": "County/City",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
@@ -272,7 +272,7 @@
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
-  "location_select": "Choose Location",
+  "location_select": "Select Location",
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
@@ -280,11 +280,11 @@
   "@settings_FCM": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copyFCM": "FCM Token has been copied",
+  "settings_copyFCM": "FCM Token Copied",
   "@settings_copyFCM": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "This earthquake may cause some sea level changes",
+  "report_offing": "This earthquake may cause several sea level changes",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
