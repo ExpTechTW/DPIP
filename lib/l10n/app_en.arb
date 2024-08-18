@@ -180,11 +180,11 @@
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "Emergency Earthquake Alert",
+  "emergency_earthquake_warning": "Earthquake Early Warning",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "Estimated Location​",
+  "location_estimate": "Estimated​",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
@@ -200,7 +200,7 @@
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "秒後抵達",
+  "monitor_after_seconds": "sec",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
@@ -220,7 +220,7 @@
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_theme": "Theme color",
+  "settings_theme": "Theme",
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
@@ -284,11 +284,11 @@
   "@settings_copyFCM": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "This earthquake may cause several sea level changes",
+  "report_offing": "May cause sea level changes",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "This earthquake may cause tsunami. Pay attention to follow-up information.",
+  "report_tsunami_attention": "Stay alerted for possible tsunami threats",
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
