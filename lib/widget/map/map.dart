@@ -120,7 +120,7 @@ class DpipMapState extends State<DpipMap> {
   double adjustedZoom(double zoom) {
     double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
     double baseZoomAdjustment = 1.0;
-    double mediumZoomAdjustment = 0.2;
+    double mediumZoomAdjustment = 0.3;
 
     if (devicePixelRatio >= 4.0) {
       return zoom - baseZoomAdjustment;
