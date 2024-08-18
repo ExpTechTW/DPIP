@@ -168,7 +168,7 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "The earthquake alert data is temporarily unavailable",
+  "earthquake_warning_error": "Earthquake data is temporarily unavailable",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
