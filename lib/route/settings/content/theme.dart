@@ -25,7 +25,6 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
     setState(() {
       themeMode = theme;
     });
-    const MonitorPage(data: 0).createState();
   }
 
   @override
