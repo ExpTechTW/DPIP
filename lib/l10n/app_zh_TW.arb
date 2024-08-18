@@ -344,7 +344,7 @@
   "@report_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
-  "report_description_sound": "地震報告",
+  "report_description_sound": "地震報告 所在地震度 3 以上",
   "@report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
