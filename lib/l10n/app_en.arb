@@ -228,11 +228,11 @@
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
-  "theme_light": "Light Theme",
+  "theme_light": "Light",
   "@theme_light": {
     "description": "「設定」路徑 → 「主題色」設定 → 淺色"
   },
-  "theme_dark": "Dark Theme",
+  "theme_dark": "Dark",
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
@@ -252,11 +252,11 @@
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
-  "settings_location_auto": "Enable automatic detect location",
+  "settings_location_auto": "Enable Automatic Locating",
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "The \"Automatic Positioning\" feature use the GPS of your device to automatically update your location according to your geographical position, providing real-time weather and earthquake information, allowing you to stay informed about the latest conditions.",
+  "settings_location_auto_description": "The \"Automatic Locating\" feature uses the GPS on your device to automatically update your location according to your geographical position, providing real-time weather and earthquake information, allowing you to stay informed about the latest conditions.",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
@@ -280,7 +280,7 @@
   "@settings_FCM": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copyFCM": "FCM Token Copied",
+  "settings_copyFCM": "FCM Token copied",
   "@settings_copyFCM": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
