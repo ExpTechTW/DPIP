@@ -47,8 +47,8 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
           ),
           ListTileGroupHeader(title: context.i18n.dp_info_sound_title),
           SoundListTile(
-            title: context.i18n.thunderstor_instant_messaging_sound,
-            subtitle: context.i18n.thunderstor_instant_messaging_description_sound,
+            title: context.i18n.thunderstorm_instant_messaging_sound,
+            subtitle: context.i18n.thunderstorm_instant_messaging_description_sound,
             file: "rain.wav",
           ),
           SoundListTile(
@@ -82,8 +82,8 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
             file: "warn.wav",
           ),
           SoundListTile(
-            title: context.i18n.hight_temperature_info_sound,
-            subtitle: context.i18n.hight_temperature_info_description_sound,
+            title: context.i18n.high_temperature_info_sound,
+            subtitle: context.i18n.high_temperature_info_description_sound,
             file: "normal.wav",
           ),
           SoundListTile(
