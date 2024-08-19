@@ -194,7 +194,7 @@
   },
   "monitor_unknown": "未知",
   "@monitor_unknown": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
+    "description": "「強震監視器」路徑 → 資訊托盤 → 未知"
   },
   "monitor_arrival": "抵達",
   "@monitor_arrival": {
