@@ -98,18 +98,18 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          ListTileGroupHeader(title: context.i18n.settings_FCM),
+          ListTileGroupHeader(title: context.i18n.settings_fcm),
           ListTile(
             leading: Icon(
               Platform.isAndroid ? Icons.bug_report_rounded : CupertinoIcons.square_on_square,
             ),
-            title: Text(context.i18n.settings_FCM),
+            title: Text(context.i18n.settings_fcm),
             onTap: () {
               messaging.getToken().then((value) {
                 FlutterClipboard.copy(value ?? "");
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(context.i18n.settings_copyFCM),
+                    content: Text(context.i18n.settings_copy_fcm),
                   ),
                 );
               }).catchError((error) {
