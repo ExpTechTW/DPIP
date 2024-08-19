@@ -200,7 +200,7 @@
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "sec",
+  "monitor_after_seconds": "Seconds",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
@@ -212,7 +212,7 @@
   "@image_save": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "Saved image",
+  "image_saved": "Image saved",
   "@image_saved": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
@@ -248,7 +248,7 @@
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "Adjust your location to receive real-time weather information, estimated earthquake intensity, and estimated seconds until the earthquake wave arrives",
+  "settings_location_description": "Adjust your location to receive real-time weather information, estimated intensity, and estimated seconds until earthquakes",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
