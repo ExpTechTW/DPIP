@@ -301,7 +301,7 @@
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
       "version": {
-        "type": "String",
+        "type": "String"
       }
     }
   },
