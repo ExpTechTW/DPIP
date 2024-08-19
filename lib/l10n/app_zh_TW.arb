@@ -276,12 +276,12 @@
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
-  "settings_FCM": "複製 FCM Token",
-  "@settings_FCM": {
+  "settings_fcm": "複製 FCM Token",
+  "@settings_fcm": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copyFCM": "已複製 FCM Token",
-  "@settings_copyFCM": {
+  "settings_copy_fcm": "已複製 FCM Token",
+  "@settings_copy_fcm": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
   "report_offing": "此地震可能引起若干海面變動",
@@ -364,12 +364,12 @@
   "@other_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 其他"
   },
-  "thunderstor_instant_messaging_sound": "大雷雨即時訊息",
-  "@thunderstor_instant_messaging_sound": {
+  "thunderstorm_instant_messaging_sound": "大雷雨即時訊息",
+  "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstor_instant_messaging_description_sound": "所在地發布 大雷雨即時訊息",
-  "@thunderstor_instant_messaging_description_sound": {
+  "thunderstorm_instant_messaging_description_sound": "所在地發布 大雷雨即時訊息",
+  "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
   "heavy_rain_alert_sound": "大雨特報",
@@ -420,12 +420,12 @@
   "@volcano_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
   },
-  "hight_temperature_info_sound": "高溫資訊",
-  "@hight_temperature_info_sound": {
+  "high_temperature_info_sound": "高溫資訊",
+  "@high_temperature_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
   },
-  "hight_temperature_info_description_sound": "所在地發布 高溫資訊",
-  "@hight_temperature_info_description_sound": {
+  "high_temperature_info_description_sound": "所在地發布 高溫資訊",
+  "@high_temperature_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
   },
   "strong_wind_warning_sound": "陸上強風特報",
