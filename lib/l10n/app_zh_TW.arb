@@ -305,6 +305,10 @@
       }
     }
   },
+  "source_language": "來源語言",
+  "@source_language": {
+    "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
+  },
   "sound_test": "音效測試",
   "@sound_test": {
     "description": "「設定」路徑 → 「音效」標題 → 音效測試"
