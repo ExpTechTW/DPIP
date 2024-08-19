@@ -128,19 +128,19 @@
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   },
-  "settings_locale": "語言",
+  "settings_locale": "언어",
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
   },
-  "settings_locale_description": "調整 DPIP 的顯示語言",
+  "settings_locale_description": "DPIP의 표시 언어 조정",
   "@settings_locale_description": {
     "description": "「設定」路徑 → 「語言」副標題敘述"
   },
-  "settings_display_locale": "顯示語言",
+  "settings_display_locale": "표시 언어",
   "@settings_display_locale": {
     "description": "「設定」路徑 → 「顯示語言」標題"
   },
-  "settings_locale_translated": "已翻譯 {percentage}",
+  "settings_locale_translated": "번역 완료 {percentage}",
   "@settings_locale_translated": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
     "placeholders": {
@@ -150,7 +150,7 @@
       }
     }
   },
-  "settings_locale_approved": "已校對 {percentage}",
+  "settings_locale_approved": "검토 완료 {percentage}",
   "@settings_locale_approved": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
     "placeholders": {
@@ -160,139 +160,139 @@
       }
     }
   },
-  "settings_locale_crowdin": "協助翻譯",
+  "settings_locale_crowdin": "번역을 도와주다",
   "@settings_locale_crowdin": {
     "description": "「設定」路徑 → 「協助翻譯」標題"
   },
-  "settings_locale_crowdin_description": "點擊這裡來幫助我們改進 DPIP 的翻譯",
+  "settings_locale_crowdin_description": "여기를 클릭하여 DPIP 번역 개선을 도와주세요",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "暫時無法取得地震速報資料",
+  "earthquake_warning_error": "지진 속보를 일시적으로 받을 수 없습니다",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "目前無生效中的地震速報",
+  "no_earthquake_warning": "현재 유효한 지진 속보가 없습니다",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "地震速報",
+  "earthquake_warning": "지진 속보",
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "緊急地震速報",
+  "emergency_earthquake_warning": "긴급 지진 속보",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "所在地預估",
+  "location_estimate": "위치 추정",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
-  "seismic_waves": "震波",
+  "seismic_waves": "지진의 파동",
   "@seismic_waves": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
   },
-  "monitor_unknown": "未知",
+  "monitor_unknown": "알려지지 않은",
   "@monitor_unknown": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_arrival": "抵達",
+  "monitor_arrival": "도착하다",
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "秒後抵達",
+  "monitor_after_seconds": "초 후 도착",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
-  "report_replay": "重播",
+  "report_replay": "재생",
   "@report_replay": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
   },
-  "image_save": "儲存",
+  "image_save": "저장하다",
   "@image_save": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "已儲存圖片",
+  "image_saved": "이미지 저장 완료",
   "@image_saved": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
-  "settings_Personalization": "個人化",
+  "settings_Personalization": "개인 설정",
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_theme": "主題色",
+  "settings_theme": "테마 색",
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
+  "settings_theme_description": "DPIP 전체의 외관과 색상을 조정하다",
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
-  "theme_light": "淺色",
+  "theme_light": "연한",
   "@theme_light": {
     "description": "「設定」路徑 → 「主題色」設定 → 淺色"
   },
-  "theme_dark": "深色",
+  "theme_dark": "다크",
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
-  "theme_system": "跟隨系統主題",
+  "theme_system": "시스템 테마 따르기",
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
-  "settings_position": "位置",
+  "settings_position": "위치",
   "@settings_position": {
     "description": "「設定」路徑 → 「位置」標題"
   },
-  "settings_location": "所在地",
+  "settings_location": "현재 위치",
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
+  "settings_location_description": "현재 위치를 조정하여 실시간 날씨 정보, 지진 예상 진도 및 지진파 도착 예상 시간을 수신하세요",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
-  "settings_location_auto": "啟用自動定位",
+  "settings_location_auto": "자동 위치 설정을 활성화하다",
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。",
+  "settings_location_auto_description": "자동 위치 지정 기능은 장치의 GPS를 사용하여 지리적 위치를 기반으로 위치를 자동으로 업데이트하고 실시간 날씨 및 지진 정보를 제공하여 최신 지역 상황에 대한 정보를 제공합니다.",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
-  "location_Not_set": "尚未設定",
+  "location_Not_set": "설정되지 않음",
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
-  "location_city": "縣市",
+  "location_city": "시와 군",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "鄉鎮",
+  "location_town": "읍과 면",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
-  "location_select": "選擇所在地",
+  "location_select": "위치를 선택하다",
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
-  "settings_FCM": "複製 FCM Token",
+  "settings_FCM": "복사 FCM Token",
   "@settings_FCM": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copyFCM": "已複製 FCM Token",
+  "settings_copyFCM": "FCM Token이 복사되었습니다",
   "@settings_copyFCM": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "此地震可能引起若干海面變動",
+  "report_offing": "이번 지진으로 인해 해면에 일부 변동이 있을 수 있습니다",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "此地震可能引起海嘯 注意後續資訊",
+  "report_tsunami_attention": "이번 지진으로 인해 쓰나미가 발생할 수 있으니, 후속 정보를 주의하세요",
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_": "複製 FCM Token",
+  "report_": "복사 FCM Token",
   "@report_": {
     "description": "「設定」路徑 → 「FCM」標題"
   }
