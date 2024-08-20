@@ -1,11 +1,6 @@
-import 'dart:async';
-
-import 'package:dpip/app/page/map/tsunami.dart';
+import 'package:dpip/app/page/map/tsunami/tsunami.dart';
 import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-import '../../../widget/map/map.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -15,8 +10,6 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  final mapController = Completer<MapLibreMapController>();
-
   int selected = 0;
 
   @override
@@ -43,13 +36,7 @@ class _MapPageState extends State<MapPage> {
       ),
       body: Stack(
         children: [
-          DpipMap(
-            onMapCreated: (controller) async {
-              mapController.complete(controller);
-              await controller.setSymbolIconAllowOverlap(true);
-              await controller.setSymbolIconIgnorePlacement(true);
-            },
-          ),
+          _getContent(selected, context),
           Padding(
             padding: const EdgeInsets.all(10),
             child: Align(
@@ -83,7 +70,6 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
-          _getContent(selected, context),
         ],
       ),
     );
