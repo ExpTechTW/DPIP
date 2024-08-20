@@ -276,11 +276,11 @@
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
-  "settings_fcm": "複製 FCM Token",
+  "settings_fcm": "复制 FCM Token",
   "@settings_fcm": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copy_fcm": "已複製 FCM Token",
+  "settings_copy_fcm": "已复制 FCM Token",
   "@settings_copy_fcm": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
