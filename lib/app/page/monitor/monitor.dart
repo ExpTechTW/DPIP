@@ -47,12 +47,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _eewUpdateTimer;
   Timer? _blinkTimer;
   int _timeOffset = 0;
-  int _ping = 0;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
   int _timeReplay = 0;
   double userLat = 0;
   double userLon = 0;
+  double _ping = 0;
+  String _formattedPing = '';
   Map<String, double> _eewDist = {};
   Map<String, int> _eewUpdateList = {};
   Map<String, Map<String, int>> _userEewArriveTime = {};
@@ -276,7 +277,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       int t = DateTime.now().millisecondsSinceEpoch;
       final data = await ExpTech().getRts(_timeReplay);
       if (data.time < (_rtsData?.time ?? 0)) return;
-      _ping = DateTime.now().millisecondsSinceEpoch - t;
+      _ping = (DateTime.now().millisecondsSinceEpoch - t) / 1000;
+      String formattedPing = _ping.toStringAsFixed(2);
+      _formattedPing = formattedPing;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
     } catch (err) {
@@ -967,13 +970,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
-                    (!_dataStatus()) ? "999+ms" : "${_ping}ms",
+                    (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
                     style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: (!_dataStatus())
                             ? Colors.red
-                            : (_ping > 250)
+                            : (_ping > 1)
                                 ? Colors.orange
                                 : Colors.green),
                   ),
