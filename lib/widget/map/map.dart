@@ -17,7 +17,7 @@ class DpipMap extends StatefulWidget {
 
   const DpipMap({
     super.key,
-    this.initialCameraPosition = const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.4),
+    this.initialCameraPosition = const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
@@ -35,7 +35,7 @@ class DpipMapState extends State<DpipMap> {
       "version": 8,
       "name": "ExpTech Studio",
       "center": [120.85, 23.10],
-      "zoom": 6.4,
+      "zoom": 6.2,
       "sources": {
         "map": {
           "type": "vector",
@@ -117,6 +117,22 @@ class DpipMapState extends State<DpipMap> {
 
   String? styleAbsoluteFilePath;
 
+  double adjustedZoom(double zoom) {
+    double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    double baseZoomAdjustment = 1.0;
+    double mediumZoomAdjustment = 0.3;
+
+    if (devicePixelRatio >= 4.0) {
+      return zoom - baseZoomAdjustment;
+    } else if (devicePixelRatio >= 3.0) {
+      return zoom;
+    } else if (devicePixelRatio >= 2.0 && devicePixelRatio < 3.0) {
+      return zoom - mediumZoomAdjustment;
+    } else {
+      return zoom + baseZoomAdjustment;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -145,10 +161,15 @@ class DpipMapState extends State<DpipMap> {
       );
     }
 
+    double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
+
     return MapLibreMap(
       minMaxZoomPreference: const MinMaxZoomPreference(3, 9),
       trackCameraPosition: true,
-      initialCameraPosition: widget.initialCameraPosition,
+      initialCameraPosition: CameraPosition(
+        target: widget.initialCameraPosition.target,
+        zoom: adjustedZoomValue,
+      ),
       styleString: styleAbsoluteFilePath!,
       onMapCreated: widget.onMapCreated,
       onMapClick: widget.onMapClick,
