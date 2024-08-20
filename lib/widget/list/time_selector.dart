@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TimeSelector extends StatefulWidget {
-  final Function(DateTime) onTimeSelected;
-  final DateTime initialTime;
-  final Duration interval;
+  final Function(String) onTimeSelected;
+  final List<String> timeList;
 
   const TimeSelector({
     Key? key,
     required this.onTimeSelected,
-    required this.initialTime,
-    this.interval = const Duration(minutes: 10),
+    required this.timeList,
   }) : super(key: key);
 
   @override
@@ -18,7 +16,7 @@ class TimeSelector extends StatefulWidget {
 }
 
 class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {
-  late DateTime _selectedTime;
+  late String _selectedTimestamp;
   late List<DateTime> _timeList;
   late ScrollController _scrollController;
   final double _itemWidth = 80.0;
@@ -29,8 +27,8 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _selectedTime = widget.initialTime;
-    _generateTimeList();
+    _timeList = widget.timeList.map((e) => _convertTimestamp(e)).toList();
+    _selectedTimestamp = widget.timeList.last;
     _scrollController = ScrollController();
     _animationController = AnimationController(
       vsync: this,
@@ -43,6 +41,11 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
   }
 
+  DateTime _convertTimestamp(String timestamp) {
+    DateTime utcTime = DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
+    return utcTime.add(Duration(hours: 8));
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -50,15 +53,8 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
     super.dispose();
   }
 
-  void _generateTimeList() {
-    final now = DateTime.now();
-    _timeList = List.generate(24 * 6, (index) {
-      return now.subtract(Duration(minutes: (24 * 60) - (index * 10)));
-    });
-  }
-
   void _scrollToSelected() {
-    final index = _timeList.indexWhere((time) => time.isAtSameMomentAs(_selectedTime));
+    final index = widget.timeList.indexOf(_selectedTimestamp);
     if (index != -1) {
       _scrollController.animateTo(
         index * _itemWidth,
@@ -87,7 +83,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
         GestureDetector(
           onTap: _toggleExpanded,
           child: Container(
-            margin: EdgeInsets.only(bottom: 8, left: 16, right: 16),
+            margin: EdgeInsets.only(bottom: 4, left: 16, right: 16),
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
@@ -104,7 +100,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  DateFormat('yyyy/MM/dd HH:mm').format(_selectedTime),
+                  DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp)),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSurface,
@@ -130,16 +126,17 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
               child: ListView.builder(
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
-                itemCount: _timeList.length,
+                itemCount: widget.timeList.length,
                 itemBuilder: (context, index) {
-                  final time = _timeList[index];
-                  final isSelected = time.isAtSameMomentAs(_selectedTime);
+                  final timestamp = widget.timeList[index];
+                  final time = _convertTimestamp(timestamp);
+                  final isSelected = timestamp == _selectedTimestamp;
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        _selectedTime = time;
+                        _selectedTimestamp = timestamp;
                       });
-                      widget.onTimeSelected(_selectedTime);
+                      widget.onTimeSelected(_selectedTimestamp);
                       _scrollToSelected();
                     },
                     child: Container(

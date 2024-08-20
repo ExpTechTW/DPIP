@@ -167,4 +167,20 @@ class ExpTech {
 
     return json.map((e) => CrowdinLocalizationProgress.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  Future<List<String>> getRadarList() async {
+    final requestUrl = Route.radarList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    final List<String> radarList = jsonData.map((item) => item.toString()).toList();
+
+    return radarList;
+  }
 }

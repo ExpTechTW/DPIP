@@ -1,10 +1,9 @@
-// radar_map.dart
-import 'dart:async';
-
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/api/exptech.dart';
 
 class RadarMap extends StatefulWidget {
   const RadarMap({Key? key}) : super(key: key);
@@ -14,38 +13,64 @@ class RadarMap extends StatefulWidget {
 }
 
 class _RadarMapState extends State<RadarMap> {
-  final mapController = Completer<MapLibreMapController>();
-  DateTime _selectedTime = DateTime.now();
+  late MapLibreMapController _mapController;
+
+  List<String> radar_list = [];
+
+  String getTileUrl(String timestamp) {
+    return "https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png";
+  }
+
+  void _initMap(MapLibreMapController controller) async {
+    _mapController = controller;
+
+    radar_list = await ExpTech().getRadarList();
+
+    String newTileUrl = getTileUrl(radar_list.last);
+
+    _mapController.addSource(
+        "radarSource",
+        RasterSourceProperties(
+          tiles: [newTileUrl],
+          tileSize: 256,
+        ));
+
+    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        DpipMap(
-          onMapCreated: (controller) async {
-            mapController.complete(controller);
-            await controller.setSymbolIconAllowOverlap(true);
-            await controller.setSymbolIconIgnorePlacement(true);
-          },
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Container(
-            color: Colors.white.withOpacity(0),
+        DpipMap(onMapCreated: _initMap),
+        if (radar_list.isNotEmpty)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 2,
             child: TimeSelector(
-              initialTime: _selectedTime,
+              timeList: radar_list,
               onTimeSelected: (time) {
-                setState(() {
-                  _selectedTime = time;
-                });
-                // 在這裡添加更新雷達圖層的邏輯
-                print("Selected time: $_selectedTime");
+                String newTileUrl = getTileUrl(time);
+
+                _mapController.removeLayer("radarLayer");
+                _mapController.removeSource("radarSource");
+
+                _mapController.addSource(
+                    "radarSource",
+                    RasterSourceProperties(
+                      tiles: [newTileUrl],
+                      tileSize: 256,
+                    ));
+
+                _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
+
+                print("Selected time: $time");
               },
             ),
           ),
-        ),
       ],
     );
   }
