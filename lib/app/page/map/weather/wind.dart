@@ -75,14 +75,12 @@ class _WindMapState extends State<WindMap> {
     List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
     windDataList = weatherData
-        .where((station) =>
-    station.data.wind.direction != -99 &&
-        station.data.wind.speed != -99)
+        .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
         .map((station) => WindData(
-        latitude: station.station.lat,
-        longitude: station.station.lng,
-        direction: (station.data.wind.direction + 180) % 360,
-        speed: station.data.wind.speed))
+            latitude: station.station.lat,
+            longitude: station.station.lng,
+            direction: (station.data.wind.direction + 180) % 360,
+            speed: station.data.wind.speed))
         .toList();
 
     await addDynamicWindArrows(windDataList);
@@ -144,8 +142,32 @@ class _WindMapState extends State<WindMap> {
             })
         .toList();
 
-    await _mapController.setGeoJsonSource(
-        "wind-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource("wind-data", {"type": "FeatureCollection", "features": features});
+
+    await _mapController.removeLayer("wind-circles");
+    await _mapController.addLayer(
+      "wind-data",
+      "wind-circles",
+      const CircleLayerProperties(
+        circleRadius: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          5,
+          2,
+          10,
+          4,
+        ],
+        circleColor: "#808080",
+        circleStrokeWidth: 0.8,
+        circleStrokeColor: "#FFFFFF",
+      ),
+      filter: [
+        '==',
+        ['get', 'speed'],
+        0
+      ],
+    );
 
     await _mapController.removeLayer("wind-arrows");
     await _mapController.addLayer(
@@ -174,6 +196,11 @@ class _WindMapState extends State<WindMap> {
         textAllowOverlap: true,
         iconAllowOverlap: true,
       ),
+      filter: [
+        '!=',
+        ['get', 'speed'],
+        0
+      ],
     );
 
     await _mapController.removeLayer("wind-speed-labels");
@@ -221,14 +248,12 @@ class _WindMapState extends State<WindMap> {
                 windDataList = [];
 
                 windDataList = weatherData
-                    .where((station) =>
-                station.data.wind.direction != -99 &&
-                    station.data.wind.speed != -99)
+                    .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
                     .map((station) => WindData(
-                    latitude: station.station.lat,
-                    longitude: station.station.lng,
-                    direction: (station.data.wind.direction + 180) % 360,
-                    speed: station.data.wind.speed))
+                        latitude: station.station.lat,
+                        longitude: station.station.lng,
+                        direction: (station.data.wind.direction + 180) % 360,
+                        speed: station.data.wind.speed))
                     .toList();
 
                 await addDynamicWindArrows(windDataList);
