@@ -64,8 +64,7 @@ class _MePageState extends State<MePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Text(
-                      "版本 ${Global.packageInfo.version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+                    child: Text(context.i18n.me_version(Global.packageInfo.version.toString()),
                       textAlign: TextAlign.center,
                     ),
                   ),

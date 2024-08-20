@@ -78,7 +78,7 @@ class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
                       ),
                     ],
                   )
-                : const Text("Source Language"),
+                : Text(context.i18n.source_language),
             controlAffinity: ListTileControlAffinity.trailing,
             value: locale,
             groupValue: widget.locale,

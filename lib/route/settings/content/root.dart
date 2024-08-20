@@ -51,11 +51,11 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.audiotrack_sharp),
             ),
-            title: const Text(
-              "音效測試",
+            title: Text(
+              context.i18n.sound_test,
               style: tileTitleTextStyle,
             ),
-            subtitle: const Text("測試即時天氣資訊、地震速報等音效"),
+            subtitle: Text(context.i18n.sound_test_description),
             onTap: () {
               Navigator.pushNamed(
                 context,
@@ -98,18 +98,18 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          ListTileGroupHeader(title: context.i18n.settings_FCM),
+          ListTileGroupHeader(title: context.i18n.settings_fcm),
           ListTile(
             leading: Icon(
               Platform.isAndroid ? Icons.bug_report_rounded : CupertinoIcons.square_on_square,
             ),
-            title: Text(context.i18n.settings_FCM),
+            title: Text(context.i18n.settings_fcm),
             onTap: () {
               messaging.getToken().then((value) {
                 FlutterClipboard.copy(value ?? "");
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(context.i18n.settings_copyFCM),
+                    content: Text(context.i18n.settings_copy_fcm),
                   ),
                 );
               }).catchError((error) {
