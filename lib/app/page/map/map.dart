@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -22,7 +23,7 @@ class _MapPageState extends State<MapPage> {
       case 0:
         return const TsunamiMap();
       case 1:
-        return Container();
+        return RadarMap();
       default:
         return Container();
     }
