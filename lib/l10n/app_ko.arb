@@ -176,11 +176,11 @@
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "지진 속보",
+  "earthquake_warning": "지진 경보",
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "긴급 지진 속보",
+  "emergency_earthquake_warning": "긴급 지진 경보",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
