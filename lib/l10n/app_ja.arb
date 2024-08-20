@@ -447,7 +447,7 @@
   "@other_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
-  "server_announcement_sound": "アナウンスメント",
+  "server_announcement_sound": "伺服器公告",
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
