@@ -55,8 +55,12 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
   void _scrollToSelected() {
     final index = widget.timeList.indexOf(_selectedTimestamp);
     if (index != -1) {
+      final selectedItemOffset = index * _itemWidth;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final scrollOffset = selectedItemOffset - (screenWidth / 2) + (_itemWidth / 2);
+
       _scrollController.animateTo(
-        index * _itemWidth,
+        scrollOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
         duration: Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -130,46 +134,51 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                   final timestamp = widget.timeList[index];
                   final time = _convertTimestamp(timestamp);
                   final isSelected = timestamp == _selectedTimestamp;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedTimestamp = timestamp;
-                      });
-                      widget.onTimeSelected(_selectedTimestamp);
-                      _scrollToSelected();
-                    },
-                    child: Container(
-                      width: _itemWidth,
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            DateFormat('HH:mm').format(time),
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.onSecondary
-                                  : Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                  return Container(
+                    width: _itemWidth,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedTimestamp = timestamp;
+                        });
+                        widget.onTimeSelected(_selectedTimestamp);
+                        _scrollToSelected();
+                      },
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 200),
+                        alignment: Alignment.center,
+                        margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AnimatedDefaultTextStyle(
+                              duration: Duration(milliseconds: 200),
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.onSecondary
+                                    : Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              child: Text(DateFormat('HH:mm').format(time)),
                             ),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            DateFormat('MM/dd').format(time),
-                            style: TextStyle(
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.onSecondary
-                                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                              fontSize: 12,
+                            SizedBox(height: 4),
+                            AnimatedDefaultTextStyle(
+                              duration: Duration(milliseconds: 200),
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.onSecondary
+                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                fontSize: 12,
+                              ),
+                              child: Text(DateFormat('MM/dd').format(time)),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );

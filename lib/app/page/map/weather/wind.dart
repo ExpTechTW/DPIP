@@ -67,6 +67,9 @@ class _WindMapState extends State<WindMap> {
       await _addUserLocationMarker();
     }
 
+    await _mapController.addSource(
+        "wind-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+
     weather_list = await ExpTech().getWeatherList();
 
     List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
@@ -138,9 +141,10 @@ class _WindMapState extends State<WindMap> {
             })
         .toList();
 
-    await _mapController.addSource(
-        "wind-data", GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": features}));
+    await _mapController.setGeoJsonSource(
+        "wind-data", {"type": "FeatureCollection", "features": features});
 
+    await _mapController.removeLayer("wind-arrows");
     await _mapController.addLayer(
       "wind-data",
       "wind-arrows",
@@ -169,6 +173,7 @@ class _WindMapState extends State<WindMap> {
       ),
     );
 
+    await _mapController.removeLayer("wind-speed-labels");
     await _mapController.addSymbolLayer(
       "wind-data",
       "wind-speed-labels",
@@ -187,7 +192,7 @@ class _WindMapState extends State<WindMap> {
           [0, 2]
         ],
       ),
-      minzoom: 8,
+      minzoom: 9,
     );
   }
 

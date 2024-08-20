@@ -70,7 +70,7 @@ class _MapPageState extends State<MapPage> {
                     const PopupMenuItem<int>(
                       value: 2,
                       child: ListTile(
-                        leading: Icon(Symbols.radar),
+                        leading: Icon(Symbols.wind_power_sharp),
                         title: Text('風向/風速'),
                       ),
                     ),
