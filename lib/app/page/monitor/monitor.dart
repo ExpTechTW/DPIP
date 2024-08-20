@@ -17,15 +17,9 @@ import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:timezone/timezone.dart' as tz;
 
 import 'eew_info.dart';
@@ -105,7 +99,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     _eewUI.add(Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
-      child: Text(context.i18n.earthquake_warning_error,
+      child: Text(
+        context.i18n.earthquake_warning_error,
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 20, color: context.colors.error),
       ),
@@ -482,7 +477,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _eewLastInfo[eew.id]?.status == 1 ? context.i18n.emergency_earthquake_warning : context.i18n.earthquake_warning,
+                        _eewLastInfo[eew.id]?.status == 1
+                            ? context.i18n.emergency_earthquake_warning
+                            : context.i18n.earthquake_warning,
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurface,
@@ -582,7 +579,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(context.i18n.location_estimate,
+                            Text(
+                              context.i18n.location_estimate,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
@@ -608,7 +606,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(context.i18n.seismic_waves,
+                            Text(
+                              context.i18n.seismic_waves,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: context.colors.onSurfaceVariant,
@@ -620,11 +619,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        (!isUserLocationValid) ? context.i18n.monitor_unknown : context.i18n.monitor_arrival,
+                                        (!isUserLocationValid)
+                                            ? context.i18n.monitor_unknown
+                                            : context.i18n.monitor_arrival,
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 36,
-                                            color: context.colors.onSurface),
+                                            fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
                                       ),
                                     ],
                                   )
@@ -642,7 +641,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                       const SizedBox(
                                         width: 10,
                                       ),
-                                      Text(context.i18n.monitor_after_seconds,
+                                      Text(
+                                        context.i18n.monitor_after_seconds,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold, fontSize: 14, color: context.colors.onSurface),
                                       ),
@@ -663,7 +663,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (eewUI.isEmpty) {
       eewUI.add(Padding(
         padding: const EdgeInsets.only(left: 20, right: 20),
-        child: Text(context.i18n.no_earthquake_warning,
+        child: Text(
+          context.i18n.no_earthquake_warning,
           textAlign: TextAlign.left,
           style: const TextStyle(fontSize: 20),
         ),

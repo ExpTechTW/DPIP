@@ -56,7 +56,7 @@ void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
   }
 }
 
-void androidSendPositionlisten(){
+void androidSendPositionlisten() {
   service.on('sendposition').listen((event) {
     if (event != null) {
       var positionData = event.values.first;
@@ -171,7 +171,7 @@ void onStart(ServiceInstance service) async {
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
-        service.invoke("sendposition",{"position": position.toJson()});
+        service.invoke("sendposition", {"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
         String country = position.position.country;
@@ -182,7 +182,7 @@ void onStart(ServiceInstance service) async {
         }
 
         String notifyTitle = '自動定位中';
-        String date=DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+        String date = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
         String notifyBody = '$date\n$lat,$lon $country';
 
         flutterLocalNotificationsPlugin.show(
