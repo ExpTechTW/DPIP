@@ -20,7 +20,8 @@ class LocaleSelectorRoute extends StatefulWidget {
 
 class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
   List<CrowdinLocalizationProgress> progress = [];
-  List<Locale> localeList = AppLocalizations.supportedLocales.where((e) => !["zh"].contains(e.toLanguageTag())).toList();
+  List<Locale> localeList =
+      AppLocalizations.supportedLocales.where((e) => !["zh"].contains(e.toLanguageTag())).toList();
 
   @override
   void initState() {

@@ -48,7 +48,12 @@ class ExpTech {
     var requestUrl = Route.rts();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl.toString().replaceAll("rts", "rts/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+      requestUrl = Uri.parse(requestUrl
+          .toString()
+          .replaceAll("rts", "rts/$time")
+          .replaceAll("lb-", "api-")
+          .replaceAll("-3", "-1")
+          .replaceAll("-4", "-2"));
     }
 
     var res = await get(requestUrl);
@@ -64,7 +69,12 @@ class ExpTech {
     var requestUrl = Route.eew();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl.toString().replaceAll("eew", "eew/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+      requestUrl = Uri.parse(requestUrl
+          .toString()
+          .replaceAll("eew", "eew/$time")
+          .replaceAll("lb-", "api-")
+          .replaceAll("-3", "-1")
+          .replaceAll("-4", "-2"));
     }
 
     var res = await get(requestUrl);

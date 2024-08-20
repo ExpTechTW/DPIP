@@ -3,15 +3,14 @@ import 'dart:async';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami_estimate_list.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami_observed_list.dart';
+import 'package:dpip/model/tsunami/tsunami.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart' as tz;
-
-import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/widget/map/map.dart';
 
 class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
