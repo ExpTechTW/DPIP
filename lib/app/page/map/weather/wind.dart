@@ -74,13 +74,16 @@ class _WindMapState extends State<WindMap> {
 
     List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
-    windDataList.addAll(weatherData.map((station) {
-      return WindData(
-          latitude: station.station.lat,
-          longitude: station.station.lng,
-          direction: (station.data.wind.direction + 180) % 360,
-          speed: station.data.wind.speed);
-    }));
+    windDataList = weatherData
+        .where((station) =>
+    station.data.wind.direction != -99 &&
+        station.data.wind.speed != -99)
+        .map((station) => WindData(
+        latitude: station.station.lat,
+        longitude: station.station.lng,
+        direction: (station.data.wind.direction + 180) % 360,
+        speed: station.data.wind.speed))
+        .toList();
 
     await addDynamicWindArrows(windDataList);
     setState(() {});
@@ -217,13 +220,16 @@ class _WindMapState extends State<WindMap> {
 
                 windDataList = [];
 
-                windDataList.addAll(weatherData.map((station) {
-                  return WindData(
-                      latitude: station.station.lat,
-                      longitude: station.station.lng,
-                      direction: station.data.wind.direction,
-                      speed: station.data.wind.speed);
-                }));
+                windDataList = weatherData
+                    .where((station) =>
+                station.data.wind.direction != -99 &&
+                    station.data.wind.speed != -99)
+                    .map((station) => WindData(
+                    latitude: station.station.lat,
+                    longitude: station.station.lng,
+                    direction: (station.data.wind.direction + 180) % 360,
+                    speed: station.data.wind.speed))
+                    .toList();
 
                 await addDynamicWindArrows(windDataList);
                 setState(() {});

@@ -1,5 +1,6 @@
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
+import 'package:dpip/app/page/map/weather/temperature.dart';
 import 'package:dpip/app/page/map/weather/wind.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -25,6 +26,8 @@ class _MapPageState extends State<MapPage> {
         return const TsunamiMap();
       case 1:
         return RadarMap();
+      case 2:
+        return TemperatureMap();
       default:
         return WindMap();
     }
@@ -69,6 +72,13 @@ class _MapPageState extends State<MapPage> {
                     ),
                     const PopupMenuItem<int>(
                       value: 2,
+                      child: ListTile(
+                        leading: Icon(Symbols.temp_preferences_eco_rounded),
+                        title: Text('氣溫'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 3,
                       child: ListTile(
                         leading: Icon(Symbols.wind_power_sharp),
                         title: Text('風向/風速'),
