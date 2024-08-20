@@ -1,24 +1,30 @@
 import 'dart:io';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/weather.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
-import 'package:dpip/global.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/api/exptech.dart';
 
 class TemperatureData {
   final double latitude;
   final double longitude;
   final double temperature;
+  final String stationName;
+  final String county;
+  final String town;
 
   TemperatureData({
     required this.latitude,
     required this.longitude,
     required this.temperature,
+    required this.stationName,
+    required this.county,
+    required this.town,
   });
 }
 
@@ -41,7 +47,6 @@ class _TemperatureMapState extends State<TemperatureMap> {
 
   Future<void> _loadMapImages(bool isDark) async {
     await loadGPSImage(_mapController);
-    // Load any additional images if needed
   }
 
   void _initMap(MapLibreMapController controller) async {
@@ -78,6 +83,9 @@ class _TemperatureMapState extends State<TemperatureMap> {
               latitude: station.station.lat,
               longitude: station.station.lng,
               temperature: station.data.air.temperature,
+              stationName: station.station.name,
+              county: station.station.county,
+              town: station.station.town,
             ))
         .toList();
 
@@ -86,7 +94,43 @@ class _TemperatureMapState extends State<TemperatureMap> {
   }
 
   Future<void> _addUserLocationMarker() async {
-    // Same as in WindMap
+    await _mapController.addSource(
+        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    await _mapController.addLayer(
+      "markers-geojson",
+      "markers",
+      const SymbolLayerProperties(
+        symbolZOrder: "source",
+        iconSize: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          5,
+          0.5,
+          10,
+          1.5,
+        ],
+        iconImage: "gps",
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+      ),
+    );
+    await _mapController.setGeoJsonSource(
+      "markers-geojson",
+      {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point"
+            }
+          }
+        ],
+      },
+    );
   }
 
   Future<void> addTemperatureCircles(List<TemperatureData> temperatureDataList) async {
@@ -123,9 +167,22 @@ class _TemperatureMapState extends State<TemperatureMap> {
           Expressions.interpolate,
           ["linear"],
           [Expressions.get, "temperature"],
-          0, "#0000FF", // Blue for cold
-          15, "#FFFFFF", // White for mild
-          30, "#FF0000", // Red for hot
+          -20,
+          "#0000FF",
+          -10,
+          "#4169E1",
+          -5,
+          "#6495ED",
+          0,
+          "#FFFFFF",
+          10,
+          "#FFDAB9",
+          20,
+          "#FFA500",
+          30,
+          "#FF4500",
+          40,
+          "#8B0000",
         ],
         circleOpacity: 0.7,
       ),
@@ -136,12 +193,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
       "temperature-data",
       "temperature-labels",
       const SymbolLayerProperties(
-        textField: [
-          Expressions.format,
-          ['get', 'temperature'],
-          2, // 2 decimal places
-          "°C"
-        ],
+        textField: ['get', 'temperature'],
         textSize: 12,
         textColor: '#ffffff',
         textHaloColor: '#000000',
@@ -149,7 +201,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
         textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
-          [0, 0]
+          [0, 2]
         ],
       ),
       minzoom: 9,
@@ -183,6 +235,9 @@ class _TemperatureMapState extends State<TemperatureMap> {
                           latitude: station.station.lat,
                           longitude: station.station.lng,
                           temperature: station.data.air.temperature,
+                          stationName: station.station.name,
+                          county: station.station.county,
+                          town: station.station.town,
                         ))
                     .toList();
 
