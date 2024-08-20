@@ -1,5 +1,6 @@
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
+import 'package:dpip/app/page/map/weather/wind.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -25,7 +26,7 @@ class _MapPageState extends State<MapPage> {
       case 1:
         return RadarMap();
       default:
-        return Container();
+        return WindMap();
     }
   }
 
@@ -64,6 +65,13 @@ class _MapPageState extends State<MapPage> {
                       child: ListTile(
                         leading: Icon(Symbols.radar),
                         title: Text('雷達回波'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 2,
+                      child: ListTile(
+                        leading: Icon(Symbols.radar),
+                        title: Text('風向/風速'),
                       ),
                     ),
                   ],

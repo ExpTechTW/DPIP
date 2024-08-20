@@ -9,6 +9,7 @@ import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
+import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
 
 class ExpTech {
@@ -179,8 +180,34 @@ class ExpTech {
 
     final List<dynamic> jsonData = jsonDecode(res.body);
 
-    final List<String> radarList = jsonData.map((item) => item.toString()).toList();
+    return jsonData.map((item) => item.toString()).toList();
+  }
 
-    return radarList;
+  Future<List<String>> getWeatherList() async {
+    final requestUrl = Route.weatherList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<WeatherStation>> getWeather(String time) async {
+    final requestUrl = Route.weather(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
   }
 }

@@ -42,8 +42,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
   }
 
   DateTime _convertTimestamp(String timestamp) {
-    DateTime utcTime = DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
-    return utcTime.add(Duration(hours: 8));
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp));
   }
 
   @override

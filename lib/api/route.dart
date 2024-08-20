@@ -35,4 +35,6 @@ class Route {
       Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
   static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
   static Uri radarList() => Uri.parse("$onlyapi/v1/tiles/radar/list");
+  static Uri weatherList() => Uri.parse("$onlyapi/v1/meteor/weather/list");
+  static Uri weather(String time) => Uri.parse("$onlyapi/v1/meteor/weather/$time");
 }
