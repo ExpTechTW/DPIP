@@ -305,7 +305,7 @@
       }
     }
   },
-  "source_language": "來源語言",
+  "source_language": "Source Language",
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
