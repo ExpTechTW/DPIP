@@ -23,9 +23,13 @@ class TsunamiMap extends StatefulWidget {
 
 class _TsunamiMapState extends State<TsunamiMap> {
   late MapLibreMapController _mapController;
+  Timer? _blinkTimer;
   Tsunami? tsunami;
   String tsunamiStatus = "";
-  bool refreshingTsunami = true;
+  int _isTsunamiVisible = 0;
+  String _tsunami_id = "";
+  int _tsunami_serial = 0;
+  String? _selectedOption;
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
@@ -41,10 +45,46 @@ class _TsunamiMapState extends State<TsunamiMap> {
     if (tsunami != null) {
       await addTsunamiObservationPoints(tsunami!);
     }
+    setState(() {});
+  }
+
+  String heightToColor(int height) {
+    Color color;
+    if (height >= 2) {
+      color = const Color(0xFFE543FF);
+    } else if (height == 1) {
+      color = const Color(0xFFC90000);
+    } else {
+      color = const Color(0xFFFFC900);
+    }
+    return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
   }
 
   Future<void> addTsunamiObservationPoints(Tsunami tsunami) async {
+    await _mapController.removeLayer("tsunami-actual-circles");
+    await _mapController.removeLayer("tsunami-actual-labels");
+    _blinkTimer?.cancel();
+    await _mapController.setLayerProperties("tsunami", const LineLayerProperties(lineOpacity: 0));
     if (tsunami.info.type == "estimate") {
+      Map<String, String> area_color = {};
+      tsunami.info.data.forEach((station) {
+        var estimateStation = station as TsunamiEstimate;
+        area_color[estimateStation.area] = heightToColor(estimateStation.waveHeight);
+      });
+
+      _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+        if (!mounted) return;
+        await _mapController.setLayerProperties(
+            "tsunami",
+            LineLayerProperties(lineColor: [
+              "match",
+              ["get", "AREANAME"],
+              ...area_color.entries.expand((entry) => [entry.key, entry.value]),
+              "#000000" // 添加默認顏色
+            ], lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0));
+        _isTsunamiVisible++;
+        if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
+      });
     } else {
       final features = tsunami.info.data.map((station) {
         var actualStation = station as TsunamiActual;
@@ -127,21 +167,24 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   Future<Tsunami?> refreshTsunami() async {
-    refreshingTsunami = true;
     var idList = await ExpTech().getTsunamiList();
     var id = "";
     if (idList.isNotEmpty) {
-      id = idList[0];
+      id = idList.first;
+      _tsunami_id = id.split("-")[0];
+      _tsunami_serial = int.parse(id.split("-")[1]);
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
           ? tsunamiStatus = "發布"
           : (tsunami?.status == 1)
               ? tsunamiStatus = "更新"
               : tsunamiStatus = "解除";
+
+      List<String> options = generateTsunamiOptions();
+      if (options.isNotEmpty && _selectedOption == null) {
+        _selectedOption = options.last;
+      }
     }
-    setState(() {
-      refreshingTsunami = false;
-    });
     return tsunami;
   }
 
@@ -184,8 +227,24 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   @override
+  void dispose() {
+    _blinkTimer?.cancel();
+    super.dispose();
+  }
+
+  List<String> generateTsunamiOptions() {
+    List<String> options = [];
+    for (int i = 1; i <= _tsunami_serial; i++) {
+      options.add("$_tsunami_id-$i");
+    }
+    return options;
+  }
+
+  @override
   Widget build(BuildContext context) {
     const sheetInitialSize = 0.16;
+    List<String> tsunamiOptions = generateTsunamiOptions();
+
     return Stack(children: [
       DpipMap(
         onMapCreated: _initMap,
@@ -218,39 +277,100 @@ class _TsunamiMapState extends State<TsunamiMap> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: refreshingTsunami == true
+                    child: tsunami == null
                         ? Container()
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                tsunami == null ? "近期無海嘯資訊" : "海嘯警報",
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2,
-                                  color: context.colors.onSurface,
-                                ),
-                              ),
-                              tsunami != null
-                                  ? Text(
-                                      "${tsunami?.id}號 第${tsunami?.serial}報",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        letterSpacing: 1,
-                                        color: context.colors.onSurface,
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          tsunami == null ? "近期無海嘯資訊" : "海嘯警報",
+                                          style: TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 2,
+                                            color: context.colors.onSurface,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        if (tsunami != null)
+                                          Text(
+                                            "${tsunami?.id}號 第${tsunami?.serial}報",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              letterSpacing: 1,
+                                              color: context.colors.onSurface.withOpacity(0.8),
+                                            ),
+                                          ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          tsunami != null
+                                              ? "${convertTimestamp(tsunami!.time)} $tsunamiStatus"
+                                              : "${getTime()} 更新",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            letterSpacing: 1,
+                                            color: context.colors.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  if (tsunamiOptions.isNotEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: context.colors.surface,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: context.colors.onSurface.withOpacity(0.1),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
-                                    )
-                                  : Container(),
-                              Text(
-                                tsunami != null
-                                    ? "${convertTimestamp(tsunami!.time)} $tsunamiStatus"
-                                    : "${getTime()} 更新",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  letterSpacing: 1,
-                                  color: context.colors.onSurfaceVariant,
-                                ),
+                                      child: DropdownButton<String>(
+                                        value: _selectedOption,
+                                        onChanged: (String? newValue) async {
+                                          if (newValue == null) return;
+                                          _selectedOption = newValue;
+                                          tsunami = await ExpTech().getTsunami(newValue);
+                                          tsunamiStatus = tsunami?.status == 0
+                                              ? "發布"
+                                              : tsunami?.status == 1
+                                                  ? "更新"
+                                                  : "解除";
+                                          if (tsunami != null) {
+                                            await addTsunamiObservationPoints(tsunami!);
+                                          }
+                                          setState(() {});
+                                        },
+                                        items: tsunamiOptions.reversed.map<DropdownMenuItem<String>>((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                        style: TextStyle(
+                                          color: context.colors.onSurface,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        icon: Icon(Icons.arrow_drop_down, color: context.colors.onSurface),
+                                        underline: const SizedBox(),
+                                        dropdownColor: context.colors.surface,
+                                      ),
+                                    ),
+                                ],
                               ),
                               const SizedBox(
                                 height: 30,
