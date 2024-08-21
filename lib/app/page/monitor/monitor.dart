@@ -923,9 +923,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: _timeReplay != 0
+          ? AppBar(
         title: Text(context.i18n.monitor),
-      ),
+      )
+          : null,
       body: Stack(
         children: [
           DpipMap(
@@ -992,8 +994,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           ),
           if (_rtsUI.isNotEmpty)
             Positioned(
-              right: 4,
-              top: 4,
+              left: 4,
+              top: 62,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [..._rtsUI],

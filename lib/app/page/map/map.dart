@@ -9,6 +9,7 @@ import 'package:dpip/app/page/map/weather/wind.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/app/page/monitor/monitor.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -18,7 +19,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  int selected = 1;
+  int selected = 7;
 
   @override
   void initState() {
@@ -41,8 +42,33 @@ class _MapPageState extends State<MapPage> {
         return const PressureMap();
       case 6:
         return const RainMap();
+      case 7:
+        return const MonitorPage(data: 0);
       default:
         return const TyphoonMap();
+    }
+  }
+
+  String _getTitle(int value) {
+    switch (value) {
+      case 0:
+        return '海嘯資訊';
+      case 1:
+        return '雷達回波';
+      case 2:
+        return '氣溫';
+      case 3:
+        return '風向/風速';
+      case 4:
+        return '濕度';
+      case 5:
+        return '氣壓';
+      case 6:
+        return '降水';
+      case 7:
+        return '強震監視器';
+      default:
+        return '颱風';
     }
   }
 
@@ -50,16 +76,16 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.i18n.map),
+        title: Text(_getTitle(selected)),
       ),
       body: Stack(
         children: [
           _getContent(selected, context),
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(5),
             child: Align(
               alignment: Alignment.topRight,
-              child: FloatingActionButton(
+              child: FloatingActionButton.small(
                 onPressed: () {},
                 child: PopupMenuButton<int>(
                   icon: const Icon(Symbols.menu),
@@ -69,6 +95,13 @@ class _MapPageState extends State<MapPage> {
                     });
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+                    const PopupMenuItem<int>(
+                      value: 7,
+                      child: ListTile(
+                        leading: Icon(Symbols.monitor_heart),
+                        title: Text('強震監視器'),
+                      ),
+                    ),
                     const PopupMenuItem<int>(
                       value: 1,
                       child: ListTile(
@@ -112,7 +145,7 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                     // const PopupMenuItem<int>(
-                    //   value: 7,
+                    //   value: 8,
                     //   child: ListTile(
                     //     leading: Icon(Symbols.rainy_light_rounded),
                     //     title: Text('颱風'),
