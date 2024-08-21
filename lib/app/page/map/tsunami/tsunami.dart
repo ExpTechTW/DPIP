@@ -1,18 +1,21 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami_estimate_list.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami_observed_list.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
+import 'package:dpip/model/tsunami/tsunami_actual.dart';
+import 'package:dpip/model/tsunami/tsunami_estimate.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:dpip/model/tsunami/tsunami_actual.dart';
-import 'package:dpip/model/tsunami/tsunami_estimate.dart';
 
 class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
@@ -30,9 +33,17 @@ class _TsunamiMapState extends State<TsunamiMap> {
   String _tsunami_id = "";
   int _tsunami_serial = 0;
   String? _selectedOption;
+  double userLat = 0;
+  double userLon = 0;
+  bool isUserLocationValid = false;
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
+  }
+
+  Future<void> _loadMapImages(bool isDark) async {
+    await loadGPSImage(_mapController);
+    await loadCrossImage(_mapController);
   }
 
   void _loadMap() async {
@@ -45,6 +56,23 @@ class _TsunamiMapState extends State<TsunamiMap> {
     if (tsunami != null) {
       await addTsunamiObservationPoints(tsunami!);
     }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    await _loadMapImages(isDark);
+
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
+    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+    if (isUserLocationValid) {
+      await _addUserLocationMarker();
+    }
+
     setState(() {});
   }
 
@@ -84,7 +112,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
               "match",
               ["get", "AREANAME"],
               ...area_color.entries.expand((entry) => [entry.key, entry.value]),
-              "#000000" // 添加默認顏色
+              "#000000"
             ], lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0));
         _isTsunamiVisible++;
         if (_isTsunamiVisible >= 8) _isTsunamiVisible = 0;
@@ -166,6 +194,65 @@ class _TsunamiMapState extends State<TsunamiMap> {
         minzoom: 7,
       );
     }
+  }
+
+  Future<void> _addUserLocationMarker() async {
+    await _mapController.addSource(
+        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+    await _mapController.addLayer(
+      "markers-geojson",
+      "markers",
+      const SymbolLayerProperties(
+        symbolZOrder: "source",
+        iconSize: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          5,
+          0.5,
+          10,
+          1.5,
+        ],
+        iconImage: [
+          Expressions.match,
+          [Expressions.get, "cross"],
+          1,
+          "cross",
+          "gps"
+        ],
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+      ),
+    );
+    List markers_features = [];
+    final tsunami = this.tsunami;
+    if (tsunami != null) {
+      markers_features.add({
+        "type": "Feature",
+        "properties": {
+          "cross": 1,
+        },
+        "geometry": {
+          "coordinates": [tsunami.eq.lon, tsunami.eq.lat],
+          "type": "Point"
+        }
+      });
+    }
+    markers_features.add({
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "coordinates": [userLon, userLat],
+        "type": "Point"
+      }
+    });
+    await _mapController.setGeoJsonSource(
+      "markers-geojson",
+      {
+        "type": "FeatureCollection",
+        "features": markers_features,
+      },
+    );
   }
 
   Future<Tsunami?> refreshTsunami() async {

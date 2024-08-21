@@ -1,8 +1,8 @@
 import 'dart:convert';
+import 'dart:math' show asin, atan2, cos, pi, sin;
 
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'dart:math' show asin, atan2, cos, pi, sin;
 
 import '../../../../widget/map/map.dart';
 
@@ -24,12 +24,8 @@ class TyphoonData {
     return TyphoonData(
       year: tropicalCyclone['year'],
       cwaTdNo: tropicalCyclone['cwaTdNo'],
-      analysisFixes: (tropicalCyclone['analysisData']['fix'] as List)
-          .map((fix) => TyphoonFix.fromJson(fix))
-          .toList(),
-      forecastFixes: (tropicalCyclone['forecastData']['fix'] as List)
-          .map((fix) => TyphoonFix.fromJson(fix))
-          .toList(),
+      analysisFixes: (tropicalCyclone['analysisData']['fix'] as List).map((fix) => TyphoonFix.fromJson(fix)).toList(),
+      forecastFixes: (tropicalCyclone['forecastData']['fix'] as List).map((fix) => TyphoonFix.fromJson(fix)).toList(),
     );
   }
 
@@ -39,7 +35,6 @@ class TyphoonData {
     return [...analysisFixes, ...forecastFixes].map((fix) => fix.coordinate).toList();
   }
 }
-
 
 class TyphoonFix {
   final DateTime fixTime;
@@ -76,16 +71,10 @@ class TyphoonFix {
       pressure: int.parse(json['pressure']),
       movingSpeed: json['movingSpeed'],
       movingDirection: json['movingDirection'],
-      movingPrediction: (json['movingPrediction'] as List?)
-          ?.map((pred) => pred['value'].toString())
-          .toList() ??
-          [],
-      radiusOf70PercentProbability: json['radiusOf70PercentProbability'] != null
-          ? double.parse(json['radiusOf70PercentProbability'])
-          : null,
-      circleOf15MsRadius: json['circleOf15Ms']?['radius'] != null
-          ? double.parse(json['circleOf15Ms']['radius'])
-          : null,
+      movingPrediction: (json['movingPrediction'] as List?)?.map((pred) => pred['value'].toString()).toList() ?? [],
+      radiusOf70PercentProbability:
+          json['radiusOf70PercentProbability'] != null ? double.parse(json['radiusOf70PercentProbability']) : null,
+      circleOf15MsRadius: json['circleOf15Ms']?['radius'] != null ? double.parse(json['circleOf15Ms']['radius']) : null,
     );
   }
 }
@@ -278,8 +267,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
       final bearing = i * pi / 180;
       final lat1 = center.latitude * pi / 180;
       final lon1 = center.longitude * pi / 180;
-      final lat2 = asin(sin(lat1) * cos(radiusInKm / earthRadiusKm) +
-          cos(lat1) * sin(radiusInKm / earthRadiusKm) * cos(bearing));
+      final lat2 = asin(
+          sin(lat1) * cos(radiusInKm / earthRadiusKm) + cos(lat1) * sin(radiusInKm / earthRadiusKm) * cos(bearing));
       final lon2 = lon1 +
           atan2(sin(bearing) * sin(radiusInKm / earthRadiusKm) * cos(lat1),
               cos(radiusInKm / earthRadiusKm) - sin(lat1) * sin(lat2));
@@ -310,13 +299,13 @@ class _TyphoonMapState extends State<TyphoonMap> {
       },
       // 預測位置
       ...typhoon.forecastFixes.map((fix) => {
-        "type": "Feature",
-        "properties": {"type": "forecast"},
-        "geometry": {
-          "type": "Point",
-          "coordinates": [fix.coordinate.longitude, fix.coordinate.latitude],
-        },
-      }),
+            "type": "Feature",
+            "properties": {"type": "forecast"},
+            "geometry": {
+              "type": "Point",
+              "coordinates": [fix.coordinate.longitude, fix.coordinate.latitude],
+            },
+          }),
     ];
 
     // 添加70%機率半徑
@@ -340,9 +329,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
         "properties": {"type": "15ms-radius"},
         "geometry": {
           "type": "Polygon",
-          "coordinates": [
-            _createCircle(typhoon.currentFix.coordinate, typhoon.currentFix.circleOf15MsRadius!)
-          ],
+          "coordinates": [_createCircle(typhoon.currentFix.coordinate, typhoon.currentFix.circleOf15MsRadius!)],
         },
       });
     }
@@ -413,16 +400,12 @@ class TyphoonInfoCard extends StatelessWidget {
             Text('最大風速: ${currentFix.maxWindSpeed} m/s'),
             Text('最大陣風: ${currentFix.maxGustSpeed} m/s'),
             Text('氣壓: ${currentFix.pressure} hPa'),
-            if (currentFix.movingSpeed != null)
-              Text('移動速度: ${currentFix.movingSpeed} km/h'),
-            if (currentFix.movingDirection != null)
-              Text('移動方向: ${currentFix.movingDirection}'),
-            if (currentFix.movingPrediction.isNotEmpty)
-              Text('移動預測: ${currentFix.movingPrediction.first}'),
+            if (currentFix.movingSpeed != null) Text('移動速度: ${currentFix.movingSpeed} km/h'),
+            if (currentFix.movingDirection != null) Text('移動方向: ${currentFix.movingDirection}'),
+            if (currentFix.movingPrediction.isNotEmpty) Text('移動預測: ${currentFix.movingPrediction.first}'),
             if (currentFix.radiusOf70PercentProbability != null)
               Text('70%機率半徑: ${currentFix.radiusOf70PercentProbability} km'),
-            if (currentFix.circleOf15MsRadius != null)
-              Text('15m/s風速半徑: ${currentFix.circleOf15MsRadius} km'),
+            if (currentFix.circleOf15MsRadius != null) Text('15m/s風速半徑: ${currentFix.circleOf15MsRadius} km'),
           ],
         ),
       ),

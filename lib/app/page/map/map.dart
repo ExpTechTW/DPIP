@@ -1,9 +1,9 @@
 import 'package:dpip/app/page/map/radar/radar.dart';
+import 'package:dpip/app/page/map/rain/rain.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
 import 'package:dpip/app/page/map/typhoon/typhoon.dart';
 import 'package:dpip/app/page/map/weather/humidity.dart';
 import 'package:dpip/app/page/map/weather/pressure.dart';
-import 'package:dpip/app/page/map/rain/rain.dart';
 import 'package:dpip/app/page/map/weather/temperature.dart';
 import 'package:dpip/app/page/map/weather/wind.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -18,7 +18,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  int selected = 0;
+  int selected = 1;
 
   @override
   void initState() {
@@ -70,13 +70,6 @@ class _MapPageState extends State<MapPage> {
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
                     const PopupMenuItem<int>(
-                      value: 0,
-                      child: ListTile(
-                        leading: Icon(Symbols.tsunami),
-                        title: Text('海嘯資訊'),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
                       value: 1,
                       child: ListTile(
                         leading: Icon(Symbols.radar),
@@ -84,17 +77,17 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                     const PopupMenuItem<int>(
+                      value: 6,
+                      child: ListTile(
+                        leading: Icon(Symbols.rainy_heavy_rounded),
+                        title: Text('降水'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
                       value: 2,
                       child: ListTile(
                         leading: Icon(Symbols.temp_preferences_eco_rounded),
                         title: Text('氣溫'),
-                      ),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 3,
-                      child: ListTile(
-                        leading: Icon(Symbols.wind_power_sharp),
-                        title: Text('風向/風速'),
                       ),
                     ),
                     const PopupMenuItem<int>(
@@ -112,10 +105,10 @@ class _MapPageState extends State<MapPage> {
                       ),
                     ),
                     const PopupMenuItem<int>(
-                      value: 6,
+                      value: 3,
                       child: ListTile(
-                        leading: Icon(Symbols.rainy_heavy_rounded),
-                        title: Text('降水'),
+                        leading: Icon(Symbols.wind_power_sharp),
+                        title: Text('風向/風速'),
                       ),
                     ),
                     // const PopupMenuItem<int>(
@@ -125,6 +118,13 @@ class _MapPageState extends State<MapPage> {
                     //     title: Text('颱風'),
                     //   ),
                     // ),
+                    const PopupMenuItem<int>(
+                      value: 0,
+                      child: ListTile(
+                        leading: Icon(Symbols.tsunami),
+                        title: Text('海嘯資訊'),
+                      ),
+                    ),
                   ],
                 ),
               ),
