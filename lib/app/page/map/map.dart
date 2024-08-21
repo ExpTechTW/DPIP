@@ -2,7 +2,7 @@ import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
 import 'package:dpip/app/page/map/weather/humidity.dart';
 import 'package:dpip/app/page/map/weather/pressure.dart';
-import 'package:dpip/app/page/map/weather/rain.dart';
+import 'package:dpip/app/page/map/rain/rain.dart';
 import 'package:dpip/app/page/map/weather/temperature.dart';
 import 'package:dpip/app/page/map/weather/wind.dart';
 import 'package:dpip/util/extension/build_context.dart';

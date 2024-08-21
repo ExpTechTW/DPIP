@@ -34,7 +34,9 @@ class _RadarMapState extends State<RadarMap> {
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
+  }
 
+  void _loadMap() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -107,7 +109,10 @@ class _RadarMapState extends State<RadarMap> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        DpipMap(onMapCreated: _initMap),
+        DpipMap(
+          onMapCreated: _initMap,
+          onStyleLoadedCallback: _loadMap,
+        ),
         if (radar_list.isNotEmpty)
           Positioned(
             left: 0,

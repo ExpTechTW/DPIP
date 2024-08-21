@@ -87,6 +87,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
+  }
+
+  void _loadMap() async {
     _initStations();
 
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
@@ -916,14 +919,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    const sheetInitialSize = 0.2;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.monitor),
       ),
       body: Stack(
         children: [
-          DpipMap(onMapCreated: _initMap),
+          DpipMap(
+            onMapCreated: _initMap,
+            onStyleLoadedCallback: _loadMap,
+          ),
           Positioned(
             left: 4,
             top: 4,

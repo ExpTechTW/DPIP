@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:dpip/model/tsunami/tsunami_actual.dart';
+import 'package:dpip/model/tsunami/tsunami_estimate.dart';
 
 class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
@@ -20,13 +22,111 @@ class TsunamiMap extends StatefulWidget {
 }
 
 class _TsunamiMapState extends State<TsunamiMap> {
-  final mapController = Completer<MapLibreMapController>();
-
+  late MapLibreMapController _mapController;
   Tsunami? tsunami;
   String tsunamiStatus = "";
   bool refreshingTsunami = true;
 
-  refreshTsunami() async {
+  void _initMap(MapLibreMapController controller) async {
+    _mapController = controller;
+  }
+
+  void _loadMap() async {
+    await refreshTsunami();
+    await _mapController.addSource(
+      "tsunami-data",
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+    );
+
+    if (tsunami != null) {
+      await addTsunamiObservationPoints(tsunami!);
+    }
+  }
+
+  Future<void> addTsunamiObservationPoints(Tsunami tsunami) async {
+    if (tsunami.info.type == "estimate") {
+    } else {
+      final features = tsunami.info.data.map((station) {
+        var actualStation = station as TsunamiActual;
+        return {
+          "type": "Feature",
+          "properties": {
+            "name": actualStation.name,
+            "id": actualStation.id,
+            "waveHeight": actualStation.waveHeight,
+            "arrivalTime": actualStation.arrivalTime,
+            "isEstimate": false,
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [actualStation.lon ?? 0, actualStation.lat ?? 0]
+          }
+        };
+      }).toList();
+
+      await _mapController.setGeoJsonSource("tsunami-data", {"type": "FeatureCollection", "features": features});
+
+      await _mapController.addLayer(
+        "tsunami-data",
+        "tsunami-actual-circles",
+        const CircleLayerProperties(
+          circleRadius: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            7,
+            8,
+            12,
+            18,
+          ],
+          circleColor: [
+            Expressions.step,
+            [Expressions.get, "waveHeight"],
+            "#606060",
+            30,
+            "#FFC900",
+            100,
+            "#C90000",
+            300,
+            "#E543FF",
+          ],
+          circleOpacity: 1,
+          circleStrokeWidth: 0.2,
+          circleStrokeColor: "#000000",
+          circleStrokeOpacity: 0.7,
+        ),
+        filter: [
+          '!=',
+          ['get', 'isEstimate'],
+          0
+        ],
+      );
+
+      await _mapController.addSymbolLayer(
+        "tsunami-data",
+        "tsunami-actual-labels",
+        const SymbolLayerProperties(
+          textField: ['get', 'name'],
+          textSize: 12,
+          textColor: '#ffffff',
+          textHaloColor: '#000000',
+          textHaloWidth: 1,
+          textFont: ['Noto Sans Regular'],
+          textOffset: [
+            Expressions.literal,
+            [0, 2]
+          ],
+        ),
+        filter: [
+          '!',
+          ['get', 'isEstimate']
+        ],
+        minzoom: 8,
+      );
+    }
+  }
+
+  Future<Tsunami?> refreshTsunami() async {
     refreshingTsunami = true;
     var idList = await ExpTech().getTsunamiList();
     var id = "";
@@ -45,7 +145,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     return tsunami;
   }
 
-  convertTimestamp(int timestamp) {
+  String convertTimestamp(int timestamp) {
     var location = tz.getLocation('Asia/Taipei');
     DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
@@ -54,7 +154,14 @@ class _TsunamiMapState extends State<TsunamiMap> {
     return formattedDate;
   }
 
-  convertLatLon(double lat, double lon) {
+  String getTime() {
+    DateTime now = DateTime.now();
+    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+    String formattedDate = formatter.format(now);
+    return (formattedDate);
+  }
+
+  String convertLatLon(double lat, double lon) {
     var latFormat = "";
     var lonFormat = "";
     if (lat > 90) {
@@ -76,32 +183,14 @@ class _TsunamiMapState extends State<TsunamiMap> {
     return "$latFormat　$lonFormat";
   }
 
-  getTime() {
-    DateTime now = DateTime.now();
-
-    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
-
-    String formattedDate = formatter.format(now);
-
-    return (formattedDate);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    refreshTsunami();
-  }
-
   @override
   Widget build(BuildContext context) {
     const sheetInitialSize = 0.16;
     return Stack(children: [
       DpipMap(
-        onMapCreated: (controller) async {
-          mapController.complete(controller);
-          await controller.setSymbolIconAllowOverlap(true);
-          await controller.setSymbolIconIgnorePlacement(true);
-        },
+        onMapCreated: _initMap,
+        onStyleLoadedCallback: _loadMap,
+        minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
       ),
       Positioned.fill(
         child: DraggableScrollableSheet(

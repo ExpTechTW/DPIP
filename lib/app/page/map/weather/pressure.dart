@@ -179,6 +179,9 @@ class _PressureMapState extends State<PressureMap> {
           "#FF0000",
         ],
         circleOpacity: 0.7,
+        circleStrokeWidth: 0.2,
+        circleStrokeColor: "#000000",
+        circleStrokeOpacity: 0.7,
       ),
     );
 

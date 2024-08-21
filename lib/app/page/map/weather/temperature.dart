@@ -185,6 +185,9 @@ class _TemperatureMapState extends State<TemperatureMap> {
           "#8B0000",
         ],
         circleOpacity: 0.7,
+        circleStrokeWidth: 0.2,
+        circleStrokeColor: "#000000",
+        circleStrokeOpacity: 0.7,
       ),
     );
 

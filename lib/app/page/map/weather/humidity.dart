@@ -179,6 +179,9 @@ class _HumidityMapState extends State<HumidityMap> {
           "#0000FF", // Blue for very humid
         ],
         circleOpacity: 0.7,
+        circleStrokeWidth: 0.2,
+        circleStrokeColor: "#000000",
+        circleStrokeOpacity: 0.7,
       ),
     );
 
