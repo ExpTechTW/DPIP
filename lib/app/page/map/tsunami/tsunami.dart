@@ -60,6 +60,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
     return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
   }
 
+  DateTime _convertTimestamp(int timestamp) {
+    return DateTime.fromMillisecondsSinceEpoch(timestamp);
+  }
+
   Future<void> addTsunamiObservationPoints(Tsunami tsunami) async {
     await _mapController.removeLayer("tsunami-actual-circles");
     await _mapController.removeLayer("tsunami-actual-labels");
@@ -94,8 +98,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             "name": actualStation.name,
             "id": actualStation.id,
             "waveHeight": actualStation.waveHeight,
-            "arrivalTime": actualStation.arrivalTime,
-            "isEstimate": false,
+            "arrivalTime": DateFormat('dd日HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
           },
           "geometry": {
             "type": "Point",
@@ -135,18 +138,21 @@ class _TsunamiMapState extends State<TsunamiMap> {
           circleStrokeColor: "#000000",
           circleStrokeOpacity: 0.7,
         ),
-        filter: [
-          '!=',
-          ['get', 'isEstimate'],
-          0
-        ],
       );
 
       await _mapController.addSymbolLayer(
         "tsunami-data",
         "tsunami-actual-labels",
         const SymbolLayerProperties(
-          textField: ['get', 'name'],
+          textField: [
+            Expressions.concat,
+            ['get', 'name'],
+            " ",
+            ['get', 'waveHeight'],
+            "cm\n",
+            ['get', 'arrivalTime'],
+            " 抵達"
+          ],
           textSize: 12,
           textColor: '#ffffff',
           textHaloColor: '#000000',
@@ -157,11 +163,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             [0, 2]
           ],
         ),
-        filter: [
-          '!',
-          ['get', 'isEstimate']
-        ],
-        minzoom: 8,
+        minzoom: 7,
       );
     }
   }
