@@ -1,5 +1,6 @@
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
+import 'package:dpip/app/page/map/typhoon/typhoon.dart';
 import 'package:dpip/app/page/map/weather/humidity.dart';
 import 'package:dpip/app/page/map/weather/pressure.dart';
 import 'package:dpip/app/page/map/rain/rain.dart';
@@ -38,8 +39,10 @@ class _MapPageState extends State<MapPage> {
         return const HumidityMap();
       case 5:
         return const PressureMap();
-      default:
+      case 6:
         return const RainMap();
+      default:
+        return const TyphoonMap();
     }
   }
 
@@ -115,6 +118,13 @@ class _MapPageState extends State<MapPage> {
                         title: Text('降水'),
                       ),
                     ),
+                    // const PopupMenuItem<int>(
+                    //   value: 7,
+                    //   child: ListTile(
+                    //     leading: Icon(Symbols.rainy_light_rounded),
+                    //     title: Text('颱風'),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

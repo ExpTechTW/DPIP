@@ -36,6 +36,29 @@ class _RadarMapState extends State<RadarMap> {
     _mapController = controller;
   }
 
+  Future<void> _addUserLocationMarker() async {
+    await _mapController.removeLayer("markers");
+    await _mapController.addLayer(
+      "markers-geojson",
+      "markers",
+      const SymbolLayerProperties(
+        symbolZOrder: "source",
+        iconSize: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          5,
+          0.5,
+          10,
+          1.5,
+        ],
+        iconImage: "gps",
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+      ),
+    );
+  }
+
   void _loadMap() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -65,25 +88,6 @@ class _RadarMapState extends State<RadarMap> {
     if (isUserLocationValid) {
       await _mapController.addSource(
           "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-      await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
-        const SymbolLayerProperties(
-          symbolZOrder: "source",
-          iconSize: [
-            Expressions.interpolate,
-            ["linear"],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: "gps",
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
       await _mapController.setGeoJsonSource(
         "markers-geojson",
         {
@@ -100,6 +104,7 @@ class _RadarMapState extends State<RadarMap> {
           ],
         },
       );
+      _addUserLocationMarker();
     }
 
     setState(() {});
@@ -134,6 +139,10 @@ class _RadarMapState extends State<RadarMap> {
                     ));
 
                 _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
+
+                if (isUserLocationValid) {
+                  _addUserLocationMarker();
+                }
 
                 print("Selected time: $time");
               },
