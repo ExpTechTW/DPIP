@@ -82,10 +82,10 @@ class _MapPageState extends State<MapPage> {
         children: [
           _getContent(selected, context),
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(5),
             child: Align(
               alignment: Alignment.topRight,
-              child: FloatingActionButton(
+              child: FloatingActionButton.small(
                 onPressed: () {},
                 child: PopupMenuButton<int>(
                   icon: const Icon(Symbols.menu),
