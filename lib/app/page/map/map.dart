@@ -2,6 +2,7 @@ import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
 import 'package:dpip/app/page/map/weather/temperature.dart';
 import 'package:dpip/app/page/map/weather/wind.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -37,7 +38,7 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("地圖"),
+        title: Text(context.i18n.map),
       ),
       body: Stack(
         children: [
