@@ -1,9 +1,8 @@
 import 'package:dpip/core/location.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
 import 'package:dpip/route/settings/content/location.dart';
 import 'package:flutter/services.dart';
-
-import 'package:dpip/global.dart';
 
 const _channel = MethodChannel('com.exptech.dpip/data');
 

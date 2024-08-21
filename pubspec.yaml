@@ -24,7 +24,7 @@ dependencies:
     git:
       url: https://github.com/yayacat/flutter_background_service.git
       path: packages/flutter_background_service
-      ref: 5.0.9
+      ref: master
   flutter_hooks: ^0.20.5
   flutter_local_notifications: ^17.1.2
   flutter_localizations:

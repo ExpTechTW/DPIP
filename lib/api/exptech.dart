@@ -9,6 +9,8 @@ import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
+import 'package:dpip/model/weather/rain.dart';
+import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
 
 class ExpTech {
@@ -48,7 +50,12 @@ class ExpTech {
     var requestUrl = Route.rts();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl.toString().replaceAll("rts", "rts/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+      requestUrl = Uri.parse(requestUrl
+          .toString()
+          .replaceAll("rts", "rts/$time")
+          .replaceAll("lb-", "api-")
+          .replaceAll("-3", "-1")
+          .replaceAll("-4", "-2"));
     }
 
     var res = await get(requestUrl);
@@ -64,7 +71,12 @@ class ExpTech {
     var requestUrl = Route.eew();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl.toString().replaceAll("eew", "eew/$time").replaceAll("lb-", "api-").replaceAll("-3", "-1").replaceAll("-4", "-2"));
+      requestUrl = Uri.parse(requestUrl
+          .toString()
+          .replaceAll("eew", "eew/$time")
+          .replaceAll("lb-", "api-")
+          .replaceAll("-3", "-1")
+          .replaceAll("-4", "-2"));
     }
 
     var res = await get(requestUrl);
@@ -156,5 +168,75 @@ class ExpTech {
     final json = jsonDecode(res.body) as List;
 
     return json.map((e) => CrowdinLocalizationProgress.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  Future<List<String>> getRadarList() async {
+    final requestUrl = Route.radarList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<String>> getWeatherList() async {
+    final requestUrl = Route.weatherList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<WeatherStation>> getWeather(String time) async {
+    final requestUrl = Route.weather(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
+  }
+
+  Future<List<String>> getRainList() async {
+    final requestUrl = Route.rainList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<RainStation>> getRain(String time) async {
+    final requestUrl = Route.rain(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => RainStation.fromJson(item)).toList();
   }
 }

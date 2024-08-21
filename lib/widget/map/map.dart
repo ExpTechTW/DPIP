@@ -14,6 +14,7 @@ class DpipMap extends StatefulWidget {
   final void Function()? onMapIdle;
   final void Function(Point<double>, LatLng)? onMapLongClick;
   final void Function()? onStyleLoadedCallback;
+  final MinMaxZoomPreference? minMaxZoomPreference;
 
   const DpipMap({
     super.key,
@@ -23,6 +24,7 @@ class DpipMap extends StatefulWidget {
     this.onMapIdle,
     this.onMapLongClick,
     this.onStyleLoadedCallback,
+    this.minMaxZoomPreference,
   });
 
   @override
@@ -45,7 +47,7 @@ class DpipMapState extends State<DpipMap> {
         },
       },
       "sprite": "",
-      "glyphs": "https://orangemug.github.io/font-glyphs-v2/glyphs/{fontstack}/{range}.pbf",
+      "glyphs": "https://glyphs.geolonia.com/{fontstack}/{range}.pbf",
       "layers": [
         {
           "id": "background",
@@ -164,7 +166,7 @@ class DpipMapState extends State<DpipMap> {
     double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
 
     return MapLibreMap(
-      minMaxZoomPreference: const MinMaxZoomPreference(3, 9),
+      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(3, 9),
       trackCameraPosition: true,
       initialCameraPosition: CameraPosition(
         target: widget.initialCameraPosition.target,

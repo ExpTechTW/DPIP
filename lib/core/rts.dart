@@ -1,8 +1,7 @@
-import 'package:intl/intl.dart';
-
+import 'package:dpip/core/eew.dart';
 import 'package:dpip/model/eew.dart';
 import 'package:dpip/model/station_info.dart';
-import 'package:dpip/core/eew.dart';
+import 'package:intl/intl.dart';
 
 StationInfo findAppropriateItem(List<StationInfo> infos, int date) {
   DateTime targetDate = (date == 0) ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(date);

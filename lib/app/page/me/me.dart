@@ -64,7 +64,8 @@ class _MePageState extends State<MePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8),
-                    child: Text(context.i18n.me_version(Global.packageInfo.version.toString()),
+                    child: Text(
+                      context.i18n.me_version(Global.packageInfo.version.toString()),
                       textAlign: TextAlign.center,
                     ),
                   ),
