@@ -4,7 +4,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/time_selector.dart';
+import 'package:dpip/widget/list/rain_time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -44,6 +44,8 @@ class _RainMapState extends State<RainMap> {
   bool isUserLocationValid = false;
 
   List<RainData> rainDataList = [];
+  String selectedTimestamp = '';
+  String selectedInterval = 'now'; // 默認選擇 'now'
 
   Future<void> _loadMapImages(bool isDark) async {
     await loadGPSImage(_mapController);
@@ -75,21 +77,61 @@ class _RainMapState extends State<RainMap> {
 
     rainTimeList = await ExpTech().getRainList();
 
-    List<RainStation> rainData = await ExpTech().getRain(rainTimeList.last);
+    if (rainTimeList.isNotEmpty) {
+      selectedTimestamp = rainTimeList.last;
+      await updateRainData(selectedTimestamp, selectedInterval);
+    }
 
-    rainDataList = rainData
-        .map((station) => RainData(
-              latitude: station.station.lat,
-              longitude: station.station.lng,
-              rainfall: station.data.twentyFourHours,
-              stationName: station.station.name,
-              county: station.station.county,
-              town: station.station.town,
-            ))
-        .toList();
+    setState(() {});
+  }
+
+  Future<void> updateRainData(String timestamp, String interval) async {
+    List<RainStation> rainData = await ExpTech().getRain(timestamp);
+
+    rainDataList = rainData.map((station) {
+      double rainfall;
+      switch (interval) {
+        case 'now':
+          rainfall = station.data.now;
+          break;
+        case '10m':
+          rainfall = station.data.tenMinutes;
+          break;
+        case '1h':
+          rainfall = station.data.oneHour;
+          break;
+        case '3h':
+          rainfall = station.data.threeHours;
+          break;
+        case '6h':
+          rainfall = station.data.sixHours;
+          break;
+        case '12h':
+          rainfall = station.data.twelveHours;
+          break;
+        case '24h':
+          rainfall = station.data.twentyFourHours;
+          break;
+        case '2d':
+          rainfall = station.data.twoDays;
+          break;
+        case '3d':
+          rainfall = station.data.threeDays;
+          break;
+        default:
+          rainfall = station.data.now; // 默認使用 'now'
+      }
+      return RainData(
+        latitude: station.station.lat,
+        longitude: station.station.lng,
+        rainfall: rainfall,
+        stationName: station.station.name,
+        county: station.station.county,
+        town: station.station.town,
+      );
+    }).toList();
 
     await addRainCircles(rainDataList);
-    setState(() {});
   }
 
   Future<void> _addUserLocationMarker() async {
@@ -277,23 +319,12 @@ class _RainMapState extends State<RainMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: rainTimeList,
-              onTimeSelected: (time) async {
-                List<RainStation> rainData = await ExpTech().getRain(time);
-
-                rainDataList = rainData
-                    .map((station) => RainData(
-                          latitude: station.station.lat,
-                          longitude: station.station.lng,
-                          rainfall: station.data.twentyFourHours,
-                          stationName: station.station.name,
-                          county: station.station.county,
-                          town: station.station.town,
-                        ))
-                    .toList();
-
-                await addRainCircles(rainDataList);
+              onSelectionChanged: (timestamp, interval) async {
+                print('Selected time: $timestamp, interval: $interval');
+                selectedTimestamp = timestamp;
+                selectedInterval = interval;
+                await updateRainData(timestamp, interval);
                 setState(() {});
-                print("Selected time: $time");
               },
             ),
           ),

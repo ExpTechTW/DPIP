@@ -17,7 +17,6 @@ class TimeSelector extends StatefulWidget {
 
 class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
-  late List<DateTime> _timeList;
   late ScrollController _scrollController;
   final double _itemWidth = 80.0;
   late AnimationController _animationController;
@@ -27,12 +26,11 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    _timeList = widget.timeList.map((e) => _convertTimestamp(e)).toList();
     _selectedTimestamp = widget.timeList.last;
     _scrollController = ScrollController();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
     _expandAnimation = CurvedAnimation(
       parent: _animationController,
@@ -61,7 +59,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
 
       _scrollController.animateTo(
         scrollOffset.clamp(0.0, _scrollController.position.maxScrollExtent),
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
@@ -86,8 +84,8 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
         GestureDetector(
           onTap: _toggleExpanded,
           child: Container(
-            margin: EdgeInsets.only(bottom: 4, left: 16, right: 16),
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            margin: const EdgeInsets.only(bottom: 4, left: 16, right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
@@ -95,7 +93,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -109,7 +107,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 Icon(
                   _isExpanded ? Icons.expand_less : Icons.expand_more,
                   color: Theme.of(context).colorScheme.onSurface,
@@ -120,10 +118,10 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
         ),
         SizeTransition(
           sizeFactor: _expandAnimation,
-          child: Container(
+          child: SizedBox(
             height: 80,
             child: Card(
-              margin: EdgeInsets.all(8),
+              margin: const EdgeInsets.all(8),
               elevation: 4,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: ListView.builder(
@@ -134,7 +132,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                   final timestamp = widget.timeList[index];
                   final time = _convertTimestamp(timestamp);
                   final isSelected = timestamp == _selectedTimestamp;
-                  return Container(
+                  return SizedBox(
                     width: _itemWidth,
                     child: GestureDetector(
                       onTap: () {
@@ -145,9 +143,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                         _scrollToSelected();
                       },
                       child: AnimatedContainer(
-                        duration: Duration(milliseconds: 200),
+                        duration: const Duration(milliseconds: 200),
                         alignment: Alignment.center,
-                        margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                         decoration: BoxDecoration(
                           color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
@@ -156,7 +154,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             AnimatedDefaultTextStyle(
-                              duration: Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 200),
                               style: TextStyle(
                                 color: isSelected
                                     ? Theme.of(context).colorScheme.onSecondary
@@ -166,9 +164,9 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                               ),
                               child: Text(DateFormat('HH:mm').format(time)),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             AnimatedDefaultTextStyle(
-                              duration: Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 200),
                               style: TextStyle(
                                 color: isSelected
                                     ? Theme.of(context).colorScheme.onSecondary
