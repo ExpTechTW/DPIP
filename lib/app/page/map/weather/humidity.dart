@@ -168,15 +168,11 @@ class _HumidityMapState extends State<HumidityMap> {
           ["linear"],
           [Expressions.get, "humidity"],
           0,
-          "#FFFF00", // Yellow for very dry
-          30,
-          "#ADFF2F", // Green Yellow
+          "#ffb63d",
           50,
-          "#32CD32", // Lime Green
-          70,
-          "#008000", // Green
-          90,
-          "#0000FF", // Blue for very humid
+          "#ffffff",
+          100,
+          "#0000FF",
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
