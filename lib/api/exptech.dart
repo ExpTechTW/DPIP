@@ -9,8 +9,8 @@ import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/model/weather/rain.dart';
+import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
 
 class ExpTech {
