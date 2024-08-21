@@ -368,7 +368,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                                 children: [
                                   Flexible(
                                     flex: 8,
-                                    child: Text(context.i18n.report_error,
+                                    child: Text(
+                                      context.i18n.report_error,
                                       style: const TextStyle(fontSize: 16),
                                     ),
                                   ),

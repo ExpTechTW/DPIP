@@ -10,6 +10,7 @@ import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
 import 'package:dpip/model/weather/weather.dart';
+import 'package:dpip/model/weather/rain.dart';
 import 'package:http/http.dart';
 
 class ExpTech {
@@ -209,5 +210,33 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
+  }
+
+  Future<List<String>> getRainList() async {
+    final requestUrl = Route.rainList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<RainStation>> getRain(String time) async {
+    final requestUrl = Route.rain(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => RainStation.fromJson(item)).toList();
   }
 }

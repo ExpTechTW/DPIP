@@ -1,5 +1,8 @@
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
+import 'package:dpip/app/page/map/weather/humidity.dart';
+import 'package:dpip/app/page/map/weather/pressure.dart';
+import 'package:dpip/app/page/map/weather/rain.dart';
 import 'package:dpip/app/page/map/weather/temperature.dart';
 import 'package:dpip/app/page/map/weather/wind.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -26,11 +29,17 @@ class _MapPageState extends State<MapPage> {
       case 0:
         return const TsunamiMap();
       case 1:
-        return RadarMap();
+        return const RadarMap();
       case 2:
-        return TemperatureMap();
+        return const TemperatureMap();
+      case 3:
+        return const WindMap();
+      case 4:
+        return const HumidityMap();
+      case 5:
+        return const PressureMap();
       default:
-        return WindMap();
+        return const RainMap();
     }
   }
 
@@ -83,6 +92,27 @@ class _MapPageState extends State<MapPage> {
                       child: ListTile(
                         leading: Icon(Symbols.wind_power_sharp),
                         title: Text('風向/風速'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 4,
+                      child: ListTile(
+                        leading: Icon(Symbols.humidity_high_rounded),
+                        title: Text('濕度'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 5,
+                      child: ListTile(
+                        leading: Icon(Symbols.blood_pressure_rounded),
+                        title: Text('氣壓'),
+                      ),
+                    ),
+                    const PopupMenuItem<int>(
+                      value: 6,
+                      child: ListTile(
+                        leading: Icon(Symbols.rainy_heavy_rounded),
+                        title: Text('降水'),
                       ),
                     ),
                   ],

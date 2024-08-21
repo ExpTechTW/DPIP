@@ -1,14 +1,14 @@
 import 'dart:io';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/weather.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
-import 'package:dpip/global.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/api/exptech.dart';
 
 class WindData {
   final double latitude;
@@ -154,9 +154,9 @@ class _WindMapState extends State<WindMap> {
           ["linear"],
           [Expressions.zoom],
           5,
-          2,
+          3,
           10,
-          4,
+          6,
         ],
         circleColor: "#808080",
         circleStrokeWidth: 0.8,
@@ -167,6 +167,34 @@ class _WindMapState extends State<WindMap> {
         ['get', 'speed'],
         0
       ],
+      minzoom: 10,
+    );
+
+    await _mapController.removeLayer("wind-speed-0-labels");
+    await _mapController.addSymbolLayer(
+      "wind-data",
+      "wind-speed-0-labels",
+      const SymbolLayerProperties(
+        textField: [
+          Expressions.format,
+          ['get', 'speed']
+        ],
+        textSize: 12,
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
+        textHaloWidth: 2,
+        textFont: ['Noto Sans Regular'],
+        textOffset: [
+          Expressions.literal,
+          [0, 2]
+        ],
+      ),
+      filter: [
+        '==',
+        ['get', 'speed'],
+        0
+      ],
+      minzoom: 10,
     );
 
     await _mapController.removeLayer("wind-arrows");
@@ -222,6 +250,11 @@ class _WindMapState extends State<WindMap> {
           [0, 2]
         ],
       ),
+      filter: [
+        '!=',
+        ['get', 'speed'],
+        0
+      ],
       minzoom: 9,
     );
   }
