@@ -42,6 +42,7 @@ class _PressureMapState extends State<PressureMap> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  bool _showLegend = false;
 
   List<PressureData> pressureDataList = [];
 
@@ -208,6 +209,74 @@ class _PressureMapState extends State<PressureMap> {
     );
   }
 
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('氣壓圖例', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 12),
+          _buildColorBar(),
+          const SizedBox(height: 8),
+          _buildColorBarLabels(),
+          const SizedBox(height: 12),
+          Text('單位：百帕 (hPa)', style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildColorBar() {
+    return Container(
+      height: 20,
+      width: 300,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF77BFCC),  // 725 hPa
+            Color(0xFF82CB75),  // 850 hPa
+            Color(0xFFF7E78A),  // 975 hPa
+            Color(0xFFFFFFFF),  // 1020 hPa
+          ],
+          stops: [0.0, 0.4167, 0.8333, 1.0],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = ['725', '850', '975', '1020'];
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels.map((label) => Text(
+          label,
+          style: const TextStyle(fontSize: 12),
+        )).toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -217,6 +286,32 @@ class _PressureMapState extends State<PressureMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: Material(
+            color: Theme.of(context).colorScheme.secondary,
+            elevation: 4.0,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: _toggleLegend,
+              child: Tooltip(
+                message: '圖例',
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    _showLegend ? Icons.close : Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         if (weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -224,6 +319,10 @@ class _PressureMapState extends State<PressureMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: weather_list,
+              onTimeExpanded: () {
+                _showLegend = false;
+                setState(() {});
+              },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
@@ -247,6 +346,12 @@ class _PressureMapState extends State<PressureMap> {
                 print("Selected time: $time");
               },
             ),
+          ),
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50, // Adjusted to be above the legend button
+            child: _buildLegend(),
           ),
       ],
     );

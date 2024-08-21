@@ -3,11 +3,13 @@ import 'package:intl/intl.dart';
 
 class TimeSelector extends StatefulWidget {
   final Function(String) onTimeSelected;
+  final Function() onTimeExpanded;
   final List<String> timeList;
 
   const TimeSelector({
     Key? key,
     required this.onTimeSelected,
+    required this.onTimeExpanded,
     required this.timeList,
   }) : super(key: key);
 
@@ -69,6 +71,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
+        widget.onTimeExpanded();
         _animationController.forward();
       } else {
         _animationController.reverse();

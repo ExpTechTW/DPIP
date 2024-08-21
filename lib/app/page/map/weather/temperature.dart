@@ -42,6 +42,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  bool _showLegend = false;
 
   List<TemperatureData> temperatureDataList = [];
 
@@ -214,6 +215,79 @@ class _TemperatureMapState extends State<TemperatureMap> {
     );
   }
 
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('溫度圖例', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 12),
+          _buildColorBar(),
+          const SizedBox(height: 8),
+          _buildColorBarLabels(),
+          const SizedBox(height: 12),
+          Text('單位：攝氏度 (°C)', style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildColorBar() {
+    return Container(
+      height: 20,
+      width: 300,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF4d4e51),
+            Color(0xFF0000FF),
+            Color(0xFF6495ED),
+            Color(0xFF95d07e),
+            Color(0xFFf6e78b),
+            Color(0xFFFF4500),
+            Color(0xFF8B0000),
+          ],
+          stops: [0.0, 0.1667, 0.3333, 0.5, 0.6667, 0.8333, 1.0],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = ['-20', '-10', '0', '10', '20', '30', '40'];
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 12),
+                ))
+            .toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -223,6 +297,32 @@ class _TemperatureMapState extends State<TemperatureMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: Material(
+            color: Theme.of(context).colorScheme.secondary,
+            elevation: 4.0,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: _toggleLegend,
+              child: Tooltip(
+                message: '圖例',
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    _showLegend ? Icons.close : Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         if (weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -230,6 +330,10 @@ class _TemperatureMapState extends State<TemperatureMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: weather_list,
+              onTimeExpanded: () {
+                _showLegend = false;
+                setState(() {});
+              },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
@@ -255,6 +359,12 @@ class _TemperatureMapState extends State<TemperatureMap> {
                 print("Selected time: $time");
               },
             ),
+          ),
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50, // Adjusted to be above the legend button
+            child: _buildLegend(),
           ),
       ],
     );

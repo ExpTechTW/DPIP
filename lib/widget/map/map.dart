@@ -180,6 +180,7 @@ class DpipMapState extends State<DpipMap> {
       tiltGesturesEnabled: false,
       rotateGesturesEnabled: false,
       onStyleLoadedCallback: widget.onStyleLoadedCallback,
+      attributionButtonMargins: const Point<double>(-100, -100),
     );
   }
 }

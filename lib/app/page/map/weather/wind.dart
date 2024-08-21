@@ -38,6 +38,7 @@ class _WindMapState extends State<WindMap> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  bool _showLegend = false;
 
   List<WindData> windDataList = [];
 
@@ -222,9 +223,9 @@ class _WindMapState extends State<WindMap> {
           "wind-1",
           3.4,
           "wind-2",
-          10.8,
+          8,
           "wind-3",
-          20.8,
+          13.9,
           "wind-4",
           32.7,
           "wind-5"
@@ -268,6 +269,57 @@ class _WindMapState extends State<WindMap> {
     );
   }
 
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('圖例', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 12),
+          _legendItem('wind-1', '0.1 - 3.3 m/s'),
+          _legendItem('wind-2', '3.4 - 7.9 m/s'),
+          _legendItem('wind-3', '8.0 - 13.8 m/s'),
+          _legendItem('wind-4', '13.9 - 32.6 m/s'),
+          _legendItem('wind-5', '≥ 32.7 m/s'),
+          const SizedBox(height: 12),
+          Text('此展示結果為使用平均風速繪製', style: Theme.of(context).textTheme.labelMedium),
+        ],
+      ),
+    );
+  }
+
+  Widget _legendItem(String imageName, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -277,6 +329,32 @@ class _WindMapState extends State<WindMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: Material(
+            color: Theme.of(context).colorScheme.secondary,
+            elevation: 4.0,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: _toggleLegend,
+              child: Tooltip(
+                message: '圖例',
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    _showLegend ? Icons.close : Icons.info_outline,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         if (weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -284,6 +362,10 @@ class _WindMapState extends State<WindMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: weather_list,
+              onTimeExpanded: () {
+                _showLegend = false;
+                setState(() {});
+              },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
@@ -304,6 +386,12 @@ class _WindMapState extends State<WindMap> {
                 print("Selected time: $time");
               },
             ),
+          ),
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50, // Adjusted to be above the legend button
+            child: _buildLegend(),
           ),
       ],
     );
