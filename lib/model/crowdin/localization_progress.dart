@@ -16,7 +16,8 @@ class CrowdinLocalizationProgress {
     required this.approval,
   });
 
-  factory CrowdinLocalizationProgress.fromJson(Map<String, dynamic> json) => _$CrowdinLocalizationProgressFromJson(json);
+  factory CrowdinLocalizationProgress.fromJson(Map<String, dynamic> json) =>
+      _$CrowdinLocalizationProgressFromJson(json);
 
   Map<String, dynamic> toJson() => _$CrowdinLocalizationProgressToJson(this);
 }

@@ -29,7 +29,7 @@
   "@map": {
     "description": "「地圖」頁面標題"
   },
-  "me": "自分",
+  "me": "アプリ情報",
   "@me": {
     "description": "「我」頁面標題"
   },
@@ -127,5 +127,45 @@
   "report_intensity": "各地の震度",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
+  },
+  "settings_locale": "言語",
+  "@settings_locale": {
+    "description": "「設定」路徑 → 「語言」標題"
+  },
+  "settings_locale_description": "DPIPの言語を変更する",
+  "@settings_locale_description": {
+    "description": "「設定」路徑 → 「語言」副標題敘述"
+  },
+  "settings_display_locale": "表示言語",
+  "@settings_display_locale": {
+    "description": "「設定」路徑 → 「顯示語言」標題"
+  },
+  "settings_locale_translated": "翻訳済み {percentage}",
+  "@settings_locale_translated": {
+    "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
+    "placeholders": {
+      "percentage": {
+        "type": "String",
+        "description": "已翻譯百分比"
+      }
+    }
+  },
+  "settings_locale_approved": "校正済み {percentage}",
+  "@settings_locale_approved": {
+    "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
+    "placeholders": {
+      "percentage": {
+        "type": "String",
+        "description": "已翻譯百分比"
+      }
+    }
+  },
+  "settings_locale_crowdin": "翻訳を協力",
+  "@settings_locale_crowdin": {
+    "description": "「設定」路徑 → 「協助翻譯」標題"
+  },
+  "settings_locale_crowdin_description": "DPIPの翻訳を改善する",
+  "@settings_locale_crowdin_description": {
+    "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   }
 }

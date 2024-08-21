@@ -20,7 +20,8 @@ class LocaleSelectorRoute extends StatefulWidget {
 
 class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
   List<CrowdinLocalizationProgress> progress = [];
-  List<Locale> localeList = AppLocalizations.supportedLocales.where((e) => !["zh"].contains(e.toLanguageTag())).toList();
+  List<Locale> localeList =
+      AppLocalizations.supportedLocales.where((e) => !["zh"].contains(e.toLanguageTag())).toList();
 
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("語言"),
+        title: Text(context.i18n.settings_locale),
       ),
       body: ListView.builder(
         itemCount: localeList.length,
@@ -78,7 +79,7 @@ class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
                       ),
                     ],
                   )
-                : const Text("Source Language"),
+                : Text(context.i18n.source_language),
             controlAffinity: ListTileControlAffinity.trailing,
             value: locale,
             groupValue: widget.locale,

@@ -3,9 +3,11 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/monitor/monitor.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
+import 'package:dpip/route/settings/content/location.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,37 +26,7 @@ void initBackgroundService() async {
     if (isLocationAlwaysEnabled.isGranted && isNotificationEnabled.isGranted) {
       if (Platform.isAndroid) {
         androidForegroundService();
-        service.on('sendposition').listen((event) {
-          if (event != null) {
-            var positionData = event.values.first;
-            var position = positionData['position'];
-            String country = position['country'];
-            List<String> parts = country.split(' ');
-
-            if (parts.length == 3) {
-              String code = parts[2];
-
-              if (Global.location.containsKey(code)) {
-                Location locationInfo = Global.location[code]!;
-
-                Global.preference.setString("location-city", locationInfo.city);
-                Global.preference.setString("location-town", locationInfo.town);
-
-                print('Updated location: ${locationInfo.city}, ${locationInfo.town}');
-              } else {
-                print('Code $code not found in location data');
-
-                Global.preference.setString("location-city", "解析失敗");
-                Global.preference.setString("location-town", "解析失敗");
-              }
-            }
-
-            var latitude = position['latitude'];
-            var longitude = position['longitude'];
-            Global.preference.setDouble("user-lat", latitude);
-            Global.preference.setDouble("user-lon", longitude);
-          }
-        });
+        androidSendPositionlisten();
         androidStartBackgroundService(true);
       }
     }
@@ -64,6 +36,7 @@ void initBackgroundService() async {
 void androidStartBackgroundService(bool init) async {
   if (!androidServiceInit) {
     androidForegroundService();
+    androidSendPositionlisten();
   }
   var isRunning = await service.isRunning();
   if (!isRunning) {
@@ -81,6 +54,36 @@ void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
     }
     service.invoke("stopService");
   }
+}
+
+void androidSendPositionlisten() {
+  service.on('sendposition').listen((event) {
+    if (event != null) {
+      var positionData = event.values.first;
+      var position = positionData['position'];
+      String country = position['country'];
+      List<String> parts = country.split(' ');
+
+      if (parts.length == 3) {
+        String code = parts[2];
+
+        if (Global.location.containsKey(code)) {
+          Location locationInfo = Global.location[code]!;
+
+          Global.preference.setString("location-city", locationInfo.city);
+          Global.preference.setString("location-town", locationInfo.town);
+
+          SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
+        }
+      }
+
+      var latitude = position['latitude'];
+      var longitude = position['longitude'];
+      Global.preference.setDouble("user-lat", (latitude as num?)?.toDouble() ?? 0.0);
+      Global.preference.setDouble("user-lon", (longitude as num?)?.toDouble() ?? 0.0);
+      const MonitorPage(data: 0).createState();
+    }
+  });
 }
 
 Future<void> androidForegroundService() async {
@@ -168,7 +171,7 @@ void onStart(ServiceInstance service) async {
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
-        service.invoke("sendposition",{"position": position.toJson()});
+        service.invoke("sendposition", {"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
         String country = position.position.country;
@@ -179,7 +182,7 @@ void onStart(ServiceInstance service) async {
         }
 
         String notifyTitle = '自動定位中';
-        String date=DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+        String date = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
         String notifyBody = '$date\n$lat,$lon $country';
 
         flutterLocalNotificationsPlugin.show(
@@ -204,7 +207,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 210), (timer) async {
       task();
     });
   }
