@@ -292,11 +292,11 @@
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_error": "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+  "report_error": "There are some problems when getting the report. Check your network and try again.",
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "me_version": "Ver. {version}\nMade by ExpTech studio\nA part of data from CWA.",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -309,7 +309,7 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "sound_test": "音效測試",
+  "sound_test": "Sound test",
   "@sound_test": {
     "description": "「設定」路徑 → 「音效」標題 → 音效測試"
   },
@@ -361,12 +361,12 @@
   "@eew_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
-  "eew_info_sound_title": "地震資訊",
+  "eew_info_sound_title": "The information of earthquake",
   "dp_info_sound_title": "災防資訊",
   "@dp_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 災防資訊"
   },
-  "other_sound_title": "其他",
+  "other_sound_title": "Other",
   "@other_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 其他"
   },
