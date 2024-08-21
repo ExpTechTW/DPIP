@@ -923,9 +923,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.i18n.monitor),
-      ),
       body: Stack(
         children: [
           DpipMap(
