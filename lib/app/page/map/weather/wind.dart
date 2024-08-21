@@ -293,7 +293,7 @@ class _WindMapState extends State<WindMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('圖例', style: Theme.of(context).textTheme.titleLarge),
+          Text('平均風速圖例', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _legendItem('wind-1', '0.1 - 3.3 m/s'),
           _legendItem('wind-2', '3.4 - 7.9 m/s'),
@@ -301,7 +301,6 @@ class _WindMapState extends State<WindMap> {
           _legendItem('wind-4', '13.9 - 32.6 m/s'),
           _legendItem('wind-5', '≥ 32.7 m/s'),
           const SizedBox(height: 12),
-          Text('此展示結果為使用平均風速繪製', style: Theme.of(context).textTheme.labelMedium),
         ],
       ),
     );
