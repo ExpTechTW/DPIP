@@ -219,11 +219,15 @@ class _WindMapState extends State<WindMap> {
         iconImage: [
           Expressions.step,
           [Expressions.get, "speed"],
-          "wind-low",
-          5,
-          "wind-middle",
-          10,
-          "wind-high"
+          "wind-1",
+          3.4,
+          "wind-2",
+          10.8,
+          "wind-3",
+          20.8,
+          "wind-4",
+          32.7,
+          "wind-5"
         ],
         iconRotate: [Expressions.get, "direction"],
         textAllowOverlap: true,
