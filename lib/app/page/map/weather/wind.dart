@@ -63,10 +63,6 @@ class _WindMapState extends State<WindMap> {
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
-    if (isUserLocationValid) {
-      await _addUserLocationMarker();
-    }
-
     await _mapController.addSource(
         "wind-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
 
@@ -84,47 +80,56 @@ class _WindMapState extends State<WindMap> {
         .toList();
 
     await addDynamicWindArrows(windDataList);
+
+    if (isUserLocationValid) {
+      await _mapController.addSource(
+          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      await _mapController.setGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "coordinates": [userLon, userLat],
+                "type": "Point"
+              }
+            }
+          ],
+        },
+      );
+    }
+
+    await _addUserLocationMarker();
+
     setState(() {});
   }
 
   Future<void> _addUserLocationMarker() async {
-    await _mapController.addSource(
-        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
-      const SymbolLayerProperties(
-        symbolZOrder: "source",
-        iconSize: [
-          Expressions.interpolate,
-          ["linear"],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: "gps",
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
-    await _mapController.setGeoJsonSource(
-      "markers-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point"
-            }
-          }
-        ],
-      },
-    );
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
   }
 
   Future<void> addDynamicWindArrows(List<WindData> windDataList) async {
@@ -290,6 +295,7 @@ class _WindMapState extends State<WindMap> {
                     .toList();
 
                 await addDynamicWindArrows(windDataList);
+                await _addUserLocationMarker();
                 setState(() {});
                 print("Selected time: $time");
               },

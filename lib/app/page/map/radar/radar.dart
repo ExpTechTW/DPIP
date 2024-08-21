@@ -37,26 +37,28 @@ class _RadarMapState extends State<RadarMap> {
   }
 
   Future<void> _addUserLocationMarker() async {
-    await _mapController.removeLayer("markers");
-    await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
-      const SymbolLayerProperties(
-        symbolZOrder: "source",
-        iconSize: [
-          Expressions.interpolate,
-          ["linear"],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: "gps",
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
   }
 
   void _loadMap() async {
@@ -104,8 +106,9 @@ class _RadarMapState extends State<RadarMap> {
           ],
         },
       );
-      _addUserLocationMarker();
     }
+
+    _addUserLocationMarker();
 
     setState(() {});
   }
@@ -140,9 +143,7 @@ class _RadarMapState extends State<RadarMap> {
 
                 _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
 
-                if (isUserLocationValid) {
-                  _addUserLocationMarker();
-                }
+                _addUserLocationMarker();
 
                 print("Selected time: $time");
               },
