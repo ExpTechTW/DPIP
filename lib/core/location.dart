@@ -43,6 +43,13 @@ class LocationResult {
   final bool change;
 
   LocationResult(this.cityTown, this.change);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'cityTown': cityTown,
+      'change': change,
+    };
+  }
 }
 
 class LocationStatus {
@@ -75,6 +82,7 @@ class LocationService {
       if (Platform.isIOS) {
         city = placemark.subAdministrativeArea;
         town = placemark.locality;
+        code = placemark.isoCountryCode == "TW" ? placemark.postalCode?.substring(0, 3) : "";
       } else if (Platform.isAndroid) {
         city = placemark.administrativeArea;
         town = placemark.subAdministrativeArea;
@@ -108,7 +116,7 @@ class LocationService {
 
     if (nowtemp > 300000 || nowtemp == 0) {
       Global.preference.setInt("last-location-update", now);
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
       LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
       positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
       double distance =

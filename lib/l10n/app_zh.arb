@@ -13,7 +13,7 @@
   "@time_format": {
     "description": "時間顯示格式"
   },
-  "home": "主頁",
+  "home": "首页",
   "@home": {
     "description": "「首頁」頁面標題"
   },
@@ -45,7 +45,7 @@
   "@donate": {
     "description": "「我」頁面 → 應用程式資訊 → 「贊助我們」按鈕"
   },
-  "threads": "于 Threads 上追踪我们",
+  "threads": "在Threads关注我们",
   "@threads": {
     "description": "「我」頁面 → 應用程式資訊 → 「在 Threads 上追蹤我們」按鈕"
   },
@@ -127,5 +127,45 @@
   "report_intensity": "各地震度",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
+  },
+  "settings_locale": "语言",
+  "@settings_locale": {
+    "description": "「設定」路徑 → 「語言」標題"
+  },
+  "settings_locale_description": "更改 DPIP 的显示语言",
+  "@settings_locale_description": {
+    "description": "「設定」路徑 → 「語言」副標題敘述"
+  },
+  "settings_display_locale": "显示语言",
+  "@settings_display_locale": {
+    "description": "「設定」路徑 → 「顯示語言」標題"
+  },
+  "settings_locale_translated": "已翻译 {percentage}",
+  "@settings_locale_translated": {
+    "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
+    "placeholders": {
+      "percentage": {
+        "type": "String",
+        "description": "已翻譯百分比"
+      }
+    }
+  },
+  "settings_locale_approved": "已校对 {percentage}",
+  "@settings_locale_approved": {
+    "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
+    "placeholders": {
+      "percentage": {
+        "type": "String",
+        "description": "已翻譯百分比"
+      }
+    }
+  },
+  "settings_locale_crowdin": "协助翻译",
+  "@settings_locale_crowdin": {
+    "description": "「設定」路徑 → 「協助翻譯」標題"
+  },
+  "settings_locale_crowdin_description": "点击这里来帮助我们改进 DPIP 的翻译",
+  "@settings_locale_crowdin_description": {
+    "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   }
 }

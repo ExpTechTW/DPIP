@@ -1,17 +1,18 @@
 import 'dart:async';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/eew.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
+import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/util/intensity_color.dart';
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -70,7 +71,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       final data = await ExpTech().getReport(widget.report.id);
       final controller = await mapController.future;
 
-      List features = [];
+      List markers = [];
       List<double> bounds = [];
 
       Map<String, int> cityMaxIntensity = {};
@@ -81,7 +82,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             cityMaxIntensity[areaName] = town.intensity;
           }
 
-          features.add({
+          markers.add({
             "type": "Feature",
             "properties": {
               "intensity": town.intensity,
@@ -100,7 +101,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         }
       }
 
-      features.add({
+      markers.add({
         "type": "Feature",
         "properties": {
           "intensity": 10, // 10 is for classifying epicenter cross
@@ -134,11 +135,46 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         "markers-geojson",
         {
           "type": "FeatureCollection",
-          "features": features,
+          "features": markers,
+        },
+      );
+
+      List waves = [];
+
+      for (var i = 0; i < 10; i++) {
+        final distance = psWaveDist(
+          data.depth,
+          data.time.millisecondsSinceEpoch,
+          data.time.millisecondsSinceEpoch + i * 5000,
+        );
+
+        if (distance["s_dist"] == null || distance["s_dist"]! < 0) continue;
+
+        waves.add(
+          circle(
+            LatLng(data.latitude, data.longitude),
+            distance["s_dist"]!,
+          ),
+        );
+      }
+
+      await controller.addGeoJsonSource(
+        "waves-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": waves,
         },
       );
 
       if (!mounted) return;
+
+      await controller.addLayer(
+        "waves-geojson",
+        "waves",
+        LineLayerProperties(
+          lineColor: context.colors.outline.toHexStringRGB(),
+        ),
+      );
 
       await loadIntensityImage(controller, isDark);
       await loadCrossImage(controller);
@@ -201,6 +237,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           fillOpacity: 1,
         ),
       );
+
       await controller.setLayerProperties(
         'town',
         const FillLayerProperties(fillOpacity: 0),
@@ -280,7 +317,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                         color: context.theme.extendedColors.blue,
                       ),
                       label: Text(
-                        "此地震可能引起若干海面變動",
+                        context.i18n.report_offing,
                         style: TextStyle(
                           color: context.theme.extendedColors.blue,
                         ),
@@ -292,7 +329,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   if (report!.magnitude >= 7 && report!.getLocation().contains("海"))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
-                      label: Text("此地震可能引起海嘯 注意後續資訊", style: TextStyle(color: context.colors.error)),
+                      label: Text(context.i18n.report_tsunami_attention, style: TextStyle(color: context.colors.error)),
                       backgroundColor: Colors.red.withOpacity(0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.colors.error),
@@ -329,11 +366,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                               padding: const EdgeInsets.all(20),
                               child: Row(
                                 children: [
-                                  const Flexible(
+                                  Flexible(
                                     flex: 8,
                                     child: Text(
-                                      "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
-                                      style: TextStyle(fontSize: 16),
+                                      context.i18n.report_error,
+                                      style: const TextStyle(fontSize: 16),
                                     ),
                                   ),
                                   const SizedBox(width: 10),

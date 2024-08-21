@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/location/location.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -12,6 +13,7 @@ class Global {
   static late Map<String, dynamic> geojson;
   static late Map<String, dynamic> timeTable;
   static late Map<String, dynamic> box;
+  static ExpTech api = ExpTech();
 
   static loadLocationData() async {
     final json = await rootBundle.loadString("assets/location.json");

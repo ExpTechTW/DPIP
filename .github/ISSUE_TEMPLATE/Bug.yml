@@ -3,6 +3,7 @@ labels: ["錯誤"]
 projects: ["ExpTechTW/12"]
 description: |
   請詳細描述你遇到的問題協助我們排除問題
+title: '[Bug]: '
 body:
 - type: dropdown
   id: platform
@@ -14,13 +15,13 @@ body:
     default: 0
   validations:
     required: true
-- type: textarea
+- type: input
   attributes:
     label: 版本
     description: 填入版本
   validations:
     required: true
-- type: textarea
+- type: input
   attributes:
     label: 裝置
     description: 填入裝置名稱

@@ -21,7 +21,7 @@
 	<key>CFBundleLocalizations</key>
 	<array>
 		<string>zh</string>
-		<string>zh-Hant</string>
+		<string>zh_TW</string>
 		<string>ja</string>
 		<string>en</string>
 		<string>ko</string>

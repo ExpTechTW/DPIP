@@ -17,15 +17,9 @@ import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:timezone/timezone.dart' as tz;
 
 import 'eew_info.dart';
@@ -47,12 +41,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Timer? _eewUpdateTimer;
   Timer? _blinkTimer;
   int _timeOffset = 0;
-  int _ping = 0;
   int _lsatGetRtsDataTime = 0;
   int _replayTimeStamp = 0;
   int _timeReplay = 0;
   double userLat = 0;
   double userLon = 0;
+  double _ping = 0;
+  String _formattedPing = '';
   Map<String, double> _eewDist = {};
   Map<String, int> _eewUpdateList = {};
   Map<String, Map<String, int>> _userEewArriveTime = {};
@@ -93,6 +88,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
+  }
+
+  void _loadMap() async {
     _initStations();
 
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
@@ -106,7 +104,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _eewUI.add(Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
       child: Text(
-        "暫時無法取得地震速報資料",
+        context.i18n.earthquake_warning_error,
         textAlign: TextAlign.left,
         style: TextStyle(fontSize: 20, color: context.colors.error),
       ),
@@ -277,7 +275,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       int t = DateTime.now().millisecondsSinceEpoch;
       final data = await ExpTech().getRts(_timeReplay);
       if (data.time < (_rtsData?.time ?? 0)) return;
-      _ping = DateTime.now().millisecondsSinceEpoch - t;
+      _ping = (DateTime.now().millisecondsSinceEpoch - t) / 1000;
+      String formattedPing = _ping.toStringAsFixed(2);
+      _formattedPing = formattedPing;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
     } catch (err) {
@@ -483,7 +483,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _eewLastInfo[eew.id]?.status == 1 ? "緊急地震速報" : "地震速報",
+                        _eewLastInfo[eew.id]?.status == 1
+                            ? context.i18n.emergency_earthquake_warning
+                            : context.i18n.earthquake_warning,
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurface,
@@ -584,7 +586,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              "所在地預估",
+                              context.i18n.location_estimate,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
@@ -611,7 +613,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "震波",
+                              context.i18n.seismic_waves,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: context.colors.onSurfaceVariant,
@@ -623,11 +625,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        (!isUserLocationValid) ? "未知" : "抵達",
+                                        (!isUserLocationValid)
+                                            ? context.i18n.monitor_unknown
+                                            : context.i18n.monitor_arrival,
                                         style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 36,
-                                            color: context.colors.onSurface),
+                                            fontWeight: FontWeight.bold, fontSize: 36, color: context.colors.onSurface),
                                       ),
                                     ],
                                   )
@@ -646,7 +648,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                         width: 10,
                                       ),
                                       Text(
-                                        "秒後抵達",
+                                        context.i18n.monitor_after_seconds,
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold, fontSize: 14, color: context.colors.onSurface),
                                       ),
@@ -665,12 +667,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ));
     }
     if (eewUI.isEmpty) {
-      eewUI.add(const Padding(
-        padding: EdgeInsets.only(left: 20, right: 20),
+      eewUI.add(Padding(
+        padding: const EdgeInsets.only(left: 20, right: 20),
         child: Text(
-          "目前無生效中的地震速報",
+          context.i18n.no_earthquake_warning,
           textAlign: TextAlign.left,
-          style: TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 20),
         ),
       ));
     } else {
@@ -920,14 +922,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    const sheetInitialSize = 0.2;
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.monitor),
       ),
       body: Stack(
         children: [
-          DpipMap(onMapCreated: _initMap),
+          DpipMap(
+            onMapCreated: _initMap,
+            onStyleLoadedCallback: _loadMap,
+          ),
           Positioned(
             left: 4,
             top: 4,
@@ -972,13 +976,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
-                    (!_dataStatus()) ? "999+ms" : "${_ping}ms",
+                    (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
                     style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: (!_dataStatus())
                             ? Colors.red
-                            : (_ping > 250)
+                            : (_ping > 1)
                                 ? Colors.orange
                                 : Colors.green),
                   ),
