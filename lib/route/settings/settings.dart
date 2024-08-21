@@ -7,7 +7,9 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 
 class SettingsRoute extends StatefulWidget {
-  const SettingsRoute({super.key});
+  final String? initialRoute;
+
+  const SettingsRoute({Key? key, this.initialRoute}) : super(key: key);
 
   @override
   State<SettingsRoute> createState() => _SettingsRouteState();
@@ -18,6 +20,16 @@ class _SettingsRouteState extends State<SettingsRoute> {
   List<String> history = [];
   final backTransition = const Interval(0, 0.5, curve: Easing.emphasizedAccelerate);
   final forwardTransition = const Interval(0.5, 1, curve: Easing.emphasizedDecelerate);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialRoute != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        navKey.currentState?.pushNamed(widget.initialRoute!);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

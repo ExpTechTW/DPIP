@@ -22,10 +22,11 @@ import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:dpip/util/need_location.dart';
 import 'eew_info.dart';
 
 class MonitorPage extends StatefulWidget {
-  const MonitorPage({super.key, required this.data});
+  const MonitorPage({Key? key, required this.data}) : super(key: key);
 
   final int data;
 
@@ -70,7 +71,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-
     _initTimeOffset();
     _timeReplay = widget.data;
 
@@ -90,9 +90,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _mapController = controller;
   }
 
-  void _loadMap() async {
-    _initStations();
-
+  void userLocation() async {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
@@ -100,6 +98,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+    if (!isUserLocationValid) {
+      await showLocationDialog(context);
+    }
+  }
+
+  void _loadMap() async {
+    _initStations();
+
+    userLocation();
 
     _eewUI.add(Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
@@ -925,8 +933,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     return Scaffold(
       appBar: _timeReplay != 0
           ? AppBar(
-        title: Text(context.i18n.monitor),
-      )
+              title: Text(context.i18n.monitor),
+            )
           : null,
       body: Stack(
         children: [
