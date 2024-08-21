@@ -276,7 +276,7 @@ class _RainMapState extends State<RainMap> {
           "#fb00ff",
           1000,
           "#960099",
-          1750,
+          2000,
           "#000000"
         ],
         circleOpacity: 0.7,
