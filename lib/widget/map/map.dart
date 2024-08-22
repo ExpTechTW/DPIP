@@ -16,6 +16,11 @@ class DpipMap extends StatefulWidget {
   final void Function()? onStyleLoadedCallback;
   final MinMaxZoomPreference? minMaxZoomPreference;
   final bool? rotateGesturesEnabled;
+  final bool? zoomGesturesEnabled;
+  final bool? doubleClickZoomEnabled;
+  final bool? dragEnabled;
+  final bool? scrollGesturesEnabled;
+  final bool? tiltGesturesEnabled;
 
   const DpipMap({
     super.key,
@@ -27,6 +32,11 @@ class DpipMap extends StatefulWidget {
     this.onStyleLoadedCallback,
     this.minMaxZoomPreference,
     this.rotateGesturesEnabled,
+    this.zoomGesturesEnabled,
+    this.doubleClickZoomEnabled,
+    this.dragEnabled,
+    this.scrollGesturesEnabled,
+    this.tiltGesturesEnabled,
   });
 
   @override
@@ -179,8 +189,12 @@ class DpipMapState extends State<DpipMap> {
       onMapClick: widget.onMapClick,
       onMapIdle: widget.onMapIdle,
       onMapLongClick: widget.onMapLongClick,
-      tiltGesturesEnabled: false,
+      tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
+      scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
       rotateGesturesEnabled: widget.rotateGesturesEnabled ?? false,
+      zoomGesturesEnabled: widget.zoomGesturesEnabled ?? true,
+      doubleClickZoomEnabled: widget.doubleClickZoomEnabled ?? true,
+      dragEnabled: widget.dragEnabled ?? true,
       onStyleLoadedCallback: widget.onStyleLoadedCallback,
       attributionButtonMargins: const Point<double>(-100, -100),
     );
