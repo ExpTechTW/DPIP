@@ -168,6 +168,8 @@ void onStart(ServiceInstance service) async {
       Global.preference.remove("user-country");
     });
 
+    int timertime = 30;
+
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
@@ -179,6 +181,11 @@ void onStart(ServiceInstance service) async {
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
           print(body);
+          timertime = 300;
+          timer?.cancel();
+          timer = Timer.periodic(Duration(seconds: timertime), (timer) async {
+            task();
+          });
         }
 
         String notifyTitle = '自動定位中';
@@ -207,7 +214,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer = Timer.periodic(const Duration(seconds: 210), (timer) async {
+    timer = Timer.periodic(Duration(seconds: timertime), (timer) async {
       task();
     });
   }
