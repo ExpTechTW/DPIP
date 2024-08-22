@@ -280,7 +280,7 @@
   "@settings_fcm": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copy_fcm": "FCM Token copied",
+  "settings_copy_fcm": "FCM Token Copied",
   "@settings_copy_fcm": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
@@ -296,7 +296,7 @@
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "Ver. {version}\nMade by ExpTech studio\nA part of data from CWA.",
+  "me_version": "Ver. {version}\nBy ExpTech studio\nA part of data from CWA.",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -321,11 +321,11 @@
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
-  "eew_alert_description_sound": "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
+  "eew_alert_description_sound": "Earthquake Alerts (Maximum level more than 5 strong) and local level more than 4",
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "地震速報（注意）",
+  "eew_sound": "Earthquake Alerts (Warning)",
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
@@ -451,7 +451,7 @@
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
-  "server_announcement_description_sound": "Announcement issued by Expect",
+  "server_announcement_description_sound": "Announcement issued by ExpTech",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   }
