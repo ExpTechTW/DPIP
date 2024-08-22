@@ -22,50 +22,50 @@ class _HomePageState extends State<HomePage> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: Colors.black87,
+                // color: Colors.black87,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '台北市 中正區',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: context.colors.secondary,
                       fontSize: 20,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
                       Icon(
                         Icons.cloud,
-                        color: Colors.white,
+                        color: context.colors.secondary,
                         size: 32,
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Text(
                         '27.0°C',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: context.colors.secondary,
                           fontSize: 48,
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     '降水量: 0.56 mm\n濕度: 89.0 %\n體感: 31.4°C',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: context.colors.secondary,
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     '更新時間: 07/26 00:00',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: context.colors.secondary,
                       fontSize: 12,
                     ),
                   ),
