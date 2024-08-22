@@ -25,6 +25,7 @@ List<double> expandBounds(List<double> bounds, LatLng point) {
   return bounds;
 }
 
+// TODO: Migrate symbol images to sprite
 Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = false]) async {
   for (var i = 1; i < 10; i++) {
     final path = "assets/map/icons/intensity-$i${dark ? "" : "-dark"}.png";
@@ -33,14 +34,17 @@ Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = f
   }
 }
 
+// TODO: Migrate symbol images to sprite
 Future<void> loadCrossImage(MapLibreMapController controller) async {
   await controller.addImage("cross", Uint8List.sublistView(await rootBundle.load("assets/map/icons/cross.png")));
 }
 
+// TODO: Migrate symbol images to sprite
 Future<void> loadGPSImage(MapLibreMapController controller) async {
   await controller.addImage("gps", Uint8List.sublistView(await rootBundle.load("assets/map/icons/gps.png")));
 }
 
+// TODO: Migrate symbol images to sprite
 Future<void> loadWindImage(MapLibreMapController controller) async {
   await controller.addImage("wind-1", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-1.png")));
   await controller.addImage("wind-2", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-2.png")));
