@@ -32,49 +32,49 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     final destinations = [
       NavigationDrawerDestination(
-        icon: const Icon(Symbols.monitor_heart),
+        icon: Icon(Symbols.monitor_heart),
         selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
         label: Text(context.i18n.monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.radar_rounded),
         selectedIcon: Icon(Symbols.radar_rounded, fill: 1),
-        label: Text('雷達回波'),
+        label: Text(context.i18n.radar_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.rainy_heavy_rounded),
         selectedIcon: Icon(Symbols.rainy_heavy_rounded, fill: 1),
-        label: Text('降水'),
+        label: Text(context.i18n.precipitation_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.temp_preferences_eco_rounded),
         selectedIcon: Icon(Symbols.temp_preferences_eco_rounded, fill: 1),
-        label: Text('氣溫'),
+        label: Text(context.i18n.temperature_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.humidity_percentage_rounded),
         selectedIcon: Icon(Symbols.humidity_percentage_rounded, fill: 1),
-        label: Text('濕度'),
+        label: Text(context.i18n.humidity_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.blood_pressure_rounded),
         selectedIcon: Icon(Symbols.blood_pressure_rounded, fill: 1),
-        label: Text('氣壓'),
+        label: Text(context.i18n.pressure_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.wind_power_rounded),
         selectedIcon: Icon(Symbols.wind_power_rounded, fill: 1),
-        label: Text('風向/風速'),
+        label: Text(context.i18n.wind_direction_and_speed_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.rainy_light_rounded),
         selectedIcon: Icon(Symbols.rainy_light_rounded, fill: 1),
-        label: Text('颱風'),
+        label: Text(context.i18n.typhoon_monitor),
       ),
-      const NavigationDrawerDestination(
+      NavigationDrawerDestination(
         icon: Icon(Symbols.tsunami),
         selectedIcon: Icon(Symbols.tsunami, fill: 1),
-        label: Text('海嘯資訊'),
+        label: Text(context.i18n.tsunami_info_monitor),
       ),
     ];
     return Scaffold(
@@ -84,7 +84,7 @@ class _MapPageState extends State<MapPage> {
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
         children: [
-          const ListTileGroupHeader(title: "地圖列表"),
+          ListTileGroupHeader(title: context.i18n.monitor_list),
           ...destinations,
         ],
         onDestinationSelected: (value) {

@@ -5,6 +5,7 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/rain.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/rain_time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
@@ -329,7 +330,7 @@ class _RainMapState extends State<RainMap> {
 
   Widget _buildLegend() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -345,13 +346,13 @@ class _RainMapState extends State<RainMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('降水量圖例', style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.precipitation_legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _buildColorBar(),
           const SizedBox(height: 8),
           _buildColorBarLabels(),
           const SizedBox(height: 12),
-          Text('單位：毫米 (mm)', style: Theme.of(context).textTheme.labelMedium),
+          Text(context.i18n.unit_mm, style: Theme.of(context).textTheme.labelMedium),
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
@@ -277,7 +278,7 @@ class _WindMapState extends State<WindMap> {
 
   Widget _buildLegend() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -293,7 +294,7 @@ class _WindMapState extends State<WindMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('平均風速圖例', style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.ave_wind_speed_legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _legendItem('wind-1', '0.1 - 3.3 m/s'),
           _legendItem('wind-2', '3.4 - 7.9 m/s'),

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
@@ -191,7 +192,7 @@ class _RadarMapState extends State<RadarMap> {
 
   Widget _buildLegend() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -207,13 +208,13 @@ class _RadarMapState extends State<RadarMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('反射率圖例', style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.reflectivity_legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _buildColorBar(),
           const SizedBox(height: 8),
           _buildColorBarLabels(),
           const SizedBox(height: 12),
-          Text('單位：dBZ', style: Theme.of(context).textTheme.labelMedium),
+          Text(context.i18n.unit_dbz, style: Theme.of(context).textTheme.labelMedium),
         ],
       ),
     );

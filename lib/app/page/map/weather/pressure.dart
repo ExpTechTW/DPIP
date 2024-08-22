@@ -5,6 +5,7 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
@@ -217,7 +218,7 @@ class _PressureMapState extends State<PressureMap> {
 
   Widget _buildLegend() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
@@ -233,13 +234,13 @@ class _PressureMapState extends State<PressureMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('氣壓圖例', style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.pressure_legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _buildColorBar(),
           const SizedBox(height: 8),
           _buildColorBarLabels(),
           const SizedBox(height: 12),
-          Text('單位：百帕 (hPa)', style: Theme.of(context).textTheme.labelMedium),
+          Text(context.i18n.unit_hpa, style: Theme.of(context).textTheme.labelMedium),
         ],
       ),
     );
