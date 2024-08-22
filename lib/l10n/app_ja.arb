@@ -100,7 +100,7 @@
   "@report_location": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
   },
-  "report_magnitude": "規模",
+  "report_magnitude": "マグニチュード",
   "@report_magnitude": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
   },
@@ -120,7 +120,7 @@
   "@report_pga_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
   },
-  "report_pgv_image": "地動最大加速度",
+  "report_pgv_image": "地動最大速度",
   "@report_pgv_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
   },
@@ -167,5 +167,292 @@
   "settings_locale_crowdin_description": "DPIPの翻訳を改善する",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
+  },
+  "earthquake_warning_error": "最新の地震速報は取得できません",
+  "@earthquake_warning_error": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
+  },
+  "no_earthquake_warning": "地震速報が受信されていません",
+  "@no_earthquake_warning": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
+  },
+  "earthquake_warning": "地震速報",
+  "@earthquake_warning": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
+  },
+  "emergency_earthquake_warning": "緊急地震速報",
+  "@emergency_earthquake_warning": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
+  },
+  "location_estimate": "現在地の予想",
+  "@location_estimate": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
+  },
+  "seismic_waves": "地震波",
+  "@seismic_waves": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
+  },
+  "monitor_unknown": "不明",
+  "@monitor_unknown": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 未知"
+  },
+  "monitor_arrival": "到達",
+  "@monitor_arrival": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
+  },
+  "monitor_after_seconds": "秒までに到着",
+  "@monitor_after_seconds": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
+  },
+  "report_replay": "地震の状況を再生",
+  "@report_replay": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
+  },
+  "image_save": "セーブ",
+  "@image_save": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
+  },
+  "image_saved": "セーブしました",
+  "@image_saved": {
+    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
+  },
+  "settings_Personalization": "個人用設定",
+  "@settings_Personalization": {
+    "description": "「設定」路徑 → 「個人化」標題"
+  },
+  "settings_theme": "テーマ色",
+  "@settings_theme": {
+    "description": "「設定」路徑 → 「主題色」副標題"
+  },
+  "settings_theme_description": "DPIPの外観とテーマ色を変更する",
+  "@settings_theme_description": {
+    "description": "「設定」路徑 → 「主題色」副標題描述"
+  },
+  "theme_light": "ライト",
+  "@theme_light": {
+    "description": "「設定」路徑 → 「主題色」設定 → 淺色"
+  },
+  "theme_dark": "ダーク",
+  "@theme_dark": {
+    "description": "「設定」路徑 → 「主題色」設定 → 深色"
+  },
+  "theme_system": "システムのテーマに従う",
+  "@theme_system": {
+    "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
+  },
+  "settings_position": "位置",
+  "@settings_position": {
+    "description": "「設定」路徑 → 「位置」標題"
+  },
+  "settings_location": "現在地",
+  "@settings_location": {
+    "description": "「設定」路徑 → 「所在地」副標題"
+  },
+  "settings_location_description": "現在地を変更して、リアルタイムの天気情報や地震情報を取得する",
+  "@settings_location_description": {
+    "description": "「設定」路徑 → 「所在地」副標題敘述"
+  },
+  "settings_location_auto": "自動で位置情報を取得する",
+  "@settings_location_auto": {
+    "description": "「設定」路徑 → 「啟用自動定位」標題"
+  },
+  "settings_location_auto_description": "この機能はデバイスのGPSを使用して、地理的な位置情報に基づいて、所在地を更新します。リアルタイムの天気情報や地震情報を提供して、最新の地域の状況を取得します。",
+  "@settings_location_auto_description": {
+    "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
+  },
+  "location_Not_set": "未設定",
+  "@location_Not_set": {
+    "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
+  },
+  "location_city": "都道府県",
+  "@location_city": {
+    "description": "「設定」路徑 → 「所在地」設定 → 縣市"
+  },
+  "location_town": "市町村",
+  "@location_town": {
+    "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
+  },
+  "location_select": "現在地を選択",
+  "@location_select": {
+    "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
+  },
+  "settings_fcm": "FCM Tokenをコピーする",
+  "@settings_fcm": {
+    "description": "「設定」路徑 → 「FCM」標題"
+  },
+  "settings_copy_fcm": "FCM Tokenはコピーしました",
+  "@settings_copy_fcm": {
+    "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
+  },
+  "report_offing": "この地震により若干の海面変動があります",
+  "@report_offing": {
+    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
+  },
+  "report_tsunami_attention": "この地震による津波の恐れがあります　情報をご注意してください",
+  "@report_tsunami_attention": {
+    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
+  },
+  "report_error": "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+  "@report_error": {
+    "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
+  },
+  "me_version": "版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "@me_version": {
+    "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "source_language": "來源語言",
+  "@source_language": {
+    "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
+  },
+  "sound_test": "音效測試",
+  "@sound_test": {
+    "description": "「設定」路徑 → 「音效」標題 → 音效測試"
+  },
+  "sound_test_description": "測試即時天氣資訊、地震速報等音效",
+  "@sound_test_description": {
+    "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
+  },
+  "eew_alert_sound": "強震即時警報（警報）",
+  "@eew_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
+  },
+  "eew_alert_description_sound": "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
+  "@eew_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
+  },
+  "eew_sound": "地震速報（注意）",
+  "@eew_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
+  },
+  "eew_description_sound": "地震速報 所在地預估震度 2 以上",
+  "@eew_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
+  },
+  "int_report_sound": "震度速報",
+  "@int_report_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 震度速報"
+  },
+  "int_report_description_sound": "TREM 觀測網 所在地實測震度 3 以上",
+  "@int_report_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
+  },
+  "eq_sound": "強震モニタ",
+  "@eq_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
+  },
+  "eq_description_sound": "TREM 觀測網 偵測到晃動",
+  "@eq_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
+  },
+  "report_sound": "地震情報",
+  "@report_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
+  },
+  "report_description_sound": "地震報告 所在地震度 3 以上",
+  "@report_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
+  },
+  "eew_sound_title": "地震速報音效",
+  "@eew_sound_title": {
+    "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
+  },
+  "eew_info_sound_title": "地震資訊",
+  "dp_info_sound_title": "災防資訊",
+  "@dp_info_sound_title": {
+    "description": "「設定」路徑 → 「音效測試」內容 → 災防資訊"
+  },
+  "other_sound_title": "其他",
+  "@other_sound_title": {
+    "description": "「設定」路徑 → 「音效測試」內容 → 其他"
+  },
+  "thunderstorm_instant_messaging_sound": "大雷雨即時訊息",
+  "@thunderstorm_instant_messaging_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
+  },
+  "thunderstorm_instant_messaging_description_sound": "所在地發布 大雷雨即時訊息",
+  "@thunderstorm_instant_messaging_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
+  },
+  "heavy_rain_alert_sound": "大雨特報",
+  "@heavy_rain_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雨特報"
+  },
+  "heavy_rain_alert_description_sound": "所在地發布 大雨特報",
+  "@heavy_rain_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
+  },
+  "torrential_rain_alert_sound": "豪雨特報",
+  "@torrential_rain_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
+  },
+  "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
+  "flooding_alert_sound": "淹水警戒",
+  "@flooding_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 淹水警戒"
+  },
+  "flooding_alert_description_sound": "所在地發布 淹水警戒",
+  "@flooding_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
+  },
+  "tsunami_alert_sound": "海嘯警報（注意）",
+  "@tsunami_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
+  },
+  "tsunami_alert_description_sound": "所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下",
+  "@tsunami_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
+  },
+  "tsunami_alert2_sound": "海嘯警報（警報）",
+  "@tsunami_alert2_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
+  },
+  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下",
+  "@tsunami_alert2_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下"
+  },
+  "volcano_info_sound": "火山資訊",
+  "@volcano_info_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 火山資訊"
+  },
+  "volcano_info_description_sound": "所在地發布 火山資訊",
+  "@volcano_info_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
+  },
+  "high_temperature_info_sound": "高溫資訊",
+  "@high_temperature_info_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
+  },
+  "high_temperature_info_description_sound": "所在地發布 高溫資訊",
+  "@high_temperature_info_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
+  },
+  "strong_wind_warning_sound": "陸上強風特報",
+  "@strong_wind_warning_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 陸上強風特報"
+  },
+  "strong_wind_warning_description_sound": "所在地發布 陸上強風特報",
+  "@strong_wind_warning_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 陸上強風特報"
+  },
+  "other_alert_sound": "其他類型警報",
+  "@other_alert_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 其他類型警報"
+  },
+  "other_alert_description_sound": "所在地發布 其他類型警報",
+  "@other_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
+  },
+  "server_announcement_sound": "伺服器公告",
+  "@server_announcement_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
+  },
+  "server_announcement_description_sound": "ExpTech 發布之公告",
+  "@server_announcement_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   }
 }
