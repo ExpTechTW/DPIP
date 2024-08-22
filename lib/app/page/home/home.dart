@@ -1,5 +1,8 @@
+import 'package:dpip/model/history.dart';
 import 'package:flutter/material.dart';
 import 'package:dpip/util/extension/build_context.dart';
+
+import '../../../api/exptech.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,6 +12,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<History> historyList = [];
+  final _scrollController = ScrollController();
+
+  Future<void> refreshHistoryList() async {
+    historyList = await ExpTech().getHistory();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refreshHistoryList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,22 +90,43 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
-                children: List.generate(5, (index) {
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: _getAlertColor(index),
-                        child: Text('${index + 1}'),
-                      ),
-                      title: const Text('test'),
-                      subtitle: const Text('2024/06/25 22:26:15\n規模 3.8 深度 17.8 公里'),
-                    ),
+            Builder(
+              builder: (context) {
+                if (historyList.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
                   );
-                }),
-              ),
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await refreshHistoryList();
+                  },
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    controller: _scrollController,
+                    itemCount: historyList.length,
+                    itemBuilder: (context, index) {
+                      var showDate = false;
+                      final current = historyList[index];
+
+                      // if (index != 0) {
+                      //   final prev = historyList[index - 1];
+                      //   if (current.time.day != prev.time.day) {
+                      //     showDate = true;
+                      //   }
+                      // } else {
+                      //   showDate = true;
+                      // }
+
+                      return SizedBox(
+                        height: 15,
+                        child: Text(current.id),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ],
         ),
