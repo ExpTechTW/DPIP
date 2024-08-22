@@ -7,6 +7,7 @@ import 'package:dpip/model/weather/rain.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/rain_time_selector.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -147,7 +148,7 @@ class _RainMapState extends State<RainMap> {
           if (rainfall == -99) {
             return null;
           }
-          
+
           return RainData(
             latitude: station.station.lat,
             longitude: station.station.lng,
@@ -337,32 +338,14 @@ class _RainMapState extends State<RainMap> {
   }
 
   Widget _buildLegend() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
-          _buildColorBar(),
-          const SizedBox(height: 8),
-          _buildColorBarLabels(),
-          const SizedBox(height: 12),
-          Text(context.i18n.unit_mm, style: Theme.of(context).textTheme.labelMedium),
-        ],
-      ),
+    return MapLegend(
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+        const SizedBox(height: 12),
+        Text(context.i18n.unit_mm, style: Theme.of(context).textTheme.labelMedium),
+      ],
     );
   }
 
