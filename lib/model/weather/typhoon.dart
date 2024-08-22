@@ -60,6 +60,8 @@ class Analysis {
   final double lng;
   final int pressure;
   final Wind wind;
+  final Move move;
+  final Map<String, int> circle;
 
   const Analysis({
     required this.time,
@@ -67,6 +69,8 @@ class Analysis {
     required this.lng,
     required this.pressure,
     required this.wind,
+    required this.move,
+    required this.circle,
   });
 
   factory Analysis.fromJson(Map<String, dynamic> json) => _$AnalysisFromJson(json);

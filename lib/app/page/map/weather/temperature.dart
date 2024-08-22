@@ -29,10 +29,10 @@ class TemperatureData {
 }
 
 class TemperatureMap extends StatefulWidget {
-  const TemperatureMap({Key? key}) : super(key: key);
+  const TemperatureMap({super.key});
 
   @override
-  _TemperatureMapState createState() => _TemperatureMapState();
+  State<TemperatureMap> createState() => _TemperatureMapState();
 }
 
 class _TemperatureMapState extends State<TemperatureMap> {

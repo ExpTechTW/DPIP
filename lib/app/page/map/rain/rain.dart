@@ -29,10 +29,10 @@ class RainData {
 }
 
 class RainMap extends StatefulWidget {
-  const RainMap({Key? key}) : super(key: key);
+  const RainMap({super.key});
 
   @override
-  _RainMapState createState() => _RainMapState();
+  State<RainMap> createState() => _RainMapState();
 }
 
 class _RainMapState extends State<RainMap> {
@@ -387,10 +387,12 @@ class _RainMapState extends State<RainMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(
-          label,
-          style: const TextStyle(fontSize: 10),
-        )).toList(),
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 10),
+                ))
+            .toList(),
       ),
     );
   }

@@ -29,10 +29,10 @@ class HumidityData {
 }
 
 class HumidityMap extends StatefulWidget {
-  const HumidityMap({Key? key}) : super(key: key);
+  const HumidityMap({super.key});
 
   @override
-  _HumidityMapState createState() => _HumidityMapState();
+  State<HumidityMap> createState() => _HumidityMapState();
 }
 
 class _HumidityMapState extends State<HumidityMap> {
@@ -250,9 +250,9 @@ class _HumidityMapState extends State<HumidityMap> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFFFFB63D),  // 0% humidity
-            Color(0xFFFFFFFF),  // 50% humidity
-            Color(0xFF0000FF),  // 100% humidity
+            Color(0xFFFFB63D), // 0% humidity
+            Color(0xFFFFFFFF), // 50% humidity
+            Color(0xFF0000FF), // 100% humidity
           ],
           stops: [0.0, 0.5, 1.0],
         ),
@@ -266,10 +266,12 @@ class _HumidityMapState extends State<HumidityMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        )).toList(),
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 12),
+                ))
+            .toList(),
       ),
     );
   }

@@ -21,7 +21,7 @@ class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
 
   @override
-  State<StatefulWidget> createState() => _TsunamiMapState();
+  State<TsunamiMap> createState() => _TsunamiMapState();
 }
 
 class _TsunamiMapState extends State<TsunamiMap> {

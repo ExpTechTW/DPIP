@@ -10,10 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class RadarMap extends StatefulWidget {
-  const RadarMap({Key? key}) : super(key: key);
+  const RadarMap({super.key});
 
   @override
-  _RadarMapState createState() => _RadarMapState();
+  State<RadarMap> createState() => _RadarMapState();
 }
 
 class _RadarMapState extends State<RadarMap> {
@@ -235,10 +235,12 @@ class _RadarMapState extends State<RadarMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(
-          label,
-          style: const TextStyle(fontSize: 9),
-        )).toList(),
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 9),
+                ))
+            .toList(),
       ),
     );
   }
