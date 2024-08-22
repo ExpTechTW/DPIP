@@ -36,12 +36,12 @@ class _SettingsSoundViewState extends State<SettingsSoundView> {
             file: "int_report.wav",
           ),
           SoundListTile(
-            title: context.i18n.eq_sound,
+            title: context.i18n.monitor,
             subtitle: context.i18n.eq_description_sound,
             file: "eq.wav",
           ),
           SoundListTile(
-            title: context.i18n.report_sound,
+            title: context.i18n.report,
             subtitle: context.i18n.report_description_sound,
             file: "report.wav",
           ),

@@ -19,11 +19,11 @@
   },
   "monitor": "強震監視器",
   "@monitor": {
-    "description": "「強震監視器」頁面標題"
+    "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
   "report": "地震報告",
   "@report": {
-    "description": "「地震報告」頁面標題"
+    "description": "「地震報告」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "map": "地圖",
   "@map": {
@@ -341,17 +341,9 @@
   "@int_report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
   },
-  "eq_sound": "強震監視器",
-  "@eq_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
-  },
   "eq_description_sound": "TREM 觀測網 偵測到晃動",
   "@eq_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
-  },
-  "report_sound": "地震報告",
-  "@report_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "report_description_sound": "地震報告 所在地震度 3 以上",
   "@report_description_sound": {
@@ -362,7 +354,7 @@
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
   "eew_info_sound_title": "地震資訊",
-  "@eew_sound_title": {
+  "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
   "dp_info_sound_title": "災防資訊",
@@ -394,7 +386,7 @@
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
   "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
-  "@heavy_rain_alert_description_sound": {
+  "@torrential_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
   "flooding_alert_sound": "淹水警戒",
@@ -448,10 +440,6 @@
   "other_alert_sound": "其他類型警報",
   "@other_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 其他類型警報"
-  },
-  "other_alert_description_sound": "所在地發布 其他類型警報",
-  "@other_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
   "other_alert_description_sound": "所在地發布 其他類型警報",
   "@other_alert_description_sound": {
