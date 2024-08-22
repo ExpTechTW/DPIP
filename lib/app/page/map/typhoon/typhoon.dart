@@ -31,8 +31,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
     try {
       typhoonList = await ExpTech().getTyphoonList();
       if (typhoonList.isNotEmpty) {
-        selectedTyphoonId = typhoonList.last;
-        await _loadTyphoonData(selectedTyphoonId);
+        selectedTimestamp = typhoonList.last;
+        await _loadTyphoonData(selectedTimestamp);
       }
       selectedTimestamp = typhoonList.last;
       setState(() {});
@@ -41,9 +41,9 @@ class _TyphoonMapState extends State<TyphoonMap> {
     }
   }
 
-  Future<void> _loadTyphoonData(String typhoonId) async {
+  Future<void> _loadTyphoonData(String time) async {
     try {
-      typhoonData = await ExpTech().getTyphoon(typhoonId);
+      typhoonData = await ExpTech().getTyphoon(time);
       if (typhoonData != null && typhoonData!.isNotEmpty) {
         typhoon_name_list = [];
         selectedTyphoonId = "";
@@ -55,11 +55,10 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   void _onSelectionChanged(String timestamp, String typhoonId) {
-    setState(() {
-      selectedTimestamp = timestamp;
-      selectedTyphoonId = typhoonId;
-    });
-    _loadTyphoonData(typhoonId);
+    selectedTimestamp = timestamp;
+    selectedTyphoonId = typhoonId;
+    _loadTyphoonData(timestamp);
+    setState(() {});
   }
 
   Future<void> _drawTyphoonPaths(List<Typhoon> typhoons) async {
