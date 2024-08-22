@@ -65,14 +65,14 @@ class _DpipState extends State<Dpip> {
             label: context.i18n.home,
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.summarize),
-            selectedIcon: const Icon(Symbols.summarize, fill: 1),
-            label: context.i18n.report,
-          ),
-          NavigationDestination(
             icon: const Icon(Symbols.map),
             selectedIcon: const Icon(Symbols.map, fill: 1),
             label: context.i18n.map,
+          ),
+          NavigationDestination(
+            icon: const Icon(Symbols.summarize),
+            selectedIcon: const Icon(Symbols.summarize, fill: 1),
+            label: context.i18n.report,
           ),
           NavigationDestination(
             icon: const Icon(Symbols.person),
@@ -93,8 +93,8 @@ class _DpipState extends State<Dpip> {
         physics: const NeverScrollableScrollPhysics(),
         children: const [
           HomePage(),
-          ReportListPage(),
           MapPage(),
+          ReportListPage(),
           MePage(),
         ],
       ),
