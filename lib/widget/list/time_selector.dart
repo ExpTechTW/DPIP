@@ -152,7 +152,6 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                   ),
                                   child: Text(DateFormat('HH:mm').format(time)),
                                 ),
-                                const SizedBox(height: 4),
                                 AnimatedDefaultTextStyle(
                                   duration: const Duration(milliseconds: 200),
                                   style: TextStyle(

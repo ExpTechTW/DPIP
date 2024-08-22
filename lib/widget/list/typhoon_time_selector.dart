@@ -169,7 +169,6 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 4),
                       Text(
                         DateFormat('MM/dd').format(time),
                         style: TextStyle(
