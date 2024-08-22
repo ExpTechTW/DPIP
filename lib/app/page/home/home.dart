@@ -92,9 +92,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   height: headerHeight,
                   child: Container(
                     padding: EdgeInsets.only(top: context.padding.top),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color.fromARGB(137, 14, 52, 96), Color.fromARGB(61, 39, 58, 81), Colors.transparent],
+                        colors: [
+                          context.colors.primary.withOpacity(0.2),
+                          context.colors.primaryContainer.withOpacity(0.16),
+                          Colors.transparent
+                        ],
                         stops: [0.16, 0.6, 1],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -229,7 +233,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                  padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
                   child: Text(
                     "每小時預報",
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
@@ -617,7 +621,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                  padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
                   child: Text(
                     "目前的事件資訊",
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
