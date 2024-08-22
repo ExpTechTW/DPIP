@@ -10,6 +10,18 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:dpip/app/page/monitor/monitor.dart';
 
+enum DisplayMode {
+  tsunami,
+  radar,
+  temperature,
+  wind,
+  humidity,
+  pressure,
+  rain,
+  monitor,
+  typhoon,
+}
+
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -18,55 +30,55 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  int selected = 7;
+  DisplayMode selected = DisplayMode.monitor;
 
   @override
   void initState() {
     super.initState();
   }
 
-  Widget _getContent(int value, context) {
-    switch (value) {
-      case 0:
+  Widget _getContent(DisplayMode mode, context) {
+    switch (mode) {
+      case DisplayMode.tsunami:
         return const TsunamiMap();
-      case 1:
+      case DisplayMode.radar:
         return const RadarMap();
-      case 2:
+      case DisplayMode.temperature:
         return const TemperatureMap();
-      case 3:
+      case DisplayMode.wind:
         return const WindMap();
-      case 4:
+      case DisplayMode.humidity:
         return const HumidityMap();
-      case 5:
+      case DisplayMode.pressure:
         return const PressureMap();
-      case 6:
+      case DisplayMode.rain:
         return const RainMap();
-      case 7:
+      case DisplayMode.monitor:
         return const MonitorPage(data: 0);
-      default:
+      case DisplayMode.typhoon:
         return const TyphoonMap();
     }
   }
 
-  String _getTitle(int value) {
-    switch (value) {
-      case 0:
+  String _getTitle(DisplayMode mode) {
+    switch (mode) {
+      case DisplayMode.tsunami:
         return '海嘯資訊';
-      case 1:
+      case DisplayMode.radar:
         return '雷達回波';
-      case 2:
+      case DisplayMode.temperature:
         return '氣溫';
-      case 3:
+      case DisplayMode.wind:
         return '風向/風速';
-      case 4:
+      case DisplayMode.humidity:
         return '濕度';
-      case 5:
+      case DisplayMode.pressure:
         return '氣壓';
-      case 6:
+      case DisplayMode.rain:
         return '降水';
-      case 7:
+      case DisplayMode.monitor:
         return '強震監視器';
-      default:
+      case DisplayMode.typhoon:
         return '颱風';
     }
   }
@@ -86,72 +98,72 @@ class _MapPageState extends State<MapPage> {
               alignment: Alignment.topRight,
               child: FloatingActionButton.small(
                 onPressed: () {},
-                child: PopupMenuButton<int>(
+                child: PopupMenuButton(
                   icon: const Icon(Symbols.menu),
                   onSelected: (value) {
                     setState(() {
                       selected = value;
                     });
                   },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-                    const PopupMenuItem<int>(
-                      value: 7,
+                  itemBuilder: (BuildContext context) => [
+                    const PopupMenuItem(
+                      value: DisplayMode.monitor,
                       child: ListTile(
                         leading: Icon(Symbols.monitor_heart),
                         title: Text('強震監視器'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 1,
+                    const PopupMenuItem(
+                      value: DisplayMode.radar,
                       child: ListTile(
                         leading: Icon(Symbols.radar),
                         title: Text('雷達回波'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 6,
+                    const PopupMenuItem(
+                      value: DisplayMode.rain,
                       child: ListTile(
                         leading: Icon(Symbols.rainy_heavy_rounded),
                         title: Text('降水'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 2,
+                    const PopupMenuItem(
+                      value: DisplayMode.temperature,
                       child: ListTile(
                         leading: Icon(Symbols.temp_preferences_eco_rounded),
                         title: Text('氣溫'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 4,
+                    const PopupMenuItem(
+                      value: DisplayMode.humidity,
                       child: ListTile(
                         leading: Icon(Symbols.humidity_high_rounded),
                         title: Text('濕度'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 5,
+                    const PopupMenuItem(
+                      value: DisplayMode.pressure,
                       child: ListTile(
                         leading: Icon(Symbols.blood_pressure_rounded),
                         title: Text('氣壓'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 3,
+                    const PopupMenuItem(
+                      value: DisplayMode.wind,
                       child: ListTile(
                         leading: Icon(Symbols.wind_power_sharp),
                         title: Text('風向/風速'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 8,
+                    const PopupMenuItem(
+                      value: DisplayMode.typhoon,
                       child: ListTile(
                         leading: Icon(Symbols.rainy_light_rounded),
                         title: Text('颱風'),
                       ),
                     ),
-                    const PopupMenuItem<int>(
-                      value: 0,
+                    const PopupMenuItem(
+                      value: DisplayMode.tsunami,
                       child: ListTile(
                         leading: Icon(Symbols.tsunami),
                         title: Text('海嘯資訊'),
