@@ -1,5 +1,5 @@
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/monitor/monitor.dart';
+import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
 import 'package:dpip/route/location_selector/search.dart';
