@@ -143,13 +143,13 @@ class _MapPageState extends State<MapPage> {
                         title: Text('風向/風速'),
                       ),
                     ),
-                    // const PopupMenuItem<int>(
-                    //   value: 8,
-                    //   child: ListTile(
-                    //     leading: Icon(Symbols.rainy_light_rounded),
-                    //     title: Text('颱風'),
-                    //   ),
-                    // ),
+                    const PopupMenuItem<int>(
+                      value: 8,
+                      child: ListTile(
+                        leading: Icon(Symbols.rainy_light_rounded),
+                        title: Text('颱風'),
+                      ),
+                    ),
                     const PopupMenuItem<int>(
                       value: 0,
                       child: ListTile(
