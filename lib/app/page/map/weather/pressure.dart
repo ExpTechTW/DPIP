@@ -29,10 +29,10 @@ class PressureData {
 }
 
 class PressureMap extends StatefulWidget {
-  const PressureMap({Key? key}) : super(key: key);
+  const PressureMap({super.key});
 
   @override
-  _PressureMapState createState() => _PressureMapState();
+  State<PressureMap> createState() => _PressureMapState();
 }
 
 class _PressureMapState extends State<PressureMap> {
@@ -252,10 +252,10 @@ class _PressureMapState extends State<PressureMap> {
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF77BFCC),  // 725 hPa
-            Color(0xFF82CB75),  // 850 hPa
-            Color(0xFFF7E78A),  // 975 hPa
-            Color(0xFFFFFFFF),  // 1020 hPa
+            Color(0xFF77BFCC), // 725 hPa
+            Color(0xFF82CB75), // 850 hPa
+            Color(0xFFF7E78A), // 975 hPa
+            Color(0xFFFFFFFF), // 1020 hPa
           ],
           stops: [0.0, 0.4167, 0.8333, 1.0],
         ),
@@ -269,10 +269,12 @@ class _PressureMapState extends State<PressureMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        )).toList(),
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 12),
+                ))
+            .toList(),
       ),
     );
   }

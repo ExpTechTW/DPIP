@@ -25,10 +25,10 @@ class WindData {
 }
 
 class WindMap extends StatefulWidget {
-  const WindMap({Key? key}) : super(key: key);
+  const WindMap({super.key});
 
   @override
-  _WindMapState createState() => _WindMapState();
+  State<WindMap> createState() => _WindMapState();
 }
 
 class _WindMapState extends State<WindMap> {

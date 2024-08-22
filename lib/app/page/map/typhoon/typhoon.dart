@@ -7,10 +7,10 @@ import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/typhoon_time_selector.dart';
 
 class TyphoonMap extends StatefulWidget {
-  const TyphoonMap({Key? key}) : super(key: key);
+  const TyphoonMap({super.key});
 
   @override
-  _TyphoonMapState createState() => _TyphoonMapState();
+  State<TyphoonMap> createState() => _TyphoonMapState();
 }
 
 class _TyphoonMapState extends State<TyphoonMap> {
