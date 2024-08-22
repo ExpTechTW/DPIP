@@ -208,7 +208,7 @@ class _RadarMapState extends State<RadarMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(context.i18n.reflectivity_legend, style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _buildColorBar(),
           const SizedBox(height: 8),

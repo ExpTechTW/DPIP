@@ -489,49 +489,29 @@
   "@tsunami_info_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 海嘯資訊"
   },
-  "reflectivity_legend": "反射率圖例",
-  "@reflectivity_legend": {
-    "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 反射率圖例"
+  "legend": "圖例",
+  "@legend": {
+    "description": "「地圖」路徑 → 地圖列表 → 「圖例」標題"
   },
   "unit_dbz": "單位：dBZ",
   "@unit_dbz": {
     "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 單位：dBZ"
   },
-  "precipitation_legend": "降水量圖例",
-  "@precipitation_legend": {
-    "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 降水量圖例"
-  },
   "unit_mm": "單位：毫米 (mm)",
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
-  },
-  "temperature_legend": "溫度圖例",
-  "@temperature_legend": {
-    "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 溫度圖例"
   },
   "unit_degrees_c": "單位：攝氏度 (°C)",
   "@unit_degrees_c": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 單位：攝氏度 (°C)"
   },
-  "humidity_legend": "濕度圖例",
-  "@humidity_legend": {
-    "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 濕度圖例"
-  },
   "unit_relative_humidity": "單位：相對濕度 (%)",
   "@unit_relative_humidity": {
     "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 單位：相對濕度 (%)"
   },
-  "pressure_legend": "氣壓圖例",
-  "@pressure_legend": {
-    "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 氣壓圖例"
-  },
   "unit_hpa": "單位：百帕 (hPa)",
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
-  },
-  "ave_wind_speed_legend": "平均風速圖例",
-  "@ave_wind_speed_legend": {
-    "description": "「地圖」路徑 → 地圖列表 → 「風向/風速」圖例 → 平均風速圖例"
   },
   "sound": "音效",
   "@sound": {

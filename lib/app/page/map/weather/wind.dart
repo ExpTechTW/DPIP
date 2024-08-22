@@ -294,7 +294,7 @@ class _WindMapState extends State<WindMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(context.i18n.ave_wind_speed_legend, style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _legendItem('wind-1', '0.1 - 3.3 m/s'),
           _legendItem('wind-2', '3.4 - 7.9 m/s'),

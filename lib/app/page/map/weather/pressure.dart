@@ -234,7 +234,7 @@ class _PressureMapState extends State<PressureMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(context.i18n.pressure_legend, style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _buildColorBar(),
           const SizedBox(height: 8),

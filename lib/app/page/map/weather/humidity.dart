@@ -232,7 +232,7 @@ class _HumidityMapState extends State<HumidityMap> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(context.i18n.humidity_legend, style: Theme.of(context).textTheme.titleLarge),
+          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           _buildColorBar(),
           const SizedBox(height: 8),
