@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:clipboard/clipboard.dart';
-import 'package:dpip/core/notify.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,24 +41,6 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          ListTileGroupHeader(title: context.i18n.sound),
-          ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.audiotrack_sharp),
-            ),
-            title: Text(
-              context.i18n.sound_test,
-              style: tileTitleTextStyle,
-            ),
-            subtitle: Text(context.i18n.sound_test_description),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                "/sound",
-              );
-            },
-          ),
           ListTileGroupHeader(title: context.i18n.settings_Personalization),
           ListTile(
             leading: const Padding(
@@ -96,29 +74,6 @@ class _SettingsRootViewState extends State<SettingsRootView> {
                 context,
                 "/locale",
               );
-            },
-          ),
-          ListTileGroupHeader(title: context.i18n.settings_fcm),
-          ListTile(
-            leading: Icon(
-              Platform.isAndroid ? Icons.bug_report_rounded : CupertinoIcons.square_on_square,
-            ),
-            title: Text(context.i18n.settings_fcm),
-            onTap: () {
-              messaging.getToken().then((value) {
-                FlutterClipboard.copy(value ?? "");
-                context.scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text(context.i18n.settings_copy_fcm),
-                  ),
-                );
-              }).catchError((error) {
-                context.scaffoldMessenger.showSnackBar(
-                  SnackBar(
-                    content: Text('複製 FCM Token 時發生錯誤：$error'),
-                  ),
-                );
-              });
             },
           ),
         ],
