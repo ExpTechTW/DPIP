@@ -236,6 +236,7 @@ class _RadarMapState extends State<RadarMap> {
         DpipMap(
           onMapCreated: _initMap,
           onStyleLoadedCallback: _loadMap,
+          rotateGesturesEnabled: true,
         ),
         Positioned(
           left: 4,
