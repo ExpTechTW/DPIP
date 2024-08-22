@@ -45,7 +45,7 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          const ListTileGroupHeader(title: "音效"),
+          ListTileGroupHeader(title: context.i18n.sound),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
