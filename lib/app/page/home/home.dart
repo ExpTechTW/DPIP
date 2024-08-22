@@ -161,14 +161,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        "晴時多雲",
+                                        "最高 30°",
                                         style: TextStyle(
-                                          fontSize: 20,
-                                          color: context.colors.primary,
+                                          fontSize: 16,
+                                          color: context.colors.onSecondaryContainer.withOpacity(0.75),
                                         ),
                                       ),
                                       Text(
-                                        "降雨機率: 20%",
+                                        "最低 24°",
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: context.colors.onSecondaryContainer.withOpacity(0.75),
@@ -178,35 +178,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   ),
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "最高 30°",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: context.colors.onPrimaryContainer.withOpacity(0.6),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    child: Container(
-                                      height: 8,
-                                      width: 8,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: context.colors.onPrimaryContainer.withOpacity(0.4),
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    "最低 24°",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: context.colors.onPrimaryContainer.withOpacity(0.6),
-                                    ),
-                                  ),
-                                ],
-                              )
+                              Text(
+                                "晴時多雲",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: context.colors.primary,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -215,6 +193,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Text(
+                                "體感溫度: ˇ30°",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant.withOpacity(0.75),
+                                ),
+                              ),
+                              Text(
+                                "降雨機率: 20%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant.withOpacity(0.75),
+                                ),
+                              ),
                               Text(
                                 "相對濕度: 42%",
                                 style: TextStyle(
@@ -234,6 +226,394 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ],
                     ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                  child: Text(
+                    "一小時預報",
+                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                  ),
+                ),
+                SizedBox(
+                  height: 160,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "9:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "30°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/27°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "30%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.partly_cloudy_day_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "10:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "30°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/28°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "30%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.partly_cloudy_day_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "11:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "31°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/28°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "35%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.sunny_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "12:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "32°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/29°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "40%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.sunny_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "13:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "32°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/29°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "50%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.partly_cloudy_day_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "14:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "32°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/28°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "65%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.cloudy_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Card(
+                        elevation: 4,
+                        surfaceTintColor: context.colors.surfaceTint,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "15:00",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.primary,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "30°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurface,
+                                    ),
+                                  ),
+                                  Text(
+                                    "/26°",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "80%",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.theme.extendedColors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Icon(
+                                Symbols.rainy_rounded,
+                                fill: 1,
+                                size: 36,
+                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Padding(
