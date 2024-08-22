@@ -435,36 +435,33 @@ packages:
     description:
       path: "packages/flutter_background_service"
       ref: master
-      resolved-ref: "3ced50f74b732cf289e89ac707a4810a295c426d"
-      url: "https://github.com/yayacat/flutter_background_service.git"
+      resolved-ref: "603a745156ddb4dc362f428636bea7f67e100564"
+      url: "https://github.com/ExpTechTW/flutter_background_service.git"
     source: git
-    version: "5.0.9"
+    version: "5.0.7"
   flutter_background_service_android:
     dependency: transitive
     description:
-      path: "packages/flutter_background_service_android"
-      ref: HEAD
-      resolved-ref: "46efe22550de5420678e9242d65c8d55b1a249b8"
-      url: "https://github.com/yayacat/flutter_background_service.git"
-    source: git
+      name: flutter_background_service_android
+      sha256: fe06c4bd719b8ce8512d5724a229526155c1f54f734524b8e43f8212e98384a8
+      url: "https://pub.dev"
+    source: hosted
     version: "6.2.4"
   flutter_background_service_ios:
     dependency: transitive
     description:
-      path: "packages/flutter_background_service_ios"
-      ref: HEAD
-      resolved-ref: "46efe22550de5420678e9242d65c8d55b1a249b8"
-      url: "https://github.com/yayacat/flutter_background_service.git"
-    source: git
+      name: flutter_background_service_ios
+      sha256: "45c8aca1e8850e5c45822152b06d5806aba9470517dcd2c291fce8ef99a44d60"
+      url: "https://pub.dev"
+    source: hosted
     version: "5.0.2"
   flutter_background_service_platform_interface:
     dependency: transitive
     description:
-      path: "packages/flutter_background_service_platform_interface"
-      ref: HEAD
-      resolved-ref: "46efe22550de5420678e9242d65c8d55b1a249b8"
-      url: "https://github.com/yayacat/flutter_background_service.git"
-    source: git
+      name: flutter_background_service_platform_interface
+      sha256: "91dd3391c213e37094fbc3fb7f34319b99ea9df76036a5c054d6371be843b0ae"
+      url: "https://pub.dev"
+    source: hosted
     version: "5.1.1"
   flutter_cache_manager:
     dependency: transitive
