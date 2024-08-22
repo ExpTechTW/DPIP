@@ -152,6 +152,13 @@ class _MePageState extends State<MePage> {
                         },
                       ),
                       ActionChip(
+                        avatar: const Icon(Icons.web_rounded),
+                        label: const Text("ExpTech Studio"),
+                        onPressed: () {
+                          launchUrl(Uri.parse("https://exptech.com.tw/dpip"));
+                        },
+                      ),
+                      ActionChip(
                         avatar: const Icon(SimpleIcons.threads),
                         label: Text(context.i18n.threads),
                         onPressed: () {
