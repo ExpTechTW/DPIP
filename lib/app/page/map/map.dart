@@ -23,60 +23,56 @@ class _MapPageState extends State<MapPage> {
   final controller = PageController();
   int currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  late final destinations = [
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.monitor_heart),
+      selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+      label: Text(context.i18n.monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.radar_rounded),
+      selectedIcon: const Icon(Symbols.radar_rounded, fill: 1),
+      label: Text(context.i18n.radar_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.rainy_heavy_rounded),
+      selectedIcon: const Icon(Symbols.rainy_heavy_rounded, fill: 1),
+      label: Text(context.i18n.precipitation_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.temp_preferences_eco_rounded),
+      selectedIcon: const Icon(Symbols.temp_preferences_eco_rounded, fill: 1),
+      label: Text(context.i18n.temperature_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.humidity_percentage_rounded),
+      selectedIcon: const Icon(Symbols.humidity_percentage_rounded, fill: 1),
+      label: Text(context.i18n.humidity_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.blood_pressure_rounded),
+      selectedIcon: const Icon(Symbols.blood_pressure_rounded, fill: 1),
+      label: Text(context.i18n.pressure_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.wind_power_rounded),
+      selectedIcon: const Icon(Symbols.wind_power_rounded, fill: 1),
+      label: Text(context.i18n.wind_direction_and_speed_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.rainy_light_rounded),
+      selectedIcon: const Icon(Symbols.rainy_light_rounded, fill: 1),
+      label: Text(context.i18n.typhoon_monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.tsunami),
+      selectedIcon: const Icon(Symbols.tsunami, fill: 1),
+      label: Text(context.i18n.tsunami_info_monitor),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final destinations = [
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.monitor_heart),
-        selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-        label: Text(context.i18n.monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.radar_rounded),
-        selectedIcon: const Icon(Symbols.radar_rounded, fill: 1),
-        label: Text(context.i18n.radar_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.rainy_heavy_rounded),
-        selectedIcon: const Icon(Symbols.rainy_heavy_rounded, fill: 1),
-        label: Text(context.i18n.precipitation_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.temp_preferences_eco_rounded),
-        selectedIcon: const Icon(Symbols.temp_preferences_eco_rounded, fill: 1),
-        label: Text(context.i18n.temperature_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.humidity_percentage_rounded),
-        selectedIcon: const Icon(Symbols.humidity_percentage_rounded, fill: 1),
-        label: Text(context.i18n.humidity_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.blood_pressure_rounded),
-        selectedIcon: const Icon(Symbols.blood_pressure_rounded, fill: 1),
-        label: Text(context.i18n.pressure_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.wind_power_rounded),
-        selectedIcon: const Icon(Symbols.wind_power_rounded, fill: 1),
-        label: Text(context.i18n.wind_direction_and_speed_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.rainy_light_rounded),
-        selectedIcon: const Icon(Symbols.rainy_light_rounded, fill: 1),
-        label: Text(context.i18n.typhoon_monitor),
-      ),
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.tsunami),
-        selectedIcon: const Icon(Symbols.tsunami, fill: 1),
-        label: Text(context.i18n.tsunami_info_monitor),
-      ),
-    ];
     return Scaffold(
       appBar: AppBar(
         title: destinations[currentIndex].label,
