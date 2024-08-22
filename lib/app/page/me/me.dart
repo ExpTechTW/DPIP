@@ -139,9 +139,16 @@ class _MePageState extends State<MePage> {
                       ),
                       ActionChip(
                         avatar: const Icon(SimpleIcons.github),
-                        label: const Text("Github"),
+                        label: const Text("GitHub"),
                         onPressed: () {
                           launchUrl(Uri.parse("https://github.com/exptechtw/dpip"));
+                        },
+                      ),
+                      ActionChip(
+                        avatar: const Icon(SimpleIcons.discord),
+                        label: const Text("Discord"),
+                        onPressed: () {
+                          launchUrl(Uri.parse("https://exptech.com.tw/dc"));
                         },
                       ),
                       ActionChip(
