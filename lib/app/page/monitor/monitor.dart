@@ -121,7 +121,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _initStations() async {
     final data = await ExpTech().getStations();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
     _setupStationSource(data);

@@ -59,7 +59,7 @@ class _RainMapState extends State<RainMap> {
   }
 
   void _loadMap() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
@@ -344,7 +344,7 @@ class _RainMapState extends State<RainMap> {
         const SizedBox(height: 8),
         _buildColorBarLabels(),
         const SizedBox(height: 12),
-        Text(context.i18n.unit_mm, style: Theme.of(context).textTheme.labelMedium),
+        Text(context.i18n.unit_mm, style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -402,7 +402,7 @@ class _RainMapState extends State<RainMap> {
           left: 4,
           bottom: 4,
           child: Material(
-            color: Theme.of(context).colorScheme.secondary,
+            color: context.colors.secondary,
             elevation: 4.0,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -417,7 +417,7 @@ class _RainMapState extends State<RainMap> {
                   child: Icon(
                     _showLegend ? Icons.close : Icons.info_outline,
                     size: 20,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                    color: context.colors.onSecondary,
                   ),
                 ),
               ),

@@ -57,7 +57,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
       await addTsunamiObservationPoints(tsunami!);
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 

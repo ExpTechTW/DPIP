@@ -107,13 +107,13 @@ class _SettingsRootViewState extends State<SettingsRootView> {
             onTap: () {
               messaging.getToken().then((value) {
                 FlutterClipboard.copy(value ?? "");
-                ScaffoldMessenger.of(context).showSnackBar(
+                context.scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text(context.i18n.settings_copy_fcm),
                   ),
                 );
               }).catchError((error) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                context.scaffoldMessenger.showSnackBar(
                   SnackBar(
                     content: Text('複製 FCM Token 時發生錯誤：$error'),
                   ),

@@ -1,3 +1,4 @@
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -90,7 +91,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
             margin: const EdgeInsets.only(bottom: 4, left: 16, right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
+              color: context.colors.surface,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -107,13 +108,13 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                   DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp)),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: context.colors.onSurface,
                   ),
                 ),
                 const SizedBox(width: 4),
                 Icon(
                   _isExpanded ? Icons.expand_less : Icons.expand_more,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: context.colors.onSurface,
                 ),
               ],
             ),
@@ -150,7 +151,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                         alignment: Alignment.center,
                         margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
+                          color: isSelected ? context.colors.secondary : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Column(
@@ -159,9 +160,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                             AnimatedDefaultTextStyle(
                               duration: const Duration(milliseconds: 200),
                               style: TextStyle(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.onSecondary
-                                    : Theme.of(context).colorScheme.onSurface,
+                                color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -171,9 +170,8 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                             AnimatedDefaultTextStyle(
                               duration: const Duration(milliseconds: 200),
                               style: TextStyle(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.onSecondary
-                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                color:
+                                    isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
                                 fontSize: 12,
                               ),
                               child: Text(DateFormat('MM/dd').format(time)),

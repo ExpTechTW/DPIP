@@ -42,15 +42,11 @@ Future<void> loadGPSImage(MapLibreMapController controller) async {
 }
 
 Future<void> loadWindImage(MapLibreMapController controller) async {
+  await controller.addImage("wind-1", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-1.png")));
+  await controller.addImage("wind-2", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-2.png")));
+  await controller.addImage("wind-3", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-3.png")));
+  await controller.addImage("wind-4", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-4.png")));
   await controller.addImage("wind-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-5.png")));
-  await controller.addImage(
-      "wind-1", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-1.png")));
-  await controller.addImage(
-      "wind-2", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-2.png")));
-  await controller.addImage(
-      "wind-3", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-3.png")));
-  await controller.addImage(
-      "wind-4", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-4.png")));
 }
 
 enum Units {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/map/legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -131,7 +132,6 @@ class _LightningMapState extends State<LightningMap> {
 
   Widget _buildLegend() {
     return MapLegend(
-      title: '閃電圖例',
       children: [
         _buildLegendItem(Icons.add, Colors.red, '對地閃電'),
         _buildLegendItem(Icons.circle, Colors.orange, '雲間閃電'),
@@ -146,7 +146,7 @@ class _LightningMapState extends State<LightningMap> {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 8),
-          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Text(label, style: context.theme.textTheme.bodyMedium),
         ],
       ),
     );
@@ -165,7 +165,7 @@ class _LightningMapState extends State<LightningMap> {
           left: 4,
           bottom: 4,
           child: Material(
-            color: Theme.of(context).colorScheme.secondary,
+            color: context.colors.secondary,
             elevation: 4.0,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -180,7 +180,7 @@ class _LightningMapState extends State<LightningMap> {
                   child: Icon(
                     _showLegend ? Icons.close : Icons.info_outline,
                     size: 20,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                    color: context.colors.onSecondary,
                   ),
                 ),
               ),

@@ -54,7 +54,7 @@ class _WindMapState extends State<WindMap> {
   }
 
   void _loadMap() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
@@ -315,7 +315,7 @@ class _WindMapState extends State<WindMap> {
           left: 4,
           bottom: 4,
           child: Material(
-            color: Theme.of(context).colorScheme.secondary,
+            color: context.colors.secondary,
             elevation: 4.0,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -330,7 +330,7 @@ class _WindMapState extends State<WindMap> {
                   child: Icon(
                     _showLegend ? Icons.close : Icons.info_outline,
                     size: 20,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                    color: context.colors.onSecondary,
                   ),
                 ),
               ),
