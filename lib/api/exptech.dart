@@ -15,6 +15,8 @@ import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
 
+import '../model/history.dart';
+
 class ExpTech {
   String? apikey;
 
@@ -298,7 +300,7 @@ class ExpTech {
     return jsonData.map((item) => Lightning.fromJson(item)).toList();
   }
 
-  Future<List<Lightning>> getRealtime() async {
+  Future<List<History>> getRealtime() async {
     final requestUrl = Route.realtime();
 
     var res = await get(requestUrl);
@@ -309,10 +311,10 @@ class ExpTech {
 
     final List<dynamic> jsonData = jsonDecode(res.body);
 
-    return jsonData.map((item) => Lightning.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item)).toList();
   }
 
-  Future<List<Lightning>> getHistory() async {
+  Future<List<History>> getHistory() async {
     final requestUrl = Route.history();
 
     var res = await get(requestUrl);
@@ -323,6 +325,6 @@ class ExpTech {
 
     final List<dynamic> jsonData = jsonDecode(res.body);
 
-    return jsonData.map((item) => Lightning.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item)).toList();
   }
 }
