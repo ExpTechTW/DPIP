@@ -39,4 +39,8 @@ class Route {
   static Uri weather(String time) => Uri.parse("$onlyapi/v1/meteor/weather/$time");
   static Uri rainList() => Uri.parse("$onlyapi/v1/meteor/rain/list");
   static Uri rain(String time) => Uri.parse("$onlyapi/v1/meteor/rain/$time");
+  static Uri typhoonList() => Uri.parse("$onlyapi/v1/meteor/typhoon/list");
+  static Uri typhoon(String time) => Uri.parse("$onlyapi/v1/meteor/typhoon/$time");
+  static Uri lightningList() => Uri.parse("$onlyapi/v1/meteor/lightning/list");
+  static Uri lightning(String time) => Uri.parse("$onlyapi/v1/meteor/lightning/$time");
 }

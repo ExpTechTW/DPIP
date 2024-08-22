@@ -9,7 +9,9 @@ import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
+import 'package:dpip/model/weather/lightning.dart';
 import 'package:dpip/model/weather/rain.dart';
+import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
 
@@ -238,5 +240,61 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return jsonData.map((item) => RainStation.fromJson(item)).toList();
+  }
+
+  Future<List<String>> getTyphoonList() async {
+    final requestUrl = Route.typhoonList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<String>> getLightningList() async {
+    final requestUrl = Route.lightningList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<Typhoon>> getTyphoon(String time) async {
+    final requestUrl = Route.typhoon(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Typhoon.fromJson(item)).toList();
+  }
+
+  Future<List<Lightning>> getLightning(String time) async {
+    final requestUrl = Route.lightning(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Lightning.fromJson(item)).toList();
   }
 }
