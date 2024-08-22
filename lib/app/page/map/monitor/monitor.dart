@@ -21,8 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart' as tz;
-
 import 'package:dpip/util/need_location.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'eew_info.dart';
 
 class MonitorPage extends StatefulWidget {
@@ -67,6 +67,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   late ScrollController scrollController;
   List<Widget> _eewUI = [];
   List<Widget> _rtsUI = [];
+  bool _showLegend = false;
 
   @override
   void initState() {
@@ -928,6 +929,59 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     super.dispose();
   }
 
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return MapLegend(
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+      ],
+    );
+  }
+
+  Widget _buildColorBar() {
+    final intensities = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    return SizedBox(
+      height: 20,
+      width: 300,
+      child: Row(
+        children: intensities.map((intensity) {
+          return Expanded(
+            child: Container(
+              color: IntensityColor.intensity(intensity),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = ['1', '2', '3', '4', '5弱', '5強', '6弱', '6強', '7'];
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels.map((label) {
+          return SizedBox(
+            width: 300 / 9,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -941,6 +995,32 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           DpipMap(
             onMapCreated: _initMap,
             onStyleLoadedCallback: _loadMap,
+          ),
+          Positioned(
+            right: 4,
+            top: 4,
+            child: Material(
+              color: context.colors.secondary,
+              elevation: 4.0,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: _toggleLegend,
+                child: Tooltip(
+                  message: '圖例',
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _showLegend ? Icons.close : Icons.info_outline,
+                      size: 20,
+                      color: context.colors.onSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
           Positioned(
             left: 4,
@@ -1012,6 +1092,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           Positioned.fill(
             child: EewDraggableSheet(eewUI: _eewUI),
           ),
+          if (_showLegend)
+            Positioned(
+              right: 6,
+              top: 50, // Adjusted to be above the legend button
+              child: _buildLegend(),
+            ),
         ],
       ),
     );
