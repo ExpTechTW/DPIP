@@ -42,7 +42,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final scrollController = ScrollController();
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
 
+  double headerHeight = 360;
   bool isAppBarVisible = false;
+
   Future<void> refreshHistoryList() async {
     final data = await ExpTech().getHistory();
     setState(() => historyList = data);
@@ -52,8 +54,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     refreshHistoryList();
+    double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
-      print(scrollController.offset);
       if (scrollController.offset > 1e-5) {
         if (!isAppBarVisible) {
           setState(() => isAppBarVisible = true);
@@ -63,8 +65,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           setState(() => isAppBarVisible = false);
         }
       }
-      if (scrollController.offset < 200) {
-        animController.animateTo(scrollController.offset / 200, duration: Duration.zero);
+
+      if (scrollController.offset < headerScrollHeight) {
+        animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
   }
@@ -81,59 +84,128 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         children: [
           RefreshIndicator(
             onRefresh: refreshHistoryList,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: ListView(
-                controller: scrollController,
-                children: [
-                  Builder(
-                    builder: (context) {
-                      if (historyList.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      List<Widget> children = [];
-
-                      for (var i = 0, n = historyList.length; i < n; i++) {
-                        final current = historyList[i];
-                        var showDate = false;
-
-                        if (i != 0) {
-                          final prev = historyList[i - 1];
-                          if (current.time.send.day != prev.time.send.day) {
-                            showDate = true;
-                          }
-                        } else {
-                          showDate = true;
-                        }
-
-                        final item = TimeLineTile(
-                          time: current.time.send,
-                          icon: const Icon(Symbols.thunderstorm_rounded),
-                          height: 100,
-                          first: i == 0,
-                          showDate: showDate,
-                          color: context.theme.extendedColors.blueContainer,
+            child: ListView(
+              padding: EdgeInsets.only(bottom: context.padding.bottom),
+              controller: scrollController,
+              children: [
+                SizedBox(
+                  height: headerHeight,
+                  child: Container(
+                    padding: EdgeInsets.only(top: context.padding.top),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color.fromARGB(140, 41, 77, 118), Color.fromARGB(62, 43, 59, 78), Colors.transparent],
+                        stops: [0.16, 0.6, 1],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                              child: Row(
+                                children: [
+                                  Icon(Symbols.pin_drop_rounded, color: context.colors.onSurfaceVariant),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "臺南市歸仁區",
+                                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 16, 0, 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(current.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
-                              Text(current.text.description["all"]!),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "27.5°",
+                                    style: TextStyle(
+                                      fontSize: 64,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                                      height: 1,
+                                    ),
+                                  ),
+                                  Icon(
+                                    Symbols.partly_cloudy_day_rounded,
+                                    fill: 1,
+                                    size: 48,
+                                    color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                                  )
+                                ],
+                              ),
+                              Text(
+                                "晴時多雲",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  color: context.colors.onSecondaryContainer.withOpacity(0.65),
+                                ),
+                              ),
                             ],
                           ),
-                          onTap: () {},
-                        );
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Builder(
+                  builder: (context) {
+                    if (historyList.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                        children.add(item);
+                    List<Widget> children = [];
+
+                    for (var i = 0, n = historyList.length; i < n; i++) {
+                      final current = historyList[i];
+                      var showDate = false;
+
+                      if (i != 0) {
+                        final prev = historyList[i - 1];
+                        if (current.time.send.day != prev.time.send.day) {
+                          showDate = true;
+                        }
+                      } else {
+                        showDate = true;
                       }
 
-                      return Column(
-                        children: children,
+                      final item = TimeLineTile(
+                        time: current.time.send,
+                        icon: const Icon(Symbols.thunderstorm_rounded),
+                        height: 100,
+                        first: i == 0,
+                        showDate: showDate,
+                        color: context.theme.extendedColors.blueContainer,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(current.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
+                            Text(current.text.description["all"]!),
+                          ],
+                        ),
+                        onTap: () {},
                       );
-                    },
-                  )
-                ],
-              ),
+
+                      children.add(item);
+                    }
+
+                    return Column(
+                      children: children,
+                    );
+                  },
+                )
+              ],
             ),
           ),
           Positioned(
