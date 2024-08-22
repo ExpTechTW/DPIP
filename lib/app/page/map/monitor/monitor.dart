@@ -937,10 +937,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   Widget _buildLegend() {
     return MapLegend(
+      label: "預估震度圖例",
       children: [
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
+        Text("僅用於地震速報時", style: context.theme.textTheme.labelMedium),
       ],
     );
   }

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class MapLegend extends StatelessWidget {
   final List<Widget> children;
+  final String? label;
 
-  const MapLegend({super.key, required this.children});
+  const MapLegend({super.key, required this.children, this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class MapLegend extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.i18n.map_legend,
+              label ?? context.i18n.map_legend,
               style: context.theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
