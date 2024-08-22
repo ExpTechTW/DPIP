@@ -176,7 +176,7 @@
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "Earthquake alert",
+  "earthquake_warning": "Earthquake Early Warning",
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
@@ -184,7 +184,7 @@
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "Estimated​",
+  "location_estimate": "Estimated Intensity",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
@@ -362,7 +362,7 @@
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
   "eew_info_sound_title": "The information of earthquake",
-  "dp_info_sound_title": "災防資訊",
+  "dp_info_sound_title": "Disaster Prevention Information",
   "@dp_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 災防資訊"
   },
@@ -370,11 +370,11 @@
   "@other_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "大雷雨即時訊息",
+  "thunderstorm_instant_messaging_sound": "Immediate thunderstorm alerts",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "所在地發布 大雷雨即時訊息",
+  "thunderstorm_instant_messaging_description_sound": "Immediate thunderstorm alerts issued for your area",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -391,11 +391,11 @@
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
   "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
-  "flooding_alert_sound": "淹水警戒",
+  "flooding_alert_sound": "Flood alert",
   "@flooding_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 淹水警戒"
   },
-  "flooding_alert_description_sound": "所在地發布 淹水警戒",
+  "flooding_alert_description_sound": "Flood alert issued for your area",
   "@flooding_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
   },
