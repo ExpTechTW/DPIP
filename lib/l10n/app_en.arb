@@ -19,11 +19,11 @@
   },
   "monitor": "Monitor",
   "@monitor": {
-    "description": "「強震監視器」頁面標題"
+    "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
   "report": "Reports",
   "@report": {
-    "description": "「地震報告」頁面標題"
+    "description": "「地震報告」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "map": "Map",
   "@map": {
@@ -317,7 +317,7 @@
   "@sound_test_description": {
     "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "Earthquake early warning (alert)",
+  "eew_alert_sound": "Earthquake Early Warning (Alert)",
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
@@ -341,17 +341,9 @@
   "@int_report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
   },
-  "eq_sound": "Monitor",
-  "@eq_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
-  },
   "eq_description_sound": "TREM 觀測網 偵測到晃動",
   "@eq_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
-  },
-  "report_sound": "Reports",
-  "@report_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "report_description_sound": "地震報告 所在地震度 3 以上",
   "@report_description_sound": {
@@ -359,9 +351,12 @@
   },
   "eew_sound_title": "地震速報音效",
   "@eew_sound_title": {
-    "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
+    "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
   "eew_info_sound_title": "The information of earthquake",
+  "@eew_info_sound_title": {
+    "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
+  },
   "dp_info_sound_title": "Disaster Prevention Information",
   "@dp_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 災防資訊"
@@ -384,13 +379,16 @@
   },
   "heavy_rain_alert_description_sound": "所在地發布 大雨特報",
   "@heavy_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
   "torrential_rain_alert_sound": "Extremely Heavy Rain Advisory",
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
   "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
+  "@torrential_rain_alert_description_sound": {
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
+  },
   "flooding_alert_sound": "Flood alert",
   "@flooding_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 淹水警戒"
