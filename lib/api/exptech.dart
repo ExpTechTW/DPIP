@@ -297,4 +297,32 @@ class ExpTech {
 
     return jsonData.map((item) => Lightning.fromJson(item)).toList();
   }
+
+  Future<List<Lightning>> getRealtime() async {
+    final requestUrl = Route.realtime();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Lightning.fromJson(item)).toList();
+  }
+
+  Future<List<Lightning>> getHistory() async {
+    final requestUrl = Route.history();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Lightning.fromJson(item)).toList();
+  }
 }
