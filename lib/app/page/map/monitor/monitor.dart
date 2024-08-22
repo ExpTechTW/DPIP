@@ -99,7 +99,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
-    if (!isUserLocationValid) {
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
   }

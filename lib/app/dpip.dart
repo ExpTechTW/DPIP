@@ -48,7 +48,7 @@ class _DpipState extends State<Dpip> {
   }
 
   Future<void> _checkAndShowLocationDialog() async {
-    if (!isUserLocationValid) {
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
   }
