@@ -63,8 +63,8 @@ class _LightningMapState extends State<LightningMap> {
   }
 
   Future<void> _loadMapImages() async {
-    await _mapController.addImage("cross", await loadImageFromAsset("assets/cross.png"));
-    await _mapController.addImage("circle", await loadImageFromAsset("assets/circle.png"));
+    // await _mapController.addImage("cross", await loadImageFromAsset("assets/cross.png"));
+    // await _mapController.addImage("circle", await loadImageFromAsset("assets/circle.png"));
   }
 
   Future<void> _loadLightningData(String time) async {

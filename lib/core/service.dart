@@ -113,6 +113,7 @@ Future<void> androidForegroundService() async {
       onStart: onStart,
       autoStart: true,
       isForegroundMode: true,
+      foregroundServiceType: AndroidForegroundType.location,
       notificationChannelId: 'my_foreground',
       initialNotificationTitle: 'DPIP',
       initialNotificationContent: '前景服務啟動中...',
