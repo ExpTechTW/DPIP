@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Stack(
           children: [
+            const DpipMap(),
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -127,7 +128,6 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            const DpipMap(),
           ],
         ),
     );
