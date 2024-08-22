@@ -36,57 +36,86 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
           children: [
             const DpipMap(),
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                // color: Colors.black87,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '台北市 中正區',
-                    style: TextStyle(
-                      color: context.colors.secondary,
-                      fontSize: 20,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.cloud,
-                        color: context.colors.secondary,
-                        size: 32,
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '27.0°C',
-                        style: TextStyle(
-                          color: context.colors.secondary,
-                          fontSize: 48,
+            Positioned.fill(
+              child: DraggableScrollableSheet(
+                initialChildSize: 0.2,
+                minChildSize: 0.2,
+                builder: (context, scrollController) {
+                  return Container(
+                    color: context.colors.surface,
+                    child: ListView(
+                      controller: scrollController,
+                      children: [
+                        SizedBox(
+                          height: 24,
+                          child: Center(
+                            child: Container(
+                              width: 32,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: context.colors.onSurfaceVariant.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '降水量: 0.56 mm\n濕度: 89.0 %\n體感: 31.4°C',
-                    style: TextStyle(
-                      color: context.colors.secondary,
-                      fontSize: 16,
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            // color: Colors.black87,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '台北市 中正區',
+                                style: TextStyle(
+                                  color: context.colors.secondary,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.cloud,
+                                    color: context.colors.secondary,
+                                    size: 32,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    '27.0°C',
+                                    style: TextStyle(
+                                      color: context.colors.secondary,
+                                      fontSize: 48,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '降水量: 0.56 mm\n濕度: 89.0 %\n體感: 31.4°C',
+                                style: TextStyle(
+                                  color: context.colors.secondary,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '更新時間: 07/26 00:00',
+                                style: TextStyle(
+                                  color: context.colors.secondary,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '更新時間: 07/26 00:00',
-                    style: TextStyle(
-                      color: context.colors.secondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -119,10 +148,10 @@ class _HomePageState extends State<HomePage> {
                       //   showDate = true;
                       // }
 
-                      return SizedBox(
-                        height: 15,
-                        child: Text(current.id),
-                      );
+                      // return SizedBox(
+                      //   height: 15,
+                      //   child: Text(current.id),
+                      // );
                     },
                   ),
                 );
