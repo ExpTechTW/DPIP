@@ -1,4 +1,6 @@
+import 'package:dpip/util/parser.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:timezone/timezone.dart';
 
 part 'history.g.dart';
 
@@ -28,7 +30,8 @@ class History {
 
 @JsonSerializable()
 class InfoTime {
-  final int send;
+  @JsonKey(fromJson: parseDateTime, toJson: dateTimeToJson)
+  final TZDateTime send;
   final Map expires;
 
   InfoTime({
@@ -42,8 +45,8 @@ class InfoTime {
 
 @JsonSerializable()
 class InfoText {
-  final Map content;
-  final Map description;
+  final Map<String, InfoTextValue> content;
+  final Map<String, String> description;
 
   InfoText({
     required this.content,
@@ -52,4 +55,18 @@ class InfoText {
 
   factory InfoText.fromJson(Map<String, dynamic> json) => _$InfoTextFromJson(json);
   Map<String, dynamic> toJson() => _$InfoTextToJson(this);
+}
+
+@JsonSerializable()
+class InfoTextValue {
+  final String title;
+  final String subtitle;
+
+  InfoTextValue({
+    required this.title,
+    required this.subtitle,
+  });
+
+  factory InfoTextValue.fromJson(Map<String, dynamic> json) => _$InfoTextValueFromJson(json);
+  Map<String, dynamic> toJson() => _$InfoTextValueToJson(this);
 }
