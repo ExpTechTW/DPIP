@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dpip/util/extension/build_context.dart';
 
 import '../../../api/exptech.dart';
+import '../../../widget/map/map.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,10 +33,9 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(context.i18n.home),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
+      body: Stack(
           children: [
+            DpipMap(),
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -130,7 +130,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-      ),
     );
   }
 
