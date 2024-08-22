@@ -354,7 +354,7 @@
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
   "eew_info_sound_title": "地震資訊",
-  "@eew_sound_title": {
+  "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
   "dp_info_sound_title": "災防資訊",
@@ -386,7 +386,7 @@
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
   "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
-  "@heavy_rain_alert_description_sound": {
+  "@torrential_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
   "flooding_alert_sound": "淹水警戒",
@@ -440,10 +440,6 @@
   "other_alert_sound": "其他類型警報",
   "@other_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 其他類型警報"
-  },
-  "other_alert_description_sound": "所在地發布 其他類型警報",
-  "@other_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
   "other_alert_description_sound": "所在地發布 其他類型警報",
   "@other_alert_description_sound": {
