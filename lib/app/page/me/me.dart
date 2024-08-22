@@ -47,7 +47,7 @@ class _MePageState extends State<MePage> {
          * 音效測試
          */
         ListTile(
-          leading: Icon(Symbols.audiotrack_sharp),
+          leading: const Icon(Symbols.audiotrack_sharp),
           title: Text(
             context.i18n.sound_test,
             style: tileTitleTextStyle,
