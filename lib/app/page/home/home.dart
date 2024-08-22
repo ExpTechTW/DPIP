@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
                   child: Text(
-                    "一小時預報",
+                    "每小時預報",
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
@@ -619,7 +619,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
                   child: Text(
-                    "目前的天氣資訊",
+                    "目前的事件資訊",
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
