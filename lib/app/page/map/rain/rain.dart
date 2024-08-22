@@ -109,48 +109,56 @@ class _RainMapState extends State<RainMap> {
   Future<void> updateRainData(String timestamp, String interval) async {
     List<RainStation> rainData = await ExpTech().getRain(timestamp);
 
-    rainDataList = rainData.map((station) {
-      double rainfall;
-      switch (interval) {
-        case 'now':
-          rainfall = station.data.now;
-          break;
-        case '10m':
-          rainfall = station.data.tenMinutes;
-          break;
-        case '1h':
-          rainfall = station.data.oneHour;
-          break;
-        case '3h':
-          rainfall = station.data.threeHours;
-          break;
-        case '6h':
-          rainfall = station.data.sixHours;
-          break;
-        case '12h':
-          rainfall = station.data.twelveHours;
-          break;
-        case '24h':
-          rainfall = station.data.twentyFourHours;
-          break;
-        case '2d':
-          rainfall = station.data.twoDays;
-          break;
-        case '3d':
-          rainfall = station.data.threeDays;
-          break;
-        default:
-          rainfall = station.data.now; // 默認使用 'now'
-      }
-      return RainData(
-        latitude: station.station.lat,
-        longitude: station.station.lng,
-        rainfall: rainfall,
-        stationName: station.station.name,
-        county: station.station.county,
-        town: station.station.town,
-      );
-    }).toList();
+    rainDataList = rainData
+        .map((station) {
+          double rainfall;
+          switch (interval) {
+            case 'now':
+              rainfall = station.data.now;
+              break;
+            case '10m':
+              rainfall = station.data.tenMinutes;
+              break;
+            case '1h':
+              rainfall = station.data.oneHour;
+              break;
+            case '3h':
+              rainfall = station.data.threeHours;
+              break;
+            case '6h':
+              rainfall = station.data.sixHours;
+              break;
+            case '12h':
+              rainfall = station.data.twelveHours;
+              break;
+            case '24h':
+              rainfall = station.data.twentyFourHours;
+              break;
+            case '2d':
+              rainfall = station.data.twoDays;
+              break;
+            case '3d':
+              rainfall = station.data.threeDays;
+              break;
+            default:
+              rainfall = station.data.now;
+          }
+
+          if (rainfall == -99) {
+            return null;
+          }
+          
+          return RainData(
+            latitude: station.station.lat,
+            longitude: station.station.lng,
+            rainfall: rainfall,
+            stationName: station.station.name,
+            county: station.station.county,
+            town: station.station.town,
+          );
+        })
+        .whereType<RainData>()
+        .toList();
 
     await addRainCircles(rainDataList);
   }
@@ -330,7 +338,7 @@ class _RainMapState extends State<RainMap> {
 
   Widget _buildLegend() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
