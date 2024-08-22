@@ -3,14 +3,14 @@ import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:dpip/widget/settings/sound/sound_list_tile.dart';
 import 'package:flutter/material.dart';
 
-class SettingsSoundView extends StatefulWidget {
-  const SettingsSoundView({super.key});
+class SoundRoute extends StatefulWidget {
+  const SoundRoute({super.key});
 
   @override
-  State<SettingsSoundView> createState() => _SettingsSoundViewState();
+  State<SoundRoute> createState() => _SettingsSoundViewState();
 }
 
-class _SettingsSoundViewState extends State<SettingsSoundView> {
+class _SettingsSoundViewState extends State<SoundRoute> {
   @override
   Widget build(BuildContext context) {
     return Material(

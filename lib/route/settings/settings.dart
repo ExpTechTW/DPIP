@@ -1,7 +1,6 @@
 import 'package:dpip/route/settings/content/locale.dart';
 import 'package:dpip/route/settings/content/location.dart';
 import 'package:dpip/route/settings/content/root.dart';
-import 'package:dpip/route/settings/content/sound.dart';
 import 'package:dpip/route/settings/content/theme.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +36,6 @@ class _SettingsRouteState extends State<SettingsRoute> {
       "/": context.i18n.settings,
       "/locale": context.i18n.settings_locale,
       "/location": context.i18n.settings_location,
-      "/sound": context.i18n.sound_test,
       "/theme": context.i18n.settings_theme,
     };
 
@@ -93,9 +91,6 @@ class _SettingsRouteState extends State<SettingsRoute> {
                   break;
                 case "/location":
                   child = const SettingsLocationView();
-                  break;
-                case "/sound":
-                  child = const SettingsSoundView();
                   break;
                 case "/theme":
                   child = const SettingsThemeView();

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:clipboard/clipboard.dart';
+import 'package:dpip/route/sound/sound.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/settings/settings.dart';
@@ -47,18 +48,19 @@ class _MePageState extends State<MePage> {
          * 音效測試
          */
         ListTile(
-          leading: Icon(Symbols.audiotrack_sharp),
+          leading: const Icon(Symbols.audiotrack_sharp),
           title: Text(
             context.i18n.sound_test,
             style: tileTitleTextStyle,
           ),
           subtitle: Text(context.i18n.sound_test_description),
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              "/sound",
-            );
-          },
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              settings: const RouteSettings(name: "/sound"),
+              builder: (context) => const SoundRoute(),
+            ),
+          ),
         ),
 
         /**
