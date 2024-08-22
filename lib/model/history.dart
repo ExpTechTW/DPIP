@@ -8,8 +8,8 @@ class History {
   final int status;
   final String type;
   final String author;
-  final Time time;
-  final Text text;
+  final InfoTime time;
+  final InfoText text;
   final List<int> area;
 
   History({
@@ -27,70 +27,29 @@ class History {
 }
 
 @JsonSerializable()
-class Time {
+class InfoTime {
   final int send;
-  final Expires expires;
+  final Map expires;
 
-  Time({
+  InfoTime({
     required this.send,
     required this.expires,
   });
 
-  factory Time.fromJson(Map<String, dynamic> json) => _$TimeFromJson(json);
-  Map<String, dynamic> toJson() => _$TimeToJson(this);
+  factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
+  Map<String, dynamic> toJson() => _$InfoTimeToJson(this);
 }
 
 @JsonSerializable()
-class Expires {
-  final int all;
+class InfoText {
+  final Map content;
+  final Map description;
 
-  Expires({required this.all});
-
-  factory Expires.fromJson(Map<String, dynamic> json) => _$ExpiresFromJson(json);
-  Map<String, dynamic> toJson() => _$ExpiresToJson(this);
-}
-
-@JsonSerializable()
-class Text {
-  final Content content;
-  final Description description;
-
-  Text({
+  InfoText({
     required this.content,
     required this.description,
   });
 
-  factory Text.fromJson(Map<String, dynamic> json) => _$TextFromJson(json);
-  Map<String, dynamic> toJson() => _$TextToJson(this);
-}
-
-@JsonSerializable()
-class Content {
-  final All all;
-
-  Content({required this.all});
-
-  factory Content.fromJson(Map<String, dynamic> json) => _$ContentFromJson(json);
-  Map<String, dynamic> toJson() => _$ContentToJson(this);
-}
-
-@JsonSerializable()
-class All {
-  final String title;
-  final String subtitle;
-
-  All({required this.title, required this.subtitle});
-
-  factory All.fromJson(Map<String, dynamic> json) => _$AllFromJson(json);
-  Map<String, dynamic> toJson() => _$AllToJson(this);
-}
-
-@JsonSerializable()
-class Description {
-  final String all;
-
-  Description({required this.all});
-
-  factory Description.fromJson(Map<String, dynamic> json) => _$DescriptionFromJson(json);
-  Map<String, dynamic> toJson() => _$DescriptionToJson(this);
+  factory InfoText.fromJson(Map<String, dynamic> json) => _$InfoTextFromJson(json);
+  Map<String, dynamic> toJson() => _$InfoTextToJson(this);
 }
