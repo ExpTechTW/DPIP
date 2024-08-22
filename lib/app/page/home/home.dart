@@ -94,62 +94,139 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     padding: EdgeInsets.only(top: context.padding.top),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color.fromARGB(140, 41, 77, 118), Color.fromARGB(62, 43, 59, 78), Colors.transparent],
+                        colors: [Color.fromARGB(137, 14, 52, 96), Color.fromARGB(61, 39, 58, 81), Colors.transparent],
                         stops: [0.16, 0.6, 1],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                              child: Row(
-                                children: [
-                                  Icon(Symbols.pin_drop_rounded, color: context.colors.onSurfaceVariant),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    "臺南市歸仁區",
-                                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  child: Row(
+                                    children: [
+                                      Icon(Symbols.pin_drop_rounded, color: context.colors.onSurfaceVariant),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "臺南市歸仁區",
+                                        style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 16, 0, 16),
+                          padding: const EdgeInsets.fromLTRB(24, 16, 16, 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "27.5°",
-                                    style: TextStyle(
-                                      fontSize: 64,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onPrimaryContainer.withOpacity(0.85),
-                                      height: 1,
-                                    ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "27°",
+                                        style: TextStyle(
+                                          fontSize: 68,
+                                          fontWeight: FontWeight.w500,
+                                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                                          height: 1,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Symbols.partly_cloudy_day_rounded,
+                                        fill: 1,
+                                        size: 48,
+                                        color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                                      ),
+                                    ],
                                   ),
-                                  Icon(
-                                    Symbols.partly_cloudy_day_rounded,
-                                    fill: 1,
-                                    size: 48,
-                                    color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                                  )
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "晴時多雲",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: context.colors.primary,
+                                        ),
+                                      ),
+                                      Text(
+                                        "降雨機率: 20%",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: context.colors.onSecondaryContainer.withOpacity(0.75),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
+                              Row(
+                                children: [
+                                  Text(
+                                    "最高 30°",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: context.colors.onPrimaryContainer.withOpacity(0.6),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                                    child: Container(
+                                      height: 8,
+                                      width: 8,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: context.colors.onPrimaryContainer.withOpacity(0.4),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "最低 24°",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: context.colors.onPrimaryContainer.withOpacity(0.6),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 8, 0, 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                "晴時多雲",
+                                "相對濕度: 42%",
                                 style: TextStyle(
-                                  fontSize: 24,
-                                  color: context.colors.onSecondaryContainer.withOpacity(0.65),
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant.withOpacity(0.75),
+                                ),
+                              ),
+                              Text(
+                                "紫外線指數: 6（高量級）",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                 ),
                               ),
                             ],
@@ -157,6 +234,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ],
                     ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                  child: Text(
+                    "目前的天氣資訊",
+                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
                 Builder(
@@ -200,8 +284,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       children.add(item);
                     }
 
-                    return Column(
-                      children: children,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Column(
+                        children: children,
+                      ),
                     );
                   },
                 )

@@ -35,7 +35,7 @@ class TimeLineTile extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8),
             child: SizedBox(
-              width: 88,
+              width: 84,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
