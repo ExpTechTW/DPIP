@@ -532,5 +532,9 @@
   "ave_wind_speed_legend": "平均風速圖例",
   "@ave_wind_speed_legend": {
     "description": "「地圖」路徑 → 地圖列表 → 「風向/風速」圖例 → 平均風速圖例"
+  },
+  "sound": "音效",
+  "@sound": {
+    "description": "「設定」路徑 → 「音效」標題"
   }
 }
