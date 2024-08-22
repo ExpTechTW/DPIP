@@ -362,7 +362,7 @@
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
   "eew_info_sound_title": "地震資訊",
-  "@eew_sound_title": {
+  "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
   "dp_info_sound_title": "災防資訊",
