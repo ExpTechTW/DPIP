@@ -37,7 +37,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
       "/": context.i18n.settings,
       "/locale": context.i18n.settings_locale,
       "/location": context.i18n.settings_location,
-      "/sound": "音效測試",
+      "/sound": context.i18n.sound_test,
       "/theme": context.i18n.settings_theme,
     };
 
