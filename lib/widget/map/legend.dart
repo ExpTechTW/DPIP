@@ -1,0 +1,30 @@
+import 'package:dpip/util/extension/build_context.dart';
+import 'package:flutter/material.dart';
+
+class MapLegend extends StatelessWidget {
+  final List<Widget> children;
+
+  const MapLegend({super.key, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              context.i18n.map_legend,
+              style: context.theme.textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}

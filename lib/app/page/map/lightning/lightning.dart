@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
@@ -69,11 +70,11 @@ class _LightningMapState extends State<LightningMap> {
     List<Lightning> lightningData = await ExpTech().getLightning(time);
     lightningDataList = lightningData
         .map((lightning) => LightningData(
-      latitude: lightning.loc.lat,
-      longitude: lightning.loc.lng,
-      type: lightning.type,
-      time: lightning.time,
-    ))
+              latitude: lightning.loc.lat,
+              longitude: lightning.loc.lng,
+              type: lightning.type,
+              time: lightning.time,
+            ))
         .toList();
 
     await _addLightningMarkers();
@@ -82,16 +83,16 @@ class _LightningMapState extends State<LightningMap> {
   Future<void> _addLightningMarkers() async {
     final features = lightningDataList
         .map((data) => {
-      "type": "Feature",
-      "properties": {
-        "type": data.type,
-        "time": data.time,
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [data.longitude, data.latitude]
-      }
-    })
+              "type": "Feature",
+              "properties": {
+                "type": data.type,
+                "time": data.time,
+              },
+              "geometry": {
+                "type": "Point",
+                "coordinates": [data.longitude, data.latitude]
+              }
+            })
         .toList();
 
     await _mapController.setGeoJsonSource("lightning-data", {"type": "FeatureCollection", "features": features});
@@ -129,29 +130,12 @@ class _LightningMapState extends State<LightningMap> {
   }
 
   Widget _buildLegend() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('閃電圖例', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
-          _buildLegendItem(Icons.add, Colors.red, '對地閃電'),
-          _buildLegendItem(Icons.circle, Colors.orange, '雲間閃電'),
-        ],
-      ),
+    return MapLegend(
+      title: '閃電圖例',
+      children: [
+        _buildLegendItem(Icons.add, Colors.red, '對地閃電'),
+        _buildLegendItem(Icons.circle, Colors.orange, '雲間閃電'),
+      ],
     );
   }
 

@@ -489,8 +489,8 @@
   "@tsunami_info_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 海嘯資訊"
   },
-  "legend": "圖例",
-  "@legend": {
+  "map_legend": "圖例",
+  "@map_legend": {
     "description": "「地圖」路徑 → 地圖列表 → 「圖例」標題"
   },
   "unit_dbz": "單位：dBZ",

@@ -7,6 +7,7 @@ import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/time_selector.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -277,33 +278,14 @@ class _WindMapState extends State<WindMap> {
   }
 
   Widget _buildLegend() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
-          _legendItem('wind-1', '0.1 - 3.3 m/s'),
-          _legendItem('wind-2', '3.4 - 7.9 m/s'),
-          _legendItem('wind-3', '8.0 - 13.8 m/s'),
-          _legendItem('wind-4', '13.9 - 32.6 m/s'),
-          _legendItem('wind-5', '≥ 32.7 m/s'),
-          const SizedBox(height: 12),
-        ],
-      ),
+    return MapLegend(
+      children: [
+        _legendItem('wind-1', '0.1 - 3.3 m/s'),
+        _legendItem('wind-2', '3.4 - 7.9 m/s'),
+        _legendItem('wind-3', '8.0 - 13.8 m/s'),
+        _legendItem('wind-4', '13.9 - 32.6 m/s'),
+        _legendItem('wind-5', '≥ 32.7 m/s'),
+      ],
     );
   }
 

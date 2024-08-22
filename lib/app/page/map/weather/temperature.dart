@@ -7,6 +7,7 @@ import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/time_selector.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -223,32 +224,14 @@ class _TemperatureMapState extends State<TemperatureMap> {
   }
 
   Widget _buildLegend() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(context.i18n.legend, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 12),
-          _buildColorBar(),
-          const SizedBox(height: 8),
-          _buildColorBarLabels(),
-          const SizedBox(height: 12),
-          Text(context.i18n.unit_degrees_c, style: Theme.of(context).textTheme.labelMedium),
-        ],
-      ),
+    return MapLegend(
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+        const SizedBox(height: 12),
+        Text(context.i18n.unit_degrees_c, style: Theme.of(context).textTheme.labelMedium),
+      ],
     );
   }
 
@@ -257,6 +240,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
       height: 20,
       width: 300,
       decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(4)),
         gradient: LinearGradient(
           colors: [
             Color(0xFF4d4e51),
