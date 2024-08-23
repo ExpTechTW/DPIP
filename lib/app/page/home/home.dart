@@ -74,7 +74,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final now = DateTime.now();
     final currentHour = now.hour;
     List<Map<String, dynamic>> nextHours = [];
-
     for (var day in days) {
       for (var hour in day["hours"]) {
         final hourTime = DateTime.parse(hour["time"]);
@@ -86,7 +85,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         }
       }
     }
-
     return nextHours;
   }
 
@@ -154,9 +152,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  Future<void> start() async {
     Global.location.forEach((key, data) {
       if (data.city == city && data.town == town) {
         region = key;
@@ -186,16 +182,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      start();
+    });
     final appBar = AppBar(
       elevation: 4,
       title: Text(context.i18n.home),
     );
-
     return Scaffold(
       body: Stack(
         children: [
           RefreshIndicator(
-            onRefresh: refreshRealtimeList,
+            onRefresh: start,
             child: ListView(
               padding: EdgeInsets.only(bottom: context.padding.bottom),
               controller: scrollController,
@@ -349,7 +347,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                  child: Text(context.i18n.hourly_forecast,
+                  child: Text(
+                    context.i18n.hourly_forecast,
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
@@ -364,7 +363,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                  child: Text(context.i18n.current_events,
+                  child: Text(
+                    context.i18n.current_events,
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
