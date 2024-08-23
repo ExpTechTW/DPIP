@@ -122,12 +122,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           minTemperature: (hour["temp"]?["c"]).round(),
           maxTemperature: (hour["heat"]?["c"]).round(),
           rain: hour["chance"]?["rain"],
-          icon: Icon(
-            Symbols.partly_cloudy_day_rounded,
-            fill: 1,
-            size: 36,
-            color: context.colors.onPrimaryContainer.withOpacity(0.75),
-          ),
+          icon: Symbols.partly_cloudy_day_rounded,
         ),
       );
     }

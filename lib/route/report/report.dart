@@ -7,6 +7,7 @@ import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
+import 'package:dpip/util/geojson.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/map/map.dart';
@@ -139,7 +140,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         },
       );
 
-      List waves = [];
+      final waves = GeoJsonBuilder();
 
       for (var i = 0; i < 10; i++) {
         final distance = psWaveDist(
@@ -150,8 +151,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
         if (distance["s_dist"] == null || distance["s_dist"]! < 0) continue;
 
-        waves.add(
-          circle(
+        waves.addFeature(
+          circleFeature(
             LatLng(data.latitude, data.longitude),
             distance["s_dist"]!,
           ),
@@ -160,10 +161,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
       await controller.addGeoJsonSource(
         "waves-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": waves,
-        },
+        waves.build(),
       );
 
       if (!mounted) return;

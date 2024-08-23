@@ -7,7 +7,7 @@ class ForecastWeatherCard extends StatelessWidget {
   final int maxTemperature;
   final int minTemperature;
   final int rain;
-  final Widget icon;
+  final IconData icon;
 
   const ForecastWeatherCard({
     super.key,
@@ -63,7 +63,12 @@ class ForecastWeatherCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            icon,
+            Icon(
+              icon,
+              fill: 1,
+              size: 36,
+              color: context.colors.onPrimaryContainer.withOpacity(0.75),
+            ),
           ],
         ),
       ),
