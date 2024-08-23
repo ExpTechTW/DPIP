@@ -125,7 +125,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                           }
                           return const Center(child: CircularProgressIndicator());
                         } else {
-                          return const Center(child: Text("服務區域外，僅在臺灣各地可用"));
+                          return Center(child: Text(context.i18n.out_of_service_only_taiwan));
                         }
                       }
 

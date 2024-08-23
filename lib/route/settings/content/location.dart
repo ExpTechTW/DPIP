@@ -76,14 +76,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         builder: (context) {
           return AlertDialog(
             icon: const Icon(Symbols.error),
-            title: const Text("無法取得通知權限"),
+            title: Text(context.i18n.unable_obtain_notification_permissions),
             content: Text(
               "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: const Text("取消"),
+                child: const Text(""),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -97,7 +97,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       },
                     )
                   : FilledButton(
-                      child: const Text("再試一次"),
+                      child: Text(context.i18n.again),
                       onPressed: () {
                         checkNotificationPermission();
                         Navigator.pop(context);
@@ -126,14 +126,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         builder: (context) {
           return AlertDialog(
             icon: const Icon(Symbols.error),
-            title: const Text("無法取得位置權限"),
+            title: Text(context.i18n.unable_obtain_location_permissions),
             content: Text(
               "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: const Text("取消"),
+                child: Text(context.i18n.cancel),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -147,7 +147,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       },
                     )
                   : FilledButton(
-                      child: const Text("再試一次"),
+                      child: Text(context.i18n.cancel),
                       onPressed: () {
                         checkLocationPermission();
                         Navigator.pop(context);

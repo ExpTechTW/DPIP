@@ -317,17 +317,17 @@
   "@sound_test_description": {
     "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "強震即時警報（警報）",
+  "eew_alert_sound": "緊急地震速報",
   "@eew_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
   "eew_alert_description_sound": "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "地震速報（注意）",
+  "eew_sound": "地震速報",
   "@eew_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
+    "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報"
   },
   "eew_description_sound": "地震速報 所在地預估震度 2 以上",
   "@eew_description_sound": {
@@ -556,5 +556,21 @@
   "out_of_service_only_taiwan": "服務區域外，僅在臺灣各地可用",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
+  },
+  "unable_obtain_notification_permissions": "無法取得通知權限",
+  "@unable_obtain_notification_permissions": {
+    "description": "「通知」設定彈窗 → 無法取得通知權限"
+  },
+  "again": "再試一次",
+  "@again": {
+    "description": "「通知」設定彈窗 → 再試一次 and "
+  },
+  "unable_obtain_location_permissions": "無法取得位置權限",
+  "@unable_obtain_location_permissions": {
+    "description": "「所在地」設定彈窗 → 無法取得位置權限"
+  },
+  "cancel": "取消",
+  "@cancel": {
+    "description": "「所在地」設定彈窗 → 取消"
   }
 }
