@@ -63,7 +63,7 @@ class _MapPageState extends State<MapPage> {
     NavigationDrawerDestination(
       icon: const Icon(Symbols.lightning_stand_rounded),
       selectedIcon: const Icon(Symbols.lightning_stand_rounded, fill: 1),
-      label: Text("閃電"),
+      label: Text(context.i18n.lightning),
     ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.rainy_light_rounded),

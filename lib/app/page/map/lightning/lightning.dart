@@ -202,8 +202,8 @@ class _LightningMapState extends State<LightningMap> {
   Widget _buildLegend() {
     return MapLegend(
       children: [
-        _buildLegendItem(Icons.add, Colors.red, '對地閃電'),
-        _buildLegendItem(Icons.circle, Colors.orange, '雲間閃電'),
+        _buildLegendItem(Icons.add, Colors.red, context.i18n.cg_lightning),
+        _buildLegendItem(Icons.circle, Colors.orange, context.i18n.cc_lightning),
       ],
     );
   }
