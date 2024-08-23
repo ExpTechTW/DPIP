@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.1.501
+version: 2.1.502
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -18,8 +18,8 @@ dependencies:
   device_info_plus: ^10.1.0
   disable_battery_optimization: ^1.1.1
   dynamic_color: ^1.7.0
-  firebase_core: ^3.2.0
-  firebase_messaging: ^15.0.3
+  firebase_core: ^3.3.0
+  firebase_messaging: ^15.0.4
   flutter_background_service:
     git:
       url: https://github.com/ExpTechTW/flutter_background_service.git

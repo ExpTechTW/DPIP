@@ -1057,8 +1057,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             ),
           ),
           Positioned(
-            left: 136,
-            top: 4,
+            left: 4,
+            top: 32,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -1086,7 +1086,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           if (_rtsUI.isNotEmpty)
             Positioned(
               left: 4,
-              top: 34,
+              top: 58,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [..._rtsUI],
