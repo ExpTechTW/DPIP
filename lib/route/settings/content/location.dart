@@ -562,6 +562,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             subtitle: Text(town ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled && city != null,
             onTap: () async {
+              bool autoStart = await androidCheckAutoStartPermission();
+
+              if (!autoStart) return;
+
+              bool batteryOptimization = await androidCheckBatteryOptimizationPermission();
+
+              if (!batteryOptimization) return;
+
               await Navigator.of(
                 context,
                 rootNavigator: true,
