@@ -1,4 +1,5 @@
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
@@ -30,6 +31,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
     Global.preference.setDouble("user-lon", location.lng);
     if (!mounted) return;
     const MonitorPage(data: 0).createState();
+    const HomePage().createState();
     Navigator.popUntil(context, ModalRoute.withName("/settings"));
   }
 
