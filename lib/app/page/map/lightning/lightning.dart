@@ -43,6 +43,7 @@ class _LightningMapState extends State<LightningMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  int selectTime = 0;
 
   @override
   void initState() {
@@ -68,6 +69,7 @@ class _LightningMapState extends State<LightningMap> {
     );
     lightningTimeList = await ExpTech().getLightningList();
     if (lightningTimeList.isNotEmpty) {
+      selectTime = int.parse(lightningTimeList.last);
       await _loadLightningData(lightningTimeList.last);
     }
 
@@ -144,21 +146,30 @@ class _LightningMapState extends State<LightningMap> {
   }
 
   Future<void> _addLightningMarkers() async {
-    final features = lightningDataList
-        .map((data) => {
-              "type": "Feature",
-              "properties": {
-                "type": data.type,
-                "time": data.time,
-              },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [data.longitude, data.latitude]
-              }
-            })
-        .toList();
+    final features = lightningDataList.map((data) {
+      final timeDiff = selectTime - data.time;
+      int level;
+      if (timeDiff < 5 * 60 * 1000) {
+        level = 5;
+      } else if (timeDiff < 10 * 60 * 1000) {
+        level = 10;
+      } else if (timeDiff < 30 * 60 * 1000) {
+        level = 30;
+      } else {
+        level = 60;
+      }
 
-    print(features);
+      return {
+        "type": "Feature",
+        "properties": {
+          "type": "${data.type}-$level",
+        },
+        "geometry": {
+          "type": "Point",
+          "coordinates": [data.longitude, data.latitude]
+        }
+      };
+    }).toList();
 
     await _mapController.setGeoJsonSource("lightning-data", {"type": "FeatureCollection", "features": features});
 
@@ -166,22 +177,34 @@ class _LightningMapState extends State<LightningMap> {
     await _mapController.addLayer(
       "lightning-data",
       "lightning-markers",
-      SymbolLayerProperties(
+      const SymbolLayerProperties(
         iconSize: [
           Expressions.interpolate,
           ["linear"],
           [Expressions.zoom],
           5,
-          0.2,
+          0.5,
           10,
-          1,
+          1.3,
         ],
         iconImage: [
           Expressions.match,
           ["get", "type"],
-          1,
+          "1-5",
           "lightning-1-5",
+          "1-10",
+          "lightning-1-10",
+          "1-30",
+          "lightning-1-30",
+          "1-60",
+          "lightning-1-60",
+          "0-5",
           "lightning-0-5",
+          "0-10",
+          "lightning-0-10",
+          "0-30",
+          "lightning-0-30",
+          "lightning-0-60",
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -266,6 +289,7 @@ class _LightningMapState extends State<LightningMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
+                selectTime = int.parse(time);
                 await _loadLightningData(time);
                 setState(() {});
               },
