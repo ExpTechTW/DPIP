@@ -94,7 +94,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final appBar = AppBar(
       elevation: 4,
-      title: Text("歷史"),
+      title: Text(context.i18n.history),
     );
 
     return Scaffold(
@@ -109,8 +109,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                    child: Text(
-                      "3天內的歷史事件資訊",
+                    child: Text(context.i18n.historical_events,
                       style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                     ),
                   ),
@@ -118,7 +117,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                     builder: (context) {
                       if (historyList.isEmpty) {
                         if (init) {
-                          return const Center(child: Text("沒有歷史事件資訊"));
+                          return Center(child: Text(context.i18n.no_historical_events));
                         }
                         return const Center(child: CircularProgressIndicator());
                       }
