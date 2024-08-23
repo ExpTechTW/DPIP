@@ -5,12 +5,12 @@ import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/report_list/report_list.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/need_location.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/core/ios_get_location.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});

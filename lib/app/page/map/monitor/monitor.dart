@@ -16,13 +16,14 @@ import 'package:dpip/util/extension/int.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/need_location.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:dpip/util/need_location.dart';
-import 'package:dpip/widget/map/legend.dart';
+
 import 'eew_info.dart';
 
 class MonitorPage extends StatefulWidget {

@@ -1,11 +1,12 @@
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/history.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/api/exptech.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/global.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +23,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Map<String, dynamic> weatherData = {};
   List<Widget> weatherCard = [];
   bool init = false;
+  String city = Global.preference.getString("location-city") ?? "";
+  String town = Global.preference.getString("location-town") ?? "";
+  String region = "";
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
@@ -50,7 +54,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool isAppBarVisible = false;
 
   Future<void> refreshRealtimeList() async {
-    final data = await ExpTech().getRealtimeRegion("711");
+    final data = await ExpTech().getRealtimeRegion(region);
     setState(() {
       init = true;
       realtimeList = data.reversed.toList();
@@ -87,7 +91,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> refreshWeatherAll() async {
-    final data = await ExpTech().getWeatherAll("711");
+    final data = await ExpTech().getWeatherAll(region);
     final next15Hours = getNextHours(data["forecast"]["day"]);
 
     for (var hour in next15Hours) {
@@ -153,8 +157,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    refreshWeatherAll();
-    refreshRealtimeList();
+    Global.location.forEach((key, data) {
+      if (data.city == city && data.town == town) {
+        region = key;
+      }
+    });
+    if (region != "") {
+      refreshWeatherAll();
+      refreshRealtimeList();
+    }
     double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
       if (scrollController.offset > 1e-5) {
@@ -223,7 +234,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Icon(Symbols.pin_drop_rounded, color: context.colors.onSurfaceVariant),
                                       const SizedBox(width: 4),
                                       Text(
-                                        "臺南市歸仁區",
+                                        "$city$town",
                                         style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                                       ),
                                     ],
@@ -306,13 +317,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                               ),
                               Text(
-                                "降雨機率: 20%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.onSurfaceVariant.withOpacity(0.75),
-                                ),
-                              ),
-                              Text(
                                 "相對濕度: ${weatherData["realtime"]?["humidity"] ?? "- -"}%",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -358,7 +362,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Builder(
                   builder: (context) {
-                    if (realtimeList.isEmpty) {
+                    if (realtimeList.isEmpty && region != "") {
                       if (init) {
                         return const Center(child: Text("目前沒有事件資訊"));
                       }

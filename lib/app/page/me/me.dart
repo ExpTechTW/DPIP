@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:clipboard/clipboard.dart';
-import 'package:dpip/route/sound/sound.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/settings/settings.dart';
+import 'package:dpip/route/sound/sound.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
