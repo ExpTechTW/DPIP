@@ -94,7 +94,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final appBar = AppBar(
       elevation: 4,
-      title: Text(context.i18n.home),
+      title: Text("歷史"),
     );
 
     return Scaffold(
