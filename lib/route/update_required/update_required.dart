@@ -1,8 +1,18 @@
+import 'dart:io';
+
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:dpip/app/dpip.dart';
+
+import 'package:dpip/global.dart';
 
 class UpdateRequiredPage extends StatelessWidget {
-  const UpdateRequiredPage({super.key});
+  final bool showSkipButton;
+  final String lastVersion;
+
+  const UpdateRequiredPage({super.key, this.showSkipButton = true, this.lastVersion = ""});
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +64,9 @@ class UpdateRequiredPage extends StatelessWidget {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        _buildVersionInfo('目前版本', "1.0.0", Colors.red.shade400),
+                        _buildVersionInfo('目前版本', Global.packageInfo.version, Colors.red.shade400),
                         const SizedBox(height: 12),
-                        _buildVersionInfo('最新版本', "2.3.4", Colors.green.shade400),
+                        _buildVersionInfo('最新版本', lastVersion, Colors.green.shade400),
                       ],
                     ),
                   ),
@@ -64,7 +74,12 @@ class UpdateRequiredPage extends StatelessWidget {
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: Implement update logic
+                    if (Platform.isIOS) {
+                      launchUrl(Uri.parse(
+                          "https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"));
+                    } else {
+                      launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.exptech.dpip"));
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: context.colors.onPrimary,
@@ -77,19 +92,26 @@ class UpdateRequiredPage extends StatelessWidget {
                   ),
                   child: const Text('立即更新', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    // TODO: Implement skip logic
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                if (showSkipButton) ...[
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      Global.preference.setInt("update-skip", DateTime.now().millisecondsSinceEpoch);
+                      Navigator.of(context).pop();
+                      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const Dpip()),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      '暫時略過',
+                      style: TextStyle(fontSize: 16, color: Colors.blue.shade700),
+                    ),
                   ),
-                  child: Text(
-                    '暫時略過',
-                    style: TextStyle(fontSize: 16, color: Colors.blue.shade700),
-                  ),
-                ),
+                ],
               ],
             ),
           ),

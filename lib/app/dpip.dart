@@ -1,16 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/route/update_required/update_required.dart';
+import 'package:dpip/route/welcome/about.dart';
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/more/more.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/route/update_required/update_required.dart';
-import 'package:dpip/route/welcome/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class Dpip extends StatefulWidget {
-  const Dpip({super.key});
+  const Dpip({Key? key}) : super(key: key);
 
   @override
   State<Dpip> createState() => _DpipState();
@@ -19,18 +21,67 @@ class Dpip extends StatefulWidget {
 class _DpipState extends State<Dpip> {
   PageController controller = PageController();
   int currentActivePage = 0;
+  bool update = false;
+  bool criticalUpdate = false;
+  String lastVersion = "";
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Global.preference.getBool("welcome-1.0.0") != null) return;
-      Global.preference.setBool("welcome-1.0.0", true);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => AboutPage()),
-      );
+      checkForUpdates();
     });
+  }
+
+  Future<void> checkForUpdates() async {
+    try {
+      var data = await ExpTech().getSupport();
+      List<String> criticalList = (data["support-version"] as List<dynamic>).cast<String>();
+
+      if (Global.packageInfo.version.endsWith(".0")) {
+        lastVersion = data["last-version"]["release"];
+        update = (Global.packageInfo.version != lastVersion);
+      } else {
+        lastVersion = data["last-version"]["beta"];
+        update = (Global.packageInfo.version != lastVersion);
+      }
+
+      criticalUpdate = !criticalList.contains(Global.packageInfo.version);
+
+      bool skip =
+          (DateTime.now().millisecondsSinceEpoch - (Global.preference.getInt("update-skip") ?? 0)) < 86400 * 3 * 1000;
+
+      if ((update && !skip) || criticalUpdate) {
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => UpdateRequiredPage(
+                      showSkipButton: !criticalUpdate,
+                      lastVersion: lastVersion,
+                    )),
+            (Route<dynamic> route) => false,
+          );
+        }
+      } else {
+        if (Global.preference.getBool("welcome-1.0.0") == null) {
+          Global.preference.setBool("welcome-1.0.0", true);
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AboutPage()),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      print("Error checking for updates: $e");
+      update = false;
+      criticalUpdate = false;
+    } finally {
+      if (mounted) {
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -69,7 +120,6 @@ class _DpipState extends State<Dpip> {
           setState(() {
             currentActivePage = value;
           });
-
           controller.jumpToPage(currentActivePage);
         },
       ),
@@ -77,9 +127,7 @@ class _DpipState extends State<Dpip> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          UpdateRequiredPage(),
-          // ChangelogPage(),
-          // HomePage(),
+          HomePage(),
           HistoryPage(),
           MapPage(),
           MorePage(),
