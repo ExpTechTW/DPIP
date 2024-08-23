@@ -138,7 +138,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void start() {
     Global.location.forEach((key, data) {
-      if (data.city == city && data.town == town) {
+      if (data.city == "服務區域外" || data.town == "服務區域外") {
+        region = "";
+        return;
+      } else if (data.city == city && data.town == town) {
         region = key;
       }
     });
