@@ -1,12 +1,10 @@
 import 'dart:io';
 
+import 'package:dpip/app/dpip.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:dpip/app/dpip.dart';
-
-import 'package:dpip/global.dart';
 
 class UpdateRequiredPage extends StatelessWidget {
   final bool showSkipButton;

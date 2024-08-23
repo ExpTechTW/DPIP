@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:clipboard/clipboard.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/route/sound/sound.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -79,6 +80,16 @@ class _MePageState extends State<MePage> {
                 ),
               );
             });
+          },
+        ),
+        ListTile(
+          leading: Icon(Symbols.update_rounded),
+          title: Text("更新日誌"),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ChangelogPage()),
+            );
           },
         ),
 
