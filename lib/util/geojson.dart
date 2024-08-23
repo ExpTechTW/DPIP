@@ -59,7 +59,7 @@ class GeoJsonFeatureBuilder<T extends GeoJsonFeatureType> {
       "properties": properties,
       "geometry": {
         "type": type.name,
-        "coordinates": [coordinates],
+        "coordinates": coordinates,
       }
     };
   }
