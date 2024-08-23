@@ -17,7 +17,7 @@
   "@home": {
     "description": "「首頁」頁面標題"
   },
-  "monitor": "강진 모니터링",
+  "monitor": "강진 모니터",
   "@monitor": {
     "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
@@ -29,7 +29,7 @@
   "@map": {
     "description": "「地圖」頁面標題"
   },
-  "me": "내 계정",
+  "me": "사용자",
   "@me": {
     "description": "「我」頁面標題"
   },
@@ -61,7 +61,7 @@
   "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   },
-  "report_list_item_subtitle": "규모 {magnitude} 발생깊이 {depth} km",
+  "report_list_item_subtitle": "규모 {magnitude} 깊이 {depth} km",
   "@report_list_item_subtitle": {
     "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",
     "placeholders": {
@@ -75,7 +75,7 @@
       }
     }
   },
-  "report_with_number": "고유번호 {reportNumber} 의 현저한 유감 지진",
+  "report_with_number": "ID {reportNumber} 의 현저한 유감 지진",
   "@report_with_number": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
     "placeholders": {
@@ -160,39 +160,39 @@
       }
     }
   },
-  "settings_locale_crowdin": "번역을 도와주다",
+  "settings_locale_crowdin": "번역 돕기",
   "@settings_locale_crowdin": {
     "description": "「設定」路徑 → 「協助翻譯」標題"
   },
-  "settings_locale_crowdin_description": "여기를 클릭하여 DPIP 번역 개선을 도와주세요",
+  "settings_locale_crowdin_description": "여기를 눌러 DPIP 번역 개선을 도와주세요",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "지진 속보를 일시적으로 받을 수 없습니다",
+  "earthquake_warning_error": "일시적으로 지진 속보를 받을 수 없습니다",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "현재 유효한 지진 속보가 없습니다",
+  "no_earthquake_warning": "현재 발생 중인 지진 속보가 없습니다",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "지진 경보",
+  "earthquake_warning": "지진 속보",
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "긴급 지진 경보",
+  "emergency_earthquake_warning": "긴급 지진 속보",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "위치 추정",
+  "location_estimate": "예상 진도",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
-  "seismic_waves": "지진의 파동",
+  "seismic_waves": "지진파",
   "@seismic_waves": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
   },
-  "monitor_unknown": "미확인",
+  "monitor_unknown": "알 수 없음",
   "@monitor_unknown": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 未知"
   },
@@ -317,7 +317,7 @@
   "@sound_test_description": {
     "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "강한 지진 긴급 경보(경보)",
+  "eew_alert_sound": "강진 즉시경보(경보)",
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
@@ -325,23 +325,23 @@
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "긴급 지진 속보 (경보)",
+  "eew_sound": "지진 속보(예보)",
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
-  "eew_description_sound": "지진 속보 위치 추정 진도 2 이상",
+  "eew_description_sound": "지진 속보 혅위치 추정 진도 2 이상",
   "@eew_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
-  "int_report_sound": "지진 강도 보고서",
+  "int_report_sound": "진도속보",
   "@int_report_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 震度速報"
   },
-  "int_report_description_sound": "TREM 실측 진도 3 이상",
+  "int_report_description_sound": "TREM 관측망 현위치 실측 진도 3 이상",
   "@int_report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
   },
-  "eq_description_sound": "TREM 흔들림이 감지되었습니다.",
+  "eq_description_sound": "TREM 관측망에 흔들림이 감지되었습니다.",
   "@eq_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
   },
@@ -361,15 +361,15 @@
   "@dp_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 災防資訊"
   },
-  "other_sound_title": "기타카테고리",
+  "other_sound_title": "기타",
   "@other_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "강한 뇌우 실시간 메시지",
+  "thunderstorm_instant_messaging_sound": "강한 뇌우 재난 문자",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "현재 위치에서 강한 뇌우 실시간 메시지가 발송되었습니다.",
+  "thunderstorm_instant_messaging_description_sound": "현재 위치에서 강한 뇌우 재난 문자가 발송되었습니다.",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -397,19 +397,19 @@
   "@flooding_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
   },
-  "tsunami_alert_sound": "쓰나미 경보 (주의)",
+  "tsunami_alert_sound": "쓰나미 경보(주의)",
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert_description_sound": "현재 위치에서 쓰나미 경보 (주의)가 발령되었습니다.\n예상 파고 1미터 이하입니다.",
+  "tsunami_alert_description_sound": "현재 위치에서 쓰나미 경보(주의보)가 발령되었습니다.\n예상되는 해일의 높이는 1미터 이하입니다.",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
-  "tsunami_alert2_sound": "쓰나미 경보 (경보)",
+  "tsunami_alert2_sound": "쓰나미 경보(경보)",
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "현재 위치에서 쓰나미 경보 (경보)가 발령되었습니다.\n예상 파고 1미터 이상입니다.",
+  "tsunami_alert2_description_sound": "현재 위치에서 쓰나미 경보(경보)가 발령되었습니다.\n예상되는 해일의 높이는 1미터 이상입니다.",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下"
   },
@@ -449,7 +449,7 @@
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
-  "server_announcement_description_sound": "ExpTech에서 발행한 공지",
+  "server_announcement_description_sound": "ExpTech에서 발표한 공지",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   }
