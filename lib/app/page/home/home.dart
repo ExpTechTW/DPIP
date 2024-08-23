@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Icon(Symbols.pin_drop_rounded, color: context.colors.onSurfaceVariant),
                                       const SizedBox(width: 4),
                                       Text(
-                                        "$city$town",
+                                        (city != "" && town != "") ? "$city$town" : "服務區域外，僅在臺灣各地可用",
                                         style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                                       ),
                                     ],

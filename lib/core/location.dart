@@ -86,15 +86,18 @@ class LocationService {
       } else if (Platform.isAndroid) {
         city = placemark.administrativeArea;
         town = placemark.subAdministrativeArea;
-        code = placemark.postalCode;
+        code = placemark.isoCountryCode == "TW" ? placemark.postalCode?.substring(0, 3) : "";
       }
 
       String citytown = '$city $town $code';
       String citytowntemp = Global.preference.getString("user-country") ?? "";
 
-      if (citytowntemp == "" || citytowntemp != citytown) {
+      if ((citytowntemp == "" || citytowntemp != citytown) && code != "") {
         await Global.preference.setString("user-country", citytown);
         locationGet = LocationResult(citytown, true);
+      } else if (code == "") {
+        await Global.preference.setString("user-country", "");
+        locationGet = LocationResult("", true);
       } else {
         locationGet = LocationResult(citytowntemp, false);
       }
