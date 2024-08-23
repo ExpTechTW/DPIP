@@ -104,6 +104,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
+
+    _updateCrossMarker();
   }
 
   void _loadMap() async {
