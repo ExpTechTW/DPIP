@@ -186,6 +186,8 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
   };
 }
 
+/// Takes a [LatLng] and calculates the circle polygon given a radius in
+/// degrees, radians, miles, or kilometers; and steps for precision.
 GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
   // main
   final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
