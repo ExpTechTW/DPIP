@@ -3,11 +3,11 @@ import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/more/more.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/route/welcome/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/global.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});

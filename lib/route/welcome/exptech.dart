@@ -33,8 +33,8 @@ class ExpTechAboutPage extends StatelessWidget {
                         Text(
                           '©2024 ExpTech Studio Ltd.',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Theme.of(context).primaryColor.withOpacity(0.7),
-                          ),
+                                color: Theme.of(context).primaryColor.withOpacity(0.7),
+                              ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),

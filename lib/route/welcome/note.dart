@@ -50,17 +50,17 @@ class NotePage extends StatelessWidget {
                                   Text(
                                     '●',
                                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: context.colors.error,
-                                    ),
+                                          fontWeight: FontWeight.bold,
+                                          color: context.colors.error,
+                                        ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       "任何資訊應以中央氣象署發布之內容為準。",
                                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: context.colors.error,
-                                      ),
+                                            color: context.colors.error,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -80,8 +80,8 @@ class NotePage extends StatelessWidget {
                                   Text(
                                     '●',
                                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -107,8 +107,8 @@ class NotePage extends StatelessWidget {
                                   Text(
                                     '●',
                                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -134,8 +134,8 @@ class NotePage extends StatelessWidget {
                                   Text(
                                     '●',
                                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
@@ -161,8 +161,8 @@ class NotePage extends StatelessWidget {
                                   Text(
                                     '●',
                                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(

@@ -8,6 +8,7 @@ import 'package:dpip/app/page/map/weather/humidity.dart';
 import 'package:dpip/app/page/map/weather/pressure.dart';
 import 'package:dpip/app/page/map/weather/temperature.dart';
 import 'package:dpip/app/page/map/weather/wind.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final controller = PageController();
   int currentIndex = 0;
+  final monitor = Global.preference.getBool("monitor") ?? false;
 
   late final destinations = [
     NavigationDrawerDestination(
