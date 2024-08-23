@@ -512,9 +512,5 @@
   "unit_hpa": "單位：百帕 (hPa)",
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
-  },
-  "sound": "音效",
-  "@sound": {
-    "description": "「設定」路徑 → 「音效」標題"
   }
 }
