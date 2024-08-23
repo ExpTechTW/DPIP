@@ -6,6 +6,8 @@ import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../global.dart';
+
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
@@ -21,6 +23,9 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   Map<String, dynamic> weatherData = {};
   List<Widget> weatherCard = [];
   bool init = false;
+  String city = Global.preference.getString("location-city") ?? "";
+  String town = Global.preference.getString("location-town") ?? "";
+  String region = "";
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
@@ -49,7 +54,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   bool isAppBarVisible = false;
 
   Future<void> refreshHistoryList() async {
-    final data = await ExpTech().getHistoryRegion("711");
+    final data = await ExpTech().getHistoryRegion(region);
     setState(() {
       init = true;
       historyList = data.reversed.toList();
@@ -59,7 +64,14 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    refreshHistoryList();
+    Global.location.forEach((key, data) {
+      if (data.city == city && data.town == town) {
+        region = key;
+      }
+    });
+    if (region != "") {
+      refreshHistoryList();
+    }
     double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
       if (scrollController.offset > 1e-5) {
