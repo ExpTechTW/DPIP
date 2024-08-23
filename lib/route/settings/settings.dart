@@ -1,3 +1,4 @@
+import 'package:dpip/route/settings/content/experiment.dart';
 import 'package:dpip/route/settings/content/locale.dart';
 import 'package:dpip/route/settings/content/location.dart';
 import 'package:dpip/route/settings/content/root.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 class SettingsRoute extends StatefulWidget {
   final String? initialRoute;
 
-  const SettingsRoute({Key? key, this.initialRoute}) : super(key: key);
+  const SettingsRoute({super.key, this.initialRoute});
 
   @override
   State<SettingsRoute> createState() => _SettingsRouteState();
@@ -37,6 +38,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
       "/locale": context.i18n.settings_locale,
       "/location": context.i18n.settings_location,
       "/theme": context.i18n.settings_theme,
+      "/experiment": "進階功能",
     };
 
     return PopScope(
@@ -94,6 +96,9 @@ class _SettingsRouteState extends State<SettingsRoute> {
                   break;
                 case "/theme":
                   child = const SettingsThemeView();
+                  break;
+                case "/experiment":
+                  child = const SettingsExperimentView();
                   break;
                 default:
                   return PageRouteBuilder(

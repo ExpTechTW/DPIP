@@ -24,7 +24,6 @@ class _DpipState extends State<Dpip> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Global.preference.setBool("monitor", false);
       if (Global.preference.getBool("welcome-1.0.0") != null) return;
       Global.preference.setBool("welcome-1.0.0", true);
       Navigator.push(
