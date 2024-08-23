@@ -13,6 +13,7 @@ typedef PositionUpdateCallback = void Function(String?, String?);
 
 class HomePage extends StatefulWidget {
   final Function(String?, String?)? onPositionUpdate;
+
   const HomePage({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
@@ -361,11 +362,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Builder(
                   builder: (context) {
-                    if (realtimeList.isEmpty && region != "") {
-                      if (init) {
-                        return Center(child: Text(context.i18n.no_events));
+                    if (realtimeList.isEmpty) {
+                      if (region != "") {
+                        if (init) {
+                          return Center(child: Text(context.i18n.no_events));
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      } else {
+                        return const Center(child: Text("服務區域外，僅在臺灣各地可用"));
                       }
-                      return const Center(child: CircularProgressIndicator());
                     }
 
                     List<Widget> children = [];

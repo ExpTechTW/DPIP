@@ -117,10 +117,14 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                   Builder(
                     builder: (context) {
                       if (historyList.isEmpty) {
-                        if (init) {
-                          return Center(child: Text(context.i18n.no_historical_events));
+                        if (region != "") {
+                          if (init) {
+                            return Center(child: Text(context.i18n.no_historical_events));
+                          }
+                          return const Center(child: CircularProgressIndicator());
+                        } else {
+                          return const Center(child: Text("服務區域外，僅在臺灣各地可用"));
                         }
-                        return const Center(child: CircularProgressIndicator());
                       }
 
                       List<Widget> children = [];
