@@ -566,16 +566,16 @@
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
-  "unable_obtain_notification_permissions": "無法取得通知權限",
-  "@unable_obtain_notification_permissions": {
+  "unable_notification": "無法取得通知權限",
+  "@unable_notification": {
     "description": "「通知」設定彈窗 → 無法取得通知權限"
   },
   "again": "再試一次",
   "@again": {
     "description": "「通知」設定彈窗 → 再試一次 and "
   },
-  "unable_obtain_location_permissions": "無法取得位置權限",
-  "@unable_obtain_location_permissions": {
+  "unable_location": "無法取得位置權限",
+  "@unable_location": {
     "description": "「所在地」設定彈窗 → 無法取得位置權限"
   },
   "cancel": "取消",
