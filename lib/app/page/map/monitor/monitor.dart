@@ -566,7 +566,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         ),
                         child: Center(
                           child: Text(
-                            _eewLastInfo[eew.id]!.eq.max.asIntensityLabel,
+                            _eewLastInfo[eew.id]!.eq.max.asIntensityDisplayLabel,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 28,
@@ -605,7 +605,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                       : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
                             ),
                             Text(
-                              (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
+                              (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityDisplayLabel,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40,

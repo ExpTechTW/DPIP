@@ -5,7 +5,7 @@ import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/widget/home/forecast_weather_card.dart';
-import 'package:dpip/widget/home/weather.dart';
+import 'package:dpip/util/weather_icon.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
