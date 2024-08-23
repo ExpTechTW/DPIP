@@ -1,14 +1,9 @@
-import 'dart:io';
-
 import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
-import 'package:dpip/app/page/report_list/report_list.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
+import 'package:dpip/app/page/more/more.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/need_location.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -45,9 +40,9 @@ class _DpipState extends State<Dpip> {
             label: context.i18n.map,
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.summarize),
-            selectedIcon: const Icon(Symbols.summarize, fill: 1),
-            label: context.i18n.report,
+            icon: const Icon(Symbols.more),
+            selectedIcon: const Icon(Symbols.more, fill: 1),
+            label: "更多",
           ),
           NavigationDestination(
             icon: const Icon(Symbols.person),
@@ -70,7 +65,7 @@ class _DpipState extends State<Dpip> {
           HomePage(),
           HistoryPage(),
           MapPage(),
-          ReportListPage(),
+          MorePage(),
           MePage(),
         ],
       ),

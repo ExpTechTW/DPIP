@@ -182,7 +182,7 @@ void onStart(ServiceInstance service) async {
         service.invoke("sendposition", {"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
-        String country = position.position.country ;
+        String country = position.position.country;
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
