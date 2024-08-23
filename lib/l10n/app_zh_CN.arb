@@ -13,11 +13,11 @@
   "@time_format": {
     "description": "時間顯示格式"
   },
-  "home": "主页",
+  "home": "首页",
   "@home": {
     "description": "「首頁」頁面標題"
   },
-  "monitor": "强震監控",
+  "monitor": "强震监视器",
   "@monitor": {
     "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
@@ -168,31 +168,31 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "暂时无法取得地震速报资料",
+  "earthquake_warning_error": "暂时无法取得地震预警资料",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "目前无生效中的地震速报",
+  "no_earthquake_warning": "目前无生效中的地震预警",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "震情速递",
+  "earthquake_warning": "地震预警",
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "紧急地震速报",
+  "emergency_earthquake_warning": "紧急地震预警",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "本地烈度",
+  "location_estimate": "本地震度",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
-  "seismic_waves": "橫波",
+  "seismic_waves": "震波",
   "@seismic_waves": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
   },
-  "monitor_unknown": "回放",
+  "monitor_unknown": "未知",
   "@monitor_unknown": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 未知"
   },
