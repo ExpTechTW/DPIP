@@ -518,11 +518,23 @@
     "description": "「歷史」頁面標題"
   },
   "historical_events": "3天內的歷史事件資訊",
-  "@history": {
+  "@historical_events": {
     "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
   },
   "no_historical_events": "沒有歷史事件資訊",
-  "@history": {
+  "@no_historical_events": {
     "description": "「歷史」路徑 → 沒有歷史事件資訊"
+  },
+  "hourly_forecast": "每小時預報",
+  "@hourly_forecast": {
+    "description": "「首頁」路徑 → 「每小時預報」標題"
+  },
+  "current_events": "目前的事件資訊",
+  "@current_events": {
+    "description": "「首頁」路徑 → 「目前的事件資訊」標題"
+  },
+  "no_events": "目前沒有事件資訊",
+  "@no_events": {
+    "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   }
 }

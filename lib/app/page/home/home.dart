@@ -349,8 +349,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                  child: Text(
-                    "每小時預報",
+                  child: Text(context.i18n.hourly_forecast,
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
@@ -365,8 +364,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                  child: Text(
-                    "目前的事件資訊",
+                  child: Text(context.i18n.current_events,
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
@@ -374,7 +372,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   builder: (context) {
                     if (realtimeList.isEmpty && region != "") {
                       if (init) {
-                        return const Center(child: Text("目前沒有事件資訊"));
+                        return Center(child: Text(context.i18n.no_events));
                       }
                       return const Center(child: CircularProgressIndicator());
                     }
