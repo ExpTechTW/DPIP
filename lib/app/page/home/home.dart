@@ -4,6 +4,7 @@ import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
+import 'package:dpip/widget/home/forecast_weather_card.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -114,59 +115,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final next15Hours = getNextHours(data["forecast"]["day"]);
 
     for (var hour in next15Hours) {
-      weatherCard.add(Card(
-        elevation: 4,
-        surfaceTintColor: context.colors.surfaceTint,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                formatDateTime(hour["time"]),
-                style: TextStyle(
-                  fontSize: 16,
-                  color: context.colors.primary,
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    "${(hour["heat"]?["c"]).round()}°",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: context.colors.onSurface,
-                    ),
-                  ),
-                  Text(
-                    "/${(hour["temp"]?["c"]).round()}°",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: context.colors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                "${hour["chance"]?["rain"] ?? "N/A"}%",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: context.theme.extendedColors.blue,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Icon(
-                Symbols.partly_cloudy_day_rounded,
-                fill: 1,
-                size: 36,
-                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-              ),
-            ],
+      weatherCard.add(
+        ForecastWeatherCard(
+          time: formatDateTime(hour["time"]),
+          minTemperature: (hour["temp"]?["c"]).round(),
+          maxTemperature: (hour["heat"]?["c"]).round(),
+          rain: hour["chance"]?["rain"],
+          icon: Icon(
+            Symbols.partly_cloudy_day_rounded,
+            fill: 1,
+            size: 36,
+            color: context.colors.onPrimaryContainer.withOpacity(0.75),
           ),
         ),
-      ));
+      );
     }
     setState(() {
       weatherData = data;
