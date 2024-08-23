@@ -565,5 +565,18 @@
   "out_of_service_only_taiwan": "服務區域外，僅在臺灣各地可用",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
-  }
+  },
+  "weather_sunny": "",
+  "weather_nightlight": "",
+  "weather_partly_cloudy_day": "",
+  "weather_partly_cloudy_night": "",
+  "weather_cloud": "",
+  "weather_foggy": "",
+  "weather_rainy": "",
+  "weather_ac_unit": "",
+  "weather_weather_mix": "",
+  "weather_thunderstorm": "",
+  "weather_grain": "",
+  "weather_water": "",
+  "weather_snowing": ""
 }
