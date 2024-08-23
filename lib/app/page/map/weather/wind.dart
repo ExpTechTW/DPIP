@@ -103,6 +103,8 @@ class _WindMapState extends State<WindMap> {
           ],
         },
       );
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1500));
     }
 
     await _addUserLocationMarker();
