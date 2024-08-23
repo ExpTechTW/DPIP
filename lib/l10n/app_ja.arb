@@ -329,7 +329,7 @@
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
-  "eew_description_sound": "地震速報 所在地預估震度 2 以上",
+  "eew_description_sound": "緊急地震速報 現在地の予測震度2以上",
   "@eew_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
