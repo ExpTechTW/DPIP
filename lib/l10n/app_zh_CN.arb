@@ -21,7 +21,7 @@
   "@monitor": {
     "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
-  "report": "地震信息",
+  "report": "地震报告",
   "@report": {
     "description": "「地震報告」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
@@ -212,11 +212,11 @@
   "@image_save": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "已储存图片",
+  "image_saved": "图片已储存",
   "@image_saved": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
-  "settings_Personalization": "个人化",
+  "settings_Personalization": "个性化",
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
@@ -248,7 +248,7 @@
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "调整所在地来接收即时天气资讯、地震预估震度以及地震波预估抵达秒数等",
+  "settings_location_description": "调整所在地来接收即时天气信息、地震预估震度以及地震波预估抵达秒数等",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
@@ -256,11 +256,11 @@
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "自动定位功能将使用您的装置上的 GPS ，根据您的地理位置，自动更新您的所在地，提供即时的天气和地震资讯，让您随时掌握当地最新状况。",
+  "settings_location_auto_description": "自动定位功能将使用您的装置上的定位功能 ，根据您的地理位置，自动更新您的所在地，提供实时的天气和地震资讯，让您随时掌握当地最新状况。",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
-  "location_Not_set": "尚未设定",
+  "location_Not_set": "尚未设置",
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
@@ -268,7 +268,7 @@
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "乡镇",
+  "location_town": "乡镇市区",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
@@ -292,7 +292,7 @@
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_error": "取得地震报告时发生错误，请检查网路状况后再试一次。",
+  "report_error": "获取地震报告时发生错误，请检查网络连接后再试一次。",
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
@@ -313,23 +313,23 @@
   "@sound_test": {
     "description": "「設定」路徑 → 「音效」標題 → 音效測試"
   },
-  "sound_test_description": "测试即时天气资讯、地震速报等音效",
+  "sound_test_description": "测试实时天气信息、地震速报等音效",
   "@sound_test_description": {
     "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "强震即时警报（警报）",
+  "eew_alert_sound": "紧急地震预警",
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
-  "eew_alert_description_sound": "地震速报 最大震度 5弱 以上\n且所在地预估震度 4 以上",
+  "eew_alert_description_sound": "紧急地震预警 最大震度 5弱 以上\n且所在地预估震度 4 以上",
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "地震速报（注意）",
+  "eew_sound": "地震预警",
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
-  "eew_description_sound": "地震速报 所在地预估震度 2 以上",
+  "eew_description_sound": "地震预警 所在地预估震度 2 以上",
   "@eew_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
@@ -349,15 +349,15 @@
   "@report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
-  "eew_sound_title": "地震速报音效",
+  "eew_sound_title": "地震预警音效",
   "@eew_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
-  "eew_info_sound_title": "地震资讯",
+  "eew_info_sound_title": "地震信息",
   "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
-  "dp_info_sound_title": "灾防资讯",
+  "dp_info_sound_title": "灾防信息",
   "@dp_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 災防資訊"
   },
@@ -365,11 +365,11 @@
   "@other_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "大雷雨即时讯息",
+  "thunderstorm_instant_messaging_sound": "大雷雨即时信息",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "所在地发布 大雷雨即时讯息",
+  "thunderstorm_instant_messaging_description_sound": "所在地发布 大雷雨即时信息",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -409,23 +409,23 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "所在地发布 海啸警报（警报）\n预估浪高 1 公尺以下",
+  "tsunami_alert2_description_sound": "所在地发布 海啸警报（警报）\n预估浪高 1 公尺以上",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下"
   },
-  "volcano_info_sound": "火山资讯",
+  "volcano_info_sound": "火山信息",
   "@volcano_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 火山資訊"
   },
-  "volcano_info_description_sound": "所在地发布 火山资讯",
+  "volcano_info_description_sound": "所在地发布 火山信息",
   "@volcano_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
   },
-  "high_temperature_info_sound": "高温资讯",
+  "high_temperature_info_sound": "高温信息",
   "@high_temperature_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
   },
-  "high_temperature_info_description_sound": "所在地发布 高温资讯",
+  "high_temperature_info_description_sound": "所在地发布 高温信息",
   "@high_temperature_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
   },
@@ -445,7 +445,7 @@
   "@other_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
-  "server_announcement_sound": "伺服器公告",
+  "server_announcement_sound": "服务器公告",
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
