@@ -1,4 +1,3 @@
-import 'package:dpip/route/settings/content/root.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:dpip/widget/settings/sound/sound_list_tile.dart';
