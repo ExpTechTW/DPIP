@@ -8,11 +8,28 @@ import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+typedef PositionUpdateCallback = void Function(String?, String?);
+
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Function(String?, String?)? onPositionUpdate;
+  const HomePage({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition(String? city, String? town) {
+    _activeCallback?.call(city, town);
+  }
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
@@ -54,6 +71,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     start();
+    HomePage.setActiveCallback(sendpositionUpdate);
   }
 
   Future<void> refreshRealtimeList() async {
@@ -181,6 +199,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
+  }
+
+  void sendpositionUpdate(String? cityUpdate, String? townUpdate) {
+    if (mounted) {
+      setState(() {
+        city = cityUpdate!;
+        town = townUpdate!;
+        start();
+      });
+      widget.onPositionUpdate?.call(city, town);
+    }
   }
 
   @override
@@ -442,6 +471,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    HomePage.clearActiveCallback();
     scrollController.dispose();
     super.dispose();
   }

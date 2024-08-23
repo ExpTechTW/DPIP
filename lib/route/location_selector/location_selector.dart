@@ -32,6 +32,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
     if (!mounted) return;
     const MonitorPage(data: 0).createState();
     const HomePage().createState();
+    HomePage.updatePosition(location.city, location.town);
     Navigator.popUntil(context, ModalRoute.withName("/settings"));
   }
 
