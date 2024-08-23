@@ -172,7 +172,7 @@
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "No active earthquake alerts",
+  "no_earthquake_warning": "No active earthquake warnings",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
@@ -184,11 +184,11 @@
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "Estimated Intensity",
+  "location_estimate": "Estimated​",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
-  "seismic_waves": "Seismic Wave",
+  "seismic_waves": "Arrive in",
   "@seismic_waves": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
   },
@@ -200,7 +200,7 @@
   "@monitor_arrival": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
   },
-  "monitor_after_seconds": "Seconds",
+  "monitor_after_seconds": "Sec(s)",
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
@@ -224,7 +224,7 @@
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_theme_description": "Adjust the overall appearance and color of the DPIP",
+  "settings_theme_description": "Adjust appearance and color of DPIP",
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
@@ -236,7 +236,7 @@
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
-  "theme_system": "Use system defaults",
+  "theme_system": "Follow system",
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
@@ -244,11 +244,11 @@
   "@settings_position": {
     "description": "「設定」路徑 → 「位置」標題"
   },
-  "settings_location": "Current Location",
+  "settings_location": "Location",
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "Adjust your location to receive real-time weather information, estimated intensity, and estimated seconds until earthquakes",
+  "settings_location_description": "Adjust your location to receive real-time weather information, estimated earthquake intensity, and estimated arrival time of seismic waves.",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
@@ -256,7 +256,7 @@
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "The \"Automatic Locating\" feature uses the GPS on your device to automatically update your location according to your geographical position, providing real-time weather and earthquake information, allowing you to stay informed about the latest conditions.",
+  "settings_location_auto_description": "The automatic location feature will use the GPS on your device to automatically update your location based on your geographical position, providing real-time weather and earthquake information, so you can stay up-to-date with the latest local conditions.",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
@@ -280,11 +280,11 @@
   "@settings_fcm": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copy_fcm": "FCM Token Copied",
+  "settings_copy_fcm": "FCM token copied",
   "@settings_copy_fcm": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "May cause sea level changes",
+  "report_offing": "May cause sea level fluctuations.",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
@@ -292,11 +292,11 @@
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_error": "There are some problems when getting the report. Check your network and try again.",
+  "report_error": "Failed to fetch earthquake report. Check connection and try again.",
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "Version {version}\nBy ExpTech Studio\nA part of data from CWA.",
+  "me_version": "Version {version}\nA product of ExpTech Studio\nParts of data from CWA",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -313,7 +313,7 @@
   "@sound_test": {
     "description": "「設定」路徑 → 「音效」標題 → 音效測試"
   },
-  "sound_test_description": "Testing sound effects for real-time weather information, earthquake alerts, etc.",
+  "sound_test_description": "Testing notification sound for real-time weather information, Earthquake Early Warnings, etc.",
   "@sound_test_description": {
     "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
@@ -321,11 +321,11 @@
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
-  "eew_alert_description_sound": "Earthquake Alerts (Maximum level more than 5 strong) and local level more than 4",
+  "eew_alert_description_sound": "Maximum intensity more than 5 upper and local intensity more than 4",
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "Earthquake Alerts (Warning)",
+  "eew_sound": "Earthquake Early Warning (Notice)",
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
@@ -353,7 +353,7 @@
   "@eew_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
-  "eew_info_sound_title": "The information of earthquake",
+  "eew_info_sound_title": "Earthquake information",
   "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
