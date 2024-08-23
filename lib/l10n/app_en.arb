@@ -132,7 +132,7 @@
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
   },
-  "settings_locale_description": "Adjust the display language of DPIP",
+  "settings_locale_description": "Adjust display language of DPIP",
   "@settings_locale_description": {
     "description": "「設定」路徑 → 「語言」副標題敘述"
   },
@@ -180,7 +180,7 @@
   "@earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "Earthquake Early Warning",
+  "emergency_earthquake_warning": "Earthquake Early Warning (Alert)",
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
@@ -268,7 +268,7 @@
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "Town",
+  "location_town": "Country(Town, City, District)",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
@@ -321,7 +321,7 @@
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
-  "eew_alert_description_sound": "Maximum intensity more than 5 upper and local intensity more than 4",
+  "eew_alert_description_sound": "Maximum intensity greater than 5 upper and local intensity greater than 4",
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
@@ -329,31 +329,31 @@
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
-  "eew_description_sound": "地震速報 所在地預估震度 2 以上",
+  "eew_description_sound": "Maximum intensity greater than 2",
   "@eew_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
-  "int_report_sound": "震度速報",
+  "int_report_sound": "Intensity report",
   "@int_report_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 震度速報"
   },
-  "int_report_description_sound": "TREM 觀測網 所在地實測震度 3 以上",
+  "int_report_description_sound": "TREM seismic network detected shaking greater than 3 at your location.",
   "@int_report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
   },
-  "eq_description_sound": "TREM 觀測網 偵測到晃動",
+  "eq_description_sound": "TREM seismic network detected shaking.",
   "@eq_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
   },
-  "report_description_sound": "地震報告 所在地震度 3 以上",
+  "report_description_sound": "Earthquake report: intensity at your location greater than 3",
   "@report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
-  "eew_sound_title": "地震速報音效",
+  "eew_sound_title": "Earthquake Early Warning notification",
   "@eew_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
-  "eew_info_sound_title": "Earthquake information",
+  "eew_info_sound_title": "Earthquake Information",
   "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
@@ -365,11 +365,11 @@
   "@other_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "Immediate thunderstorm alerts",
+  "thunderstorm_instant_messaging_sound": "Immediate Thunderstorm Alerts",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "Immediate thunderstorm alerts issued for your area",
+  "thunderstorm_instant_messaging_description_sound": "Immediate Thunderstorm Alerts issued at your location",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -377,7 +377,7 @@
   "@heavy_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雨特報"
   },
-  "heavy_rain_alert_description_sound": "所在地發布 大雨特報",
+  "heavy_rain_alert_description_sound": "Heavy Rain Advisory issued at your location",
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
@@ -385,31 +385,31 @@
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
-  "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
+  "torrential_rain_alert_description_sound": "Extremely Heavy Rain Advisory issued at your location",
   "@torrential_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
-  "flooding_alert_sound": "Flood alert",
+  "flooding_alert_sound": "Flood Alert",
   "@flooding_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 淹水警戒"
   },
-  "flooding_alert_description_sound": "Flood alert issued for your area",
+  "flooding_alert_description_sound": "Flood Alert issued at your location",
   "@flooding_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
   },
-  "tsunami_alert_sound": "海嘯警報（注意）",
+  "tsunami_alert_sound": "Tsunami Warning (Notice)",
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert_description_sound": "所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下",
+  "tsunami_alert_description_sound": "Tsunami Warning (Notice): estimated height below 1 meter.",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
-  "tsunami_alert2_sound": "海嘯警報（警報）",
+  "tsunami_alert2_sound": "Tsunami Warning (Alert)",
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下",
+  "tsunami_alert2_description_sound": "Tsunami Warning (Alert): estimated height above 1 meter.",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下"
   },
@@ -417,31 +417,31 @@
   "@volcano_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 火山資訊"
   },
-  "volcano_info_description_sound": "所在地發布 火山資訊",
+  "volcano_info_description_sound": "Volcano Information issued at your location",
   "@volcano_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
   },
-  "high_temperature_info_sound": "High Temperature Information",
+  "high_temperature_info_sound": "Heat Information",
   "@high_temperature_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
   },
-  "high_temperature_info_description_sound": "所在地發布 高溫資訊",
+  "high_temperature_info_description_sound": "Heat Information issued at your location",
   "@high_temperature_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
   },
-  "strong_wind_warning_sound": "陸上強風特報",
+  "strong_wind_warning_sound": "Land Strong Wind Advisory",
   "@strong_wind_warning_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 陸上強風特報"
   },
-  "strong_wind_warning_description_sound": "所在地發布 陸上強風特報",
+  "strong_wind_warning_description_sound": "Land Strong Wind Advisory issued at your location",
   "@strong_wind_warning_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 陸上強風特報"
   },
-  "other_alert_sound": "其他類型警報",
+  "other_alert_sound": "Other Advisory",
   "@other_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 其他類型警報"
   },
-  "other_alert_description_sound": "所在地發布 其他類型警報",
+  "other_alert_description_sound": "Other Advisory issued at your location",
   "@other_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
@@ -449,7 +449,7 @@
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
-  "server_announcement_description_sound": "Announcement issued by ExpTech",
+  "server_announcement_description_sound": "Announcement by ExpTech",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   }
