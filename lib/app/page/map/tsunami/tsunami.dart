@@ -21,7 +21,7 @@ class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
 
   @override
-  State<StatefulWidget> createState() => _TsunamiMapState();
+  State<TsunamiMap> createState() => _TsunamiMapState();
 }
 
 class _TsunamiMapState extends State<TsunamiMap> {
@@ -57,7 +57,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
       await addTsunamiObservationPoints(tsunami!);
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 

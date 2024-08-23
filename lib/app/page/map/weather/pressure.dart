@@ -4,8 +4,10 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/weather.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/time_selector.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -29,10 +31,10 @@ class PressureData {
 }
 
 class PressureMap extends StatefulWidget {
-  const PressureMap({Key? key}) : super(key: key);
+  const PressureMap({super.key});
 
   @override
-  _PressureMapState createState() => _PressureMapState();
+  State<PressureMap> createState() => _PressureMapState();
 }
 
 class _PressureMapState extends State<PressureMap> {
@@ -42,6 +44,7 @@ class _PressureMapState extends State<PressureMap> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  bool _showLegend = false;
 
   List<PressureData> pressureDataList = [];
 
@@ -54,7 +57,7 @@ class _PressureMapState extends State<PressureMap> {
   }
 
   void _loadMap() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
@@ -65,10 +68,6 @@ class _PressureMapState extends State<PressureMap> {
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
-    if (isUserLocationValid) {
-      await _addUserLocationMarker();
-    }
 
     await _mapController.addSource(
         "pressure-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
@@ -90,47 +89,58 @@ class _PressureMapState extends State<PressureMap> {
         .toList();
 
     await addPressureCircles(pressureDataList);
+
+    if (isUserLocationValid) {
+      await _mapController.addSource(
+          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      await _mapController.setGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "coordinates": [userLon, userLat],
+                "type": "Point"
+              }
+            }
+          ],
+        },
+      );
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    }
+
+    await _addUserLocationMarker();
+
     setState(() {});
   }
 
   Future<void> _addUserLocationMarker() async {
-    await _mapController.addSource(
-        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
-      const SymbolLayerProperties(
-        symbolZOrder: "source",
-        iconSize: [
-          Expressions.interpolate,
-          ["linear"],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: "gps",
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
-    await _mapController.setGeoJsonSource(
-      "markers-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point"
-            }
-          }
-        ],
-      },
-    );
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
   }
 
   Future<void> addPressureCircles(List<PressureData> pressureDataList) async {
@@ -167,16 +177,14 @@ class _PressureMapState extends State<PressureMap> {
           Expressions.interpolate,
           ["linear"],
           [Expressions.get, "pressure"],
-          950,
-          "#0000FF",
-          980,
-          "#00FF00",
-          1000,
-          "#FFFF00",
+          725,
+          "#77bfcc",
+          850,
+          "#82cb75",
+          975,
+          "#f7e78a",
           1020,
-          "#FFA500",
-          1050,
-          "#FF0000",
+          "#ffffff",
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
@@ -205,6 +213,59 @@ class _PressureMapState extends State<PressureMap> {
     );
   }
 
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return MapLegend(
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+        const SizedBox(height: 12),
+        Text(context.i18n.unit_hpa, style: context.theme.textTheme.labelMedium),
+      ],
+    );
+  }
+
+  Widget _buildColorBar() {
+    return Container(
+      height: 20,
+      width: 300,
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF77BFCC), // 725 hPa
+            Color(0xFF82CB75), // 850 hPa
+            Color(0xFFF7E78A), // 975 hPa
+            Color(0xFFFFFFFF), // 1020 hPa
+          ],
+          stops: [0.0, 0.4167, 0.8333, 1.0],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = ['725', '850', '975', '1020'];
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 12),
+                ))
+            .toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -214,6 +275,32 @@ class _PressureMapState extends State<PressureMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: Material(
+            color: context.colors.secondary,
+            elevation: 4.0,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: _toggleLegend,
+              child: Tooltip(
+                message: '圖例',
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    _showLegend ? Icons.close : Icons.info_outline,
+                    size: 20,
+                    color: context.colors.onSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         if (weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -221,6 +308,10 @@ class _PressureMapState extends State<PressureMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: weather_list,
+              onTimeExpanded: () {
+                _showLegend = false;
+                setState(() {});
+              },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
@@ -239,10 +330,17 @@ class _PressureMapState extends State<PressureMap> {
                     .toList();
 
                 await addPressureCircles(pressureDataList);
+                await _addUserLocationMarker();
                 setState(() {});
                 print("Selected time: $time");
               },
             ),
+          ),
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50, // Adjusted to be above the legend button
+            child: _buildLegend(),
           ),
       ],
     );

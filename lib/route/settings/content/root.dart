@@ -1,10 +1,5 @@
-import 'dart:io';
-
-import 'package:clipboard/clipboard.dart';
-import 'package:dpip/core/notify.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -45,24 +40,6 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          const ListTileGroupHeader(title: "音效"),
-          ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.audiotrack_sharp),
-            ),
-            title: Text(
-              context.i18n.sound_test,
-              style: tileTitleTextStyle,
-            ),
-            subtitle: Text(context.i18n.sound_test_description),
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                "/sound",
-              );
-            },
-          ),
           ListTileGroupHeader(title: context.i18n.settings_Personalization),
           ListTile(
             leading: const Padding(
@@ -98,27 +75,22 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          ListTileGroupHeader(title: context.i18n.settings_fcm),
+          const ListTileGroupHeader(title: "其他"),
           ListTile(
-            leading: Icon(
-              Platform.isAndroid ? Icons.bug_report_rounded : CupertinoIcons.square_on_square,
+            leading: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(Symbols.experiment),
             ),
-            title: Text(context.i18n.settings_fcm),
+            title: const Text(
+              "進階功能",
+              style: tileTitleTextStyle,
+            ),
+            subtitle: const Text("調整 DPIP 的進階功能"),
             onTap: () {
-              messaging.getToken().then((value) {
-                FlutterClipboard.copy(value ?? "");
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(context.i18n.settings_copy_fcm),
-                  ),
-                );
-              }).catchError((error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('複製 FCM Token 時發生錯誤：$error'),
-                  ),
-                );
-              });
+              Navigator.pushNamed(
+                context,
+                "/experiment",
+              );
             },
           ),
         ],

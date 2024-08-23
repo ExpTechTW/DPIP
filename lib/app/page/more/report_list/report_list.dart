@@ -91,59 +91,57 @@ class _ReportListPageState extends State<ReportListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.i18n.report),
-        bottom: PreferredSize(
-          preferredSize: const Size(double.maxFinite, 4),
-          child: Visibility(
-            visible: isLoading,
-            child: LinearProgressIndicator(
-              borderRadius: BorderRadius.circular(4),
-              backgroundColor: context.colors.secondaryContainer,
-            ),
+    return Column(
+      children: [
+        Visibility(
+          visible: isLoading,
+          child: LinearProgressIndicator(
+            borderRadius: BorderRadius.circular(4),
+            backgroundColor: context.colors.secondaryContainer,
           ),
         ),
-      ),
-      body: Builder(
-        builder: (context) {
-          if (reportList.isEmpty) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              await refreshReportList();
-            },
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: reportList.length,
-              itemBuilder: (context, index) {
-                var showDate = false;
-                final current = reportList[index];
-
-                if (index != 0) {
-                  final prev = reportList[index - 1];
-                  if (current.time.day != prev.time.day) {
-                    showDate = true;
-                  }
-                } else {
-                  showDate = true;
-                }
-
-                return ReportListItem(
-                  report: current,
-                  showDate: showDate,
-                  first: index == 0,
-                  refreshReportList: refreshReportList,
+        Expanded(
+          child: Builder(
+            builder: (context) {
+              if (reportList.isEmpty) {
+                return const Center(
+                  child: CircularProgressIndicator(),
                 );
-              },
-            ),
-          );
-        },
-      ),
+              }
+
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await refreshReportList();
+                },
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: reportList.length,
+                  itemBuilder: (context, index) {
+                    var showDate = false;
+                    final current = reportList[index];
+
+                    if (index != 0) {
+                      final prev = reportList[index - 1];
+                      if (current.time.day != prev.time.day) {
+                        showDate = true;
+                      }
+                    } else {
+                      showDate = true;
+                    }
+
+                    return ReportListItem(
+                      report: current,
+                      showDate: showDate,
+                      first: index == 0,
+                      refreshReportList: refreshReportList,
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

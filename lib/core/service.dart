@@ -3,7 +3,8 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/monitor/monitor.dart';
+import 'package:dpip/app/page/home/home.dart';
+import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
@@ -73,8 +74,14 @@ void androidSendPositionlisten() {
           Global.preference.setString("location-city", locationInfo.city);
           Global.preference.setString("location-town", locationInfo.town);
 
-          SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
+          SettingsLocationView.updatePosition();
+          HomePage.updatePosition();
         }
+      } else {
+        Global.preference.setDouble("user-lat", 0.0);
+        Global.preference.setDouble("user-lon", 0.0);
+        SettingsLocationView.updatePosition();
+        HomePage.updatePosition();
       }
 
       var latitude = position['latitude'];
@@ -113,6 +120,7 @@ Future<void> androidForegroundService() async {
       onStart: onStart,
       autoStart: true,
       isForegroundMode: true,
+      foregroundServiceType: AndroidForegroundType.location,
       notificationChannelId: 'my_foreground',
       initialNotificationTitle: 'DPIP',
       initialNotificationContent: '前景服務啟動中...',
@@ -207,7 +215,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer = Timer.periodic(const Duration(seconds: 210), (timer) async {
+    timer = Timer.periodic(Duration(seconds: 300), (timer) async {
       task();
     });
   }

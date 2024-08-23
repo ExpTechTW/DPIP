@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
@@ -27,8 +28,13 @@ Future<void> getSavedLocation() async {
         Global.preference.setString("location-city", locationInfo.city);
         Global.preference.setString("location-town", locationInfo.town);
 
-        SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
+        SettingsLocationView.updatePosition();
       }
+    } else {
+      Global.preference.setDouble("user-lat", 0.0);
+      Global.preference.setDouble("user-lon", 0.0);
+      SettingsLocationView.updatePosition();
+      HomePage.updatePosition();
     }
     return;
   } on PlatformException catch (e) {
