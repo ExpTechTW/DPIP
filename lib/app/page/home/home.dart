@@ -1,5 +1,6 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/history.dart';
+import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
@@ -226,7 +227,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             children: [
                               InkWell(
                                 borderRadius: BorderRadius.circular(16),
-                                onTap: () {},
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      settings: const RouteSettings(name: "/settings"),
+                                      builder: (context) => const SettingsRoute(
+                                        initialRoute: '/location',
+                                      ),
+                                    ),
+                                  );
+                                },
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                   child: Row(
