@@ -321,11 +321,11 @@
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
-  "eew_alert_description_sound": "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
+  "eew_alert_description_sound": "緊急地震速報 推定最大震度5弱以上\nかつ現在地の予測震度4以上",
   "@eew_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "地震速報（注意）",
+  "eew_sound": "緊急地震速報（注意）",
   "@eew_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報（注意）"
   },
@@ -397,19 +397,19 @@
   "@flooding_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
   },
-  "tsunami_alert_sound": "海嘯警報（注意）",
+  "tsunami_alert_sound": "津波警報（注意）",
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert_description_sound": "所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下",
+  "tsunami_alert_description_sound": "現在地に津波警報（注意）が発表\n予想される津波の高さ1ｍ未満",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
-  "tsunami_alert2_sound": "海嘯警報（警報）",
+  "tsunami_alert2_sound": "津波警報（警報）",
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下",
+  "tsunami_alert2_description_sound": "現在地に津波警報（警報）が発表\n予想される津波の高さ1ｍ以上",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下"
   },
