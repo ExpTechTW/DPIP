@@ -4,9 +4,8 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
-import '../../../global.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/util/list_icon.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -147,7 +146,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 
                         final item = TimeLineTile(
                           time: current.time.send,
-                          icon: const Icon(Symbols.thunderstorm_rounded),
+                          icon: Icon(ListIcons.getListIcon(current.type)),
                           height: 100,
                           first: i == 0,
                           showDate: showDate,
