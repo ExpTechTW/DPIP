@@ -53,6 +53,25 @@ Future<void> loadWindImage(MapLibreMapController controller) async {
   await controller.addImage("wind-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-5.png")));
 }
 
+Future<void> loadLightningImage(MapLibreMapController controller) async {
+  await controller.addImage(
+      "lightning-1-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-5.png")));
+  await controller.addImage(
+      "lightning-1-10", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-10.png")));
+  await controller.addImage(
+      "lightning-1-30", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-30.png")));
+  await controller.addImage(
+      "lightning-1-60", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-60.png")));
+  await controller.addImage(
+      "lightning-0-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-5.png")));
+  await controller.addImage(
+      "lightning-0-10", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-10.png")));
+  await controller.addImage(
+      "lightning-0-30", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-30.png")));
+  await controller.addImage(
+      "lightning-0-60", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-60.png")));
+}
+
 enum Units {
   meters,
   metres,

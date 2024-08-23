@@ -149,7 +149,7 @@ class _RadarMapState extends State<RadarMap> {
           tileSize: 256,
         ));
 
-    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(),belowLayerId: "county-outline");
+    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(), belowLayerId: "county-outline");
 
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
@@ -288,7 +288,8 @@ class _RadarMapState extends State<RadarMap> {
                       tileSize: 256,
                     ));
 
-                _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
+                _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(),
+                    belowLayerId: "county-outline");
 
                 _addUserLocationMarker();
 

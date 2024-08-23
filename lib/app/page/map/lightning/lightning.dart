@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/weather/lightning.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import '../../../../core/ios_get_location.dart';
+import '../../../../global.dart';
 
 class LightningData {
   final double latitude;
@@ -34,6 +39,9 @@ class _LightningMapState extends State<LightningMap> {
   late MapLibreMapController _mapController;
   List<String> lightningTimeList = [];
   List<LightningData> lightningDataList = [];
+  double userLat = 0;
+  double userLon = 0;
+  bool isUserLocationValid = false;
   bool _showLegend = false;
 
   @override
@@ -49,11 +57,17 @@ class _LightningMapState extends State<LightningMap> {
 
   void _initMap(MapLibreMapController controller) {
     _mapController = controller;
-    _loadMap();
   }
 
   Future<void> _loadMap() async {
     await _loadMapImages();
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
+    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
     await _mapController.addSource(
       "lightning-data",
       const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
@@ -61,11 +75,58 @@ class _LightningMapState extends State<LightningMap> {
     if (lightningTimeList.isNotEmpty) {
       await _loadLightningData(lightningTimeList.last);
     }
+
+    if (isUserLocationValid) {
+      await _mapController.addSource(
+          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      await _mapController.setGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "coordinates": [userLon, userLat],
+                "type": "Point"
+              }
+            }
+          ],
+        },
+      );
+    }
+
+    setState(() {});
+  }
+
+  Future<void> _addUserLocationMarker() async {
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
   }
 
   Future<void> _loadMapImages() async {
-    // await _mapController.addImage("cross", await loadImageFromAsset("assets/cross.png"));
-    // await _mapController.addImage("circle", await loadImageFromAsset("assets/circle.png"));
+    await loadLightningImage(_mapController);
   }
 
   Future<void> _loadLightningData(String time) async {
@@ -97,6 +158,8 @@ class _LightningMapState extends State<LightningMap> {
             })
         .toList();
 
+    print(features);
+
     await _mapController.setGeoJsonSource("lightning-data", {"type": "FeatureCollection", "features": features});
 
     await _mapController.removeLayer("lightning-markers");
@@ -104,25 +167,28 @@ class _LightningMapState extends State<LightningMap> {
       "lightning-data",
       "lightning-markers",
       SymbolLayerProperties(
+        iconSize: [
+          Expressions.interpolate,
+          ["linear"],
+          [Expressions.zoom],
+          5,
+          0.4,
+          10,
+          1.2,
+        ],
         iconImage: [
           Expressions.match,
           ["get", "type"],
           1,
-          "cross",
-          "circle",
+          "lightning-1-5",
+          "lightning-0-5",
         ],
-        iconSize: 0.5,
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
-        iconColor: [
-          Expressions.match,
-          ["get", "type"],
-          1,
-          "#FF0000", // 紅色for對地閃電
-          "#FFA500", // 橙色for雲間閃電
-        ],
       ),
     );
+
+    await _addUserLocationMarker();
   }
 
   void _toggleLegend() {

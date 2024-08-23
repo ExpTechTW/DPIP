@@ -1,13 +1,12 @@
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/global.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

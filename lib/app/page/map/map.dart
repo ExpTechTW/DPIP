@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/map/lightning/lightning.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/rain/rain.dart';
@@ -60,6 +61,11 @@ class _MapPageState extends State<MapPage> {
       label: Text(context.i18n.wind_direction_and_speed_monitor),
     ),
     NavigationDrawerDestination(
+      icon: const Icon(Symbols.lightning_stand_rounded),
+      selectedIcon: const Icon(Symbols.lightning_stand_rounded, fill: 1),
+      label: Text("閃電"),
+    ),
+    NavigationDrawerDestination(
       icon: const Icon(Symbols.rainy_light_rounded),
       selectedIcon: const Icon(Symbols.rainy_light_rounded, fill: 1),
       label: Text(context.i18n.typhoon_monitor),
@@ -100,6 +106,7 @@ class _MapPageState extends State<MapPage> {
           HumidityMap(),
           PressureMap(),
           WindMap(),
+          LightningMap(),
           TyphoonMap(),
           TsunamiMap(),
         ],
