@@ -183,7 +183,7 @@ void onStart(ServiceInstance service) async {
         service.invoke("sendposition", {"position": position.toJson()});
         String lat = position.position.latitude.toStringAsFixed(6);
         String lon = position.position.longitude.toStringAsFixed(6);
-        String country = position.position.country == "" ? "服務區域外，僅在臺灣各地可用" : position.position.country ;
+        String country = position.position.country == "" ? "服務區域外" : position.position.country ;
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
@@ -192,7 +192,7 @@ void onStart(ServiceInstance service) async {
 
         String notifyTitle = '自動定位中';
         String date = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-        String notifyBody = '$date\n$lat,$lon\n$country';
+        String notifyBody = '$date\n$lat,$lon $country';
 
         flutterLocalNotificationsPlugin.show(
           888,

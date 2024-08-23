@@ -171,7 +171,8 @@ class _MePageState extends State<MePage> {
                         avatar: const Icon(SimpleIcons.appstore),
                         label: const Text("App Store"),
                         onPressed: () {
-                          launchUrl(Uri.parse("https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"));
+                          launchUrl(Uri.parse(
+                              "https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"));
                         },
                       ),
                       ActionChip(

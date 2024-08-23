@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dpip/util/geojson.dart';
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -90,6 +91,8 @@ enum Units {
   degrees,
 }
 
+const emptyGeoJson = {"type": "FeatureCollection", "features": []};
+
 /// Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
 ///
 /// @memberof helpers
@@ -161,6 +164,7 @@ LatLng destination(LatLng origin, double distance, double bearing, {Units units 
 
 /// Takes a [LatLng] and calculates the circle polygon given a radius in
 /// degrees, radians, miles, or kilometers; and steps for precision.
+@Deprecated("Use circleFeature()")
 Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
   // main
   final coordinates = [];
@@ -180,4 +184,20 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
       "type": "Polygon",
     }
   };
+}
+
+/// Takes a [LatLng] and calculates the circle polygon given a radius in
+/// degrees, radians, miles, or kilometers; and steps for precision.
+GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
+  // main
+  final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
+
+  for (var i = 0; i < steps; i++) {
+    final point = destination(center, radius, (i * -360) / steps, units: units);
+    polygon.coordinates.add(point.toGeoJsonCoordinates());
+  }
+
+  polygon.coordinates.add(polygon.coordinates[0]);
+
+  return polygon;
 }

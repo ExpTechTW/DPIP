@@ -4,7 +4,9 @@ import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
+import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/widget/home/forecast_weather_card.dart';
+import 'package:dpip/util/weather_icon.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -122,12 +124,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           minTemperature: (hour["temp"]?["c"]).round(),
           maxTemperature: (hour["heat"]?["c"]).round(),
           rain: hour["chance"]?["rain"],
-          icon: Icon(
-            Symbols.partly_cloudy_day_rounded,
-            fill: 1,
-            size: 36,
-            color: context.colors.onPrimaryContainer.withOpacity(0.75),
-          ),
+          icon: WeatherIcons.getWeatherIcon(hour["condition"].toString() ?? "", hour["is_day"] ?? 1),
         ),
       );
     }
@@ -269,7 +266,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         ),
                                       ),
                                       Icon(
-                                        Symbols.partly_cloudy_day_rounded,
+                                        WeatherIcons.getWeatherIcon(
+                                            weatherData["realtime"]?["condition"].toString() ?? "",
+                                            weatherData["realtime"]?["is_day"] ?? 1),
                                         fill: 1,
                                         size: 48,
                                         color: context.colors.onPrimaryContainer.withOpacity(0.75),
@@ -298,7 +297,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ],
                               ),
                               Text(
-                                "晴時多雲",
+                                WeatherIcons.getWeatherContent(
+                                    weatherData["realtime"]?["condition"].toString() ?? "", "zh"),
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: context.colors.primary,
@@ -393,7 +393,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                       final item = TimeLineTile(
                         time: current.time.send,
-                        icon: const Icon(Symbols.thunderstorm_rounded),
+                        icon: Icon(ListIcons.getListIcon(current.type)),
                         height: 100,
                         first: i == 0,
                         showDate: showDate,

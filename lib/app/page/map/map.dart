@@ -66,8 +66,8 @@ class _MapPageState extends State<MapPage> {
       label: Text(context.i18n.lightning),
     ),
     NavigationDrawerDestination(
-      icon: const Icon(Symbols.rainy_light_rounded),
-      selectedIcon: const Icon(Symbols.rainy_light_rounded, fill: 1),
+      icon: const Icon(Symbols.cyclone_rounded),
+      selectedIcon: const Icon(Symbols.cyclone_rounded, fill: 1),
       label: Text(context.i18n.typhoon_monitor),
     ),
     NavigationDrawerDestination(
