@@ -172,7 +172,7 @@
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "地震速報が受信されていません",
+  "no_earthquake_warning": "地震速報が発表されていません",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
@@ -220,7 +220,7 @@
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_theme": "テーマ色",
+  "settings_theme": "テーマ",
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
