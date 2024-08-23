@@ -9,7 +9,7 @@ import "package:path_provider/path_provider.dart";
 
 class DpipMap extends StatefulWidget {
   final CameraPosition initialCameraPosition;
-  final void Function(MapLibreMapController)? onMapCreated;
+  final void Function(MapLibreMapController controller)? onMapCreated;
   final void Function(Point<double>, LatLng)? onMapClick;
   final void Function()? onMapIdle;
   final void Function(Point<double>, LatLng)? onMapLongClick;
