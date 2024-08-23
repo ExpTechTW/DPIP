@@ -94,6 +94,8 @@ class _LightningMapState extends State<LightningMap> {
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
 
+    await _addUserLocationMarker();
+
     setState(() {});
   }
 
