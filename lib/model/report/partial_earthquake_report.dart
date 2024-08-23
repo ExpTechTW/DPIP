@@ -1,6 +1,7 @@
 import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
 
 part 'partial_earthquake_report.g.dart';
@@ -58,6 +59,8 @@ class PartialEarthquakeReport {
 
     return null;
   }
+
+  LatLng get latlng => LatLng(latitude, longitude);
 
   bool get hasNumber => number != null;
 

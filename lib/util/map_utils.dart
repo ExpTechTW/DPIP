@@ -26,7 +26,7 @@ List<double> expandBounds(List<double> bounds, LatLng point) {
   return bounds;
 }
 
-// TODO: Migrate symbol images to sprite
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = false]) async {
   for (var i = 1; i < 10; i++) {
     final path = "assets/map/icons/intensity-$i${dark ? "" : "-dark"}.png";
@@ -35,17 +35,17 @@ Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = f
   }
 }
 
-// TODO: Migrate symbol images to sprite
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadCrossImage(MapLibreMapController controller) async {
   await controller.addImage("cross", Uint8List.sublistView(await rootBundle.load("assets/map/icons/cross.png")));
 }
 
-// TODO: Migrate symbol images to sprite
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadGPSImage(MapLibreMapController controller) async {
   await controller.addImage("gps", Uint8List.sublistView(await rootBundle.load("assets/map/icons/gps.png")));
 }
 
-// TODO: Migrate symbol images to sprite
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadWindImage(MapLibreMapController controller) async {
   await controller.addImage("wind-1", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-1.png")));
   await controller.addImage("wind-2", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-2.png")));
@@ -54,6 +54,7 @@ Future<void> loadWindImage(MapLibreMapController controller) async {
   await controller.addImage("wind-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-5.png")));
 }
 
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadLightningImage(MapLibreMapController controller) async {
   await controller.addImage(
       "lightning-1-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-5.png")));
@@ -191,13 +192,14 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
 GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
   // main
   final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
+  List coordinates = [];
 
   for (var i = 0; i < steps; i++) {
     final point = destination(center, radius, (i * -360) / steps, units: units);
-    polygon.coordinates.add(point.toGeoJsonCoordinates());
+    coordinates.add(point.toGeoJsonCoordinates());
   }
 
-  polygon.coordinates.add(polygon.coordinates[0]);
+  coordinates.add(coordinates[0]);
 
-  return polygon;
+  return polygon.setGeometry([coordinates]);
 }

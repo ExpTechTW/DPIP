@@ -537,6 +537,15 @@
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
+  "eew_no_x": "第 {serial} 報",
+  "@eew_no_x": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 第 {serial} 報",
+    "placeholders": {
+      "serial": {
+        "type": "String"
+      }
+    }
+  },
   "lightning": "閃電",
   "@lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電"
@@ -572,5 +581,18 @@
   "cancel": "取消",
   "@cancel": {
     "description": "「所在地」設定彈窗 → 取消"
-  }
+  },
+  "weather_sunny": "",
+  "weather_nightlight": "",
+  "weather_partly_cloudy_day": "",
+  "weather_partly_cloudy_night": "",
+  "weather_cloud": "",
+  "weather_foggy": "",
+  "weather_rainy": "",
+  "weather_ac_unit": "",
+  "weather_weather_mix": "",
+  "weather_thunderstorm": "",
+  "weather_grain": "",
+  "weather_water": "",
+  "weather_snowing": ""
 }

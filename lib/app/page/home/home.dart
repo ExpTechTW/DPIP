@@ -297,8 +297,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ],
                               ),
                               Text(
-                                WeatherIcons.getWeatherContent(
-                                    weatherData["realtime"]?["condition"].toString() ?? "", "zh"),
+                                WeatherIcons.getWeatherContent(context,
+                                    weatherData["realtime"]?["condition"].toString() ?? ""),
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: context.colors.primary,

@@ -2,6 +2,7 @@ import 'package:dpip/app/page/map/lightning/lightning.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/app/page/map/rain/rain.dart';
+import 'package:dpip/app/page/map/report/report.dart';
 import 'package:dpip/app/page/map/tsunami/tsunami.dart';
 import 'package:dpip/app/page/map/typhoon/typhoon.dart';
 import 'package:dpip/app/page/map/weather/humidity.dart';
@@ -29,6 +30,11 @@ class _MapPageState extends State<MapPage> {
       icon: const Icon(Symbols.monitor_heart),
       selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
       label: Text(context.i18n.monitor),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.summarize_rounded),
+      selectedIcon: const Icon(Symbols.summarize_rounded, fill: 1),
+      label: Text(context.i18n.report),
     ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.radar_rounded),
@@ -100,6 +106,7 @@ class _MapPageState extends State<MapPage> {
         physics: const NeverScrollableScrollPhysics(),
         children: const [
           MonitorPage(data: 0),
+          ReportMap(),
           RadarMap(),
           RainMap(),
           TemperatureMap(),
