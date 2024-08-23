@@ -22,10 +22,6 @@ class MePage extends StatefulWidget {
 class _MePageState extends State<MePage> {
   @override
   Widget build(BuildContext context) {
-    const tileTitleTextStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-    );
-
     return ListView(
       children: [
         /**
@@ -49,10 +45,7 @@ class _MePageState extends State<MePage> {
          */
         ListTile(
           leading: const Icon(Symbols.audiotrack_sharp),
-          title: Text(
-            context.i18n.sound_test,
-            style: tileTitleTextStyle,
-          ),
+          title: Text(context.i18n.sound_test),
           subtitle: Text(context.i18n.sound_test_description),
           onTap: () => Navigator.push(
             context,
