@@ -584,26 +584,194 @@
   },
   "sunny": "晴",
   "@sunny": {
-    "description": "「所在地」設定彈窗 → 晴"
+    "description": "天氣狀況：晴"
   },
-  "partly_cloudy_day": "多雲時晴",
-  "@partly_cloudy_day": {
-    "description": "「所在地」設定彈窗 → 多雲時晴"
+  "partly_cloudy": "多雲時晴",
+  "@partly_cloudy": {
+    "description": "天氣狀況：多雲時晴"
   },
   "cloudy": "多雲",
   "@cloudy": {
-    "description": "「所在地」設定彈窗 → 多雲"
+    "description": "天氣狀況：多雲"
   },
   "overcast": "陰",
   "@overcast": {
-    "description": "「所在地」設定彈窗 → 陰"
+    "description": "天氣狀況：陰"
   },
   "foggy": "霧",
   "@foggy": {
-    "description": "「所在地」設定彈窗 → 霧"
+    "description": "天氣狀況：霧"
   },
-  "rainy": "",
-  "@rainy": {
-    "description": "「所在地」設定彈窗 → rainy"
+  "patchy_rain_possible": "可能有局部降雨",
+  "@patchy_rain_possible": {
+    "description": "天氣狀況：可能有局部降雨"
+  },
+  "patchy_snow_possible": "可能有局部降雪",
+  "@patchy_snow_possible": {
+    "description": "天氣狀況：可能有局部降雪"
+  },
+  "patchy_sleet_possible": "可能有局部雨夾雪",
+  "@patchy_sleet_possible": {
+    "description": "天氣狀況：可能有局部雨夾雪"
+  },
+  "patchy_freezing_drizzle_possible": "可能有局部凍毛毛雨",
+  "@patchy_freezing_drizzle_possible": {
+    "description": "天氣狀況：可能有局部凍毛毛雨"
+  },
+  "thundery_outbreaks_possible": "可能有局部雷雨",
+  "@thundery_outbreaks_possible": {
+    "description": "天氣狀況：可能有局部雷雨"
+  },
+  "blowing_snow": "高吹雪",
+  "@blowing_snow": {
+    "description": "天氣狀況：高吹雪"
+  },
+  "blizzard": "暴風雪",
+  "@blizzard": {
+    "description": "天氣狀況：暴風雪"
+  },
+  "fog": "霧",
+  "@fog": {
+    "description": "天氣狀況：霧"
+  },
+  "freezing_fog": "凍霧",
+  "@freezing_fog": {
+    "description": "天氣狀況：凍霧"
+  },
+  "patchy_light_drizzle": "局部毛毛雨",
+  "@patchy_light_drizzle": {
+    "description": "天氣狀況：局部毛毛雨"
+  },
+  "light_drizzle": "毛毛雨",
+  "@light_drizzle": {
+    "description": "天氣狀況：毛毛雨"
+  },
+  "freezing_drizzle": "凍毛毛雨",
+  "@freezing_drizzle": {
+    "description": "天氣狀況：凍毛毛雨"
+  },
+  "heavy_freezing_drizzle": "大凍毛毛雨",
+  "@heavy_freezing_drizzle": {
+    "description": "天氣狀況：大凍毛毛雨"
+  },
+  "patchy_light_rain": "局部小雨",
+  "@patchy_light_rain": {
+    "description": "天氣狀況：局部小雨"
+  },
+  "light_rain": "小雨",
+  "@light_rain": {
+    "description": "天氣狀況：小雨"
+  },
+  "moderate_rain_at_times": "間歇降雨",
+  "@moderate_rain_at_times": {
+    "description": "天氣狀況：間歇降雨"
+  },
+  "moderate_rain": "雨",
+  "@moderate_rain": {
+    "description": "天氣狀況：雨"
+  },
+  "heavy_rain_at_times": "間歇大雨",
+  "@heavy_rain_at_times": {
+    "description": "天氣狀況：間歇大雨"
+  },
+  "heavy_rain": "大雨",
+  "@heavy_rain": {
+    "description": "天氣狀況：大雨"
+  },
+  "light_freezing_rain": "凍雨",
+  "@light_freezing_rain": {
+    "description": "天氣狀況：凍雨"
+  },
+  "moderate_or_heavy_freezing_rain": "凍雨",
+  "@moderate_or_heavy_freezing_rain": {
+    "description": "天氣狀況：凍雨"
+  },
+  "light_sleet": "小雨夾雪",
+  "@light_sleet": {
+    "description": "天氣狀況：小雨夾雪"
+  },
+  "moderate_or_heavy_sleet": "雨夾雪",
+  "@moderate_or_heavy_sleet": {
+    "description": "天氣狀況：雨夾雪"
+  },
+  "patchy_light_snow": "局部小雪",
+  "@patchy_light_snow": {
+    "description": "天氣狀況：局部小雪"
+  },
+  "light_snow": "小雪",
+  "@light_snow": {
+    "description": "天氣狀況：小雪"
+  },
+  "patchy_moderate_snow": "局部降雪",
+  "@patchy_moderate_snow": {
+    "description": "天氣狀況：局部降雪"
+  },
+  "moderate_snow": "雪",
+  "@moderate_snow": {
+    "description": "天氣狀況：雪"
+  },
+  "patchy_heavy_snow": "局部大雪",
+  "@patchy_heavy_snow": {
+    "description": "天氣狀況：局部大雪"
+  },
+  "heavy_snow": "大雪",
+  "@heavy_snow": {
+    "description": "天氣狀況：大雪"
+  },
+  "ice_pellets": "冰霰",
+  "@ice_pellets": {
+    "description": "天氣狀況：冰霰"
+  },
+  "light_rain_shower": "小陣雨",
+  "@light_rain_shower": {
+    "description": "天氣狀況：小陣雨"
+  },
+  "moderate_or_heavy_rain_shower": "陣雨",
+  "@moderate_or_heavy_rain_shower": {
+    "description": "天氣狀況：陣雨"
+  },
+  "torrential_rain_shower": "大陣雨",
+  "@torrential_rain_shower": {
+    "description": "天氣狀況：大陣雨"
+  },
+  "light_sleet_showers": "小陣雨夾雪",
+  "@light_sleet_showers": {
+    "description": "天氣狀況：小陣雨夾雪"
+  },
+  "moderate_or_heavy_sleet_showers": "陣雨夾雪",
+  "@moderate_or_heavy_sleet_showers": {
+    "description": "天氣狀況：陣雨夾雪"
+  },
+  "light_snow_showers": "小陣雪",
+  "@light_snow_showers": {
+    "description": "天氣狀況：小陣雪"
+  },
+  "moderate_or_heavy_snow_showers": "陣雪",
+  "@moderate_or_heavy_snow_showers": {
+    "description": "天氣狀況：陣雪"
+  },
+  "light_showers_of_ice_pellets": "小陣雨伴隨冰霰",
+  "@light_showers_of_ice_pellets": {
+    "description": "天氣狀況：小陣雨伴隨冰霰"
+  },
+  "moderate_or_heavy_showers_of_ice_pellets": "陣雨伴隨冰霰",
+  "@moderate_or_heavy_showers_of_ice_pellets": {
+    "description": "天氣狀況：陣雨伴隨冰霰"
+  },
+  "patchy_light_rain_with_thunder": "局部小雷雨",
+  "@patchy_light_rain_with_thunder": {
+    "description": "天氣狀況：局部小雷雨"
+  },
+  "moderate_or_heavy_rain_with_thunder": "雷雨",
+  "@moderate_or_heavy_rain_with_thunder": {
+    "description": "天氣狀況：雷雨"
+  },
+  "patchy_light_snow_with_thunder": "局部小雪伴雷",
+  "@patchy_light_snow_with_thunder": {
+    "description": "天氣狀況：局部小雪伴雷"
+  },
+  "moderate_or_heavy_snow_with_thunder": "降雪伴雷",
+  "@moderate_or_heavy_snow_with_thunder": {
+    "description": "天氣狀況：降雪伴雷"
   }
 }
