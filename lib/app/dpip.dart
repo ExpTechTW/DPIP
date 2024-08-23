@@ -3,9 +3,11 @@ import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/more/more.dart';
+import 'package:dpip/route/welcome/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/global.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});
@@ -17,6 +19,20 @@ class Dpip extends StatefulWidget {
 class _DpipState extends State<Dpip> {
   PageController controller = PageController();
   int currentActivePage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Global.preference.setBool("monitor", false);
+      if (Global.preference.getBool("welcome-1.0.0") != null) return;
+      Global.preference.setBool("welcome-1.0.0", true);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AboutPage()),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

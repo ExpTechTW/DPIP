@@ -69,6 +69,7 @@ flutter:
     - assets/map/
     - assets/map/icons/
     - assets/DPIP.png
+    - assets/ExpTech.jpg
     - assets/location.json
     - assets/time.json
     - assets/box.json
