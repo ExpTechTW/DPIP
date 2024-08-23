@@ -225,10 +225,27 @@ class WeatherIcons {
 
   static String getWeatherContent(BuildContext context, String code) {
     final weatherInfo = weatherCodeMap[code];
-    if (weatherInfo != null) {
-      final contentKey = weatherInfo['contentKey'] as String;
-      return context.i18n.translate(contentKey) ?? 'Unknown weather';
+    if (weatherInfo == null) {
+      return 'Unknown weather';
     }
-    return 'Unknown weather';
+    final contentKey = weatherInfo['contentKey'] as String;
+
+    Map<String, String> iconLabel = {
+      'sunny': context.i18n.weather_sunny,
+      'nightlight': context.i18n.weather_nightlight,
+      'partly_cloudy_day': context.i18n.weather_partly_cloudy_day,
+      'partly_cloudy_night': context.i18n.weather_partly_cloudy_night,
+      'cloudy': context.i18n.weather_cloud,
+      'foggy': context.i18n.weather_foggy,
+      'rainy': context.i18n.weather_rainy,
+      'ac_unit': context.i18n.weather_ac_unit,
+      'rainy_snow': context.i18n.weather_weather_mix,
+      'thunderstorm': context.i18n.weather_thunderstorm,
+      'rainy_light': context.i18n.weather_grain,
+      'rainy_heavy': context.i18n.weather_water,
+      'snowing': context.i18n.weather_snowing,
+    };
+
+    return iconLabel[contentKey] ?? 'Unknown weather';
   }
 }
