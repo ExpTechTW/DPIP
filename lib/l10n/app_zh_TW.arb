@@ -409,9 +409,9 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下",
+  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上",
   "@tsunami_alert2_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以下"
+    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
   },
   "volcano_info_sound": "火山資訊",
   "@volcano_info_sound": {
