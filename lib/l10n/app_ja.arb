@@ -317,7 +317,7 @@
   "@sound_test_description": {
     "description": "「設定」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "強震即時警報（警報）",
+  "eew_alert_sound": "緊急地震速報（警報）",
   "@eew_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 強震即時警報（警報）"
   },
@@ -337,15 +337,15 @@
   "@int_report_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 震度速報"
   },
-  "int_report_description_sound": "TREM 觀測網 所在地實測震度 3 以上",
+  "int_report_description_sound": "TREM観測網 現在地の観測震度3以上",
   "@int_report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
   },
-  "eq_description_sound": "TREM 觀測網 偵測到晃動",
+  "eq_description_sound": "TREM観測網 揺れを検出",
   "@eq_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
   },
-  "report_description_sound": "地震報告 所在地震度 3 以上",
+  "report_description_sound": "地震情報 現在地の観測震度3以上",
   "@report_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
@@ -353,7 +353,7 @@
   "@eew_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震速報音效"
   },
-  "eew_info_sound_title": "地震資訊",
+  "eew_info_sound_title": "地震情報",
   "@eew_info_sound_title": {
     "description": "「設定」路徑 → 「音效測試」內容 → 地震資訊"
   },
@@ -445,7 +445,7 @@
   "@other_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
-  "server_announcement_sound": "伺服器公告",
+  "server_announcement_sound": "サーバーのお知らせ",
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
