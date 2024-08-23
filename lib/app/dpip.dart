@@ -81,10 +81,10 @@ class _DpipState extends State<Dpip> {
               barrierDismissible: false,
               builder: (context) {
                 return AlertDialog(
-                  icon: const Icon(Symbols.error),
+                  icon: const Icon(Symbols.update_rounded),
                   title: const Text("更新完成"),
                   content: const Text(
-                    "DPIP 已成功完成更新，要前往查看更新日誌嗎？",
+                    "DPIP 更新完成，要前往查看更新日誌嗎？",
                   ),
                   actionsAlignment: MainAxisAlignment.spaceBetween,
                   actions: [
