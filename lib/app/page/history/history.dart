@@ -98,89 +98,91 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     );
 
     return Scaffold(
-      body: Stack(
-        children: [
-          RefreshIndicator(
-            onRefresh: refreshHistoryList,
-            child: ListView(
-              padding: EdgeInsets.only(bottom: context.padding.bottom),
-              controller: scrollController,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                  child: Text(
-                    "3天內的歷史事件資訊",
-                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: refreshHistoryList,
+              child: ListView(
+                padding: EdgeInsets.only(bottom: context.padding.bottom),
+                controller: scrollController,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
+                    child: Text(
+                      "3天內的歷史事件資訊",
+                      style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                    ),
                   ),
-                ),
-                Builder(
-                  builder: (context) {
-                    if (historyList.isEmpty) {
-                      if (init) {
-                        return const Center(child: Text("沒有歷史事件資訊"));
+                  Builder(
+                    builder: (context) {
+                      if (historyList.isEmpty) {
+                        if (init) {
+                          return const Center(child: Text("沒有歷史事件資訊"));
+                        }
+                        return const Center(child: CircularProgressIndicator());
                       }
-                      return const Center(child: CircularProgressIndicator());
-                    }
 
-                    List<Widget> children = [];
+                      List<Widget> children = [];
 
-                    for (var i = 0, n = historyList.length; i < n; i++) {
-                      final current = historyList[i];
-                      var showDate = false;
+                      for (var i = 0, n = historyList.length; i < n; i++) {
+                        final current = historyList[i];
+                        var showDate = false;
 
-                      if (i != 0) {
-                        final prev = historyList[i - 1];
-                        if (current.time.send.day != prev.time.send.day) {
+                        if (i != 0) {
+                          final prev = historyList[i - 1];
+                          if (current.time.send.day != prev.time.send.day) {
+                            showDate = true;
+                          }
+                        } else {
                           showDate = true;
                         }
-                      } else {
-                        showDate = true;
+
+                        final item = TimeLineTile(
+                          time: current.time.send,
+                          icon: const Icon(Symbols.thunderstorm_rounded),
+                          height: 100,
+                          first: i == 0,
+                          showDate: showDate,
+                          color: context.theme.extendedColors.blueContainer,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(current.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
+                              Text(current.text.description["all"]!),
+                            ],
+                          ),
+                          onTap: () {},
+                        );
+
+                        children.add(item);
                       }
 
-                      final item = TimeLineTile(
-                        time: current.time.send,
-                        icon: const Icon(Symbols.thunderstorm_rounded),
-                        height: 100,
-                        first: i == 0,
-                        showDate: showDate,
-                        color: context.theme.extendedColors.blueContainer,
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(current.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
-                            Text(current.text.description["all"]!),
-                          ],
+                          children: children,
                         ),
-                        onTap: () {},
                       );
-
-                      children.add(item);
-                    }
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Column(
-                        children: children,
-                      ),
-                    );
-                  },
-                )
-              ],
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Visibility(
-              visible: isAppBarVisible,
-              child: FadeTransition(
-                opacity: animController.drive(opacityTween),
-                child: appBar,
+                    },
+                  )
+                ],
               ),
             ),
-          ),
-        ],
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Visibility(
+                visible: isAppBarVisible,
+                child: FadeTransition(
+                  opacity: animController.drive(opacityTween),
+                  child: appBar,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
