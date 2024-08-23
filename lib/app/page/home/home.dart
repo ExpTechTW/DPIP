@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
@@ -10,6 +12,8 @@ import 'package:dpip/util/weather_icon.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/util/need_location.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -44,6 +48,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String city = "";
   String town = "";
   String region = "";
+  double userLat = 0;
+  double userLon = 0;
+  bool isUserLocationValid = false;
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
@@ -76,6 +83,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
     start();
     HomePage.setActiveCallback(sendpositionUpdate);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initUserLocation();
+    });
+  }
+
+  @override
+  void dispose() {
+    HomePage.clearActiveCallback();
+    scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> refreshRealtimeList() async {
@@ -131,6 +148,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     setState(() {
       weatherData = data;
     });
+  }
+
+  void _initUserLocation() async {
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
+    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+      await showLocationDialog(context);
+    }
   }
 
   void start() {
@@ -437,12 +468,5 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    HomePage.clearActiveCallback();
-    scrollController.dispose();
-    super.dispose();
   }
 }

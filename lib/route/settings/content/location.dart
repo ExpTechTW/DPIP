@@ -325,8 +325,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
     Global.preference.remove("location-city");
     Global.preference.remove("location-town");
-    Global.preference.setDouble("user-lat", 0.0);
-    Global.preference.setDouble("user-lon", 0.0);
+    Global.preference.remove("user-lat");
+    Global.preference.remove("user-lon");
 
     if (isAutoLocatingEnabled) {
       setState(() {
