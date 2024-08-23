@@ -17,9 +17,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<History> realtimeList = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
   Map<String, dynamic> weatherData = {};
   List<Widget> weatherCard = [];
   bool init = false;
@@ -52,6 +49,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   double headerHeight = 360;
   bool isAppBarVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    start();
+  }
 
   Future<void> refreshRealtimeList() async {
     final data = await ExpTech().getRealtimeRegion(region);
@@ -152,7 +155,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  Future<void> start() async {
+  void start() {
     Global.location.forEach((key, data) {
       if (data.city == city && data.town == town) {
         region = key;
@@ -182,9 +185,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      start();
-    });
     final appBar = AppBar(
       elevation: 4,
       title: Text(context.i18n.home),
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: Stack(
         children: [
           RefreshIndicator(
-            onRefresh: start,
+            onRefresh: refreshRealtimeList,
             child: ListView(
               padding: EdgeInsets.only(bottom: context.padding.bottom),
               controller: scrollController,
