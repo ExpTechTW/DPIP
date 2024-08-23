@@ -136,11 +136,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void start() {
     city = Global.preference.getString("location-city") ?? "";
     town = Global.preference.getString("location-town") ?? "";
+    region = "";
     Global.location.forEach((key, data) {
       if (data.city == city && data.town == town) {
         region = key;
       }
     });
+    weatherData = {};
+    realtimeList = [];
+    weatherCard = [];
     if (region != "") {
       refreshWeatherAll();
       refreshRealtimeList();
@@ -161,12 +165,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
+    setState(() {});
   }
 
   void sendpositionUpdate() {
     if (mounted) {
       start();
-      setState(() {});
       widget.onPositionUpdate?.call();
     }
   }

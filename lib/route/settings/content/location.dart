@@ -323,9 +323,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       androidstopBackgroundService(isAutoLocatingEnabled);
     }
 
+    Global.preference.remove("location-city");
+    Global.preference.remove("location-town");
+    Global.preference.setDouble("user-lat", 0.0);
+    Global.preference.setDouble("user-lon", 0.0);
+
     if (isAutoLocatingEnabled) {
-      Global.preference.setDouble("user-lat", 0.0);
-      Global.preference.setDouble("user-lon", 0.0);
       setState(() {
         isAutoLocatingEnabled = false;
       });
@@ -349,9 +352,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       if (Platform.isAndroid) {
         androidStartBackgroundService(false);
       }
-
-      Global.preference.remove("location-city");
-      Global.preference.remove("location-town");
 
       city = null;
       town = null;
