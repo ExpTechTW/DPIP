@@ -216,7 +216,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
   }
 
-  Future<bool> androidCheckAutoStartPermission() async {
+  Future<bool> androidCheckAutoStartPermission(int num) async {
     if (Platform.isIOS) return true;
     try {
       bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
@@ -224,13 +224,14 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         bool? status = await Autostarter.checkAutoStartState();
         if (status != null) {
           if (status == false) {
+            String contentText = (num == 0) ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以讓 DPIP 在背景自動設定所在地資訊。" : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」已讓 DPIP 在背景有更好的運作。";
             return await showDialog<bool>(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
                       icon: const Icon(Symbols.my_location),
                       title: const Text("自啟動權限"),
-                      content: const Text("為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以讓 DPIP 在背景自動設定所在地資訊。"),
+                      content: Text(contentText),
                       actionsAlignment: MainAxisAlignment.spaceBetween,
                       actions: [
                         TextButton(
@@ -265,18 +266,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
   }
 
-  Future<bool> androidCheckBatteryOptimizationPermission() async {
+  Future<bool> androidCheckBatteryOptimizationPermission(int num) async {
     if (Platform.isIOS) return true;
     try {
       bool? isAvailable = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
       if (isAvailable == false) {
+        String contentText = (num == 0) ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以讓 DPIP 在背景自動設定所在地資訊。" : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」已讓 DPIP 在背景有更好的運作。";
         return await showDialog<bool>(
               context: context,
               builder: (context) {
                 return AlertDialog(
                   icon: const Icon(Symbols.my_location),
                   title: const Text("省電策略"),
-                  content: const Text("為了獲得更好的自動定位體驗，您需要給予「無限制」以讓 DPIP 在背景自動設定所在地資訊。"),
+                  content: Text(contentText),
                   actionsAlignment: MainAxisAlignment.spaceBetween,
                   actions: [
                     TextButton(
@@ -329,11 +331,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       await checkLocationAlwaysPermission();
 
-      bool autoStart = await androidCheckAutoStartPermission();
+      bool autoStart = await androidCheckAutoStartPermission(0);
 
       if (!autoStart) return;
 
-      bool batteryOptimization = await androidCheckBatteryOptimizationPermission();
+      bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
 
       if (!batteryOptimization) return;
 
@@ -530,11 +532,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             subtitle: Text(city ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled,
             onTap: () async {
-              bool autoStart = await androidCheckAutoStartPermission();
+              bool autoStart = await androidCheckAutoStartPermission(1);
 
               if (!autoStart) return;
 
-              bool batteryOptimization = await androidCheckBatteryOptimizationPermission();
+              bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
               if (!batteryOptimization) return;
 
@@ -562,11 +564,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             subtitle: Text(town ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled && city != null,
             onTap: () async {
-              bool autoStart = await androidCheckAutoStartPermission();
+              bool autoStart = await androidCheckAutoStartPermission(1);
 
               if (!autoStart) return;
 
-              bool batteryOptimization = await androidCheckBatteryOptimizationPermission();
+              bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
               if (!batteryOptimization) return;
 
