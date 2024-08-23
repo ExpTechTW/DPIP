@@ -40,8 +40,8 @@ class _DpipState extends State<Dpip> {
             label: context.i18n.map,
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.more),
-            selectedIcon: const Icon(Symbols.more, fill: 1),
+            icon: const Icon(Symbols.note_stack_add_rounded),
+            selectedIcon: const Icon(Symbols.note_stack_add_rounded, fill: 1),
             label: "更多",
           ),
           NavigationDestination(
