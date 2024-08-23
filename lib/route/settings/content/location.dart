@@ -181,7 +181,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
                 title: Text("$permissionType位置權限"),
-                content: Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以讓 DPIP 在背景自動設定所在地資訊。"),
+                content: Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以便讓 DPIP 在背景自動設定所在地資訊。"),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
@@ -225,8 +225,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         if (status != null) {
           if (status == false) {
             String contentText = (num == 0)
-                ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以讓 DPIP 在背景自動設定所在地資訊。"
-                : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」已讓 DPIP 在背景有更好的運作。";
+                ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
+                : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。";
             return await showDialog<bool>(
                   context: context,
                   builder: (context) {
@@ -274,8 +274,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       bool? isAvailable = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
       if (isAvailable == false) {
         String contentText = (num == 0)
-            ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以讓 DPIP 在背景自動設定所在地資訊。"
-            : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」已讓 DPIP 在背景有更好的運作。";
+            ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
+            : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。";
         return await showDialog<bool>(
               context: context,
               builder: (context) {
