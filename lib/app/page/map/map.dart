@@ -61,13 +61,13 @@ class _MapPageState extends State<MapPage> {
       label: Text(context.i18n.wind_direction_and_speed_monitor),
     ),
     NavigationDrawerDestination(
-      icon: const Icon(Symbols.lightning_stand_rounded),
-      selectedIcon: const Icon(Symbols.lightning_stand_rounded, fill: 1),
+      icon: const Icon(Symbols.bolt_rounded),
+      selectedIcon: const Icon(Symbols.bolt_rounded, fill: 1),
       label: Text("閃電"),
     ),
     NavigationDrawerDestination(
-      icon: const Icon(Symbols.rainy_light_rounded),
-      selectedIcon: const Icon(Symbols.rainy_light_rounded, fill: 1),
+      icon: const Icon(Symbols.cyclone_rounded),
+      selectedIcon: const Icon(Symbols.cyclone_rounded, fill: 1),
       label: Text(context.i18n.typhoon_monitor),
     ),
     NavigationDrawerDestination(
