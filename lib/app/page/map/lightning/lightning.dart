@@ -47,12 +47,6 @@ class _LightningMapState extends State<LightningMap> {
   @override
   void initState() {
     super.initState();
-    _loadLightningTimeList();
-  }
-
-  Future<void> _loadLightningTimeList() async {
-    lightningTimeList = await ExpTech().getLightningList();
-    setState(() {});
   }
 
   void _initMap(MapLibreMapController controller) {
@@ -72,6 +66,7 @@ class _LightningMapState extends State<LightningMap> {
       "lightning-data",
       const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
     );
+    lightningTimeList = await ExpTech().getLightningList();
     if (lightningTimeList.isNotEmpty) {
       await _loadLightningData(lightningTimeList.last);
     }
@@ -128,6 +123,7 @@ class _LightningMapState extends State<LightningMap> {
   }
 
   Future<void> _loadMapImages() async {
+    await loadGPSImage(_mapController);
     await loadLightningImage(_mapController);
   }
 
