@@ -1,8 +1,7 @@
 import 'package:dpip/global.dart';
+import 'package:dpip/route/welcome/tos.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
-
-import '../../welcome/tos.dart';
 
 class SettingsExperimentView extends StatefulWidget {
   const SettingsExperimentView({super.key});

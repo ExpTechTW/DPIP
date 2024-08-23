@@ -1,9 +1,9 @@
 import 'package:dpip/app/page/history/history.dart';
-import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/more/more.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/route/welcome/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +77,9 @@ class _DpipState extends State<Dpip> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          HomePage(),
+          UpdateRequiredPage(),
+          // ChangelogPage(),
+          // HomePage(),
           HistoryPage(),
           MapPage(),
           MorePage(),
