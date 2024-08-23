@@ -26,13 +26,30 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'eew_info.dart';
 
+typedef PositionUpdateCallback = void Function();
+
 class MonitorPage extends StatefulWidget {
-  const MonitorPage({Key? key, required this.data}) : super(key: key);
+  final Function()? onPositionUpdate;
+  const MonitorPage({Key? key, required this.data, this.onPositionUpdate}) : super(key: key);
 
   final int data;
 
   @override
   State<MonitorPage> createState() => _MonitorPageState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition() {
+    _activeCallback?.call();
+  }
 }
 
 class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
@@ -81,6 +98,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
+    MonitorPage.setActiveCallback(sendpositionUpdate);
+  }
+
+  void sendpositionUpdate() {
+    if (mounted) {
+      userLocation();
+      widget.onPositionUpdate?.call();
+    }
   }
 
   void _initTimeOffset() async {
@@ -929,6 +954,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
+    MonitorPage.clearActiveCallback();
     super.dispose();
   }
 

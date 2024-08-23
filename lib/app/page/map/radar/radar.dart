@@ -5,17 +5,36 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/need_location.dart';
 import 'package:dpip/widget/list/time_selector.dart';
 import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+typedef PositionUpdateCallback = void Function();
+
 class RadarMap extends StatefulWidget {
-  const RadarMap({super.key});
+  final Function()? onPositionUpdate;
+
+  const RadarMap({super.key, this.onPositionUpdate});
 
   @override
   State<RadarMap> createState() => _RadarMapState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition() {
+    _activeCallback?.call();
+  }
 }
 
 class _RadarMapState extends State<RadarMap> {
@@ -104,6 +123,25 @@ class _RadarMapState extends State<RadarMap> {
     await loadGPSImage(_mapController);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    RadarMap.setActiveCallback(sendpositionUpdate);
+  }
+
+  void sendpositionUpdate() {
+    if (mounted) {
+      start();
+      widget.onPositionUpdate?.call();
+    }
+  }
+
+  @override
+  void dispose() {
+    RadarMap.clearActiveCallback();
+    super.dispose();
+  }
+
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
@@ -154,14 +192,20 @@ class _RadarMapState extends State<RadarMap> {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
+
+    await _mapController.addSource(
+        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+
+    start();
+  }
+
+  void start() async {
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     if (isUserLocationValid) {
-      await _mapController.addSource(
-          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
       await _mapController.setGeoJsonSource(
         "markers-geojson",
         {
@@ -180,6 +224,10 @@ class _RadarMapState extends State<RadarMap> {
       );
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    }
+
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+      await showLocationDialog(context);
     }
 
     _addUserLocationMarker();
