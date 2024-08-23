@@ -582,16 +582,28 @@
   "@cancel": {
     "description": "「所在地」設定彈窗 → 取消"
   },
-  "weather_sunny": "晴",
-  "weather_partly_cloudy_day": "多雲時晴",
-  "weather_partly_cloudy_night": "",
-  "weather_cloud": "",
-  "weather_foggy": "",
-  "weather_rainy": "",
-  "weather_ac_unit": "",
-  "weather_weather_mix": "",
-  "weather_thunderstorm": "",
-  "weather_grain": "",
-  "weather_water": "",
-  "weather_snowing": ""
+  "sunny": "晴",
+  "@sunny": {
+    "description": "「所在地」設定彈窗 → 晴"
+  },
+  "partly_cloudy_day": "多雲時晴",
+  "@partly_cloudy_day": {
+    "description": "「所在地」設定彈窗 → 多雲時晴"
+  },
+  "cloudy": "多雲",
+  "@cloudy": {
+    "description": "「所在地」設定彈窗 → 多雲"
+  },
+  "overcast": "陰",
+  "@overcast": {
+    "description": "「所在地」設定彈窗 → 陰"
+  },
+  "foggy": "霧",
+  "@foggy": {
+    "description": "「所在地」設定彈窗 → 霧"
+  },
+  "rainy": "",
+  "@rainy": {
+    "description": "「所在地」設定彈窗 → rainy"
+  }
 }

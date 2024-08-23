@@ -83,7 +83,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: const Text(""),
+                child: Text(context.i18n.cancel),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -147,7 +147,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                       },
                     )
                   : FilledButton(
-                      child: Text(context.i18n.cancel),
+                      child: Text(context.i18n.again),
                       onPressed: () {
                         checkLocationPermission();
                         Navigator.pop(context);
