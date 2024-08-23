@@ -65,7 +65,10 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   void initState() {
     super.initState();
     Global.location.forEach((key, data) {
-      if (data.city == city && data.town == town) {
+      if (data.city == "服務區域外" || data.town == "服務區域外") {
+        region = "";
+        return;
+      } else if (data.city == city && data.town == town) {
         region = key;
       }
     });
