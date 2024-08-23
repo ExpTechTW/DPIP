@@ -225,8 +225,7 @@ class WeatherIcons {
   static String getWeatherContent(BuildContext context, String code) {
     Map<String, String> iconLabel = {
       '1000': context.i18n.weather_sunny,
-      'nightlight': context.i18n.weather_nightlight,
-      'partly_cloudy_day': context.i18n.weather_partly_cloudy_day,
+      '1003': context.i18n.weather_partly_cloudy_day,
       'partly_cloudy_night': context.i18n.weather_partly_cloudy_night,
       'cloudy': context.i18n.weather_cloud,
       'foggy': context.i18n.weather_foggy,

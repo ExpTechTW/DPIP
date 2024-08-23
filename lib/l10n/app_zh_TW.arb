@@ -582,9 +582,8 @@
   "@cancel": {
     "description": "「所在地」設定彈窗 → 取消"
   },
-  "weather_sunny": "",
-  "weather_nightlight": "",
-  "weather_partly_cloudy_day": "",
+  "weather_sunny": "晴",
+  "weather_partly_cloudy_day": "多雲時晴",
   "weather_partly_cloudy_night": "",
   "weather_cloud": "",
   "weather_foggy": "",
