@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/location/location.dart';
@@ -29,6 +30,12 @@ Future<void> getSavedLocation() async {
 
         SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
       }
+    } else {
+      Global.preference.setString("location-city", "服務區域外");
+      Global.preference.setString("location-town", "服務區域外");
+
+      SettingsLocationView.updatePosition("服務區域外", "服務區域外");
+      HomePage.updatePosition("服務區域外", "服務區域外");
     }
     return;
   } on PlatformException catch (e) {
