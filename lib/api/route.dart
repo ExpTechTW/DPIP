@@ -47,4 +47,6 @@ class Route {
   static Uri history() => Uri.parse("$onlyapi/v1/dpip/history/list");
   static Uri realtimeRegion(String region) => Uri.parse("$onlyapi/v1/dpip/realtime/$region");
   static Uri historyRegion(String region) => Uri.parse("$onlyapi/v1/dpip/history/$region");
+  static Uri support() => Uri.parse("$onlyapi/v1/dpip/support");
+  static Uri changelog() => Uri.parse("$onlyapi/v1/dpip/changelog");
 }

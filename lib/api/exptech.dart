@@ -368,4 +368,28 @@ class ExpTech {
 
     return jsonData.map((item) => History.fromJson(item)).toList();
   }
+
+  Future<Map<String, dynamic>> getSupport() async {
+    final requestUrl = Route.support();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    return jsonDecode(res.body);
+  }
+
+  Future<Map<String, dynamic>> getChangelog() async {
+    final requestUrl = Route.changelog();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    return jsonDecode(res.body);
+  }
 }
