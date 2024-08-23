@@ -27,11 +27,12 @@ class _MapPageState extends State<MapPage> {
   final monitor = Global.preference.getBool("monitor") ?? false;
 
   late final destinations = [
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.monitor_heart),
-      selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-      label: Text(context.i18n.monitor),
-    ),
+    if (monitor)
+      NavigationDrawerDestination(
+        icon: const Icon(Symbols.monitor_heart),
+        selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+        label: Text(context.i18n.monitor),
+      ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.radar_rounded),
       selectedIcon: const Icon(Symbols.radar_rounded, fill: 1),
@@ -100,17 +101,17 @@ class _MapPageState extends State<MapPage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          MonitorPage(data: 0),
-          RadarMap(),
-          RainMap(),
-          TemperatureMap(),
-          HumidityMap(),
-          PressureMap(),
-          WindMap(),
-          LightningMap(),
-          TyphoonMap(),
-          TsunamiMap(),
+        children: [
+          if (monitor) const MonitorPage(data: 0),
+          const RadarMap(),
+          const RainMap(),
+          const TemperatureMap(),
+          const HumidityMap(),
+          const PressureMap(),
+          const WindMap(),
+          const LightningMap(),
+          const TyphoonMap(),
+          const TsunamiMap(),
         ],
       ),
     );
