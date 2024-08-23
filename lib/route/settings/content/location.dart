@@ -15,6 +15,7 @@ import '../../../core/service.dart';
 import '../../location_selector/location_selector.dart';
 
 final stateSettingsLocationView = _SettingsLocationViewState();
+
 typedef PositionUpdateCallback = void Function(String?, String?);
 
 class SettingsLocationView extends StatefulWidget {
@@ -323,6 +324,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
 
     if (isAutoLocatingEnabled) {
+      Global.preference.setDouble("user-lat", 0.0);
+      Global.preference.setDouble("user-lon", 0.0);
       setState(() {
         isAutoLocatingEnabled = false;
       });

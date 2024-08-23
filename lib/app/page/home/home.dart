@@ -135,10 +135,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void start() {
     Global.location.forEach((key, data) {
-      if (data.city == "服務區域外" || data.town == "服務區域外") {
-        region = "";
-        return;
-      } else if (data.city == city && data.town == town) {
+      if (data.city == city && data.town == town) {
         region = key;
       }
     });
@@ -234,7 +231,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Icon(Symbols.pin_drop_rounded, color: context.colors.onSurfaceVariant),
                                       const SizedBox(width: 4),
                                       Text(
-                                        (city != "服務區域外" && town != "服務區域外") ? "$city$town" : "服務區域外",
+                                        (region != "") ? "$city$town" : "服務區域外",
                                         style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                                       ),
                                     ],
@@ -297,8 +294,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ],
                               ),
                               Text(
-                                WeatherIcons.getWeatherContent(context,
-                                    weatherData["realtime"]?["condition"].toString() ?? ""),
+                                WeatherIcons.getWeatherContent(
+                                    context, weatherData["realtime"]?["condition"].toString() ?? ""),
                                 style: TextStyle(
                                   fontSize: 20,
                                   color: context.colors.primary,

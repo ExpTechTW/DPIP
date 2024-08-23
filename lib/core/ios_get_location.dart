@@ -31,11 +31,8 @@ Future<void> getSavedLocation() async {
         SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
       }
     } else {
-      Global.preference.setString("location-city", "服務區域外");
-      Global.preference.setString("location-town", "服務區域外");
-
-      SettingsLocationView.updatePosition("服務區域外", "服務區域外");
-      HomePage.updatePosition("服務區域外", "服務區域外");
+      Global.preference.setDouble("user-lat", 0.0);
+      Global.preference.setDouble("user-lon", 0.0);
     }
     return;
   } on PlatformException catch (e) {
