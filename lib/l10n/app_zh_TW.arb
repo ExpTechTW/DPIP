@@ -512,5 +512,17 @@
   "unit_hpa": "單位：百帕 (hPa)",
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
+  },
+  "history": "歷史",
+  "@history": {
+    "description": "「歷史」頁面標題"
+  },
+  "historical_events": "3天內的歷史事件資訊",
+  "@history": {
+    "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
+  },
+  "no_historical_events": "沒有歷史事件資訊",
+  "@history": {
+    "description": "「歷史」路徑 → 沒有歷史事件資訊"
   }
 }
