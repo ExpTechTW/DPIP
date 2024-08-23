@@ -29,7 +29,7 @@ class Route {
   static Uri rts() => Uri.parse("$lb/v1/trem/rts");
   static Uri ntp() => Uri.parse("${lb.replaceAll("api", "")}ntp");
   static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
-  static Uri weatherRealtime(String postalCode) => Uri.parse("$onlyapi/v1/weather/realtime/$postalCode");
+  static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v1/weather/all/$postalCode");
   static Uri station() => Uri.parse("$api/v1/trem/station");
   static Uri location(String token, String lat, String lng) =>
       Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
@@ -45,4 +45,6 @@ class Route {
   static Uri lightning(String time) => Uri.parse("$onlyapi/v1/meteor/lightning/$time");
   static Uri realtime() => Uri.parse("$onlyapi/v1/dpip/realtime/list");
   static Uri history() => Uri.parse("$onlyapi/v1/dpip/history/list");
+  static Uri realtimeRegion(String region) => Uri.parse("$onlyapi/v1/dpip/realtime/$region");
+  static Uri historyRegion(String region) => Uri.parse("$onlyapi/v1/dpip/history/$region");
 }

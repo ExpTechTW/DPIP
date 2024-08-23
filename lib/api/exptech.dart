@@ -14,8 +14,7 @@ import 'package:dpip/model/weather/rain.dart';
 import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
-
-import '../model/history.dart';
+import 'package:dpip/model/history.dart';
 
 class ExpTech {
   String? apikey;
@@ -216,6 +215,20 @@ class ExpTech {
     return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
   }
 
+  Future<Map<String, dynamic>> getWeatherAll(String region) async {
+    final requestUrl = Route.weatherAll(region);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final jsonData = jsonDecode(res.body);
+
+    return jsonData;
+  }
+
   Future<List<String>> getRainList() async {
     final requestUrl = Route.rainList();
 
@@ -316,6 +329,34 @@ class ExpTech {
 
   Future<List<History>> getHistory() async {
     final requestUrl = Route.history();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<List<History>> getRealtimeRegion(String region) async {
+    final requestUrl = Route.realtimeRegion(region);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<List<History>> getHistoryRegion(String region) async {
+    final requestUrl = Route.historyRegion(region);
 
     var res = await get(requestUrl);
 

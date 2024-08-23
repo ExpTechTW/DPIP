@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
@@ -65,6 +66,11 @@ class _DpipState extends State<Dpip> {
             label: context.i18n.home,
           ),
           NavigationDestination(
+            icon: const Icon(Symbols.clock_loader_10_rounded),
+            selectedIcon: const Icon(Symbols.clock_loader_10_rounded, fill: 1),
+            label: "歷史",
+          ),
+          NavigationDestination(
             icon: const Icon(Symbols.map),
             selectedIcon: const Icon(Symbols.map, fill: 1),
             label: context.i18n.map,
@@ -93,6 +99,7 @@ class _DpipState extends State<Dpip> {
         physics: const NeverScrollableScrollPhysics(),
         children: const [
           HomePage(),
+          HistoryPage(),
           MapPage(),
           ReportListPage(),
           MePage(),

@@ -1,6 +1,7 @@
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/api/exptech.dart';
@@ -14,10 +15,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  List<History> historyList = [];
+  List<History> realtimeList = [];
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  Map<String, dynamic> weatherData = {};
+  List<Widget> weatherCard = [];
+  bool init = false;
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
@@ -45,15 +49,112 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   double headerHeight = 360;
   bool isAppBarVisible = false;
 
-  Future<void> refreshHistoryList() async {
-    final data = await ExpTech().getHistory();
-    setState(() => historyList = data);
+  Future<void> refreshRealtimeList() async {
+    final data = await ExpTech().getRealtimeRegion("711");
+    setState(() {
+      init = true;
+      realtimeList = data.reversed.toList();
+    });
+  }
+
+  String formatDateTime(String dateTimeString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      return '${dateTime.day.toString().padLeft(2, '0')}日${dateTime.hour.toString().padLeft(2, '0')}時';
+    } catch (e) {
+      return 'Invalid Date';
+    }
+  }
+
+  List<Map<String, dynamic>> getNextHours(List<dynamic> days) {
+    final now = DateTime.now();
+    final currentHour = now.hour;
+    List<Map<String, dynamic>> nextHours = [];
+
+    for (var day in days) {
+      for (var hour in day["hours"]) {
+        final hourTime = DateTime.parse(hour["time"]);
+        if (hourTime.isAfter(now) || (hourTime.hour == currentHour && hourTime.day == now.day)) {
+          nextHours.add(hour);
+          if (nextHours.length == 25) {
+            return nextHours;
+          }
+        }
+      }
+    }
+
+    return nextHours;
+  }
+
+  Future<void> refreshWeatherAll() async {
+    final data = await ExpTech().getWeatherAll("711");
+    final next15Hours = getNextHours(data["forecast"]["day"]);
+
+    for (var hour in next15Hours) {
+      weatherCard.add(Card(
+        elevation: 4,
+        surfaceTintColor: context.colors.surfaceTint,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                formatDateTime(hour["time"]),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: context.colors.primary,
+                ),
+              ),
+              Row(
+                children: [
+                  Text(
+                    "${(hour["heat"]?["c"]).round()}°",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: context.colors.onSurface,
+                    ),
+                  ),
+                  Text(
+                    "/${(hour["temp"]?["c"]).round()}°",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: context.colors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                "${hour["chance"]?["rain"] ?? "N/A"}%",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: context.theme.extendedColors.blue,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Icon(
+                Symbols.partly_cloudy_day_rounded,
+                fill: 1,
+                size: 36,
+                color: context.colors.onPrimaryContainer.withOpacity(0.75),
+              ),
+            ],
+          ),
+        ),
+      ));
+    }
+    setState(() {
+      weatherData = data;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    refreshHistoryList();
+    refreshWeatherAll();
+    refreshRealtimeList();
     double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
       if (scrollController.offset > 1e-5) {
@@ -83,7 +184,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: Stack(
         children: [
           RefreshIndicator(
-            onRefresh: refreshHistoryList,
+            onRefresh: refreshRealtimeList,
             child: ListView(
               padding: EdgeInsets.only(bottom: context.padding.bottom),
               controller: scrollController,
@@ -99,7 +200,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           context.colors.primaryContainer.withOpacity(0.16),
                           Colors.transparent
                         ],
-                        stops: [0.16, 0.6, 1],
+                        stops: const [0.16, 0.6, 1],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
@@ -145,7 +246,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        "27°",
+                                        "${weatherData["realtime"]?["temp"]?["c"].round() ?? "--"}°",
                                         style: TextStyle(
                                           fontSize: 68,
                                           fontWeight: FontWeight.w500,
@@ -165,14 +266,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
                                       Text(
-                                        "最高 30°",
+                                        "最高 ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["max"].round() ?? "--"}°",
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: context.colors.onSecondaryContainer.withOpacity(0.75),
                                         ),
                                       ),
                                       Text(
-                                        "最低 24°",
+                                        "最低 ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["min"].round() ?? "--"}°",
                                         style: TextStyle(
                                           fontSize: 16,
                                           color: context.colors.onSecondaryContainer.withOpacity(0.75),
@@ -198,7 +299,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "體感溫度: ˇ30°",
+                                "體感溫度: ${weatherData["realtime"]?["feel"]?["c"].round() ?? "--"}°",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: context.colors.onSurfaceVariant.withOpacity(0.75),
@@ -212,14 +313,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 ),
                               ),
                               Text(
-                                "相對濕度: 42%",
+                                "相對濕度: ${weatherData["realtime"]?["humidity"] ?? "- -"}%",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                 ),
                               ),
                               Text(
-                                "紫外線指數: 6（高量級）",
+                                "紫外線指數: ${weatherData["realtime"]?["uv"] ?? "- -"}",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: context.colors.onSurfaceVariant.withOpacity(0.75),
@@ -245,379 +346,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "9:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "30°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/27°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "30%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.partly_cloudy_day_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "10:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "30°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/28°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "30%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.partly_cloudy_day_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "11:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "31°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/28°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "35%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.sunny_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "12:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "32°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/29°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "40%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.sunny_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "13:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "32°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/29°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "50%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.partly_cloudy_day_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "14:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "32°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/28°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "65%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.cloudy_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Card(
-                        elevation: 4,
-                        surfaceTintColor: context.colors.surfaceTint,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "15:00",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.colors.primary,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    "30°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurface,
-                                    ),
-                                  ),
-                                  Text(
-                                    "/26°",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                "80%",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: context.theme.extendedColors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Icon(
-                                Symbols.rainy_rounded,
-                                fill: 1,
-                                size: 36,
-                                color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    children: [...weatherCard],
                   ),
                 ),
                 Padding(
@@ -629,18 +358,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 Builder(
                   builder: (context) {
-                    if (historyList.isEmpty) {
+                    if (realtimeList.isEmpty) {
+                      if (init) {
+                        return const Center(child: Text("目前沒有事件資訊"));
+                      }
                       return const Center(child: CircularProgressIndicator());
                     }
 
                     List<Widget> children = [];
 
-                    for (var i = 0, n = historyList.length; i < n; i++) {
-                      final current = historyList[i];
+                    for (var i = 0, n = realtimeList.length; i < n; i++) {
+                      final current = realtimeList[i];
                       var showDate = false;
 
                       if (i != 0) {
-                        final prev = historyList[i - 1];
+                        final prev = realtimeList[i - 1];
                         if (current.time.send.day != prev.time.send.day) {
                           showDate = true;
                         }
