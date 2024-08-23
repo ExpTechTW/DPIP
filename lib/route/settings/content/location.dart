@@ -76,7 +76,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         builder: (context) {
           return AlertDialog(
             icon: const Icon(Symbols.error),
-            title: Text(context.i18n.unable_obtain_notification_permissions),
+            title: Text(context.i18n.unable_notification),
             content: Text(
               "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
             ),
@@ -126,7 +126,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         builder: (context) {
           return AlertDialog(
             icon: const Icon(Symbols.error),
-            title: Text(context.i18n.unable_obtain_location_permissions),
+            title: Text(context.i18n.unable_location),
             content: Text(
               "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
             ),
