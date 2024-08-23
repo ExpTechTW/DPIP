@@ -22,7 +22,6 @@ class WeatherIcons {
   static final Map<String, Map<String, dynamic>> weatherCodeMap = {
     '1000': {
       'icon': {'day': 'sunny', 'night': 'nightlight'},
-      'content': 'Sunny',
     },
     '1003': {
       'icon': {'day': 'partly_cloudy_day', 'night': 'partly_cloudy_night'},
@@ -224,14 +223,8 @@ class WeatherIcons {
   }
 
   static String getWeatherContent(BuildContext context, String code) {
-    final weatherInfo = weatherCodeMap[code];
-    if (weatherInfo == null) {
-      return 'Unknown weather';
-    }
-    final contentKey = weatherInfo['contentKey'] as String;
-
     Map<String, String> iconLabel = {
-      'sunny': context.i18n.weather_sunny,
+      '1000': context.i18n.weather_sunny,
       'nightlight': context.i18n.weather_nightlight,
       'partly_cloudy_day': context.i18n.weather_partly_cloudy_day,
       'partly_cloudy_night': context.i18n.weather_partly_cloudy_night,
@@ -246,6 +239,6 @@ class WeatherIcons {
       'snowing': context.i18n.weather_snowing,
     };
 
-    return iconLabel[contentKey] ?? 'Unknown weather';
+    return iconLabel[code] ?? 'Unknown weather';
   }
 }
