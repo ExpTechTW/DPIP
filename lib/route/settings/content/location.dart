@@ -16,7 +16,7 @@ import '../../location_selector/location_selector.dart';
 
 final stateSettingsLocationView = _SettingsLocationViewState();
 
-typedef PositionUpdateCallback = void Function(String?, String?);
+typedef PositionUpdateCallback = void Function();
 
 class SettingsLocationView extends StatefulWidget {
   final Function(String?, String?)? onPositionUpdate;
@@ -36,8 +36,8 @@ class SettingsLocationView extends StatefulWidget {
     _activeCallback = null;
   }
 
-  static void updatePosition(String? city, String? town) {
-    _activeCallback?.call(city, town);
+  static void updatePosition() {
+    _activeCallback?.call();
   }
 }
 
@@ -409,12 +409,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     );
   }
 
-  void sendpositionUpdate(String? cityUpdate, String? townUpdate) {
+  void sendpositionUpdate() {
     if (mounted) {
-      setState(() {
-        city = cityUpdate;
-        town = townUpdate;
-      });
+      city = Global.preference.getString("location-city");
+      town = Global.preference.getString("location-town");
+      setState(() {});
       widget.onPositionUpdate?.call(city, town);
     }
   }

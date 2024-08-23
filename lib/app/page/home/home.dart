@@ -11,10 +11,10 @@ import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-typedef PositionUpdateCallback = void Function(String?, String?);
+typedef PositionUpdateCallback = void Function();
 
 class HomePage extends StatefulWidget {
-  final Function(String?, String?)? onPositionUpdate;
+  final Function()? onPositionUpdate;
 
   const HomePage({Key? key, this.onPositionUpdate}) : super(key: key);
 
@@ -31,8 +31,8 @@ class HomePage extends StatefulWidget {
     _activeCallback = null;
   }
 
-  static void updatePosition(String? city, String? town) {
-    _activeCallback?.call(city, town);
+  static void updatePosition() {
+    _activeCallback?.call();
   }
 }
 
@@ -41,8 +41,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Map<String, dynamic> weatherData = {};
   List<Widget> weatherCard = [];
   bool init = false;
-  String city = Global.preference.getString("location-city") ?? "";
-  String town = Global.preference.getString("location-town") ?? "";
+  String city = "";
+  String town = "";
   String region = "";
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
@@ -134,6 +134,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void start() {
+    city = Global.preference.getString("location-city") ?? "";
+    town = Global.preference.getString("location-town") ?? "";
     Global.location.forEach((key, data) {
       if (data.city == city && data.town == town) {
         region = key;
@@ -161,14 +163,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
-  void sendpositionUpdate(String? cityUpdate, String? townUpdate) {
+  void sendpositionUpdate() {
     if (mounted) {
-      setState(() {
-        city = cityUpdate!;
-        town = townUpdate!;
-        start();
-      });
-      widget.onPositionUpdate?.call(city, town);
+      start();
+      setState(() {});
+      widget.onPositionUpdate?.call();
     }
   }
 
