@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/global.dart';
@@ -74,6 +75,7 @@ void androidSendPositionlisten() {
           Global.preference.setString("location-town", locationInfo.town);
 
           SettingsLocationView.updatePosition(locationInfo.city, locationInfo.town);
+          HomePage.updatePosition(locationInfo.city, locationInfo.town);
         }
       }
 
