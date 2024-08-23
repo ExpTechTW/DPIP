@@ -537,6 +537,15 @@
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
+  "eew_no_x": "第 {serial} 報",
+  "@eew_no_x": {
+    "description": "「強震監視器」路徑 → 資訊托盤 → 第 {serial} 報",
+    "placeholders": {
+      "serial": {
+        "type": "String"
+      }
+    }
+  },
   "lightning": "閃電",
   "@lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電"

@@ -502,7 +502,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         ),
                       ),
                       Text(
-                        "第 ${_eewLastInfo[eew.id]?.serial} 報",
+                        context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ''),
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurfaceVariant,
