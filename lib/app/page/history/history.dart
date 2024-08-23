@@ -109,7 +109,8 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                    child: Text(context.i18n.historical_events,
+                    child: Text(
+                      context.i18n.historical_events,
                       style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                     ),
                   ),
