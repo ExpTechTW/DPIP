@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/util/map_utils.dart';
@@ -5,6 +7,8 @@ import 'package:dpip/widget/list/typhoon_time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 
 class TyphoonMap extends StatefulWidget {
   const TyphoonMap({super.key});
@@ -22,6 +26,9 @@ class _TyphoonMapState extends State<TyphoonMap> {
   List<String> layerList = [];
   List<String> typhoon_name_list = [];
   String selectedTimestamp = '';
+  double userLat = 0;
+  double userLon = 0;
+  bool isUserLocationValid = false;
 
   void _initMap(MapLibreMapController controller) {
     _mapController = controller;
@@ -35,9 +42,70 @@ class _TyphoonMapState extends State<TyphoonMap> {
         await _loadTyphoonData(selectedTimestamp);
       }
       selectedTimestamp = typhoonList.last;
+
+      if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+        await getSavedLocation();
+      }
+      userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+      userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+      isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+      await loadGPSImage(_mapController);
+
+      if (isUserLocationValid) {
+        await _mapController.addSource(
+            "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+        await _mapController.setGeoJsonSource(
+          "markers-geojson",
+          {
+            "type": "FeatureCollection",
+            "features": [
+              {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                  "coordinates": [userLon, userLat],
+                  "type": "Point"
+                }
+              }
+            ],
+          },
+        );
+        // final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+        // await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+      }
+
+      await _addUserLocationMarker();
+
       setState(() {});
     } catch (e) {
       print('Error loading typhoon list: $e');
+    }
+  }
+
+  Future<void> _addUserLocationMarker() async {
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
     }
   }
 
