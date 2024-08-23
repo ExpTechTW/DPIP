@@ -463,11 +463,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     ),
                     TextButton(
                       child: Text(context.i18n.settings),
-                      onPressed: () async {
-                        final status = await Permission.locationAlways.request();
-                        if (status.isPermanentlyDenied) {
-                          openAppSettings();
-                        }
+                      onPressed: () {
+                        openAppSettings();
                       },
                     ),
                   ]),
