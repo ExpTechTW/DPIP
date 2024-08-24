@@ -67,13 +67,12 @@ class _PermissionPageState extends State<PermissionPage> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.info_outline, color: context.theme.primaryColor),
+                                  const Icon(Icons.info_outline),
                                   const SizedBox(width: 10),
                                   Text(
                                     "所需的資訊和權限列表：",
                                     style: context.theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: context.theme.primaryColor,
                                     ),
                                   ),
                                 ],
