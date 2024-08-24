@@ -49,7 +49,7 @@ String _getLocalizedType(String type) {
 
 Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
       color: _getTypeColor(entry.type).withOpacity(0.1),
       borderRadius: BorderRadius.circular(10),
@@ -57,7 +57,7 @@ Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
     ),
     child: Text(
       _getLocalizedType(entry.type),
-      style: context.theme.textTheme.bodyMedium?.copyWith(
+      style: context.theme.textTheme.bodySmall?.copyWith(
         color: _getTypeColor(entry.type),
         fontWeight: FontWeight.bold,
       ),
@@ -159,10 +159,10 @@ class ChangelogCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const ChangelogCard({
-    Key? key,
+    super.key,
     required this.entry,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -174,12 +174,14 @@ class ChangelogCard extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              _buildTypeChip(context, entry),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'v${entry.version}',
@@ -188,8 +190,12 @@ class ChangelogCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              _buildTypeChip(context, entry),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: context.theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+              ),
             ],
           ),
         ),

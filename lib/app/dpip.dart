@@ -10,6 +10,7 @@ import "package:dpip/core/fcm.dart";
 import "package:dpip/core/notify.dart";
 import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
+import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
 import "package:dpip/route/update_required/update_required.dart";
 import "package:dpip/route/welcome/about.dart";
@@ -153,6 +154,43 @@ class _DpipState extends State<Dpip> {
                 );
               },
             );
+          } else {
+            var data = await ExpTech().getAnnouncement();
+            if (data.last.show && Global.preference.getString("announcement") != data.last.time.toString()) {
+              Global.preference.setString("announcement", data.last.time.toString());
+              await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) {
+                  return AlertDialog(
+                    icon: const Icon(Symbols.announcement),
+                    title: const Text("公告"),
+                    content: const Text(
+                      "有新的公告，要前往查看嗎？",
+                    ),
+                    actionsAlignment: MainAxisAlignment.spaceBetween,
+                    actions: [
+                      TextButton(
+                        child: const Text("稍後再說"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      TextButton(
+                        child: const Text("前往查看"),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AnnouncementPage()),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
           }
           fcmInit();
           notifyInit();
