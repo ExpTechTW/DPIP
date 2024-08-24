@@ -114,7 +114,7 @@ class _DpipState extends State<Dpip> {
           if (mounted) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AboutPage()),
+              MaterialPageRoute(builder: (context) => const AboutPage()),
             );
           }
         } else {
