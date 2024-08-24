@@ -199,8 +199,8 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
                 forInfoDictionaryKey: "CFBundleShortVersionString") as? String
             ?? "Unknown"
 
-        let deviceIdentifier = UIDevice.current.identifierForVendor?.uuidString ?? ""
-        let urlString = "https://api-1.exptech.dev/api/v1/notify/location/\(appVersion)/1/\(latitude),\(longitude)/\(token)/\(deviceIdentifier)"
+        let urlString =
+            "https://api-1.exptech.dev/api/v1/notify/location/\(appVersion)/1/\(latitude),\(longitude)/\(token)"
         print(urlString)
         guard let url = URL(string: urlString) else { return }
         UserDefaults.standard.set(latitude, forKey: "user-lat")

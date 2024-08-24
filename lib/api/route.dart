@@ -2,7 +2,6 @@ import "dart:io";
 import "dart:math";
 
 import "package:dpip/global.dart";
-import "package:platform_device_id_plus/platform_device_id.dart";
 
 class Route {
   static String get api => baseApi();
@@ -23,10 +22,6 @@ class Route {
     return "https://lb-$i.exptech.dev/api";
   }
 
-  static Future<String> getDeviceIdentifier() async {
-    return await PlatformDeviceId.getDeviceId ?? "";
-  }
-
   static Uri reportList({int? limit = 50, int? page = 1}) => Uri.parse("$api/v2/eq/report?limit=$limit&page=$page");
   static Uri report(String reportId) => Uri.parse("$api/v2/eq/report/$reportId");
   static Uri tsunamiList() => Uri.parse("$onlyapi/v1/tsunami/list");
@@ -36,12 +31,7 @@ class Route {
   static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
   static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v1/weather/all/$postalCode");
   static Uri station() => Uri.parse("$api/v1/trem/station");
-  static Future<Uri> location(String token, String lat, String lng) async {
-    String identifier = await getDeviceIdentifier();
-    return Uri.parse(
-        "$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token/$identifier");
-  }
-
+  static Uri location(String token, String lat, String lng) => Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
   static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
   static Uri radarList() => Uri.parse("$onlyapi/v1/tiles/radar/list");
   static Uri weatherList() => Uri.parse("$onlyapi/v1/meteor/weather/list");
