@@ -1,31 +1,37 @@
-import "package:dpip/core/fcm.dart";
-import "package:dpip/core/notify.dart";
-import "package:dpip/core/service.dart";
-import "package:dpip/route/welcome/tos.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:flutter/material.dart";
-import "package:permission_handler/permission_handler.dart";
+import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PermissionPage extends StatefulWidget {
-  const PermissionPage({super.key});
+  const PermissionPage({Key? key}) : super(key: key);
 
   @override
   State<PermissionPage> createState() => _PermissionPageState();
 }
 
 class _PermissionPageState extends State<PermissionPage> {
-  ScrollController controller = ScrollController();
-  bool isEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  final List<PermissionItem> permissions = [
+    PermissionItem(
+      icon: Icons.notifications,
+      text: 'Notification',
+      description: 'Allow notifications for important updates',
+      color: Colors.orange,
+      permission: Permission.notification,
+    ),
+    PermissionItem(
+      icon: Icons.location_on,
+      text: 'Location',
+      description: 'Enable location-based services',
+      color: Colors.blue,
+      permission: Permission.location,
+    ),
+    PermissionItem(
+      icon: Icons.storage,
+      text: 'Storage',
+      description: 'Allow saving images and data visualization',
+      color: Colors.green,
+      permission: Permission.storage,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,96 +49,41 @@ class _PermissionPageState extends State<PermissionPage> {
                       Icon(
                         Icons.security,
                         size: 80,
-                        color: context.colors.primary,
+                        color: Theme.of(context).primaryColor,
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        context.i18n.privacy_policy,
-                        style: context.theme.textTheme.headlineLarge,
+                        'Privacy Policy',
+                        style: Theme.of(context).textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          context.i18n.privacy_commitment,
-                          style: context.theme.textTheme.bodyMedium,
-                        ),
+                      Text(
+                        'We are committed to protecting your privacy. Please review and grant the following permissions to use all features of the app.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
                       ),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    color: context.colors.primary,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    context.i18n.required_info_permissions,
-                                    style: context.theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: context.colors.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              PermissionItem(
-                                icon: Icons.notifications,
-                                text: context.i18n.notification,
-                                description: context.i18n.notification_service_description,
-                                color: Colors.orange,
-                                onTap: () async {
-                                  final status = await requestNotificationPermission();
-                                  if (status.isGranted) {
-                                    fcmInit();
-                                    notifyInit();
-                                    initBackgroundService();
-                                    setState(() => isEnabled = true);
-                                  }
-                                },
-                              ),
-                              const SizedBox(height: 20),
-                              PermissionItem(
-                                icon: Icons.location_on,
-                                text: context.i18n.settings_position,
-                                description: context.i18n.location_based_service,
-                                color: Colors.blue,
-                              ),
-                              const SizedBox(height: 16),
-                              PermissionItem(
-                                icon: Icons.storage,
-                                text: context.i18n.image_save,
-                                description: context.i18n.data_visualization_storage,
-                                color: Colors.green,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      const SizedBox(height: 24),
+                      ...permissions.map(_buildPermissionCard).toList(),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: isEnabled
-                    ? () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const TOSPage()),
-                        );
-                      }
-                    : null,
+                onPressed: () async {
+                  if (await _areAllPermissionsGranted()) {
+                    // Navigate to next page
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please grant all permissions to continue')),
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: Text(context.i18n.next_step),
+                child: const Text('Continue'),
               ),
             ],
           ),
@@ -140,61 +91,71 @@ class _PermissionPageState extends State<PermissionPage> {
       ),
     );
   }
+
+  Widget _buildPermissionCard(PermissionItem item) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: item.color.withOpacity(0.1),
+          child: Icon(item.icon, color: item.color),
+        ),
+        title: Text(item.text),
+        subtitle: Text(item.description),
+        trailing: _buildPermissionSwitch(item),
+      ),
+    );
+  }
+
+  Widget _buildPermissionSwitch(PermissionItem item) {
+    return FutureBuilder<bool>(
+      future: item.permission.isGranted,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+        final isGranted = snapshot.data ?? false;
+        return Switch(
+          value: isGranted,
+          onChanged: (value) async {
+            if (value) {
+              final status = await item.permission.request();
+              setState(() {
+                item.isGranted = status.isGranted;
+              });
+            } else {
+              openAppSettings();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Future<bool> _areAllPermissionsGranted() async {
+    for (var item in permissions) {
+      if (!(await item.permission.isGranted)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
-class PermissionItem extends StatelessWidget {
+class PermissionItem {
   final IconData icon;
   final String text;
   final String description;
   final Color color;
-  final VoidCallback? onTap;
+  final Permission permission;
+  bool isGranted;
 
-  const PermissionItem({
-    super.key,
+  PermissionItem({
     required this.icon,
     required this.text,
     required this.description,
     required this.color,
-    this.onTap,
+    required this.permission,
+    this.isGranted = false,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    text,
-                    style: context.theme.textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: context.theme.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
