@@ -1,3 +1,5 @@
+import "dart:async";
+
 import "package:dpip/app/dpip.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
@@ -14,16 +16,22 @@ class TOSPage extends StatefulWidget {
 class _TOSPageState extends State<TOSPage> {
   ScrollController controller = ScrollController();
   bool isEnabled = false;
+  double progress = 0;
 
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
-      if (bottom && !isEnabled) {
-        setState(() => isEnabled = true);
-      }
-    });
+
+    if (controller.position.maxScrollExtent > 0) {
+      controller.addListener(() {
+        final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
+        if (bottom && !isEnabled) {
+          setState(() => isEnabled = true);
+        }
+      });
+    } else {
+      setState(()=>isEnabled = true);
+    }
   }
 
   @override
@@ -37,7 +45,7 @@ class _TOSPageState extends State<TOSPage> {
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -66,7 +74,10 @@ class _TOSPageState extends State<TOSPage> {
                         );
                       }
                     : null,
-                child: Text(context.i18n.agree, style: TextStyle(fontSize: 16, color: context.colors.onPrimary)),
+                child: Text(context.i18n.agree),
+                style: ButtonStyle(
+                  shape: 
+                ),
               ),
             ],
           ),
@@ -97,7 +108,7 @@ class _TOSPageState extends State<TOSPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Text(
                 context.i18n.trem_service_description,
                 style: context.theme.textTheme.bodyLarge,
@@ -164,23 +175,6 @@ class _TOSPageState extends State<TOSPage> {
               ),
               child: Text(
                 context.i18n.trem_net_deployment,
-                style: context.theme.textTheme.bodyLarge,
-              ),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height + 1,
-              child: const Column(
-                children: [],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.colors.surfaceContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                "閱讀到底了請選擇。",
                 style: context.theme.textTheme.bodyLarge,
               ),
             ),
