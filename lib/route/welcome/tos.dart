@@ -12,31 +12,26 @@ class TOSPage extends StatefulWidget {
 }
 
 class _TOSPageState extends State<TOSPage> {
-  late ScrollController controller;
-  bool isEnabled = false;
+  final ScrollController controller = ScrollController();
+  bool _isEnabled = false;
   double progress = 0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (controller.position.maxScrollExtent > 0) {
-        controller.addListener(() {
-          final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
-          if (bottom && !isEnabled) {
-            setState(() => isEnabled = true);
-          }
-        });
-      } else {
-        setState(() => isEnabled = true);
-      }
-    });
+    controller.addListener(_scrollListener);
+    WidgetsBinding.instance.addPostFrameCallback(_checkInitialScroll);
+  }
+
+  void _checkInitialScroll(_) {
+    if (controller.position.maxScrollExtent == 0) {
+      setState(() => _isEnabled = true);
+    }
   }
 
   void _scrollListener() {
-    final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
-    if (bottom && !isEnabled) {
-      setState(() => isEnabled = true);
+    if (!_isEnabled && controller.offset >= controller.position.maxScrollExtent) {
+      setState(() => _isEnabled = true);
     }
   }
 
@@ -71,7 +66,7 @@ class _TOSPageState extends State<TOSPage> {
                 ),
               ),
               FilledButton(
-                onPressed: isEnabled
+                onPressed: _isEnabled
                     ? () {
                         Global.preference.setBool("monitor", true);
                         Global.preference.setBool("welcome-1.0.0", true);
