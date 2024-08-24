@@ -221,25 +221,16 @@ class _PermissionPageState extends State<PermissionPage> with WidgetsBindingObse
       PermissionStatus status;
       if (value) {
         status = await item.permission.request();
+        _showPermanentlyDeniedDialog(item);
       } else {
         status = await item.permission.status;
         if (status.isGranted) {
           await openAppSettings();
-          // 等待一段時間，讓用戶有機會更改設置
-          await Future.delayed(const Duration(seconds: 2));
-          status = await item.permission.status;
         }
       }
 
-      if (status.isPermanentlyDenied) {
-        _showPermanentlyDeniedDialog(item);
-      }
-
-      setState(() {
-        item.isGranted = status.isGranted;
-      });
+      item.isGranted = status.isGranted;
     } catch (e) {
-      print('Error handling permission change: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to change permission: ${item.text}')),
       );
@@ -254,15 +245,15 @@ class _PermissionPageState extends State<PermissionPage> with WidgetsBindingObse
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text('${item.text} Permission Required'),
-        content: Text('This permission is required for the app to function properly. Please enable it in your device settings.'),
+        title: Text('權限請求'),
+        content: Text('需要使用者手動到設定開啟相關權限。'),
         actions: [
           TextButton(
-            child: const Text('Cancel'),
+            child: const Text('取消'),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('Open Settings'),
+            child: const Text('設定'),
             onPressed: () {
               openAppSettings();
               Navigator.of(context).pop();
