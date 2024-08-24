@@ -6,6 +6,9 @@ import "package:dpip/app/page/home/home.dart";
 import "package:dpip/app/page/map/map.dart";
 import "package:dpip/app/page/me/me.dart";
 import "package:dpip/app/page/more/more.dart";
+import "package:dpip/core/fcm.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/changelog/changelog.dart";
 import "package:dpip/route/update_required/update_required.dart";
@@ -107,12 +110,11 @@ class _DpipState extends State<Dpip> {
         }
       } else {
         if (Global.preference.getBool("welcome-1.0.0") == null) {
-          Global.preference.setBool("welcome-1.0.0", true);
           Global.preference.setString("changelog", Global.packageInfo.version);
           if (mounted) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AboutPage()),
+              MaterialPageRoute(builder: (context) => const AboutPage()),
             );
           }
         } else {
@@ -151,6 +153,9 @@ class _DpipState extends State<Dpip> {
               },
             );
           }
+          fcmInit();
+          notifyInit();
+          initBackgroundService();
         }
       }
     } catch (e) {

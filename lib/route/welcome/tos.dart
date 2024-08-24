@@ -1,3 +1,6 @@
+import "package:dpip/core/fcm.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
@@ -54,6 +57,10 @@ class _TOSPageState extends State<TOSPage> {
                 onPressed: isEnabled
                     ? () {
                         Global.preference.setBool("monitor", true);
+                        Global.preference.setBool("welcome-1.0.0", true);
+                        fcmInit();
+                        notifyInit();
+                        initBackgroundService();
                         Navigator.pop(context);
                       }
                     : null,

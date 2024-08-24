@@ -107,33 +107,22 @@ class LocationService {
 
   @pragma("vm:entry-point")
   Future<GetLocationResult> androidGetLocation() async {
-    int lastLocationUpdate =
-        Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
-    int now = DateTime.now().toUtc().millisecondsSinceEpoch;
-    int nowtemp = now - lastLocationUpdate;
     bool positionchange = false;
     final positionlattemp = Global.preference.getDouble("user-lat") ?? 0.0;
     final positionlontemp = Global.preference.getDouble("user-lon") ?? 0.0;
-    final positioncountrytemp = Global.preference.getString("user-country") ?? "";
-    GetLocationPosition positionlast = GetLocationPosition(positionlattemp, positionlontemp, positioncountrytemp);
 
-    if (nowtemp > 300000 || nowtemp == 0) {
-      Global.preference.setInt("last-location-update", now);
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-      LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
-      positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
-      double distance =
-          Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
-      if (distance >= 250 || nowtemp == 0) {
-        Global.preference.setDouble("user-lat", position.latitude);
-        Global.preference.setDouble("user-lon", position.longitude);
-        positionchange = true;
-        print("距離: $distance 更新位置");
-      } else {
-        print("距離: $distance 不更新位置");
-      }
+    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
+    LocationResult country = await getLatLngLocation(position.latitude, position.longitude);
+    GetLocationPosition positionlast = GetLocationPosition(position.latitude, position.longitude, country.cityTown);
+    double distance =
+        Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+    if (distance >= 250) {
+      Global.preference.setDouble("user-lat", position.latitude);
+      Global.preference.setDouble("user-lon", position.longitude);
+      positionchange = true;
+      print("距離: $distance 更新位置");
     } else {
-      print("間距: $nowtemp 不更新位置");
+      print("距離: $distance 不更新位置");
     }
 
     return GetLocationResult(positionlast, positionchange);

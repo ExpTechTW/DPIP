@@ -1,7 +1,4 @@
 import "package:dpip/app/dpip.dart";
-import "package:dpip/core/fcm.dart";
-import "package:dpip/core/notify.dart";
-import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/string.dart";
 import "package:dynamic_color/dynamic_color.dart";
@@ -75,9 +72,6 @@ class DpipAppState extends State<DpipApp> {
   @override
   void initState() {
     super.initState();
-    fcmInit();
-    notifyInit();
-    initBackgroundService();
   }
 
   @override
