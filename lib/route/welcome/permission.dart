@@ -65,7 +65,7 @@ class _PermissionPageState extends State<PermissionPage> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
-                      ...permissions.map(_buildPermissionCard).toList(),
+                      ...permissions.map(_buildPermissionCard),
                     ],
                   ),
                 ),
