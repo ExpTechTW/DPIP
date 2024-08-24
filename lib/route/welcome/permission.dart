@@ -221,7 +221,9 @@ class _PermissionPageState extends State<PermissionPage> with WidgetsBindingObse
       PermissionStatus status;
       if (value) {
         status = await item.permission.request();
-        _showPermanentlyDeniedDialog(item);
+        if (status.isPermanentlyDenied) {
+          _showPermanentlyDeniedDialog(item);
+        }
       } else {
         status = await item.permission.status;
         if (status.isGranted) {
