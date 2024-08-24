@@ -47,7 +47,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        "隱私權聲明",
+                        context.i18n.privacy_policy,
                         style: context.theme.textTheme.headlineLarge,
                         textAlign: TextAlign.center,
                       ),
@@ -55,7 +55,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
+                          context.i18n.privacy_commitment,
                           style: context.theme.textTheme.bodyMedium,
                         ),
                       ),
@@ -70,7 +70,7 @@ class _PermissionPageState extends State<PermissionPage> {
                                   const Icon(Icons.info_outline),
                                   const SizedBox(width: 10),
                                   Text(
-                                    "所需的資訊和權限列表：",
+                                    context.i18n.required_info_permissions,
                                     style: context.theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -80,9 +80,9 @@ class _PermissionPageState extends State<PermissionPage> {
                               const SizedBox(height: 20),
                               PermissionItem(
                                 icon: Icons.notifications,
-                                text: "通知",
-                                description: "用於提供基於FCM&通知的服務",
-                                color: Colors.orange,
+                                text: context.i18n.notification,
+                                description: context.i18n.notification_service_description,
+                                color: Colors.yellow,
                                 onTap: () async {
                                   final status = await requestNotificationPermission();
                                   if (status.isGranted) {
@@ -94,17 +94,17 @@ class _PermissionPageState extends State<PermissionPage> {
                                 },
                               ),
                               const SizedBox(height: 20),
-                              const PermissionItem(
+                              PermissionItem(
                                 icon: Icons.location_on,
-                                text: "位置",
-                                description: "用於提供基於位置的服務",
+                                text: context.i18n.settings_position,
+                                description: context.i18n.location_based_service,
                                 color: Colors.blue,
                               ),
                               const SizedBox(height: 16),
-                              const PermissionItem(
+                              PermissionItem(
                                 icon: Icons.storage,
-                                text: "儲存",
-                                description: "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
+                                text: context.i18n.image_save,
+                                description: context.i18n.data_visualization_storage,
                                 color: Colors.green,
                               ),
                             ],
@@ -128,7 +128,7 @@ class _PermissionPageState extends State<PermissionPage> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text("下一步"),
+                child: Text(context.i18n.next_step),
               ),
             ],
           ),

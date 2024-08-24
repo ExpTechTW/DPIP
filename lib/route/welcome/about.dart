@@ -22,7 +22,7 @@ class AboutPage extends StatelessWidget {
                         Image.asset("assets/DPIP.png", width: 120, height: 120),
                         const SizedBox(height: 32),
                         Text(
-                          "歡迎使用 DPIP",
+                          context.i18n.welcome_message,
                           style: context.theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: context.theme.primaryColor,
@@ -38,7 +38,7 @@ class AboutPage extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          "防災資訊平台",
+                          context.i18n.disaster_info_platform,
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.theme.primaryColor.withOpacity(0.7),
                           ),
@@ -51,9 +51,9 @@ class AboutPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: EdgeInsets.all(16.0),
                             child: Text(
-                              "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+                              context.i18n.dpip_description,
                               style: context.theme.textTheme.bodyMedium,
                               textAlign: TextAlign.left,
                             ),
@@ -80,7 +80,7 @@ class AboutPage extends StatelessWidget {
                     ),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text("下一步"),
+                  child: Text(context.i18n.next_step),
                 ),
               ),
             ],
