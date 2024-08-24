@@ -81,6 +81,8 @@ void androidSendPositionlisten() {
           MonitorPage.updatePosition();
         }
       } else {
+        Global.preference.remove("location-city");
+        Global.preference.remove("location-town");
         Global.preference.setDouble("user-lat", 0.0);
         Global.preference.setDouble("user-lon", 0.0);
         SettingsLocationView.updatePosition();
