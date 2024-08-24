@@ -2,23 +2,23 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class TimeSelector extends StatefulWidget {
+class RainTimeSelector extends StatefulWidget {
   final Function(String, String) onSelectionChanged;
   final Function() onTimeExpanded;
   final List<String> timeList;
 
-  const TimeSelector({
-    Key? key,
+  const RainTimeSelector({
+    super.key,
     required this.onSelectionChanged,
     required this.onTimeExpanded,
     required this.timeList,
-  }) : super(key: key);
+  });
 
   @override
-  _TimeSelectorState createState() => _TimeSelectorState();
+  State<RainTimeSelector> createState() => _RainTimeSelectorState();
 }
 
-class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {
+class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late String _selectedInterval;
   late ScrollController _timeScrollController;

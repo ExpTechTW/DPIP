@@ -1,5 +1,6 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/route/changelog/update_card.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -52,9 +53,9 @@ class ChangelogPage extends StatelessWidget {
                           return Markdown(
                             data: snapshot.data ?? '',
                             styleSheet: MarkdownStyleSheet(
-                              h1: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                              h2: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                              p: Theme.of(context).textTheme.bodyMedium,
+                              h1: context.theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
+                              h2: context.theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
+                              p: context.theme.textTheme.bodyMedium,
                             ),
                           );
                         }

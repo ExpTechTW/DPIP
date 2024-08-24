@@ -431,7 +431,7 @@ class _RainMapState extends State<RainMap> {
             left: 0,
             right: 0,
             bottom: 2,
-            child: TimeSelector(
+            child: RainTimeSelector(
               timeList: rainTimeList,
               onTimeExpanded: () {
                 _showLegend = false;

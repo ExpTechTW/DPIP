@@ -22,7 +22,7 @@ typedef PositionUpdateCallback = void Function();
 class HomePage extends StatefulWidget {
   final Function()? onPositionUpdate;
 
-  const HomePage({Key? key, this.onPositionUpdate}) : super(key: key);
+  const HomePage({super.key, this.onPositionUpdate});
 
   @override
   State<HomePage> createState() => _HomePageState();

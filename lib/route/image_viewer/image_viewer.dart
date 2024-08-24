@@ -89,6 +89,8 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
         name: widget.imageName,
       );
 
+      if (!mounted) return;
+
       if (!result["isSuccess"]) {
         throw Exception(result["errorMessage"]);
       }
@@ -186,7 +188,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     icon: const Icon(Symbols.close_rounded),
                     style: ButtonStyle(
                       foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
-                      backgroundColor: WidgetStateProperty.all(context.colors.surfaceVariant.withOpacity(0.8)),
+                      backgroundColor: WidgetStateProperty.all(context.colors.surfaceContainerHighest.withOpacity(0.8)),
                     ),
                     onPressed: () {
                       Navigator.maybePop(context);
@@ -212,9 +214,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     label: Text(context.i18n.image_save),
                     style: ButtonStyle(
                       foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
-                      // FIXME: workaround waiting for upstream PR to merge
-                      // https://github.com/material-foundation/flutter-packages/pull/599
-                      backgroundColor: WidgetStatePropertyAll(context.colors.surfaceVariant.withOpacity(0.8)),
+                      backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),
                     ),
                     onPressed: isDownloading
                         ? null

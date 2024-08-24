@@ -78,7 +78,8 @@ class ReportSheetContent extends StatelessWidget {
               avatar: const Icon(Symbols.replay),
               label: Text(context.i18n.report_replay),
               onPressed: () {
-                Navigator.of(context).push(
+                Navigator.push(
+                  context,
                   MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
                 );
               },

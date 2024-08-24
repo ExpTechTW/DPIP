@@ -21,7 +21,7 @@ typedef PositionUpdateCallback = void Function();
 class SettingsLocationView extends StatefulWidget {
   final Function(String?, String?)? onPositionUpdate;
 
-  const SettingsLocationView({Key? key, this.onPositionUpdate}) : super(key: key);
+  const SettingsLocationView({super.key, this.onPositionUpdate});
 
   @override
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
@@ -221,49 +221,47 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     if (Platform.isIOS) return true;
     try {
       bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
-      if (isAvailable == true) {
-        bool? status = await Autostarter.checkAutoStartState();
-        if (status != null) {
-          if (status == false) {
-            String contentText = (num == 0)
-                ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
-                : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。";
-            return await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      icon: const Icon(Symbols.my_location),
-                      title: const Text("自啟動權限"),
-                      content: Text(contentText),
-                      actionsAlignment: MainAxisAlignment.spaceBetween,
-                      actions: [
-                        TextButton(
-                          child: const Text("取消"),
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                          },
-                        ),
-                        FilledButton(
-                          child: const Text("確定"),
-                          onPressed: () async {
-                            await Autostarter.getAutoStartPermission(newTask: true);
-                            Navigator.pop(context, false);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ) ??
-                false;
-          } else {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      } else {
-        return true;
-      }
+      if (isAvailable == null || !isAvailable) return true;
+
+      bool? status = await Autostarter.checkAutoStartState();
+      if (status == null) return true;
+      if (status) return status;
+
+      if (!mounted) return true;
+
+      String contentText = (num == 0)
+          ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
+          : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。";
+
+      return await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                icon: const Icon(Symbols.my_location),
+                title: const Text("自啟動權限"),
+                content: Text(contentText),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: const Text("取消"),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  FilledButton(
+                    child: const Text("確定"),
+                    onPressed: () async {
+                      await Autostarter.getAutoStartPermission(newTask: true);
+
+                      if (!context.mounted) return;
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
     } catch (err) {
       return false;
     }
@@ -272,41 +270,41 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Future<bool> androidCheckBatteryOptimizationPermission(int num) async {
     if (Platform.isIOS) return true;
     try {
-      bool? isAvailable = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
-      if (isAvailable == false) {
-        String contentText = (num == 0)
-            ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
-            : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。";
-        return await showDialog<bool>(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  icon: const Icon(Symbols.my_location),
-                  title: const Text("省電策略"),
-                  content: Text(contentText),
-                  actionsAlignment: MainAxisAlignment.spaceBetween,
-                  actions: [
-                    TextButton(
-                      child: const Text("取消"),
-                      onPressed: () {
-                        Navigator.pop(context, false);
-                      },
-                    ),
-                    FilledButton(
-                      child: const Text("確定"),
-                      onPressed: () async {
-                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                        Navigator.pop(context, false);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ) ??
-            false;
-      } else {
-        return true;
-      }
+      bool status = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
+      if (status) return true;
+      if (!mounted) return true;
+
+      String contentText = (num == 0)
+          ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
+          : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。";
+
+      return await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                icon: const Icon(Symbols.my_location),
+                title: const Text("省電策略"),
+                content: Text(contentText),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: const Text("取消"),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  FilledButton(
+                    child: const Text("確定"),
+                    onPressed: () async {
+                      DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
     } catch (err) {
       return false;
     }
@@ -428,9 +426,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SwitchListTile(
-              // FIXME: workaround waiting for upstream PR to merge
-              // https://github.com/material-foundation/flutter-packages/pull/599
-              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceVariant,
+              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 context.i18n.settings_location_auto,
@@ -545,6 +541,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
               if (!batteryOptimization) return;
+              if (!context.mounted) return;
 
               await Navigator.of(
                 context,
@@ -577,6 +574,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
               if (!batteryOptimization) return;
+              if (!context.mounted) return;
 
               await Navigator.of(
                 context,

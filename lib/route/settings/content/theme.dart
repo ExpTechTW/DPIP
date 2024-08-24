@@ -44,6 +44,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
                   title: context.i18n.theme_light,
                   theme: light,
                 ),
+                const SizedBox(height: 16),
                 ThemeRadioTile(
                   value: "dark",
                   groupValue: themeMode,
@@ -51,6 +52,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
                   title: context.i18n.theme_dark,
                   theme: dark,
                 ),
+                const SizedBox(height: 16),
                 ThemeRadioTile(
                   value: "system",
                   groupValue: themeMode,

@@ -280,7 +280,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: TimeSelector(
+            child: TyphoonTimeSelector(
               onSelectionChanged: _onSelectionChanged,
               onTimeExpanded: () {},
               timeList: typhoonList,

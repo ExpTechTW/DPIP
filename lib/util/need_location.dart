@@ -18,7 +18,7 @@ Future<void> showLocationDialog(BuildContext context) async {
           TextButton(
             child: const Text("前往設定"),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(

@@ -1,4 +1,5 @@
 import 'package:dpip/route/welcome/tos.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 
 class PermissionPage extends StatelessWidget {
@@ -20,12 +21,12 @@ class PermissionPage extends StatelessWidget {
                       Icon(
                         Icons.security,
                         size: 80,
-                        color: Theme.of(context).primaryColor,
+                        color: context.theme.primaryColor,
                       ),
                       const SizedBox(height: 24),
                       Text(
                         '隱私權聲明',
-                        style: Theme.of(context).textTheme.headlineLarge,
+                        style: context.theme.textTheme.headlineLarge,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
@@ -33,7 +34,7 @@ class PermissionPage extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           '我們一直和使用者站在一起，為使用者的隱私而不斷努力。',
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: context.theme.textTheme.bodyMedium,
                         ),
                       ),
                       Card(
@@ -44,14 +45,14 @@ class PermissionPage extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
+                                  Icon(Icons.info_outline, color: context.theme.primaryColor),
                                   const SizedBox(width: 10),
                                   Text(
                                     '所需的資訊和權限列表：',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).primaryColor,
-                                        ),
+                                    style: context.theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: context.theme.primaryColor,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -132,12 +133,12 @@ class PermissionItem extends StatelessWidget {
             children: [
               Text(
                 text,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: context.theme.textTheme.titleMedium,
               ),
               const SizedBox(height: 4),
               Text(
                 description,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: context.theme.textTheme.bodyMedium,
               ),
             ],
           ),

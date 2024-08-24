@@ -83,36 +83,43 @@ class DpipAppState extends State<DpipApp> {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
-      builder: (lightColorScheme, darkColorScheme) => MaterialApp(
-        builder: (context, child) {
-          final mediaQueryData = MediaQuery.of(context);
-          final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0, maxScaleFactor: 1.5);
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: scale),
-            child: child!,
-          );
-        },
-        title: "DPIP",
-        theme: ThemeData(
-          colorScheme: lightColorScheme,
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: darkColorScheme,
-          brightness: Brightness.dark,
-        ),
-        themeMode: _themeMode,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          LocaleNamesLocalizationsDelegate(),
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: _locale,
-        home: const Dpip(),
-      ),
+      builder: (lightColorScheme, darkColorScheme) {
+        final lightTheme = lightColorScheme != null ? ColorScheme.fromSeed(seedColor: lightColorScheme.primary) : null;
+        final darkTheme = darkColorScheme != null
+            ? ColorScheme.fromSeed(brightness: Brightness.dark, seedColor: darkColorScheme.primary)
+            : null;
+
+        return MaterialApp(
+          builder: (context, child) {
+            final mediaQueryData = MediaQuery.of(context);
+            final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.3);
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: scale),
+              child: child!,
+            );
+          },
+          title: "DPIP",
+          theme: ThemeData(
+            colorScheme: lightTheme,
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: darkTheme,
+            brightness: Brightness.dark,
+          ),
+          themeMode: _themeMode,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            LocaleNamesLocalizationsDelegate(),
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: _locale,
+          home: const Dpip(),
+        );
+      },
     );
   }
 }

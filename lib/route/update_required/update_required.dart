@@ -38,18 +38,18 @@ class UpdateRequiredPage extends StatelessWidget {
                 const SizedBox(height: 32),
                 Text(
                   '發現新版本',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.onPrimary,
-                      ),
+                  style: context.theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.colors.onPrimary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   '更新至最新版本以獲得最佳體驗',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: context.colors.onPrimary,
-                      ),
+                  style: context.theme.textTheme.bodyLarge?.copyWith(
+                    color: context.colors.onPrimary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -95,7 +95,7 @@ class UpdateRequiredPage extends StatelessWidget {
                   TextButton(
                     onPressed: () {
                       Global.preference.setInt("update-skip", DateTime.now().millisecondsSinceEpoch);
-                      Navigator.of(context).pop();
+                      Navigator.pop(context);
                       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => const Dpip()),
                         (Route<dynamic> route) => false,

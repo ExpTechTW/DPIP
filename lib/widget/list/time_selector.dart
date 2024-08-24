@@ -8,14 +8,14 @@ class TimeSelector extends StatefulWidget {
   final List<String> timeList;
 
   const TimeSelector({
-    Key? key,
+    super.key,
     required this.onTimeSelected,
     required this.onTimeExpanded,
     required this.timeList,
-  }) : super(key: key);
+  });
 
   @override
-  _TimeSelectorState createState() => _TimeSelectorState();
+  State<TimeSelector> createState() => _TimeSelectorState();
 }
 
 class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {

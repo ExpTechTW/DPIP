@@ -30,7 +30,7 @@ typedef PositionUpdateCallback = void Function();
 
 class MonitorPage extends StatefulWidget {
   final Function()? onPositionUpdate;
-  const MonitorPage({Key? key, required this.data, this.onPositionUpdate}) : super(key: key);
+  const MonitorPage({super.key, required this.data, this.onPositionUpdate});
 
   final int data;
 

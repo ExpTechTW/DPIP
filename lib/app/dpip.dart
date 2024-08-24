@@ -133,13 +133,13 @@ class _DpipState extends State<Dpip> {
                     TextButton(
                       child: const Text("稍後再說"),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.pop(context);
                       },
                     ),
                     TextButton(
                       child: const Text("前往查看"),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const ChangelogPage()),
