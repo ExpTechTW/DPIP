@@ -10,9 +10,9 @@ import 'package:intl/intl.dart';
 final List<TagType> tagTypes = [
   TagType(id: 0, text: "錯誤", color: Colors.red),
   TagType(id: 1, text: "已解決", color: Colors.green),
-  TagType(id: 2, text: "影響: 小", color: Colors.grey.shade600),
-  TagType(id: 3, text: "影響: 中", color: Colors.orange.shade700),
-  TagType(id: 4, text: "影響: 大", color: Colors.purple),
+  TagType(id: 2, text: "影響：小", color: Colors.grey.shade600),
+  TagType(id: 3, text: "影響：中", color: Colors.orange.shade700),
+  TagType(id: 4, text: "影響：大", color: Colors.purple),
   TagType(id: 5, text: "公告", color: Colors.blue.shade900),
   TagType(id: 6, text: "維修", color: Colors.teal.shade700),
   TagType(id: 7, text: "測試", color: Colors.cyan.shade700),
