@@ -85,7 +85,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
 
   Future<void> _fetchChangelog() async {
     try {
-      final List<dynamic> data = await ExpTech().getChangelog();
+      final List<dynamic> data = (await ExpTech().getChangelog()).reversed.toList();
       setState(() {
         _changelogEntries = data.map((json) => ChangelogEntry.fromJson(json)).toList();
         _isLoading = false;
