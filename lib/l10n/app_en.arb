@@ -453,23 +453,23 @@
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   },
-  "monitor_list": "地圖列表",
+  "monitor_list": "Map list",
   "@monitor_list": {
     "description": "「地圖」路徑 → 地圖列表"
   },
-  "radar_monitor": "雷達回波",
+  "radar_monitor": "radar echo",
   "@radar_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 雷達回波"
   },
-  "precipitation_monitor": "降水",
+  "precipitation_monitor": "precipitation",
   "@precipitation_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 降水"
   },
-  "temperature_monitor": "氣溫",
+  "temperature_monitor": "temperature",
   "@temperature_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫"
   },
-  "humidity_monitor": "濕度",
+  "humidity_monitor": "Humid.",
   "@humidity_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 濕度"
   },
