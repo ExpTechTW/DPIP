@@ -1063,5 +1063,29 @@
   "skip_for_now": "暫時略過",
   "@skip_for_now": {
     "description": "暫時略過"
+  },
+  "update_complete": "更新完成",
+  "@update_complete": {
+    "description": "更新完成"
+  },
+  "update_complete_prompt": "DPIP 更新完成，要前往查看更新日誌嗎？",
+  "@update_complete_prompt": {
+    "description": "DPIP 更新完成，要前往查看更新日誌嗎？"
+  },
+  "remind_later": "稍後再說",
+  "@remind_later": {
+    "description": "稍後再說"
+  },
+  "go_to_view": "前往查看",
+  "@go_to_view": {
+    "description": "前往查看"
+  },
+  "announcement": "公告",
+  "@announcement": {
+    "description": "公告"
+  },
+  "new_announcement_prompt": "有新的公告，要前往查看嗎？",
+  "@new_announcement_prompt": {
+    "description": "有新的公告，要前往查看嗎？"
   }
 }

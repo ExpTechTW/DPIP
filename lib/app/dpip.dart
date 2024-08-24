@@ -128,20 +128,20 @@ class _DpipState extends State<Dpip> {
               builder: (context) {
                 return AlertDialog(
                   icon: const Icon(Symbols.update_rounded),
-                  title: const Text("更新完成"),
-                  content: const Text(
-                    "DPIP 更新完成，要前往查看更新日誌嗎？",
+                  title: Text(context.i18n.update_complete),
+                  content: Text(
+                    context.i18n.update_complete_prompt,
                   ),
                   actionsAlignment: MainAxisAlignment.spaceBetween,
                   actions: [
                     TextButton(
-                      child: const Text("稍後再說"),
+                      child: Text(context.i18n.remind_later),
                       onPressed: () {
                         Navigator.pop(context);
                       },
                     ),
                     TextButton(
-                      child: const Text("前往查看"),
+                      child: Text(context.i18n.go_to_view),
                       onPressed: () {
                         Navigator.pop(context);
                         Navigator.push(
@@ -164,20 +164,20 @@ class _DpipState extends State<Dpip> {
                 builder: (context) {
                   return AlertDialog(
                     icon: const Icon(Symbols.announcement),
-                    title: const Text("公告"),
-                    content: const Text(
-                      "有新的公告，要前往查看嗎？",
+                    title: Text(context.i18n.announcement),
+                    content: Text(
+                      context.i18n.new_announcement_prompt,
                     ),
                     actionsAlignment: MainAxisAlignment.spaceBetween,
                     actions: [
                       TextButton(
-                        child: const Text("稍後再說"),
+                        child: Text(context.i18n.remind_later),
                         onPressed: () {
                           Navigator.pop(context);
                         },
                       ),
                       TextButton(
-                        child: const Text("前往查看"),
+                        child: Text(context.i18n.go_to_view),
                         onPressed: () {
                           Navigator.pop(context);
                           Navigator.push(
