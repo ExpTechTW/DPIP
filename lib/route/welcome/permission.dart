@@ -58,6 +58,13 @@ class PermissionPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 20),
                               const PermissionItem(
+                                icon: Icons.notifications,
+                                text: "通知",
+                                description: "用於提供基於FCM&通知的服務",
+                                color: Colors.yellow,
+                              ),
+                              const SizedBox(height: 20),
+                              const PermissionItem(
                                 icon: Icons.location_on,
                                 text: "位置",
                                 description: "用於提供基於位置的服務",
