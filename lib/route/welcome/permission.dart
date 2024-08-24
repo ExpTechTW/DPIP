@@ -2,8 +2,33 @@ import "package:dpip/route/welcome/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 
-class PermissionPage extends StatelessWidget {
+class PermissionPage extends StatefulWidget {
   const PermissionPage({super.key});
+
+  @override
+  State<PermissionPage> createState() => _PermissionPageState();
+}
+
+class _PermissionPageState extends State<PermissionPage> {
+  ScrollController controller = ScrollController();
+  bool isEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
+      if (bottom && !isEnabled) {
+        setState(() => isEnabled = true);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +82,14 @@ class PermissionPage extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 20),
-                              const PermissionItem(
+                              PermissionItem(
                                 icon: Icons.notifications,
                                 text: "通知",
                                 description: "用於提供基於FCM&通知的服務",
                                 color: Colors.yellow,
+                                onTap: () {
+                                  print("通知權限項目被點擊了");
+                                },
                               ),
                               const SizedBox(height: 20),
                               const PermissionItem(
@@ -87,12 +115,14 @@ class PermissionPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const TOSPage()),
-                  );
-                },
+                onPressed: isEnabled
+                    ? () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const TOSPage()),
+                        );
+                      }
+                    : null,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -111,6 +141,7 @@ class PermissionItem extends StatelessWidget {
   final String text;
   final String description;
   final Color color;
+  final VoidCallback? onTap;
 
   const PermissionItem({
     super.key,
@@ -118,39 +149,46 @@ class PermissionItem extends StatelessWidget {
     required this.text,
     required this.description,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(icon, color: color, size: 24),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                text,
-                style: context.theme.textTheme.titleMedium,
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: context.theme.textTheme.bodyMedium,
+              child: Icon(icon, color: color, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    text,
+                    style: context.theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: context.theme.textTheme.bodyMedium,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
