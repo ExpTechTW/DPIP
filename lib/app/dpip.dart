@@ -112,9 +112,10 @@ class _DpipState extends State<Dpip> {
         if (Global.preference.getBool("welcome-1.0.0") == null) {
           Global.preference.setString("changelog", Global.packageInfo.version);
           if (mounted) {
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const AboutPage()),
+              (Route<dynamic> route) => false,
             );
           }
         } else {
