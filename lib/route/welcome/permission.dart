@@ -57,7 +57,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       Icon(
                         Icons.security,
                         size: 80,
-                        color: Theme.of(context).primaryColor,
+                        color: context.colors.primary,
                       ),
                       const SizedBox(height: 24),
                       Text(
@@ -68,7 +68,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       const SizedBox(height: 16),
                       Text(
                         context.i18n.privacy_commitment,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: context.theme.textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
