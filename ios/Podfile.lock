@@ -98,7 +98,6 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - Siren (6.1.3)
   - sqflite (0.0.3):
     - Flutter
     - FlutterMacOS
@@ -123,7 +122,6 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - Siren
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
@@ -139,7 +137,6 @@ SPEC REPOS:
     - MapLibre
     - nanopb
     - PromisesObjC
-    - Siren
     - Toast
 
 EXTERNAL SOURCES:
@@ -207,11 +204,10 @@ SPEC CHECKSUMS:
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  Siren: c0f6012f61196b73455202db07730f6454a4beb0
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
   Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: 905c923e70ad60c1d7af5cb21d5445583f8718c2
+PODFILE CHECKSUM: c6f422730fbc2e717e290d7d68eb7902f9aecd3e
 
 COCOAPODS: 1.15.2
