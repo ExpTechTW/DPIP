@@ -378,14 +378,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
-                SizedBox(
-                  height: 160,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    children: [...weatherCard],
-                  ),
+                Builder(
+                  builder: (context) {
+                    if (realtimeList.isEmpty) {
+                      if (region != "") {
+                        return SizedBox(
+                          height: 160,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            children: [...weatherCard],
+                          ),
+                        );
+                      }
+                    }
+                    return Center(child: Text(context.i18n.out_of_service_only_taiwan));
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
