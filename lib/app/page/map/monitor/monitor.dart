@@ -16,6 +16,8 @@ import 'package:dpip/util/extension/int.dart';
 import 'package:dpip/util/instrumental_intensity_color.dart';
 import 'package:dpip/util/intensity_color.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/need_location.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,13 +26,30 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'eew_info.dart';
 
+typedef PositionUpdateCallback = void Function();
+
 class MonitorPage extends StatefulWidget {
-  const MonitorPage({super.key, required this.data});
+  final Function()? onPositionUpdate;
+  const MonitorPage({Key? key, required this.data, this.onPositionUpdate}) : super(key: key);
 
   final int data;
 
   @override
   State<MonitorPage> createState() => _MonitorPageState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition() {
+    _activeCallback?.call();
+  }
 }
 
 class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
@@ -66,11 +85,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   late ScrollController scrollController;
   List<Widget> _eewUI = [];
   List<Widget> _rtsUI = [];
+  bool _showLegend = false;
 
   @override
   void initState() {
     super.initState();
-
     _initTimeOffset();
     _timeReplay = widget.data;
 
@@ -79,6 +98,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
+    MonitorPage.setActiveCallback(sendpositionUpdate);
+  }
+
+  void sendpositionUpdate() {
+    if (mounted) {
+      userLocation();
+      widget.onPositionUpdate?.call();
+    }
   }
 
   void _initTimeOffset() async {
@@ -90,9 +117,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _mapController = controller;
   }
 
-  void _loadMap() async {
-    _initStations();
-
+  void userLocation() async {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
@@ -100,6 +125,18 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+      await showLocationDialog(context);
+    }
+
+    _updateCrossMarker();
+  }
+
+  void _loadMap() async {
+    _initStations();
+
+    userLocation();
 
     _eewUI.add(Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
@@ -113,7 +150,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _initStations() async {
     final data = await ExpTech().getStations();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
     _setupStationSource(data);
@@ -492,7 +529,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         ),
                       ),
                       Text(
-                        "第 ${_eewLastInfo[eew.id]?.serial} 報",
+                        context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ''),
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurfaceVariant,
@@ -556,7 +593,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         ),
                         child: Center(
                           child: Text(
-                            _eewLastInfo[eew.id]!.eq.max.asIntensityLabel,
+                            _eewLastInfo[eew.id]!.eq.max.asIntensityDisplayLabel,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 28,
@@ -595,7 +632,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                       : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0)),
                             ),
                             Text(
-                              (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityLabel,
+                              (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityDisplayLabel,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 40,
@@ -917,7 +954,63 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
+    MonitorPage.clearActiveCallback();
     super.dispose();
+  }
+
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return MapLegend(
+      label: "預估震度圖例",
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+        Text("僅用於地震速報時", style: context.theme.textTheme.labelMedium),
+      ],
+    );
+  }
+
+  Widget _buildColorBar() {
+    final intensities = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    return SizedBox(
+      height: 20,
+      width: 300,
+      child: Row(
+        children: intensities.map((intensity) {
+          return Expanded(
+            child: Container(
+              color: IntensityColor.intensity(intensity),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = ['1', '2', '3', '4', '5弱', '5強', '6弱', '6強', '7'];
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels.map((label) {
+          return SizedBox(
+            width: 300 / 9,
+            child: Text(
+              label,
+              style: const TextStyle(fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   @override
@@ -925,14 +1018,40 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     return Scaffold(
       appBar: _timeReplay != 0
           ? AppBar(
-        title: Text(context.i18n.monitor),
-      )
+              title: Text(context.i18n.monitor),
+            )
           : null,
       body: Stack(
         children: [
           DpipMap(
             onMapCreated: _initMap,
             onStyleLoadedCallback: _loadMap,
+          ),
+          Positioned(
+            right: 4,
+            top: 4,
+            child: Material(
+              color: context.colors.secondary,
+              elevation: 4.0,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: _toggleLegend,
+                child: Tooltip(
+                  message: '圖例',
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _showLegend ? Icons.close : Icons.info_outline,
+                      size: 20,
+                      color: context.colors.onSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
           Positioned(
             left: 4,
@@ -967,7 +1086,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           ),
           Positioned(
             left: 4,
-            top: 34,
+            top: 32,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -995,7 +1114,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           if (_rtsUI.isNotEmpty)
             Positioned(
               left: 4,
-              top: 62,
+              top: 58,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [..._rtsUI],
@@ -1004,6 +1123,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           Positioned.fill(
             child: EewDraggableSheet(eewUI: _eewUI),
           ),
+          if (_showLegend)
+            Positioned(
+              right: 6,
+              top: 50, // Adjusted to be above the legend button
+              child: _buildLegend(),
+            ),
         ],
       ),
     );

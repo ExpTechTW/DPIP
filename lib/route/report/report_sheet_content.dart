@@ -1,4 +1,4 @@
-import 'package:dpip/app/page/monitor/monitor.dart';
+import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/util/depth_color.dart';
 import 'package:dpip/util/extension/build_context.dart';

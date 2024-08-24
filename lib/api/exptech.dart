@@ -4,12 +4,15 @@ import 'dart:io';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/model/crowdin/localization_progress.dart';
 import 'package:dpip/model/eew.dart';
+import 'package:dpip/model/history.dart';
 import 'package:dpip/model/report/earthquake_report.dart';
 import 'package:dpip/model/report/partial_earthquake_report.dart';
 import 'package:dpip/model/rts/rts.dart';
 import 'package:dpip/model/station.dart';
 import 'package:dpip/model/tsunami/tsunami.dart';
+import 'package:dpip/model/weather/lightning.dart';
 import 'package:dpip/model/weather/rain.dart';
+import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/model/weather/weather.dart';
 import 'package:http/http.dart';
 
@@ -212,6 +215,20 @@ class ExpTech {
     return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
   }
 
+  Future<Map<String, dynamic>> getWeatherAll(String region) async {
+    final requestUrl = Route.weatherAll(region);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final jsonData = jsonDecode(res.body);
+
+    return jsonData;
+  }
+
   Future<List<String>> getRainList() async {
     final requestUrl = Route.rainList();
 
@@ -238,5 +255,141 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return jsonData.map((item) => RainStation.fromJson(item)).toList();
+  }
+
+  Future<List<String>> getTyphoonList() async {
+    final requestUrl = Route.typhoonList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<String>> getLightningList() async {
+    final requestUrl = Route.lightningList();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => item.toString()).toList();
+  }
+
+  Future<List<Typhoon>> getTyphoon(String time) async {
+    final requestUrl = Route.typhoon(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Typhoon.fromJson(item)).toList();
+  }
+
+  Future<List<Lightning>> getLightning(String time) async {
+    final requestUrl = Route.lightning(time);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Lightning.fromJson(item)).toList();
+  }
+
+  Future<List<History>> getRealtime() async {
+    final requestUrl = Route.realtime();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<List<History>> getHistory() async {
+    final requestUrl = Route.history();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<List<History>> getRealtimeRegion(String region) async {
+    final requestUrl = Route.realtimeRegion(region);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<List<History>> getHistoryRegion(String region) async {
+    final requestUrl = Route.historyRegion(region);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<Map<String, dynamic>> getSupport() async {
+    final requestUrl = Route.support();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    return jsonDecode(res.body);
+  }
+
+  Future<Map<String, dynamic>> getChangelog() async {
+    final requestUrl = Route.changelog();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    return jsonDecode(res.body);
   }
 }

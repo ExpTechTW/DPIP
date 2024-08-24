@@ -3,17 +3,38 @@ import 'dart:io';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/need_location.dart';
 import 'package:dpip/widget/list/time_selector.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
+typedef PositionUpdateCallback = void Function();
+
 class RadarMap extends StatefulWidget {
-  const RadarMap({Key? key}) : super(key: key);
+  final Function()? onPositionUpdate;
+
+  const RadarMap({super.key, this.onPositionUpdate});
 
   @override
-  _RadarMapState createState() => _RadarMapState();
+  State<RadarMap> createState() => _RadarMapState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition() {
+    _activeCallback?.call();
+  }
 }
 
 class _RadarMapState extends State<RadarMap> {
@@ -23,6 +44,76 @@ class _RadarMapState extends State<RadarMap> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  bool _showLegend = false;
+
+  final List<String> dBZColors = [
+    "00ffff",
+    "00ecff",
+    "00daff",
+    "00c8ff",
+    "00b6ff",
+    "00a3ff",
+    "0091ff",
+    "007fff",
+    "006dff",
+    "005bff",
+    "0048ff",
+    "0036ff",
+    "0024ff",
+    "0012ff",
+    "0000ff",
+    "00ff00",
+    "00f400",
+    "00e900",
+    "00de00",
+    "00d300",
+    "00c800",
+    "00be00",
+    "00b400",
+    "00aa00",
+    "00a000",
+    "009600",
+    "33ab00",
+    "66c000",
+    "99d500",
+    "ccea00",
+    "ffff00",
+    "fff400",
+    "ffe900",
+    "ffde00",
+    "ffd300",
+    "ffc800",
+    "ffb800",
+    "ffa800",
+    "ff9800",
+    "ff8800",
+    "ff7800",
+    "ff6000",
+    "ff4800",
+    "ff3000",
+    "ff1800",
+    "ff0000",
+    "f40000",
+    "e90000",
+    "de0000",
+    "d30000",
+    "c80000",
+    "be0000",
+    "b40000",
+    "aa0000",
+    "a00000",
+    "960000",
+    "ab0033",
+    "c00066",
+    "d50099",
+    "ea00cc",
+    "ff00ff",
+    "ea00ff",
+    "d500ff",
+    "c000ff",
+    "ab00ff",
+    "9600ff",
+  ];
 
   String getTileUrl(String timestamp) {
     return "https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png";
@@ -32,35 +123,56 @@ class _RadarMapState extends State<RadarMap> {
     await loadGPSImage(_mapController);
   }
 
+  @override
+  void initState() {
+    super.initState();
+    RadarMap.setActiveCallback(sendpositionUpdate);
+  }
+
+  void sendpositionUpdate() {
+    if (mounted) {
+      start();
+      widget.onPositionUpdate?.call();
+    }
+  }
+
+  @override
+  void dispose() {
+    RadarMap.clearActiveCallback();
+    super.dispose();
+  }
+
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
   Future<void> _addUserLocationMarker() async {
-    await _mapController.removeLayer("markers");
-    await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
-      const SymbolLayerProperties(
-        symbolZOrder: "source",
-        iconSize: [
-          Expressions.interpolate,
-          ["linear"],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: "gps",
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
   }
 
   void _loadMap() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
@@ -75,19 +187,25 @@ class _RadarMapState extends State<RadarMap> {
           tileSize: 256,
         ));
 
-    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
+    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(), belowLayerId: "county-outline");
 
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
+
+    await _mapController.addSource(
+        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+
+    start();
+  }
+
+  void start() async {
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     if (isUserLocationValid) {
-      await _mapController.addSource(
-          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
       await _mapController.setGeoJsonSource(
         "markers-geojson",
         {
@@ -104,10 +222,61 @@ class _RadarMapState extends State<RadarMap> {
           ],
         },
       );
-      _addUserLocationMarker();
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
 
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+      await showLocationDialog(context);
+    }
+
+    _addUserLocationMarker();
+
     setState(() {});
+  }
+
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return MapLegend(
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+        const SizedBox(height: 12),
+        Text(context.i18n.unit_dbz, style: context.theme.textTheme.labelMedium),
+      ],
+    );
+  }
+
+  Widget _buildColorBar() {
+    return SizedBox(
+      height: 20,
+      width: 300,
+      child: CustomPaint(
+        painter: ColorBarPainter(dBZColors),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = List.generate(14, (index) => (index * 5).toString());
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 9),
+                ))
+            .toList(),
+      ),
+    );
   }
 
   @override
@@ -117,6 +286,33 @@ class _RadarMapState extends State<RadarMap> {
         DpipMap(
           onMapCreated: _initMap,
           onStyleLoadedCallback: _loadMap,
+          rotateGesturesEnabled: true,
+        ),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: Material(
+            color: context.colors.secondary,
+            elevation: 4.0,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: _toggleLegend,
+              child: Tooltip(
+                message: '圖例',
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    _showLegend ? Icons.close : Icons.info_outline,
+                    size: 20,
+                    color: context.colors.onSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         if (radar_list.isNotEmpty)
           Positioned(
@@ -125,6 +321,10 @@ class _RadarMapState extends State<RadarMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: radar_list,
+              onTimeExpanded: () {
+                _showLegend = false;
+                setState(() {});
+              },
               onTimeSelected: (time) {
                 String newTileUrl = getTileUrl(time);
 
@@ -138,17 +338,45 @@ class _RadarMapState extends State<RadarMap> {
                       tileSize: 256,
                     ));
 
-                _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties());
+                _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(),
+                    belowLayerId: "county-outline");
 
-                if (isUserLocationValid) {
-                  _addUserLocationMarker();
-                }
+                _addUserLocationMarker();
 
                 print("Selected time: $time");
               },
             ),
           ),
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50, // Adjusted to be above the legend button
+            child: _buildLegend(),
+          ),
       ],
     );
   }
+}
+
+class ColorBarPainter extends CustomPainter {
+  final List<String> colors;
+
+  ColorBarPainter(this.colors);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    final width = size.width / colors.length;
+
+    for (int i = 0; i < colors.length; i++) {
+      paint.color = Color(int.parse('0xFF${colors[i]}'));
+      canvas.drawRect(
+        Rect.fromLTWH(i * width, 0, width, size.height),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dpip/util/geojson.dart';
 import 'package:flutter/services.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -25,6 +26,7 @@ List<double> expandBounds(List<double> bounds, LatLng point) {
   return bounds;
 }
 
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = false]) async {
   for (var i = 1; i < 10; i++) {
     final path = "assets/map/icons/intensity-$i${dark ? "" : "-dark"}.png";
@@ -33,20 +35,43 @@ Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = f
   }
 }
 
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadCrossImage(MapLibreMapController controller) async {
   await controller.addImage("cross", Uint8List.sublistView(await rootBundle.load("assets/map/icons/cross.png")));
 }
 
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadGPSImage(MapLibreMapController controller) async {
   await controller.addImage("gps", Uint8List.sublistView(await rootBundle.load("assets/map/icons/gps.png")));
 }
 
+@Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadWindImage(MapLibreMapController controller) async {
-  await controller.addImage("wind-low", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-low.png")));
+  await controller.addImage("wind-1", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-1.png")));
+  await controller.addImage("wind-2", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-2.png")));
+  await controller.addImage("wind-3", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-3.png")));
+  await controller.addImage("wind-4", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-4.png")));
+  await controller.addImage("wind-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-5.png")));
+}
+
+@Deprecated("Migrate symbol image loading to sprite")
+Future<void> loadLightningImage(MapLibreMapController controller) async {
   await controller.addImage(
-      "wind-middle", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-middle.png")));
+      "lightning-1-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-5.png")));
   await controller.addImage(
-      "wind-high", Uint8List.sublistView(await rootBundle.load("assets/map/icons/wind-high.png")));
+      "lightning-1-10", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-10.png")));
+  await controller.addImage(
+      "lightning-1-30", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-30.png")));
+  await controller.addImage(
+      "lightning-1-60", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-60.png")));
+  await controller.addImage(
+      "lightning-0-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-5.png")));
+  await controller.addImage(
+      "lightning-0-10", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-10.png")));
+  await controller.addImage(
+      "lightning-0-30", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-30.png")));
+  await controller.addImage(
+      "lightning-0-60", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-60.png")));
 }
 
 enum Units {
@@ -66,6 +91,8 @@ enum Units {
   radians,
   degrees,
 }
+
+const emptyGeoJson = {"type": "FeatureCollection", "features": []};
 
 /// Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
 ///
@@ -138,6 +165,7 @@ LatLng destination(LatLng origin, double distance, double bearing, {Units units 
 
 /// Takes a [LatLng] and calculates the circle polygon given a radius in
 /// degrees, radians, miles, or kilometers; and steps for precision.
+@Deprecated("Use circleFeature()")
 Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
   // main
   final coordinates = [];
@@ -157,4 +185,21 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
       "type": "Polygon",
     }
   };
+}
+
+/// Takes a [LatLng] and calculates the circle polygon given a radius in
+/// degrees, radians, miles, or kilometers; and steps for precision.
+GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
+  // main
+  final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
+  List coordinates = [];
+
+  for (var i = 0; i < steps; i++) {
+    final point = destination(center, radius, (i * -360) / steps, units: units);
+    coordinates.add(point.toGeoJsonCoordinates());
+  }
+
+  coordinates.add(coordinates[0]);
+
+  return polygon.setGeometry([coordinates]);
 }

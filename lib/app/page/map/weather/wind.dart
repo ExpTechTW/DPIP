@@ -4,8 +4,10 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/weather.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/time_selector.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -25,10 +27,10 @@ class WindData {
 }
 
 class WindMap extends StatefulWidget {
-  const WindMap({Key? key}) : super(key: key);
+  const WindMap({super.key});
 
   @override
-  _WindMapState createState() => _WindMapState();
+  State<WindMap> createState() => _WindMapState();
 }
 
 class _WindMapState extends State<WindMap> {
@@ -38,6 +40,7 @@ class _WindMapState extends State<WindMap> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  bool _showLegend = false;
 
   List<WindData> windDataList = [];
 
@@ -51,7 +54,7 @@ class _WindMapState extends State<WindMap> {
   }
 
   void _loadMap() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
@@ -62,10 +65,6 @@ class _WindMapState extends State<WindMap> {
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
-    if (isUserLocationValid) {
-      await _addUserLocationMarker();
-    }
 
     await _mapController.addSource(
         "wind-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
@@ -84,47 +83,58 @@ class _WindMapState extends State<WindMap> {
         .toList();
 
     await addDynamicWindArrows(windDataList);
+
+    if (isUserLocationValid) {
+      await _mapController.addSource(
+          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      await _mapController.setGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "coordinates": [userLon, userLat],
+                "type": "Point"
+              }
+            }
+          ],
+        },
+      );
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    }
+
+    await _addUserLocationMarker();
+
     setState(() {});
   }
 
   Future<void> _addUserLocationMarker() async {
-    await _mapController.addSource(
-        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-    await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
-      const SymbolLayerProperties(
-        symbolZOrder: "source",
-        iconSize: [
-          Expressions.interpolate,
-          ["linear"],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: "gps",
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
-    await _mapController.setGeoJsonSource(
-      "markers-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point"
-            }
-          }
-        ],
-      },
-    );
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
   }
 
   Future<void> addDynamicWindArrows(List<WindData> windDataList) async {
@@ -214,11 +224,15 @@ class _WindMapState extends State<WindMap> {
         iconImage: [
           Expressions.step,
           [Expressions.get, "speed"],
-          "wind-low",
-          5,
-          "wind-middle",
-          10,
-          "wind-high"
+          "wind-1",
+          3.4,
+          "wind-2",
+          8,
+          "wind-3",
+          13.9,
+          "wind-4",
+          32.7,
+          "wind-5"
         ],
         iconRotate: [Expressions.get, "direction"],
         textAllowOverlap: true,
@@ -259,6 +273,37 @@ class _WindMapState extends State<WindMap> {
     );
   }
 
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return MapLegend(
+      children: [
+        _legendItem('wind-1', '0.1 - 3.3 m/s'),
+        _legendItem('wind-2', '3.4 - 7.9 m/s'),
+        _legendItem('wind-3', '8.0 - 13.8 m/s'),
+        _legendItem('wind-4', '13.9 - 32.6 m/s'),
+        _legendItem('wind-5', '≥ 32.7 m/s'),
+      ],
+    );
+  }
+
+  Widget _legendItem(String imageName, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -268,6 +313,32 @@ class _WindMapState extends State<WindMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
+        Positioned(
+          left: 4,
+          bottom: 4,
+          child: Material(
+            color: context.colors.secondary,
+            elevation: 4.0,
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: _toggleLegend,
+              child: Tooltip(
+                message: '圖例',
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  child: Icon(
+                    _showLegend ? Icons.close : Icons.info_outline,
+                    size: 20,
+                    color: context.colors.onSecondary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
         if (weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -275,6 +346,10 @@ class _WindMapState extends State<WindMap> {
             bottom: 2,
             child: TimeSelector(
               timeList: weather_list,
+              onTimeExpanded: () {
+                _showLegend = false;
+                setState(() {});
+              },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
@@ -290,10 +365,17 @@ class _WindMapState extends State<WindMap> {
                     .toList();
 
                 await addDynamicWindArrows(windDataList);
+                await _addUserLocationMarker();
                 setState(() {});
                 print("Selected time: $time");
               },
             ),
+          ),
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50, // Adjusted to be above the legend button
+            child: _buildLegend(),
           ),
       ],
     );

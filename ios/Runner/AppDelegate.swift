@@ -2,7 +2,6 @@ import CoreLocation
 import Firebase
 import FirebaseMessaging
 import Flutter
-import Siren
 import UIKit
 
 @UIApplicationMain
@@ -25,8 +24,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     ) -> Bool {
         FirebaseApp.configure()
         GeneratedPluginRegistrant.register(with: self)
-        hyperCriticalRulesExample()
-        Siren.shared.wail()
 
         let controller = window?.rootViewController as! FlutterViewController
         locationChannel = FlutterMethodChannel(
@@ -274,24 +271,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
         if backgroundTask != .invalid {
             UIApplication.shared.endBackgroundTask(backgroundTask)
             backgroundTask = .invalid
-        }
-    }
-
-    func hyperCriticalRulesExample() {
-        let siren = Siren.shared
-        siren.rulesManager = RulesManager(
-            globalRules: .critical,
-            showAlertAfterCurrentVersionHasBeenReleasedForDays: 3)
-        siren.wail { results in
-            switch results {
-            case .success(let updateResults):
-                print("AlerAction ", updateResults.alertAction)
-                print("Localization ", updateResults.localization)
-                print("Model ", updateResults.model)
-                print("UPdateType ", updateResults.updateType)
-            case .failure(let error):
-                print(error.localizedDescription)
-            }
         }
     }
 }

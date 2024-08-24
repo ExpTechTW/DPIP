@@ -1,13 +1,15 @@
+import 'package:dpip/route/settings/content/experiment.dart';
 import 'package:dpip/route/settings/content/locale.dart';
 import 'package:dpip/route/settings/content/location.dart';
 import 'package:dpip/route/settings/content/root.dart';
-import 'package:dpip/route/settings/content/sound.dart';
 import 'package:dpip/route/settings/content/theme.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 
 class SettingsRoute extends StatefulWidget {
-  const SettingsRoute({super.key});
+  final String? initialRoute;
+
+  const SettingsRoute({super.key, this.initialRoute});
 
   @override
   State<SettingsRoute> createState() => _SettingsRouteState();
@@ -20,13 +22,23 @@ class _SettingsRouteState extends State<SettingsRoute> {
   final forwardTransition = const Interval(0.5, 1, curve: Easing.emphasizedDecelerate);
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.initialRoute != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        navKey.currentState?.pushNamed(widget.initialRoute!);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final routeTitle = {
       "/": context.i18n.settings,
       "/locale": context.i18n.settings_locale,
       "/location": context.i18n.settings_location,
-      "/sound": "音效測試",
       "/theme": context.i18n.settings_theme,
+      "/experiment": "進階功能",
     };
 
     return PopScope(
@@ -82,11 +94,11 @@ class _SettingsRouteState extends State<SettingsRoute> {
                 case "/location":
                   child = const SettingsLocationView();
                   break;
-                case "/sound":
-                  child = const SettingsSoundView();
-                  break;
                 case "/theme":
                   child = const SettingsThemeView();
+                  break;
+                case "/experiment":
+                  child = const SettingsExperimentView();
                   break;
                 default:
                   return PageRouteBuilder(
