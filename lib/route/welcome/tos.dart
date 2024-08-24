@@ -1,5 +1,3 @@
-import "dart:async";
-
 import "package:dpip/app/dpip.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
@@ -30,7 +28,7 @@ class _TOSPageState extends State<TOSPage> {
         }
       });
     } else {
-      setState(()=>isEnabled = true);
+      setState(() => isEnabled = true);
     }
   }
 
@@ -75,9 +73,6 @@ class _TOSPageState extends State<TOSPage> {
                       }
                     : null,
                 child: Text(context.i18n.agree),
-                style: ButtonStyle(
-                  shape: 
-                ),
               ),
             ],
           ),
