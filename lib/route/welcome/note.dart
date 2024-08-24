@@ -31,7 +31,7 @@ class NotePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       Padding(
-                        padding: EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: Text(
                           context.i18n.notice_details,
                           style: context.theme.textTheme.bodyMedium,
