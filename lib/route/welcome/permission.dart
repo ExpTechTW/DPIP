@@ -14,7 +14,7 @@ class PermissionPage extends StatefulWidget {
 }
 
 class _PermissionPageState extends State<PermissionPage> {
-  late Future<List<PermissionItem>> _permissionsFuture;
+  late Future<List<Permission>> _permissionsFuture;
   bool _isRequestingPermission = false;
 
   @override
@@ -23,60 +23,24 @@ class _PermissionPageState extends State<PermissionPage> {
     _permissionsFuture = _initializePermissions();
   }
 
-  Future<List<PermissionItem>> _initializePermissions() async {
+  Future<List<Permission>> _initializePermissions() async {
     final deviceInfo = DeviceInfoPlugin();
-    final List<PermissionItem> permissions = [];
+    List<Permission> permissions = [];
 
     try {
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
-        permissions.addAll([
-          PermissionItem(
-            icon: Icons.notifications,
-            text: context.i18n.notification,
-            description: context.i18n.notification_service_description,
-            color: Colors.orange,
-            permission: Permission.notification,
-          ),
-          PermissionItem(
-            icon: Icons.location_on,
-            text: context.i18n.settings_position,
-            description: context.i18n.location_based_service,
-            color: Colors.blue,
-            permission: Permission.location,
-          ),
-          PermissionItem(
-            icon: Icons.storage,
-            text: context.i18n.image_save,
-            description: context.i18n.data_visualization_storage,
-            color: Colors.green,
-            permission: androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
-          ),
-        ]);
+        permissions = [
+          Permission.notification,
+          Permission.location,
+          androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+        ];
       } else if (Platform.isIOS) {
-        permissions.addAll([
-          PermissionItem(
-            icon: Icons.notifications,
-            text: context.i18n.notification,
-            description: context.i18n.notification_service_description,
-            color: Colors.orange,
-            permission: Permission.notification,
-          ),
-          PermissionItem(
-            icon: Icons.location_on,
-            text: context.i18n.settings_position,
-            description: context.i18n.location_based_service,
-            color: Colors.blue,
-            permission: Permission.location,
-          ),
-          PermissionItem(
-            icon: Icons.photo_library,
-            text: context.i18n.image_save,
-            description: context.i18n.data_visualization_storage,
-            color: Colors.green,
-            permission: Permission.photos,
-          ),
-        ]);
+        permissions = [
+          Permission.notification,
+          Permission.location,
+          Permission.photos,
+        ];
       }
     } catch (e) {
       print('Error initializing permissions: $e');
@@ -85,13 +49,56 @@ class _PermissionPageState extends State<PermissionPage> {
     return permissions;
   }
 
+  List<PermissionItem> _createPermissionItems(List<Permission> permissions, BuildContext context) {
+    final items = <PermissionItem>[];
+    for (final permission in permissions) {
+      IconData icon;
+      String text;
+      String description;
+      Color color;
+
+      switch (permission) {
+        case Permission.notification:
+          icon = Icons.notifications;
+          text = context.i18n.notification;
+          description = context.i18n.notification_service_description;
+          color = Colors.orange;
+          break;
+        case Permission.location:
+          icon = Icons.location_on;
+          text = context.i18n.settings_position;
+          description = context.i18n.location_based_service;
+          color = Colors.blue;
+          break;
+        case Permission.storage:
+        case Permission.photos:
+          icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
+          text = context.i18n.image_save;
+          description = context.i18n.data_visualization_storage;
+          color = Colors.green;
+          break;
+        default:
+          continue;
+      }
+
+      items.add(PermissionItem(
+        icon: icon,
+        text: text,
+        description: description,
+        color: color,
+        permission: permission,
+      ));
+    }
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: FutureBuilder<List<PermissionItem>>(
+          child: FutureBuilder<List<Permission>>(
             future: _permissionsFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -102,7 +109,7 @@ class _PermissionPageState extends State<PermissionPage> {
                 return const Center(child: Text('No permissions to display'));
               }
 
-              final permissions = snapshot.data!;
+              final permissionItems = _createPermissionItems(snapshot.data!, context);
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -128,7 +135,7 @@ class _PermissionPageState extends State<PermissionPage> {
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 24),
-                          ...permissions.map(_buildPermissionCard),
+                          ...permissionItems.map(_buildPermissionCard),
                         ],
                       ),
                     ),
