@@ -167,10 +167,9 @@ class _TOSPageState extends State<TOSPage> {
                 style: context.theme.textTheme.bodyLarge,
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
+            SizedBox(
               height: MediaQuery.of(context).size.height + 1,
-              child: Column(
+              child: const Column(
                 children: [],
               ),
             ),
