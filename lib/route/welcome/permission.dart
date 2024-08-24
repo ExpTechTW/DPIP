@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/route/welcome/tos.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +14,17 @@ class PermissionPage extends StatefulWidget {
 }
 
 class _PermissionPageState extends State<PermissionPage> {
-  late List<PermissionItem> permissions;
+  late Future<List<PermissionItem>> _permissionsFuture;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    permissions = [
+  void initState() {
+    super.initState();
+    _permissionsFuture = _initializePermissions();
+  }
+
+  Future<List<PermissionItem>> _initializePermissions() async {
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    return [
       PermissionItem(
         icon: Icons.notifications,
         text: context.i18n.notification,
@@ -36,9 +44,15 @@ class _PermissionPageState extends State<PermissionPage> {
         text: context.i18n.image_save,
         description: context.i18n.data_visualization_storage,
         color: Colors.green,
-        permission: Permission.storage,
+        permission: (androidInfo.version.sdkInt <= 32 || Platform.isIOS) ? Permission.storage : Permission.photos,
       ),
     ];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _permissionsFuture = _initializePermissions();
   }
 
   @override
@@ -47,45 +61,59 @@ class _PermissionPageState extends State<PermissionPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.security,
-                        size: 80,
-                        color: context.colors.primary,
+          child: FutureBuilder<List<PermissionItem>>(
+            future: _permissionsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData) {
+                return const Center(child: Text('No permissions to display'));
+              }
+
+              final permissions = snapshot.data!;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.security,
+                            size: 80,
+                            color: context.colors.primary,
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            context.i18n.permission,
+                            style: context.theme.textTheme.headlineMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            context.i18n.privacy_commitment,
+                            style: context.theme.textTheme.bodyMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          ...permissions.map(_buildPermissionCard),
+                        ],
                       ),
-                      const SizedBox(height: 24),
-                      Text(
-                        context.i18n.permission,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        context.i18n.privacy_commitment,
-                        style: context.theme.textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-                      ...permissions.map(_buildPermissionCard),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _continueToTOS,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(context.i18n.next_step),
-              ),
-            ],
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _continueToTOS,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(context.i18n.next_step),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
