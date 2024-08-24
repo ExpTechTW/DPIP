@@ -204,7 +204,7 @@
   "@monitor_after_seconds": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
   },
-  "report_replay": "地震の状況を再生",
+  "report_replay": "再生",
   "@report_replay": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
   },
@@ -626,7 +626,7 @@
   "@blowing_snow": {
     "description": "天氣狀況：高吹雪"
   },
-  "blizzard": "ブリザード",
+  "blizzard": "暴風雪",
   "@blizzard": {
     "description": "天氣狀況：暴風雪"
   },
