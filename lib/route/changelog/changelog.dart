@@ -1,18 +1,99 @@
-import "package:dpip/api/exptech.dart";
-import "package:dpip/route/changelog/update_card.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:flutter/material.dart";
-import "package:flutter_markdown/flutter_markdown.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/util/extension/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
-class ChangelogPage extends StatelessWidget {
-  const ChangelogPage({super.key});
+class ChangelogEntry {
+  final String version;
+  final String type;
+  final String content;
 
-  Future<String> _fetchChangelog() async {
+  ChangelogEntry({required this.version, required this.type, required this.content});
+
+  factory ChangelogEntry.fromJson(Map<String, dynamic> json) {
+    return ChangelogEntry(
+      version: json['ver'],
+      type: json['type'],
+      content: json['content'],
+    );
+  }
+}
+
+Color _getTypeColor(String type) {
+  switch (type.toLowerCase()) {
+    case 'alpha':
+      return Colors.red;
+    case 'beta':
+      return Colors.orangeAccent;
+    case 'release':
+      return Colors.green;
+    default:
+      return Colors.grey;
+  }
+}
+
+String _getLocalizedType(String type) {
+  // 這裡可以之後替換為 l10n 的實現
+  switch (type.toLowerCase()) {
+    case 'alpha':
+      return '內測版';
+    case 'beta':
+      return '公測版';
+    case 'release':
+      return '正式版';
+    default:
+      return type;
+  }
+}
+
+Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    decoration: BoxDecoration(
+      color: _getTypeColor(entry.type).withOpacity(0.1),
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: _getTypeColor(entry.type).withOpacity(0.3)),
+    ),
+    child: Text(
+      _getLocalizedType(entry.type),
+      style: context.theme.textTheme.bodyMedium?.copyWith(
+        color: _getTypeColor(entry.type),
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
+
+class ChangelogPage extends StatefulWidget {
+  const ChangelogPage({Key? key}) : super(key: key);
+
+  @override
+  _ChangelogPageState createState() => _ChangelogPageState();
+}
+
+class _ChangelogPageState extends State<ChangelogPage> {
+  List<ChangelogEntry> _changelogEntries = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchChangelog();
+  }
+
+  Future<void> _fetchChangelog() async {
     try {
-      var data = await ExpTech().getChangelog();
-      return data["content"] as String;
+      final List<dynamic> data = await ExpTech().getChangelog();
+      setState(() {
+        _changelogEntries = data.map((json) => ChangelogEntry.fromJson(json)).toList();
+        _isLoading = false;
+      });
     } catch (e) {
-      return "# 📛 錯誤\n- 無法載入更新日誌，請稍後再重試。";
+      setState(() {
+        _errorMessage = '無法載入更新日誌，請稍後再試。';
+        _isLoading = false;
+      });
     }
   }
 
@@ -20,48 +101,132 @@ class ChangelogPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("更新日誌"),
+        title: const Text('更新日誌', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
       ),
       body: SafeArea(
         child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              Expanded(
+                child: _buildChangelogList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChangelogList() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_errorMessage != null) {
+      return Center(child: Text(_errorMessage!));
+    }
+    if (_changelogEntries.isEmpty) {
+      return const Center(child: Text('目前沒有更新日誌'));
+    }
+    return RefreshIndicator(
+      onRefresh: _fetchChangelog,
+      child: ListView.builder(
+        itemCount: _changelogEntries.length,
+        itemBuilder: (context, index) {
+          return ChangelogCard(
+            entry: _changelogEntries[index],
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChangelogDetailPage(entry: _changelogEntries[index]),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class ChangelogCard extends StatelessWidget {
+  final ChangelogEntry entry;
+  final VoidCallback onTap;
+
+  const ChangelogCard({
+    Key? key,
+    required this.entry,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  'v${entry.version}',
+                  style: context.theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              _buildTypeChip(context, entry),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangelogDetailPage extends StatelessWidget {
+  final ChangelogEntry entry;
+
+  const ChangelogDetailPage({
+    Key? key,
+    required this.entry,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('v${entry.version} ${_getLocalizedType(entry.type)}'),
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const UpdateCard(
-                title: "更新日誌",
-                description: "我們持續改進應用程式，為您帶來更好的體驗。",
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: FutureBuilder<String>(
-                      future: _fetchChangelog(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text("Error: ${snapshot.error}"));
-                        } else {
-                          return Markdown(
-                            data: snapshot.data ?? "",
-                            styleSheet: MarkdownStyleSheet(
-                              h1: context.theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
-                              h2: context.theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
-                              p: context.theme.textTheme.bodyMedium,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ),
+              _buildTypeChip(context, entry),
+              const SizedBox(height: 24),
+              MarkdownBody(
+                data: entry.content,
+                styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
+                  h1: context.theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                  h2: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  h3: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  p: context.theme.textTheme.bodyLarge,
                 ),
               ),
             ],

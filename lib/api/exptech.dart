@@ -382,7 +382,7 @@ class ExpTech {
     return jsonDecode(res.body);
   }
 
-  Future<Map<String, dynamic>> getChangelog() async {
+  Future<List<dynamic>> getChangelog() async {
     final requestUrl = Route.changelog();
 
     var res = await get(requestUrl);
