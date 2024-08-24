@@ -23,30 +23,60 @@ class _PermissionPageState extends State<PermissionPage> {
   }
 
   Future<List<PermissionItem>> _initializePermissions() async {
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-    return [
-      PermissionItem(
-        icon: Icons.notifications,
-        text: context.i18n.notification,
-        description: context.i18n.notification_service_description,
-        color: Colors.orange,
-        permission: Permission.notification,
-      ),
-      PermissionItem(
-        icon: Icons.location_on,
-        text: context.i18n.settings_position,
-        description: context.i18n.location_based_service,
-        color: Colors.blue,
-        permission: Permission.location,
-      ),
-      PermissionItem(
-        icon: Icons.storage,
-        text: context.i18n.image_save,
-        description: context.i18n.data_visualization_storage,
-        color: Colors.green,
-        permission: (androidInfo.version.sdkInt <= 32 || Platform.isIOS) ? Permission.storage : Permission.photos,
-      ),
-    ];
+    final deviceInfo = DeviceInfoPlugin();
+    final List<PermissionItem> permissions = [];
+
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      permissions.addAll([
+        PermissionItem(
+          icon: Icons.notifications,
+          text: context.i18n.notification,
+          description: context.i18n.notification_service_description,
+          color: Colors.orange,
+          permission: Permission.notification,
+        ),
+        PermissionItem(
+          icon: Icons.location_on,
+          text: context.i18n.settings_position,
+          description: context.i18n.location_based_service,
+          color: Colors.blue,
+          permission: Permission.location,
+        ),
+        PermissionItem(
+          icon: Icons.storage,
+          text: context.i18n.image_save,
+          description: context.i18n.data_visualization_storage,
+          color: Colors.green,
+          permission: androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+        ),
+      ]);
+    } else if (Platform.isIOS) {
+      permissions.addAll([
+        PermissionItem(
+          icon: Icons.notifications,
+          text: context.i18n.notification,
+          description: context.i18n.notification_service_description,
+          color: Colors.orange,
+          permission: Permission.notification,
+        ),
+        PermissionItem(
+          icon: Icons.location_on,
+          text: context.i18n.settings_position,
+          description: context.i18n.location_based_service,
+          color: Colors.blue,
+          permission: Permission.location,
+        ),
+        PermissionItem(
+          icon: Icons.photo_library,
+          text: context.i18n.image_save,
+          description: context.i18n.data_visualization_storage,
+          color: Colors.green,
+          permission: Permission.photos,
+        ),
+      ]);
+    }
+    return permissions;
   }
 
   @override
