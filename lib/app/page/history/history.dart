@@ -109,6 +109,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
+    setState(() {});
   }
 
   void sendpositionUpdate() {
