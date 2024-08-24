@@ -43,7 +43,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       Icon(
                         Icons.security,
                         size: 80,
-                        color: context.colors.secondary,
+                        color: context.colors.primary,
                       ),
                       const SizedBox(height: 24),
                       Text(
@@ -67,12 +67,16 @@ class _PermissionPageState extends State<PermissionPage> {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.info_outline),
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: context.colors.primary,
+                                  ),
                                   const SizedBox(width: 10),
                                   Text(
                                     context.i18n.required_info_permissions,
                                     style: context.theme.textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
+                                      color: context.colors.primary,
                                     ),
                                   ),
                                 ],
@@ -82,7 +86,7 @@ class _PermissionPageState extends State<PermissionPage> {
                                 icon: Icons.notifications,
                                 text: context.i18n.notification,
                                 description: context.i18n.notification_service_description,
-                                color: Colors.yellow,
+                                color: Colors.orange,
                                 onTap: () async {
                                   final status = await requestNotificationPermission();
                                   if (status.isGranted) {

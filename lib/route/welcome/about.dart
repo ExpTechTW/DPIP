@@ -25,7 +25,7 @@ class AboutPage extends StatelessWidget {
                           context.i18n.welcome_message,
                           style: context.theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: context.theme.primaryColor,
+                            color: context.colors.primary,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -33,14 +33,14 @@ class AboutPage extends StatelessWidget {
                         Text(
                           "Disaster Prevention Information Platform",
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.theme.primaryColor.withOpacity(0.7),
+                            color: context.colors.primary.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           context.i18n.disaster_info_platform,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.theme.primaryColor.withOpacity(0.7),
+                            color: context.colors.primary.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
