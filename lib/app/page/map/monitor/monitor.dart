@@ -13,6 +13,7 @@ import "package:dpip/model/station.dart";
 import "package:dpip/model/station_info.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/int.dart";
+import "package:dpip/util/geojson.dart";
 import "package:dpip/util/instrumental_intensity_color.dart";
 import "package:dpip/util/intensity_color.dart";
 import "package:dpip/util/map_utils.dart";
@@ -121,6 +122,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
+
+    if (!mounted) return;
+
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
@@ -150,6 +154,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _initStations() async {
     final data = await ExpTech().getStations();
+
+    if (!mounted) return;
+
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -340,20 +347,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   Future<void> _updateCrossMarker() async {
-    List markers_features = [];
+    List<GeoJsonFeatureBuilder> markers_features = [];
 
     if (_isMarkerVisible) {
       for (var id in _eewLastInfo.keys) {
-        markers_features.add({
-          "type": "Feature",
-          "properties": {
-            "intensity": 10,
-          },
-          "geometry": {
-            "coordinates": [_eewLastInfo[id]!.eq.lon, _eewLastInfo[id]!.eq.lat],
-            "type": "Point"
-          }
-        });
+        markers_features.add(
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+              .setProperty("intensity", 10)
+              .setGeometry(_eewLastInfo[id]!.eq.latlng.toGeoJsonCoordinates()),
+        );
       }
     }
 
@@ -361,39 +363,21 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       int intensity = intensityFloatToInt(value.I);
       if (value.alert == true && intensity > 0) {
         StationInfo info = findAppropriateItem(_stations[key]!.info, _timeReplay);
-        markers_features.add({
-          "type": "Feature",
-          "properties": {
-            "intensity": intensity, // 10 is for classifying epicenter cross
-          },
-          "geometry": {
-            "coordinates": [info.lon, info.lat],
-            "type": "Point"
-          }
-        });
+        markers_features.add(
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+              .setProperty("intensity", intensity)
+              .setGeometry(info.latlng.toGeoJsonCoordinates()),
+        );
       }
     });
 
     if (isUserLocationValid) {
-      markers_features.add({
-        "type": "Feature",
-        "properties": {
-          "intensity": 11,
-        },
-        "geometry": {
-          "coordinates": [userLon, userLat],
-          "type": "Point"
-        }
-      });
+      markers_features.add(
+        GeoJsonFeatureBuilder(GeoJsonFeatureType.Point).setGeometry([userLon, userLat]).setProperty("intensity", 11),
+      );
     }
 
-    await _mapController.setGeoJsonSource(
-      "markers-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": markers_features,
-      },
-    );
+    await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers_features).build());
   }
 
   Future<void> _updateTsunamiLine() async {
@@ -487,7 +471,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _updateEewIntensityArea(eew);
         _updateMapArea();
 
-        Map<String, dynamic> info = eewLocationInfo(eew.eq.mag, eew.eq.depth, eew.eq.lat, eew.eq.lon, userLat, userLon);
+        Map<String, dynamic> info =
+            eewLocationInfo(eew.eq.magnitude, eew.eq.depth, eew.eq.latitude, eew.eq.longitude, userLat, userLon);
         _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
         _userEewArriveTime[eew.id] = {
           "s": (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
@@ -545,7 +530,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _eewLastInfo[eew.id]!.eq.loc,
+                              _eewLastInfo[eew.id]!.eq.location,
                               style: TextStyle(
                                 fontSize: 24,
                                 color: context.colors.onSurface,
@@ -563,7 +548,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "M ${_eewLastInfo[eew.id]?.eq.mag}",
+                                  "M ${_eewLastInfo[eew.id]?.eq.magnitude}",
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: context.colors.onSurface,
@@ -719,7 +704,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _addEewCircle(Eew eew) async {
-    final circleData = circle(LatLng(eew.eq.lat, eew.eq.lon), 0, steps: 256);
+    final circleData = circle(LatLng(eew.eq.latitude, eew.eq.longitude), 0, steps: 256);
     await _mapController.addSource(
         "${eew.id}-circle",
         GeojsonSourceProperties(data: {
@@ -747,7 +732,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void _updateEewIntensityArea(Eew eew) {
-    _eewIntensityArea[eew.id] = eewAreaPga(eew.eq.lat, eew.eq.lon, eew.eq.depth, eew.eq.mag, Global.location);
+    _eewIntensityArea[eew.id] =
+        eewAreaPga(eew.eq.latitude, eew.eq.longitude, eew.eq.depth, eew.eq.magnitude, Global.location);
   }
 
   void _updateEewCircles() async {
@@ -756,13 +742,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       final dist = psWaveDist(_eewLastInfo[id]!.eq.depth, _eewLastInfo[id]!.eq.time, _getCurrentTime());
       _eewDist[id] = dist["s_dist"]!;
       final circleData =
-          circle(LatLng(_eewLastInfo[id]!.eq.lat, _eewLastInfo[id]!.eq.lon), dist["s_dist"]!, steps: 256);
+          circle(LatLng(_eewLastInfo[id]!.eq.latitude, _eewLastInfo[id]!.eq.longitude), dist["s_dist"]!, steps: 256);
       await _mapController.setGeoJsonSource("${id}-circle", {
         "type": "FeatureCollection",
         "features": [circleData]
       });
       final circleDataP =
-          circle(LatLng(_eewLastInfo[id]!.eq.lat, _eewLastInfo[id]!.eq.lon), dist["p_dist"]!, steps: 256);
+          circle(LatLng(_eewLastInfo[id]!.eq.latitude, _eewLastInfo[id]!.eq.longitude), dist["p_dist"]!, steps: 256);
       await _mapController.setGeoJsonSource("${id}-circle-p", {
         "type": "FeatureCollection",
         "features": [circleDataP]
@@ -860,7 +846,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         "properties": {},
         "id": e.key,
         "geometry": {
-          "coordinates": [info.lon, info.lat],
+          "coordinates": [info.longitude, info.latitude],
           "type": "Point"
         }
       };
@@ -895,7 +881,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         "properties": properties,
         "id": e.key,
         "geometry": {
-          "coordinates": [info.lon, info.lat],
+          "coordinates": [info.longitude, info.latitude],
           "type": "Point"
         }
       };

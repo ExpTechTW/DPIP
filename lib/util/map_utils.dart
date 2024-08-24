@@ -201,5 +201,5 @@ GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 6
 
   coordinates.add(coordinates[0]);
 
-  return polygon.setGeometry([coordinates]);
+  return polygon.setGeometry(coordinates);
 }

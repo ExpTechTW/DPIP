@@ -22,7 +22,7 @@ bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, Lis
   for (var eew in eewLastInfo.keys) {
     int skip = 0;
     for (int i = 0; i < 4; i++) {
-      final dist = distance(eewLastInfo[eew]!.eq.lat, eewLastInfo[eew]!.eq.lon, box[i][1], box[i][0]);
+      final dist = distance(eewLastInfo[eew]!.eq.latitude, eewLastInfo[eew]!.eq.longitude, box[i][1], box[i][0]);
       if (eewDist[eew]! > dist) {
         skip++;
       }

@@ -49,7 +49,7 @@ Future<void> getSavedLocation() async {
       MonitorPage.updatePosition();
     }
     return;
-  } on PlatformException catch (e) {
+  } on PlatformException {
     return;
   }
 }
