@@ -31,7 +31,8 @@ class Route {
   static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
   static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v1/weather/all/$postalCode");
   static Uri station() => Uri.parse("$api/v1/trem/station");
-  static Uri location(String token, String lat, String lng) => Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
+  static Uri location(String token, String lat, String lng) =>
+      Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
   static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
   static Uri radarList() => Uri.parse("$onlyapi/v1/tiles/radar/list");
   static Uri weatherList() => Uri.parse("$onlyapi/v1/meteor/weather/list");

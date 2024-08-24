@@ -110,7 +110,7 @@ class _DpipState extends State<Dpip> {
           );
         }
       } else {
-        if (Global.preference.getBool("welcome-1.0.0") != null) {
+        if (Global.preference.getBool("welcome-1.0.0") == null) {
           Global.preference.setString("changelog", Global.packageInfo.version);
           if (mounted) {
             Navigator.pushAndRemoveUntil(
