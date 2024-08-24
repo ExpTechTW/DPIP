@@ -10,6 +10,7 @@ import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/route/welcome/about.dart';
@@ -17,7 +18,6 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/route/announcement/announcement.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});

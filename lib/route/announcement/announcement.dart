@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/announcement.dart';
 import 'package:dpip/util/extension/build_context.dart';
