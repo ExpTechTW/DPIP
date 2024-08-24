@@ -47,17 +47,16 @@ String _getLocalizedType(String type) {
 }
 
 Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(
-      color: _getTypeColor(entry.type).withOpacity(0.1),
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: _getTypeColor(entry.type).withOpacity(0.3)),
-    ),
-    child: Text(
+  return Chip(
+    padding: const EdgeInsets.all(2),
+    side: BorderSide(color: _getTypeColor(entry.type)),
+    backgroundColor: _getTypeColor(entry.type).withOpacity(0.16),
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    label: Text(
       _getLocalizedType(entry.type),
-      style: context.theme.textTheme.bodySmall?.copyWith(
-        color: _getTypeColor(entry.type),
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.white,
         fontWeight: FontWeight.bold,
       ),
     ),
@@ -207,15 +206,15 @@ class ChangelogDetailPage extends StatelessWidget {
   final ChangelogEntry entry;
 
   const ChangelogDetailPage({
-    Key? key,
+    super.key,
     required this.entry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('v${entry.version} ${_getLocalizedType(entry.type)}'),
+        title: Text('版本詳情'),
         elevation: 0,
       ),
       body: SafeArea(
@@ -224,6 +223,13 @@ class ChangelogDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'v${entry.version} ${_getLocalizedType(entry.type)}',
+                style: context.theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
               _buildTypeChip(context, entry),
               const SizedBox(height: 24),
               MarkdownBody(

@@ -219,38 +219,17 @@ class AnnouncementCard extends StatelessWidget {
   }
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
-    final brightness = Theme.of(context).brightness;
-    final backgroundColor =
-        brightness == Brightness.dark ? tagType.color.withOpacity(0.5) : tagType.color.withOpacity(0.3);
-    final borderColor = brightness == Brightness.dark ? tagType.color.withOpacity(0.7) : tagType.color.withOpacity(0.5);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(5),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: IntrinsicWidth(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                color: borderColor,
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                tagType.text,
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+    return Chip(
+      padding: const EdgeInsets.all(2),
+      side: BorderSide(color: tagType.color),
+      backgroundColor: tagType.color.withOpacity(0.16),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      label: Text(
+        tagType.text,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -336,38 +315,17 @@ class AnnouncementDetailPage extends StatelessWidget {
   }
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
-    final brightness = Theme.of(context).brightness;
-    final backgroundColor =
-        brightness == Brightness.dark ? tagType.color.withOpacity(0.5) : tagType.color.withOpacity(0.3);
-    final borderColor = brightness == Brightness.dark ? tagType.color.withOpacity(0.7) : tagType.color.withOpacity(0.5);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(5),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: IntrinsicWidth(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                color: borderColor,
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                tagType.text,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+    return Chip(
+      padding: const EdgeInsets.all(2),
+      side: BorderSide(color: tagType.color),
+      backgroundColor: tagType.color.withOpacity(0.16),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      label: Text(
+        tagType.text,
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
