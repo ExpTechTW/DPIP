@@ -710,51 +710,51 @@
   "@moderate_snow": {
     "description": "天氣狀況：雪"
   },
-  "patchy_heavy_snow": "국지적인 폭설",
+  "patchy_heavy_snow": "국지성 대설",
   "@patchy_heavy_snow": {
     "description": "天氣狀況：局部大雪"
   },
-  "heavy_snow": "폭설",
+  "heavy_snow": "대설",
   "@heavy_snow": {
     "description": "天氣狀況：大雪"
   },
-  "ice_pellets": "진눈깨비",
+  "ice_pellets": "싸라기눈",
   "@ice_pellets": {
     "description": "天氣狀況：冰霰"
   },
-  "light_rain_shower": "가벼운 소나기",
+  "light_rain_shower": "약한 소나기",
   "@light_rain_shower": {
     "description": "天氣狀況：小陣雨"
   },
-  "moderate_or_heavy_rain_shower": "샤워",
+  "moderate_or_heavy_rain_shower": "소나기",
   "@moderate_or_heavy_rain_shower": {
     "description": "天氣狀況：陣雨"
   },
-  "torrential_rain_shower": "큰샤워",
+  "torrential_rain_shower": "강한 소나기",
   "@torrential_rain_shower": {
     "description": "天氣狀況：大陣雨"
   },
-  "light_sleet_showers": "진눈깨비가 약간 내림",
+  "light_sleet_showers": "약한 진눈깨비",
   "@light_sleet_showers": {
     "description": "天氣狀況：小陣雨夾雪"
   },
-  "moderate_or_heavy_sleet_showers": "진눈깨비 소나기",
+  "moderate_or_heavy_sleet_showers": "진눈깨비",
   "@moderate_or_heavy_sleet_showers": {
     "description": "天氣狀況：陣雨夾雪"
   },
-  "light_snow_showers": "작은 눈 소나기",
+  "light_snow_showers": "약한 소낙눈",
   "@light_snow_showers": {
     "description": "天氣狀況：小陣雪"
   },
-  "moderate_or_heavy_snow_showers": "눈 소나기",
+  "moderate_or_heavy_snow_showers": "소낙눈",
   "@moderate_or_heavy_snow_showers": {
     "description": "天氣狀況：陣雪"
   },
-  "light_showers_of_ice_pellets": "얼음을 동반한 작은 비",
+  "light_showers_of_ice_pellets": "약한 소나기를 동반한 싸라기눈",
   "@light_showers_of_ice_pellets": {
     "description": "天氣狀況：小陣雨伴隨冰霰"
   },
-  "moderate_or_heavy_showers_of_ice_pellets": "진눈깨비를 동반한 소나기",
+  "moderate_or_heavy_showers_of_ice_pellets": "소나기를 동반한 싸라기눈",
   "@moderate_or_heavy_showers_of_ice_pellets": {
     "description": "天氣狀況：陣雨伴隨冰霰"
   },
@@ -766,7 +766,7 @@
   "@moderate_or_heavy_rain_with_thunder": {
     "description": "天氣狀況：雷雨"
   },
-  "patchy_light_snow_with_thunder": "천둥을 동반한 부분적으로 눈이 내림",
+  "patchy_light_snow_with_thunder": "국지성 약한 뇌설",
   "@patchy_light_snow_with_thunder": {
     "description": "天氣狀況：局部小雪伴雷"
   },
