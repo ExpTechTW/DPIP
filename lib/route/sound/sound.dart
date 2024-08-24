@@ -123,7 +123,7 @@ class _SettingsSoundViewState extends State<SoundRoute> {
                 subtitle: context.i18n.strong_wind_warning_description_sound,
                 file: "normal.wav",
               ),
-              ListTileGroupHeader(title: context.i18n.other_sound_title),
+              ListTileGroupHeader(title: context.i18n.other_title),
               SoundListTile(
                 title: context.i18n.other_alert_sound,
                 subtitle: context.i18n.other_alert_description_sound,

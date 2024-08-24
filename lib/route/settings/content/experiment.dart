@@ -21,7 +21,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
           SwitchListTile(
-            title: const Text("啟用強震監視器"),
+            title: Text(context.i18n.enable_monitor),
             value: monitorEnabled,
             onChanged: (value) async {
               if (!value) {
