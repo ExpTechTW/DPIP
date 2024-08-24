@@ -82,7 +82,7 @@ class _PermissionPageState extends State<PermissionPage> {
                                 icon: Icons.notifications,
                                 text: "通知",
                                 description: "用於提供基於FCM&通知的服務",
-                                color: Colors.yellow,
+                                color: Colors.orange,
                                 onTap: () async {
                                   final status = await requestNotificationPermission();
                                   if (status.isGranted) {
