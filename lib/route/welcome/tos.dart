@@ -173,6 +173,17 @@ class _TOSPageState extends State<TOSPage> {
                 children: [],
               ),
             ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: context.colors.surfaceContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                "感謝您閱讀完。",
+                style: context.theme.textTheme.bodyLarge,
+              ),
+            ),
           ],
         ),
       ),
