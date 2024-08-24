@@ -19,21 +19,18 @@ class _TOSPageState extends State<TOSPage> {
   @override
   void initState() {
     super.initState();
-    controller = ScrollController();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _checkScrollExtent();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (controller.position.maxScrollExtent > 0) {
+        controller.addListener(() {
+          final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
+          if (bottom && !isEnabled) {
+            setState(() => isEnabled = true);
+          }
+        });
+      } else {
+        setState(() => isEnabled = true);
       }
     });
-  }
-
-  void _checkScrollExtent() {
-    if (controller.position.maxScrollExtent > 0) {
-      controller.addListener(_scrollListener);
-    } else {
-      setState(() => isEnabled = true);
-    }
   }
 
   void _scrollListener() {
