@@ -62,7 +62,8 @@ class UpdateRequiredPage extends StatelessWidget {
                     padding: EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        _buildVersionInfo(context.i18n.current_version, Global.packageInfo.version, Colors.red.shade400),
+                        _buildVersionInfo(
+                            context.i18n.current_version, Global.packageInfo.version, Colors.red.shade400),
                         const SizedBox(height: 12),
                         _buildVersionInfo(context.i18n.latest_version, lastVersion, Colors.green.shade400),
                       ],
