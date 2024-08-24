@@ -208,6 +208,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  void openLocationSetting() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        settings: const RouteSettings(name: "/settings"),
+        builder: (context) => const SettingsRoute(
+          initialRoute: '/location',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -256,17 +268,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   children: [
                                     InkWell(
                                       borderRadius: BorderRadius.circular(16),
-                                      onTap: () => {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            settings: const RouteSettings(name: "/settings"),
-                                            builder: (context) => const SettingsRoute(
-                                              initialRoute: '/location',
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      onTap: () => openLocationSetting(),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                         child: Row(
