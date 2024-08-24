@@ -222,21 +222,28 @@ class _LightningMapState extends State<LightningMap> {
 
   Widget _buildLegend() {
     return MapLegend(
+      label: "閃電圖例",
       children: [
-        _buildLegendItem(Icons.add, Colors.red, context.i18n.cg_lightning),
-        _buildLegendItem(Icons.circle, Colors.orange, context.i18n.cc_lightning),
+        _legendItem('lightning-1-5', '5 分鐘內對地閃電'),
+        _legendItem('lightning-1-10', '10 分鐘內對地閃電'),
+        _legendItem('lightning-1-30', '30 分鐘內對地閃電'),
+        _legendItem('lightning-1-60', '60 分鐘內對地閃電'),
+        _legendItem('lightning-0-5', '5 分鐘內雲間閃電'),
+        _legendItem('lightning-0-10', '10 分鐘內雲間閃電'),
+        _legendItem('lightning-0-30', '30 分鐘內雲間閃電'),
+        _legendItem('lightning-0-60', '60 分鐘內雲間閃電'),
       ],
     );
   }
 
-  Widget _buildLegendItem(IconData icon, Color color, String label) {
+  Widget _legendItem(String imageName, String label) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
+          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
           const SizedBox(width: 8),
-          Text(label, style: context.theme.textTheme.bodyMedium),
+          Text(label),
         ],
       ),
     );
