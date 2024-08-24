@@ -1,4 +1,6 @@
+import "package:dpip/core/fcm.dart";
 import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
 import "package:dpip/route/welcome/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
@@ -85,6 +87,9 @@ class _PermissionPageState extends State<PermissionPage> {
                                 onTap: () async {
                                   final status = await requestNotificationPermission();
                                   if (status.isGranted) {
+                                    fcmInit();
+                                    notifyInit();
+                                    initBackgroundService();
                                     setState(() => isEnabled = true);
                                   }
                                 },
