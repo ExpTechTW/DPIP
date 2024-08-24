@@ -1,3 +1,4 @@
+import 'package:dpip/route/welcome/tos.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -72,13 +73,10 @@ class _PermissionPageState extends State<PermissionPage> {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
-                  if (await _areAllPermissionsGranted()) {
-                    // Navigate to next page
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please grant all permissions to continue')),
-                    );
-                  }
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const TOSPage()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -130,15 +128,6 @@ class _PermissionPageState extends State<PermissionPage> {
         );
       },
     );
-  }
-
-  Future<bool> _areAllPermissionsGranted() async {
-    for (var item in permissions) {
-      if (!(await item.permission.isGranted)) {
-        return false;
-      }
-    }
-    return true;
   }
 }
 
