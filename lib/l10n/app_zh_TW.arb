@@ -876,8 +876,8 @@
       }
     }
   },
-  "observing_tsunamis": "各地觀測到的海嘯",
-  "@observing_tsunamis": {
-    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
+  "home_Safety": "一切平安，無事件發生。",
+  "@home_Safety": {
+    "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   }
 }
