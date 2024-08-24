@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/home/home.dart';
@@ -10,6 +12,7 @@ import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/route/welcome/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class Dpip extends StatefulWidget {
@@ -32,6 +35,23 @@ class _DpipState extends State<Dpip> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkForUpdates();
     });
+    if (Platform.isAndroid) {
+      InAppUpdate.checkForUpdate().then((info) {
+        setState(() {
+          if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+            if (info.immediateUpdateAllowed) {
+              InAppUpdate.performImmediateUpdate();
+            } else if (info.flexibleUpdateAllowed) {
+              InAppUpdate.startFlexibleUpdate().then((updateResult) {
+                if (updateResult == AppUpdateResult.success) {
+                  InAppUpdate.completeFlexibleUpdate();
+                }
+              });
+            }
+          }
+        });
+      }).catchError((e) {});
+    }
   }
 
   int compareVersions(String version1, String version2) {
