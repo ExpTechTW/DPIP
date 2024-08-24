@@ -75,17 +75,17 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
-          const ListTileGroupHeader(title: "其他"),
+          ListTileGroupHeader(title: context.i18n.other_title),
           ListTile(
             leading: const Padding(
               padding: EdgeInsets.all(8),
               child: Icon(Symbols.experiment),
             ),
-            title: const Text(
-              "進階功能",
+            title: Text(
+              context.i18n.advanced_features,
               style: tileTitleTextStyle,
             ),
-            subtitle: const Text("調整 DPIP 的進階功能"),
+            subtitle: Text(context.i18n.advanced_features_title),
             onTap: () {
               Navigator.pushNamed(
                 context,
