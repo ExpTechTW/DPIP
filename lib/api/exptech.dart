@@ -147,7 +147,7 @@ class ExpTech {
   }
 
   Future<String> getNotifyLocation(String token, String lat, String lng) async {
-    final requestUrl = Route.location(token, lat, lng);
+    final requestUrl = await Route.location(token, lat, lng);
 
     var res = await get(requestUrl);
 
