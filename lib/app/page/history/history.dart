@@ -9,11 +9,29 @@ import 'package:dpip/widget/error/region_out_of_service.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 
+typedef PositionUpdateCallback = void Function();
+
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+  final Function()? onPositionUpdate;
+
+  const HistoryPage({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition() {
+    _activeCallback?.call();
+  }
 }
 
 class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin {
@@ -21,8 +39,6 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
-  Map<String, dynamic> weatherData = {};
-  List<Widget> weatherCard = [];
   bool init = false;
   String city = Global.preference.getString("location-city") ?? "";
   String town = Global.preference.getString("location-town") ?? "";
@@ -67,6 +83,23 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+    start();
+    HistoryPage.setActiveCallback(sendpositionUpdate);
+  }
+
+  @override
+  void dispose() {
+    HistoryPage.clearActiveCallback();
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  void start() {
+    city = Global.preference.getString("location-city") ?? "";
+    town = Global.preference.getString("location-town") ?? "";
+    region = Global.location.entries.firstWhereOrNull((l) => (l.value.city == city) && (l.value.town == town))?.key;
+    if (region == null) return;
+    refreshHistoryList();
     double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
       if (scrollController.offset > 1e-5) {
@@ -83,10 +116,13 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
+  }
 
-    region = Global.location.entries.firstWhereOrNull((l) => (l.value.city == city) && (l.value.town == town))?.key;
-    if (region == null) return;
-    refreshHistoryList();
+  void sendpositionUpdate() {
+    if (mounted) {
+      start();
+      widget.onPositionUpdate?.call();
+    }
   }
 
   @override

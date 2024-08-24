@@ -1,4 +1,5 @@
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/app/page/map/radar/radar.dart';
@@ -34,6 +35,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
     const MonitorPage(data: 0).createState();
     const HomePage().createState();
     HomePage.updatePosition();
+    HistoryPage.updatePosition();
     RadarMap.updatePosition();
     MonitorPage.updatePosition();
     Navigator.popUntil(context, ModalRoute.withName("/settings"));

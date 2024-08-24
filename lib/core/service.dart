@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/app/page/map/radar/radar.dart';
@@ -77,6 +78,7 @@ void androidSendPositionlisten() {
 
           SettingsLocationView.updatePosition();
           HomePage.updatePosition();
+          HistoryPage.updatePosition();
           RadarMap.updatePosition();
           MonitorPage.updatePosition();
         }
@@ -87,6 +89,7 @@ void androidSendPositionlisten() {
         Global.preference.setDouble("user-lon", 0.0);
         SettingsLocationView.updatePosition();
         HomePage.updatePosition();
+        HistoryPage.updatePosition();
         RadarMap.updatePosition();
         MonitorPage.updatePosition();
       }
