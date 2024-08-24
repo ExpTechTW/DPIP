@@ -13,14 +13,30 @@ class PermissionPage extends StatefulWidget {
   State<PermissionPage> createState() => _PermissionPageState();
 }
 
-class _PermissionPageState extends State<PermissionPage> {
+class _PermissionPageState extends State<PermissionPage> with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
   bool _isRequestingPermission = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _permissionsFuture = _initializePermissions();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _permissionsFuture = _initializePermissions();
+      });
+    }
   }
 
   Future<List<Permission>> _initializePermissions() async {
@@ -173,8 +189,8 @@ class _PermissionPageState extends State<PermissionPage> {
   }
 
   Widget _buildPermissionSwitch(PermissionItem item) {
-    return FutureBuilder<bool>(
-      future: item.permission.isGranted,
+    return FutureBuilder<PermissionStatus>(
+      future: item.permission.status,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(
@@ -183,9 +199,9 @@ class _PermissionPageState extends State<PermissionPage> {
             child: CircularProgressIndicator(strokeWidth: 2),
           );
         }
-        final isGranted = snapshot.data ?? false;
+        final status = snapshot.data ?? PermissionStatus.denied;
         return Switch(
-          value: isGranted,
+          value: status.isGranted,
           onChanged: (value) => _handlePermissionChange(item, value),
         );
       },
@@ -202,24 +218,59 @@ class _PermissionPageState extends State<PermissionPage> {
     });
 
     try {
+      PermissionStatus status;
       if (value) {
-        final status = await item.permission.request();
-        setState(() {
-          item.isGranted = status.isGranted;
-        });
+        status = await item.permission.request();
       } else {
-        await openAppSettings();
+        status = await item.permission.status;
+        if (status.isGranted) {
+          await openAppSettings();
+          // 等待一段時間，讓用戶有機會更改設置
+          await Future.delayed(const Duration(seconds: 2));
+          status = await item.permission.status;
+        }
       }
+
+      if (status.isPermanentlyDenied) {
+        _showPermanentlyDeniedDialog(item);
+      }
+
+      setState(() {
+        item.isGranted = status.isGranted;
+      });
     } catch (e) {
-      print('Error requesting permission: $e');
+      print('Error handling permission change: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to request permission: ${item.text}')),
+        SnackBar(content: Text('Failed to change permission: ${item.text}')),
       );
     } finally {
       setState(() {
         _isRequestingPermission = false;
       });
     }
+  }
+
+  void _showPermanentlyDeniedDialog(PermissionItem item) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('${item.text} Permission Required'),
+        content: Text('This permission is required for the app to function properly. Please enable it in your device settings.'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Open Settings'),
+            onPressed: () {
+              openAppSettings();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _continueToTOS() {
