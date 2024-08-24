@@ -156,7 +156,7 @@ class _DpipState extends State<Dpip> {
             );
           } else {
             var data = await ExpTech().getAnnouncement();
-            if (Global.preference.getString("announcement") != data.last.time.toString()) {
+            if (data.last.show && Global.preference.getString("announcement") != data.last.time.toString()) {
               Global.preference.setString("announcement", data.last.time.toString());
               await showDialog(
                 context: context,
