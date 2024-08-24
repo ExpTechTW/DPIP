@@ -15,6 +15,7 @@ class PermissionPage extends StatefulWidget {
 
 class _PermissionPageState extends State<PermissionPage> {
   late Future<List<PermissionItem>> _permissionsFuture;
+  bool _isRequestingPermission = false;
 
   @override
   void initState() {
@@ -26,63 +27,62 @@ class _PermissionPageState extends State<PermissionPage> {
     final deviceInfo = DeviceInfoPlugin();
     final List<PermissionItem> permissions = [];
 
-    if (Platform.isAndroid) {
-      final androidInfo = await deviceInfo.androidInfo;
-      permissions.addAll([
-        PermissionItem(
-          icon: Icons.notifications,
-          text: context.i18n.notification,
-          description: context.i18n.notification_service_description,
-          color: Colors.orange,
-          permission: Permission.notification,
-        ),
-        PermissionItem(
-          icon: Icons.location_on,
-          text: context.i18n.settings_position,
-          description: context.i18n.location_based_service,
-          color: Colors.blue,
-          permission: Permission.location,
-        ),
-        PermissionItem(
-          icon: Icons.storage,
-          text: context.i18n.image_save,
-          description: context.i18n.data_visualization_storage,
-          color: Colors.green,
-          permission: androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
-        ),
-      ]);
-    } else if (Platform.isIOS) {
-      permissions.addAll([
-        PermissionItem(
-          icon: Icons.notifications,
-          text: context.i18n.notification,
-          description: context.i18n.notification_service_description,
-          color: Colors.orange,
-          permission: Permission.notification,
-        ),
-        PermissionItem(
-          icon: Icons.location_on,
-          text: context.i18n.settings_position,
-          description: context.i18n.location_based_service,
-          color: Colors.blue,
-          permission: Permission.location,
-        ),
-        PermissionItem(
-          icon: Icons.photo_library,
-          text: context.i18n.image_save,
-          description: context.i18n.data_visualization_storage,
-          color: Colors.green,
-          permission: Permission.photos,
-        ),
-      ]);
+    try {
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        permissions.addAll([
+          PermissionItem(
+            icon: Icons.notifications,
+            text: context.i18n.notification,
+            description: context.i18n.notification_service_description,
+            color: Colors.orange,
+            permission: Permission.notification,
+          ),
+          PermissionItem(
+            icon: Icons.location_on,
+            text: context.i18n.settings_position,
+            description: context.i18n.location_based_service,
+            color: Colors.blue,
+            permission: Permission.location,
+          ),
+          PermissionItem(
+            icon: Icons.storage,
+            text: context.i18n.image_save,
+            description: context.i18n.data_visualization_storage,
+            color: Colors.green,
+            permission: androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+          ),
+        ]);
+      } else if (Platform.isIOS) {
+        permissions.addAll([
+          PermissionItem(
+            icon: Icons.notifications,
+            text: context.i18n.notification,
+            description: context.i18n.notification_service_description,
+            color: Colors.orange,
+            permission: Permission.notification,
+          ),
+          PermissionItem(
+            icon: Icons.location_on,
+            text: context.i18n.settings_position,
+            description: context.i18n.location_based_service,
+            color: Colors.blue,
+            permission: Permission.location,
+          ),
+          PermissionItem(
+            icon: Icons.photo_library,
+            text: context.i18n.image_save,
+            description: context.i18n.data_visualization_storage,
+            color: Colors.green,
+            permission: Permission.photos,
+          ),
+        ]);
+      }
+    } catch (e) {
+      print('Error initializing permissions: $e');
     }
-    return permissions;
-  }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _permissionsFuture = _initializePermissions();
+    return permissions;
   }
 
   @override
@@ -98,7 +98,7 @@ class _PermissionPageState extends State<PermissionPage> {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData) {
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return const Center(child: Text('No permissions to display'));
               }
 
@@ -170,7 +170,11 @@ class _PermissionPageState extends State<PermissionPage> {
       future: item.permission.isGranted,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          );
         }
         final isGranted = snapshot.data ?? false;
         return Switch(
@@ -181,14 +185,33 @@ class _PermissionPageState extends State<PermissionPage> {
     );
   }
 
-  void _handlePermissionChange(PermissionItem item, bool value) async {
-    if (value) {
-      final status = await item.permission.request();
+  Future<void> _handlePermissionChange(PermissionItem item, bool value) async {
+    if (_isRequestingPermission) {
+      return;
+    }
+
+    setState(() {
+      _isRequestingPermission = true;
+    });
+
+    try {
+      if (value) {
+        final status = await item.permission.request();
+        setState(() {
+          item.isGranted = status.isGranted;
+        });
+      } else {
+        await openAppSettings();
+      }
+    } catch (e) {
+      print('Error requesting permission: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to request permission: ${item.text}')),
+      );
+    } finally {
       setState(() {
-        item.isGranted = status.isGranted;
+        _isRequestingPermission = false;
       });
-    } else {
-      openAppSettings();
     }
   }
 
