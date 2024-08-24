@@ -42,7 +42,7 @@ class _DpipState extends State<Dpip> {
       if (Global.packageInfo.version.endsWith(".0")) {
         lastVersion = data["last-version"]["release"];
         update = (Global.packageInfo.version != lastVersion);
-      } else {
+      } else if (Global.packageInfo.version.endsWith("00")){
         lastVersion = data["last-version"]["beta"];
         update = (Global.packageInfo.version != lastVersion);
       }
