@@ -87,13 +87,6 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     HistoryPage.setActiveCallback(sendpositionUpdate);
   }
 
-  @override
-  void dispose() {
-    HistoryPage.clearActiveCallback();
-    scrollController.dispose();
-    super.dispose();
-  }
-
   void start() {
     city = Global.preference.getString("location-city") ?? "";
     town = Global.preference.getString("location-town") ?? "";
@@ -232,6 +225,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 
   @override
   void dispose() {
+    HistoryPage.clearActiveCallback();
     scrollController.dispose();
     super.dispose();
   }
