@@ -980,9 +980,9 @@
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
-  "privacy_policy": "隱私權聲明",
-  "@privacy_policy": {
-    "description": "「歡迎」頁面 → 隱私權聲明"
+  "permission": "權限",
+  "@permission": {
+    "description": "「歡迎」頁面 → 權限"
   },
   "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
   "@privacy_commitment": {

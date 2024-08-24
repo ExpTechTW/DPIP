@@ -61,7 +61,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        context.i18n.privacy_policy,
+                        context.i18n.permission,
                         style: Theme.of(context).textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
