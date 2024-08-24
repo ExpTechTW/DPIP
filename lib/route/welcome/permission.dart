@@ -104,8 +104,8 @@ class _PermissionPageState extends State<PermissionPage> {
                               const SizedBox(height: 16),
                               const PermissionItem(
                                 icon: Icons.storage,
-                                text: "存儲",
-                                description: "用於存儲中央氣象署或 ExpTech 提供之數據可視畫圖片",
+                                text: "儲存",
+                                description: "用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片",
                                 color: Colors.green,
                               ),
                             ],
