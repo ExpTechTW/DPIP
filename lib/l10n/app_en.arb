@@ -409,7 +409,7 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上",
+  "tsunami_alert2_description_sound": "",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
   },
@@ -473,7 +473,7 @@
   "@humidity_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 濕度"
   },
-  "pressure_monitor": "氣壓",
+  "pressure_monitor": "Air pressure",
   "@pressure_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 氣壓"
   },
@@ -481,7 +481,7 @@
   "@wind_direction_and_speed_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 風向/風速"
   },
-  "typhoon_monitor": "颱風",
+  "typhoon_monitor": "Typhoon",
   "@typhoon_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 颱風"
   },
@@ -493,7 +493,7 @@
   "@map_legend": {
     "description": "「地圖」路徑 → 地圖列表 → 「圖例」標題"
   },
-  "unit_dbz": "單位：dBZ",
+  "unit_dbz": "Unit: dBZ",
   "@unit_dbz": {
     "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 單位：dBZ"
   },
@@ -517,15 +517,15 @@
   "@history": {
     "description": "「歷史」頁面標題"
   },
-  "historical_events": "3天內的歷史事件資訊",
+  "historical_events": "Historical event information within 3 days",
   "@historical_events": {
     "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
   },
-  "no_historical_events": "沒有歷史事件資訊",
+  "no_historical_events": "no history",
   "@no_historical_events": {
     "description": "「歷史」路徑 → 沒有歷史事件資訊"
   },
-  "hourly_forecast": "每小時預報",
+  "hourly_forecast": "per hour",
   "@hourly_forecast": {
     "description": "「首頁」路徑 → 「每小時預報」標題"
   },
