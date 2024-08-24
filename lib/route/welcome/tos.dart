@@ -74,6 +74,7 @@ class _TOSPageState extends State<TOSPage> {
       ),
       body: SafeArea(
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           controller: controller,
           padding: const EdgeInsets.all(24),
           children: [
@@ -164,6 +165,12 @@ class _TOSPageState extends State<TOSPage> {
               child: Text(
                 "2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
                 style: context.theme.textTheme.bodyLarge,
+              ),
+            ),
+            SizedBox(
+              height: MediaQuery.of(context).size.height + 1,
+              child: const Column(
+                children: [],
               ),
             ),
           ],
