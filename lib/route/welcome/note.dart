@@ -25,15 +25,15 @@ class NotePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        "注意事項",
+                        context.i18n.notice,
                         style: context.theme.textTheme.headlineLarge,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: EdgeInsets.all(16.0),
                         child: Text(
-                          "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+                          context.i18n.notice_details,
                           style: context.theme.textTheme.bodyMedium,
                         ),
                       ),
@@ -57,7 +57,7 @@ class NotePage extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      "任何資訊應以中央氣象署發布之內容為準。",
+                                      context.i18n.official_info,
                                       style: context.theme.textTheme.bodyMedium?.copyWith(
                                         color: context.colors.error,
                                       ),
@@ -86,7 +86,7 @@ class NotePage extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。",
+                                      context.i18n.information_reliability,
                                       style: context.theme.textTheme.bodyMedium,
                                     ),
                                   ),
@@ -113,7 +113,7 @@ class NotePage extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      "強烈搖晃有機率比通知早抵達使用者所在地。",
+                                      context.i18n.strong_shake_warning,
                                       style: context.theme.textTheme.bodyMedium,
                                     ),
                                   ),
@@ -140,7 +140,7 @@ class NotePage extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。",
+                                      context.i18n.earthquake_alert_warning,
                                       style: context.theme.textTheme.bodyMedium,
                                     ),
                                   ),
@@ -167,7 +167,7 @@ class NotePage extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。",
+                                      context.i18n.legal_risks,
                                       style: context.theme.textTheme.bodyMedium,
                                     ),
                                   ),
@@ -192,7 +192,7 @@ class NotePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text("下一步"),
+                child: Text(context.i18n.next_step),
               ),
             ],
           ),

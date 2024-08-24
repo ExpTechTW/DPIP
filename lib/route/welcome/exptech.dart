@@ -45,31 +45,31 @@ class ExpTechAboutPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: EdgeInsets.all(16.0),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "我們是誰？",
+                                  context.i18n.who_we_are,
                                   style: context.theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+                                  context.i18n.exptech_studio_description,
                                   style: context.theme.textTheme.bodyMedium,
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  "我們的初衷",
+                                  context.i18n.our_mission,
                                   style: context.theme.textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+                                  context.i18n.founding_mission,
                                   style: context.theme.textTheme.bodyMedium,
                                 ),
                               ],
