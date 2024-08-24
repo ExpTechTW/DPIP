@@ -461,19 +461,19 @@
   "@radar_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 雷達回波"
   },
-  "precipitation_monitor": "降水",
+  "precipitation_monitor": "降水量",
   "@precipitation_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 降水"
   },
-  "temperature_monitor": "氣溫",
+  "temperature_monitor": "気温",
   "@temperature_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫"
   },
-  "humidity_monitor": "濕度",
+  "humidity_monitor": "湿度",
   "@humidity_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 濕度"
   },
-  "pressure_monitor": "氣壓",
+  "pressure_monitor": "気圧",
   "@pressure_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 氣壓"
   },
@@ -481,15 +481,15 @@
   "@wind_direction_and_speed_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 風向/風速"
   },
-  "typhoon_monitor": "颱風",
+  "typhoon_monitor": "台風",
   "@typhoon_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 颱風"
   },
-  "tsunami_info_monitor": "海嘯資訊",
+  "tsunami_info_monitor": "津波情報",
   "@tsunami_info_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 海嘯資訊"
   },
-  "map_legend": "圖例",
+  "map_legend": "凡例",
   "@map_legend": {
     "description": "「地圖」路徑 → 地圖列表 → 「圖例」標題"
   },
