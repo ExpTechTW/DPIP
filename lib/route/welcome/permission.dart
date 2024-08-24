@@ -43,7 +43,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       Icon(
                         Icons.security,
                         size: 80,
-                        color: context.theme.primaryColor,
+                        color: context.colors.secondary,
                       ),
                       const SizedBox(height: 24),
                       Text(

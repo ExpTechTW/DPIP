@@ -21,7 +21,7 @@ class NotePage extends StatelessWidget {
                       Icon(
                         Icons.warning_rounded,
                         size: 80,
-                        color: context.theme.primaryColor,
+                        color: context.colors.secondary,
                       ),
                       const SizedBox(height: 24),
                       Text(
