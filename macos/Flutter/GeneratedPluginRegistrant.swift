@@ -14,8 +14,8 @@ import flutter_local_notifications
 import geolocator_apple
 import package_info_plus
 import path_provider_foundation
+import platform_device_id
 import platform_device_id_macos
-import platform_device_id_v3
 import shared_preferences_foundation
 import sqflite
 import url_launcher_macos
