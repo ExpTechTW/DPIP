@@ -1,6 +1,6 @@
-import 'package:dpip/route/settings/settings.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/route/settings/settings.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 Future<void> showLocationDialog(BuildContext context) async {
   await showDialog(
@@ -24,7 +24,7 @@ Future<void> showLocationDialog(BuildContext context) async {
                 MaterialPageRoute(
                   settings: const RouteSettings(name: "/settings"),
                   builder: (context) => const SettingsRoute(
-                    initialRoute: '/location',
+                    initialRoute: "/location",
                   ),
                 ),
               );

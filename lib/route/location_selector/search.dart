@@ -1,7 +1,7 @@
-import 'package:dpip/global.dart';
-import 'package:dpip/model/location/location.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/global.dart";
+import "package:dpip/model/location/location.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
   @override

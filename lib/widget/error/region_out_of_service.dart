@@ -1,6 +1,6 @@
-import 'package:dpip/route/settings/settings.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/route/settings/settings.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
 
 class RegionOutOfService extends StatelessWidget {
   const RegionOutOfService({super.key});
@@ -22,7 +22,7 @@ class RegionOutOfService extends StatelessWidget {
               MaterialPageRoute(
                 settings: const RouteSettings(name: "/settings"),
                 builder: (context) => const SettingsRoute(
-                  initialRoute: '/location',
+                  initialRoute: "/location",
                 ),
               ),
             );

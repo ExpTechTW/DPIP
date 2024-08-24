@@ -1,6 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
+import "package:json_annotation/json_annotation.dart";
 
-part 'eew_info.g.dart';
+part "eew_info.g.dart";
 
 @JsonSerializable()
 class EewInfo {

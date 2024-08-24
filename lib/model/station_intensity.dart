@@ -1,6 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
+import "package:json_annotation/json_annotation.dart";
 
-part 'station_intensity.g.dart';
+part "station_intensity.g.dart";
 
 @JsonSerializable()
 class StationIntensity {

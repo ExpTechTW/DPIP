@@ -1,18 +1,18 @@
-import 'dart:async';
-import 'dart:io';
+import "dart:async";
+import "dart:io";
 
-import 'package:autostarter/autostarter.dart';
-import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/widget/list/tile_group_header.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
+import "package:autostarter/autostarter.dart";
+import "package:disable_battery_optimization/disable_battery_optimization.dart";
+import "package:dpip/global.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/widget/list/tile_group_header.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:permission_handler/permission_handler.dart";
 
-import '../../../core/service.dart';
-import '../../location_selector/location_selector.dart';
+import "../../../core/service.dart";
+import "../../location_selector/location_selector.dart";
 
 final stateSettingsLocationView = _SettingsLocationViewState();
 
@@ -42,7 +42,7 @@ class SettingsLocationView extends StatefulWidget {
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
-  static const platform = MethodChannel('com.exptech.dpip/location');
+  static const platform = MethodChannel("com.exptech.dpip/location");
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
@@ -313,7 +313,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Future toggleAutoLocation() async {
     if (Platform.isIOS) {
       try {
-        await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
+        await platform.invokeMethod("toggleLocation", {"isEnabled": !isAutoLocatingEnabled});
       } catch (e) {
         return;
       }
@@ -497,7 +497,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '通知功能已被拒絕，請移至設定允許權限',
+                        "通知功能已被拒絕，請移至設定允許權限",
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),

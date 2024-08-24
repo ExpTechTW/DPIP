@@ -1,17 +1,17 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:clipboard/clipboard.dart';
-import 'package:dpip/core/notify.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/route/changelog/changelog.dart';
-import 'package:dpip/route/settings/settings.dart';
-import 'package:dpip/route/sound/sound.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:simple_icons/simple_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
+import "package:clipboard/clipboard.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/global.dart";
+import "package:dpip/route/changelog/changelog.dart";
+import "package:dpip/route/settings/settings.dart";
+import "package:dpip/route/sound/sound.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/cupertino.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:simple_icons/simple_icons.dart";
+import "package:url_launcher/url_launcher.dart";
 
 class MePage extends StatefulWidget {
   const MePage({super.key});
@@ -76,7 +76,7 @@ class _MePageState extends State<MePage> {
             }).catchError((error) {
               context.scaffoldMessenger.showSnackBar(
                 SnackBar(
-                  content: Text('複製 FCM Token 時發生錯誤：$error'),
+                  content: Text("複製 FCM Token 時發生錯誤：$error"),
                 ),
               );
             });

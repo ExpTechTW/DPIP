@@ -1,6 +1,6 @@
-import 'package:dpip/route/welcome/exptech.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/route/welcome/exptech.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -19,10 +19,10 @@ class AboutPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset('assets/DPIP.png', width: 120, height: 120),
+                        Image.asset("assets/DPIP.png", width: 120, height: 120),
                         const SizedBox(height: 32),
                         Text(
-                          '歡迎使用 DPIP',
+                          "歡迎使用 DPIP",
                           style: context.theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: context.theme.primaryColor,
@@ -31,14 +31,14 @@ class AboutPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Disaster Prevention Information Platform',
+                          "Disaster Prevention Information Platform",
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.theme.primaryColor.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          '防災資訊平台',
+                          "防災資訊平台",
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.theme.primaryColor.withOpacity(0.7),
                           ),
@@ -53,7 +53,7 @@ class AboutPage extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              'DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。',
+                              "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
                               style: context.theme.textTheme.bodyMedium,
                               textAlign: TextAlign.left,
                             ),
@@ -80,7 +80,7 @@ class AboutPage extends StatelessWidget {
                     ),
                     minimumSize: const Size(double.infinity, 50),
                   ),
-                  child: const Text('下一步'),
+                  child: const Text("下一步"),
                 ),
               ),
             ],

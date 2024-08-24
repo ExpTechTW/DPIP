@@ -1,7 +1,7 @@
-import 'package:dpip/model/station_info.dart';
-import 'package:json_annotation/json_annotation.dart';
+import "package:dpip/model/station_info.dart";
+import "package:json_annotation/json_annotation.dart";
 
-part 'station.g.dart';
+part "station.g.dart";
 
 @JsonSerializable()
 class Station {

@@ -1,21 +1,21 @@
-import 'dart:async';
-import 'dart:io';
+import "dart:async";
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/map/tsunami/tsunami_estimate_list.dart';
-import 'package:dpip/app/page/map/tsunami/tsunami_observed_list.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/model/tsunami/tsunami_actual.dart';
-import 'package:dpip/model/tsunami/tsunami_estimate.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:timezone/timezone.dart' as tz;
+import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/tsunami/tsunami_estimate_list.dart";
+import "package:dpip/app/page/map/tsunami/tsunami_observed_list.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/tsunami/tsunami.dart";
+import "package:dpip/model/tsunami/tsunami_actual.dart";
+import "package:dpip/model/tsunami/tsunami_estimate.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:timezone/timezone.dart" as tz;
 
 class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
@@ -85,7 +85,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     } else {
       color = const Color(0xFFFFC900);
     }
-    return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
+    return "#${color.value.toRadixString(16).padLeft(8, "0").substring(2)}";
   }
 
   DateTime _convertTimestamp(int timestamp) {
@@ -126,7 +126,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             "name": actualStation.name,
             "id": actualStation.id,
             "waveHeight": actualStation.waveHeight,
-            "arrivalTime": DateFormat('dd日HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
+            "arrivalTime": DateFormat("dd日HH:mm").format(_convertTimestamp(actualStation.arrivalTime)),
           },
           "geometry": {
             "type": "Point",
@@ -174,18 +174,18 @@ class _TsunamiMapState extends State<TsunamiMap> {
         const SymbolLayerProperties(
           textField: [
             Expressions.concat,
-            ['get', 'name'],
+            ["get", "name"],
             " ",
-            ['get', 'waveHeight'],
+            ["get", "waveHeight"],
             "cm\n",
-            ['get', 'arrivalTime'],
+            ["get", "arrivalTime"],
             " 抵達"
           ],
           textSize: 12,
-          textColor: '#ffffff',
-          textHaloColor: '#000000',
+          textColor: "#ffffff",
+          textHaloColor: "#000000",
           textHaloWidth: 1,
-          textFont: ['Noto Sans Regular'],
+          textFont: ["Noto Sans Regular"],
           textOffset: [
             Expressions.literal,
             [0, 2]
@@ -278,17 +278,17 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   String convertTimestamp(int timestamp) {
-    var location = tz.getLocation('Asia/Taipei');
+    var location = tz.getLocation("Asia/Taipei");
     DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+    DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
     String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
 
   String getTime() {
     DateTime now = DateTime.now();
-    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+    DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
     String formattedDate = formatter.format(now);
     return (formattedDate);
   }

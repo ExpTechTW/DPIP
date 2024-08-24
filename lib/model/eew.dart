@@ -1,8 +1,8 @@
-import 'package:dpip/model/eew_info.dart';
-import 'package:dpip/util/parser.dart';
-import 'package:json_annotation/json_annotation.dart';
+import "package:dpip/model/eew_info.dart";
+import "package:dpip/util/parser.dart";
+import "package:json_annotation/json_annotation.dart";
 
-part 'eew.g.dart';
+part "eew.g.dart";
 
 @JsonSerializable()
 class Eew {

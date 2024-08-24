@@ -1,7 +1,7 @@
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/global.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class TOSPage extends StatefulWidget {
   const TOSPage({super.key});
@@ -46,7 +46,7 @@ class _TOSPageState extends State<TOSPage> {
                   Navigator.pop(context);
                 },
                 child: Text(
-                  '不同意',
+                  "不同意",
                   style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
@@ -57,7 +57,7 @@ class _TOSPageState extends State<TOSPage> {
                         Navigator.pop(context);
                       }
                     : null,
-                child: Text('同意', style: TextStyle(fontSize: 16, color: context.colors.onPrimary)),
+                child: Text("同意", style: TextStyle(fontSize: 16, color: context.colors.onPrimary)),
               ),
             ],
           ),
@@ -79,7 +79,7 @@ class _TOSPageState extends State<TOSPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    '強震監視器',
+                    "強震監視器",
                     style: context.theme.textTheme.headlineMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -89,7 +89,7 @@ class _TOSPageState extends State<TOSPage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                '在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。',
+                "在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。",
                 style: context.theme.textTheme.bodyLarge,
               ),
             ),

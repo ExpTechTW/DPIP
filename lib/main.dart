@@ -1,17 +1,17 @@
-import 'package:dpip/app/dpip.dart';
-import 'package:dpip/core/fcm.dart';
-import 'package:dpip/core/notify.dart';
-import 'package:dpip/core/service.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/string.dart';
-import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:timezone/data/latest.dart';
+import "package:dpip/app/dpip.dart";
+import "package:dpip/core/fcm.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
+import "package:dpip/global.dart";
+import "package:dpip/util/extension/string.dart";
+import "package:dynamic_color/dynamic_color.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:flutter_gen/gen_l10n/app_localizations.dart";
+import "package:flutter_localizations/flutter_localizations.dart";
+import "package:flutter_localized_locales/flutter_localized_locales.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:timezone/data/latest.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,9 +44,9 @@ class DpipAppState extends State<DpipApp> {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
         "system": ThemeMode.system,
-      }[Global.preference.getString('theme')] ??
+      }[Global.preference.getString("theme")] ??
       ThemeMode.system;
-  Locale? _locale = Global.preference.getString('locale')?.asLocale;
+  Locale? _locale = Global.preference.getString("locale")?.asLocale;
 
   void changeTheme(String themeMode) {
     setState(() {

@@ -1,6 +1,6 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
 
 class TyphoonTimeSelector extends StatefulWidget {
   final Function(String, String) onSelectionChanged;
@@ -162,7 +162,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        DateFormat('HH:mm').format(time),
+                        DateFormat("HH:mm").format(time),
                         style: TextStyle(
                           color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                           fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                         ),
                       ),
                       Text(
-                        DateFormat('MM/dd').format(time),
+                        DateFormat("MM/dd").format(time),
                         style: TextStyle(
                           color: isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
                           fontSize: 12,
@@ -261,7 +261,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonId)',
+                  "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonId)",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: context.colors.onSurface,

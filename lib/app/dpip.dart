@@ -1,19 +1,19 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/history/history.dart';
-import 'package:dpip/app/page/home/home.dart';
-import 'package:dpip/app/page/map/map.dart';
-import 'package:dpip/app/page/me/me.dart';
-import 'package:dpip/app/page/more/more.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/route/changelog/changelog.dart';
-import 'package:dpip/route/update_required/update_required.dart';
-import 'package:dpip/route/welcome/about.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/history/history.dart";
+import "package:dpip/app/page/home/home.dart";
+import "package:dpip/app/page/map/map.dart";
+import "package:dpip/app/page/me/me.dart";
+import "package:dpip/app/page/more/more.dart";
+import "package:dpip/global.dart";
+import "package:dpip/route/changelog/changelog.dart";
+import "package:dpip/route/update_required/update_required.dart";
+import "package:dpip/route/welcome/about.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:in_app_update/in_app_update.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class Dpip extends StatefulWidget {
   const Dpip({Key? key}) : super(key: key);
@@ -55,8 +55,8 @@ class _DpipState extends State<Dpip> {
   }
 
   int compareVersions(String version1, String version2) {
-    List<int> v1Parts = version1.split('.').map(int.parse).toList();
-    List<int> v2Parts = version2.split('.').map(int.parse).toList();
+    List<int> v1Parts = version1.split(".").map(int.parse).toList();
+    List<int> v2Parts = version2.split(".").map(int.parse).toList();
 
     int maxLength = v1Parts.length > v2Parts.length ? v1Parts.length : v2Parts.length;
     v1Parts.length = maxLength;

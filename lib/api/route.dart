@@ -1,7 +1,7 @@
-import 'dart:io';
-import 'dart:math';
+import "dart:io";
+import "dart:math";
 
-import 'package:dpip/global.dart';
+import "package:dpip/global.dart";
 
 class Route {
   static String get api => baseApi();

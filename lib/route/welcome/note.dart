@@ -1,6 +1,6 @@
-import 'package:dpip/route/welcome/permission.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/route/welcome/permission.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
 
 class NotePage extends StatelessWidget {
   const NotePage({super.key});
@@ -25,7 +25,7 @@ class NotePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        '注意事項',
+                        "注意事項",
                         style: context.theme.textTheme.headlineLarge,
                         textAlign: TextAlign.center,
                       ),
@@ -33,7 +33,7 @@ class NotePage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          'DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。',
+                          "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
                           style: context.theme.textTheme.bodyMedium,
                         ),
                       ),
@@ -48,7 +48,7 @@ class NotePage extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    '●',
+                                    "●",
                                     style: context.theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: context.colors.error,
@@ -78,7 +78,7 @@ class NotePage extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    '●',
+                                    "●",
                                     style: context.theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -105,7 +105,7 @@ class NotePage extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    '●',
+                                    "●",
                                     style: context.theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -132,7 +132,7 @@ class NotePage extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    '●',
+                                    "●",
                                     style: context.theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -159,7 +159,7 @@ class NotePage extends StatelessWidget {
                               child: Row(
                                 children: [
                                   Text(
-                                    '●',
+                                    "●",
                                     style: context.theme.textTheme.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -192,7 +192,7 @@ class NotePage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('下一步'),
+                child: const Text("下一步"),
               ),
             ],
           ),

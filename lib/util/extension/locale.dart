@@ -1,6 +1,6 @@
-import 'dart:ui';
+import "dart:ui";
 
-import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import "package:flutter_localized_locales/flutter_localized_locales.dart";
 
 extension NativeLocale on Locale {
   String get nativeName {

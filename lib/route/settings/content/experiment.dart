@@ -1,7 +1,7 @@
-import 'package:dpip/global.dart';
-import 'package:dpip/route/welcome/tos.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/global.dart";
+import "package:dpip/route/welcome/tos.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
 
 class SettingsExperimentView extends StatefulWidget {
   const SettingsExperimentView({super.key});

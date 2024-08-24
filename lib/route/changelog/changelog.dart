@@ -1,8 +1,8 @@
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/route/changelog/update_card.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/route/changelog/update_card.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:flutter_markdown/flutter_markdown.dart";
 
 class ChangelogPage extends StatelessWidget {
   const ChangelogPage({super.key});
@@ -20,7 +20,7 @@ class ChangelogPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('更新日誌'),
+        title: const Text("更新日誌"),
         elevation: 0,
       ),
       body: SafeArea(
@@ -30,8 +30,8 @@ class ChangelogPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const UpdateCard(
-                title: '更新日誌',
-                description: '我們持續改進應用程式，為您帶來更好的體驗。',
+                title: "更新日誌",
+                description: "我們持續改進應用程式，為您帶來更好的體驗。",
               ),
               const SizedBox(height: 10),
               Expanded(
@@ -48,10 +48,10 @@ class ChangelogPage extends StatelessWidget {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(child: Text("Error: ${snapshot.error}"));
                         } else {
                           return Markdown(
-                            data: snapshot.data ?? '',
+                            data: snapshot.data ?? "",
                             styleSheet: MarkdownStyleSheet(
                               h1: context.theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
                               h2: context.theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),

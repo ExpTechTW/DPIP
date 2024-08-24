@@ -1,8 +1,8 @@
-import 'package:dpip/util/parser.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:timezone/timezone.dart';
+import "package:dpip/util/parser.dart";
+import "package:json_annotation/json_annotation.dart";
+import "package:timezone/timezone.dart";
 
-part 'history.g.dart';
+part "history.g.dart";
 
 @JsonSerializable()
 class History {

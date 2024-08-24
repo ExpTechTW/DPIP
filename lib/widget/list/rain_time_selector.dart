@@ -1,6 +1,6 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
 
 class RainTimeSelector extends StatefulWidget {
   final Function(String, String) onSelectionChanged;
@@ -29,14 +29,14 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
   bool _isExpanded = false;
   int _select_index = 8;
 
-  final List<String> _intervals = ['3d', '2d', '24h', '12h', '6h', '3h', '1h', '10m', 'now'];
-  final List<String> _intervalTranslations = ['3天', '2天', '24小時', '12小時', '6小時', '3小時', '1小時', '10分鐘', '現在'];
+  final List<String> _intervals = ["3d", "2d", "24h", "12h", "6h", "3h", "1h", "10m", "now"];
+  final List<String> _intervalTranslations = ["3天", "2天", "24小時", "12小時", "6小時", "3小時", "1小時", "10分鐘", "現在"];
 
   @override
   void initState() {
     super.initState();
     _selectedTimestamp = widget.timeList.last;
-    _selectedInterval = 'now'; // Default to now
+    _selectedInterval = "now"; // Default to now
     _timeScrollController = ScrollController();
     _intervalScrollController = ScrollController();
     _animationController = AnimationController(
@@ -165,7 +165,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          DateFormat('HH:mm').format(time),
+                          DateFormat("HH:mm").format(time),
                           style: TextStyle(
                             color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                             fontWeight: FontWeight.bold,
@@ -173,7 +173,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                           ),
                         ),
                         Text(
-                          DateFormat('MM/dd').format(time),
+                          DateFormat("MM/dd").format(time),
                           style: TextStyle(
                             color: isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
                             fontSize: 12,
@@ -256,7 +256,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
           FilledButton.tonalIcon(
             onPressed: _toggleExpanded,
             label: Text(
-              '${DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp))} (${_intervalTranslations[_select_index]})',
+              "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} (${_intervalTranslations[_select_index]})",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             icon: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),

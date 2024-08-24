@@ -1,9 +1,9 @@
-import 'dart:async';
-import 'dart:io';
+import "dart:async";
+import "dart:io";
 
-import 'package:dpip/global.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+import "package:dpip/global.dart";
+import "package:geocoding/geocoding.dart";
+import "package:geolocator/geolocator.dart";
 
 StreamSubscription<Position>? positionStreamSubscription;
 Timer? restartTimer;
@@ -17,9 +17,9 @@ class GetLocationPosition {
 
   Map<String, dynamic> toJson() {
     return {
-      'latitude': latitude,
-      'longitude': longitude,
-      'country': country,
+      "latitude": latitude,
+      "longitude": longitude,
+      "country": country,
     };
   }
 }
@@ -32,8 +32,8 @@ class GetLocationResult {
 
   Map<String, dynamic> toJson() {
     return {
-      'position': position.toJson(),
-      'change': change,
+      "position": position.toJson(),
+      "change": change,
     };
   }
 }
@@ -46,8 +46,8 @@ class LocationResult {
 
   Map<String, dynamic> toJson() {
     return {
-      'cityTown': cityTown,
-      'change': change,
+      "cityTown": cityTown,
+      "change": change,
     };
   }
 }
@@ -72,7 +72,7 @@ class LocationService {
 
   Future<LocationResult> getLatLngLocation(double latitude, double longitude) async {
     List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
-    LocationResult locationGet = LocationResult('', false);
+    LocationResult locationGet = LocationResult("", false);
     if (placemarks.isNotEmpty) {
       Placemark placemark = placemarks.first;
       String? city;
@@ -89,7 +89,7 @@ class LocationService {
         code = placemark.isoCountryCode == "TW" ? placemark.postalCode?.substring(0, 3) : "";
       }
 
-      String citytown = '$city $town $code';
+      String citytown = "$city $town $code";
       String citytowntemp = Global.preference.getString("user-country") ?? "";
 
       if ((citytowntemp == "" || citytowntemp != citytown) && code != "") {
@@ -105,7 +105,7 @@ class LocationService {
     return locationGet;
   }
 
-  @pragma('vm:entry-point')
+  @pragma("vm:entry-point")
   Future<GetLocationResult> androidGetLocation() async {
     int lastLocationUpdate =
         Global.preference.getInt("last-location-update") ?? DateTime.now().toUtc().millisecondsSinceEpoch;
@@ -128,12 +128,12 @@ class LocationService {
         Global.preference.setDouble("user-lat", position.latitude);
         Global.preference.setDouble("user-lon", position.longitude);
         positionchange = true;
-        print('距離: $distance 更新位置');
+        print("距離: $distance 更新位置");
       } else {
-        print('距離: $distance 不更新位置');
+        print("距離: $distance 不更新位置");
       }
     } else {
-      print('間距: $nowtemp 不更新位置');
+      print("間距: $nowtemp 不更新位置");
     }
 
     return GetLocationResult(positionlast, positionchange);

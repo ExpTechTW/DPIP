@@ -1,30 +1,30 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:ui' as ui;
+import "dart:async";
+import "dart:io";
+import "dart:ui" as ui;
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/eew.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/core/rts.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/eew.dart';
-import 'package:dpip/model/rts/rts.dart';
-import 'package:dpip/model/station.dart';
-import 'package:dpip/model/station_info.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/int.dart';
-import 'package:dpip/util/instrumental_intensity_color.dart';
-import 'package:dpip/util/intensity_color.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/util/need_location.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:timezone/timezone.dart' as tz;
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/eew.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/core/rts.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/eew.dart";
+import "package:dpip/model/rts/rts.dart";
+import "package:dpip/model/station.dart";
+import "package:dpip/model/station_info.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/int.dart";
+import "package:dpip/util/instrumental_intensity_color.dart";
+import "package:dpip/util/intensity_color.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/util/need_location.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:timezone/timezone.dart" as tz;
 
-import 'eew_info.dart';
+import "eew_info.dart";
 
 typedef PositionUpdateCallback = void Function();
 
@@ -66,7 +66,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   double userLat = 0;
   double userLon = 0;
   double _ping = 0;
-  String _formattedPing = '';
+  String _formattedPing = "";
   Map<String, double> _eewDist = {};
   Map<String, int> _eewUpdateList = {};
   Map<String, Map<String, int>> _userEewArriveTime = {};
@@ -256,8 +256,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         "box-geojson",
         "box-geojson",
         const LineLayerProperties(lineWidth: 2, lineColor: [
-          'match',
-          ['get', 'i'],
+          "match",
+          ["get", "i"],
           9,
           "#FF0000",
           8,
@@ -529,7 +529,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         ),
                       ),
                       Text(
-                        context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ''),
+                        context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ""),
                         style: TextStyle(
                           fontSize: 18,
                           color: context.colors.onSurfaceVariant,
@@ -553,7 +553,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                               ),
                             ),
                             Text(
-                              "${DateFormat('yyyy/MM/dd HH:mm:ss').format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _eewLastInfo[eew.id]!.eq.time))} 發震",
+                              "${DateFormat("yyyy/MM/dd HH:mm:ss").format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _eewLastInfo[eew.id]!.eq.time))} 發震",
                               style: TextStyle(
                                 fontSize: 14,
                                 color: context.colors.onSurfaceVariant,
@@ -812,7 +812,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     if (eewArea.keys.isEmpty) {
       await _mapController.setLayerProperties(
-        'town',
+        "town",
         FillLayerProperties(
           fillColor: context.colors.surfaceContainerHighest.toHexStringRGB(),
           fillOpacity: 1,
@@ -822,11 +822,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     }
 
     await _mapController.setLayerProperties(
-      'town',
+      "town",
       FillLayerProperties(
         fillColor: [
-          'match',
-          ['get', 'CODE'],
+          "match",
+          ["get", "CODE"],
           ...eewArea.entries.expand((entry) => [
                 int.parse(entry.key),
                 IntensityColor.intensity(entry.value).toHexStringRGB(),
@@ -994,7 +994,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ['1', '2', '3', '4', '5弱', '5強', '6弱', '6強', '7'];
+    final labels = ["1", "2", "3", "4", "5弱", "5強", "6弱", "6強", "7"];
     return SizedBox(
       width: 300,
       child: Row(
@@ -1038,7 +1038,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               child: InkWell(
                 onTap: _toggleLegend,
                 child: Tooltip(
-                  message: '圖例',
+                  message: "圖例",
                   child: Container(
                     width: 30,
                     height: 30,
@@ -1066,11 +1066,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
-                    DateFormat('yyyy/MM/dd HH:mm:ss').format((!_dataStatus())
-                        ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _lsatGetRtsDataTime)
+                    DateFormat("yyyy/MM/dd HH:mm:ss").format((!_dataStatus())
+                        ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _lsatGetRtsDataTime)
                         : (_timeReplay == 0)
-                            ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _getCurrentTime())
-                            : tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation('Asia/Taipei'), _timeReplay)),
+                            ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _getCurrentTime())
+                            : tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _timeReplay)),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,

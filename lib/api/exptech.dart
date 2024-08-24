@@ -1,20 +1,20 @@
-import 'dart:convert';
-import 'dart:io';
+import "dart:convert";
+import "dart:io";
 
-import 'package:dpip/api/route.dart';
-import 'package:dpip/model/crowdin/localization_progress.dart';
-import 'package:dpip/model/eew.dart';
-import 'package:dpip/model/history.dart';
-import 'package:dpip/model/report/earthquake_report.dart';
-import 'package:dpip/model/report/partial_earthquake_report.dart';
-import 'package:dpip/model/rts/rts.dart';
-import 'package:dpip/model/station.dart';
-import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/model/weather/lightning.dart';
-import 'package:dpip/model/weather/rain.dart';
-import 'package:dpip/model/weather/typhoon.dart';
-import 'package:dpip/model/weather/weather.dart';
-import 'package:http/http.dart';
+import "package:dpip/api/route.dart";
+import "package:dpip/model/crowdin/localization_progress.dart";
+import "package:dpip/model/eew.dart";
+import "package:dpip/model/history.dart";
+import "package:dpip/model/report/earthquake_report.dart";
+import "package:dpip/model/report/partial_earthquake_report.dart";
+import "package:dpip/model/rts/rts.dart";
+import "package:dpip/model/station.dart";
+import "package:dpip/model/tsunami/tsunami.dart";
+import "package:dpip/model/weather/lightning.dart";
+import "package:dpip/model/weather/rain.dart";
+import "package:dpip/model/weather/typhoon.dart";
+import "package:dpip/model/weather/weather.dart";
+import "package:http/http.dart";
 
 class ExpTech {
   String? apikey;
@@ -153,7 +153,7 @@ class ExpTech {
     if (res.statusCode == 200) {
       return res.body;
     } else if (res.statusCode == 204) {
-      return '${res.statusCode} $requestUrl';
+      return "${res.statusCode} $requestUrl";
     } else {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }

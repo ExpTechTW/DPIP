@@ -1,16 +1,16 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/rain.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/rain_time_selector.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/weather/rain.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/list/rain_time_selector.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 class RainData {
   final double latitude;
@@ -47,8 +47,8 @@ class _RainMapState extends State<RainMap> {
   bool _showLegend = false;
 
   List<RainData> rainDataList = [];
-  String selectedTimestamp = '';
-  String selectedInterval = 'now'; // 默認選擇 'now'
+  String selectedTimestamp = "";
+  String selectedInterval = "now"; // 默認選擇 "now"
 
   Future<void> _loadMapImages(bool isDark) async {
     await loadGPSImage(_mapController);
@@ -116,31 +116,31 @@ class _RainMapState extends State<RainMap> {
         .map((station) {
           double rainfall;
           switch (interval) {
-            case 'now':
+            case "now":
               rainfall = station.data.now;
               break;
-            case '10m':
+            case "10m":
               rainfall = station.data.tenMinutes;
               break;
-            case '1h':
+            case "1h":
               rainfall = station.data.oneHour;
               break;
-            case '3h':
+            case "3h":
               rainfall = station.data.threeHours;
               break;
-            case '6h':
+            case "6h":
               rainfall = station.data.sixHours;
               break;
-            case '12h':
+            case "12h":
               rainfall = station.data.twelveHours;
               break;
-            case '24h':
+            case "24h":
               rainfall = station.data.twentyFourHours;
               break;
-            case '2d':
+            case "2d":
               rainfall = station.data.twoDays;
               break;
-            case '3d':
+            case "3d":
               rainfall = station.data.threeDays;
               break;
             default:
@@ -226,8 +226,8 @@ class _RainMapState extends State<RainMap> {
         circleStrokeColor: "#FFFFFF",
       ),
       filter: [
-        '==',
-        ['get', 'rainfall'],
+        "==",
+        ["get", "rainfall"],
         0
       ],
       minzoom: 10,
@@ -238,20 +238,20 @@ class _RainMapState extends State<RainMap> {
       "rain-data",
       "rain-0-labels",
       const SymbolLayerProperties(
-        textField: ['get', 'rainfall'],
+        textField: ["get", "rainfall"],
         textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
+        textColor: "#ffffff",
+        textHaloColor: "#000000",
         textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
+        textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
           [0, 2]
         ],
       ),
       filter: [
-        '==',
-        ['get', 'rainfall'],
+        "==",
+        ["get", "rainfall"],
         0
       ],
       minzoom: 10,
@@ -302,8 +302,8 @@ class _RainMapState extends State<RainMap> {
         circleStrokeOpacity: 0.7,
       ),
       filter: [
-        '!=',
-        ['get', 'rainfall'],
+        "!=",
+        ["get", "rainfall"],
         0
       ],
     );
@@ -313,20 +313,20 @@ class _RainMapState extends State<RainMap> {
       "rain-data",
       "rain-labels",
       const SymbolLayerProperties(
-        textField: ['get', 'rainfall'],
+        textField: ["get", "rainfall"],
         textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
+        textColor: "#ffffff",
+        textHaloColor: "#000000",
         textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
+        textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
           [0, 2]
         ],
       ),
       filter: [
-        '!=',
-        ['get', 'rainfall'],
+        "!=",
+        ["get", "rainfall"],
         0
       ],
       minzoom: 9,
@@ -376,7 +376,7 @@ class _RainMapState extends State<RainMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ['0', '10', '30', '50', '100', '200', '300', '500', '1000', '2000+'];
+    final labels = ["0", "10", "30", "50", "100", "200", "300", "500", "1000", "2000+"];
     return SizedBox(
       width: 300,
       child: Row(
@@ -411,7 +411,7 @@ class _RainMapState extends State<RainMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: '圖例',
+                message: "圖例",
                 child: Container(
                   width: 30,
                   height: 30,
@@ -438,7 +438,7 @@ class _RainMapState extends State<RainMap> {
                 setState(() {});
               },
               onSelectionChanged: (timestamp, interval) async {
-                print('Selected time: $timestamp, interval: $interval');
+                print("Selected time: $timestamp, interval: $interval");
                 selectedTimestamp = timestamp;
                 selectedInterval = interval;
                 await updateRainData(timestamp, interval);

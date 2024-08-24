@@ -1,16 +1,16 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/weather.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/time_selector.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/weather/weather.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/list/time_selector.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 class WindData {
   final double latitude;
@@ -173,8 +173,8 @@ class _WindMapState extends State<WindMap> {
         circleStrokeColor: "#FFFFFF",
       ),
       filter: [
-        '==',
-        ['get', 'speed'],
+        "==",
+        ["get", "speed"],
         0
       ],
       minzoom: 10,
@@ -187,21 +187,21 @@ class _WindMapState extends State<WindMap> {
       const SymbolLayerProperties(
         textField: [
           Expressions.format,
-          ['get', 'speed']
+          ["get", "speed"]
         ],
         textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
+        textColor: "#ffffff",
+        textHaloColor: "#000000",
         textHaloWidth: 2,
-        textFont: ['Noto Sans Regular'],
+        textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
           [0, 2]
         ],
       ),
       filter: [
-        '==',
-        ['get', 'speed'],
+        "==",
+        ["get", "speed"],
         0
       ],
       minzoom: 10,
@@ -239,8 +239,8 @@ class _WindMapState extends State<WindMap> {
         iconAllowOverlap: true,
       ),
       filter: [
-        '!=',
-        ['get', 'speed'],
+        "!=",
+        ["get", "speed"],
         0
       ],
     );
@@ -252,21 +252,21 @@ class _WindMapState extends State<WindMap> {
       const SymbolLayerProperties(
         textField: [
           Expressions.format,
-          ['get', 'speed']
+          ["get", "speed"]
         ],
         textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
+        textColor: "#ffffff",
+        textHaloColor: "#000000",
         textHaloWidth: 2,
-        textFont: ['Noto Sans Regular'],
+        textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
           [0, 2]
         ],
       ),
       filter: [
-        '!=',
-        ['get', 'speed'],
+        "!=",
+        ["get", "speed"],
         0
       ],
       minzoom: 9,
@@ -282,11 +282,11 @@ class _WindMapState extends State<WindMap> {
   Widget _buildLegend() {
     return MapLegend(
       children: [
-        _legendItem('wind-1', '0.1 - 3.3 m/s'),
-        _legendItem('wind-2', '3.4 - 7.9 m/s'),
-        _legendItem('wind-3', '8.0 - 13.8 m/s'),
-        _legendItem('wind-4', '13.9 - 32.6 m/s'),
-        _legendItem('wind-5', '≥ 32.7 m/s'),
+        _legendItem("wind-1", "0.1 - 3.3 m/s"),
+        _legendItem("wind-2", "3.4 - 7.9 m/s"),
+        _legendItem("wind-3", "8.0 - 13.8 m/s"),
+        _legendItem("wind-4", "13.9 - 32.6 m/s"),
+        _legendItem("wind-5", "≥ 32.7 m/s"),
       ],
     );
   }
@@ -296,7 +296,7 @@ class _WindMapState extends State<WindMap> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
+          Image.asset("assets/map/icons/$imageName.png", width: 24, height: 24),
           const SizedBox(width: 8),
           Text(label),
         ],
@@ -324,7 +324,7 @@ class _WindMapState extends State<WindMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: '圖例',
+                message: "圖例",
                 child: Container(
                   width: 30,
                   height: 30,

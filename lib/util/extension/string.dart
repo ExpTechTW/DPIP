@@ -1,4 +1,4 @@
-import 'dart:ui';
+import "dart:ui";
 
 extension LocaleString on String {
   Locale get asLocale {

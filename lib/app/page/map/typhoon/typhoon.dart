@@ -1,14 +1,14 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/typhoon.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/typhoon_time_selector.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/weather/typhoon.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/list/typhoon_time_selector.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 class TyphoonMap extends StatefulWidget {
   const TyphoonMap({super.key});
@@ -21,11 +21,11 @@ class _TyphoonMapState extends State<TyphoonMap> {
   late MapLibreMapController _mapController;
   List<Typhoon>? typhoonData;
   List<String> typhoonList = [];
-  String selectedTyphoonId = '';
+  String selectedTyphoonId = "";
   List<String> sourceList = [];
   List<String> layerList = [];
   List<String> typhoon_name_list = [];
-  String selectedTimestamp = '';
+  String selectedTimestamp = "";
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
@@ -80,7 +80,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       setState(() {});
     } catch (e) {
-      print('Error loading typhoon list: $e');
+      print("Error loading typhoon list: $e");
     }
   }
 
@@ -118,7 +118,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
         await _drawTyphoonPaths(typhoonData!);
       }
     } catch (e) {
-      print('Error loading typhoon data: $e');
+      print("Error loading typhoon data: $e");
     }
   }
 
