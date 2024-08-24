@@ -1,3 +1,4 @@
+import "dart:io";
 import "dart:math";
 
 import "package:device_info_plus/device_info_plus.dart";
@@ -22,6 +23,18 @@ class Route {
     return "https://lb-$i.exptech.dev/api";
   }
 
+  static Future<String> getDeviceIdentifier() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.fingerprint;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor ?? '';
+    }
+    return '';
+  }
+
   static Uri reportList({int? limit = 50, int? page = 1}) => Uri.parse("$api/v2/eq/report?limit=$limit&page=$page");
   static Uri report(String reportId) => Uri.parse("$api/v2/eq/report/$reportId");
   static Uri tsunamiList() => Uri.parse("$onlyapi/v1/tsunami/list");
@@ -32,9 +45,8 @@ class Route {
   static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v1/weather/all/$postalCode");
   static Uri station() => Uri.parse("$api/v1/trem/station");
   static Future<Uri> location(String token, String lat, String lng) async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    return Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/0/$lat,$lng/$token/${androidInfo.fingerprint}");
+    String fingerprint = await getDeviceIdentifier();
+    return Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token/$fingerprint");
   }
   static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
   static Uri radarList() => Uri.parse("$onlyapi/v1/tiles/radar/list");
