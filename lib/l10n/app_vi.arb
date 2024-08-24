@@ -232,7 +232,7 @@
   "@theme_light": {
     "description": "「設定」路徑 → 「主題色」設定 → 淺色"
   },
-  "theme_dark": "深色",
+  "theme_dark": "Bóng tối",
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
@@ -240,7 +240,7 @@
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
-  "settings_position": "位置",
+  "settings_position": "Vị trí",
   "@settings_position": {
     "description": "「設定」路徑 → 「位置」標題"
   },
@@ -268,7 +268,7 @@
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "鄉鎮",
+  "location_town": "Thị trấn",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
