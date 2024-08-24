@@ -77,7 +77,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.i18n.new_announcement_prompt, style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.i18n.announcement),
         elevation: 0,
       ),
       body: SafeArea(
@@ -139,11 +139,11 @@ class AnnouncementCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const AnnouncementCard({
-    Key? key,
+    super.key,
     required this.announcement,
     required this.tagTypes,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -219,26 +219,36 @@ class AnnouncementCard extends StatelessWidget {
   }
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
+    final brightness = Theme.of(context).brightness;
+    final backgroundColor =
+        brightness == Brightness.dark ? tagType.color.withOpacity(0.5) : tagType.color.withOpacity(0.3);
+    final borderColor = brightness == Brightness.dark ? tagType.color.withOpacity(0.7) : tagType.color.withOpacity(0.5);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: tagType.color.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-              color: tagType.color.withOpacity(0.5),
-              width: 1,
+        child: IntrinsicWidth(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                color: borderColor,
+                width: 1,
+              ),
             ),
-          ),
-          child: Text(
-            tagType.text,
-            style: TextStyle(
-              fontSize: 10,
-              color: tagType.color,
-              fontWeight: FontWeight.bold,
+            child: Center(
+              child: Text(
+                tagType.text,
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
@@ -252,16 +262,16 @@ class AnnouncementDetailPage extends StatelessWidget {
   final List<TagType> tagTypes;
 
   const AnnouncementDetailPage({
-    Key? key,
+    super.key,
     required this.announcement,
     required this.tagTypes,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(announcement.title),
+        title: Text("公告詳情"),
         elevation: 0,
       ),
       body: SafeArea(
@@ -270,6 +280,13 @@ class AnnouncementDetailPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                announcement.title,
+                style: context.theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
               _buildDateChip(context),
               const SizedBox(height: 16),
               Wrap(
@@ -319,26 +336,36 @@ class AnnouncementDetailPage extends StatelessWidget {
   }
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
+    final brightness = Theme.of(context).brightness;
+    final backgroundColor =
+        brightness == Brightness.dark ? tagType.color.withOpacity(0.5) : tagType.color.withOpacity(0.3);
+    final borderColor = brightness == Brightness.dark ? tagType.color.withOpacity(0.7) : tagType.color.withOpacity(0.5);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(5),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: tagType.color.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-              color: tagType.color.withOpacity(0.5),
-              width: 1,
+        child: IntrinsicWidth(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                color: borderColor,
+                width: 1,
+              ),
             ),
-          ),
-          child: Text(
-            tagType.text,
-            style: TextStyle(
-              fontSize: 12,
-              color: tagType.color,
-              fontWeight: FontWeight.bold,
+            child: Center(
+              child: Text(
+                tagType.text,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
         ),
