@@ -2,6 +2,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:dpip/util/extension/build_context.dart';
 
 class ChangelogEntry {
   final String version;
@@ -101,7 +102,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('更新日誌', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.i18n.update_log),
         elevation: 0,
       ),
       body: SafeArea(

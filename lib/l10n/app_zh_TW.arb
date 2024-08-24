@@ -879,5 +879,45 @@
   "home_Safety": "一切平安，無事件發生。",
   "@home_Safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
+  },
+  "update_log": "更新日誌",
+  "@update_log": {
+    "description": "「設定」路徑 → 更新日誌"
+  },
+  "interval_3_days": "3天",
+  "@interval_3_days": {
+    "description": "3天"
+  },
+  "interval_2_days": "2天",
+  "@interval_2_days": {
+    "description": "2天"
+  },
+  "interval_24_hours": "24小時",
+  "@interval_24_hours": {
+    "description": "24小時"
+  },
+  "interval_12_hours": "12小時",
+  "@interval_12_hours": {
+    "description": "12小時"
+  },
+  "interval_6_hours": "6小時",
+  "@interval_6_hours": {
+    "description": "6小時"
+  },
+  "interval_3_hours": "3小時",
+  "@interval_3_hours": {
+    "description": "3小時"
+  },
+  "interval_1_hour": "1小時",
+  "@interval_1_hour": {
+    "description": "1小時"
+  },
+  "interval_10_minutes": "10分鐘",
+  "@interval_10_minutes": {
+    "description": "10分鐘"
+  },
+  "interval_now": "現在",
+  "@interval_now": {
+    "description": "現在"
   }
 }
