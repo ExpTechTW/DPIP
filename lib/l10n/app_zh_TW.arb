@@ -996,9 +996,9 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供基於FCM&通知的服務",
+  "notification_service_description": "用於提供通知服務",
   "@notification_service_description": {
-    "description": "「歡迎」頁面 → 用於提供基於FCM&通知的服務"
+    "description": "「歡迎」頁面 → 用於提供通知服務"
   },
   "location_based_service": "用於提供基於位置的服務",
   "@location_based_service": {
