@@ -2,6 +2,7 @@ import "dart:convert";
 import "dart:io";
 
 import "package:dpip/api/route.dart";
+import "package:dpip/model/announcement.dart";
 import "package:dpip/model/crowdin/localization_progress.dart";
 import "package:dpip/model/eew.dart";
 import "package:dpip/model/history.dart";
@@ -391,5 +392,19 @@ class ExpTech {
     }
 
     return jsonDecode(res.body);
+  }
+
+  Future<List<Announcement>> getAnnouncement() async {
+    final requestUrl = Route.announcement();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Announcement.fromJson(item)).toList();
   }
 }

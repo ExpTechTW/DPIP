@@ -49,4 +49,5 @@ class Route {
   static Uri historyRegion(String region) => Uri.parse("$onlyapi/v1/dpip/history/$region");
   static Uri support() => Uri.parse("$onlyapi/v1/dpip/support");
   static Uri changelog() => Uri.parse("$onlyapi/v1/dpip/changelog");
+  static Uri announcement() => Uri.parse("$onlyapi/v1/dpip/announcement");
 }
