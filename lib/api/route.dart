@@ -2,7 +2,7 @@ import "dart:io";
 import "dart:math";
 
 import "package:dpip/global.dart";
-import "package:platform_device_id/platform_device_id.dart";
+import "package:platform_device_id_plus/platform_device_id.dart";
 
 class Route {
   static String get api => baseApi();
