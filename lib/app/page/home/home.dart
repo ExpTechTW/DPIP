@@ -56,19 +56,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
-  late final decorationTween = DecorationTween(
-    begin: BoxDecoration(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
-    end: BoxDecoration(
-      borderRadius: BorderRadius.zero,
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
-  ).chain(CurveTween(curve: Curves.linear));
-
   final opacityTween = Tween(
     begin: 0.0,
     end: 1.0,
@@ -161,6 +148,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
+
+    if (!mounted) return;
+
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
