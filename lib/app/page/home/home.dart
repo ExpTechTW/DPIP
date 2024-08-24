@@ -404,7 +404,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Text(
-                                "一切平安，無事件發生。",
+                                context.i18n.home_Safety,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: context.colors.onSurfaceVariant,
