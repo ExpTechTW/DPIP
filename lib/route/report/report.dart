@@ -151,8 +151,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
         waves.addFeature(
           circleFeature(
-            LatLng(data.latitude, data.longitude),
-            distance["s_dist"]!,
+            center: LatLng(data.latitude, data.longitude),
+            radius: distance["s_dist"]!,
           ),
         );
       }
