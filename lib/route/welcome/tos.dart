@@ -12,28 +12,40 @@ class TOSPage extends StatefulWidget {
 }
 
 class _TOSPageState extends State<TOSPage> {
-  ScrollController controller = ScrollController();
+  late ScrollController controller;
   bool isEnabled = false;
   double progress = 0;
 
   @override
   void initState() {
     super.initState();
+    controller = ScrollController();
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _checkScrollExtent();
+      }
+    });
+  }
+
+  void _checkScrollExtent() {
     if (controller.position.maxScrollExtent > 0) {
-      controller.addListener(() {
-        final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
-        if (bottom && !isEnabled) {
-          setState(() => isEnabled = true);
-        }
-      });
+      controller.addListener(_scrollListener);
     } else {
+      setState(() => isEnabled = true);
+    }
+  }
+
+  void _scrollListener() {
+    final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
+    if (bottom && !isEnabled) {
       setState(() => isEnabled = true);
     }
   }
 
   @override
   void dispose() {
+    controller.removeListener(_scrollListener);
     controller.dispose();
     super.dispose();
   }
