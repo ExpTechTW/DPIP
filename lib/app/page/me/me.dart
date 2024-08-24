@@ -62,7 +62,7 @@ class _MePageState extends State<MePage> {
          */
         ListTile(
           leading: const Icon(Symbols.announcement_rounded),
-          title: Text("公告"),
+          title: Text(context.i18n.announcement),
           onTap: () {
             Navigator.push(
               context,
@@ -72,7 +72,7 @@ class _MePageState extends State<MePage> {
         ),
         ListTile(
           leading: const Icon(Symbols.update_rounded),
-          title: Text("更新日誌"),
+          title: Text(context.i18n.update_log),
           onTap: () {
             Navigator.push(
               context,
@@ -149,9 +149,9 @@ class _MePageState extends State<MePage> {
                   alignment: WrapAlignment.center,
                   spacing: 12,
                   children: [
-                    const ActionChip(
+                    ActionChip(
                       avatar: Icon(Symbols.group_rounded, fill: 1),
-                      label: Text("貢獻者"),
+                      label: Text(context.i18n.contributor),
                     ),
                     ActionChip(
                       avatar: const Icon(Symbols.favorite_rounded, fill: 1),

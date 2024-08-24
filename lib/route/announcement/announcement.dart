@@ -77,7 +77,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('公告', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.i18n.new_announcement_prompt, style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
       ),
       body: SafeArea(
@@ -105,7 +105,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       return Center(child: Text(errorMessage!));
     }
     if (announcements.isEmpty) {
-      return const Center(child: Text('目前沒有公告'));
+      return Center(child: Text(context.i18n.no_announcements));
     }
     return RefreshIndicator(
       onRefresh: _fetchAnnouncements,

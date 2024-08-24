@@ -91,7 +91,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = '無法載入更新日誌，請稍後再試。';
+        _errorMessage = context.i18n.unable_to_load_changelog;
         _isLoading = false;
       });
     }
@@ -129,7 +129,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
       return Center(child: Text(_errorMessage!));
     }
     if (_changelogEntries.isEmpty) {
-      return const Center(child: Text('目前沒有更新日誌'));
+      return Center(child: Text(context.i18n.no_changelog));
     }
     return RefreshIndicator(
       onRefresh: _fetchChangelog,
