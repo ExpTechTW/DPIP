@@ -107,7 +107,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 children: (region == null)
                     ? [
                         Padding(
-                          padding: const EdgeInsets.only(top: 78),
+                          padding: const EdgeInsets.only(top: 128),
                           child: Center(
                             child: Text(
                               context.i18n.out_of_service_only_taiwan,

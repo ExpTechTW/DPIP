@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: (region == null)
                   ? [
                       Padding(
-                        padding: const EdgeInsets.only(top: 128),
+                        padding: EdgeInsets.only(top: context.padding.top + 128),
                         child: Center(
                           child: Text(
                             context.i18n.out_of_service_only_taiwan,
