@@ -142,11 +142,11 @@ class _MePageState extends State<MePage> {
                   spacing: 12,
                   children: [
                     const ActionChip(
-                      avatar: Icon(Symbols.group),
+                      avatar: Icon(Symbols.group_rounded, fill: 1),
                       label: Text("貢獻者"),
                     ),
                     ActionChip(
-                      avatar: const Icon(Symbols.favorite),
+                      avatar: const Icon(Symbols.favorite_rounded, fill: 1),
                       label: Text(context.i18n.donate),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/donate"));
@@ -167,32 +167,17 @@ class _MePageState extends State<MePage> {
                       },
                     ),
                     ActionChip(
-                      avatar: const Icon(Icons.web_rounded),
-                      label: const Text("ExpTech Studio"),
+                      avatar: const Icon(Symbols.web_rounded),
+                      label: const Text("ExpTech 官網"),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/dpip"));
                       },
                     ),
                     ActionChip(
-                      avatar: const Icon(Icons.history),
+                      avatar: const Icon(Symbols.notifications_rounded, fill: 1),
                       label: const Text("行動通知推播紀錄"),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/history/notification"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(SimpleIcons.appstore),
-                      label: const Text("App Store"),
-                      onPressed: () {
-                        launchUrl(Uri.parse(
-                            "https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(SimpleIcons.googleplay),
-                      label: const Text("Google Play"),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.exptech.dpip"));
                       },
                     ),
                     ActionChip(
@@ -210,14 +195,14 @@ class _MePageState extends State<MePage> {
                       },
                     ),
                     ActionChip(
-                      avatar: const Icon(Symbols.pulse_alert),
+                      avatar: const Icon(Symbols.pulse_alert, fill: 1),
                       label: Text(context.i18n.server_status),
                       onPressed: () {
                         launchUrl(Uri.parse("https://status.exptech.dev"));
                       },
                     ),
                     ActionChip(
-                      avatar: const Icon(Symbols.book),
+                      avatar: const Icon(Symbols.book_rounded, fill: 1),
                       label: Text(context.i18n.third_party_libraries),
                       onPressed: () {
                         Navigator.push(context, MaterialPageRoute(
