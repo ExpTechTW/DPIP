@@ -782,6 +782,14 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
+  "me_generally": "一般",
+  "@me_generally": {
+    "description": "「我」路徑 → 一般"
+  },
+  "me_debug": "除錯",
+  "@me_debug": {
+    "description": "「我」路徑 → 除錯"
+  },
   "official_web": "ExpTech 官網",
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"
@@ -838,6 +846,35 @@
   "estimated_time_wave": "預估海嘯到達時間及波高",
   "@estimated_time_wave": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
+  },
+  "observing_tsunamis": "各地觀測到的海嘯",
+  "@observing_tsunamis": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
+  },
+  "occurrence_time": "發生時間",
+  "@occurrence_time": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
+  },
+  "epicenter": "震央",
+  "@epicenter": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 震央"
+  },
+  "scale": "規模",
+  "@scale": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
+  },
+  "depth": "深度",
+  "@depth": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
+  },
+  "tsunami_depth": "{depth}km",
+  "@tsunami_depth": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {depth}km",
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
   },
   "observing_tsunamis": "各地觀測到的海嘯",
   "@observing_tsunamis": {

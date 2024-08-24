@@ -23,7 +23,7 @@ class _MePageState extends State<MePage> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        const ListTileGroupHeader(title: "一般"),
+        ListTileGroupHeader(title: context.i18n.me_generally),
         /**
          * 設定
          */
@@ -69,7 +69,7 @@ class _MePageState extends State<MePage> {
             );
           },
         ),
-        const ListTileGroupHeader(title: "除錯"),
+        ListTileGroupHeader(title: context.i18n.me_debug),
 
         /**
          * 複製 FCM Token
