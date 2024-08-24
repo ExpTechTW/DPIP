@@ -160,6 +160,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
     List<List<double>> coordinates = typhoon.analysis.map((a) => [a.lng, a.lat]).toList();
     List<List<double>> coordinates_forecast = typhoon.forecast.map((f) => [f.lng, f.lat]).toList();
 
+    coordinates_forecast.insert(0, coordinates.last);
+
     await _mapController.addSource(
       sourceId,
       GeojsonSourceProperties(
