@@ -11,6 +11,7 @@ import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/util/need_location.dart';
 import 'package:dpip/util/weather_icon.dart';
+import 'package:dpip/widget/error/region_out_of_service.dart';
 import 'package:dpip/widget/home/forecast_weather_card.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
@@ -207,6 +208,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  void openLocationSetting() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        settings: const RouteSettings(name: "/settings"),
+        builder: (context) => const SettingsRoute(
+          initialRoute: '/location',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
@@ -225,13 +238,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ? [
                       Padding(
                         padding: EdgeInsets.only(top: context.padding.top + 128),
-                        child: Center(
-                          child: Text(
-                            context.i18n.out_of_service_only_taiwan,
-                            style: context.theme.textTheme.titleMedium,
-                          ),
-                        ),
-                      )
+                        child: const RegionOutOfService(),
+                      ),
                     ]
                   : [
                       SizedBox(
@@ -260,17 +268,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   children: [
                                     InkWell(
                                       borderRadius: BorderRadius.circular(16),
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            settings: const RouteSettings(name: "/settings"),
-                                            builder: (context) => const SettingsRoute(
-                                              initialRoute: '/location',
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      onTap: () => openLocationSetting(),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                         child: Row(
@@ -449,8 +447,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(current.text.content["all"]!.subtitle,
-                                      style: context.theme.textTheme.titleMedium),
+                                  Text(
+                                    current.text.content["all"]!.subtitle,
+                                    style: context.theme.textTheme.titleMedium,
+                                  ),
                                   Text(current.text.description["all"]!),
                                 ],
                               ),
@@ -462,9 +462,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: Column(
-                              children: children,
-                            ),
+                            child: Column(children: children),
                           );
                         },
                       )

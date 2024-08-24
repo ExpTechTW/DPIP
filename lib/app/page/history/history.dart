@@ -5,6 +5,7 @@ import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/list_icon.dart';
+import 'package:dpip/widget/error/region_out_of_service.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 
@@ -106,14 +107,9 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 controller: scrollController,
                 children: (region == null)
                     ? [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 128),
-                          child: Center(
-                            child: Text(
-                              context.i18n.out_of_service_only_taiwan,
-                              style: context.theme.textTheme.titleMedium,
-                            ),
-                          ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 128),
+                          child: RegionOutOfService(),
                         )
                       ]
                     : [
