@@ -40,7 +40,7 @@ class _PermissionPageState extends State<PermissionPage> {
         text: context.i18n.image_save,
         description: context.i18n.data_visualization_storage,
         color: Colors.green,
-        permission: androidInfo.version.sdkInt <= 32 || Platform.isIOS ? Permission.storage : Permission.photos,
+        permission: (androidInfo.version.sdkInt <= 32 || Platform.isIOS) ? Permission.storage : Permission.photos,
       ),
     ];
   }
@@ -66,7 +66,7 @@ class _PermissionPageState extends State<PermissionPage> {
                       const SizedBox(height: 24),
                       Text(
                         context.i18n.permission,
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: context.theme.textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
