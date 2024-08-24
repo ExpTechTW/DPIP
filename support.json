@@ -1,7 +1,8 @@
 {
   "last-version": {
     "release": "2.1.1",
-    "beta": "2.1.504"
+    "beta": "2.1.504",
+    "alpha": "2.1.601"
   },
   "support-version": [
     "2.1.504"

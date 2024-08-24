@@ -34,6 +34,27 @@ class _DpipState extends State<Dpip> {
     });
   }
 
+  int compareVersions(String version1, String version2) {
+    List<int> v1Parts = version1.split('.').map(int.parse).toList();
+    List<int> v2Parts = version2.split('.').map(int.parse).toList();
+
+    int maxLength = v1Parts.length > v2Parts.length ? v1Parts.length : v2Parts.length;
+    v1Parts.length = maxLength;
+    v2Parts.length = maxLength;
+    v1Parts.fillRange(v1Parts.length, maxLength, 0);
+    v2Parts.fillRange(v2Parts.length, maxLength, 0);
+
+    for (int i = 0; i < maxLength; i++) {
+      if (v1Parts[i] > v2Parts[i]) {
+        return 1;
+      } else if (v1Parts[i] < v2Parts[i]) {
+        return -1;
+      }
+    }
+
+    return 0;
+  }
+
   Future<void> checkForUpdates() async {
     try {
       var data = await ExpTech().getSupport();
@@ -41,11 +62,12 @@ class _DpipState extends State<Dpip> {
 
       if (Global.packageInfo.version.endsWith(".0")) {
         lastVersion = data["last-version"]["release"];
-        update = (Global.packageInfo.version != lastVersion);
-      } else if (Global.packageInfo.version.endsWith("00")){
+      } else if (Global.packageInfo.version.endsWith("00")) {
         lastVersion = data["last-version"]["beta"];
-        update = (Global.packageInfo.version != lastVersion);
+      } else {
+        lastVersion = data["last-version"]["alpha"];
       }
+      update = compareVersions(lastVersion, Global.packageInfo.version) == 1 ? true : false;
 
       criticalUpdate = !criticalList.contains(Global.packageInfo.version);
 
