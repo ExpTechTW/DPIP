@@ -1,17 +1,37 @@
+import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/list_icon.dart';
+import 'package:dpip/widget/error/region_out_of_service.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 
+typedef PositionUpdateCallback = void Function();
+
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+  final Function()? onPositionUpdate;
+
+  const HistoryPage({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
+
+  static PositionUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(PositionUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updatePosition() {
+    _activeCallback?.call();
+  }
 }
 
 class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin {
@@ -19,12 +39,10 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
-  Map<String, dynamic> weatherData = {};
-  List<Widget> weatherCard = [];
   bool init = false;
   String city = Global.preference.getString("location-city") ?? "";
   String town = Global.preference.getString("location-town") ?? "";
-  String region = "";
+  String? region;
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
@@ -53,7 +71,9 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   bool isAppBarVisible = false;
 
   Future<void> refreshHistoryList() async {
-    final data = await ExpTech().getHistoryRegion(region);
+    if (region == null) return;
+
+    final data = await ExpTech().getHistoryRegion(region!);
     setState(() {
       init = true;
       historyList = data.reversed.toList();
@@ -63,17 +83,20 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    Global.location.forEach((key, data) {
-      if (data.city == "服務區域外" || data.town == "服務區域外") {
-        region = "";
-        return;
-      } else if (data.city == city && data.town == town) {
-        region = key;
-      }
-    });
-    if (region != "") {
-      refreshHistoryList();
+    start();
+    HistoryPage.setActiveCallback(sendpositionUpdate);
+  }
+
+  void start() {
+    city = Global.preference.getString("location-city") ?? "";
+    town = Global.preference.getString("location-town") ?? "";
+    region = Global.location.entries.firstWhereOrNull((l) => (l.value.city == city) && (l.value.town == town))?.key;
+    historyList = [];
+    if (region == null) {
+      setState(() {});
+      return;
     }
+    refreshHistoryList();
     double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
       if (scrollController.offset > 1e-5) {
@@ -90,6 +113,14 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
+    setState(() {});
+  }
+
+  void sendpositionUpdate() {
+    if (mounted) {
+      start();
+      widget.onPositionUpdate?.call();
+    }
   }
 
   @override
@@ -108,71 +139,75 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
               child: ListView(
                 padding: EdgeInsets.only(bottom: context.padding.bottom),
                 controller: scrollController,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                    child: Text(
-                      context.i18n.historical_events,
-                      style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
-                    ),
-                  ),
-                  Builder(
-                    builder: (context) {
-                      if (historyList.isEmpty) {
-                        if (region != "") {
-                          if (init) {
-                            return Center(child: Text(context.i18n.no_historical_events));
-                          }
-                          return const Center(child: CircularProgressIndicator());
-                        } else {
-                          return Center(child: Text(context.i18n.out_of_service_only_taiwan));
-                        }
-                      }
-
-                      List<Widget> children = [];
-
-                      for (var i = 0, n = historyList.length; i < n; i++) {
-                        final current = historyList[i];
-                        var showDate = false;
-
-                        if (i != 0) {
-                          final prev = historyList[i - 1];
-                          if (current.time.send.day != prev.time.send.day) {
-                            showDate = true;
-                          }
-                        } else {
-                          showDate = true;
-                        }
-
-                        final item = TimeLineTile(
-                          time: current.time.send,
-                          icon: Icon(ListIcons.getListIcon(current.type)),
-                          height: 100,
-                          first: i == 0,
-                          showDate: showDate,
-                          color: context.theme.extendedColors.blueContainer,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(current.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
-                              Text(current.text.description["all"]!),
-                            ],
+                children: (region == null)
+                    ? [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 128),
+                          child: RegionOutOfService(),
+                        )
+                      ]
+                    : [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
+                          child: Text(
+                            context.i18n.historical_events,
+                            style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                           ),
-                          onTap: () {},
-                        );
-
-                        children.add(item);
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
-                          children: children,
                         ),
-                      );
-                    },
-                  )
-                ],
+                        Builder(
+                          builder: (context) {
+                            if (historyList.isEmpty) {
+                              if (init) {
+                                return Center(child: Text(context.i18n.no_historical_events));
+                              }
+                              return const Center(child: CircularProgressIndicator());
+                            }
+
+                            List<Widget> children = [];
+
+                            for (var i = 0, n = historyList.length; i < n; i++) {
+                              final current = historyList[i];
+                              var showDate = false;
+
+                              if (i != 0) {
+                                final prev = historyList[i - 1];
+                                if (current.time.send.day != prev.time.send.day) {
+                                  showDate = true;
+                                }
+                              } else {
+                                showDate = true;
+                              }
+
+                              final item = TimeLineTile(
+                                time: current.time.send,
+                                icon: Icon(ListIcons.getListIcon(current.type)),
+                                height: 100,
+                                first: i == 0,
+                                showDate: showDate,
+                                color: context.theme.extendedColors.blueContainer,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(current.text.content["all"]!.subtitle,
+                                        style: context.theme.textTheme.titleMedium),
+                                    Text(current.text.description["all"]!),
+                                  ],
+                                ),
+                                onTap: () {},
+                              );
+
+                              children.add(item);
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Column(
+                                children: children,
+                              ),
+                            );
+                          },
+                        )
+                      ],
               ),
             ),
             Positioned(
@@ -195,6 +230,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 
   @override
   void dispose() {
+    HistoryPage.clearActiveCallback();
     scrollController.dispose();
     super.dispose();
   }

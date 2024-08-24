@@ -1,3 +1,4 @@
+import 'package:dpip/app/page/history/history.dart';
 import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/monitor/monitor.dart';
 import 'package:dpip/app/page/map/radar/radar.dart';
@@ -33,14 +34,18 @@ Future<void> getSavedLocation() async {
         SettingsLocationView.updatePosition();
         RadarMap.updatePosition();
         HomePage.updatePosition();
+        HistoryPage.updatePosition();
         MonitorPage.updatePosition();
       }
     } else {
+      Global.preference.remove("location-city");
+      Global.preference.remove("location-town");
       Global.preference.setDouble("user-lat", 0.0);
       Global.preference.setDouble("user-lon", 0.0);
       SettingsLocationView.updatePosition();
       RadarMap.updatePosition();
       HomePage.updatePosition();
+      HistoryPage.updatePosition();
       MonitorPage.updatePosition();
     }
     return;
