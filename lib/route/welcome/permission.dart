@@ -1,6 +1,8 @@
+import "package:dpip/core/notify.dart";
 import "package:dpip/route/welcome/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
+import "package:permission_handler/permission_handler.dart";
 
 class PermissionPage extends StatefulWidget {
   const PermissionPage({super.key});
@@ -16,17 +18,10 @@ class _PermissionPageState extends State<PermissionPage> {
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      final bottom = controller.position.pixels >= controller.position.maxScrollExtent;
-      if (bottom && !isEnabled) {
-        setState(() => isEnabled = true);
-      }
-    });
   }
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
   }
 
@@ -87,8 +82,11 @@ class _PermissionPageState extends State<PermissionPage> {
                                 text: "通知",
                                 description: "用於提供基於FCM&通知的服務",
                                 color: Colors.yellow,
-                                onTap: () {
-                                  print("通知權限項目被點擊了");
+                                onTap: () async {
+                                  final status = await requestNotificationPermission();
+                                  if (status.isGranted) {
+                                    setState(() => isEnabled = true);
+                                  }
                                 },
                               ),
                               const SizedBox(height: 20),
