@@ -1,38 +1,45 @@
 import 'package:dpip/route/welcome/tos.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionPage extends StatefulWidget {
-  const PermissionPage({Key? key}) : super(key: key);
+  const PermissionPage({super.key});
 
   @override
   State<PermissionPage> createState() => _PermissionPageState();
 }
 
 class _PermissionPageState extends State<PermissionPage> {
-  final List<PermissionItem> permissions = [
-    PermissionItem(
-      icon: Icons.notifications,
-      text: 'Notification',
-      description: 'Allow notifications for important updates',
-      color: Colors.orange,
-      permission: Permission.notification,
-    ),
-    PermissionItem(
-      icon: Icons.location_on,
-      text: 'Location',
-      description: 'Enable location-based services',
-      color: Colors.blue,
-      permission: Permission.location,
-    ),
-    PermissionItem(
-      icon: Icons.storage,
-      text: 'Storage',
-      description: 'Allow saving images and data visualization',
-      color: Colors.green,
-      permission: Permission.storage,
-    ),
-  ];
+  late List<PermissionItem> permissions;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    permissions = [
+      PermissionItem(
+        icon: Icons.notifications,
+        text: context.i18n.notification,
+        description: context.i18n.notification_service_description,
+        color: Colors.orange,
+        permission: Permission.notification,
+      ),
+      PermissionItem(
+        icon: Icons.location_on,
+        text: context.i18n.settings_position,
+        description: context.i18n.location_based_service,
+        color: Colors.blue,
+        permission: Permission.location,
+      ),
+      PermissionItem(
+        icon: Icons.storage,
+        text: context.i18n.image_save,
+        description: context.i18n.data_visualization_storage,
+        color: Colors.green,
+        permission: Permission.storage,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,13 +61,13 @@ class _PermissionPageState extends State<PermissionPage> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'Privacy Policy',
+                        context.i18n.privacy_policy,
                         style: Theme.of(context).textTheme.headlineMedium,
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'We are committed to protecting your privacy. Please review and grant the following permissions to use all features of the app.',
+                        context.i18n.privacy_commitment,
                         style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.center,
                       ),
@@ -72,16 +79,11 @@ class _PermissionPageState extends State<PermissionPage> {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () async {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const TOSPage()),
-                  );
-                },
+                onPressed: _continueToTOS,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Continue'),
+                child: Text(context.i18n.next_step),
               ),
             ],
           ),
@@ -115,18 +117,27 @@ class _PermissionPageState extends State<PermissionPage> {
         final isGranted = snapshot.data ?? false;
         return Switch(
           value: isGranted,
-          onChanged: (value) async {
-            if (value) {
-              final status = await item.permission.request();
-              setState(() {
-                item.isGranted = status.isGranted;
-              });
-            } else {
-              openAppSettings();
-            }
-          },
+          onChanged: (value) => _handlePermissionChange(item, value),
         );
       },
+    );
+  }
+
+  void _handlePermissionChange(PermissionItem item, bool value) async {
+    if (value) {
+      final status = await item.permission.request();
+      setState(() {
+        item.isGranted = status.isGranted;
+      });
+    } else {
+      openAppSettings();
+    }
+  }
+
+  void _continueToTOS() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const TOSPage()),
     );
   }
 }
