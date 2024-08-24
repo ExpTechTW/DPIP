@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/route/welcome/tos.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +17,9 @@ class _PermissionPageState extends State<PermissionPage> {
   late List<PermissionItem> permissions;
 
   @override
-  void didChangeDependencies() {
+  Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
     permissions = [
       PermissionItem(
         icon: Icons.notifications,
@@ -36,7 +40,7 @@ class _PermissionPageState extends State<PermissionPage> {
         text: context.i18n.image_save,
         description: context.i18n.data_visualization_storage,
         color: Colors.green,
-        permission: Permission.storage,
+        permission: androidInfo.version.sdkInt <= 32 || Platform.isIOS ? Permission.storage : Permission.photos,
       ),
     ];
   }
