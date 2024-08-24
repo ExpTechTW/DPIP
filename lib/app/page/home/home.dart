@@ -188,7 +188,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
-    setState(() {});
   }
 
   void sendpositionUpdate() {
@@ -239,8 +238,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                context.colors.primary.withOpacity(0.2),
-                                context.colors.primaryContainer.withOpacity(0.16),
+                                context.colors.primary.withOpacity(0.12),
+                                context.colors.primaryContainer.withOpacity(0.08),
                                 Colors.transparent
                               ],
                               stops: const [0.16, 0.6, 1],
@@ -381,18 +380,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                       Builder(
                         builder: (context) {
-                          if (realtimeList.isEmpty) {
-                            return SizedBox(
-                              height: 160,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                children: [...weatherCard],
-                              ),
-                            );
-                          }
-                          return Center(child: Text(context.i18n.out_of_service_only_taiwan));
+                          return SizedBox(
+                            height: 160,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              children: [...weatherCard],
+                            ),
+                          );
                         },
                       ),
                       Padding(
@@ -405,11 +401,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       Builder(
                         builder: (context) {
                           if (realtimeList.isEmpty) {
-                            if (init) {
-                              return Center(child: Text(context.i18n.no_events));
-                            }
-
-                            return const Center(child: CircularProgressIndicator());
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: Text(
+                                "一切平安，無事件發生。",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                              ),
+                            );
                           }
 
                           List<Widget> children = [];

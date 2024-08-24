@@ -393,8 +393,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                         if (tsunami != null)
                                           Text(
                                             context.i18n.tsunami_number(
-                                                id: tsunami?.id.toString() ?? '',
-                                                serial: tsunami?.serial.toString() ?? ''),
+                                              tsunami?.id.toString() ?? '',
+                                              tsunami?.serial.toString() ?? '',
+                                            ),
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
