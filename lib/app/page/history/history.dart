@@ -91,7 +91,11 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     city = Global.preference.getString("location-city") ?? "";
     town = Global.preference.getString("location-town") ?? "";
     region = Global.location.entries.firstWhereOrNull((l) => (l.value.city == city) && (l.value.town == town))?.key;
-    if (region == null) return;
+    historyList = [];
+    if (region == null) {
+      setState(() {});
+      return;
+    }
     refreshHistoryList();
     double headerScrollHeight = headerHeight / 5 * 3;
     scrollController.addListener(() {
