@@ -61,7 +61,7 @@ class _MePageState extends State<MePage> {
          * 更新日誌
          */
         ListTile(
-          leading: const Icon(Symbols.update_rounded),
+          leading: const Icon(Symbols.announcement_rounded),
           title: Text("公告"),
           onTap: () {
             Navigator.push(
