@@ -32,7 +32,7 @@ class _MorePageState extends State<MorePage> {
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
         children: [
-          ListTileGroupHeader(title: "更多功能列表"),
+          ListTileGroupHeader(title: context.i18n.more_features),
           ...destinations,
         ],
         onDestinationSelected: (value) {

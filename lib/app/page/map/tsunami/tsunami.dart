@@ -264,10 +264,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
       _tsunami_serial = int.parse(id.split("-")[1]);
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
-          ? tsunamiStatus = "發布"
+          ? tsunamiStatus = context.i18n.tsunami_publish
           : (tsunami?.status == 1)
-              ? tsunamiStatus = "更新"
-              : tsunamiStatus = "解除";
+              ? tsunamiStatus = context.i18n.tsunami_renew
+              : tsunamiStatus = context.i18n.tsunami_relieve;
 
       List<String> options = generateTsunamiOptions();
       if (options.isNotEmpty && _selectedOption == null) {
@@ -379,7 +379,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          tsunami == null ? "近期無海嘯資訊" : "海嘯警報",
+                                          tsunami == null
+                                              ? context.i18n.no_tsunami_information
+                                              : context.i18n.tsunami_warning,
                                           style: TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
@@ -390,7 +392,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                         const SizedBox(height: 8),
                                         if (tsunami != null)
                                           Text(
-                                            "${tsunami?.id}號 第${tsunami?.serial}報",
+                                            context.i18n.tsunami_number(
+                                                id: tsunami?.id.toString() ?? '',
+                                                serial: tsunami?.serial.toString() ?? ''),
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
@@ -434,10 +438,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           _selectedOption = newValue;
                                           tsunami = await ExpTech().getTsunami(newValue);
                                           tsunamiStatus = tsunami?.status == 0
-                                              ? "發布"
+                                              ? context.i18n.tsunami_publish
                                               : tsunami?.status == 1
-                                                  ? "更新"
-                                                  : "解除";
+                                                  ? context.i18n.tsunami_renew
+                                                  : context.i18n.tsunami_relieve;
                                           if (tsunami != null) {
                                             await addTsunamiObservationPoints(tsunami!);
                                           }
@@ -484,7 +488,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "預估海嘯到達時間及波高",
+                                                    context.i18n.estimated_time_wave,
                                                     style: TextStyle(
                                                       fontSize: 22,
                                                       fontWeight: FontWeight.bold,
@@ -502,7 +506,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "各地觀測到的海嘯",
+                                                    context.i18n.observing_tsunamis,
                                                     style: TextStyle(
                                                       fontSize: 22,
                                                       fontWeight: FontWeight.bold,
@@ -520,7 +524,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           height: 15,
                                         ),
                                         Text(
-                                          "地震資訊",
+                                          context.i18n.eew_info_sound_title,
                                           style: TextStyle(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,

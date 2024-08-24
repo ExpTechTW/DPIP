@@ -193,7 +193,7 @@ class _DpipState extends State<Dpip> {
           NavigationDestination(
             icon: const Icon(Symbols.note_stack_add_rounded),
             selectedIcon: const Icon(Symbols.note_stack_add_rounded, fill: 1),
-            label: "更多",
+            label: context.i18n.more,
           ),
           NavigationDestination(
             icon: const Icon(Symbols.person),

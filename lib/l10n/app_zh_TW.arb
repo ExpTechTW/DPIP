@@ -774,6 +774,22 @@
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：降雪伴雷"
   },
+  "more": "更多",
+  "@more": {
+    "description": "「更多」頁面標題"
+  },
+  "more_features": "更多功能列表",
+  "@more_features": {
+    "description": "「更多」路徑 → 「更多功能列表」標題"
+  },
+  "official_web": "ExpTech 官網",
+  "@official_web": {
+    "description": "「我」路徑 → ExpTech 官網"
+  },
+  "notification_record": "行動通知推播紀錄",
+  "@notification_record": {
+    "description": "「我」路徑 → 行動通知推播紀錄"
+  },
   "advanced_features": "進階功能",
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
@@ -785,5 +801,46 @@
   "enable_monitor": "啟用強震監視器",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
+  },
+  "no_tsunami_information": "近期無海嘯資訊",
+  "@no_tsunami_information": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
+  },
+  "tsunami_warning": "海嘯警報",
+  "@tsunami_warning": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
+  },
+  "tsunami_number": "{id}號 第{serial}報",
+  "@tsunami_number": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
+    "placeholders": {
+      "id": {
+        "type": "String",
+        "description": "編號"
+      },
+      "serial": {
+        "type": "String"
+      }
+    }
+  },
+  "tsunami_publish": "發布",
+  "@tsunami_publish": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發布"
+  },
+  "tsunami_renew": "更新",
+  "@tsunami_renew": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 更新"
+  },
+  "tsunami_relieve": "解除",
+  "@tsunami_relieve": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
+  },
+  "estimated_time_wave": "預估海嘯到達時間及波高",
+  "@estimated_time_wave": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
+  },
+  "observing_tsunamis": "各地觀測到的海嘯",
+  "@observing_tsunamis": {
+    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   }
 }

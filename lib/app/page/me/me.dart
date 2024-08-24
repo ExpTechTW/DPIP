@@ -168,14 +168,14 @@ class _MePageState extends State<MePage> {
                     ),
                     ActionChip(
                       avatar: const Icon(Symbols.web_rounded),
-                      label: const Text("ExpTech 官網"),
+                      label: Text(context.i18n.official_web),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/dpip"));
                       },
                     ),
                     ActionChip(
-                      avatar: const Icon(Symbols.notifications_rounded, fill: 1),
-                      label: const Text("行動通知推播紀錄"),
+                      avatar: const Icon(Icons.history),
+                      label: Text(context.i18n.notification_record),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/history/notification"));
                       },
