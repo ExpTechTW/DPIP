@@ -14,7 +14,7 @@ typedef PositionUpdateCallback = void Function();
 class HistoryPage extends StatefulWidget {
   final Function()? onPositionUpdate;
 
-  const HistoryPage({Key? key, this.onPositionUpdate}) : super(key: key);
+  const HistoryPage({super.key, this.onPositionUpdate});
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
