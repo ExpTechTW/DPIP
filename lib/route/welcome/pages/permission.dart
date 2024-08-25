@@ -247,15 +247,15 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text('權限請求'),
-        content: Text('需要使用者手動到設定開啟相關權限。'),
+        title: Text(context.i18n.permission_request),
+        content: Text(context.i18n.manual_permission_enablement),
         actions: [
           TextButton(
-            child: const Text('取消'),
+            child: Text(context.i18n.cancel),
             onPressed: () => Navigator.of(context).pop(),
           ),
           TextButton(
-            child: const Text('設定'),
+            child: Text(context.i18n.confirm),
             onPressed: () {
               openAppSettings();
               Navigator.of(context).pop();

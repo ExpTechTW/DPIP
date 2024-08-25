@@ -213,7 +213,7 @@ class ChangelogDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('版本詳情'),
+        title: Text(context.i18n.version_details),
         elevation: 0,
       ),
       body: SafeArea(

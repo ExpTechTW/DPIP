@@ -50,20 +50,20 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           builder: (context) {
             return AlertDialog(
               icon: const Icon(Symbols.error),
-              title: const Text("無法取得權限"),
+              title: Text(context.i18n.unable_to_obtain_permission),
               content: Text(
                 "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。" : ""}",
               ),
               actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
                 TextButton(
-                  child: const Text("取消"),
+                  child: Text(context.i18n.cancel),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
                 FilledButton(
-                  child: Text(status.isPermanentlyDenied ? "設定" : "再試一次"),
+                  child: Text(status.isPermanentlyDenied ? context.i18n.settings : context.i18n.again),
                   onPressed: () {
                     if (status.isPermanentlyDenied) {
                       openAppSettings();
@@ -105,11 +105,11 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           builder: (context) {
             return AlertDialog(
               icon: const Icon(Symbols.error),
-              title: const Text("儲存圖片時發生錯誤"),
+              title: Text(context.i18n.error_saving_image),
               content: Text(e.toString()),
               actions: [
                 TextButton(
-                  child: const Text("確定"),
+                  child: Text(context.i18n.confirm),
                   onPressed: () {
                     Navigator.pop(context);
                   },

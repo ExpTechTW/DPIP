@@ -247,7 +247,7 @@ class AnnouncementDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("公告詳情"),
+        title: Text(context.i18n.announcement_details),
         elevation: 0,
       ),
       body: SafeArea(

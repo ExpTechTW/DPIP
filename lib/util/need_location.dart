@@ -1,4 +1,5 @@
 import "package:dpip/route/settings/settings.dart";
+import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
@@ -9,14 +10,14 @@ Future<void> showLocationDialog(BuildContext context) async {
     builder: (context) {
       return AlertDialog(
         icon: const Icon(Symbols.error),
-        title: const Text("尚未設定所在地"),
-        content: const Text(
-          "DPIP 需要設定所在地才能正常運作。點擊「前往設定」設定所在地後再試一次。",
+        title: Text(context.i18n.location_not_set),
+        content: Text(
+          context.i18n.location_setting_required,
         ),
         actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
           TextButton(
-            child: const Text("前往設定"),
+            child: Text(context.i18n.go_to_settings),
             onPressed: () {
               Navigator.pop(context);
               Navigator.push(

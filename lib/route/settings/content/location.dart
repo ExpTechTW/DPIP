@@ -174,7 +174,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       return true;
     } else {
       if (!mounted) return false;
-      final permissionType = Platform.isAndroid ? "一律允許" : "永遠";
+      final permissionType = Platform.isAndroid
+          ? context.i18n.always_allow
+          : context.i18n.always;
 
       final status = await showDialog<bool>(
             context: context,
@@ -192,7 +194,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     },
                   ),
                   FilledButton(
-                    child: const Text("確定"),
+                    child: Text(context.i18n.confirm),
                     onPressed: () async {
                       final status = await Permission.locationAlways.request();
 
@@ -230,26 +232,26 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       if (!mounted) return true;
 
       String contentText = (num == 0)
-          ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
-          : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。";
+          ? context.i18n.auto_start_permission_info
+          : context.i18n.auto_start_permission_experience;
 
       return await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: const Text("自啟動權限"),
+                title: Text(context.i18n.auto_start_permission),
                 content: Text(contentText),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
-                    child: const Text("取消"),
+                    child: Text(context.i18n.cancel),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
                   ),
                   FilledButton(
-                    child: const Text("確定"),
+                    child: Text(context.i18n.confirm),
                     onPressed: () async {
                       await Autostarter.getAutoStartPermission(newTask: true);
 
@@ -275,26 +277,26 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       if (!mounted) return true;
 
       String contentText = (num == 0)
-          ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
-          : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。";
+          ? context.i18n.auto_location_experience_info
+          : context.i18n.unlimited_permission_experience_info;
 
       return await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: const Text("省電策略"),
+                title: Text(context.i18n.power_saving_strategy),
                 content: Text(contentText),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
-                    child: const Text("取消"),
+                    child: Text(context.i18n.cancel),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
                   ),
                   FilledButton(
-                    child: const Text("確定"),
+                    child: Text(context.i18n.confirm),
                     onPressed: () async {
                       DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                       Navigator.pop(context, false);
@@ -497,7 +499,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "通知功能已被拒絕，請移至設定允許權限",
+                        context.i18n.notification_permission_denied,
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),

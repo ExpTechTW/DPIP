@@ -1090,7 +1090,7 @@
   },
   "no_announcements": "目前沒有公告",
   "@no_announcements": {
-    "description": "「公告」 前沒有公告"
+    "description": "「公告」 → 前沒有公告"
   },
   "contributor": "貢獻者",
   "@contributor": {
@@ -1107,5 +1107,86 @@
   "no_changelog": "目前沒有更新日誌",
   "@no_changelog": {
     "description": "當前沒有任何更新日誌"
+  },
+  "announcement_details": "公告詳情",
+  "@announcement_details": {
+    "description": "「公告」 → 查看公告的具體內容"
+  },
+  "version_details": "版本詳情",
+  "@version_details": {
+    "description": "「更新日誌」 → 版本詳情"
+  },
+  "unable_to_obtain_permission": "無法取得權限",
+  "@unable_to_obtain_permission": {
+    "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
+  },
+  "error_saving_image": "儲存圖片時發生錯誤",
+  "@error_saving_image": {
+    "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
+  },
+  "confirm": "確定",
+  "@confirm": {
+    "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
+  },
+  "no_search_results": "無搜尋結果",
+  "@no_search_results": {
+    "description": "當搜尋無結果時顯示的訊息 → 儲存圖片時發生錯誤"
+  },
+  "always_allow": "一律允許",
+  "@always_allow": {
+    "description": "「存取權限彈窗」 → 一律允許"
+  },
+  "always": "永遠",
+  "@always": {
+    "description": "「存取權限彈窗」 → 永遠"
+  },
+  "auto_start_permission_info": "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "@auto_start_permission_info": {
+    "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
+  },
+  "auto_start_permission_experience": "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "@auto_start_permission_experience": {
+    "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
+  },
+  "auto_start_permission": "自啟動權限",
+  "@auto_start_permission": {
+    "description": "「存取權限彈窗」 → 自啟動權限"
+  },
+  "auto_location_experience_info": "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "@auto_location_experience_info": {
+    "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
+  },
+  "unlimited_permission_experience_info": "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "@unlimited_permission_experience_info": {
+    "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
+  },
+  "power_saving_strategy": "省電策略",
+  "@power_saving_strategy": {
+    "description": "「存取權限彈窗」 → 省電策略"
+  },
+  "notification_permission_denied": "通知功能已被拒絕，請移至設定允許權限。",
+  "@notification_permission_denied": {
+    "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
+  },
+  "permission_request": "權限請求",
+  "@permission_request": {
+    "description": "「存取權限彈窗」 → 權限請求"
+  },
+  "manual_permission_enablement": "需要使用者手動到設定開啟相關權限。",
+  "@manual_permission_enablement": {
+    "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
+  },
+  "location_not_set": "尚未設定所在地",
+  "@location_not_set": {
+    "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
+  },
+  "location_setting_required": "DPIP 需要設定所在地才能正常運作。點擊「前往設定」設定所在地後再試一次。",
+  "@location_setting_required": {
+    "description": "提示用戶需要設定所在地才能正常運作的訊息"
+  },
+  "go_to_settings": "前往設定",
+  "@go_to_settings": {
+    "description": "引導用戶前往設定的選項"
   }
+
 }
