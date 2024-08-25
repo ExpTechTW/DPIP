@@ -5,6 +5,7 @@ import "package:dpip/route/changelog/changelog.dart";
 import "package:dpip/route/notification/notification.dart";
 import "package:dpip/route/settings/settings.dart";
 import "package:dpip/route/sound/sound.dart";
+import "package:dpip/route/status/status.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
@@ -77,6 +78,16 @@ class _MePageState extends State<MePage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const NotificationHistoryPage()),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Symbols.dns_rounded),
+          title: const Text("伺服器狀態"),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ServerStatusPage()),
             );
           },
         ),
@@ -190,13 +201,6 @@ class _MePageState extends State<MePage> {
                       label: Text(context.i18n.official_web),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/dpip"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(Icons.history),
-                      label: Text(context.i18n.notification_record),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://exptech.com.tw/history/notification"));
                       },
                     ),
                     ActionChip(

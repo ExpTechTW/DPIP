@@ -10,6 +10,7 @@ import "package:dpip/model/notification_record.dart";
 import "package:dpip/model/report/earthquake_report.dart";
 import "package:dpip/model/report/partial_earthquake_report.dart";
 import "package:dpip/model/rts/rts.dart";
+import "package:dpip/model/server_status.dart";
 import "package:dpip/model/station.dart";
 import "package:dpip/model/tsunami/tsunami.dart";
 import "package:dpip/model/weather/lightning.dart";
@@ -423,5 +424,19 @@ class ExpTech {
     print(jsonData);
 
     return jsonData.map((item) => NotificationRecord.fromJson(item)).toList();
+  }
+
+  Future<List<ServerStatus>> getStatus() async {
+    final requestUrl = Route.status();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
   }
 }

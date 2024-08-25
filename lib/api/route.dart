@@ -51,4 +51,5 @@ class Route {
   static Uri changelog() => Uri.parse("$onlyapi/v1/dpip/changelog");
   static Uri announcement() => Uri.parse("$onlyapi/v1/dpip/announcement");
   static Uri notificationHistory() => Uri.parse("$onlyapi/v1/notify/history");
+  static Uri status() => Uri.parse("https://status.exptech.dev/api/v1/status/data?duration=1d");
 }
