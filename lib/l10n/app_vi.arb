@@ -61,7 +61,7 @@
   "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   },
-  "report_list_item_subtitle": "M {magnitude}　深度 {depth} km",
+  "report_list_item_subtitle": "Độ lớn M {magnitude}　Độ sâu {depth} km",
   "@report_list_item_subtitle": {
     "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",
     "placeholders": {
@@ -75,7 +75,7 @@
       }
     }
   },
-  "report_with_number": "編號 {reportNumber} 顯著有感地震",
+  "report_with_number": "Động đất đáng chú ý có mã báo cáo # {reportNumber}",
   "@report_with_number": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
     "placeholders": {
@@ -84,11 +84,11 @@
       }
     }
   },
-  "report_without_number": "小區域有感地震",
+  "report_without_number": "Động đất nhẹ, cảm nhận được ở khu vực nhỏ",
   "@report_without_number": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
   },
-  "open_report_url": "報告頁面",
+  "open_report_url": "Trang báo cáo",
   "@open_report_url": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
@@ -108,23 +108,23 @@
   "@report_depth": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
   },
-  "report_image": "地震報告圖",
+  "report_image": "Bản đồ báo cáo động đất",
   "@report_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
   },
-  "report_intensity_image": "震度圖",
+  "report_intensity_image": "Bản đồ cường độ địa chấn",
   "@report_intensity_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
   },
-  "report_pga_image": "最大地動加速度圖",
+  "report_pga_image": "Bản đồ gia tốc mặt đất tối đa",
   "@report_pga_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
   },
-  "report_pgv_image": "最大地動速度圖",
+  "report_pgv_image": "Bản đồ vận tốc mặt đất tối đa",
   "@report_pgv_image": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
   },
-  "report_intensity": "各地震度",
+  "report_intensity": "Cường độ địa chấn tại các khu vực",
   "@report_intensity": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
   },
@@ -140,7 +140,7 @@
   "@settings_display_locale": {
     "description": "「設定」路徑 → 「顯示語言」標題"
   },
-  "settings_locale_translated": "已翻譯 {percentage}",
+  "settings_locale_translated": "Đã dịch {percentage}",
   "@settings_locale_translated": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
     "placeholders": {
@@ -150,7 +150,7 @@
       }
     }
   },
-  "settings_locale_approved": "已校對 {percentage}",
+  "settings_locale_approved": "Đã hiệu đính {percentage}",
   "@settings_locale_approved": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
     "placeholders": {
@@ -164,15 +164,15 @@
   "@settings_locale_crowdin": {
     "description": "「設定」路徑 → 「協助翻譯」標題"
   },
-  "settings_locale_crowdin_description": "點擊這裡來幫助我們改進 DPIP 的翻譯",
+  "settings_locale_crowdin_description": "Nhấp vào đây để giúp chúng tôi cải thiện bản dịch DPIP",
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "暫時無法取得地震速報資料",
+  "earthquake_warning_error": "Tạm thời không thể lấy dữ liệu cảnh báo động đất",
   "@earthquake_warning_error": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "目前無生效中的地震速報",
+  "no_earthquake_warning": "Hiện không có cảnh báo động đất nào có hiệu lực.",
   "@no_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
   },
@@ -184,7 +184,7 @@
   "@emergency_earthquake_warning": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
   },
-  "location_estimate": "所在地預估",
+  "location_estimate": "Dự đoán vị trí",
   "@location_estimate": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
   },
@@ -212,7 +212,7 @@
   "@image_save": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "已儲存圖片",
+  "image_saved": "Đã lưu ảnh",
   "@image_saved": {
     "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
@@ -224,7 +224,7 @@
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_theme_description": "調整 DPIP 整體的外觀與顏色",
+  "settings_theme_description": "Điều chỉnh giao diện và màu sắc tổng thể của DPIP",
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
@@ -236,7 +236,7 @@
   "@theme_dark": {
     "description": "「設定」路徑 → 「主題色」設定 → 深色"
   },
-  "theme_system": "跟隨系統主題",
+  "theme_system": "Theo chủ đề hệ thống",
   "@theme_system": {
     "description": "「設定」路徑 → 「主題色」設定 → 跟隨系統主題"
   },
@@ -248,19 +248,19 @@
   "@settings_location": {
     "description": "「設定」路徑 → 「所在地」副標題"
   },
-  "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
+  "settings_location_description": "Điều chỉnh vị trí để nhận thông tin thời tiết theo thời gian thực, dự đoán cường độ động đất và thời gian sóng địa chấn dự kiến đến.",
   "@settings_location_description": {
     "description": "「設定」路徑 → 「所在地」副標題敘述"
   },
-  "settings_location_auto": "啟用自動定位",
+  "settings_location_auto": "Bật định vị tự động",
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "自動定位功能將使用您的裝置上的 GPS ，根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。",
+  "settings_location_auto_description": "Tính năng định vị tự động sẽ sử dụng GPS trên thiết bị của bạn để tự động cập nhật vị trí của bạn dựa trên vị trí địa lý, cung cấp thông tin thời tiết và động đất theo thời gian thực, giúp bạn luôn nắm bắt được tình hình mới nhất tại địa phương.",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
-  "location_Not_set": "尚未設定",
+  "location_Not_set": "Chưa được thiết lập",
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
@@ -276,23 +276,23 @@
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
-  "settings_fcm": "複製 FCM Token",
+  "settings_fcm": "Sao chép FCM Token",
   "@settings_fcm": {
     "description": "「設定」路徑 → 「FCM」標題"
   },
-  "settings_copy_fcm": "已複製 FCM Token",
+  "settings_copy_fcm": "Đã sao chép FCM Token",
   "@settings_copy_fcm": {
     "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "此地震可能引起若干海面變動",
+  "report_offing": "Trận động đất này có thể gây ra một số biến động trên mặt biển.",
   "@report_offing": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "此地震可能引起海嘯 注意後續資訊",
+  "report_tsunami_attention": "Trận động đất này có thể gây ra sóng thần. Hãy chú ý theo dõi thông tin cập nhật.",
   "@report_tsunami_attention": {
     "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
-  "report_error": "取得地震報告時發生錯誤，請檢查網路狀況後再試一次。",
+  "report_error": "Đã xảy ra lỗi khi lấy báo cáo động đất. Vui lòng kiểm tra kết nối mạng và thử lại.",
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
