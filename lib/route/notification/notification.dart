@@ -264,7 +264,7 @@ class NotificationDetailPage extends StatelessWidget {
               record.body,
               style: context.theme.textTheme.titleMedium,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 24),
             Text(
               '通知發送區域',
               style: context.theme.textTheme.bodyMedium,
