@@ -166,37 +166,33 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
     try {
       PermissionStatus status;
-      if (item.permission == Permission.criticalAlerts) {
-        status = await requestNotificationPermission();
-      } else if (value) {
+      if (value) {
         status = await item.permission.request();
         if (status.isPermanentlyDenied) {
           _showPermanentlyDeniedDialog(item);
+        } else if (item.permission == Permission.notification) {
+          if (Platform.isAndroid && status == PermissionStatus.granted) {
+            _isNotificationPermission = true;
+          } else if (Platform.isIOS) {
+              await Firebase.initializeApp();
+              NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+                alert: true,
+                announcement: true,
+                badge: true,
+                carPlay: true,
+                criticalAlert: true,
+                provisional: true,
+                sound: true,
+              );
+              if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+                _isNotificationPermission = true;
+              }
+            }
         }
       } else {
         status = await item.permission.status;
         if (status.isGranted) {
           await openAppSettings();
-        }
-      }
-
-      if (item.permission == Permission.notification) {
-        if (Platform.isAndroid && status == PermissionStatus.granted) {
-          _isNotificationPermission = true;
-        } else if (Platform.isIOS) {
-          await Firebase.initializeApp();
-          NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-            alert: true,
-            announcement: true,
-            badge: true,
-            carPlay: true,
-            criticalAlert: true,
-            provisional: true,
-            sound: true,
-          );
-          if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-            _isNotificationPermission = true;
-          }
         }
       }
 
