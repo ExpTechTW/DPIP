@@ -256,7 +256,8 @@ Future<void> notifyInit() async {
 Future<PermissionStatus> requestNotificationPermission() async {
   bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowed) {
-    isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications();
+    List<NotificationPermission> a = [NotificationPermission.Alert,NotificationPermission.CriticalAlert];
+    isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications(permissions: a);
   }
   return isAllowed ? PermissionStatus.granted : PermissionStatus.denied;
 }

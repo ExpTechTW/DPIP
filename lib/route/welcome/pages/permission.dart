@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/route/welcome/pages/tos.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
@@ -162,7 +163,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
     try {
       PermissionStatus status;
-      if (value) {
+      if (Platform.isIOS && item.permission == Permission.notification) {
+        status = await requestNotificationPermission();
+      } else if (value) {
         status = await item.permission.request();
         if (status.isPermanentlyDenied) {
           _showPermanentlyDeniedDialog(item);
