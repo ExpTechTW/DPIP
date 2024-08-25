@@ -6,14 +6,10 @@ import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/more/more.dart';
-import 'package:dpip/core/fcm.dart';
-import 'package:dpip/core/notify.dart';
-import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/route/update_required/update_required.dart';
-import 'package:dpip/route/welcome/pages/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -179,7 +175,6 @@ class _DpipState extends State<Dpip> {
                     child: Text(context.i18n.remind_later),
                     onPressed: () {
                       Navigator.pop(context);
-                      _initializeServices();
                     },
                   ),
                   TextButton(
@@ -198,15 +193,7 @@ class _DpipState extends State<Dpip> {
           },
         );
       }
-    } else {
-      _initializeServices();
     }
-  }
-
-  void _initializeServices() {
-    fcmInit();
-    notifyInit();
-    initBackgroundService();
   }
 
   Future<void> _showErrorDialog() async {

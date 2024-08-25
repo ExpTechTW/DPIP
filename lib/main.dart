@@ -1,4 +1,7 @@
 import "package:dpip/app/dpip.dart";
+import "package:dpip/core/fcm.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
 import "package:dpip/dialog/welcome/announcement.dart";
 import "package:dpip/dialog/welcome/changelog.dart";
 import "package:dpip/global.dart";
@@ -83,12 +86,19 @@ class DpipAppState extends State<DpipApp> {
 
       showWelcomeScreen = true;
     } else {
+      _initializeServices();
       if (Global.preference.getString("changelog") != Global.packageInfo.version) {
         showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
       } else {
         showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
       }
     }
+  }
+
+  void _initializeServices() {
+    fcmInit();
+    notifyInit();
+    initBackgroundService();
   }
 
   @override
