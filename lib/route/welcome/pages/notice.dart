@@ -1,6 +1,7 @@
 import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class WelcomeNoticePage extends StatelessWidget {
   const WelcomeNoticePage({super.key});
@@ -30,13 +31,11 @@ class WelcomeNoticePage extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: SizedBox(
-                      height: 120,
-                      child: Icon(
-                        Icons.warning_rounded,
-                        size: 80,
-                        color: context.colors.primary,
-                      ),
+                    child: Icon(
+                      Symbols.warning_rounded,
+                      size: 80,
+                      color: context.colors.primary,
+                      fill: 1,
                     ),
                   ),
                   Padding(
