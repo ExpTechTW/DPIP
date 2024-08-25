@@ -78,7 +78,6 @@ class DpipAppState extends State<DpipApp> {
     super.initState();
     if (Global.preference.getBool("welcome-1.0.0") == null) {
       Global.preference.setString("changelog", Global.packageInfo.version);
-
       showWelcomeScreen = true;
     }
   }

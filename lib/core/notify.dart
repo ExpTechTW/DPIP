@@ -167,7 +167,7 @@ Future<void> notifyInit() async {
             ledColor: Colors.red,
             vibrationPattern: highVibrationPattern),
         NotificationChannel(
-            channelGroupKey: 'group_info',
+            channelGroupKey: 'group_other',
             channelKey: "other",
             channelName: "其他類型警報",
             channelDescription: "所在地發布其他類型警報",
@@ -177,7 +177,7 @@ Future<void> notifyInit() async {
             ledColor: Colors.red,
             vibrationPattern: highVibrationPattern),
         NotificationChannel(
-            channelGroupKey: 'group_info',
+            channelGroupKey: 'group_other',
             channelKey: "announcement",
             channelName: "公告",
             channelDescription: "ExpTech 發布之公告",

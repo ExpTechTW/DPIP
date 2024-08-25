@@ -74,7 +74,7 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
-            shrinkResources true
+            shrinkResources false
             multiDexEnabled true
         }
         debug {

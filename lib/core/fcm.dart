@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/global.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,5 +25,36 @@ Future<void> onNativeTokenHandle(String token) async {
 }
 
 Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
+  print("Silent data received: ${silentData.data}");
+  Map<String, dynamic> data = silentData.data!.cast<String, dynamic>();
+
+  if (silentData.createdLifeCycle == NotificationLifeCycle.AppKilled) {
+    String channelKey = data['channel'] ?? 'other';
+    data['content'] = {
+      'id': int.parse(data['id'] ?? '0'),
+      'channelKey': channelKey,
+      'title': data['title'],
+      'body': data['body'],
+      'notificationLayout': NotificationLayout.Default.name,
+    };
+    await AwesomeNotifications().createNotificationFromJsonData(data);
+  } else {
+    await showNotify(data);
+  }
   return Future.value();
+}
+
+Future<void> showNotify(Map<String, dynamic> data) async {
+  print(data);
+  String channelKey = data['channel'] ?? 'other';
+
+  await AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: int.parse(data['id'] ?? '0'),
+      channelKey: channelKey,
+      title: data['title'],
+      body: data['body'],
+      notificationLayout: NotificationLayout.Default,
+    ),
+  );
 }
