@@ -25,7 +25,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   Future<void> _fetchNotificationRecords() async {
     try {
       final records = await ExpTech().getNotificationHistory();
-      notificationRecords = records;
+      notificationRecords = records.reversed.toList();
     } catch (e) {
       errorMessage = '獲取通知紀錄時發生錯誤: $e';
     } finally {
@@ -339,6 +339,6 @@ class NotificationDetailPage extends StatelessWidget {
 
   String _formatDate(int timestamp) {
     final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return DateFormat('yyyy/MM/dd HH:mm').format(date);
+    return DateFormat('yyyy/MM/dd HH:mm:ss').format(date);
   }
 }
