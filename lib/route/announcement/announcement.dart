@@ -226,7 +226,6 @@ class AnnouncementCard extends StatelessWidget {
         tagType.text,
         style: const TextStyle(
           fontSize: 12,
-          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -322,7 +321,6 @@ class AnnouncementDetailPage extends StatelessWidget {
         tagType.text,
         style: const TextStyle(
           fontSize: 12,
-          color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),

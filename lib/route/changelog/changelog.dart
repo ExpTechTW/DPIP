@@ -56,7 +56,6 @@ Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
       _getLocalizedType(entry.type),
       style: const TextStyle(
         fontSize: 12,
-        color: Colors.white,
         fontWeight: FontWeight.bold,
       ),
     ),
