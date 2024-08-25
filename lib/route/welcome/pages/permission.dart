@@ -4,6 +4,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/route/welcome/pages/tos.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -56,7 +58,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       } else if (Platform.isIOS) {
         permissions = [
           Permission.notification,
-          Permission.criticalAlerts,
           Permission.location,
           Permission.photos,
         ];
@@ -80,12 +81,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         case Permission.notification:
           icon = Icons.notifications;
           text = context.i18n.notification;
-          description = context.i18n.notification_service_description;
-          color = Colors.orange;
-          break;
-        case Permission.criticalAlerts:
-          icon = Icons.notifications;
-          text = "重大通知";
           description = context.i18n.notification_service_description;
           color = Colors.orange;
           break;
@@ -179,6 +174,19 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         if (status.isGranted) {
           await openAppSettings();
         }
+      }
+
+      if (Platform.isIOS && item.permission == Permission.notification) {
+        await Firebase.initializeApp();
+        await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          announcement: true,
+          badge: true,
+          carPlay: true,
+          criticalAlert: true,
+          provisional: true,
+          sound: true,
+        );
       }
 
       item.isGranted = status.isGranted;

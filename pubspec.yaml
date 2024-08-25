@@ -19,6 +19,7 @@ dependencies:
   disable_battery_optimization: ^1.1.1
   dynamic_color: ^1.7.0
   firebase_core: ^2.32.0
+  firebase_messaging: ^14.9.4
   flutter_background_service:
     git:
       url: https://github.com/ExpTechTW/flutter_background_service.git
