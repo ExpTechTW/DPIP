@@ -1,5 +1,6 @@
 import "package:dpip/app/dpip.dart";
 import "package:dpip/global.dart";
+import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
@@ -42,15 +43,11 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     super.dispose();
   }
 
-  void gotodpip() {
-    Global.preference.setBool("welcome-1", true);
-    if (mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const Dpip()),
-        (Route<dynamic> route) => false,
-      );
-    }
+  void complete(bool status) {
+    Global.preference.setBool("welcome-1.0.0", true);
+    Global.preference.setBool("monitor", status);
+
+    WelcomeRouteState.of(context)!.complete();
   }
 
   @override
@@ -63,22 +60,14 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () {
-                  Global.preference.setBool("monitor", false);
-                  gotodpip();
-                },
+                onPressed: () => complete(false),
                 child: Text(
                   context.i18n.disagree,
                   style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
               FilledButton(
-                onPressed: _isEnabled
-                    ? () {
-                        Global.preference.setBool("monitor", true);
-                        gotodpip();
-                      }
-                    : null,
+                onPressed: _isEnabled ? () => complete(true) : null,
                 child: Text(context.i18n.agree),
               ),
             ],
