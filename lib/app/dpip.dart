@@ -6,6 +6,9 @@ import 'package:dpip/app/page/home/home.dart';
 import 'package:dpip/app/page/map/map.dart';
 import 'package:dpip/app/page/me/me.dart';
 import 'package:dpip/app/page/more/more.dart';
+import 'package:dpip/core/fcm.dart';
+import 'package:dpip/core/notify.dart';
+import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/route/changelog/changelog.dart';
@@ -32,6 +35,7 @@ class _DpipState extends State<Dpip> {
   @override
   void initState() {
     super.initState();
+    _initializeServices();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkForUpdates();
     });
@@ -229,6 +233,12 @@ class _DpipState extends State<Dpip> {
       MaterialPageRoute(builder: (context) => const Dpip()),
       (Route<dynamic> route) => false,
     );
+  }
+
+  void _initializeServices() {
+    fcmInit();
+    notifyInit();
+    initBackgroundService();
   }
 
   @override
