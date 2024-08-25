@@ -421,8 +421,6 @@ class ExpTech {
 
     final List<dynamic> jsonData = jsonDecode(res.body);
 
-    print(jsonData);
-
     return jsonData.map((item) => NotificationRecord.fromJson(item)).toList();
   }
 
