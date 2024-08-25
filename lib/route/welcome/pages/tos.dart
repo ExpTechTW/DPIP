@@ -43,9 +43,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
   }
 
   void complete(bool status) {
-    Global.preference.setBool("welcome-1.0.0", true);
     Global.preference.setBool("monitor", status);
-
     WelcomeRouteState.of(context)!.complete();
   }
 

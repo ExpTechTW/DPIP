@@ -1,4 +1,5 @@
 import 'package:dpip/app/dpip.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/route/welcome/pages/about.dart';
 import 'package:dpip/route/welcome/pages/exptech.dart';
 import 'package:dpip/route/welcome/pages/notice.dart';
@@ -29,6 +30,7 @@ class WelcomeRouteState extends State<WelcomeRoute> {
   }
 
   void complete() {
+    Global.preference.setBool("welcome-1.0.0", true);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
