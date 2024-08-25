@@ -1,6 +1,4 @@
 import "package:dpip/app/dpip.dart";
-import "package:dpip/dialog/welcome/announcement.dart";
-import "package:dpip/dialog/welcome/changelog.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/string.dart";

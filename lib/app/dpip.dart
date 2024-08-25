@@ -9,6 +9,8 @@ import 'package:dpip/app/page/more/more.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
+import 'package:dpip/dialog/welcome/announcement.dart';
+import 'package:dpip/dialog/welcome/changelog.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -53,6 +55,13 @@ class _DpipState extends State<Dpip> {
           }
         });
       }).catchError((e) {});
+    }
+
+    if (Global.preference.getString("changelog") != Global.packageInfo.version) {
+      showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
+    }
+    if (false) {
+      showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
     }
   }
 
