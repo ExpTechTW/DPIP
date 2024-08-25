@@ -513,15 +513,15 @@
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
   },
-  "history": "역사",
+  "history": "이력",
   "@history": {
     "description": "「歷史」頁面標題"
   },
-  "historical_events": "3일 내의 사건 정보",
+  "historical_events": "3일간의 이벤트 정보",
   "@historical_events": {
     "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
   },
-  "no_historical_events": "사건 정보 없음",
+  "no_historical_events": "과거 이벤트 정보 없음",
   "@no_historical_events": {
     "description": "「歷史」路徑 → 沒有歷史事件資訊"
   },
@@ -529,15 +529,15 @@
   "@hourly_forecast": {
     "description": "「首頁」路徑 → 「每小時預報」標題"
   },
-  "current_events": "현재 사건 정보",
+  "current_events": "현재 이벤트 정보",
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
-  "no_events": "현재 사건 정보가 없습니다",
+  "no_events": "현재 이벤트 정보 없음",
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
-  "eew_no_x": "제 {serial} 차 보고",
+  "eew_no_x": "제 {serial} 보",
   "@eew_no_x": {
     "description": "「強震監視器」路徑 → 資訊托盤 → 第 {serial} 報",
     "placeholders": {
@@ -602,23 +602,23 @@
   "@foggy": {
     "description": "天氣狀況：霧"
   },
-  "patchy_rain_possible": "국지적인 비가 올 가능성이 있습니다.",
+  "patchy_rain_possible": "국지적인 비가 올 수 있습니다.",
   "@patchy_rain_possible": {
     "description": "天氣狀況：可能有局部降雨"
   },
-  "patchy_snow_possible": "국지적인 눈이 올 가능성이 있습니다.",
+  "patchy_snow_possible": "국지적인 눈이 올 수 있습니다.",
   "@patchy_snow_possible": {
     "description": "天氣狀況：可能有局部降雪"
   },
-  "patchy_sleet_possible": "국지적인 비와 눈이 섞일 가능성이 있습니다.",
+  "patchy_sleet_possible": "국지적인 진눈깨비가 올 수 있습니다.",
   "@patchy_sleet_possible": {
     "description": "天氣狀況：可能有局部雨夾雪"
   },
-  "patchy_freezing_drizzle_possible": "국지적으로 얼어붙는 이슬비가 있을 수 있습니다",
+  "patchy_freezing_drizzle_possible": "국지적으로 얼은 이슬비가 내릴 수 있습니다",
   "@patchy_freezing_drizzle_possible": {
     "description": "天氣狀況：可能有局部凍毛毛雨"
   },
-  "thundery_outbreaks_possible": "국지적인 천둥번개가 있을 가능성이 있습니다.",
+  "thundery_outbreaks_possible": "국지적인 뇌우가 내릴 수 있습니다.",
   "@thundery_outbreaks_possible": {
     "description": "天氣狀況：可能有局部雷雨"
   },
