@@ -4,7 +4,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/route/welcome/pages/tos.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
+import "package:dpip/route/welcome/welcome.dart";
 
 class WelcomePermissionPage extends StatefulWidget {
   const WelcomePermissionPage({super.key});
@@ -108,82 +110,23 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     return items;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: FutureBuilder<List<Permission>>(
-            future: _permissionsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No permissions to display'));
-              }
-
-              final permissionItems = _createPermissionItems(snapshot.data!, context);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.security,
-                            size: 80,
-                            color: context.colors.primary,
-                          ),
-                          const SizedBox(height: 24),
-                          Text(
-                            context.i18n.permission,
-                            style: context.theme.textTheme.headlineMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            context.i18n.privacy_commitment,
-                            style: context.theme.textTheme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
-                          ...permissionItems.map(_buildPermissionCard),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _continueToTOS,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(context.i18n.next_step),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildPermissionCard(PermissionItem item) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: item.color.withOpacity(0.1),
-          child: Icon(item.icon, color: item.color),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colors.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
         ),
-        title: Text(item.text),
-        subtitle: Text(item.description),
-        trailing: _buildPermissionSwitch(item),
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: item.color.withOpacity(0.1),
+            child: Icon(item.icon, color: item.color),
+          ),
+          title: Text(item.text),
+          subtitle: Text(item.description),
+          trailing: _buildPermissionSwitch(item),
+        ),
       ),
     );
   }
@@ -270,6 +213,96 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+          child: FilledButton(
+            child: Text(context.i18n.next_step),
+            onPressed: () {
+              WelcomeRouteState.of(context)!.nextPage();
+            },
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: context.padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 32, 0, 16),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      height: 120,
+                      child: Icon(
+                        Symbols.security_rounded,
+                        size: 80,
+                        color: context.colors.primary,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      context.i18n.permission,
+                      style: context.theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: context.colors.primary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Text(
+                          context.i18n.privacy_commitment,
+                          style: context.theme.textTheme.titleMedium?.copyWith(
+                            color: context.colors.primary.withOpacity(0.7),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          context.i18n.disaster_info_platform,
+                          style: context.theme.textTheme.titleMedium?.copyWith(
+                            color: context.colors.primary.withOpacity(0.7),
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            FutureBuilder<List<Permission>>(
+              future: _permissionsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No permissions to display'));
+                }
+
+                final permissionItems = _createPermissionItems(snapshot.data!, context);
+                return Column(children: permissionItems.map(_buildPermissionCard).toList());
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

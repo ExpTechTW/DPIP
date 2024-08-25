@@ -63,7 +63,7 @@ class WelcomeNoticePage extends StatelessWidget {
                 ),
                 child: Text(
                   context.i18n.official_info,
-                  style: context.theme.textTheme.bodyMedium!.copyWith(
+                  style: context.theme.textTheme.bodyLarge!.copyWith(
                     color: context.colors.onErrorContainer,
                     fontWeight: FontWeight.bold,
                   ),
@@ -80,7 +80,7 @@ class WelcomeNoticePage extends StatelessWidget {
                 ),
                 child: Text(
                   context.i18n.information_reliability,
-                  style: context.theme.textTheme.bodyMedium,
+                  style: context.theme.textTheme.bodyLarge,
                 ),
               ),
             ),
@@ -94,7 +94,7 @@ class WelcomeNoticePage extends StatelessWidget {
                 ),
                 child: Text(
                   context.i18n.strong_shake_warning,
-                  style: context.theme.textTheme.bodyMedium,
+                  style: context.theme.textTheme.bodyLarge,
                 ),
               ),
             ),
@@ -108,7 +108,7 @@ class WelcomeNoticePage extends StatelessWidget {
                 ),
                 child: Text(
                   context.i18n.earthquake_alert_warning,
-                  style: context.theme.textTheme.bodyMedium,
+                  style: context.theme.textTheme.bodyLarge,
                 ),
               ),
             ),
@@ -122,7 +122,7 @@ class WelcomeNoticePage extends StatelessWidget {
                 ),
                 child: Text(
                   context.i18n.legal_risks,
-                  style: context.theme.textTheme.bodyMedium,
+                  style: context.theme.textTheme.bodyLarge,
                 ),
               ),
             ),
