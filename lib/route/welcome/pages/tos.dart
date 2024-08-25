@@ -44,7 +44,12 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
 
   void complete(bool status) {
     Global.preference.setBool("monitor", status);
-    WelcomeRouteState.of(context)!.complete();
+    final state = WelcomeRouteState.of(context);
+    if (state != null) {
+      state.complete();
+    } else {
+      Navigator.pop(context);
+    }
   }
 
   @override
