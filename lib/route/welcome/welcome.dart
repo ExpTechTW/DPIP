@@ -1,3 +1,4 @@
+import 'package:dpip/app/dpip.dart';
 import 'package:dpip/route/welcome/pages/about.dart';
 import 'package:dpip/route/welcome/pages/exptech.dart';
 import 'package:dpip/route/welcome/pages/notice.dart';
@@ -25,6 +26,15 @@ class WelcomeRouteState extends State<WelcomeRoute> {
 
   void prevPage() {
     controller.previousPage(duration: Durations.short4, curve: Easing.standard);
+  }
+
+  void complete() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Dpip(),
+      ),
+    );
   }
 
   @override
