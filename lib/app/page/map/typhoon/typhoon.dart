@@ -1,14 +1,14 @@
-import "dart:io";
+import 'dart:io';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/model/weather/typhoon.dart";
-import "package:dpip/util/map_utils.dart";
-import "package:dpip/widget/list/typhoon_time_selector.dart";
-import "package:dpip/widget/map/map.dart";
-import "package:flutter/material.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/model/weather/typhoon.dart';
+import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/widget/list/typhoon_time_selector.dart';
+import 'package:dpip/widget/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class TyphoonMap extends StatefulWidget {
   const TyphoonMap({super.key});
@@ -72,15 +72,13 @@ class _TyphoonMapState extends State<TyphoonMap> {
             ],
           },
         );
-        // final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-        // await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
       }
 
       await _addUserLocationMarker();
 
       setState(() {});
     } catch (e) {
-      print("Error loading typhoon list: $e");
+      print("加載颱風列表時出錯: $e");
     }
   }
 
@@ -114,19 +112,36 @@ class _TyphoonMapState extends State<TyphoonMap> {
       typhoonData = await ExpTech().getTyphoon(time);
       if (typhoonData != null && typhoonData!.isNotEmpty) {
         typhoon_name_list = [];
-        selectedTyphoonId = "";
         await _drawTyphoonPaths(typhoonData!);
       }
     } catch (e) {
-      print("Error loading typhoon data: $e");
+      print("加載颱風數據時出錯: $e");
     }
   }
 
   void _onSelectionChanged(String timestamp, String typhoonId) {
     selectedTimestamp = timestamp;
     selectedTyphoonId = typhoonId;
-    _loadTyphoonData(timestamp);
+    _zoomToSelectedTyphoon();
     setState(() {});
+  }
+
+  Future<void> _zoomToSelectedTyphoon() async {
+    if (typhoonData != null && selectedTyphoonId.isNotEmpty) {
+      print(selectedTyphoonId);
+      Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.name.zh == selectedTyphoonId);
+      if (selectedTyphoon != null && selectedTyphoon.analysis.isNotEmpty) {
+        LatLng center = LatLng(
+          selectedTyphoon.analysis.last.lat,
+          selectedTyphoon.analysis.last.lng,
+        );
+        double zoomLevel = 5;
+        await _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(center, zoomLevel),
+          duration: const Duration(milliseconds: 1000),
+        );
+      }
+    }
   }
 
   Future<void> _drawTyphoonPaths(List<Typhoon> typhoons) async {
@@ -149,6 +164,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
       await _draw15WindCircle(typhoon, i);
       await _drawForecastCircles(typhoon, i);
     }
+    _zoomToSelectedTyphoon();
   }
 
   Future<void> _drawTyphoonPath(Typhoon typhoon, int i) async {
