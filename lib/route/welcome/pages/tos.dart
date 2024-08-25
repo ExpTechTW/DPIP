@@ -54,7 +54,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
               TextButton(
                 onPressed: () {
                   Global.preference.setBool("monitor", false);
-                  Global.preference.setBool("welcome-1.0.0", true);
+                  Global.preference.setBool("welcome-1", true);
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const Dpip()),
@@ -69,7 +69,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
                 onPressed: _isEnabled
                     ? () {
                         Global.preference.setBool("monitor", true);
-                        Global.preference.setBool("welcome-1.0.0", true);
+                        Global.preference.setBool("welcome-1", true);
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const Dpip()),
@@ -107,7 +107,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Text(
                 context.i18n.trem_service_description,
                 style: context.theme.textTheme.bodyLarge,

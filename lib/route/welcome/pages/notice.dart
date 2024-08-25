@@ -75,7 +75,7 @@ class WelcomeNoticePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
@@ -89,7 +89,7 @@ class WelcomeNoticePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
@@ -103,7 +103,7 @@ class WelcomeNoticePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
@@ -117,7 +117,7 @@ class WelcomeNoticePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
@@ -131,7 +131,7 @@ class WelcomeNoticePage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Container(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
