@@ -82,12 +82,6 @@ class DpipAppState extends State<DpipApp> {
       Global.preference.setString("changelog", Global.packageInfo.version);
 
       showWelcomeScreen = true;
-    } else {
-      if (Global.preference.getString("changelog") != Global.packageInfo.version) {
-        showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
-      } else {
-        showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
-      }
     }
   }
 

@@ -10,8 +10,6 @@ import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/route/announcement/announcement.dart';
-import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
@@ -117,86 +115,6 @@ class _DpipState extends State<Dpip> {
     } catch (e) {
       print("Error checking for updates: $e");
       await _showErrorDialog();
-    }
-  }
-
-  Future<void> _showChangelogDialog() async {
-    Global.preference.setString("changelog", Global.packageInfo.version);
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            icon: const Icon(Symbols.update_rounded),
-            title: Text(context.i18n.update_complete),
-            content: Text(context.i18n.update_complete_prompt),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: Text(context.i18n.remind_later),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _checkAnnouncement();
-                },
-              ),
-              TextButton(
-                child: Text(context.i18n.go_to_view),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ChangelogPage()),
-                  ).then((_) => _checkAnnouncement());
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _checkAnnouncement() async {
-    var data = await ExpTech().getAnnouncement();
-    if (data.last.show && Global.preference.getString("announcement") != data.last.time.toString()) {
-      Global.preference.setString("announcement", data.last.time.toString());
-      if (mounted) {
-        await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            return WillPopScope(
-              onWillPop: () async => false,
-              child: AlertDialog(
-                icon: const Icon(Symbols.announcement),
-                title: Text(context.i18n.announcement),
-                content: Text(context.i18n.new_announcement_prompt),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: Text(context.i18n.remind_later),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  TextButton(
-                    child: Text(context.i18n.go_to_view),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const AnnouncementPage()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      }
     }
   }
 
