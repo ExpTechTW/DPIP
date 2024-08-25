@@ -78,6 +78,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       String text;
       String description;
       Color color;
+      bool isHighlighted = false;
 
       switch (permission) {
         case Permission.notification:
@@ -85,6 +86,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           text = context.i18n.notification;
           description = context.i18n.notification_service_description;
           color = Colors.orange;
+          isHighlighted = true;
           break;
         case Permission.location:
           icon = Icons.location_on;
@@ -109,6 +111,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         description: description,
         color: color,
         permission: permission,
+        isHighlighted: isHighlighted,
       ));
     }
     return items;
@@ -121,6 +124,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         decoration: BoxDecoration(
           color: context.colors.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
+          border: item.isHighlighted
+            ? Border.all(color: Colors.red, width: 2)
+            : null,
         ),
         child: ListTile(
           leading: CircleAvatar(
@@ -331,6 +337,7 @@ class PermissionItem {
   final Color color;
   final Permission permission;
   bool isGranted;
+  bool isHighlighted;
 
   PermissionItem({
     required this.icon,
@@ -339,5 +346,6 @@ class PermissionItem {
     required this.color,
     required this.permission,
     this.isGranted = false,
+    required this.isHighlighted,
   });
 }
