@@ -241,13 +241,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: SizedBox(
-                      height: 120,
-                      child: Icon(
-                        Symbols.security_rounded,
-                        size: 80,
-                        color: context.colors.primary,
-                      ),
+                    child: Icon(
+                      Symbols.security_rounded,
+                      size: 80,
+                      color: context.colors.primary,
                     ),
                   ),
                   Padding(
