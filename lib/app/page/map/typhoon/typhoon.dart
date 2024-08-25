@@ -119,16 +119,18 @@ class _TyphoonMapState extends State<TyphoonMap> {
     }
   }
 
-  void _onSelectionChanged(String timestamp, String typhoonId) {
+  void _onSelectionChanged(String timestamp, String typhoonId) async {
     selectedTimestamp = timestamp;
-    selectedTyphoonId = typhoonId;
-    _zoomToSelectedTyphoon();
+    await _loadTyphoonData(selectedTimestamp);
+    if (selectedTyphoonId != typhoonId) {
+      selectedTyphoonId = typhoonId;
+      _zoomToSelectedTyphoon();
+    }
     setState(() {});
   }
 
   Future<void> _zoomToSelectedTyphoon() async {
     if (typhoonData != null && selectedTyphoonId.isNotEmpty) {
-      print(selectedTyphoonId);
       Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.name.zh == selectedTyphoonId);
       if (selectedTyphoon != null && selectedTyphoon.analysis.isNotEmpty) {
         LatLng center = LatLng(
@@ -158,13 +160,13 @@ class _TyphoonMapState extends State<TyphoonMap> {
       Typhoon typhoon = typhoons[i];
       if (selectedTyphoonId == "") {
         selectedTyphoonId = typhoon.name.zh;
+        _zoomToSelectedTyphoon();
       }
       typhoon_name_list.add(typhoon.name.zh);
       await _drawTyphoonPath(typhoon, i);
       await _draw15WindCircle(typhoon, i);
       await _drawForecastCircles(typhoon, i);
     }
-    _zoomToSelectedTyphoon();
   }
 
   Future<void> _drawTyphoonPath(Typhoon typhoon, int i) async {
