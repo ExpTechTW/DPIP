@@ -21,6 +21,7 @@ class WelcomePermissionPage extends StatefulWidget {
 class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
   bool _isRequestingPermission = false;
+  bool _isNotificationPermission = false;
 
   @override
   void initState() {
@@ -179,17 +180,24 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         }
       }
 
-      if (Platform.isIOS && item.permission == Permission.notification) {
-        await Firebase.initializeApp();
-        await FirebaseMessaging.instance.requestPermission(
-          alert: true,
-          announcement: true,
-          badge: true,
-          carPlay: true,
-          criticalAlert: true,
-          provisional: true,
-          sound: true,
-        );
+      if (item.permission == Permission.notification) {
+        if (Platform.isAndroid && status == PermissionStatus.granted) {
+          _isNotificationPermission = true;
+        } else if (Platform.isIOS) {
+          await Firebase.initializeApp();
+          NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+            alert: true,
+            announcement: true,
+            badge: true,
+            carPlay: true,
+            criticalAlert: true,
+            provisional: true,
+            sound: true,
+          );
+          if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+            _isNotificationPermission = true;
+          }
+        }
       }
 
       item.isGranted = status.isGranted;
@@ -242,9 +250,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
             child: Text(context.i18n.next_step),
-            onPressed: () {
-              WelcomeRouteState.of(context)!.nextPage();
-            },
+            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.nextPage() : null,
           ),
         ),
       ),
