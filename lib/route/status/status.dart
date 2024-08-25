@@ -36,6 +36,8 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('伺服器狀態', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -50,34 +52,76 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<ServerStatus>>(
-        future: _statusFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('錯誤: ${snapshot.error}', style: const TextStyle(color: Colors.red, fontSize: 16)),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('沒有可用的數據', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-            );
-          }
+      body: Column(
+        children: [
+          _buildInfoBox(isDarkMode),
+          Expanded(
+            child: FutureBuilder<List<ServerStatus>>(
+              future: _statusFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('錯誤: ${snapshot.error}',
+                        style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 16)),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text('沒有可用的數據', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  );
+                }
 
-          final statuses = snapshot.data!;
-          return ListView.builder(
-            itemCount: statuses.length,
-            itemBuilder: (context, index) {
-              return _buildStatusCard(statuses[index]);
-            },
-          );
-        },
+                final statuses = snapshot.data!;
+                return ListView.builder(
+                  itemCount: statuses.length,
+                  itemBuilder: (context, index) {
+                    return _buildStatusCard(statuses[index], isDarkMode);
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatusCard(ServerStatus status) {
+  Widget _buildInfoBox(bool isDarkMode) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[800] : Colors.blue[50],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode ? Colors.black26 : Colors.grey.withOpacity(0.3),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: isDarkMode ? Colors.blue[300] : Colors.blue[700]),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              '此頁面呈現伺服器各時段狀態概覽。原始數據每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。',
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusCard(ServerStatus status, bool isDarkMode) {
     final allServices = status.services.values.toList();
     final normalServices = allServices.where((s) => s.status == 1).length;
     final abnormalServices = allServices.length - normalServices;
@@ -106,6 +150,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 4,
+      color: isDarkMode ? Colors.grey[850] : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Column(
         children: [
@@ -114,7 +159,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: isDarkMode ? statusColor.withOpacity(0.2) : statusColor.withOpacity(0.1),
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
               ),
               child: Row(
@@ -122,14 +167,18 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                 children: [
                   Text(
                     _formatDateTime(status.formattedTime),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.2),
+                          color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -147,7 +196,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                       const SizedBox(width: 8),
                       Icon(
                         isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: Colors.grey,
+                        color: isDarkMode ? Colors.white70 : Colors.grey,
                       ),
                     ],
                   ),
@@ -160,10 +209,13 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: status.services.length,
-              separatorBuilder: (context, index) => const Divider(height: 1),
+              separatorBuilder: (context, index) => Divider(
+                height: 1,
+                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+              ),
               itemBuilder: (context, index) {
                 final entry = status.services.entries.elementAt(index);
-                return _buildServiceTile(entry.key, entry.value);
+                return _buildServiceTile(entry.key, entry.value, isDarkMode);
               },
             ),
         ],
@@ -171,20 +223,60 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     );
   }
 
-  Widget _buildServiceTile(String serviceName, ServiceStatus serviceStatus) {
+  Widget _buildServiceTile(String serviceName, ServiceStatus serviceStatus, bool isDarkMode) {
+    Color getStatusColor(int status) {
+      switch (status) {
+        case 1:
+          return Colors.green;
+        case 2:
+          return Colors.orange;
+        case -1:
+          return isDarkMode ? Colors.grey : Colors.grey[600]!;
+        default:
+          return Colors.red;
+      }
+    }
+
+    String getStatusText(int status) {
+      switch (status) {
+        case 1:
+          return '正常';
+        case 2:
+          return '不穩定';
+        case -1:
+          return '無資料';
+        default:
+          return '異常';
+      }
+    }
+
+    final statusColor = getStatusColor(serviceStatus.status);
+    final statusText = getStatusText(serviceStatus.status);
+
     return ListTile(
-      title: Text(serviceName, style: const TextStyle(fontWeight: FontWeight.w500)),
-      subtitle: Text('延遲: ${serviceStatus.count} ms'),
+      title: Text(
+        serviceName,
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
+      ),
+      subtitle: Text(
+        '延遲: ${serviceStatus.count} ms',
+        style: TextStyle(
+          color: isDarkMode ? Colors.white70 : Colors.black54,
+        ),
+      ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: serviceStatus.status == 1 ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+          color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          serviceStatus.status == 1 ? '正常' : '異常',
+          statusText,
           style: TextStyle(
-            color: serviceStatus.status == 1 ? Colors.green : Colors.red,
+            color: statusColor,
             fontWeight: FontWeight.bold,
           ),
         ),
