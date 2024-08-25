@@ -3,6 +3,8 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
+Map<String, dynamic> supportList = {};
+
 class ChangelogEntry {
   final String version;
   final String type;
@@ -19,30 +21,35 @@ class ChangelogEntry {
   }
 }
 
+Color _getSupportTypeColor(bool value) {
+  if (value) return Colors.green;
+  return Colors.grey;
+}
+
+String _getSupportLocalizedType(bool value) {
+  if (value) return '提供服務';
+  return '終止服務';
+}
+
 Color _getTypeColor(String type) {
   switch (type.toLowerCase()) {
     case 'alpha':
       return Colors.red;
     case 'beta':
       return Colors.orangeAccent;
-    case 'release':
-      return Colors.green;
     default:
-      return Colors.grey;
+      return Colors.green;
   }
 }
 
 String _getLocalizedType(String type) {
-  // 這裡可以之後替換為 l10n 的實現
   switch (type.toLowerCase()) {
     case 'alpha':
       return '內測版';
     case 'beta':
       return '公測版';
-    case 'release':
-      return '正式版';
     default:
-      return type;
+      return '正式版';
   }
 }
 
@@ -83,6 +90,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
   Future<void> _fetchChangelog() async {
     try {
       final List<dynamic> data = (await ExpTech().getChangelog()).reversed.toList();
+      supportList = await ExpTech().getSupport();
       setState(() {
         _changelogEntries = data.map((json) => ChangelogEntry.fromJson(json)).toList();
         _isLoading = false;
@@ -163,6 +171,8 @@ class ChangelogCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isSupport =
+        supportList["support-version"] == null ? false : supportList["support-version"].contains(entry.version);
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -177,6 +187,20 @@ class ChangelogCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Chip(
+                padding: const EdgeInsets.all(2),
+                side: BorderSide(color: _getSupportTypeColor(isSupport)),
+                backgroundColor: _getSupportTypeColor(isSupport).withOpacity(0.16),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                label: Text(
+                  _getSupportLocalizedType(isSupport),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               _buildTypeChip(context, entry),
               const SizedBox(width: 12),
               Expanded(
@@ -211,6 +235,8 @@ class ChangelogDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isSupport =
+        supportList["support-version"] == null ? false : supportList["support-version"].contains(entry.version);
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.version_details),
@@ -229,7 +255,25 @@ class ChangelogDetailPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildTypeChip(context, entry),
+              Row(
+                children: [
+                  Chip(
+                    padding: const EdgeInsets.all(2),
+                    side: BorderSide(color: _getSupportTypeColor(isSupport)),
+                    backgroundColor: _getSupportTypeColor(isSupport).withOpacity(0.16),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    label: Text(
+                      _getSupportLocalizedType(isSupport),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _buildTypeChip(context, entry),
+                ],
+              ),
               const SizedBox(height: 24),
               MarkdownBody(
                 data: entry.content,
