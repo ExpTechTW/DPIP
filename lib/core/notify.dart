@@ -73,16 +73,8 @@ Future<void> showNotify(RemoteMessage message) async {
               : (data["level"] == "0")
                   ? "重要通知"
                   : "有立即危險",
-          importance: (data["level"] == null)
-              ? Importance.low
-              : (data["level"] == "0")
-                  ? Importance.defaultImportance
-                  : Importance.max,
-          priority: (data["level"] == null)
-              ? Priority.low
-              : (data["level"] == "0")
-                  ? Priority.defaultPriority
-                  : Priority.max,
+          importance: Importance.max,
+          priority: Priority.max,
           playSound: true,
           sound: data["sound"] != null ? RawResourceAndroidNotificationSound(data["sound"]) : null,
         ),
