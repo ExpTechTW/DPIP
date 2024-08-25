@@ -3,7 +3,7 @@ import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import '../global.dart';
+import 'package:dpip/global.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
@@ -17,7 +17,6 @@ Future<void> fcmInit() async {
 }
 
 Future<void> onFcmTokenHandle(String token) async {
-  debugPrint('FCM Token:"$token"');
   Global.preference.setString("fcm-token", token);
 }
 
@@ -27,25 +26,36 @@ Future<void> onNativeTokenHandle(String token) async {
 }
 
 Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
-  debugPrint('"${silentData.createdLifeCycle?.name}": '
-      'silentData: ${silentData.toString()}');
+  print("Silent data received: ${silentData.data}");
+  Map<String, dynamic> data = silentData.data!.cast<String, dynamic>();
 
   if (silentData.createdLifeCycle == NotificationLifeCycle.AppKilled) {
-    await AwesomeNotifications().createNotificationFromJsonData(silentData.data!.cast<String, dynamic>());
+    String channelKey = data['channel'] ?? 'other';
+    data['content'] = {
+      'id': int.parse(data['id'] ?? '0'),
+      'channelKey': channelKey,
+      'title': data['title'],
+      'body': data['body'],
+      'notificationLayout': NotificationLayout.Default.name,
+    };
+    await AwesomeNotifications().createNotificationFromJsonData(data);
   } else {
-    await showNotify(silentData.data!.cast<String, dynamic>());
+    await showNotify(data);
   }
-
   return Future.value();
 }
 
 Future<void> showNotify(Map<String, dynamic> data) async {
+  print(data);
+  String channelKey = data['channel'] ?? 'other';
+
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
       id: int.parse(data['id'] ?? '0'),
-      channelKey: 'basic_channel',
+      channelKey: channelKey,
       title: data['title'],
       body: data['body'],
+      notificationLayout: NotificationLayout.Default,
     ),
   );
 }
