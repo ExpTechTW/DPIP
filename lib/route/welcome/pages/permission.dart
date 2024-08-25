@@ -7,6 +7,7 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/scheduler/binding.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -27,6 +28,21 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _permissionsFuture = _initializePermissions();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _checkNotificationPermission();
+      setState(() {});
+    });
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    if (Platform.isAndroid) {
+      final status = await Permission.notification.status;
+      _isNotificationPermission = status.isGranted;
+    } else if (Platform.isIOS) {
+      await Firebase.initializeApp();
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      _isNotificationPermission = settings.authorizationStatus == AuthorizationStatus.authorized;
+    }
   }
 
   @override
@@ -35,14 +51,14 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     super.dispose();
   }
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     setState(() {
-  //       _permissionsFuture = _initializePermissions();
-  //     });
-  //   }
-  // }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _permissionsFuture = _initializePermissions();
+      });
+    }
+  }
 
   Future<List<Permission>> _initializePermissions() async {
     final deviceInfo = DeviceInfoPlugin();
@@ -63,6 +79,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           Permission.photos,
         ];
       }
+
+      await _checkNotificationPermission();
     } catch (e) {
       print('Error initializing permissions: $e');
     }
@@ -150,6 +168,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           );
         }
         final status = snapshot.data ?? PermissionStatus.denied;
+
         return Switch(
           value: status.isGranted,
           onChanged: (value) => _handlePermissionChange(item, value),
@@ -248,8 +267,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            child: Text(context.i18n.next_step),
             onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.nextPage() : null,
+            child: Text(context.i18n.next_step),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import "package:clipboard/clipboard.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
+import "package:dpip/route/notification/notification.dart";
 import "package:dpip/route/settings/settings.dart";
 import "package:dpip/route/sound/sound.dart";
 import "package:dpip/util/extension/build_context.dart";
@@ -66,6 +67,16 @@ class _MePageState extends State<MePage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AnnouncementPage()),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Symbols.notification_add_rounded),
+          title: const Text("通知發送紀錄"),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationHistoryPage()),
             );
           },
         ),

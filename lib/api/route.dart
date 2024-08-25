@@ -50,4 +50,5 @@ class Route {
   static Uri support() => Uri.parse("$onlyapi/v1/dpip/support");
   static Uri changelog() => Uri.parse("$onlyapi/v1/dpip/changelog");
   static Uri announcement() => Uri.parse("$onlyapi/v1/dpip/announcement");
+  static Uri notificationHistory() => Uri.parse("$onlyapi/v1/notify/history");
 }

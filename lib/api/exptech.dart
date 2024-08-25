@@ -6,6 +6,7 @@ import "package:dpip/model/announcement.dart";
 import "package:dpip/model/crowdin/localization_progress.dart";
 import "package:dpip/model/eew.dart";
 import "package:dpip/model/history.dart";
+import "package:dpip/model/notification_record.dart";
 import "package:dpip/model/report/earthquake_report.dart";
 import "package:dpip/model/report/partial_earthquake_report.dart";
 import "package:dpip/model/rts/rts.dart";
@@ -406,5 +407,21 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return jsonData.map((item) => Announcement.fromJson(item)).toList();
+  }
+
+  Future<List<NotificationRecord>> getNotificationHistory() async {
+    final requestUrl = Route.notificationHistory();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    print(jsonData);
+
+    return jsonData.map((item) => NotificationRecord.fromJson(item)).toList();
   }
 }
