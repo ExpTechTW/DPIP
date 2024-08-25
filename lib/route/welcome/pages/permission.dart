@@ -57,6 +57,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       } else if (Platform.isIOS) {
         permissions = [
           Permission.notification,
+          Permission.criticalAlerts,
           Permission.location,
           Permission.photos,
         ];
@@ -80,6 +81,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         case Permission.notification:
           icon = Icons.notifications;
           text = context.i18n.notification;
+          description = context.i18n.notification_service_description;
+          color = Colors.orange;
+          break;
+        case Permission.criticalAlerts:
+          icon = Icons.notifications;
+          text = "重大通知";
           description = context.i18n.notification_service_description;
           color = Colors.orange;
           break;
@@ -163,9 +170,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
     try {
       PermissionStatus status;
-      if (Platform.isIOS && item.permission == Permission.notification) {
-        status = await requestNotificationPermission();
-      } else if (value) {
+      if (value) {
         status = await item.permission.request();
         if (status.isPermanentlyDenied) {
           _showPermanentlyDeniedDialog(item);
