@@ -192,8 +192,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         if (status.isPermanentlyDenied) {
           _showPermanentlyDeniedDialog(item);
         } else if (item.permission == Permission.notification) {
-          if (Platform.isAndroid && status == PermissionStatus.granted) {
-            _isNotificationPermission = true;
+          if (Platform.isAndroid) {
+            if (status == PermissionStatus.granted) {
+              _isNotificationPermission = true;
+            } else {
+              await openAppSettings();
+            }
           } else if (Platform.isIOS) {
             await Firebase.initializeApp();
             NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(

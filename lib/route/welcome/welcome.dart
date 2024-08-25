@@ -44,7 +44,7 @@ class WelcomeRouteState extends State<WelcomeRoute> {
     return Scaffold(
       body: PageView(
         controller: controller,
-        // physics: const NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         children: const [
           WelcomeAboutPage(),
           WelcomeExpTechPage(),
