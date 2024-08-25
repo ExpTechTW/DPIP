@@ -2,6 +2,7 @@ import "package:dpip/app/dpip.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/string.dart";
+import "package:dpip/util/log.dart";
 import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
@@ -9,10 +10,16 @@ import "package:flutter_gen/gen_l10n/app_localizations.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:flutter_localized_locales/flutter_localized_locales.dart";
 import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:talker_flutter/talker_flutter.dart";
 import "package:timezone/data/latest.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final talker = TalkerManager.instance;
+  talker.log("start");
+  FlutterError.onError = (details) {
+    talker.handle(details.exception, details.stack);
+  };
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -20,6 +27,7 @@ void main() async {
   );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await Global.init();
+  TalkerManager.instance.info('global init');
   initializeTimeZones();
   runApp(
     const ProviderScope(
@@ -93,6 +101,9 @@ class DpipAppState extends State<DpipApp> {
 
         return MaterialApp(
           navigatorKey: DpipApp.navigatorKey,
+          navigatorObservers: [
+            TalkerRouteObserver(TalkerManager.instance),
+          ],
           builder: (context, child) {
             final mediaQueryData = MediaQuery.of(context);
             final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.3);

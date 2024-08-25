@@ -58,6 +58,7 @@ dependencies:
   awesome_notifications_core: ^0.9.3
   awesome_notifications: ^0.9.3+1
   awesome_notifications_fcm: ^0.9.3+1
+  talker_flutter: ^3.6.0
 
 dev_dependencies:
   flutter_test:

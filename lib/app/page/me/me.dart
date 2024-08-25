@@ -2,6 +2,7 @@ import "package:clipboard/clipboard.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
+import "package:dpip/route/log/log.dart";
 import "package:dpip/route/notification/notification.dart";
 import "package:dpip/route/settings/settings.dart";
 import "package:dpip/route/sound/sound.dart";
@@ -102,12 +103,21 @@ class _MePageState extends State<MePage> {
           },
         ),
         ListTileGroupHeader(title: context.i18n.me_debug),
-
+        ListTile(
+          leading: const Icon(Symbols.bug_report),
+          title: Text("App 日誌"),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LogViewerPage()),
+            );
+          },
+        ),
         /**
          * 複製 FCM Token
          */
         ListTile(
-          leading: const Icon(Icons.bug_report_rounded),
+          leading: const Icon(Icons.fingerprint),
           title: Text(context.i18n.settings_fcm),
           onTap: () {
             String token = Global.preference.getString("fcm-token") ?? "";
