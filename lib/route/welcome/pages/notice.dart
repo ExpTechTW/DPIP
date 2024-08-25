@@ -1,4 +1,3 @@
-import "package:dpip/route/welcome/pages/permission.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:dpip/route/welcome/welcome.dart";
@@ -51,27 +50,6 @@ class WelcomeNoticePage extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        Text(
-                          "©2024 ExpTech Studio Ltd.",
-                          style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withOpacity(0.7),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Text(
-                          context.i18n.disaster_info_platform,
-                          style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withOpacity(0.7),
-                          ),
-                          textAlign: TextAlign.center,
-                        )
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -80,12 +58,15 @@ class WelcomeNoticePage extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: context.colors.surfaceContainer,
+                  color: context.colors.errorContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   context.i18n.official_info,
-                  style: context.theme.textTheme.bodyMedium,
+                  style: context.theme.textTheme.bodyMedium!.copyWith(
+                    color: context.colors.onErrorContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
