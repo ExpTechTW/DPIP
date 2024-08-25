@@ -1,5 +1,8 @@
 import "package:dpip/app/dpip.dart";
+import "package:dpip/dialog/welcome/announcement.dart";
+import "package:dpip/dialog/welcome/changelog.dart";
 import "package:dpip/global.dart";
+import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/string.dart";
 import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/material.dart";
@@ -46,6 +49,7 @@ class DpipAppState extends State<DpipApp> {
       }[Global.preference.getString("theme")] ??
       ThemeMode.system;
   Locale? _locale = Global.preference.getString("locale")?.asLocale;
+  bool showWelcomeScreen = false;
 
   void changeTheme(String themeMode) {
     setState(() {
@@ -69,6 +73,22 @@ class DpipAppState extends State<DpipApp> {
     setState(() {
       _locale = locale;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (Global.preference.getBool("welcome-1.0.0") == null || true) {
+      Global.preference.setString("changelog", Global.packageInfo.version);
+
+      showWelcomeScreen = true;
+    } else {
+      if (Global.preference.getString("changelog") != Global.packageInfo.version) {
+        showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
+      } else {
+        showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
+      }
+    }
   }
 
   @override
@@ -109,7 +129,7 @@ class DpipAppState extends State<DpipApp> {
           ],
           supportedLocales: AppLocalizations.supportedLocales,
           locale: _locale,
-          home: const Dpip(),
+          home: showWelcomeScreen ? const WelcomeRoute() : const Dpip(),
         );
       },
     );

@@ -1,5 +1,5 @@
 import "package:dpip/global.dart";
-import "package:dpip/route/welcome/tos.dart";
+import "package:dpip/route/welcome/pages/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 
@@ -29,7 +29,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
                 setState(() => monitorEnabled = false);
               } else {
                 await Navigator.of(context, rootNavigator: true).push(
-                  MaterialPageRoute(builder: (context) => const TOSPage()),
+                  MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
                 );
                 setState(() => monitorEnabled = Global.preference.getBool("monitor") ?? false);
               }

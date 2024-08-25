@@ -1,19 +1,19 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dpip/route/welcome/tos.dart';
+import 'package:dpip/route/welcome/pages/tos.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class PermissionPage extends StatefulWidget {
-  const PermissionPage({super.key});
+class WelcomePermissionPage extends StatefulWidget {
+  const WelcomePermissionPage({super.key});
 
   @override
-  State<PermissionPage> createState() => _PermissionPageState();
+  State<WelcomePermissionPage> createState() => _WelcomePermissionPageState();
 }
 
-class _PermissionPageState extends State<PermissionPage> with WidgetsBindingObserver {
+class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
   bool _isRequestingPermission = false;
 
@@ -269,7 +269,7 @@ class _PermissionPageState extends State<PermissionPage> with WidgetsBindingObse
   void _continueToTOS() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const TOSPage()),
+      MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
     );
   }
 }

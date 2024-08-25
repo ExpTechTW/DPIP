@@ -4,14 +4,14 @@ import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
-class TOSPage extends StatefulWidget {
-  const TOSPage({super.key});
+class WelcomeTosPage extends StatefulWidget {
+  const WelcomeTosPage({super.key});
 
   @override
-  State<TOSPage> createState() => _TOSPageState();
+  State<WelcomeTosPage> createState() => _WelcomeTosPageState();
 }
 
-class _TOSPageState extends State<TOSPage> {
+class _WelcomeTosPageState extends State<WelcomeTosPage> {
   final ScrollController controller = ScrollController();
   bool _isEnabled = false;
   double progress = 0;

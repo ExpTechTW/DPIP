@@ -13,7 +13,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/route/update_required/update_required.dart';
-import 'package:dpip/route/welcome/about.dart';
+import 'package:dpip/route/welcome/pages/about.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
@@ -109,24 +109,8 @@ class _DpipState extends State<Dpip> {
             (Route<dynamic> route) => false,
           );
         }
-      } else {
-        if (Global.preference.getBool("welcome-1.0.0") == null) {
-          Global.preference.setString("changelog", Global.packageInfo.version);
-          if (mounted) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const AboutPage()),
-              (Route<dynamic> route) => false,
-            );
-          }
-        } else {
-          if (Global.preference.getString("changelog") != Global.packageInfo.version) {
-            await _showChangelogDialog();
-          } else {
-            await _checkAnnouncement();
-          }
-        }
       }
+
       if (mounted) {
         setState(() {});
       }
