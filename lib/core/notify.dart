@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 Future<void> notifyInit() async {
   AwesomeNotifications().initialize(
@@ -251,19 +250,4 @@ Future<void> notifyInit() async {
         NotificationChannelGroup(channelGroupKey: 'group_other', channelGroupName: '其他'),
       ],
       debug: true);
-}
-
-Future<PermissionStatus> requestNotificationPermission() async {
-  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-  if (!isAllowed) {
-    isAllowed = await AwesomeNotifications().requestPermissionToSendNotifications(
-      channelKey: "eew_alert",
-      permissions: [
-      NotificationPermission.Alert,
-      NotificationPermission.Sound,
-      NotificationPermission.Badge,
-      NotificationPermission.CriticalAlert,
-    ]);
-  }
-  return isAllowed ? PermissionStatus.granted : PermissionStatus.denied;
 }

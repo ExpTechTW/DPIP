@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dpip/core/notify.dart';
 import 'package:dpip/route/welcome/pages/tos.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
@@ -124,9 +123,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         decoration: BoxDecoration(
           color: context.colors.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
-          border: item.isHighlighted
-            ? Border.all(color: Colors.red, width: 2)
-            : null,
+          border: item.isHighlighted ? Border.all(color: Colors.red, width: 2) : null,
         ),
         child: ListTile(
           leading: CircleAvatar(
@@ -180,20 +177,20 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           if (Platform.isAndroid && status == PermissionStatus.granted) {
             _isNotificationPermission = true;
           } else if (Platform.isIOS) {
-              await Firebase.initializeApp();
-              NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-                alert: true,
-                announcement: true,
-                badge: true,
-                carPlay: true,
-                criticalAlert: true,
-                provisional: true,
-                sound: true,
-              );
-              if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-                _isNotificationPermission = true;
-              }
+            await Firebase.initializeApp();
+            NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+              alert: true,
+              announcement: true,
+              badge: true,
+              carPlay: true,
+              criticalAlert: true,
+              provisional: true,
+              sound: true,
+            );
+            if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+              _isNotificationPermission = true;
             }
+          }
         }
       } else {
         status = await item.permission.status;
