@@ -1,6 +1,6 @@
+import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
-import "package:dpip/route/welcome/welcome.dart";
 
 class WelcomeExpTechPage extends StatelessWidget {
   const WelcomeExpTechPage({super.key});

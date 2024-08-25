@@ -37,7 +37,6 @@ Future<void> notifyInit() async {
             defaultColor: Colors.red,
             ledColor: Colors.red,
             vibrationPattern: lowVibrationPattern),
-
         NotificationChannel(
             channelGroupKey: 'group_eq',
             channelKey: "int_report",
@@ -77,7 +76,6 @@ Future<void> notifyInit() async {
             defaultColor: Colors.red,
             ledColor: Colors.red,
             vibrationPattern: lowVibrationPattern),
-
         NotificationChannel(
             channelGroupKey: 'group_info',
             channelKey: "thunderstorm",
@@ -168,7 +166,6 @@ Future<void> notifyInit() async {
             defaultColor: Colors.red,
             ledColor: Colors.red,
             vibrationPattern: highVibrationPattern),
-
         NotificationChannel(
             channelGroupKey: 'group_info',
             channelKey: "other",

@@ -174,9 +174,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       return true;
     } else {
       if (!mounted) return false;
-      final permissionType = Platform.isAndroid
-          ? context.i18n.always_allow
-          : context.i18n.always;
+      final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
 
       final status = await showDialog<bool>(
             context: context,
@@ -231,9 +229,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       if (!mounted) return true;
 
-      String contentText = (num == 0)
-          ? context.i18n.auto_start_permission_info
-          : context.i18n.auto_start_permission_experience;
+      String contentText =
+          (num == 0) ? context.i18n.auto_start_permission_info : context.i18n.auto_start_permission_experience;
 
       return await showDialog<bool>(
             context: context,
@@ -276,9 +273,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       if (status) return true;
       if (!mounted) return true;
 
-      String contentText = (num == 0)
-          ? context.i18n.auto_location_experience_info
-          : context.i18n.unlimited_permission_experience_info;
+      String contentText =
+          (num == 0) ? context.i18n.auto_location_experience_info : context.i18n.unlimited_permission_experience_info;
 
       return await showDialog<bool>(
             context: context,
