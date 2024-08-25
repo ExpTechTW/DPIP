@@ -381,11 +381,11 @@
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
-  "torrential_rain_alert_sound": "강한 강우 특보",
+  "torrential_rain_alert_sound": "호우 특보",
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
-  "torrential_rain_alert_description_sound": "현재 위치에서 강한 강우 특보가 발령되었습니다.",
+  "torrential_rain_alert_description_sound": "현재 위치에서 호우 특보가 발령되었습니다.",
   "@torrential_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
@@ -445,7 +445,7 @@
   "@other_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
-  "server_announcement_sound": "서버 공지",
+  "server_announcement_sound": "서버 공지사항",
   "@server_announcement_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
