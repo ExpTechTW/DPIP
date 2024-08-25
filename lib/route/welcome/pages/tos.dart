@@ -42,6 +42,17 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     super.dispose();
   }
 
+  void gotodpip() {
+    Global.preference.setBool("welcome-1", true);
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Dpip()),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,11 +65,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
               TextButton(
                 onPressed: () {
                   Global.preference.setBool("monitor", false);
-                  Global.preference.setBool("welcome-1", true);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Dpip()),
-                  );
+                  gotodpip();
                 },
                 child: Text(
                   context.i18n.disagree,
@@ -69,11 +76,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
                 onPressed: _isEnabled
                     ? () {
                         Global.preference.setBool("monitor", true);
-                        Global.preference.setBool("welcome-1", true);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const Dpip()),
-                        );
+                        gotodpip();
                       }
                     : null,
                 child: Text(context.i18n.agree),
