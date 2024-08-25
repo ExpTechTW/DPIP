@@ -28,6 +28,8 @@ void main() async {
 }
 
 class DpipApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   const DpipApp({super.key});
 
   @override
@@ -79,6 +81,7 @@ class DpipAppState extends State<DpipApp> {
             : null;
 
         return MaterialApp(
+          navigatorKey: DpipApp.navigatorKey,
           builder: (context, child) {
             final mediaQueryData = MediaQuery.of(context);
             final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.3);

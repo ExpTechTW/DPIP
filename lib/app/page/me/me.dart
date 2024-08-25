@@ -1,5 +1,4 @@
 import "package:clipboard/clipboard.dart";
-import "package:dpip/core/notify.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
@@ -89,20 +88,21 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Icons.bug_report_rounded),
           title: Text(context.i18n.settings_fcm),
           onTap: () {
-            messaging.getToken().then((value) {
-              FlutterClipboard.copy(value ?? "");
+            String token = Global.preference.getString("fcm-token") ?? "";
+            if (token != "") {
+              FlutterClipboard.copy(token);
               context.scaffoldMessenger.showSnackBar(
                 SnackBar(
                   content: Text(context.i18n.settings_copy_fcm),
                 ),
               );
-            }).catchError((error) {
+            } else {
               context.scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text("複製 FCM Token 時發生錯誤：$error"),
+                const SnackBar(
+                  content: Text("複製 FCM Token 時發生錯誤"),
                 ),
               );
-            });
+            }
           },
         ),
 
