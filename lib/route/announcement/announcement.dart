@@ -218,7 +218,7 @@ class AnnouncementCard extends StatelessWidget {
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
     return Chip(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(0),
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withOpacity(0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -313,7 +313,7 @@ class AnnouncementDetailPage extends StatelessWidget {
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
     return Chip(
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(0),
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withOpacity(0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,

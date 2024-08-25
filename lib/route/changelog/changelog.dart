@@ -55,7 +55,7 @@ String _getLocalizedType(String type) {
 
 Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
   return Chip(
-    padding: const EdgeInsets.all(2),
+    padding: const EdgeInsets.all(0),
     side: BorderSide(color: _getTypeColor(entry.type)),
     backgroundColor: _getTypeColor(entry.type).withOpacity(0.16),
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -188,7 +188,7 @@ class ChangelogCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Chip(
-                padding: const EdgeInsets.all(2),
+                padding: const EdgeInsets.all(0),
                 side: BorderSide(color: _getSupportTypeColor(isSupport)),
                 backgroundColor: _getSupportTypeColor(isSupport).withOpacity(0.16),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -258,14 +258,14 @@ class ChangelogDetailPage extends StatelessWidget {
               Row(
                 children: [
                   Chip(
-                    padding: const EdgeInsets.all(2),
+                    padding: const EdgeInsets.all(0),
                     side: BorderSide(color: _getSupportTypeColor(isSupport)),
                     backgroundColor: _getSupportTypeColor(isSupport).withOpacity(0.16),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     label: Text(
                       _getSupportLocalizedType(isSupport),
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
