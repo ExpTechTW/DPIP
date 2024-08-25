@@ -1,4 +1,7 @@
 import "package:dpip/app/dpip.dart";
+import "package:dpip/core/fcm.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
@@ -44,6 +47,9 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
 
   void gotodpip() {
     Global.preference.setBool("welcome-1", true);
+    fcmInit();
+    notifyInit();
+    initBackgroundService();
     if (mounted) {
       Navigator.pushAndRemoveUntil(
         context,
