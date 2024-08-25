@@ -63,6 +63,18 @@ Future<void> notifyInit() async {
             vibrationPattern: highVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eq',
+            channelKey: "int_report_silence",
+            channelName: "震度速報 (無聲通知)",
+            channelDescription: "TREM 觀測網所在地實測震度 3 以下的區域",
+            importance: NotificationImportance.Low,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: false,
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eq',
             channelKey: "eq",
             channelName: "強震監視器",
             channelDescription: "TREM 觀測網偵測到晃動",
