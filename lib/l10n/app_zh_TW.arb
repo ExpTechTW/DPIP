@@ -1187,6 +1187,21 @@
   "go_to_settings": "前往設定",
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
+  },
+  "notification_log": "通知發送紀錄",
+  "@notification_log": {
+    "description": "「我」路徑 → 通知發送紀錄"
+  },
+  "app_logs": "App 日誌",
+  "@app_logs": {
+    "description": "「我」路徑 → App 日誌"
+  },
+  "copy_fcm_token_error": "複製 FCM Token 時發生錯誤",
+  "@copy_fcm_token_error": {
+    "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
+  },
+  "provide_services": "提供服務",
+  "@provide_services": {
+    "description": "描述應用程式提供服務的功能"
   }
-
 }
