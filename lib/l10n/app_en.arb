@@ -774,7 +774,7 @@
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：中度或大雪伴雷"
   },
-  "more": "更多",
+  "more": "More",
   "@more": {
     "description": "「更多」頁面標題"
   },
@@ -786,15 +786,15 @@
   "@me_generally": {
     "description": "「我」路徑 → 一般"
   },
-  "me_debug": "除錯",
+  "me_debug": "Debug",
   "@me_debug": {
     "description": "「我」路徑 → 除錯"
   },
-  "official_web": "ExpTech 官網",
+  "official_web": "ExpTech Web",
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"
   },
-  "notification_record": "行動通知推播紀錄",
+  "notification_record": "Notification History",
   "@notification_record": {
     "description": "「我」路徑 → 行動通知推播紀錄"
   },
@@ -806,7 +806,7 @@
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
-  "enable_monitor": "啟用強震監視器",
+  "enable_monitor": "Earthquake Monitor",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
@@ -876,7 +876,7 @@
       }
     }
   },
-  "home_Safety": "一切平安，無事件發生。",
+  "home_Safety": "There are currently no events now",
   "@home_Safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -1080,7 +1080,7 @@
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
-  "announcement": "公告",
+  "announcement": "Announcements",
   "@announcement": {
     "description": "公告"
   },
@@ -1092,11 +1092,11 @@
   "@no_announcements": {
     "description": "「公告」 → 前沒有公告"
   },
-  "contributor": "貢獻者",
+  "contributor": "Contributors",
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "內測版",
+  "beta_version": "Beta",
   "@beta_version": {
     "description": "應用程式的內部測試版本"
   },
