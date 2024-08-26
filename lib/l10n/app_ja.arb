@@ -361,7 +361,7 @@
   "@dp_info_sound_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 災防資訊"
   },
-  "other_title": "其他",
+  "other_title": "その他",
   "@other_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
   },
@@ -774,11 +774,11 @@
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：降雪伴雷"
   },
-  "more": "更多",
+  "more": "詳細",
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "更多功能列表",
+  "more_features": "その他の機能リスト",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
@@ -786,39 +786,39 @@
   "@me_generally": {
     "description": "「我」路徑 → 一般"
   },
-  "me_debug": "除錯",
+  "me_debug": "デバッグ",
   "@me_debug": {
     "description": "「我」路徑 → 除錯"
   },
-  "official_web": "ExpTech 官網",
+  "official_web": "ExpTech 公式",
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"
   },
-  "notification_record": "行動通知推播紀錄",
+  "notification_record": "通知履歴",
   "@notification_record": {
     "description": "「我」路徑 → 行動通知推播紀錄"
   },
-  "advanced_features": "進階功能",
+  "advanced_features": "高度な機能",
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整的 DPIP 的進階功能",
+  "advanced_features_title": "DPIPの高度な機能の調整",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
-  "enable_monitor": "啟用強震監視器",
+  "enable_monitor": "強震モニタの有効化",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
-  "no_tsunami_information": "近期無海嘯資訊",
+  "no_tsunami_information": "最近の津波情報なし",
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_warning": "海嘯警報",
+  "tsunami_warning": "津波警報",
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "{id}號 第{serial}報",
+  "tsunami_number": "番号 {id} 第{serial}報",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -843,27 +843,27 @@
   "@tsunami_relieve": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
   },
-  "estimated_time_wave": "預估海嘯到達時間及波高",
+  "estimated_time_wave": "津波の到達予想時刻と波高",
   "@estimated_time_wave": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
   },
-  "observing_tsunamis": "各地觀測到的海嘯",
+  "observing_tsunamis": "各地で観測された津波",
   "@observing_tsunamis": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   },
-  "occurrence_time": "發生時間",
+  "occurrence_time": "発生日時",
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "epicenter": "震央",
+  "epicenter": "震源地",
   "@epicenter": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 震央"
   },
-  "scale": "規模",
+  "scale": "マグニチュード",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
   },
-  "depth": "深度",
+  "depth": "深さ",
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
@@ -876,79 +876,79 @@
       }
     }
   },
-  "home_Safety": "一切平安，無事件發生。",
+  "home_Safety": "すべて安全で、事件もない。",
   "@home_Safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
-  "update_log": "更新日誌",
+  "update_log": "更新履歴",
   "@update_log": {
     "description": "「設定」路徑 → 更新日誌"
   },
-  "interval_3_days": "3天",
+  "interval_3_days": "3日",
   "@interval_3_days": {
     "description": "3天"
   },
-  "interval_2_days": "2天",
+  "interval_2_days": "2日",
   "@interval_2_days": {
     "description": "2天"
   },
-  "interval_24_hours": "24小時",
+  "interval_24_hours": "24時間",
   "@interval_24_hours": {
     "description": "24小時"
   },
-  "interval_12_hours": "12小時",
+  "interval_12_hours": "12時間",
   "@interval_12_hours": {
     "description": "12小時"
   },
-  "interval_6_hours": "6小時",
+  "interval_6_hours": "6時間",
   "@interval_6_hours": {
     "description": "6小時"
   },
-  "interval_3_hours": "3小時",
+  "interval_3_hours": "3時間",
   "@interval_3_hours": {
     "description": "3小時"
   },
-  "interval_1_hour": "1小時",
+  "interval_1_hour": "1時間",
   "@interval_1_hour": {
     "description": "1小時"
   },
-  "interval_10_minutes": "10分鐘",
+  "interval_10_minutes": "10分間",
   "@interval_10_minutes": {
     "description": "10分鐘"
   },
-  "interval_now": "現在",
+  "interval_now": "今",
   "@interval_now": {
     "description": "現在"
   },
-  "welcome_message": "歡迎使用 DPIP",
+  "welcome_message": "DPIPへようこそ",
   "@welcome_message": {
     "description": "「歡迎」頁面 → 歡迎使用 DPIP"
   },
-  "disaster_info_platform": "防災資訊平台",
+  "disaster_info_platform": "防災情報プラットフォーム",
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+  "dpip_description": "DPIPは台湾の現地チームによって設計されたアプリで、TREM-Net（台湾リアルタイム地震観測網）の情報と中央気象局（CWA）のデータを統合し、統合された単一の便利な防災情報アプリを提供する。",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
-  "next_step": "下一步",
+  "next_step": "次へ",
   "@next_step": {
     "description": "「歡迎」頁面 → 下一步"
   },
-  "who_we_are": "我們是誰？",
+  "who_we_are": "私たちは誰？",
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+  "exptech_studio_description": "ExpTech Studioは、平均年齢20歳以下の15人以上の学生で構成されるグループです。メンバーは台湾（北部、中部、南部）、日本、韓国、中国から来ています。",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "私たちの初心",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために設立されたが、その後校外に発展し、徐々に現在の形になった。",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
@@ -956,39 +956,39 @@
   "@notice": {
     "description": "注意事項"
   },
-  "notice_details": "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+  "notice_details": "DPIPでは、ExpTechや中央気象署（CWA）からの様々な情報をお届けしますので、ご利用の際には以下の点にご留意ください。",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "任何資訊應以中央氣象署發布之內容為準。",
+  "official_info": "いかなる情報も、中央気象署（CWA）が発表した内容に基づいていること。",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
-  "information_reliability": "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。",
+  "information_reliability": "ネットワークの状態、サーバーの状態、アプリケーションの状態、上流のデータソースの状態などにより、情報が届かない可能性があります。そのような事態が発生しないよう最善を尽くしますが、保証はいたしかねます。",
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強烈搖晃有機率比通知早抵達使用者所在地。",
+  "strong_shake_warning": "強い揺れは、通知メッセージよりも早くユーザーの場所に到着する可能性がある。",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。",
+  "earthquake_alert_warning": "地震情報は迅速な計算の結果であり、大きな誤差が生じる可能性があるため、注意と理解をもって利用する必要がある。",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。",
+  "legal_risks": "公的に認可されていない行為は、中華民国の法律により危険となる可能性がありますので、必ず関連法規を遵守してください。",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
-  "permission": "權限",
+  "permission": "権限",
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
+  "privacy_commitment": "私たちは常にユーザーの側に立ち、プライバシーの保護に継続的に取り組んできました。",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
-  "required_info_permissions": "所需的資訊和權限列表：",
+  "required_info_permissions": "必要な情報と権限のリスト：",
   "@required_info_permissions": {
     "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
@@ -996,195 +996,195 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供通知服務",
+  "notification_service_description": "通知サービスの提供に使用",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 用於提供通知服務"
   },
-  "location_based_service": "用於提供基於位置的服務",
+  "location_based_service": "位置情報の提供に使用",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片",
+  "data_visualization_storage": "中央気象局（CWA）やExpTechが提供するデータを可視化した画像を保存する。",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
-  "disagree": "不同意",
+  "disagree": "拒否",
   "@disagree": {
     "description": "「歡迎」頁面 → 不同意"
   },
-  "agree": "同意",
+  "agree": "許可",
   "@agree": {
     "description": "「歡迎」頁面 → 同意"
   },
-  "trem_service_description": "在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。",
+  "trem_service_description": "ExpTech's TREMの強震モニターサービスはDPIPでご覧いただけますが、以下の条件をお読みいただき、この機能を有効にするかどうかをお選びください。",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。",
+  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、中央気象署（CMA）が提供する情報ではなく、最終的には中央気象署が発表する情報に従うべき観測とは一致しない可能性がある。",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。",
+  "trem_station_warning": "強震モニタで使用している観測点はExpTechが所有しており、中央気象署（CWA）の管理下にはありません。中央気象署を困らせることになりますので、故障やコメントを中央気象局に伝えないでください。",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。",
+  "trem_monitor_description": "強震モニターはTREM(台湾リアルタイム地震モニタ)で台湾全体の現在の振動を観測するために使用され、リアルタイムの地震度表示機能として、地震が発生すると、観測点の色の変化を通じて地震波の伝播状況を観察することができます。",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
-  "station_noise_warning": "由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。",
+  "station_noise_warning": "正常な状態であっても、日常的なノイズ（車、工場、工事など）により観測点の色が変化することがあります。また、観測点の故障によっても色が変わることがあります。データはリアルタイムであるため、故障の有無をその場で判断することはできません。",
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
+  "trem_net_deployment": "2022年6月上旬、台湾全土に観測点の配備を開始した。TREM-Net（TREM 地震観測網）は、SE-Net（強震観測網「加速度計」）とMS-Net（微震観測網「速度計」）の2つの観測網で構成され、地震時の様々なデータをまとめて記録する。",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
-  "discover_new_version": "發現新版本",
+  "discover_new_version": "新しいバージョンが見つかりました",
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
-  "update_to_latest_version": "更新至最新版本以獲得最佳體驗",
+  "update_to_latest_version": "最新バージョンにアップデートして、最高の体験をお楽しみください",
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
-  "current_version": "目前版本",
+  "current_version": "現在のバージョン",
   "@current_version": {
     "description": "「發現新版本」頁面 → 目前版本"
   },
-  "latest_version": "最新版本",
+  "latest_version": "新しいバージョン",
   "@latest_version": {
     "description": "「發現新版本」頁面 → 最新版本"
   },
-  "update_now": "立即更新",
+  "update_now": "今すぐ更新",
   "@update_now": {
     "description": "「發現新版本」頁面 → 立即更新"
   },
-  "skip_for_now": "暫時略過",
+  "skip_for_now": "スキップ",
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新完成",
+  "update_complete": "更新が完了",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIP 更新完成，要前往查看更新日誌嗎？",
+  "update_complete_prompt": "DPIPが更新されましたが、変更履歴をご覧になりたいですか？",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
-  "remind_later": "稍後再說",
+  "remind_later": "後でリマインドする",
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
-  "go_to_view": "前往查看",
+  "go_to_view": "表示する",
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
-  "announcement": "公告",
+  "announcement": "発表",
   "@announcement": {
     "description": "公告"
   },
-  "new_announcement_prompt": "有新的公告，要前往查看嗎？",
+  "new_announcement_prompt": "新発表をチェックしたい？",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "目前沒有公告",
+  "no_announcements": "現在発表なし",
   "@no_announcements": {
     "description": "「公告」 → 前沒有公告"
   },
-  "contributor": "貢獻者",
+  "contributor": "貢献者",
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "內測版",
+  "beta_version": "ベータ版",
   "@beta_version": {
     "description": "應用程式的內部測試版本"
   },
-  "unable_to_load_changelog": "無法載入更新日誌，請稍後再試。",
+  "unable_to_load_changelog": "変更履歴を読み込めませんでした。",
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」→ 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "目前沒有更新日誌",
+  "no_changelog": "変更履歴はない。",
   "@no_changelog": {
     "description": "當前沒有任何更新日誌"
   },
-  "announcement_details": "公告詳情",
+  "announcement_details": "発表情報",
   "@announcement_details": {
     "description": "「公告」 → 查看公告的具體內容"
   },
-  "version_details": "版本詳情",
+  "version_details": "バージョン情報",
   "@version_details": {
     "description": "「更新日誌」 → 版本詳情"
   },
-  "unable_to_obtain_permission": "無法取得權限",
+  "unable_to_obtain_permission": "権限が得られない",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
-  "error_saving_image": "儲存圖片時發生錯誤",
+  "error_saving_image": "画像の保存中にエラーが発生しました。",
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
-  "confirm": "確定",
+  "confirm": "確認",
   "@confirm": {
     "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
   },
-  "no_search_results": "無搜尋結果",
+  "no_search_results": "検索結果なし",
   "@no_search_results": {
     "description": "當搜尋無結果時顯示的訊息 → 儲存圖片時發生錯誤"
   },
-  "always_allow": "一律允許",
+  "always_allow": "常に許可",
   "@always_allow": {
     "description": "「存取權限彈窗」 → 一律允許"
   },
-  "always": "永遠",
+  "always": "永遠に",
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_start_permission_info": "より良いオートロケーションを体験するには、「自動起動許可」を指定し、DPIPがバックグラウンドで自動的に所在地を設定するように、オートアクティベーションの許可を与える必要があります。",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "auto_start_permission_experience": "より良いDPIPを体験するには、「自動起動許可」を指定し、DPIPがバックグラウンドでアラーム通知を適切に受信できるようにする必要があります。",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "auto_start_permission": "自啟動權限",
+  "auto_start_permission": "自動起動許可",
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_location_experience_info": "より良いオートロケーションを体験するためには、「制限のない」を指定し、DPIPがバックグラウンドで自動的に所在地を設定することを許可する必要があります。",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "unlimited_permission_experience_info": "より良いDPIPを体験するためには、「制限のない」を指定し、DPIPがバックグラウンドでアラーム通知を適切に受信できるようにする必要があります。",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "power_saving_strategy": "省電策略",
+  "power_saving_strategy": "低電力モード",
   "@power_saving_strategy": {
     "description": "「存取權限彈窗」 → 省電策略"
   },
-  "notification_permission_denied": "通知功能已被拒絕，請移至設定允許權限。",
+  "notification_permission_denied": "通知機能が拒否されている場合は、設定ページに移動し、通知許可を設定してください。",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
-  "permission_request": "權限請求",
+  "permission_request": "権限管理請求",
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
   },
-  "manual_permission_enablement": "需要使用者手動到設定開啟相關權限。",
+  "manual_permission_enablement": "ユーザーは手動で設定ページに移動、関連する権限を開く必要がある。",
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
-  "location_not_set": "尚未設定所在地",
+  "location_not_set": "所在地を設定していない",
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
-  "location_setting_required": "DPIP 需要設定所在地才能正常運作。點擊「前往設定」設定所在地後再試一次。",
+  "location_setting_required": "DPIPを正しく動作させるには、所在地を設定する必要があります「設定ページに移動」をクリックして、お住まいの所在地を設定し、再度お試しください。",
   "@location_setting_required": {
     "description": "提示用戶需要設定所在地才能正常運作的訊息"
   },
-  "go_to_settings": "前往設定",
+  "go_to_settings": "設定ページに移動",
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
   }
