@@ -8,6 +8,7 @@ import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/location/location.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/util/log.dart";
 import "package:flutter/services.dart";
 
 const _channel = MethodChannel("com.exptech.dpip/data");
@@ -50,9 +51,9 @@ Future<void> getSavedLocation() async {
       _updateAllPositions();
     }
   } on PlatformException catch (e) {
-    print("PlatformException in getSavedLocation: ${e.message}");
+    TalkerManager.instance.error("PlatformException in getSavedLocation: ${e.message}");
   } catch (e) {
-    print("Error in getSavedLocation: $e");
+    TalkerManager.instance.error("Error in getSavedLocation: $e");
   } finally {
     _completer?.complete();
     _completer = null;

@@ -16,6 +16,7 @@ import "package:dpip/util/extension/int.dart";
 import "package:dpip/util/geojson.dart";
 import "package:dpip/util/instrumental_intensity_color.dart";
 import "package:dpip/util/intensity_color.dart";
+import "package:dpip/util/log.dart";
 import "package:dpip/util/map_utils.dart";
 import "package:dpip/util/need_location.dart";
 import "package:dpip/widget/map/legend.dart";
@@ -325,7 +326,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
     } catch (err) {
-      print(err);
+      TalkerManager.instance.error(err);
     } finally {
       await _updateMarkers();
     }
@@ -342,7 +343,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       _processEewData(data);
       _removeOldEews(data);
     } catch (err) {
-      print(err);
+      TalkerManager.instance.error(err);
     }
   }
 
@@ -1014,7 +1015,17 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["1", "2", "3", "4", context.i18n.weak_5, context.i18n.strong_5, context.i18n.weak_6, context.i18n.strong_6, "7"];
+    final labels = [
+      "1",
+      "2",
+      "3",
+      "4",
+      context.i18n.weak_5,
+      context.i18n.strong_5,
+      context.i18n.weak_6,
+      context.i18n.strong_6,
+      "7"
+    ];
     return SizedBox(
       width: 300,
       child: Row(

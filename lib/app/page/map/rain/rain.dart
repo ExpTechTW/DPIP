@@ -444,7 +444,6 @@ class _RainMapState extends State<RainMap> {
                 setState(() {});
               },
               onSelectionChanged: (timestamp, interval) async {
-                print("Selected time: $timestamp, interval: $interval");
                 selectedTimestamp = timestamp;
                 selectedInterval = interval;
                 await updateRainData(timestamp, interval);

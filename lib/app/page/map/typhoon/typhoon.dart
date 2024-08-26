@@ -4,6 +4,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/weather/typhoon.dart';
+import 'package:dpip/util/log.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/typhoon_time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
@@ -78,7 +79,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       setState(() {});
     } catch (e) {
-      print("加載颱風列表時出錯: $e");
+      TalkerManager.instance.error("加載颱風列表時出錯: $e");
     }
   }
 
@@ -115,7 +116,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
         await _drawTyphoonPaths(typhoonData!);
       }
     } catch (e) {
-      print("加載颱風數據時出錯: $e");
+      TalkerManager.instance.error("加載颱風數據時出錯: $e");
     }
   }
 

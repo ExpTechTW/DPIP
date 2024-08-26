@@ -338,7 +338,6 @@ class _PressureMapState extends State<PressureMap> {
                 await addPressureCircles(pressureDataList);
                 await _addUserLocationMarker();
                 setState(() {});
-                print("Selected time: $time");
               },
             ),
           ),
