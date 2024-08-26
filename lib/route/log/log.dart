@@ -12,10 +12,7 @@ class LogViewerPage extends StatelessWidget {
       body: TalkerScreen(
         talker: TalkerManager.instance,
         appBarTitle: 'App 日誌',
-        theme: TalkerScreenTheme(
-          backgroundColor: context.theme.scaffoldBackgroundColor,
-          textColor: context.theme.textTheme.bodyLarge?.color ?? Colors.black,
-        ),
+        theme: const TalkerScreenTheme(),
       ),
     );
   }
