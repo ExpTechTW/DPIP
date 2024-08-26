@@ -73,6 +73,8 @@
 		5228AD5A2C2EE45D007635F5 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		529BD5D12C48C28B00EFE088 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		529BD5D22C48C28B00EFE088 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		52E010A32C7C5DDC00C87792 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Main.strings; sourceTree = "<group>"; };
+		52E010A42C7C5DDC00C87792 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		632125282C2EA17900A088F8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6321252A2C2EA20700A088F8 /* RunnerProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerProfile.entitlements; sourceTree = "<group>"; };
 		63276A4A2C48F431002C151A /* eew.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eew.wav; sourceTree = "<group>"; };
@@ -293,6 +295,7 @@
 				ja,
 				ko,
 				zh,
+				vi,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
@@ -489,6 +492,7 @@
 				520D58462C55043C0019366D /* ja */,
 				520D58482C5504590019366D /* ko */,
 				520D584A2C5504790019366D /* zh */,
+				52E010A32C7C5DDC00C87792 /* vi */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -502,6 +506,7 @@
 				520D58472C55043C0019366D /* ja */,
 				520D58492C5504590019366D /* ko */,
 				520D584B2C5504790019366D /* zh */,
+				52E010A42C7C5DDC00C87792 /* vi */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
