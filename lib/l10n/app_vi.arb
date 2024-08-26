@@ -361,7 +361,7 @@
   "@dp_info_sound_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 災防資訊"
   },
-  "other_title": "其他",
+  "other_title": "Khác",
   "@other_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
   },
@@ -558,15 +558,15 @@
   "@cc_lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 「閃電」圖例 → 雲間閃電"
   },
-  "out_of_service": "服務區域外",
+  "out_of_service": "Không còn hoạt động",
   "@out_of_service": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外"
   },
-  "out_of_service_only_taiwan": "服務區域外，僅在臺灣各地可用",
+  "out_of_service_only_taiwan": "Bạn đang ở ngoài khu vực dịch vụ, chỉ có tại Đài Loan.",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
-  "unable_notification": "無法取得通知權限",
+  "unable_notification": "Không thể nhận được quyền thông báo",
   "@unable_notification": {
     "description": "「通知」設定彈窗 → 無法取得通知權限"
   },
@@ -574,7 +574,7 @@
   "@again": {
     "description": "「通知」設定彈窗 → 再試一次 and "
   },
-  "unable_location": "無法取得位置權限",
+  "unable_location": "không thể có được quyền truy cập vị trí",
   "@unable_location": {
     "description": "「所在地」設定彈窗 → 無法取得位置權限"
   },
@@ -626,7 +626,7 @@
   "@blowing_snow": {
     "description": "天氣狀況：高吹雪"
   },
-  "blizzard": "暴風雪",
+  "blizzard": "Bão tuyết",
   "@blizzard": {
     "description": "天氣狀況：暴風雪"
   },
@@ -642,7 +642,7 @@
   "@patchy_light_drizzle": {
     "description": "天氣狀況：局部毛毛雨"
   },
-  "light_drizzle": "毛毛雨",
+  "light_drizzle": "Mưa phùn",
   "@light_drizzle": {
     "description": "天氣狀況：毛毛雨"
   },
@@ -658,7 +658,7 @@
   "@patchy_light_rain": {
     "description": "天氣狀況：局部小雨"
   },
-  "light_rain": "小雨",
+  "light_rain": "Mưa nhỏ",
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
@@ -666,7 +666,7 @@
   "@moderate_rain_at_times": {
     "description": "天氣狀況：間歇降雨"
   },
-  "moderate_rain": "雨",
+  "moderate_rain": "Mưa",
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
@@ -706,7 +706,7 @@
   "@patchy_moderate_snow": {
     "description": "天氣狀況：局部降雪"
   },
-  "moderate_snow": "雪",
+  "moderate_snow": "Tuyết",
   "@moderate_snow": {
     "description": "天氣狀況：雪"
   },
@@ -762,7 +762,7 @@
   "@patchy_light_rain_with_thunder": {
     "description": "天氣狀況：局部小雷雨"
   },
-  "moderate_or_heavy_rain_with_thunder": "雷雨",
+  "moderate_or_heavy_rain_with_thunder": "Bảo tố có sấm sét",
   "@moderate_or_heavy_rain_with_thunder": {
     "description": "天氣狀況：雷雨"
   },
@@ -774,11 +774,11 @@
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：降雪伴雷"
   },
-  "more": "更多",
+  "more": "Thêm",
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "更多功能列表",
+  "more_features": "Danh sách các tính năng khác",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
@@ -786,19 +786,19 @@
   "@me_generally": {
     "description": "「我」路徑 → 一般"
   },
-  "me_debug": "除錯",
+  "me_debug": "Gỡ lỗi",
   "@me_debug": {
     "description": "「我」路徑 → 除錯"
   },
-  "official_web": "ExpTech 官網",
+  "official_web": "ExpTech Website chính thức",
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"
   },
-  "notification_record": "行動通知推播紀錄",
+  "notification_record": "Bản ghi đẩy thông báo di động",
   "@notification_record": {
     "description": "「我」路徑 → 行動通知推播紀錄"
   },
-  "advanced_features": "進階功能",
+  "advanced_features": "Tính năng nâng cao",
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
@@ -806,15 +806,15 @@
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
-  "enable_monitor": "啟用強震監視器",
+  "enable_monitor": "Giám sát động đất mạnh",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
-  "no_tsunami_information": "近期無海嘯資訊",
+  "no_tsunami_information": "Không có thông tin về sóng thần",
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_warning": "海嘯警報",
+  "tsunami_warning": "Cảnh báo sóng thần",
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
@@ -831,39 +831,39 @@
       }
     }
   },
-  "tsunami_publish": "發布",
+  "tsunami_publish": "Quán rượu",
   "@tsunami_publish": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發布"
   },
-  "tsunami_renew": "更新",
+  "tsunami_renew": "Cập nhật",
   "@tsunami_renew": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 更新"
   },
-  "tsunami_relieve": "解除",
+  "tsunami_relieve": "Cứu trợ",
   "@tsunami_relieve": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
   },
-  "estimated_time_wave": "預估海嘯到達時間及波高",
+  "estimated_time_wave": "Thời gian dự kiến ​​đến và độ cao của sóng thần",
   "@estimated_time_wave": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
   },
-  "observing_tsunamis": "各地觀測到的海嘯",
+  "observing_tsunamis": "Sóng thần được quan sát ở nhiều nơi",
   "@observing_tsunamis": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   },
-  "occurrence_time": "發生時間",
+  "occurrence_time": "Thời gian xảy ra",
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "epicenter": "震央",
+  "epicenter": "Tâm chấn",
   "@epicenter": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 震央"
   },
-  "scale": "規模",
+  "scale": "Kích cỡ",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
   },
-  "depth": "深度",
+  "depth": "Độ sâu",
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
@@ -876,71 +876,71 @@
       }
     }
   },
-  "home_Safety": "一切平安，無事件發生。",
+  "home_Safety": "Mọi việc đều an toàn, không có sự cố nào xảy ra.",
   "@home_Safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
-  "update_log": "更新日誌",
+  "update_log": "Nhật ký thay đổi",
   "@update_log": {
     "description": "「設定」路徑 → 更新日誌"
   },
-  "interval_3_days": "3天",
+  "interval_3_days": "3 ngày",
   "@interval_3_days": {
     "description": "3天"
   },
-  "interval_2_days": "2天",
+  "interval_2_days": "2 ngày",
   "@interval_2_days": {
     "description": "2天"
   },
-  "interval_24_hours": "24小時",
+  "interval_24_hours": "24 giờ",
   "@interval_24_hours": {
     "description": "24小時"
   },
-  "interval_12_hours": "12小時",
+  "interval_12_hours": "12 giờ",
   "@interval_12_hours": {
     "description": "12小時"
   },
-  "interval_6_hours": "6小時",
+  "interval_6_hours": "6 giờ",
   "@interval_6_hours": {
     "description": "6小時"
   },
-  "interval_3_hours": "3小時",
+  "interval_3_hours": "3 giờ",
   "@interval_3_hours": {
     "description": "3小時"
   },
-  "interval_1_hour": "1小時",
+  "interval_1_hour": "1 giờ",
   "@interval_1_hour": {
     "description": "1小時"
   },
-  "interval_10_minutes": "10分鐘",
+  "interval_10_minutes": "10 phút",
   "@interval_10_minutes": {
     "description": "10分鐘"
   },
-  "interval_now": "現在",
+  "interval_now": "Hiện nay",
   "@interval_now": {
     "description": "現在"
   },
-  "welcome_message": "歡迎使用 DPIP",
+  "welcome_message": "Chào mừng đến với DPIP",
   "@welcome_message": {
     "description": "「歡迎」頁面 → 歡迎使用 DPIP"
   },
-  "disaster_info_platform": "防災資訊平台",
+  "disaster_info_platform": "Cổng thông tin phòng chống thiên tai",
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+  "dpip_description": "DPIP là ứng dụng được thiết kế bởi một nhóm địa phương tại Đài Loan, tích hợp thông tin từ TREM-Net (Mạng quan sát động đất thời gian thực Đài Loan) và dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) để cung cấp một ứng dụng thông tin phòng chống thiên tai tích hợp, duy nhất và tiện lợi.",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
-  "next_step": "下一步",
+  "next_step": "Tiếp theo",
   "@next_step": {
     "description": "「歡迎」頁面 → 下一步"
   },
-  "who_we_are": "我們是誰？",
+  "who_we_are": "Chúng tôi là ai?",
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+  "exptech_studio_description": "ExpTech Studio là một nhóm gồm hơn 15 sinh viên, phần lớn là những người có độ tuổi trung bình dưới 20. Các thành viên đến từ Đài Loan (Bắc, Trung và Nam), Nhật Bản, Hàn Quốc và Trung Quốc.",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
@@ -948,31 +948,31 @@
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+  "founding_mission": "Nhóm ban đầu được thành lập bằng cách tuyển dụng một nhóm học sinh có sở thích và năng khiếu về máy tính và công nghệ, sau đó đã phát triển vượt ra ngoài phạm vi trường học và trở thành nhóm như hiện nay.",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
-  "notice": "注意事項",
+  "notice": "Những điều cần lưu ý",
   "@notice": {
     "description": "注意事項"
   },
-  "notice_details": "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+  "notice_details": "DPIP sẽ cung cấp nhiều thông tin khác nhau từ ExpTech và Đài Loan Cơ quan Thời tiết Trung ương (CWA), vì vậy hãy lưu ý những điều sau khi sử dụng.",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "任何資訊應以中央氣象署發布之內容為準。",
+  "official_info": "Tất cả thông tin phải tuân theo nội dung do Đài Loan Cơ quan Thời tiết Trung ương (CWA) công bố.",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
-  "information_reliability": "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。",
+  "information_reliability": "Tùy thuộc vào trạng thái mạng, trạng thái máy chủ, trạng thái ứng dụng, trạng thái nguồn dữ liệu ngược dòng, v.v., sự cố không nhận được thông tin có thể xảy ra và chúng tôi sẽ cố gắng hết sức để tránh những tình huống như vậy, nhưng chúng tôi không đảm bảo rằng chúng sẽ không xảy ra.",
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強烈搖晃有機率比通知早抵達使用者所在地。",
+  "strong_shake_warning": "Rung lắc mạnh có xu hướng xảy ra ở vị trí của người dùng sớm hơn thông báo.",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。",
+  "earthquake_alert_warning": "Báo cáo động đất nhanh là những tính toán nhanh và có thể chứa nhiều lỗi, do đó cần phải thận trọng và hiểu rõ.",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
@@ -980,7 +980,7 @@
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
-  "permission": "權限",
+  "permission": "Sự cho phép",
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
@@ -992,39 +992,39 @@
   "@required_info_permissions": {
     "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
-  "notification": "通知",
+  "notification": "Thông báo",
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供通知服務",
+  "notification_service_description": "Dịch vụ được sử dụng để cung cấp dịch vụ thông báo",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 用於提供通知服務"
   },
-  "location_based_service": "用於提供基於位置的服務",
+  "location_based_service": "Dịch vụ được sử dụng để cung cấp vị trí người dùng",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片",
+  "data_visualization_storage": "Để lưu trữ hình ảnh trực quan dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) hoặc ExpTech.",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
-  "disagree": "不同意",
+  "disagree": "Không đồng ý",
   "@disagree": {
     "description": "「歡迎」頁面 → 不同意"
   },
-  "agree": "同意",
+  "agree": "Đồng ý",
   "@agree": {
     "description": "「歡迎」頁面 → 同意"
   },
-  "trem_service_description": "在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。",
+  "trem_service_description": "Bạn có thể xem dịch vụ “Strong Earthquake Monitor” từ TREM của ExpTech trong DPIP, vui lòng đọc các điều kiện sau và chọn kích hoạt dịch vụ hay không.",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。",
+  "real_time_magnitude_warning": "Thông tin địa chấn theo thời gian thực hiển thị trong DPIP không phải là thông tin do Đài Loan Cơ quan Thời tiết Trung ương (CWA) cung cấp và do đó có thể không nhất quán với kết quả do CWA quan sát được và phải dựa trên thông tin do CWA công bố.",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。",
+  "trem_station_warning": "Các điểm quan sát mà “Strong Earthquake Monitor” sử dụng thuộc sở hữu của ExpTech và không được Cơ quan Thời tiết Trung ương (CWA) quản lý, vì vậy, vui lòng không chuyển lỗi hoặc bình luận cho CWA, vì điều này sẽ khiến họ bối rối.",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
@@ -1036,11 +1036,11 @@
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
+  "trem_net_deployment": "Vào đầu tháng 6 năm 2022, chúng tôi đã bắt đầu quan sát các điểm trên khắp Đài Loan. TREM-Net (Mạng lưới quan sát địa chấn TREM) bao gồm hai mạng lưới quan sát, SE-Net (Mạng lưới quan sát địa chấn mạnh, “Gia tốc kế”) và MS-Net (Mạng lưới quan sát vi địa chấn, “Máy đo tốc độ”), cùng nhau ghi lại nhiều dữ liệu khác nhau trong các trận động đất.",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
-  "discover_new_version": "發現新版本",
+  "discover_new_version": "Khám phá phiên bản mới",
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
@@ -1048,39 +1048,39 @@
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
-  "current_version": "目前版本",
+  "current_version": "Phiên bản hiện tại",
   "@current_version": {
     "description": "「發現新版本」頁面 → 目前版本"
   },
-  "latest_version": "最新版本",
+  "latest_version": "Phiên bản mới nhất",
   "@latest_version": {
     "description": "「發現新版本」頁面 → 最新版本"
   },
-  "update_now": "立即更新",
+  "update_now": "Cập nhật ngay",
   "@update_now": {
     "description": "「發現新版本」頁面 → 立即更新"
   },
-  "skip_for_now": "暫時略過",
+  "skip_for_now": "Bây giờ",
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新完成",
+  "update_complete": "Cập nhật hoàn tất",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIP 更新完成，要前往查看更新日誌嗎？",
+  "update_complete_prompt": "Cập nhật DPIP đã hoàn tất, bạn có muốn kiểm tra nhật ký thay đổi không?",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
-  "remind_later": "稍後再說",
+  "remind_later": "Để sau",
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
-  "go_to_view": "前往查看",
+  "go_to_view": "Đi xem",
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
-  "announcement": "公告",
+  "announcement": "Thông báo",
   "@announcement": {
     "description": "公告"
   },
@@ -1088,15 +1088,15 @@
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "目前沒有公告",
+  "no_announcements": "Không có thông báo bây giờ",
   "@no_announcements": {
     "description": "「公告」 → 前沒有公告"
   },
-  "contributor": "貢獻者",
+  "contributor": "Người đóng góp",
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "內測版",
+  "beta_version": "Bản beta",
   "@beta_version": {
     "description": "應用程式的內部測試版本"
   },
@@ -1104,87 +1104,87 @@
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」→ 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "目前沒有更新日誌",
+  "no_changelog": "Không có nhật ký thay đổi bây giờ",
   "@no_changelog": {
     "description": "當前沒有任何更新日誌"
   },
-  "announcement_details": "公告詳情",
+  "announcement_details": "Thông báo Chi Tiết",
   "@announcement_details": {
     "description": "「公告」 → 查看公告的具體內容"
   },
-  "version_details": "版本詳情",
+  "version_details": "Phiên bản Chi Tiết",
   "@version_details": {
     "description": "「更新日誌」 → 版本詳情"
   },
-  "unable_to_obtain_permission": "無法取得權限",
+  "unable_to_obtain_permission": "không thể có được quyền truy cập",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
-  "error_saving_image": "儲存圖片時發生錯誤",
+  "error_saving_image": "Đã xảy ra lỗi khi lưu hình ảnh.",
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
-  "confirm": "確定",
+  "confirm": "Xác nhận",
   "@confirm": {
     "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
   },
-  "no_search_results": "無搜尋結果",
+  "no_search_results": "Không hiện kết quả tìm kiếm",
   "@no_search_results": {
     "description": "當搜尋無結果時顯示的訊息 → 儲存圖片時發生錯誤"
   },
-  "always_allow": "一律允許",
+  "always_allow": "Luôn cho phép",
   "@always_allow": {
     "description": "「存取權限彈窗」 → 一律允許"
   },
-  "always": "永遠",
+  "always": "Luôn luôn",
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_start_permission_info": "Để có trải nghiệm vị trí tự động tốt hơn, bạn cần phải thiết lập “quyền tự động khởi chạy” để cho phép DPIP tự động thiết lập thông tin vị trí ở chế độ nền.",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "auto_start_permission_experience": "Để có trải nghiệm DPIP tốt hơn, bạn cần phải thiết lập “quyền tự động khởi chạy” để cho phép DPIP tiếp nhận thông báo cảnh báo bình thường ở chế độ nền.",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "auto_start_permission": "自啟動權限",
+  "auto_start_permission": "Tự khởi động sự cho phép",
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_location_experience_info": "Để có trải nghiệm vị trí tự động tốt hơn, bạn cần phải thiết lập “Không hạn chế” để cho phép DPIP tự động thiết lập thông tin vị trí ở chế độ nền.",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "unlimited_permission_experience_info": "Để có trải nghiệm DPIP tốt hơn, bạn cần phải thiết lập “Không hạn chế” để cho phép DPIP tiếp nhận thông báo cảnh báo bình thường ở chế độ nền.",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "power_saving_strategy": "省電策略",
+  "power_saving_strategy": "Chế độ nguồn điện thấp",
   "@power_saving_strategy": {
     "description": "「存取權限彈窗」 → 省電策略"
   },
-  "notification_permission_denied": "通知功能已被拒絕，請移至設定允許權限。",
+  "notification_permission_denied": "Chức năng thông báo đã bị từ chối, vui lòng chuyển đến trang Cài đặt để thiết lập các quyền được phép.",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
-  "permission_request": "權限請求",
+  "permission_request": "Yêu cầu để xin phép",
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
   },
-  "manual_permission_enablement": "需要使用者手動到設定開啟相關權限。",
+  "manual_permission_enablement": "Người dùng cần phải tự tay vào trang cài đặt để mở các quyền có liên quan.",
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
-  "location_not_set": "尚未設定所在地",
+  "location_not_set": "Bạn chưa thiết lập vị trí của mình",
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
-  "location_setting_required": "DPIP 需要設定所在地才能正常運作。點擊「前往設定」設定所在地後再試一次。",
+  "location_setting_required": "DPIP cần được thiết lập theo vị trí của bạn để hoạt động bình thường. Nhấp vào “Cài đặt” để thiết lập vị trí của bạn và thử lại.",
   "@location_setting_required": {
     "description": "提示用戶需要設定所在地才能正常運作的訊息"
   },
-  "go_to_settings": "前往設定",
+  "go_to_settings": "Cài đặt",
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
   }
