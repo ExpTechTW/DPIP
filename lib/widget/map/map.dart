@@ -74,9 +74,7 @@ class DpipMapState extends State<DpipMap> {
           "source": "map",
           "source-layer": "city",
           "paint": {
-            // FIXME: workaround waiting for upstream PR to merge
-            // https://github.com/material-foundation/flutter-packages/pull/599
-            "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
+            "fill-color": context.colors.surfaceContainerHigh.toHexStringRGB(),
             "fill-opacity": 1,
           },
         },
@@ -86,9 +84,7 @@ class DpipMapState extends State<DpipMap> {
           "source": "map",
           "source-layer": "town",
           "paint": {
-            // FIXME: workaround waiting for upstream PR to merge
-            // https://github.com/material-foundation/flutter-packages/pull/599
-            "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
+            "fill-color": context.colors.surfaceContainerHigh.toHexStringRGB(),
             "fill-opacity": 1,
           },
         },
@@ -107,9 +103,7 @@ class DpipMapState extends State<DpipMap> {
           "source": "map",
           "source-layer": "global",
           "paint": {
-            // FIXME: workaround waiting for upstream PR to merge
-            // https://github.com/material-foundation/flutter-packages/pull/599
-            "fill-color": context.colors.surfaceVariant.toHexStringRGB(),
+            "fill-color": context.colors.surfaceContainer.toHexStringRGB(),
             "fill-opacity": 1,
           },
         },
@@ -119,8 +113,6 @@ class DpipMapState extends State<DpipMap> {
           "source": "map",
           "source-layer": "tsunami",
           "paint": {
-            // FIXME: workaround waiting for upstream PR to merge
-            // https://github.com/material-foundation/flutter-packages/pull/599
             "line-opacity": 0,
             "line-width": 10,
           },

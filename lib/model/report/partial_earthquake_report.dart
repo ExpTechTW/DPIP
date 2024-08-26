@@ -1,10 +1,10 @@
-import 'package:dpip/util/parser.dart';
-import 'package:flutter/material.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:timezone/timezone.dart';
+import "package:dpip/util/parser.dart";
+import "package:flutter/material.dart";
+import "package:json_annotation/json_annotation.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:timezone/timezone.dart";
 
-part 'partial_earthquake_report.g.dart';
+part "partial_earthquake_report.g.dart";
 
 @JsonSerializable()
 class PartialEarthquakeReport {
@@ -79,11 +79,11 @@ class PartialEarthquakeReport {
 
   String get reportImageName {
     final year = time.year.toString();
-    final month = time.month.toString().padLeft(2, '0');
-    final day = time.day.toString().padLeft(2, '0');
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    final second = time.second.toString().padLeft(2, '0');
+    final month = time.month.toString().padLeft(2, "0");
+    final day = time.day.toString().padLeft(2, "0");
+    final hour = time.hour.toString().padLeft(2, "0");
+    final minute = time.minute.toString().padLeft(2, "0");
+    final second = time.second.toString().padLeft(2, "0");
     final mag = "${(magnitude * 10).floor()}";
 
     if (hasNumber) {

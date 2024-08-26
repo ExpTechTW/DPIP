@@ -1,8 +1,8 @@
-import 'dart:math';
+import "dart:math";
 
-import 'package:dpip/util/geojson.dart';
-import 'package:flutter/services.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/util/geojson.dart";
+import "package:flutter/services.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 List<double> expandBounds(List<double> bounds, LatLng point) {
   // [南西,北東]
@@ -189,7 +189,12 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
 
 /// Takes a [LatLng] and calculates the circle polygon given a radius in
 /// degrees, radians, miles, or kilometers; and steps for precision.
-GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 64, Units units = Units.kilometers}) {
+GeoJsonFeatureBuilder circleFeature({
+  required LatLng center,
+  required double radius,
+  int steps = 64,
+  Units units = Units.kilometers,
+}) {
   // main
   final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
   List coordinates = [];
@@ -201,5 +206,5 @@ GeoJsonFeatureBuilder circleFeature(LatLng center, double radius, {int steps = 6
 
   coordinates.add(coordinates[0]);
 
-  return polygon.setGeometry([coordinates]);
+  return polygon.setGeometry(coordinates);
 }

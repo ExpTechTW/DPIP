@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.1.602
+version: 2.1.900
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -18,8 +18,8 @@ dependencies:
   device_info_plus: ^10.1.0
   disable_battery_optimization: ^1.1.1
   dynamic_color: ^1.7.0
-  firebase_core: ^3.3.0
-  firebase_messaging: ^15.0.4
+  firebase_core: ^2.32.0
+  firebase_messaging: ^14.9.4
   flutter_background_service:
     git:
       url: https://github.com/ExpTechTW/flutter_background_service.git
@@ -55,6 +55,10 @@ dependencies:
   url_launcher: ^6.3.0
   flutter_markdown: ^0.7.3+1
   in_app_update: ^4.2.3
+  awesome_notifications_core: ^0.9.3
+  awesome_notifications: ^0.9.3+1
+  awesome_notifications_fcm: ^0.9.3+1
+  talker_flutter: ^3.6.0
 
 dev_dependencies:
   flutter_test:
@@ -71,7 +75,7 @@ flutter:
     - assets/map/
     - assets/map/icons/
     - assets/DPIP.png
-    - assets/ExpTech.jpg
+    - assets/ExpTech.png
     - assets/location.json
     - assets/time.json
     - assets/box.json

@@ -1,7 +1,7 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/int.dart';
-import 'package:dpip/util/intensity_color.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/int.dart";
+import "package:dpip/util/intensity_color.dart";
+import "package:flutter/material.dart";
 
 class IntensityBox extends StatelessWidget {
   final int intensity;

@@ -1,16 +1,16 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/weather.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/time_selector.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/weather/weather.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/list/time_selector.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 class PressureData {
   final double latitude;
@@ -198,12 +198,12 @@ class _PressureMapState extends State<PressureMap> {
       "pressure-data",
       "pressure-labels",
       const SymbolLayerProperties(
-        textField: ['get', 'pressure'],
+        textField: ["get", "pressure"],
         textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
+        textColor: "#ffffff",
+        textHaloColor: "#000000",
         textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
+        textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
           [0, 2]
@@ -251,7 +251,7 @@ class _PressureMapState extends State<PressureMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ['725', '850', '975', '1020'];
+    final labels = ["725", "850", "975", "1020"];
     return SizedBox(
       width: 300,
       child: Row(
@@ -264,6 +264,12 @@ class _PressureMapState extends State<PressureMap> {
             .toList(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -286,7 +292,7 @@ class _PressureMapState extends State<PressureMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: '圖例',
+                message: "圖例",
                 child: Container(
                   width: 30,
                   height: 30,

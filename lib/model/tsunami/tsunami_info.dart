@@ -1,5 +1,5 @@
-import 'package:dpip/model/tsunami/tsunami_actual.dart';
-import 'package:dpip/model/tsunami/tsunami_estimate.dart';
+import "package:dpip/model/tsunami/tsunami_actual.dart";
+import "package:dpip/model/tsunami/tsunami_estimate.dart";
 
 class TsunamiInfo {
   /// - 海嘯資訊資料總類

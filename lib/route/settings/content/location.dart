@@ -1,18 +1,18 @@
-import 'dart:async';
-import 'dart:io';
+import "dart:async";
+import "dart:io";
 
-import 'package:autostarter/autostarter.dart';
-import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/widget/list/tile_group_header.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
+import "package:autostarter/autostarter.dart";
+import "package:disable_battery_optimization/disable_battery_optimization.dart";
+import "package:dpip/global.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/widget/list/tile_group_header.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:permission_handler/permission_handler.dart";
 
-import '../../../core/service.dart';
-import '../../location_selector/location_selector.dart';
+import "../../../core/service.dart";
+import "../../location_selector/location_selector.dart";
 
 final stateSettingsLocationView = _SettingsLocationViewState();
 
@@ -21,7 +21,7 @@ typedef PositionUpdateCallback = void Function();
 class SettingsLocationView extends StatefulWidget {
   final Function(String?, String?)? onPositionUpdate;
 
-  const SettingsLocationView({Key? key, this.onPositionUpdate}) : super(key: key);
+  const SettingsLocationView({super.key, this.onPositionUpdate});
 
   @override
   State<SettingsLocationView> createState() => _SettingsLocationViewState();
@@ -42,7 +42,7 @@ class SettingsLocationView extends StatefulWidget {
 }
 
 class _SettingsLocationViewState extends State<SettingsLocationView> with WidgetsBindingObserver {
-  static const platform = MethodChannel('com.exptech.dpip/location');
+  static const platform = MethodChannel("com.exptech.dpip/location");
   bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
@@ -174,7 +174,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       return true;
     } else {
       if (!mounted) return false;
-      final permissionType = Platform.isAndroid ? "一律允許" : "永遠";
+      final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
 
       final status = await showDialog<bool>(
             context: context,
@@ -192,7 +192,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     },
                   ),
                   FilledButton(
-                    child: const Text("確定"),
+                    child: Text(context.i18n.confirm),
                     onPressed: () async {
                       final status = await Permission.locationAlways.request();
 
@@ -221,49 +221,46 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     if (Platform.isIOS) return true;
     try {
       bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
-      if (isAvailable == true) {
-        bool? status = await Autostarter.checkAutoStartState();
-        if (status != null) {
-          if (status == false) {
-            String contentText = (num == 0)
-                ? "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
-                : "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。";
-            return await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      icon: const Icon(Symbols.my_location),
-                      title: const Text("自啟動權限"),
-                      content: Text(contentText),
-                      actionsAlignment: MainAxisAlignment.spaceBetween,
-                      actions: [
-                        TextButton(
-                          child: const Text("取消"),
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                          },
-                        ),
-                        FilledButton(
-                          child: const Text("確定"),
-                          onPressed: () async {
-                            await Autostarter.getAutoStartPermission(newTask: true);
-                            Navigator.pop(context, false);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ) ??
-                false;
-          } else {
-            return true;
-          }
-        } else {
-          return true;
-        }
-      } else {
-        return true;
-      }
+      if (isAvailable == null || !isAvailable) return true;
+
+      bool? status = await Autostarter.checkAutoStartState();
+      if (status == null) return true;
+      if (status) return status;
+
+      if (!mounted) return true;
+
+      String contentText =
+          (num == 0) ? context.i18n.auto_start_permission_info : context.i18n.auto_start_permission_experience;
+
+      return await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                icon: const Icon(Symbols.my_location),
+                title: Text(context.i18n.auto_start_permission),
+                content: Text(contentText),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: Text(context.i18n.cancel),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  FilledButton(
+                    child: Text(context.i18n.confirm),
+                    onPressed: () async {
+                      await Autostarter.getAutoStartPermission(newTask: true);
+
+                      if (!context.mounted) return;
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
     } catch (err) {
       return false;
     }
@@ -272,41 +269,40 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Future<bool> androidCheckBatteryOptimizationPermission(int num) async {
     if (Platform.isIOS) return true;
     try {
-      bool? isAvailable = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
-      if (isAvailable == false) {
-        String contentText = (num == 0)
-            ? "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
-            : "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。";
-        return await showDialog<bool>(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  icon: const Icon(Symbols.my_location),
-                  title: const Text("省電策略"),
-                  content: Text(contentText),
-                  actionsAlignment: MainAxisAlignment.spaceBetween,
-                  actions: [
-                    TextButton(
-                      child: const Text("取消"),
-                      onPressed: () {
-                        Navigator.pop(context, false);
-                      },
-                    ),
-                    FilledButton(
-                      child: const Text("確定"),
-                      onPressed: () async {
-                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                        Navigator.pop(context, false);
-                      },
-                    ),
-                  ],
-                );
-              },
-            ) ??
-            false;
-      } else {
-        return true;
-      }
+      bool status = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
+      if (status) return true;
+      if (!mounted) return true;
+
+      String contentText =
+          (num == 0) ? context.i18n.auto_location_experience_info : context.i18n.unlimited_permission_experience_info;
+
+      return await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                icon: const Icon(Symbols.my_location),
+                title: Text(context.i18n.power_saving_strategy),
+                content: Text(contentText),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  TextButton(
+                    child: Text(context.i18n.cancel),
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  FilledButton(
+                    child: Text(context.i18n.confirm),
+                    onPressed: () async {
+                      DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              );
+            },
+          ) ??
+          false;
     } catch (err) {
       return false;
     }
@@ -315,7 +311,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   Future toggleAutoLocation() async {
     if (Platform.isIOS) {
       try {
-        await platform.invokeMethod('toggleLocation', {'isEnabled': !isAutoLocatingEnabled});
+        await platform.invokeMethod("toggleLocation", {"isEnabled": !isAutoLocatingEnabled});
       } catch (e) {
         return;
       }
@@ -428,9 +424,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: SwitchListTile(
-              // FIXME: workaround waiting for upstream PR to merge
-              // https://github.com/material-foundation/flutter-packages/pull/599
-              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceVariant,
+              tileColor: isAutoLocatingEnabled ? context.colors.primaryContainer : context.colors.surfaceContainer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 context.i18n.settings_location_auto,
@@ -501,7 +495,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '通知功能已被拒絕，請移至設定允許權限',
+                        context.i18n.notification_permission_denied,
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),
@@ -545,6 +539,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
               if (!batteryOptimization) return;
+              if (!context.mounted) return;
 
               await Navigator.of(
                 context,
@@ -577,6 +572,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
               if (!batteryOptimization) return;
+              if (!context.mounted) return;
 
               await Navigator.of(
                 context,

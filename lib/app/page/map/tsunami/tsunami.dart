@@ -1,21 +1,21 @@
-import 'dart:async';
-import 'dart:io';
+import "dart:async";
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/map/tsunami/tsunami_estimate_list.dart';
-import 'package:dpip/app/page/map/tsunami/tsunami_observed_list.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/model/tsunami/tsunami_actual.dart';
-import 'package:dpip/model/tsunami/tsunami_estimate.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:timezone/timezone.dart' as tz;
+import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/tsunami/tsunami_estimate_list.dart";
+import "package:dpip/app/page/map/tsunami/tsunami_observed_list.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/tsunami/tsunami.dart";
+import "package:dpip/model/tsunami/tsunami_actual.dart";
+import "package:dpip/model/tsunami/tsunami_estimate.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:timezone/timezone.dart" as tz;
 
 class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
@@ -85,7 +85,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     } else {
       color = const Color(0xFFFFC900);
     }
-    return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
+    return "#${color.value.toRadixString(16).padLeft(8, "0").substring(2)}";
   }
 
   DateTime _convertTimestamp(int timestamp) {
@@ -126,7 +126,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             "name": actualStation.name,
             "id": actualStation.id,
             "waveHeight": actualStation.waveHeight,
-            "arrivalTime": DateFormat('dd日HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
+            "arrivalTime": DateFormat("dd日HH:mm").format(_convertTimestamp(actualStation.arrivalTime)),
           },
           "geometry": {
             "type": "Point",
@@ -174,18 +174,18 @@ class _TsunamiMapState extends State<TsunamiMap> {
         const SymbolLayerProperties(
           textField: [
             Expressions.concat,
-            ['get', 'name'],
+            ["get", "name"],
             " ",
-            ['get', 'waveHeight'],
+            ["get", "waveHeight"],
             "cm\n",
-            ['get', 'arrivalTime'],
+            ["get", "arrivalTime"],
             " 抵達"
           ],
           textSize: 12,
-          textColor: '#ffffff',
-          textHaloColor: '#000000',
+          textColor: "#ffffff",
+          textHaloColor: "#000000",
           textHaloWidth: 1,
-          textFont: ['Noto Sans Regular'],
+          textFont: ["Noto Sans Regular"],
           textOffset: [
             Expressions.literal,
             [0, 2]
@@ -264,10 +264,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
       _tsunami_serial = int.parse(id.split("-")[1]);
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
-          ? tsunamiStatus = "發布"
+          ? tsunamiStatus = context.i18n.tsunami_publish
           : (tsunami?.status == 1)
-              ? tsunamiStatus = "更新"
-              : tsunamiStatus = "解除";
+              ? tsunamiStatus = context.i18n.tsunami_renew
+              : tsunamiStatus = context.i18n.tsunami_relieve;
 
       List<String> options = generateTsunamiOptions();
       if (options.isNotEmpty && _selectedOption == null) {
@@ -278,17 +278,17 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   String convertTimestamp(int timestamp) {
-    var location = tz.getLocation('Asia/Taipei');
+    var location = tz.getLocation("Asia/Taipei");
     DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+    DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
     String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
 
   String getTime() {
     DateTime now = DateTime.now();
-    DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
+    DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
     String formattedDate = formatter.format(now);
     return (formattedDate);
   }
@@ -318,6 +318,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   @override
   void dispose() {
     _blinkTimer?.cancel();
+    _mapController.dispose();
     super.dispose();
   }
 
@@ -379,7 +380,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          tsunami == null ? "近期無海嘯資訊" : "海嘯警報",
+                                          tsunami == null
+                                              ? context.i18n.no_tsunami_information
+                                              : context.i18n.tsunami_warning,
                                           style: TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
@@ -390,7 +393,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                         const SizedBox(height: 8),
                                         if (tsunami != null)
                                           Text(
-                                            "${tsunami?.id}號 第${tsunami?.serial}報",
+                                            context.i18n.tsunami_number(
+                                              tsunami?.id.toString() ?? '',
+                                              tsunami?.serial.toString() ?? '',
+                                            ),
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
@@ -434,10 +440,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           _selectedOption = newValue;
                                           tsunami = await ExpTech().getTsunami(newValue);
                                           tsunamiStatus = tsunami?.status == 0
-                                              ? "發布"
+                                              ? context.i18n.tsunami_publish
                                               : tsunami?.status == 1
-                                                  ? "更新"
-                                                  : "解除";
+                                                  ? context.i18n.tsunami_renew
+                                                  : context.i18n.tsunami_relieve;
                                           if (tsunami != null) {
                                             await addTsunamiObservationPoints(tsunami!);
                                           }
@@ -484,7 +490,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "預估海嘯到達時間及波高",
+                                                    context.i18n.estimated_time_wave,
                                                     style: TextStyle(
                                                       fontSize: 22,
                                                       fontWeight: FontWeight.bold,
@@ -502,7 +508,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "各地觀測到的海嘯",
+                                                    context.i18n.observing_tsunamis,
                                                     style: TextStyle(
                                                       fontSize: 22,
                                                       fontWeight: FontWeight.bold,
@@ -520,7 +526,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           height: 15,
                                         ),
                                         Text(
-                                          "地震資訊",
+                                          context.i18n.eew_info_sound_title,
                                           style: TextStyle(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
@@ -535,7 +541,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "發生時間",
+                                              context.i18n.occurrence_time,
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 letterSpacing: 2,
@@ -560,7 +566,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "震央",
+                                              context.i18n.epicenter,
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 letterSpacing: 2,
@@ -602,7 +608,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text(
-                                                    "規模",
+                                                    context.i18n.scale,
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       letterSpacing: 2,
@@ -629,7 +635,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text(
-                                                    "深度",
+                                                    context.i18n.depth,
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       letterSpacing: 2,
@@ -637,7 +643,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "${tsunami!.eq.depth}km",
+                                                    context.i18n.tsunami_depth(tsunami!.eq.depth.toString()),
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,

@@ -1,7 +1,7 @@
-import 'package:dpip/global.dart';
-import 'package:dpip/route/welcome/tos.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/global.dart";
+import "package:dpip/route/welcome/pages/tos.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
 
 class SettingsExperimentView extends StatefulWidget {
   const SettingsExperimentView({super.key});
@@ -20,34 +20,20 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
         padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SwitchListTile(
-              // FIXME: workaround waiting for upstream PR to merge
-              // https://github.com/material-foundation/flutter-packages/pull/599
-              tileColor: monitorEnabled ? context.colors.primaryContainer : context.colors.surfaceVariant,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text(
-                "啟用強震監視器",
-                style: TextStyle(
-                  color: monitorEnabled ? context.colors.onPrimaryContainer : context.colors.onSurfaceVariant,
-                ),
-              ),
-              contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-              value: monitorEnabled,
-              onChanged: (value) {
-                if (!value) {
-                  Global.preference.setBool("monitor", false);
-                  monitorEnabled = false;
-                  setState(() {});
-                } else {
-                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => const TOSPage()),
-                    (Route<dynamic> route) => route.isFirst,
-                  );
-                }
-              },
-            ),
+          SwitchListTile(
+            title: Text(context.i18n.enable_monitor),
+            value: monitorEnabled,
+            onChanged: (value) async {
+              if (!value) {
+                await Global.preference.setBool("monitor", false);
+                setState(() => monitorEnabled = false);
+              } else {
+                await Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
+                );
+                setState(() => monitorEnabled = Global.preference.getBool("monitor") ?? false);
+              }
+            },
           ),
         ],
       ),

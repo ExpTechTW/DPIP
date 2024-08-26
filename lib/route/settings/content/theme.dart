@@ -1,8 +1,8 @@
-import 'package:dpip/global.dart';
-import 'package:dpip/main.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/widget/settings/theme/theme_radio_tile.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/global.dart";
+import "package:dpip/main.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/widget/settings/theme/theme_radio_tile.dart";
+import "package:flutter/material.dart";
 
 class SettingsThemeView extends StatefulWidget {
   const SettingsThemeView({super.key});
@@ -44,6 +44,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
                   title: context.i18n.theme_light,
                   theme: light,
                 ),
+                const SizedBox(height: 16),
                 ThemeRadioTile(
                   value: "dark",
                   groupValue: themeMode,
@@ -51,6 +52,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
                   title: context.i18n.theme_dark,
                   theme: dark,
                 ),
+                const SizedBox(height: 16),
                 ThemeRadioTile(
                   value: "system",
                   groupValue: themeMode,

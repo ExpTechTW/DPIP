@@ -1,7 +1,8 @@
-import 'package:dpip/global.dart';
-import 'package:dpip/model/location/location.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/global.dart";
+import "package:dpip/model/location/location.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
   @override
@@ -47,8 +48,8 @@ class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
     final data = Global.location.entries.where((e) => "${e.value.city} ${e.value.town}".contains(query)).toList();
 
     if (data.isEmpty || query.isEmpty) {
-      return const Center(
-        child: Text("無搜尋結果"),
+      return Center(
+        child: Text(context.i18n.no_search_results),
       );
     }
 

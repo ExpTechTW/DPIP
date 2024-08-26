@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
 
 class UpdateCard extends StatelessWidget {
   final String title;
@@ -6,11 +7,11 @@ class UpdateCard extends StatelessWidget {
   final VoidCallback? onViewDetails;
 
   const UpdateCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     this.onViewDetails,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +27,8 @@ class UpdateCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).primaryColor.withOpacity(0.1),
-              Theme.of(context).primaryColor.withOpacity(0.3),
+              context.theme.primaryColor.withOpacity(0.1),
+              context.theme.primaryColor.withOpacity(0.3),
             ],
           ),
         ),
@@ -42,23 +43,23 @@ class UpdateCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.new_releases, size: 28, color: Theme.of(context).primaryColor),
+                        Icon(Icons.new_releases, size: 28, color: context.theme.primaryColor),
                         const SizedBox(width: 10),
                         Text(
                           title,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).primaryColor,
-                              ),
+                          style: context.theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: context.theme.primaryColor,
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     Text(
                       description,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
-                          ),
+                      style: context.theme.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                      ),
                     ),
                   ],
                 ),

@@ -1,13 +1,14 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/cupertino.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/widget/sheet/bottom_sheet_drag_handle.dart";
+import "package:flutter/material.dart";
 
 class EewDraggableSheet extends StatefulWidget {
   final List<Widget> eewUI;
 
-  const EewDraggableSheet({Key? key, required this.eewUI}) : super(key: key);
+  const EewDraggableSheet({super.key, required this.eewUI});
 
   @override
-  _EewDraggableSheetState createState() => _EewDraggableSheetState();
+  State<EewDraggableSheet> createState() => _EewDraggableSheetState();
 }
 
 class _EewDraggableSheetState extends State<EewDraggableSheet> {
@@ -22,28 +23,22 @@ class _EewDraggableSheetState extends State<EewDraggableSheet> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.2,
-      minChildSize: 0.2,
+      initialChildSize: 0.2125,
+      minChildSize: 0.2125,
+      snapSizes: const [0.2125, 0.3725, 1],
+      snap: true,
       controller: _controller,
       builder: (context, scrollController) {
         return Container(
-          color: context.colors.surface,
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainer,
+            boxShadow: kElevationToShadow[4],
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: ListView(
             controller: scrollController,
             children: [
-              SizedBox(
-                height: 24,
-                child: Center(
-                  child: Container(
-                    width: 32,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: context.colors.onSurfaceVariant.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ),
+              const BottomSheetDragHandle(),
               ...widget.eewUI,
             ],
           ),

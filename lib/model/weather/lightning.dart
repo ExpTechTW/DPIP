@@ -1,6 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
+import "package:json_annotation/json_annotation.dart";
 
-part 'lightning.g.dart';
+part "lightning.g.dart";
 
 @JsonSerializable()
 class Lightning {

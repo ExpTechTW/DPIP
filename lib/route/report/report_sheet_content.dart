@@ -1,19 +1,19 @@
-import 'package:dpip/app/page/map/monitor/monitor.dart';
-import 'package:dpip/model/report/earthquake_report.dart';
-import 'package:dpip/util/depth_color.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/int.dart';
-import 'package:dpip/util/intensity_color.dart';
-import 'package:dpip/util/magnitude_color.dart';
-import 'package:dpip/widget/report/enlargeable_image.dart';
-import 'package:dpip/widget/report/intensity_box.dart';
-import 'package:dpip/widget/report/report_detail_field.dart';
-import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:url_launcher/url_launcher.dart';
+import "package:dpip/app/page/map/monitor/monitor.dart";
+import "package:dpip/model/report/earthquake_report.dart";
+import "package:dpip/util/depth_color.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/int.dart";
+import "package:dpip/util/intensity_color.dart";
+import "package:dpip/util/magnitude_color.dart";
+import "package:dpip/widget/report/enlargeable_image.dart";
+import "package:dpip/widget/report/intensity_box.dart";
+import "package:dpip/widget/report/report_detail_field.dart";
+import "package:dpip/widget/sheet/bottom_sheet_drag_handle.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:url_launcher/url_launcher.dart";
 
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;
@@ -78,7 +78,8 @@ class ReportSheetContent extends StatelessWidget {
               avatar: const Icon(Symbols.replay),
               label: Text(context.i18n.report_replay),
               onPressed: () {
-                Navigator.of(context).push(
+                Navigator.push(
+                  context,
                   MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
                 );
               },

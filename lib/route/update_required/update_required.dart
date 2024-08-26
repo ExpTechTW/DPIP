@@ -1,10 +1,10 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/app/dpip.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import "package:dpip/app/dpip.dart";
+import "package:dpip/global.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:url_launcher/url_launcher.dart";
 
 class UpdateRequiredPage extends StatelessWidget {
   final bool showSkipButton;
@@ -37,19 +37,19 @@ class UpdateRequiredPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  '發現新版本',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.onPrimary,
-                      ),
+                  context.i18n.discover_new_version,
+                  style: context.theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: context.colors.onPrimary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '更新至最新版本以獲得最佳體驗',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: context.colors.onPrimary,
-                      ),
+                  context.i18n.update_to_latest_version,
+                  style: context.theme.textTheme.bodyLarge?.copyWith(
+                    color: context.colors.onPrimary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -59,12 +59,13 @@ class UpdateRequiredPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(20.0),
+                    padding: EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        _buildVersionInfo('目前版本', Global.packageInfo.version, Colors.red.shade400),
+                        _buildVersionInfo(
+                            context.i18n.current_version, Global.packageInfo.version, Colors.red.shade400),
                         const SizedBox(height: 12),
-                        _buildVersionInfo('最新版本', lastVersion, Colors.green.shade400),
+                        _buildVersionInfo(context.i18n.latest_version, lastVersion, Colors.green.shade400),
                       ],
                     ),
                   ),
@@ -88,14 +89,14 @@ class UpdateRequiredPage extends StatelessWidget {
                     ),
                     elevation: 4,
                   ),
-                  child: const Text('立即更新', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: Text(context.i18n.update_now, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 if (showSkipButton) ...[
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       Global.preference.setInt("update-skip", DateTime.now().millisecondsSinceEpoch);
-                      Navigator.of(context).pop();
+                      Navigator.pop(context);
                       Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (context) => const Dpip()),
                         (Route<dynamic> route) => false,
@@ -105,7 +106,7 @@ class UpdateRequiredPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: Text(
-                      '暫時略過',
+                      context.i18n.skip_for_now,
                       style: TextStyle(fontSize: 16, color: Colors.blue.shade700),
                     ),
                   ),

@@ -1,8 +1,8 @@
-import 'package:dpip/model/rts/rts_intensity.dart';
-import 'package:dpip/model/rts/rts_station.dart';
-import 'package:json_annotation/json_annotation.dart';
+import "package:dpip/model/rts/rts_intensity.dart";
+import "package:dpip/model/rts/rts_station.dart";
+import "package:json_annotation/json_annotation.dart";
 
-part 'rts.g.dart';
+part "rts.g.dart";
 
 @JsonSerializable()
 class Rts {

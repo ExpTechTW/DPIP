@@ -1,28 +1,28 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:collection/collection.dart';
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/history.dart';
-import 'package:dpip/route/settings/settings.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/color_scheme.dart';
-import 'package:dpip/util/list_icon.dart';
-import 'package:dpip/util/need_location.dart';
-import 'package:dpip/util/weather_icon.dart';
-import 'package:dpip/widget/error/region_out_of_service.dart';
-import 'package:dpip/widget/home/forecast_weather_card.dart';
-import 'package:dpip/widget/list/timeline_tile.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:collection/collection.dart";
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/history.dart";
+import "package:dpip/route/settings/settings.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/color_scheme.dart";
+import "package:dpip/util/list_icon.dart";
+import "package:dpip/util/need_location.dart";
+import "package:dpip/util/weather_icon.dart";
+import "package:dpip/widget/error/region_out_of_service.dart";
+import "package:dpip/widget/home/forecast_weather_card.dart";
+import "package:dpip/widget/list/timeline_tile.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 typedef PositionUpdateCallback = void Function();
 
 class HomePage extends StatefulWidget {
   final Function()? onPositionUpdate;
 
-  const HomePage({Key? key, this.onPositionUpdate}) : super(key: key);
+  const HomePage({super.key, this.onPositionUpdate});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -55,19 +55,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool isUserLocationValid = false;
 
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
-
-  late final decorationTween = DecorationTween(
-    begin: BoxDecoration(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
-    end: BoxDecoration(
-      borderRadius: BorderRadius.zero,
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
-  ).chain(CurveTween(curve: Curves.linear));
 
   final opacityTween = Tween(
     begin: 0.0,
@@ -111,9 +98,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String formatDateTime(String dateTimeString) {
     try {
       DateTime dateTime = DateTime.parse(dateTimeString);
-      return '${dateTime.day.toString().padLeft(2, '0')}日${dateTime.hour.toString().padLeft(2, '0')}時';
+      return "${dateTime.day.toString().padLeft(2, "0")}日${dateTime.hour.toString().padLeft(2, "0")}時";
     } catch (e) {
-      return 'Invalid Date';
+      return "Invalid Date";
     }
   }
 
@@ -161,6 +148,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
+
+    if (!mounted) return;
+
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
@@ -198,7 +188,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
-    setState(() {});
   }
 
   void sendpositionUpdate() {
@@ -214,7 +203,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       MaterialPageRoute(
         settings: const RouteSettings(name: "/settings"),
         builder: (context) => const SettingsRoute(
-          initialRoute: '/location',
+          initialRoute: "/location",
         ),
       ),
     );
@@ -249,8 +238,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                context.colors.primary.withOpacity(0.2),
-                                context.colors.primaryContainer.withOpacity(0.16),
+                                context.colors.primary.withOpacity(0.12),
+                                context.colors.primaryContainer.withOpacity(0.08),
                                 Colors.transparent
                               ],
                               stops: const [0.16, 0.6, 1],
@@ -391,18 +380,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                       Builder(
                         builder: (context) {
-                          if (realtimeList.isEmpty) {
-                            return SizedBox(
-                              height: 160,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                children: [...weatherCard],
-                              ),
-                            );
-                          }
-                          return Center(child: Text(context.i18n.out_of_service_only_taiwan));
+                          return SizedBox(
+                            height: 160,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              children: [...weatherCard],
+                            ),
+                          );
                         },
                       ),
                       Padding(
@@ -415,11 +401,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       Builder(
                         builder: (context) {
                           if (realtimeList.isEmpty) {
-                            if (init) {
-                              return Center(child: Text(context.i18n.no_events));
-                            }
-
-                            return const Center(child: CircularProgressIndicator());
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: Text(
+                                context.i18n.home_Safety,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                              ),
+                            );
                           }
 
                           List<Widget> children = [];

@@ -1,14 +1,14 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
+import "package:cached_network_image/cached_network_image.dart";
+import "package:device_info_plus/device_info_plus.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:fluttertoast/fluttertoast.dart";
+import "package:http/http.dart";
+import "package:image_gallery_saver/image_gallery_saver.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:permission_handler/permission_handler.dart";
 
 class ImageViewerRoute extends StatefulWidget {
   final String heroTag;
@@ -50,20 +50,20 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           builder: (context) {
             return AlertDialog(
               icon: const Icon(Symbols.error),
-              title: const Text("無法取得權限"),
+              title: Text(context.i18n.unable_to_obtain_permission),
               content: Text(
                 "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。" : ""}",
               ),
               actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
                 TextButton(
-                  child: const Text("取消"),
+                  child: Text(context.i18n.cancel),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
                 FilledButton(
-                  child: Text(status.isPermanentlyDenied ? "設定" : "再試一次"),
+                  child: Text(status.isPermanentlyDenied ? context.i18n.settings : context.i18n.again),
                   onPressed: () {
                     if (status.isPermanentlyDenied) {
                       openAppSettings();
@@ -89,6 +89,8 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
         name: widget.imageName,
       );
 
+      if (!mounted) return;
+
       if (!result["isSuccess"]) {
         throw Exception(result["errorMessage"]);
       }
@@ -103,11 +105,11 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           builder: (context) {
             return AlertDialog(
               icon: const Icon(Symbols.error),
-              title: const Text("儲存圖片時發生錯誤"),
+              title: Text(context.i18n.error_saving_image),
               content: Text(e.toString()),
               actions: [
                 TextButton(
-                  child: const Text("確定"),
+                  child: Text(context.i18n.confirm),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -186,7 +188,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     icon: const Icon(Symbols.close_rounded),
                     style: ButtonStyle(
                       foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
-                      backgroundColor: WidgetStateProperty.all(context.colors.surfaceVariant.withOpacity(0.8)),
+                      backgroundColor: WidgetStateProperty.all(context.colors.surfaceContainerHighest.withOpacity(0.8)),
                     ),
                     onPressed: () {
                       Navigator.maybePop(context);
@@ -212,9 +214,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     label: Text(context.i18n.image_save),
                     style: ButtonStyle(
                       foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
-                      // FIXME: workaround waiting for upstream PR to merge
-                      // https://github.com/material-foundation/flutter-packages/pull/599
-                      backgroundColor: WidgetStatePropertyAll(context.colors.surfaceVariant.withOpacity(0.8)),
+                      backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),
                     ),
                     onPressed: isDownloading
                         ? null

@@ -1,20 +1,20 @@
-import 'package:collection/collection.dart';
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/history.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/color_scheme.dart';
-import 'package:dpip/util/list_icon.dart';
-import 'package:dpip/widget/error/region_out_of_service.dart';
-import 'package:dpip/widget/list/timeline_tile.dart';
-import 'package:flutter/material.dart';
+import "package:collection/collection.dart";
+import "package:dpip/api/exptech.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/history.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/color_scheme.dart";
+import "package:dpip/util/list_icon.dart";
+import "package:dpip/widget/error/region_out_of_service.dart";
+import "package:dpip/widget/list/timeline_tile.dart";
+import "package:flutter/material.dart";
 
 typedef PositionUpdateCallback = void Function();
 
 class HistoryPage extends StatefulWidget {
   final Function()? onPositionUpdate;
 
-  const HistoryPage({Key? key, this.onPositionUpdate}) : super(key: key);
+  const HistoryPage({super.key, this.onPositionUpdate});
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();

@@ -1,20 +1,23 @@
-import 'dart:convert';
-import 'dart:io';
+import "dart:convert";
+import "dart:io";
 
-import 'package:dpip/api/route.dart';
-import 'package:dpip/model/crowdin/localization_progress.dart';
-import 'package:dpip/model/eew.dart';
-import 'package:dpip/model/history.dart';
-import 'package:dpip/model/report/earthquake_report.dart';
-import 'package:dpip/model/report/partial_earthquake_report.dart';
-import 'package:dpip/model/rts/rts.dart';
-import 'package:dpip/model/station.dart';
-import 'package:dpip/model/tsunami/tsunami.dart';
-import 'package:dpip/model/weather/lightning.dart';
-import 'package:dpip/model/weather/rain.dart';
-import 'package:dpip/model/weather/typhoon.dart';
-import 'package:dpip/model/weather/weather.dart';
-import 'package:http/http.dart';
+import "package:dpip/api/route.dart";
+import "package:dpip/model/announcement.dart";
+import "package:dpip/model/crowdin/localization_progress.dart";
+import "package:dpip/model/eew.dart";
+import "package:dpip/model/history.dart";
+import "package:dpip/model/notification_record.dart";
+import "package:dpip/model/report/earthquake_report.dart";
+import "package:dpip/model/report/partial_earthquake_report.dart";
+import "package:dpip/model/rts/rts.dart";
+import "package:dpip/model/server_status.dart";
+import "package:dpip/model/station.dart";
+import "package:dpip/model/tsunami/tsunami.dart";
+import "package:dpip/model/weather/lightning.dart";
+import "package:dpip/model/weather/rain.dart";
+import "package:dpip/model/weather/typhoon.dart";
+import "package:dpip/model/weather/weather.dart";
+import "package:http/http.dart";
 
 class ExpTech {
   String? apikey;
@@ -146,14 +149,14 @@ class ExpTech {
   }
 
   Future<String> getNotifyLocation(String token, String lat, String lng) async {
-    final requestUrl = Route.location(token, lat, lng);
+    final requestUrl = await Route.location(token, lat, lng);
 
     var res = await get(requestUrl);
 
     if (res.statusCode == 200) {
       return res.body;
     } else if (res.statusCode == 204) {
-      return '${res.statusCode} $requestUrl';
+      return "${res.statusCode} $requestUrl";
     } else {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
@@ -381,7 +384,7 @@ class ExpTech {
     return jsonDecode(res.body);
   }
 
-  Future<Map<String, dynamic>> getChangelog() async {
+  Future<List<dynamic>> getChangelog() async {
     final requestUrl = Route.changelog();
 
     var res = await get(requestUrl);
@@ -391,5 +394,47 @@ class ExpTech {
     }
 
     return jsonDecode(res.body);
+  }
+
+  Future<List<Announcement>> getAnnouncement() async {
+    final requestUrl = Route.announcement();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => Announcement.fromJson(item)).toList();
+  }
+
+  Future<List<NotificationRecord>> getNotificationHistory() async {
+    final requestUrl = Route.notificationHistory();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => NotificationRecord.fromJson(item)).toList();
+  }
+
+  Future<List<ServerStatus>> getStatus() async {
+    final requestUrl = Route.status();
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
   }
 }

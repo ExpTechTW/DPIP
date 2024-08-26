@@ -1,6 +1,6 @@
-import 'package:json_annotation/json_annotation.dart';
+import "package:json_annotation/json_annotation.dart";
 
-part 'rain.g.dart';
+part "rain.g.dart";
 
 @JsonSerializable()
 class RainStation {
@@ -48,23 +48,23 @@ class StationInfo {
 
 @JsonSerializable()
 class RainData {
-  @JsonKey(name: 'now', defaultValue: 0.0)
+  @JsonKey(name: "now", defaultValue: 0.0)
   final double now;
-  @JsonKey(name: '10m', defaultValue: 0.0)
+  @JsonKey(name: "10m", defaultValue: 0.0)
   final double tenMinutes;
-  @JsonKey(name: '1h', defaultValue: 0.0)
+  @JsonKey(name: "1h", defaultValue: 0.0)
   final double oneHour;
-  @JsonKey(name: '3h', defaultValue: 0.0)
+  @JsonKey(name: "3h", defaultValue: 0.0)
   final double threeHours;
-  @JsonKey(name: '6h', defaultValue: 0.0)
+  @JsonKey(name: "6h", defaultValue: 0.0)
   final double sixHours;
-  @JsonKey(name: '12h', defaultValue: 0.0)
+  @JsonKey(name: "12h", defaultValue: 0.0)
   final double twelveHours;
-  @JsonKey(name: '24h', defaultValue: 0.0)
+  @JsonKey(name: "24h", defaultValue: 0.0)
   final double twentyFourHours;
-  @JsonKey(name: '2d', defaultValue: 0.0)
+  @JsonKey(name: "2d", defaultValue: 0.0)
   final double twoDays;
-  @JsonKey(name: '3d', defaultValue: 0.0)
+  @JsonKey(name: "3d", defaultValue: 0.0)
   final double threeDays;
 
   const RainData({

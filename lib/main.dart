@@ -1,20 +1,25 @@
-import 'package:dpip/app/dpip.dart';
-import 'package:dpip/core/fcm.dart';
-import 'package:dpip/core/notify.dart';
-import 'package:dpip/core/service.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/string.dart';
-import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:timezone/data/latest.dart';
+import "package:dpip/app/dpip.dart";
+import "package:dpip/global.dart";
+import "package:dpip/route/welcome/welcome.dart";
+import "package:dpip/util/extension/string.dart";
+import "package:dpip/util/log.dart";
+import "package:dynamic_color/dynamic_color.dart";
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+import "package:flutter_gen/gen_l10n/app_localizations.dart";
+import "package:flutter_localizations/flutter_localizations.dart";
+import "package:flutter_localized_locales/flutter_localized_locales.dart";
+import "package:hooks_riverpod/hooks_riverpod.dart";
+import "package:talker_flutter/talker_flutter.dart";
+import "package:timezone/data/latest.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final talker = TalkerManager.instance;
+  talker.log("start");
+  FlutterError.onError = (details) {
+    talker.handle(details.exception, details.stack);
+  };
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -22,6 +27,7 @@ void main() async {
   );
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   await Global.init();
+  TalkerManager.instance.info('global init');
   initializeTimeZones();
   runApp(
     const ProviderScope(
@@ -31,6 +37,8 @@ void main() async {
 }
 
 class DpipApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   const DpipApp({super.key});
 
   @override
@@ -44,9 +52,10 @@ class DpipAppState extends State<DpipApp> {
         "light": ThemeMode.light,
         "dark": ThemeMode.dark,
         "system": ThemeMode.system,
-      }[Global.preference.getString('theme')] ??
+      }[Global.preference.getString("theme")] ??
       ThemeMode.system;
-  Locale? _locale = Global.preference.getString('locale')?.asLocale;
+  Locale? _locale = Global.preference.getString("locale")?.asLocale;
+  bool showWelcomeScreen = false;
 
   void changeTheme(String themeMode) {
     setState(() {
@@ -75,44 +84,56 @@ class DpipAppState extends State<DpipApp> {
   @override
   void initState() {
     super.initState();
-    fcmInit();
-    notifyInit();
-    initBackgroundService();
+    if (Global.preference.getBool("welcome-1.0.0") == null) {
+      Global.preference.setString("changelog", Global.packageInfo.version);
+      showWelcomeScreen = true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
-      builder: (lightColorScheme, darkColorScheme) => MaterialApp(
-        builder: (context, child) {
-          final mediaQueryData = MediaQuery.of(context);
-          final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0, maxScaleFactor: 1.5);
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaler: scale),
-            child: child!,
-          );
-        },
-        title: "DPIP",
-        theme: ThemeData(
-          colorScheme: lightColorScheme,
-          brightness: Brightness.light,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: darkColorScheme,
-          brightness: Brightness.dark,
-        ),
-        themeMode: _themeMode,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          LocaleNamesLocalizationsDelegate(),
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: _locale,
-        home: const Dpip(),
-      ),
+      builder: (lightColorScheme, darkColorScheme) {
+        final lightTheme = lightColorScheme != null ? ColorScheme.fromSeed(seedColor: lightColorScheme.primary) : null;
+        final darkTheme = darkColorScheme != null
+            ? ColorScheme.fromSeed(brightness: Brightness.dark, seedColor: darkColorScheme.primary)
+            : null;
+
+        return MaterialApp(
+          navigatorKey: DpipApp.navigatorKey,
+          navigatorObservers: [
+            TalkerRouteObserver(TalkerManager.instance),
+          ],
+          builder: (context, child) {
+            final mediaQueryData = MediaQuery.of(context);
+            final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.3);
+            return MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaler: scale),
+              child: child!,
+            );
+          },
+          title: "DPIP",
+          theme: ThemeData(
+            colorScheme: lightTheme,
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: darkTheme,
+            brightness: Brightness.dark,
+          ),
+          themeMode: _themeMode,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            LocaleNamesLocalizationsDelegate(),
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: _locale,
+          home: showWelcomeScreen ? const WelcomeRoute() : const Dpip(),
+        );
+      },
     );
   }
 }

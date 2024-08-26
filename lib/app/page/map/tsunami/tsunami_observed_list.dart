@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
-import 'package:timezone/timezone.dart' as tz;
+import "package:flutter/cupertino.dart";
+import "package:intl/intl.dart";
+import "package:timezone/timezone.dart" as tz;
 
 class TsunamiObservedList extends StatelessWidget {
   final List tsunamiList;
@@ -11,10 +11,10 @@ class TsunamiObservedList extends StatelessWidget {
   });
 
   convertTimestamp(int timestamp) {
-    var location = tz.getLocation('Asia/Taipei');
+    var location = tz.getLocation("Asia/Taipei");
     DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat('dd日HH:mm');
+    DateFormat formatter = DateFormat("dd日HH:mm");
     String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }

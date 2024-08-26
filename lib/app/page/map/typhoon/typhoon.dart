@@ -21,11 +21,11 @@ class _TyphoonMapState extends State<TyphoonMap> {
   late MapLibreMapController _mapController;
   List<Typhoon>? typhoonData;
   List<String> typhoonList = [];
-  String selectedTyphoonId = '';
+  String selectedTyphoonId = "";
   List<String> sourceList = [];
   List<String> layerList = [];
   List<String> typhoon_name_list = [];
-  String selectedTimestamp = '';
+  String selectedTimestamp = "";
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
@@ -72,15 +72,13 @@ class _TyphoonMapState extends State<TyphoonMap> {
             ],
           },
         );
-        // final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-        // await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
       }
 
       await _addUserLocationMarker();
 
       setState(() {});
     } catch (e) {
-      print('Error loading typhoon list: $e');
+      print("加載颱風列表時出錯: $e");
     }
   }
 
@@ -114,19 +112,38 @@ class _TyphoonMapState extends State<TyphoonMap> {
       typhoonData = await ExpTech().getTyphoon(time);
       if (typhoonData != null && typhoonData!.isNotEmpty) {
         typhoon_name_list = [];
-        selectedTyphoonId = "";
         await _drawTyphoonPaths(typhoonData!);
       }
     } catch (e) {
-      print('Error loading typhoon data: $e');
+      print("加載颱風數據時出錯: $e");
     }
   }
 
-  void _onSelectionChanged(String timestamp, String typhoonId) {
+  void _onSelectionChanged(String timestamp, String typhoonId) async {
     selectedTimestamp = timestamp;
-    selectedTyphoonId = typhoonId;
-    _loadTyphoonData(timestamp);
+    await _loadTyphoonData(selectedTimestamp);
+    if (selectedTyphoonId != typhoonId) {
+      selectedTyphoonId = typhoonId;
+      _zoomToSelectedTyphoon();
+    }
     setState(() {});
+  }
+
+  Future<void> _zoomToSelectedTyphoon() async {
+    if (typhoonData != null && selectedTyphoonId.isNotEmpty) {
+      Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.name.zh == selectedTyphoonId);
+      if (selectedTyphoon != null && selectedTyphoon.analysis.isNotEmpty) {
+        LatLng center = LatLng(
+          selectedTyphoon.analysis.last.lat,
+          selectedTyphoon.analysis.last.lng,
+        );
+        double zoomLevel = 5;
+        await _mapController.animateCamera(
+          CameraUpdate.newLatLngZoom(center, zoomLevel),
+          duration: const Duration(milliseconds: 1000),
+        );
+      }
+    }
   }
 
   Future<void> _drawTyphoonPaths(List<Typhoon> typhoons) async {
@@ -143,6 +160,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
       Typhoon typhoon = typhoons[i];
       if (selectedTyphoonId == "") {
         selectedTyphoonId = typhoon.name.zh;
+        _zoomToSelectedTyphoon();
       }
       typhoon_name_list.add(typhoon.name.zh);
       await _drawTyphoonPath(typhoon, i);
@@ -159,6 +177,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
     List<List<double>> coordinates = typhoon.analysis.map((a) => [a.lng, a.lat]).toList();
     List<List<double>> coordinates_forecast = typhoon.forecast.map((f) => [f.lng, f.lat]).toList();
+
+    coordinates_forecast.insert(0, coordinates.last);
 
     await _mapController.addSource(
       sourceId,
@@ -267,6 +287,12 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -280,7 +306,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: TimeSelector(
+            child: TyphoonTimeSelector(
               onSelectionChanged: _onSelectionChanged,
               onTimeExpanded: () {},
               timeList: typhoonList,

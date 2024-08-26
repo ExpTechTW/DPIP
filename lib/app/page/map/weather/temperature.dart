@@ -1,16 +1,16 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/weather.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/time_selector.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/weather/weather.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/list/time_selector.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 class TemperatureData {
   final double latitude;
@@ -204,12 +204,12 @@ class _TemperatureMapState extends State<TemperatureMap> {
       "temperature-data",
       "temperature-labels",
       const SymbolLayerProperties(
-        textField: ['get', 'temperature'],
+        textField: ["get", "temperature"],
         textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
+        textColor: "#ffffff",
+        textHaloColor: "#000000",
         textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
+        textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
           [0, 2]
@@ -260,7 +260,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ['-20', '-10', '0', '10', '20', '30', '40'];
+    final labels = ["-20", "-10", "0", "10", "20", "30", "40"];
     return SizedBox(
       width: 300,
       child: Row(
@@ -273,6 +273,12 @@ class _TemperatureMapState extends State<TemperatureMap> {
             .toList(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -295,7 +301,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: '圖例',
+                message: "圖例",
                 child: Container(
                   width: 30,
                   height: 30,

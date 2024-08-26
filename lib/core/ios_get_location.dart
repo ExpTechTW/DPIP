@@ -1,26 +1,35 @@
-import 'package:dpip/app/page/history/history.dart';
-import 'package:dpip/app/page/home/home.dart';
-import 'package:dpip/app/page/map/monitor/monitor.dart';
-import 'package:dpip/app/page/map/radar/radar.dart';
-import 'package:dpip/core/location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/location/location.dart';
-import 'package:dpip/route/settings/content/location.dart';
-import 'package:flutter/services.dart';
+import 'dart:async';
 
-const _channel = MethodChannel('com.exptech.dpip/data');
+import "package:dpip/app/page/history/history.dart";
+import "package:dpip/app/page/home/home.dart";
+import "package:dpip/app/page/map/monitor/monitor.dart";
+import "package:dpip/app/page/map/radar/radar.dart";
+import "package:dpip/core/location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/location/location.dart";
+import "package:dpip/route/settings/content/location.dart";
+import "package:flutter/services.dart";
+
+const _channel = MethodChannel("com.exptech.dpip/data");
+Completer<void>? _completer;
 
 Future<void> getSavedLocation() async {
+  if (_completer != null && !_completer!.isCompleted) {
+    return _completer!.future;
+  }
+
+  _completer = Completer<void>();
+
   try {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getSavedLocation');
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>("getSavedLocation");
     final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
-    Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
-    Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
+    await Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
+    await Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
 
     LocationResult positionData = await LocationService().getLatLngLocation(data?["lat"] ?? 0.0, data?["lon"] ?? 0.0);
     var position = positionData.toJson();
-    String country = position['cityTown'];
-    List<String> parts = country.split(' ');
+    String country = position["cityTown"];
+    List<String> parts = country.split(" ");
 
     if (parts.length == 3) {
       String code = parts[2];
@@ -28,28 +37,39 @@ Future<void> getSavedLocation() async {
       if (Global.location.containsKey(code)) {
         Location locationInfo = Global.location[code]!;
 
-        Global.preference.setString("location-city", locationInfo.city);
-        Global.preference.setString("location-town", locationInfo.town);
+        await Global.preference.setString("location-city", locationInfo.city);
+        await Global.preference.setString("location-town", locationInfo.town);
 
-        SettingsLocationView.updatePosition();
-        RadarMap.updatePosition();
-        HomePage.updatePosition();
-        HistoryPage.updatePosition();
-        MonitorPage.updatePosition();
+        _updateAllPositions();
       }
     } else {
-      Global.preference.remove("location-city");
-      Global.preference.remove("location-town");
-      Global.preference.setDouble("user-lat", 0.0);
-      Global.preference.setDouble("user-lon", 0.0);
-      SettingsLocationView.updatePosition();
-      RadarMap.updatePosition();
-      HomePage.updatePosition();
-      HistoryPage.updatePosition();
-      MonitorPage.updatePosition();
+      await Global.preference.remove("location-city");
+      await Global.preference.remove("location-town");
+      await Global.preference.setDouble("user-lat", 0.0);
+      await Global.preference.setDouble("user-lon", 0.0);
+      _updateAllPositions();
     }
-    return;
   } on PlatformException catch (e) {
-    return;
+    print("PlatformException in getSavedLocation: ${e.message}");
+  } catch (e) {
+    print("Error in getSavedLocation: $e");
+  } finally {
+    _completer?.complete();
+    _completer = null;
+  }
+}
+
+void _updateAllPositions() {
+  SettingsLocationView.updatePosition();
+  RadarMap.updatePosition();
+  HomePage.updatePosition();
+  HistoryPage.updatePosition();
+  MonitorPage.updatePosition();
+}
+
+void cancelSavedLocationOperation() {
+  if (_completer != null && !_completer!.isCompleted) {
+    _completer?.completeError('Operation cancelled');
+    _completer = null;
   }
 }

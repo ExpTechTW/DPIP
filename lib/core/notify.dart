@@ -1,104 +1,265 @@
 import 'dart:async';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-import '../model/received_notification.dart';
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-final FirebaseMessaging messaging = FirebaseMessaging.instance;
-final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
-    StreamController<ReceivedNotification>.broadcast();
-final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
-
-const String darwinNotificationCategoryText = 'textCategory';
-const String navigationActionId = 'id_3';
-const String darwinNotificationCategoryPlain = 'plainCategory';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
 
 Future<void> notifyInit() async {
-  final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
-    requestAlertPermission: true,
-    requestBadgePermission: true,
-    requestSoundPermission: true,
-    onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {
-      didReceiveLocalNotificationStream.add(
-        ReceivedNotification(
-          id: id,
-          title: title,
-          body: body,
-          payload: payload,
-        ),
-      );
-    },
-  );
-  final initializationSettings = InitializationSettings(
-    android: const AndroidInitializationSettings('@mipmap/ic_launcher'),
-    iOS: initializationSettingsDarwin,
-  );
-  flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
-      switch (notificationResponse.notificationResponseType) {
-        case NotificationResponseType.selectedNotification:
-          selectNotificationStream.add(notificationResponse.payload);
-          break;
-        case NotificationResponseType.selectedNotificationAction:
-          if (notificationResponse.actionId == navigationActionId) {
-            selectNotificationStream.add(notificationResponse.payload);
-          }
-          break;
-      }
-    },
-  );
-}
-
-Future<void> showNotify(RemoteMessage message) async {
-  var data = message.data;
-
-  flutterLocalNotificationsPlugin.show(
-      message.notification.hashCode,
-      message.notification?.title,
-      message.notification?.body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          data["channel"]!,
-          (data["level"] == null)
-              ? '一般訊息'
-              : (data["level"] == "0")
-                  ? '警訊通知'
-                  : '緊急警報',
-          channelDescription: (data["level"] == null)
-              ? '一般通知'
-              : (data["level"] == "0")
-                  ? '重要通知'
-                  : '有立即危險',
-          importance: (data["level"] == null)
-              ? Importance.low
-              : (data["level"] == "0")
-                  ? Importance.defaultImportance
-                  : Importance.max,
-          priority: (data["level"] == null)
-              ? Priority.low
-              : (data["level"] == "0")
-                  ? Priority.defaultPriority
-                  : Priority.max,
-          playSound: true,
-          sound: data["sound"] != null ? RawResourceAndroidNotificationSound(data["sound"]) : null,
-        ),
-        iOS: DarwinNotificationDetails(
-          categoryIdentifier: darwinNotificationCategoryPlain,
-          sound: data["sound"] != null ? "${data["sound"]}.wav" : "default",
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
-      ));
-}
-
-Future<PermissionStatus> requestNotificationPermission() async {
-  PermissionStatus status = await Permission.notification.request();
-  if (status.isGranted) {
-    print('通知權限已授予');
-  }
-  print('通知權限被拒絕');
-  return status;
+  AwesomeNotifications().initialize(
+      'resource://drawable/res_app_icon',
+      [
+        NotificationChannel(
+            channelGroupKey: 'group_eew',
+            channelKey: "eew_alert",
+            channelName: "緊急地震速報",
+            channelDescription: "地震速報預估最大震度 5 弱以上",
+            importance: NotificationImportance.Max,
+            defaultPrivacy: NotificationPrivacy.Public,
+            criticalAlerts: true,
+            playSound: true,
+            soundSource: 'resource://raw/eew_alert',
+            defaultRingtoneType: DefaultRingtoneType.Alarm,
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: highVibrationPattern,
+            locked: true),
+        NotificationChannel(
+            channelGroupKey: 'group_eew',
+            channelKey: "eew",
+            channelName: "地震速報",
+            channelDescription: "地震速報所在地預估震度 2 以上",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/eew',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: mediumVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eew',
+            channelKey: "eew_silence",
+            channelName: "地震速報 (無聲通知)",
+            channelDescription: "地震速報所在地預估震度 2 以下的區域",
+            importance: NotificationImportance.Low,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: false,
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eq',
+            channelKey: "int_report",
+            channelName: "震度速報",
+            channelDescription: "TREM 觀測網所在地實測震度 3 以上",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/int_report',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: highVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eq',
+            channelKey: "int_report_silence",
+            channelName: "震度速報 (無聲通知)",
+            channelDescription: "TREM 觀測網所在地實測震度 3 以下的區域",
+            importance: NotificationImportance.Low,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: false,
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eq',
+            channelKey: "eq",
+            channelName: "強震監視器",
+            channelDescription: "TREM 觀測網偵測到晃動",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/eq',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: mediumVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eq',
+            channelKey: "report",
+            channelName: "地震報告",
+            channelDescription: "地震報告所在地震度 3 以上",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/report',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_eq',
+            channelKey: "report_silence",
+            channelName: "地震報告 (無聲通知)",
+            channelDescription: "地震報告所在地震度 3 以下的地區",
+            groupAlertBehavior: GroupAlertBehavior.Children,
+            importance: NotificationImportance.Min,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: false,
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: false),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "thunderstorm",
+            channelName: "大雷雨即時訊息",
+            channelDescription: "所在地發布大雷雨即時訊息",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/rain',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: mediumVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "rain_2",
+            channelName: "大雨特報",
+            channelDescription: "所在地發布大雨特報",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/normal',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: mediumVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "rain_1",
+            channelName: "豪雨特報",
+            channelDescription: "所在地發布豪雨特報",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/weather',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "flood",
+            channelName: "淹水警戒",
+            channelDescription: "所在地發布淹水警戒",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/warn',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: mediumVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "tsunami",
+            channelName: "海嘯警報 (警報)",
+            channelDescription: "預估浪高 1 公尺以上",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/tsunami',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: mediumVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "tsunami_warn",
+            channelName: "海嘯警報 (注意)",
+            channelDescription: "預估浪高 1 公尺以下",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/warn',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "volcano",
+            channelName: "火山資訊",
+            channelDescription: "所在地發布火山資訊",
+            importance: NotificationImportance.High,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/warn',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: highVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "heat",
+            channelName: "高溫資訊",
+            channelDescription: "所在地發布高溫資訊",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/normal',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_info',
+            channelKey: "typhoon",
+            channelName: "颱風相關資訊",
+            channelDescription: "所在地發布颱風相關資訊",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/normal',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_other',
+            channelKey: "other",
+            channelName: "其他類型警報",
+            channelDescription: "所在地發布其他類型警報",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/normal',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+        NotificationChannel(
+            channelGroupKey: 'group_other',
+            channelKey: "announcement",
+            channelName: "公告",
+            channelDescription: "ExpTech 發布之公告",
+            importance: NotificationImportance.Default,
+            defaultPrivacy: NotificationPrivacy.Public,
+            playSound: true,
+            soundSource: 'resource://raw/info',
+            defaultColor: Colors.red,
+            ledColor: Colors.red,
+            enableVibration: true,
+            vibrationPattern: lowVibrationPattern),
+      ],
+      channelGroups: [
+        NotificationChannelGroup(channelGroupKey: 'group_eew', channelGroupName: '地震速報音效'),
+        NotificationChannelGroup(channelGroupKey: 'group_eq', channelGroupName: '地震資訊'),
+        NotificationChannelGroup(channelGroupKey: 'group_info', channelGroupName: '防災資訊'),
+        NotificationChannelGroup(channelGroupKey: 'group_other', channelGroupName: '其他'),
+      ],
+      debug: true);
 }

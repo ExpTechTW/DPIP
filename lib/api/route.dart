@@ -1,7 +1,7 @@
-import 'dart:io';
-import 'dart:math';
+import "dart:io";
+import "dart:math";
 
-import 'package:dpip/global.dart';
+import "package:dpip/global.dart";
 
 class Route {
   static String get api => baseApi();
@@ -49,4 +49,7 @@ class Route {
   static Uri historyRegion(String region) => Uri.parse("$onlyapi/v1/dpip/history/$region");
   static Uri support() => Uri.parse("$onlyapi/v1/dpip/support");
   static Uri changelog() => Uri.parse("$onlyapi/v1/dpip/changelog");
+  static Uri announcement() => Uri.parse("$onlyapi/v1/dpip/announcement");
+  static Uri notificationHistory() => Uri.parse("$onlyapi/v1/notify/history");
+  static Uri status() => Uri.parse("https://status.exptech.dev/api/v1/status/data?duration=1d");
 }

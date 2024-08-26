@@ -1,21 +1,21 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:ui';
+import "dart:async";
+import "dart:io";
+import "dart:ui";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/history/history.dart';
-import 'package:dpip/app/page/home/home.dart';
-import 'package:dpip/app/page/map/monitor/monitor.dart';
-import 'package:dpip/app/page/map/radar/radar.dart';
-import 'package:dpip/core/location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/model/location/location.dart';
-import 'package:dpip/route/settings/content/location.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/history/history.dart";
+import "package:dpip/app/page/home/home.dart";
+import "package:dpip/app/page/map/monitor/monitor.dart";
+import "package:dpip/app/page/map/radar/radar.dart";
+import "package:dpip/core/location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/model/location/location.dart";
+import "package:dpip/route/settings/content/location.dart";
+import "package:flutter/cupertino.dart";
+import "package:flutter_background_service/flutter_background_service.dart";
+import "package:flutter_local_notifications/flutter_local_notifications.dart";
+import "package:intl/intl.dart";
+import "package:permission_handler/permission_handler.dart";
 
 Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();
@@ -60,12 +60,12 @@ void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
 }
 
 void androidSendPositionlisten() {
-  service.on('sendposition').listen((event) {
+  service.on("sendposition").listen((event) {
     if (event != null) {
       var positionData = event.values.first;
-      var position = positionData['position'];
-      String country = position['country'];
-      List<String> parts = country.split(' ');
+      var position = positionData["position"];
+      String country = position["country"];
+      List<String> parts = country.split(" ");
 
       if (parts.length == 3) {
         String code = parts[2];
@@ -94,8 +94,8 @@ void androidSendPositionlisten() {
         MonitorPage.updatePosition();
       }
 
-      var latitude = position['latitude'];
-      var longitude = position['longitude'];
+      var latitude = position["latitude"];
+      var longitude = position["longitude"];
       Global.preference.setDouble("user-lat", (latitude as num?)?.toDouble() ?? 0.0);
       Global.preference.setDouble("user-lon", (longitude as num?)?.toDouble() ?? 0.0);
       const MonitorPage(data: 0).createState();
@@ -106,9 +106,9 @@ void androidSendPositionlisten() {
 Future<void> androidForegroundService() async {
   androidServiceInit = true;
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'my_foreground',
-    '前景自動定位',
-    description: '前景自動定位',
+    "my_foreground",
+    "前景自動定位",
+    description: "前景自動定位",
     importance: Importance.low,
   );
 
@@ -117,7 +117,7 @@ Future<void> androidForegroundService() async {
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(
       iOS: DarwinInitializationSettings(),
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
     ),
   );
 
@@ -131,9 +131,9 @@ Future<void> androidForegroundService() async {
       autoStart: true,
       isForegroundMode: true,
       foregroundServiceType: AndroidForegroundType.location,
-      notificationChannelId: 'my_foreground',
-      initialNotificationTitle: 'DPIP',
-      initialNotificationContent: '前景服務啟動中...',
+      notificationChannelId: "my_foreground",
+      initialNotificationTitle: "DPIP",
+      initialNotificationContent: "前景服務啟動中...",
       foregroundServiceNotificationId: 888,
     ),
     iosConfiguration: IosConfiguration(
@@ -144,14 +144,14 @@ Future<void> androidForegroundService() async {
   );
 }
 
-@pragma('vm:entry-point')
+@pragma("vm:entry-point")
 Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   return true;
 }
 
-@pragma('vm:entry-point')
+@pragma("vm:entry-point")
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
   await Global.init();
@@ -160,7 +160,7 @@ void onStart(ServiceInstance service) async {
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  service.on('stopService').listen((event) {
+  service.on("stopService").listen((event) {
     timer?.cancel();
     if (service is AndroidServiceInstance) {
       service.setAutoStartOnBootMode(false);
@@ -172,15 +172,15 @@ void onStart(ServiceInstance service) async {
   if (service is AndroidServiceInstance) {
     service.setAutoStartOnBootMode(true);
 
-    service.on('setAsForeground').listen((event) {
+    service.on("setAsForeground").listen((event) {
       service.setAsForegroundService();
     });
 
-    service.on('setAsBackground').listen((event) {
+    service.on("setAsBackground").listen((event) {
       service.setAsBackgroundService();
     });
 
-    service.on('removeposition').listen((event) {
+    service.on("removeposition").listen((event) {
       Global.preference.remove("user-lat");
       Global.preference.remove("user-lon");
       Global.preference.remove("user-country");
@@ -199,9 +199,9 @@ void onStart(ServiceInstance service) async {
           print(body);
         }
 
-        String notifyTitle = '自動定位中';
-        String date = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-        String notifyBody = '$date\n$lat,$lon $country';
+        String notifyTitle = "自動定位中";
+        String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+        String notifyBody = "$date\n$lat,$lon $country";
 
         flutterLocalNotificationsPlugin.show(
           888,
@@ -209,9 +209,9 @@ void onStart(ServiceInstance service) async {
           notifyBody,
           const NotificationDetails(
             android: AndroidNotificationDetails(
-              'my_foreground',
-              '前景自動定位',
-              icon: '@mipmap/ic_launcher',
+              "my_foreground",
+              "前景自動定位",
+              icon: "@mipmap/ic_launcher",
               ongoing: true,
             ),
           ),
@@ -225,7 +225,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer = Timer.periodic(Duration(seconds: 300), (timer) async {
+    timer = Timer.periodic(const Duration(minutes: 5), (timer) async {
       task();
     });
   }

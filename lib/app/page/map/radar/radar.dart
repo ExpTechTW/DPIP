@@ -1,16 +1,16 @@
-import 'dart:io';
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/util/need_location.dart';
-import 'package:dpip/widget/list/time_selector.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/global.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/util/need_location.dart";
+import "package:dpip/widget/list/time_selector.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
 typedef PositionUpdateCallback = void Function();
 
@@ -139,6 +139,7 @@ class _RadarMapState extends State<RadarMap> {
   @override
   void dispose() {
     RadarMap.clearActiveCallback();
+    _mapController.dispose();
     super.dispose();
   }
 
@@ -299,7 +300,7 @@ class _RadarMapState extends State<RadarMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: '圖例',
+                message: "圖例",
                 child: Container(
                   width: 30,
                   height: 30,
@@ -369,7 +370,7 @@ class ColorBarPainter extends CustomPainter {
     final width = size.width / colors.length;
 
     for (int i = 0; i < colors.length; i++) {
-      paint.color = Color(int.parse('0xFF${colors[i]}'));
+      paint.color = Color(int.parse("0xFF${colors[i]}"));
       canvas.drawRect(
         Rect.fromLTWH(i * width, 0, width, size.height),
         paint,

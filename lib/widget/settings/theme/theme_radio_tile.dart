@@ -1,6 +1,6 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class ThemeRadioTile extends StatelessWidget {
   final String value;
@@ -22,9 +22,10 @@ class ThemeRadioTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card.filled(
+    return Material(
+      color: context.colors.surfaceContainerHigh,
+      borderRadius: BorderRadius.circular(16),
       clipBehavior: Clip.antiAlias,
-      margin: const EdgeInsets.all(8),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -33,9 +34,7 @@ class ThemeRadioTile extends StatelessWidget {
             Container(
               height: 96,
               decoration: BoxDecoration(
-                // FIXME: workaround waiting for upstream PR to merge
-                // https://github.com/material-foundation/flutter-packages/pull/599
-                color: theme.colorScheme.surfaceVariant,
+                color: theme.colorScheme.surfaceContainer,
               ),
               child: Center(
                 child: Icon(

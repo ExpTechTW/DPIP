@@ -1,6 +1,6 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/color_scheme.dart';
-import 'package:flutter/material.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/color_scheme.dart";
+import "package:flutter/material.dart";
 
 class ForecastWeatherCard extends StatelessWidget {
   final String time;

@@ -1,19 +1,19 @@
-import 'dart:async';
+import "dart:async";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/eew.dart';
-import 'package:dpip/model/report/earthquake_report.dart';
-import 'package:dpip/model/report/partial_earthquake_report.dart';
-import 'package:dpip/route/report/report_sheet_content.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/extension/color_scheme.dart';
-import 'package:dpip/util/geojson.dart';
-import 'package:dpip/util/intensity_color.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/eew.dart";
+import "package:dpip/model/report/earthquake_report.dart";
+import "package:dpip/model/report/partial_earthquake_report.dart";
+import "package:dpip/route/report/report_sheet_content.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/extension/color_scheme.dart";
+import "package:dpip/util/geojson.dart";
+import "package:dpip/util/intensity_color.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:material_symbols_icons/symbols.dart";
 
 class ReportRoute extends StatefulWidget {
   final PartialEarthquakeReport report;
@@ -28,8 +28,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   EarthquakeReport? report;
   final mapController = Completer<MapLibreMapController>();
 
-  // FIXME: workaround waiting for upstream PR to merge
-  // https://github.com/material-foundation/flutter-packages/pull/599
   late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
 
   late final decorationTween = DecorationTween(
@@ -153,8 +151,8 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
         waves.addFeature(
           circleFeature(
-            LatLng(data.latitude, data.longitude),
-            distance["s_dist"]!,
+            center: LatLng(data.latitude, data.longitude),
+            radius: distance["s_dist"]!,
           ),
         );
       }
@@ -220,24 +218,26 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         ),
       );
 
+      if (!mounted) return;
+
       await controller.setLayerProperties(
-        'county',
+        "county",
         FillLayerProperties(
           fillColor: [
-            'match',
-            ['get', 'NAME'],
+            "match",
+            ["get", "NAME"],
             ...cityMaxIntensity.entries.expand((entry) => [
                   entry.key,
                   IntensityColor.intensity(entry.value).toHexStringRGB(),
                 ]),
-            context.colors.surfaceVariant.toHexStringRGB(),
+            context.colors.surfaceContainerHighest.toHexStringRGB(),
           ],
           fillOpacity: 1,
         ),
       );
 
       await controller.setLayerProperties(
-        'town',
+        "town",
         const FillLayerProperties(fillOpacity: 0),
       );
 
@@ -340,7 +340,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             left: 4,
             child: BackButton(
               style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainer),
+                elevation: const WidgetStatePropertyAll(4),
+                shadowColor: WidgetStatePropertyAll(context.colors.shadow),
+                surfaceTintColor: WidgetStatePropertyAll(context.colors.surfaceTint),
+                backgroundColor: WidgetStatePropertyAll(context.colors.surface),
               ),
             ),
           ),

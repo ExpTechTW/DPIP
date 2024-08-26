@@ -1,10 +1,10 @@
-import 'dart:convert';
+import "dart:convert";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/location/location.dart';
-import 'package:flutter/services.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/model/location/location.dart";
+import "package:flutter/services.dart";
+import "package:package_info_plus/package_info_plus.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 class Global {
   static late PackageInfo packageInfo;

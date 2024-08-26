@@ -1,18 +1,18 @@
-import 'dart:async';
-import 'dart:io';
+import "dart:async";
+import "dart:io";
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/weather/lightning.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/time_selector.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
+import "package:dpip/api/exptech.dart";
+import "package:dpip/model/weather/lightning.dart";
+import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/map_utils.dart";
+import "package:dpip/widget/list/time_selector.dart";
+import "package:dpip/widget/map/legend.dart";
+import "package:dpip/widget/map/map.dart";
+import "package:flutter/material.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
 
-import '../../../../core/ios_get_location.dart';
-import '../../../../global.dart';
+import "../../../../core/ios_get_location.dart";
+import "../../../../global.dart";
 
 class LightningData {
   final double latitude;
@@ -224,14 +224,14 @@ class _LightningMapState extends State<LightningMap> {
     return MapLegend(
       label: "閃電圖例",
       children: [
-        _legendItem('lightning-1-5', '5 分鐘內對地閃電'),
-        _legendItem('lightning-1-10', '10 分鐘內對地閃電'),
-        _legendItem('lightning-1-30', '30 分鐘內對地閃電'),
-        _legendItem('lightning-1-60', '60 分鐘內對地閃電'),
-        _legendItem('lightning-0-5', '5 分鐘內雲間閃電'),
-        _legendItem('lightning-0-10', '10 分鐘內雲間閃電'),
-        _legendItem('lightning-0-30', '30 分鐘內雲間閃電'),
-        _legendItem('lightning-0-60', '60 分鐘內雲間閃電'),
+        _legendItem("lightning-1-5", "5 分鐘內對地閃電"),
+        _legendItem("lightning-1-10", "10 分鐘內對地閃電"),
+        _legendItem("lightning-1-30", "30 分鐘內對地閃電"),
+        _legendItem("lightning-1-60", "60 分鐘內對地閃電"),
+        _legendItem("lightning-0-5", "5 分鐘內雲間閃電"),
+        _legendItem("lightning-0-10", "10 分鐘內雲間閃電"),
+        _legendItem("lightning-0-30", "30 分鐘內雲間閃電"),
+        _legendItem("lightning-0-60", "60 分鐘內雲間閃電"),
       ],
     );
   }
@@ -241,12 +241,18 @@ class _LightningMapState extends State<LightningMap> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
+          Image.asset("assets/map/icons/$imageName.png", width: 24, height: 24),
           const SizedBox(width: 8),
           Text(label),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -269,7 +275,7 @@ class _LightningMapState extends State<LightningMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: '圖例',
+                message: "圖例",
                 child: Container(
                   width: 30,
                   height: 30,

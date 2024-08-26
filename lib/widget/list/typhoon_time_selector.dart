@@ -1,28 +1,28 @@
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import "package:dpip/util/extension/build_context.dart";
+import "package:flutter/material.dart";
+import "package:intl/intl.dart";
 
-class TimeSelector extends StatefulWidget {
+class TyphoonTimeSelector extends StatefulWidget {
   final Function(String, String) onSelectionChanged;
   final Function() onTimeExpanded;
   final List<String> timeList;
   final List<String> typhoonList;
   final String selectedTyphoonId;
 
-  const TimeSelector({
-    Key? key,
+  const TyphoonTimeSelector({
+    super.key,
     required this.onSelectionChanged,
     required this.onTimeExpanded,
     required this.timeList,
     required this.typhoonList,
     required this.selectedTyphoonId,
-  }) : super(key: key);
+  });
 
   @override
-  _TimeSelectorState createState() => _TimeSelectorState();
+  State<TyphoonTimeSelector> createState() => _TyphoonTimeSelectorState();
 }
 
-class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderStateMixin {
+class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
   late String _selectedTyphoonId;
   late ScrollController _timeScrollController;
@@ -162,7 +162,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        DateFormat('HH:mm').format(time),
+                        DateFormat("HH:mm").format(time),
                         style: TextStyle(
                           color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                           fontWeight: FontWeight.bold,
@@ -170,7 +170,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                         ),
                       ),
                       Text(
-                        DateFormat('MM/dd').format(time),
+                        DateFormat("MM/dd").format(time),
                         style: TextStyle(
                           color: isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
                           fontSize: 12,
@@ -261,7 +261,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp))} (${_selectedTyphoonId})',
+                  "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonId)",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: context.colors.onSurface,
