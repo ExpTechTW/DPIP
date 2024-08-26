@@ -224,14 +224,14 @@ class _LightningMapState extends State<LightningMap> {
     return MapLegend(
       label: context.i18n.map_legend,
       children: [
-        _legendItem("lightning_1_5", context.i18n.lightning_1_5),
-        _legendItem("lightning_1_10", context.i18n.lightning_1_10),
-        _legendItem("lightning_1_30", context.i18n.lightning_1_30),
-        _legendItem("lightning_1_60", context.i18n.lightning_1_60),
-        _legendItem("lightning_0_5", context.i18n.lightning_0_5),
-        _legendItem("lightning_0_10", context.i18n.lightning_0_10),
-        _legendItem("lightning_0_30", context.i18n.lightning_0_30),
-        _legendItem("lightning_0_60", context.i18n.lightning_0_60),
+        _legendItem("lightning-1-5", context.i18n.lightning_1_5),
+        _legendItem("lightning-1-10", context.i18n.lightning_1_10),
+        _legendItem("lightning-1-30", context.i18n.lightning_1_30),
+        _legendItem("lightning-1-60", context.i18n.lightning_1_60),
+        _legendItem("lightning-0-5", context.i18n.lightning_0_5),
+        _legendItem("lightning-0-10", context.i18n.lightning_0_10),
+        _legendItem("lightning-0-30", context.i18n.lightning_0_30),
+        _legendItem("lightning-0-60", context.i18n.lightning_0_60),
       ],
     );
   }
