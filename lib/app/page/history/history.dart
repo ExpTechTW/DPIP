@@ -180,7 +180,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 
                               final item = TimeLineTile(
                                 time: current.time.send,
-                                icon: Icon(ListIcons.getListIcon(current.type)),
+                                icon: Icon(ListIcons.getListIcon(current.icon)),
                                 height: 100,
                                 first: i == 0,
                                 showDate: showDate,
