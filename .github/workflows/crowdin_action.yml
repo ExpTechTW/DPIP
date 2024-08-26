@@ -2,7 +2,7 @@ name: Crowdin Action
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main,l10n ]
 
 jobs:
   crowdinup:
