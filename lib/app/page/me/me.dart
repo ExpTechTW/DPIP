@@ -228,13 +228,6 @@ class _MePageState extends State<MePage> {
                       },
                     ),
                     ActionChip(
-                      avatar: const Icon(Symbols.pulse_alert, fill: 1),
-                      label: Text(context.i18n.server_status),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://status.exptech.dev"));
-                      },
-                    ),
-                    ActionChip(
                       avatar: const Icon(Symbols.book_rounded, fill: 1),
                       label: Text(context.i18n.third_party_libraries),
                       onPressed: () {
