@@ -349,7 +349,6 @@ class _TemperatureMapState extends State<TemperatureMap> {
                 await _addUserLocationMarker();
 
                 setState(() {});
-                print("Selected time: $time");
               },
             ),
           ),

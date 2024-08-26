@@ -334,7 +334,6 @@ class _HumidityMapState extends State<HumidityMap> {
                 await addHumidityCircles(humidityDataList);
                 await _addUserLocationMarker();
                 setState(() {});
-                print("Selected time: $time");
               },
             ),
           ),
