@@ -131,7 +131,7 @@ Future<void> androidForegroundService() async {
       onStart: onStart,
       autoStart: true,
       isForegroundMode: true,
-      foregroundServiceType: AndroidForegroundType.location,
+      foregroundServiceTypes: [AndroidForegroundType.location],
       notificationChannelId: "my_foreground",
       initialNotificationTitle: "DPIP",
       initialNotificationContent: "前景服務啟動中...",
@@ -171,6 +171,22 @@ void onStart(ServiceInstance service) async {
   });
 
   if (service is AndroidServiceInstance) {
+    await service.setAsForegroundService();
+
+    await flutterLocalNotificationsPlugin.show(
+      888,
+      "DPIP",
+      "前景服務啟動中...",
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "my_foreground",
+          "前景自動定位",
+          icon: "@mipmap/ic_launcher",
+          ongoing: true,
+        ),
+      ),
+    );
+
     service.setAutoStartOnBootMode(true);
 
     service.on("setAsForeground").listen((event) {
