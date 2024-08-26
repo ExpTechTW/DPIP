@@ -74,7 +74,7 @@ class _MePageState extends State<MePage> {
         ),
         ListTile(
           leading: const Icon(Symbols.notification_add_rounded),
-          title: const Text("通知發送紀錄"),
+          title: Text(context.i18n.notification_log),
           onTap: () {
             Navigator.push(
               context,
@@ -84,7 +84,7 @@ class _MePageState extends State<MePage> {
         ),
         ListTile(
           leading: const Icon(Symbols.dns_rounded),
-          title: const Text("伺服器狀態"),
+          title: Text(context.i18n.server_status),
           onTap: () {
             Navigator.push(
               context,
@@ -105,7 +105,7 @@ class _MePageState extends State<MePage> {
         ListTileGroupHeader(title: context.i18n.me_debug),
         ListTile(
           leading: const Icon(Symbols.bug_report),
-          title: Text("App 日誌"),
+          title: Text(context.i18n.app_logs),
           onTap: () {
             Navigator.push(
               context,
@@ -130,8 +130,8 @@ class _MePageState extends State<MePage> {
               );
             } else {
               context.scaffoldMessenger.showSnackBar(
-                const SnackBar(
-                  content: Text("複製 FCM Token 時發生錯誤"),
+                SnackBar(
+                  content: Text(context.i18n.copy_fcm_token_error),
                 ),
               );
             }
