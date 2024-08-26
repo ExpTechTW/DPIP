@@ -381,7 +381,7 @@
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
-  "torrential_rain_alert_sound": "호우 특보",
+  "torrential_rain_alert_sound": "집중 호우 특보",
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
