@@ -164,13 +164,13 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
       if (!mounted) return;
 
-      await controller.addLayer(
-        "waves-geojson",
-        "waves",
-        LineLayerProperties(
-          lineColor: context.colors.outline.toHexStringRGB(),
-        ),
-      );
+      // await controller.addLayer(
+      //   "waves-geojson",
+      //   "waves",
+      //   LineLayerProperties(
+      //     lineColor: context.colors.outline.toHexStringRGB(),
+      //   ),
+      // );
 
       await loadIntensityImage(controller, isDark);
       await loadCrossImage(controller);
