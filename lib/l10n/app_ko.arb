@@ -774,11 +774,11 @@
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：降雪伴雷"
   },
-  "more": "더 보기",
+  "more": "더보기",
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "기능 목록 더 보기",
+  "more_features": "더 많은 기능",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
@@ -802,11 +802,11 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整的 DPIP 的進階功能",
+  "advanced_features_title": "고급",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
-  "enable_monitor": "지진 모니터링 활성화",
+  "enable_monitor": "강진 모니터링 활성화",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
@@ -814,11 +814,11 @@
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_warning": "쓰나미 경고",
+  "tsunami_warning": "쓰나미 경보",
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "{id}번 {serial}번째 보고",
+  "tsunami_number": "ID{id} 제{serial}보",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -831,11 +831,11 @@
       }
     }
   },
-  "tsunami_publish": "풀어 주다",
+  "tsunami_publish": "발표됨",
   "@tsunami_publish": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發布"
   },
-  "tsunami_renew": "업데이트",
+  "tsunami_renew": "갱신",
   "@tsunami_renew": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 更新"
   },
@@ -851,7 +851,7 @@
   "@observing_tsunamis": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   },
-  "occurrence_time": "발생 시간",
+  "occurrence_time": "발생 시각",
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
@@ -928,59 +928,59 @@
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+  "dpip_description": "DPIP는 TREM-Net(대만의 실시간 지진 관측 네트워크) 정보 및 중앙 기상청 자료를 통합하여 통합, 단일 및 편리한 방재 정보 응용 프로그램을 제공하는 대만 현지 팀이 설계한 앱입니다.",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
-  "next_step": "下一步",
+  "next_step": "다음 단계",
   "@next_step": {
     "description": "「歡迎」頁面 → 下一步"
   },
-  "who_we_are": "我們是誰？",
+  "who_we_are": "저희에 관하여",
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+  "exptech_studio_description": "ExpTech Studio는 대부분 학생으로 구성된 팀으로, 평균 연령이 20세 이하이며, 15명 이상의 인원이 참여하고 있습니다. 멤버들은 대만 북부, 중부, 남부, 일본, 한국, 중국의 학생들로 구성되어 있습니다.",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "우리의 목표",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+  "founding_mission": "설립 초기의 목적은 컴퓨터와 기술에 관심과 능력이 있는 학생들을 모집하는 것이었으며, 이후에는 학교 밖으로 발전하여 현재의 모습으로 발전하였습니다.",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
-  "notice": "注意事項",
+  "notice": "주의사항",
   "@notice": {
     "description": "注意事項"
   },
-  "notice_details": "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+  "notice_details": "DPIP는 ExpTech 및 대만 기상청으로부터 다양한 정보를 전달하므로, 다음 사항의 유의하여 사용하십시오.",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "任何資訊應以中央氣象署發布之內容為準。",
+  "official_info": "모든 정보는 대만 기상청에서 발표한 내용을 기준으로 합니다.",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
-  "information_reliability": "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。",
+  "information_reliability": "네트워크 상태, 서버 상태, 애플리케이션 상태, 상위 데이터 소스 상태 등 여러 요인에 따라 정보를 수신되지 않을 가능성이 있으며, 이를 방지하기 위해 최선을 다하겠지만 발생하지 않을 것이라고 보장하지는 않습니다.",
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強烈搖晃有機率比通知早抵達使用者所在地。",
+  "strong_shake_warning": "강한 진동이 알림보다 사용자 위치에 먼저 도착할 가능성이 있습니다.",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。",
+  "earthquake_alert_warning": "지진 속보는 빠른 계산 결과로, 상당한 오차가 있을 수 있으니 이해하고 신중히 사용해 주세요.",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。",
+  "legal_risks": "공식적으로 인정되지 않은 모든 행위는 법적 위험을 부담할 수 있으므로 관련 규범을 준수해야 합니다.",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
-  "permission": "권한 부여",
+  "permission": "권한",
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
@@ -992,7 +992,7 @@
   "@required_info_permissions": {
     "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
-  "notification": "통지하다",
+  "notification": "알림",
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
@@ -1008,15 +1008,15 @@
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
-  "disagree": "맞지 않다",
+  "disagree": "동의하지 않음",
   "@disagree": {
     "description": "「歡迎」頁面 → 不同意"
   },
-  "agree": "동의하다",
+  "agree": "동의",
   "@agree": {
     "description": "「歡迎」頁面 → 同意"
   },
-  "trem_service_description": "DPIP 에서 ExpTech 의 TREM 강진 모니터링 서비스를 확인할 수 있습니다. 아래 조건을 자세히 읽고 활성화 여부를 선택하세요.",
+  "trem_service_description": "DPIP 에서 ExpTech의 TREM 강진 모니터링 서비스를 확인할 수 있습니다. 아래 조건을 자세히 읽고 활성화 여부를 선택하세요.",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
@@ -1036,7 +1036,7 @@
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022년 6월 초부터 대만 전역에 지진계를 배치하기 시작했습니다. TREM-Net(대만 즉시 지진 모니터링 네트워크)은 SE-Net(강진 관측 네트워크 '가속도계')과 MS-Net(미세 진동 관측 네트워크 '속도계')의 두 개의 관측 네트워크로 구성되어 있으며, 지진 발생 시 다양한 데이터를 기록합니다.",
+  "trem_net_deployment": "2022년 6월 초부터 대만 전역에 지진계를 배치하기 시작했습니다. TREM-Net(TREM 지진관측망)은 SE-Net(강진 관측망 '가속도계')과 MS-Net(미세 진동 관측망 '속도계')의 두 개의 관측 네트워크로 구성되어 있으며, 지진 발생 시 다양한 데이터를 기록합니다.",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
@@ -1044,7 +1044,7 @@
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
-  "update_to_latest_version": "최신 버전으로 업데이트하여 최상의 경험을 누리세요",
+  "update_to_latest_version": "최상의 경험을 위해 최신 버전으로 업데이트하기",
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
@@ -1060,7 +1060,7 @@
   "@update_now": {
     "description": "「發現新版本」頁面 → 立即更新"
   },
-  "skip_for_now": "지금은 건너뛰세요",
+  "skip_for_now": "지금은 건너뛰기",
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
@@ -1084,7 +1084,7 @@
   "@announcement": {
     "description": "公告"
   },
-  "new_announcement_prompt": "새로운 알림이 있습니다. 확인하러 가시겠습니까?",
+  "new_announcement_prompt": "새로운 공지가 있습니다. 확인하러 가시겠습니까?",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
@@ -1096,7 +1096,7 @@
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "내부 베타 버전",
+  "beta_version": "비공개 베타 버전",
   "@beta_version": {
     "description": "應用程式的內部測試版本"
   },
@@ -1108,7 +1108,7 @@
   "@no_changelog": {
     "description": "當前沒有任何更新日誌"
   },
-  "announcement_details": "공지 사항 상세",
+  "announcement_details": "구체적인 공지 사항",
   "@announcement_details": {
     "description": "「公告」 → 查看公告的具體內容"
   },
@@ -1152,11 +1152,11 @@
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "더 나은 자동 위치 추적 경험을 위해, DPIP가 백그라운드에서 자동으로 위치 정보를 설정할 수 있도록 '무제한' 권한을 부여해야 합니다.",
+  "auto_location_experience_info": "더 나은 자동 위치 추적 경험을 위해, DPIP가 백그라운드에서 자동으로 위치 정보를 설정할 수 있도록 '위치' 권한을 항상 허용해야 합니다.",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "더 나은 DPIP 경험을 위해, DPIP가 백그라운드에서 정상적으로 경고 알림을 수신할 수 있도록 '무제한' 권한을 부여해야 합니다.",
+  "unlimited_permission_experience_info": "더 나은 DPIP 경험을 위해, DPIP가 백그라운드에서 정상적으로 경고 알림을 수신할 수 있도록 '제한 없음' 권한을 부여해야 합니다.",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -1180,7 +1180,7 @@
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
-  "location_setting_required": "DPIP는 위치 설정이 필요합니다. '설정'을 클릭하여 위치를 설정한 후 다시 시도해 주세요.",
+  "location_setting_required": "DPIP는 위치 설정이 필요합니다. '설정으로 이동'을 클릭하여 위치를 설정한 후 다시 시도해 주세요.",
   "@location_setting_required": {
     "description": "提示用戶需要設定所在地才能正常運作的訊息"
   },
