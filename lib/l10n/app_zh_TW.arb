@@ -802,7 +802,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整的 DPIP 的進階功能",
+  "advanced_features_title": "調整 DPIP 的進階功能",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
