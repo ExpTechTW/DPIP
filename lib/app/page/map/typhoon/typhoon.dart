@@ -287,6 +287,12 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [

@@ -263,6 +263,12 @@ class _HumidityMapState extends State<HumidityMap> {
   }
 
   @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [

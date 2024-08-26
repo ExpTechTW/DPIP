@@ -318,6 +318,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   @override
   void dispose() {
     _blinkTimer?.cancel();
+    _mapController.dispose();
     super.dispose();
   }
 

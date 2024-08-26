@@ -139,6 +139,7 @@ class _RadarMapState extends State<RadarMap> {
   @override
   void dispose() {
     RadarMap.clearActiveCallback();
+    _mapController.dispose();
     super.dispose();
   }
 

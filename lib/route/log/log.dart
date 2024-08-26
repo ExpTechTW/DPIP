@@ -1,8 +1,7 @@
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/log.dart';
 import 'package:flutter/material.dart';
 import 'package:talker_flutter/talker_flutter.dart';
-
-import 'package:dpip/util/log.dart';
 
 class LogViewerPage extends StatelessWidget {
   const LogViewerPage({super.key});
