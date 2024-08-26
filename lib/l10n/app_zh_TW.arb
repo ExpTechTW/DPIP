@@ -1383,17 +1383,5 @@
         "type": "String"
       }
     }
-  },
-  "no_data": "無資料",
-  "@no_data": {
-    "description": "狀態：無資料"
-  },
-  "no_data": "無資料",
-  "@no_data": {
-    "description": "狀態：無資料"
-  },
-  "no_data": "無資料",
-  "@no_data": {
-    "description": "狀態：無資料"
   }
 }
