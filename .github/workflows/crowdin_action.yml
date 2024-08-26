@@ -23,7 +23,7 @@ jobs:
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
   crowdin:
     needs: crowdinup
-    name: Synchronize with Crowdin
+    name: Synchronize with Crowdin (${{ matrix.language.lc }})
     runs-on: ubuntu-latest
 
     strategy:
