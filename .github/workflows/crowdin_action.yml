@@ -50,8 +50,7 @@ jobs:
           commit_message: New Crowdin translations - ${{ matrix.language.ln }}
           localization_branch_name: l10n_main_${{ matrix.language.lc }}
           download_language: ${{ matrix.language.lc }}
-          download_translations_args: -b main --preserve-hierarchy
-          skip_ref_checkout: true
+          download_translations_args: -b main --preserve-hierarchyｓ
 
           create_pull_request: true
           pull_request_title: New translations - ${{ matrix.language.ln }}
