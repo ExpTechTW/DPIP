@@ -317,7 +317,7 @@
   "@sound_test_description": {
     "description": "「我」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "Earthquake Early Warning (Alert)",
+  "eew_alert_sound": "Earthquake Early Warning （Alert）",
   "@eew_alert_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
