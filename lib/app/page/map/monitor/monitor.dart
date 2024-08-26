@@ -974,6 +974,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
     MonitorPage.clearActiveCallback();
+    _mapController.dispose();
     super.dispose();
   }
 
