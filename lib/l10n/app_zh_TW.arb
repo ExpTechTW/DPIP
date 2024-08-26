@@ -1312,9 +1312,9 @@
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
-  "no_data_available": "沒有可用的數據",
+  "no_data_available": "沒有可用的資料",
   "@no_data_available": {
-    "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的數據"
+    "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的資料"
   },
   "server_status_overview": "此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。",
   "@server_status_overview": {
