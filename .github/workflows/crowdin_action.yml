@@ -26,9 +26,17 @@ jobs:
           download_translations: true
           commit_message: New Crowdin translations - ${{ matrix.lc }}
           localization_branch_name: l10n_main_${{ matrix.lc }}
-          pull_request_base_branch_name: 'main'
-          pull_request_title: New translations - ${{ matrix.lc }}
           download_language: ${{ matrix.lc }}
+
+          create_pull_request: true
+          pull_request_title: New translations - ${{ matrix.lc }}
+          pull_request_body: New Crowdin pull request with - ${{ matrix.lc }}
+          pull_request_base_branch_name: 'main'
+
+          pull_request_labels: 'enhancement, good first issue'
+          pull_request_assignees: 'crowdin-bot'
+          pull_request_reviewers: 'crowdin-user-reviewer'
+          pull_request_team_reviewers: 'crowdin-team-reviewer'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
