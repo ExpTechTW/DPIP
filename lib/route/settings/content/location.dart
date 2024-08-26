@@ -79,7 +79,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             icon: const Icon(Symbols.error),
             title: Text(context.i18n.unable_notification),
             content: Text(
-              "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「通知」權限後再試一次。" : ""}",
+              "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? context.i18n.please_allow_notification_permission : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
@@ -129,7 +129,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             icon: const Icon(Symbols.error),
             title: Text(context.i18n.unable_location),
             content: Text(
-              "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? "請您到應用程式設定中找到並允許「位置」權限後再試一次。" : ""}",
+              "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? context.i18n.please_allow_location_permission : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
@@ -458,7 +458,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "自動定位功能需要將位置權限提升至「${(Platform.isAndroid) ? "一律允許" : "永遠"}」以在背景使用。",
+                        "自動定位功能需要將位置權限提升至「${(Platform.isAndroid) ? context.i18n.always_allow : context.i18n.always}」以在背景使用。",
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),

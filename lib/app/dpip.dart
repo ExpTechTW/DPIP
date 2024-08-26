@@ -144,12 +144,12 @@ class _DpipState extends State<Dpip> {
           onWillPop: () async => false,
           child: AlertDialog(
             icon: const Icon(Symbols.signal_disconnected_rounded),
-            title: const Text("異常"),
-            content: const Text("網路連線或伺服器異常。"),
+            title: Text(context.i18n.abnormal),
+            content: Text(context.i18n.network_or_server_error),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: const Text("重試"),
+                child: Text(context.i18n.retry),
                 onPressed: () {
                   Navigator.pop(context);
                   _restartApp();
