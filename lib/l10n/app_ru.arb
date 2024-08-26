@@ -13,7 +13,7 @@
   "@time_format": {
     "description": "時間顯示格式"
   },
-  "home": "首頁",
+  "home": "Главная",
   "@home": {
     "description": "「首頁」頁面標題"
   },
@@ -25,7 +25,7 @@
   "@report": {
     "description": "「地震報告」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
-  "map": "地圖",
+  "map": "Карта",
   "@map": {
     "description": "「地圖」頁面標題"
   },
@@ -33,7 +33,7 @@
   "@me": {
     "description": "「我」頁面標題"
   },
-  "settings": "設定",
+  "settings": "Настройки",
   "@settings": {
     "description": "「設定」頁面標題"
   },
