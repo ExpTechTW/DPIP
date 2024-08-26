@@ -296,7 +296,7 @@
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "me_version": "Phiên bản\nDo ExpTech sản xuất\nNguồn: Cơ quan thời tiết trung ương (CWA)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -662,7 +662,7 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "偶爾有雨",
+  "moderate_rain_at_times": "Thỉnh thoảng có mưa",
   "@moderate_rain_at_times": {
     "description": "天氣狀況：偶爾有雨"
   },
@@ -670,7 +670,7 @@
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
-  "heavy_rain_at_times": "偶爾有大雨",
+  "heavy_rain_at_times": "Thỉnh thoảng có mưa lớn",
   "@heavy_rain_at_times": {
     "description": "天氣狀況：偶爾有大雨"
   },
@@ -686,7 +686,7 @@
   "@moderate_or_heavy_freezing_rain": {
     "description": "天氣狀況：中度或大凍雨"
   },
-  "light_sleet": "微雨夾雪",
+  "light_sleet": "Mưa nhẹ và tuyết",
   "@light_sleet": {
     "description": "天氣狀況：微雨夾雪"
   },
@@ -944,7 +944,7 @@
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "Chúng tôi đã bắt đầu với những gì",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
@@ -1004,7 +1004,7 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
+  "data_visualization_storage": "Để lưu trữ hình ảnh trực quan dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) hoặc ExpTech.",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
@@ -1196,19 +1196,19 @@
   "@app_logs": {
     "description": "「我」路徑 → App 日誌"
   },
-  "copy_fcm_token_error": "複製 FCM Token 時發生錯誤",
+  "copy_fcm_token_error": "Đã xảy ra lỗi khi sao chép Mã thông báo FCM",
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "provide_services": "提供服務",
+  "provide_services": "Cung cấp dịch vụ",
   "@provide_services": {
     "description": "描述應用程式提供服務的功能"
   },
-  "estimated_intensity_legend": "預估震度圖例",
+  "estimated_intensity_legend": "Chú giải cường độ ước tính",
   "@estimated_intensity_legend": {
     "description": "描述預估震度的圖例"
   },
-  "only_used_during_earthquake_alerts": "僅用於地震速報時",
+  "only_used_during_earthquake_alerts": "Chỉ được sử dụng trong cảnh báo động đất",
   "@only_used_during_earthquake_alerts": {
     "description": "此項目僅在地震速報時使用"
   },
@@ -1228,127 +1228,127 @@
   "@strong_6": {
     "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6強"
   },
-  "lightning_1_5": "5 分鐘內對地閃電",
+  "lightning_1_5": "Trong vòng 5 phút sét đánh xuống đất",
   "@lightning_1_5": {
     "description": "5 分鐘內發生的對地閃電"
   },
-  "lightning_1_10": "10 分鐘內對地閃電",
+  "lightning_1_10": "Trong vòng 10 phút sét đánh xuống đất",
   "@lightning_1_10": {
     "description": "10 分鐘內發生的對地閃電"
   },
-  "lightning_1_30": "30 分鐘內對地閃電",
+  "lightning_1_30": "Trong vòng 30 phút sét đánh xuống đất",
   "@lightning_1_30": {
     "description": "30 分鐘內發生的對地閃電"
   },
-  "lightning_1_60": "60 分鐘內對地閃電",
+  "lightning_1_60": "Trong vòng 60 phút sét đánh xuống đất",
   "@lightning_1_60": {
     "description": "60 分鐘內發生的對地閃電"
   },
-  "lightning_0_5": "5 分鐘內雲間閃電",
+  "lightning_0_5": "Trong vòng 5 phút tia chớp trên mây",
   "@lightning_0_5": {
     "description": "5 分鐘內發生的雲間閃電"
   },
-  "lightning_0_10": "10 分鐘內雲間閃電",
+  "lightning_0_10": "Trong vòng 10 phút tia chớp trên mây",
   "@lightning_0_10": {
     "description": "10 分鐘內發生的雲間閃電"
   },
-  "lightning_0_30": "30 分鐘內雲間閃電",
+  "lightning_0_30": "Trong vòng 30 phút tia chớp trên mây",
   "@lightning_0_30": {
     "description": "30 分鐘內發生的雲間閃電"
   },
-  "lightning_0_60": "60 分鐘內雲間閃電",
+  "lightning_0_60": "Trong vòng 60 phút tia chớp trên mây",
   "@lightning_0_60": {
     "description": "60 分鐘內發生的雲間閃電"
   },
-  "abnormal": "異常",
+  "abnormal": "Bất thường",
   "@abnormal": {
     "description": "狀態：異常"
   },
-  "network_or_server_error": "網路連線或伺服器異常。",
+  "network_or_server_error": "Kết nối mạng hoặc máy chủ có vấn đề.",
   "@network_or_server_error": {
     "description": "網路連線或伺服器異常。"
   },
-  "retry": "重試",
+  "retry": "Thử lại",
   "@retry": {
     "description": "重試"
   },
-  "photo_media_permission_request": "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。",
+  "photo_media_permission_request": "Vui lòng vào Cài đặt ứng dụng để tìm và cấp quyền “Ảnh và phương tiện” rồi thử lại.",
   "@photo_media_permission_request": {
     "description": "「地震報告」路徑 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
-  "no_notification_history": "沒有通知紀錄",
+  "no_notification_history": "Không có lịch sử thông báo",
   "@no_notification_history": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 沒有通知紀錄"
   },
-  "emergency": "緊急",
+  "emergency": "Khẩn cấp",
   "@emergency": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急"
   },
-  "notification_details": "通知詳細資訊",
+  "notification_details": "Chi tiết thông báo",
   "@notification_details": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知詳細資訊"
   },
-  "notification_area": "通知發送區域",
+  "notification_area": "Thông báo khu vực gửi",
   "@notification_area": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知發送區域"
   },
-  "emergency_notification": "緊急通知",
+  "emergency_notification": "Thông báo khẩn cấp",
   "@emergency_notification": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急通知"
   },
-  "general_notification": "一般通知",
+  "general_notification": "Thông cáo chung",
   "@general_notification": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 一般通知"
   },
-  "sea": "海",
+  "sea": "Biển",
   "@sea": {
     "description": "海"
   },
-  "please_allow_notification_permission": "請您到應用程式設定中找到並允許「通知」權限後再試一次。",
+  "please_allow_notification_permission": "Vui lòng vào Cài đặt ứng dụng để tìm và cấp quyền “Thông báo” rồi thử lại.",
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
-  "please_allow_location_permission": "請您到應用程式設定中找到並允許「位置」權限後再試一次。",
+  "please_allow_location_permission": "Vui lòng vào Cài đặt ứng dụng để tìm và cấp quyền “Vị trí” rồi thử lại.",
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
-  "no_data_available": "沒有可用的資料",
+  "no_data_available": "Không có dữ liệu có sẵn",
   "@no_data_available": {
     "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的資料"
   },
-  "server_status_overview": "此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。",
+  "server_status_overview": "Trang này trình bày tổng quan về trạng thái của máy chủ tại nhiều thời điểm khác nhau. Dữ liệu thô được cập nhật sau mỗi 5 giây và phiên bản cô đọng được hiển thị tại đây để tối ưu hóa việc sử dụng mạng. Xin lưu ý rằng thông tin này chỉ mang tính tham khảo và trạng thái thực tế phải dựa trên thông báo.",
   "@server_status_overview": {
     "description": "「設定」路徑 → 「伺服器狀態」→ 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
   },
-  "all_normal": "全部正常",
+  "all_normal": "Tất cả đều bình thường",
   "@all_normal": {
     "description": "伺服器狀態：全部正常"
   },
-  "all_abnormal": "全部異常",
+  "all_abnormal": "Tất cả đều bất thường",
   "@all_abnormal": {
     "description": "伺服器狀態：全部異常"
   },
-  "partially_abnormal": "部分異常",
+  "partially_abnormal": "Sự bất thường một phần",
   "@partially_abnormal": {
     "description": "伺服器狀態：部分異常"
   },
-  "normal": "正常",
+  "normal": "Bình thường",
   "@normal": {
     "description": "狀態：正常"
   },
-  "unstable": "不穩定",
+  "unstable": "Không ổn định",
   "@unstable": {
     "description": "狀態：不穩定"
   },
-  "no_data": "無資料",
+  "no_data": "Không có dữ liệu",
   "@no_data": {
     "description": "狀態：無資料"
   },
-  "automatic_foreground_positioning": "前景自動定位",
+  "automatic_foreground_positioning": "Tự động định vị tiền cảnh",
   "@automatic_foreground_positioning": {
     "description": "前景自動定位"
   },
-  "south_latitude": "南緯 {lat_abs} 度",
+  "south_latitude": "Vĩ độ nam {lat_abs}",
   "@south_latitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 南緯 {lat_abs} 度",
     "placeholders": {
@@ -1357,7 +1357,7 @@
       }
     }
   },
-  "north_latitude": "北緯 {lat} 度",
+  "north_latitude": "Vĩ độ bắc {lat}",
   "@north_latitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 北緯 {lat} 度",
     "placeholders": {
@@ -1366,7 +1366,7 @@
       }
     }
   },
-  "west_longitude": "西經 {lon_abs} 度",
+  "west_longitude": "Kinh độ tây {lon_abs}",
   "@west_longitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 西經 {lon_abs} 度",
     "placeholders": {
@@ -1375,7 +1375,7 @@
       }
     }
   },
-  "east_longitude": "東經 {lon} 度",
+  "east_longitude": "Kinh độ đông {lon}",
   "@east_longitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
     "placeholders": {
