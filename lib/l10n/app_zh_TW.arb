@@ -916,9 +916,9 @@
   "@interval_10_minutes": {
     "description": "10分鐘"
   },
-  "interval_now": "現在",
+  "interval_now": "今日",
   "@interval_now": {
-    "description": "現在"
+    "description": "今日"
   },
   "welcome_message": "歡迎使用 DPIP",
   "@welcome_message": {
