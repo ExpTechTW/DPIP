@@ -11,6 +11,7 @@ import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/location/location.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/util/log.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter_background_service/flutter_background_service.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
@@ -166,7 +167,7 @@ void onStart(ServiceInstance service) async {
       service.setAutoStartOnBootMode(false);
     }
     service.stopSelf();
-    print("background process is now stopped");
+    TalkerManager.instance.warning("background process is now stopped");
   });
 
   if (service is AndroidServiceInstance) {
@@ -196,7 +197,7 @@ void onStart(ServiceInstance service) async {
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
-          print(body);
+          TalkerManager.instance.debug(body);
         }
 
         String notifyTitle = "自動定位中";

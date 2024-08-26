@@ -343,8 +343,6 @@ class _RadarMapState extends State<RadarMap> {
                     belowLayerId: "county-outline");
 
                 _addUserLocationMarker();
-
-                print("Selected time: $time");
               },
             ),
           ),

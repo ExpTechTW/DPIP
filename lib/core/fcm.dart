@@ -1,8 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/util/log.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
@@ -20,12 +20,11 @@ Future<void> onFcmTokenHandle(String token) async {
 }
 
 Future<void> onNativeTokenHandle(String token) async {
-  debugPrint('FCM Token:"$token"');
+  TalkerManager.instance.info('FCM Token:"$token"');
   Global.preference.setString("fcm-token", token);
 }
 
 Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
-  print("Silent data received: ${silentData.data}");
   Map<String, dynamic> data = silentData.data!.cast<String, dynamic>();
 
   if (silentData.createdLifeCycle == NotificationLifeCycle.AppKilled) {
@@ -45,7 +44,6 @@ Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
 }
 
 Future<void> showNotify(Map<String, dynamic> data) async {
-  print(data);
   String channelKey = data['channel'] ?? 'other';
 
   await AwesomeNotifications().createNotification(

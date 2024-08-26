@@ -9,6 +9,7 @@ import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/color_scheme.dart";
 import "package:dpip/util/geojson.dart";
 import "package:dpip/util/intensity_color.dart";
+import "package:dpip/util/log.dart";
 import "package:dpip/util/map_utils.dart";
 import "package:dpip/widget/map/map.dart";
 import "package:flutter/material.dart";
@@ -247,7 +248,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         isLoaded = true;
       });
     } catch (e) {
-      print(e);
+      TalkerManager.instance.error(e);
       setState(() => isLoading = false);
     }
   }

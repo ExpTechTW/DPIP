@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/route/welcome/pages/tos.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/log.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
       await _checkNotificationPermission();
     } catch (e) {
-      print('Error initializing permissions: $e');
+      TalkerManager.instance.error('Error initializing permissions: $e');
     }
 
     return permissions;

@@ -373,7 +373,6 @@ class _WindMapState extends State<WindMap> {
                 await addDynamicWindArrows(windDataList);
                 await _addUserLocationMarker();
                 setState(() {});
-                print("Selected time: $time");
               },
             ),
           ),
