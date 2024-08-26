@@ -20,11 +20,12 @@
 	<string>6.0</string>
 	<key>CFBundleLocalizations</key>
 	<array>
-		<string>zh</string>
 		<string>zh_TW</string>
+		<string>zh</string>
 		<string>ja</string>
 		<string>en</string>
 		<string>ko</string>
+		<string>vi</string>
 	</array>
 	<key>CFBundleName</key>
 	<string>dpip</string>
