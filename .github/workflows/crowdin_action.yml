@@ -44,6 +44,7 @@ jobs:
           commit_message: New Crowdin translations - ${{ matrix.lc }}
           localization_branch_name: l10n_main_${{ matrix.lc }}
           download_language: ${{ matrix.lc }}
+          download_sources_args: -b main --preserve-hierarchy
 
           create_pull_request: true
           pull_request_title: New translations - ${{ matrix.lc }}
