@@ -365,11 +365,11 @@
   "@other_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "Thông tin cảnh báo mưa lớn tức thời",
+  "thunderstorm_instant_messaging_sound": "Thông tin cảnh những mưa lớn kèm theo sấm sét",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "Vị trí hiện tại đã ban hành Thông tin cảnh báo mưa lớn tức thời",
+  "thunderstorm_instant_messaging_description_sound": "Vị trí hiện tại đã ban hành thông tin cảnh mưa lớn kèm theo sấm sét",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -554,7 +554,7 @@
   "@cg_lightning": {
     "description": "「地圖」路徑 → 地圖列表 →「閃電」圖例 → 對地閃電"
   },
-  "cc_lightning": "雲間閃電",
+  "cc_lightning": "Tia chớp trên mây",
   "@cc_lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 「閃電」圖例 → 雲間閃電"
   },
@@ -586,9 +586,9 @@
   "@sunny": {
     "description": "天氣狀況：晴"
   },
-  "partly_cloudy": "多雲時晴",
+  "partly_cloudy": "局部多雲",
   "@partly_cloudy": {
-    "description": "天氣狀況：多雲時晴"
+    "description": "天氣狀況：局部多雲"
   },
   "cloudy": "Nhiều mây",
   "@cloudy": {
@@ -598,33 +598,33 @@
   "@overcast": {
     "description": "天氣狀況：陰"
   },
-  "foggy": "Có sương mù",
+  "foggy": "薄霧",
   "@foggy": {
-    "description": "天氣狀況：霧"
+    "description": "天氣狀況：薄霧"
   },
-  "patchy_rain_possible": "可能有局部降雨",
+  "patchy_rain_possible": "可能有局部小雨",
   "@patchy_rain_possible": {
-    "description": "天氣狀況：可能有局部降雨"
+    "description": "天氣狀況：可能有局部小雨"
   },
-  "patchy_snow_possible": "可能有局部降雪",
+  "patchy_snow_possible": "可能有局部小雪",
   "@patchy_snow_possible": {
-    "description": "天氣狀況：可能有局部降雪"
+    "description": "天氣狀況：可能有局部小雪"
   },
-  "patchy_sleet_possible": "可能有局部雨夾雪",
+  "patchy_sleet_possible": "可能有局部小雨夾雪",
   "@patchy_sleet_possible": {
-    "description": "天氣狀況：可能有局部雨夾雪"
+    "description": "天氣狀況：可能有局部小雨夾雪"
   },
-  "patchy_freezing_drizzle_possible": "可能有局部凍毛毛雨",
+  "patchy_freezing_drizzle_possible": "可能有局部小凍霧雨",
   "@patchy_freezing_drizzle_possible": {
-    "description": "天氣狀況：可能有局部凍毛毛雨"
+    "description": "天氣狀況：可能有局部小凍霧雨"
   },
-  "thundery_outbreaks_possible": "可能有局部雷雨",
+  "thundery_outbreaks_possible": "可能有雷雨",
   "@thundery_outbreaks_possible": {
-    "description": "天氣狀況：可能有局部雷雨"
+    "description": "天氣狀況：可能有雷雨"
   },
-  "blowing_snow": "高吹雪",
+  "blowing_snow": "飛雪",
   "@blowing_snow": {
-    "description": "天氣狀況：高吹雪"
+    "description": "天氣狀況：飛雪"
   },
   "blizzard": "Bão tuyết",
   "@blizzard": {
@@ -634,27 +634,27 @@
   "@fog": {
     "description": "天氣狀況：霧"
   },
-  "freezing_fog": "凍霧",
+  "freezing_fog": "Mưa sương mù",
   "@freezing_fog": {
     "description": "天氣狀況：凍霧"
   },
-  "patchy_light_drizzle": "局部毛毛雨",
+  "patchy_light_drizzle": "局部細雨",
   "@patchy_light_drizzle": {
-    "description": "天氣狀況：局部毛毛雨"
+    "description": "天氣狀況：局部細雨"
   },
-  "light_drizzle": "Mưa phùn",
+  "light_drizzle": "細雨",
   "@light_drizzle": {
-    "description": "天氣狀況：毛毛雨"
+    "description": "天氣狀況：細雨"
   },
-  "freezing_drizzle": "凍毛毛雨",
+  "freezing_drizzle": "凍霧雨",
   "@freezing_drizzle": {
-    "description": "天氣狀況：凍毛毛雨"
+    "description": "天氣狀況：凍霧雨"
   },
-  "heavy_freezing_drizzle": "大凍毛毛雨",
+  "heavy_freezing_drizzle": "大凍霧雨",
   "@heavy_freezing_drizzle": {
-    "description": "天氣狀況：大凍毛毛雨"
+    "description": "天氣狀況：大凍霧雨"
   },
-  "patchy_light_rain": "局部小雨",
+  "patchy_light_rain": "Tuyết rơi mưa nhẹ cục bộ",
   "@patchy_light_rain": {
     "description": "天氣狀況：局部小雨"
   },
@@ -662,47 +662,47 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "間歇降雨",
+  "moderate_rain_at_times": "偶爾有雨",
   "@moderate_rain_at_times": {
-    "description": "天氣狀況：間歇降雨"
+    "description": "天氣狀況：偶爾有雨"
   },
   "moderate_rain": "Mưa",
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
-  "heavy_rain_at_times": "間歇大雨",
+  "heavy_rain_at_times": "偶爾有大雨",
   "@heavy_rain_at_times": {
-    "description": "天氣狀況：間歇大雨"
+    "description": "天氣狀況：偶爾有大雨"
   },
-  "heavy_rain": "大雨",
+  "heavy_rain": "Mưa lớn",
   "@heavy_rain": {
     "description": "天氣狀況：大雨"
   },
-  "light_freezing_rain": "凍雨",
+  "light_freezing_rain": "微凍雨",
   "@light_freezing_rain": {
-    "description": "天氣狀況：凍雨"
+    "description": "天氣狀況：微凍雨"
   },
-  "moderate_or_heavy_freezing_rain": "凍雨",
+  "moderate_or_heavy_freezing_rain": "中度或大凍雨",
   "@moderate_or_heavy_freezing_rain": {
-    "description": "天氣狀況：凍雨"
+    "description": "天氣狀況：中度或大凍雨"
   },
-  "light_sleet": "小雨夾雪",
+  "light_sleet": "微雨夾雪",
   "@light_sleet": {
-    "description": "天氣狀況：小雨夾雪"
+    "description": "天氣狀況：微雨夾雪"
   },
-  "moderate_or_heavy_sleet": "雨夾雪",
+  "moderate_or_heavy_sleet": "中度或大雨夾雪",
   "@moderate_or_heavy_sleet": {
-    "description": "天氣狀況：雨夾雪"
+    "description": "天氣狀況：中度或大雨夾雪"
   },
-  "patchy_light_snow": "局部小雪",
+  "patchy_light_snow": "Tuyết rơi nhẹ cục bộ",
   "@patchy_light_snow": {
-    "description": "天氣狀況：局部小雪"
+    "description": "天氣狀況：零星小雪"
   },
-  "light_snow": "小雪",
+  "light_snow": "tuyết rơi nhẹ",
   "@light_snow": {
     "description": "天氣狀況：小雪"
   },
-  "patchy_moderate_snow": "局部降雪",
+  "patchy_moderate_snow": "Tuyết rơi nhiều cục bộ",
   "@patchy_moderate_snow": {
     "description": "天氣狀況：局部降雪"
   },
@@ -710,69 +710,69 @@
   "@moderate_snow": {
     "description": "天氣狀況：雪"
   },
-  "patchy_heavy_snow": "局部大雪",
+  "patchy_heavy_snow": "Tuyết đang bay cục bộ",
   "@patchy_heavy_snow": {
     "description": "天氣狀況：局部大雪"
   },
-  "heavy_snow": "大雪",
+  "heavy_snow": "Tuyết đang bay",
   "@heavy_snow": {
     "description": "天氣狀況：大雪"
   },
-  "ice_pellets": "冰霰",
+  "ice_pellets": "冰丸",
   "@ice_pellets": {
-    "description": "天氣狀況：冰霰"
+    "description": "天氣狀況：冰丸"
   },
   "light_rain_shower": "Mưa rào nhẹ",
   "@light_rain_shower": {
     "description": "天氣狀況：小陣雨"
   },
-  "moderate_or_heavy_rain_shower": "Mưa rào",
+  "moderate_or_heavy_rain_shower": "中度或大陣雨",
   "@moderate_or_heavy_rain_shower": {
-    "description": "天氣狀況：陣雨"
+    "description": "天氣狀況：中度或大陣雨"
   },
-  "torrential_rain_shower": "Mưa nặng hạt",
+  "torrential_rain_shower": "暴雨",
   "@torrential_rain_shower": {
-    "description": "天氣狀況：大陣雨"
+    "description": "天氣狀況：暴雨"
   },
-  "light_sleet_showers": "小陣雨夾雪",
+  "light_sleet_showers": "小冰雹雨",
   "@light_sleet_showers": {
-    "description": "天氣狀況：小陣雨夾雪"
+    "description": "天氣狀況：小冰雹雨"
   },
-  "moderate_or_heavy_sleet_showers": "陣雨夾雪",
+  "moderate_or_heavy_sleet_showers": "中度或大冰雹雨",
   "@moderate_or_heavy_sleet_showers": {
-    "description": "天氣狀況：陣雨夾雪"
+    "description": "天氣狀況：中度或大冰雹雨"
   },
   "light_snow_showers": "Mưa tuyết nhẹ",
   "@light_snow_showers": {
     "description": "天氣狀況：小陣雪"
   },
-  "moderate_or_heavy_snow_showers": "陣雪",
+  "moderate_or_heavy_snow_showers": "中度或大陣雪",
   "@moderate_or_heavy_snow_showers": {
-    "description": "天氣狀況：陣雪"
+    "description": "天氣狀況：中度或大陣雪"
   },
-  "light_showers_of_ice_pellets": "小陣雨伴隨冰霰",
+  "light_showers_of_ice_pellets": "冰丸小雨",
   "@light_showers_of_ice_pellets": {
-    "description": "天氣狀況：小陣雨伴隨冰霰"
+    "description": "天氣狀況：冰丸小雨"
   },
-  "moderate_or_heavy_showers_of_ice_pellets": "陣雨伴隨冰霰",
+  "moderate_or_heavy_showers_of_ice_pellets": "中度或大冰丸",
   "@moderate_or_heavy_showers_of_ice_pellets": {
-    "description": "天氣狀況：陣雨伴隨冰霰"
+    "description": "天氣狀況：中度或大冰丸"
   },
-  "patchy_light_rain_with_thunder": "局部小雷雨",
+  "patchy_light_rain_with_thunder": "Mưa nhẹ có sấm sét cục bộ cục bộ",
   "@patchy_light_rain_with_thunder": {
     "description": "天氣狀況：局部小雷雨"
   },
-  "moderate_or_heavy_rain_with_thunder": "Bảo tố có sấm sét",
+  "moderate_or_heavy_rain_with_thunder": "中度或大雷雨",
   "@moderate_or_heavy_rain_with_thunder": {
-    "description": "天氣狀況：雷雨"
+    "description": "天氣狀況：中度或大雷雨"
   },
-  "patchy_light_snow_with_thunder": "局部小雪伴雷",
+  "patchy_light_snow_with_thunder": "Tuyết rơi nhẹ và có sấm cục bộ",
   "@patchy_light_snow_with_thunder": {
     "description": "天氣狀況：局部小雪伴雷"
   },
-  "moderate_or_heavy_snow_with_thunder": "降雪伴雷",
+  "moderate_or_heavy_snow_with_thunder": "中度或大雪伴雷",
   "@moderate_or_heavy_snow_with_thunder": {
-    "description": "天氣狀況：降雪伴雷"
+    "description": "天氣狀況：中度或大雪伴雷"
   },
   "more": "Thêm",
   "@more": {
@@ -782,7 +782,7 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_generally": "一般",
+  "me_generally": "Nói chung",
   "@me_generally": {
     "description": "「我」路徑 → 一般"
   },
@@ -802,7 +802,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整的 DPIP 的進階功能",
+  "advanced_features_title": "調整 DPIP 的進階功能",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
@@ -818,7 +818,7 @@
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "{id}號 第{serial}報",
+  "tsunami_number": "Số {id}, Báo cáo số {serial}",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -916,9 +916,9 @@
   "@interval_10_minutes": {
     "description": "10分鐘"
   },
-  "interval_now": "Hiện nay",
+  "interval_now": "今日",
   "@interval_now": {
-    "description": "現在"
+    "description": "今日"
   },
   "welcome_message": "Chào mừng đến với DPIP",
   "@welcome_message": {
@@ -976,7 +976,7 @@
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。",
+  "legal_risks": "Bất kỳ hành vi nào không được chính thức cho phép đều có thể bị coi là vi phạm pháp luật của Trung Hoa Dân Quốc (Đài Loan), vì vậy hãy đảm bảo tuân thủ các quy định có liên quan.",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
@@ -984,11 +984,11 @@
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
+  "privacy_commitment": "Chúng tôi luôn ủng hộ người dùng và nỗ lực không ngừng vì quyền riêng tư của họ.",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
-  "required_info_permissions": "所需的資訊和權限列表：",
+  "required_info_permissions": "Danh sách thông tin và quyền được yêu cầu bởi:",
   "@required_info_permissions": {
     "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
@@ -1004,9 +1004,9 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "Để lưu trữ hình ảnh trực quan dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) hoặc ExpTech.",
+  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
   "@data_visualization_storage": {
-    "description": "「歡迎」頁面 → 用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片"
+    "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
   "disagree": "Không đồng ý",
   "@disagree": {
@@ -1028,11 +1028,11 @@
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。",
+  "trem_monitor_description": "“Strong Earthquake Monitor” được sử dụng trong TREM (Taiwan Real-time Earthquake Monitoring) như một chức năng hiển thị địa chấn thời gian thực để quan sát rung động hiện tại trên khắp Đài Loan. Khi động đất xảy ra, sự lan truyền của sóng địa chấn có thể được quan sát thông qua sự thay đổi màu sắc của các điểm quan sát.",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
-  "station_noise_warning": "由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。",
+  "station_noise_warning": "Do ảnh hưởng của tiếng ồn hàng ngày (ô tô, nhà máy, xây dựng, v.v.), màu sắc của các điểm quan sát cũng có thể thay đổi trong thời gian bình thường. Ngoài ra, vì đây là dữ liệu thời gian thực nên không thể xác định được có trục trặc hay không tại thời điểm này, do đó có thể màu sắc có thể thay đổi do trục trặc của điểm quan sát.",
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
@@ -1044,7 +1044,7 @@
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
-  "update_to_latest_version": "更新至最新版本以獲得最佳體驗",
+  "update_to_latest_version": "Vui lòng cập nhật lên phiên bản mới nhất để có trải nghiệm tốt nhất",
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
@@ -1084,7 +1084,7 @@
   "@announcement": {
     "description": "公告"
   },
-  "new_announcement_prompt": "有新的公告，要前往查看嗎？",
+  "new_announcement_prompt": "Hiện tại có thông báo mới, bạn có muốn xem không?",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
@@ -1100,7 +1100,7 @@
   "@beta_version": {
     "description": "應用程式的內部測試版本"
   },
-  "unable_to_load_changelog": "無法載入更新日誌，請稍後再試。",
+  "unable_to_load_changelog": "Không thể tải nhật ký thay đổi, vui lòng thử lại sau.",
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」→ 無法載入更新日誌，請稍後再試。"
   },
@@ -1187,5 +1187,77 @@
   "go_to_settings": "Cài đặt",
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
+  },
+  "notification_log": "通知發送紀錄",
+  "@notification_log": {
+    "description": "「我」路徑 → 通知發送紀錄"
+  },
+  "app_logs": "App 日誌",
+  "@app_logs": {
+    "description": "「我」路徑 → App 日誌"
+  },
+  "copy_fcm_token_error": "複製 FCM Token 時發生錯誤",
+  "@copy_fcm_token_error": {
+    "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
+  },
+  "provide_services": "提供服務",
+  "@provide_services": {
+    "description": "描述應用程式提供服務的功能"
+  },
+  "estimated_intensity_legend": "預估震度圖例",
+  "@estimated_intensity_legend": {
+    "description": "描述預估震度的圖例"
+  },
+  "only_used_during_earthquake_alerts": "僅用於地震速報時",
+  "@only_used_during_earthquake_alerts": {
+    "description": "此項目僅在地震速報時使用"
+  },
+  "weak_5": "5弱",
+  "@weak_5": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5弱"
+  },
+  "strong_5": "5強",
+  "@strong_5": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5強"
+  },
+  "weak_6": "6弱",
+  "@weak_6": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6弱"
+  },
+  "strong_6": "6強",
+  "@strong_6": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6強"
+  },
+  "lightning_1_5": "5 分鐘內對地閃電",
+  "@lightning_1_5": {
+    "description": "5 分鐘內發生的對地閃電"
+  },
+  "lightning_1_10": "10 分鐘內對地閃電",
+  "@lightning_1_10": {
+    "description": "10 分鐘內發生的對地閃電"
+  },
+  "lightning_1_30": "30 分鐘內對地閃電",
+  "@lightning_1_30": {
+    "description": "30 分鐘內發生的對地閃電"
+  },
+  "lightning_1_60": "60 分鐘內對地閃電",
+  "@lightning_1_60": {
+    "description": "60 分鐘內發生的對地閃電"
+  },
+  "lightning_0_5": "5 分鐘內雲間閃電",
+  "@lightning_0_5": {
+    "description": "5 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_10": "10 分鐘內雲間閃電",
+  "@lightning_0_10": {
+    "description": "10 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_30": "30 分鐘內雲間閃電",
+  "@lightning_0_30": {
+    "description": "30 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_60": "60 分鐘內雲間閃電",
+  "@lightning_0_60": {
+    "description": "60 分鐘內發生的雲間閃電"
   }
 }
