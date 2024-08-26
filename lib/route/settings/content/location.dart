@@ -186,7 +186,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
-                    child: const Text("取消"),
+                    child: Text(context.i18n.cancel),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },

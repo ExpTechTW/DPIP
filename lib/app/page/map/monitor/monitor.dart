@@ -986,12 +986,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   Widget _buildLegend() {
     return MapLegend(
-      label: "預估震度圖例",
+      label: context.i18n.estimated_intensity_legend,
       children: [
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
-        Text("僅用於地震速報時", style: context.theme.textTheme.labelMedium),
+        Text(context.i18n.only_used_during_earthquake_alerts, style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -1014,7 +1014,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["1", "2", "3", "4", "5弱", "5強", "6弱", "6強", "7"];
+    final labels = ["1", "2", "3", "4", context.i18n.weak_5, context.i18n.strong_5, context.i18n.weak_6, context.i18n.strong_6, "7"];
     return SizedBox(
       width: 300,
       child: Row(
