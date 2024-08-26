@@ -2,6 +2,7 @@ import "dart:async";
 import "dart:io";
 
 import "package:dpip/global.dart";
+import "package:dpip/util/log.dart";
 import "package:geocoding/geocoding.dart";
 import "package:geolocator/geolocator.dart";
 
@@ -120,9 +121,9 @@ class LocationService {
       Global.preference.setDouble("user-lat", position.latitude);
       Global.preference.setDouble("user-lon", position.longitude);
       positionchange = true;
-      print("距離: $distance 更新位置");
+      TalkerManager.instance.debug("距離: $distance 更新位置");
     } else {
-      print("距離: $distance 不更新位置");
+      TalkerManager.instance.debug("距離: $distance 不更新位置");
     }
 
     return GetLocationResult(positionlast, positionchange);

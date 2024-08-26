@@ -397,7 +397,6 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     );
     Permission.locationAlways.status.then(
       (value) {
-        print(value);
         setState(() {
           locationAlwaysPermission = value;
         });

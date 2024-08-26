@@ -9,15 +9,15 @@ import 'package:dpip/app/page/more/more.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
+import 'package:dpip/dialog/welcome/announcement.dart';
 import 'package:dpip/dialog/welcome/changelog.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/log.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-import '../dialog/welcome/announcement.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});
@@ -130,7 +130,7 @@ class _DpipState extends State<Dpip> {
         setState(() {});
       }
     } catch (e) {
-      print("Error checking for updates: $e");
+      TalkerManager.instance.error("Error checking for updates: $e");
       await _showErrorDialog();
     }
   }
