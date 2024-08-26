@@ -182,7 +182,7 @@ class _MePageState extends State<MePage> {
                   spacing: 12,
                   children: [
                     ActionChip(
-                      avatar: Icon(Symbols.group_rounded, fill: 1),
+                      avatar: const Icon(Symbols.group_rounded, fill: 1),
                       label: Text(context.i18n.contributor),
                     ),
                     ActionChip(

@@ -303,14 +303,14 @@ class _TsunamiMapState extends State<TsunamiMap> {
       lat = lat - 360;
     }
     if (lat < 0) {
-      latFormat = "南緯 ${lat.abs()} 度";
+      latFormat = context.i18n.south_latitude(lat.abs().toString());
     } else {
-      latFormat = "北緯 $lat 度";
+      latFormat = context.i18n.north_latitude(lat.toString());
     }
     if (lon < 0) {
-      lonFormat = "西經 ${lon.abs()} 度";
+      lonFormat = context.i18n.west_longitude(lon.abs().toString());
     } else {
-      lonFormat = "東經 $lon 度";
+      lonFormat = context.i18n.east_longitude(lon.toString());
     }
     return "$latFormat　$lonFormat";
   }

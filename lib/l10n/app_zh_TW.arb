@@ -1347,6 +1347,53 @@
   "automatic_foreground_positioning": "前景自動定位",
   "@automatic_foreground_positioning": {
     "description": "前景自動定位"
+  },
+  "south_latitude": "南緯 {lat_abs} 度",
+  "@south_latitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 南緯 {lat_abs} 度",
+    "placeholders": {
+      "lat_abs": {
+        "type": "String"
+      }
+    }
+  },
+  "north_latitude": "北緯 {lat} 度",
+  "@north_latitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 北緯 {lat} 度",
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      }
+    }
+  },
+  "west_longitude": "西經 {lon_abs} 度",
+  "@west_longitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 西經 {lon_abs} 度",
+    "placeholders": {
+      "lon_abs": {
+        "type": "String"
+      }
+    }
+  },
+  "east_longitude": "東經 {lon} 度",
+  "@east_longitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
+    "placeholders": {
+      "lon": {
+        "type": "String"
+      }
+    }
+  },
+  "no_data": "無資料",
+  "@no_data": {
+    "description": "狀態：無資料"
+  },
+  "no_data": "無資料",
+  "@no_data": {
+    "description": "狀態：無資料"
+  },
+  "no_data": "無資料",
+  "@no_data": {
+    "description": "狀態：無資料"
   }
-
 }
