@@ -497,11 +497,11 @@
   "@unit_dbz": {
     "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 單位：dBZ"
   },
-  "unit_mm": "單位：毫米 (mm)",
+  "unit_mm": "Unit: Millimeter (mm)",
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
   },
-  "unit_degrees_c": "單位：攝氏度 (°C)",
+  "unit_degrees_c": "Unit: Celsius (°C)",
   "@unit_degrees_c": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 單位：攝氏度 (°C)"
   },
