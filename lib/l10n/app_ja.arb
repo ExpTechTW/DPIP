@@ -1300,10 +1300,6 @@
   "@general_notification": {
     "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 一般通知"
   },
-  "sea": "海",
-  "@sea": {
-    "description": "海"
-  },
   "please_allow_notification_permission": "アプリケーションの設定で 「通知 」の許可を探して許可し、もう一度試してください。",
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
