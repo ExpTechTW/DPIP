@@ -38,7 +38,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('通知發送紀錄'),
+        title: Text(context.i18n.notification_log),
         elevation: 0,
       ),
       body: SafeArea(
@@ -55,7 +55,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       return Center(child: Text(errorMessage!));
     }
     if (notificationRecords.isEmpty) {
-      return const Center(child: Text('沒有通知紀錄'));
+      return Center(child: Text(context.i18n.no_notification_history));
     }
     return RefreshIndicator(
       onRefresh: _fetchNotificationRecords,
@@ -157,7 +157,7 @@ class NotificationCard extends StatelessWidget {
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
       label: Text(
-        record.critical ? '緊急' : '一般',
+        record.critical ? context.i18n.emergency : context.i18n.me_generally,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
@@ -241,7 +241,7 @@ class NotificationDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('通知詳細資訊'),
+        title: Text(context.i18n.notification_details),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -266,7 +266,7 @@ class NotificationDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              '通知發送區域',
+              context.i18n.notification_area,
               style: context.theme.textTheme.bodyMedium,
             ),
             const SizedBox(height: 8),
@@ -305,7 +305,7 @@ class NotificationDetailPage extends StatelessWidget {
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
       label: Text(
-        record.critical ? '緊急通知' : '一般通知',
+        record.critical ? context.i18n.emergency_notification : context.i18n.general_notification,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),

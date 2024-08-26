@@ -1,5 +1,6 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/server_status.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -40,7 +41,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('伺服器狀態', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(context.i18n.server_status, style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -67,8 +68,8 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                         style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 16)),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text('沒有可用的數據', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  return Center(
+                    child: Text(context.i18n.no_data_available, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                   );
                 }
 
@@ -109,7 +110,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              '此頁面呈現伺服器各時段狀態概覽。原始數據每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。',
+              context.i18n.server_status_overview,
               style: TextStyle(
                 fontSize: 14,
                 color: isDarkMode ? Colors.white70 : Colors.black87,
@@ -133,15 +134,15 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     if (abnormalServices == 0) {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
-      statusText = "全部正常";
+      statusText = context.i18n.all_normal;
     } else if (abnormalServices == allServices.length) {
       statusColor = Colors.red;
       statusIcon = Icons.error;
-      statusText = "全部異常";
+      statusText = context.i18n.all_abnormal;
     } else {
       statusColor = Colors.orange;
       statusIcon = Icons.warning;
-      statusText = "部分異常";
+      statusText = context.i18n.partially_abnormal;
     }
 
     final cardId = status.formattedTime;
@@ -240,13 +241,13 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     String getStatusText(int status) {
       switch (status) {
         case 1:
-          return '正常';
+          return context.i18n.normal;
         case 2:
-          return '不穩定';
+          return context.i18n.unstable;
         case -1:
-          return '無資料';
+          return context.i18n.no_data;
         default:
-          return '異常';
+          return context.i18n.abnormal;
       }
     }
 
