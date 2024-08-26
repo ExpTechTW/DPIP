@@ -586,9 +586,9 @@
   "@sunny": {
     "description": "天氣狀況：晴"
   },
-  "partly_cloudy": "曇り時々晴れ",
+  "partly_cloudy": "局部多雲",
   "@partly_cloudy": {
-    "description": "天氣狀況：多雲時晴"
+    "description": "天氣狀況：局部多雲"
   },
   "cloudy": "曇り",
   "@cloudy": {
@@ -598,33 +598,33 @@
   "@overcast": {
     "description": "天氣狀況：陰"
   },
-  "foggy": "霧",
+  "foggy": "薄霧",
   "@foggy": {
-    "description": "天氣狀況：霧"
+    "description": "天氣狀況：薄霧"
   },
-  "patchy_rain_possible": "局地的な降水の可能性",
+  "patchy_rain_possible": "可能有局部小雨",
   "@patchy_rain_possible": {
-    "description": "天氣狀況：可能有局部降雨"
+    "description": "天氣狀況：可能有局部小雨"
   },
-  "patchy_snow_possible": "局地的な降雪の可能性",
+  "patchy_snow_possible": "可能有局部小雪",
   "@patchy_snow_possible": {
-    "description": "天氣狀況：可能有局部降雪"
+    "description": "天氣狀況：可能有局部小雪"
   },
-  "patchy_sleet_possible": "局地的な雨夹雪の可能性",
+  "patchy_sleet_possible": "可能有局部小雨夾雪",
   "@patchy_sleet_possible": {
-    "description": "天氣狀況：可能有局部雨夾雪"
+    "description": "天氣狀況：可能有局部小雨夾雪"
   },
-  "patchy_freezing_drizzle_possible": "局地的な凍雨の可能性",
+  "patchy_freezing_drizzle_possible": "可能有局部小凍霧雨",
   "@patchy_freezing_drizzle_possible": {
-    "description": "天氣狀況：可能有局部凍毛毛雨"
+    "description": "天氣狀況：可能有局部小凍霧雨"
   },
-  "thundery_outbreaks_possible": "局地的な雷雨の可能性",
+  "thundery_outbreaks_possible": "可能有雷雨",
   "@thundery_outbreaks_possible": {
-    "description": "天氣狀況：可能有局部雷雨"
+    "description": "天氣狀況：可能有雷雨"
   },
-  "blowing_snow": "吹雪",
+  "blowing_snow": "飛雪",
   "@blowing_snow": {
-    "description": "天氣狀況：高吹雪"
+    "description": "天氣狀況：飛雪"
   },
   "blizzard": "暴風雪",
   "@blizzard": {
@@ -638,21 +638,21 @@
   "@freezing_fog": {
     "description": "天氣狀況：凍霧"
   },
-  "patchy_light_drizzle": "局地的なこぬか雨",
+  "patchy_light_drizzle": "局部細雨",
   "@patchy_light_drizzle": {
-    "description": "天氣狀況：局部毛毛雨"
+    "description": "天氣狀況：局部細雨"
   },
-  "light_drizzle": "こぬか雨",
+  "light_drizzle": "細雨",
   "@light_drizzle": {
-    "description": "天氣狀況：毛毛雨"
+    "description": "天氣狀況：細雨"
   },
-  "freezing_drizzle": "氷雨",
+  "freezing_drizzle": "凍霧雨",
   "@freezing_drizzle": {
-    "description": "天氣狀況：凍毛毛雨"
+    "description": "天氣狀況：凍霧雨"
   },
-  "heavy_freezing_drizzle": "大凍毛毛雨",
+  "heavy_freezing_drizzle": "大凍霧雨",
   "@heavy_freezing_drizzle": {
-    "description": "天氣狀況：大凍毛毛雨"
+    "description": "天氣狀況：大凍霧雨"
   },
   "patchy_light_rain": "局地的な小雨",
   "@patchy_light_rain": {
@@ -662,41 +662,41 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "断続的な降水",
+  "moderate_rain_at_times": "偶爾有雨",
   "@moderate_rain_at_times": {
-    "description": "天氣狀況：間歇降雨"
+    "description": "天氣狀況：偶爾有雨"
   },
   "moderate_rain": "雨",
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
-  "heavy_rain_at_times": "断続的な大雨",
+  "heavy_rain_at_times": "偶爾有大雨",
   "@heavy_rain_at_times": {
-    "description": "天氣狀況：間歇大雨"
+    "description": "天氣狀況：偶爾有大雨"
   },
   "heavy_rain": "大雨",
   "@heavy_rain": {
     "description": "天氣狀況：大雨"
   },
-  "light_freezing_rain": "凍雨",
+  "light_freezing_rain": "微凍雨",
   "@light_freezing_rain": {
-    "description": "天氣狀況：凍雨"
+    "description": "天氣狀況：微凍雨"
   },
-  "moderate_or_heavy_freezing_rain": "凍雨",
+  "moderate_or_heavy_freezing_rain": "中度或大凍雨",
   "@moderate_or_heavy_freezing_rain": {
-    "description": "天氣狀況：凍雨"
+    "description": "天氣狀況：中度或大凍雨"
   },
-  "light_sleet": "みぞれまじりの小雨",
+  "light_sleet": "微雨夾雪",
   "@light_sleet": {
-    "description": "天氣狀況：小雨夾雪"
+    "description": "天氣狀況：微雨夾雪"
   },
-  "moderate_or_heavy_sleet": "みぞれまじりの雨",
+  "moderate_or_heavy_sleet": "中度或大雨夾雪",
   "@moderate_or_heavy_sleet": {
-    "description": "天氣狀況：雨夾雪"
+    "description": "天氣狀況：中度或大雨夾雪"
   },
   "patchy_light_snow": "局地的な小雪",
   "@patchy_light_snow": {
-    "description": "天氣狀況：局部小雪"
+    "description": "天氣狀況：零星小雪"
   },
   "light_snow": "小雪",
   "@light_snow": {
@@ -718,61 +718,61 @@
   "@heavy_snow": {
     "description": "天氣狀況：大雪"
   },
-  "ice_pellets": "霰",
+  "ice_pellets": "冰丸",
   "@ice_pellets": {
-    "description": "天氣狀況：冰霰"
+    "description": "天氣狀況：冰丸"
   },
   "light_rain_shower": "小雨",
   "@light_rain_shower": {
     "description": "天氣狀況：小陣雨"
   },
-  "moderate_or_heavy_rain_shower": "驟雨",
+  "moderate_or_heavy_rain_shower": "中度或大陣雨",
   "@moderate_or_heavy_rain_shower": {
-    "description": "天氣狀況：陣雨"
+    "description": "天氣狀況：中度或大陣雨"
   },
-  "torrential_rain_shower": "大驟雨",
+  "torrential_rain_shower": "暴雨",
   "@torrential_rain_shower": {
-    "description": "天氣狀況：大陣雨"
+    "description": "天氣狀況：暴雨"
   },
-  "light_sleet_showers": "みぞれ",
+  "light_sleet_showers": "小冰雹雨",
   "@light_sleet_showers": {
-    "description": "天氣狀況：小陣雨夾雪"
+    "description": "天氣狀況：小冰雹雨"
   },
-  "moderate_or_heavy_sleet_showers": "みぞれ",
+  "moderate_or_heavy_sleet_showers": "中度或大冰雹雨",
   "@moderate_or_heavy_sleet_showers": {
-    "description": "天氣狀況：陣雨夾雪"
+    "description": "天氣狀況：中度或大冰雹雨"
   },
   "light_snow_showers": "霧雪",
   "@light_snow_showers": {
     "description": "天氣狀況：小陣雪"
   },
-  "moderate_or_heavy_snow_showers": "驟雪",
+  "moderate_or_heavy_snow_showers": "中度或大陣雪",
   "@moderate_or_heavy_snow_showers": {
-    "description": "天氣狀況：陣雪"
+    "description": "天氣狀況：中度或大陣雪"
   },
-  "light_showers_of_ice_pellets": "霰",
+  "light_showers_of_ice_pellets": "冰丸小雨",
   "@light_showers_of_ice_pellets": {
-    "description": "天氣狀況：小陣雨伴隨冰霰"
+    "description": "天氣狀況：冰丸小雨"
   },
-  "moderate_or_heavy_showers_of_ice_pellets": "陣雨伴隨冰霰",
+  "moderate_or_heavy_showers_of_ice_pellets": "中度或大冰丸",
   "@moderate_or_heavy_showers_of_ice_pellets": {
-    "description": "天氣狀況：陣雨伴隨冰霰"
+    "description": "天氣狀況：中度或大冰丸"
   },
   "patchy_light_rain_with_thunder": "局地的な雷を伴う雨",
   "@patchy_light_rain_with_thunder": {
     "description": "天氣狀況：局部小雷雨"
   },
-  "moderate_or_heavy_rain_with_thunder": "雷雨",
+  "moderate_or_heavy_rain_with_thunder": "中度或大雷雨",
   "@moderate_or_heavy_rain_with_thunder": {
-    "description": "天氣狀況：雷雨"
+    "description": "天氣狀況：中度或大雷雨"
   },
   "patchy_light_snow_with_thunder": "局地的な雨で雷を伴う",
   "@patchy_light_snow_with_thunder": {
     "description": "天氣狀況：局部小雪伴雷"
   },
-  "moderate_or_heavy_snow_with_thunder": "雷雪",
+  "moderate_or_heavy_snow_with_thunder": "中度或大雪伴雷",
   "@moderate_or_heavy_snow_with_thunder": {
-    "description": "天氣狀況：降雪伴雷"
+    "description": "天氣狀況：中度或大雪伴雷"
   },
   "more": "詳細",
   "@more": {
@@ -802,7 +802,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "DPIPの高度な機能の調整",
+  "advanced_features_title": "調整 DPIP 的進階功能",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
@@ -916,9 +916,9 @@
   "@interval_10_minutes": {
     "description": "10分鐘"
   },
-  "interval_now": "今",
+  "interval_now": "今日",
   "@interval_now": {
-    "description": "現在"
+    "description": "今日"
   },
   "welcome_message": "DPIPへようこそ",
   "@welcome_message": {
@@ -976,7 +976,7 @@
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "公的に認可されていない行為は、中華民国の法律により危険となる可能性がありますので、必ず関連法規を遵守してください。",
+  "legal_risks": "公的に認可されていない行為は、中華民国（台湾）の法律により危険となる可能性がありますので、必ず関連法規を遵守してください。",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
@@ -1004,9 +1004,9 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "中央気象局（CWA）やExpTechが提供するデータを可視化した画像を保存する。",
+  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
   "@data_visualization_storage": {
-    "description": "「歡迎」頁面 → 用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片"
+    "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
   "disagree": "拒否",
   "@disagree": {
@@ -1187,5 +1187,77 @@
   "go_to_settings": "設定ページに移動",
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
+  },
+  "notification_log": "通知發送紀錄",
+  "@notification_log": {
+    "description": "「我」路徑 → 通知發送紀錄"
+  },
+  "app_logs": "App 日誌",
+  "@app_logs": {
+    "description": "「我」路徑 → App 日誌"
+  },
+  "copy_fcm_token_error": "複製 FCM Token 時發生錯誤",
+  "@copy_fcm_token_error": {
+    "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
+  },
+  "provide_services": "提供服務",
+  "@provide_services": {
+    "description": "描述應用程式提供服務的功能"
+  },
+  "estimated_intensity_legend": "預估震度圖例",
+  "@estimated_intensity_legend": {
+    "description": "描述預估震度的圖例"
+  },
+  "only_used_during_earthquake_alerts": "僅用於地震速報時",
+  "@only_used_during_earthquake_alerts": {
+    "description": "此項目僅在地震速報時使用"
+  },
+  "weak_5": "5弱",
+  "@weak_5": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5弱"
+  },
+  "strong_5": "5強",
+  "@strong_5": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5強"
+  },
+  "weak_6": "6弱",
+  "@weak_6": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6弱"
+  },
+  "strong_6": "6強",
+  "@strong_6": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6強"
+  },
+  "lightning_1_5": "5 分鐘內對地閃電",
+  "@lightning_1_5": {
+    "description": "5 分鐘內發生的對地閃電"
+  },
+  "lightning_1_10": "10 分鐘內對地閃電",
+  "@lightning_1_10": {
+    "description": "10 分鐘內發生的對地閃電"
+  },
+  "lightning_1_30": "30 分鐘內對地閃電",
+  "@lightning_1_30": {
+    "description": "30 分鐘內發生的對地閃電"
+  },
+  "lightning_1_60": "60 分鐘內對地閃電",
+  "@lightning_1_60": {
+    "description": "60 分鐘內發生的對地閃電"
+  },
+  "lightning_0_5": "5 分鐘內雲間閃電",
+  "@lightning_0_5": {
+    "description": "5 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_10": "10 分鐘內雲間閃電",
+  "@lightning_0_10": {
+    "description": "10 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_30": "30 分鐘內雲間閃電",
+  "@lightning_0_30": {
+    "description": "30 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_60": "60 分鐘內雲間閃電",
+  "@lightning_0_60": {
+    "description": "60 分鐘內發生的雲間閃電"
   }
 }
