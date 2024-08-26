@@ -9,7 +9,6 @@ import 'package:dpip/app/page/more/more.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
-import 'package:dpip/dialog/welcome/announcement.dart';
 import 'package:dpip/dialog/welcome/changelog.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/update_required/update_required.dart';
@@ -17,6 +16,8 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
+import '../dialog/welcome/announcement.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});
@@ -39,30 +40,6 @@ class _DpipState extends State<Dpip> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkForUpdates();
     });
-    if (Platform.isAndroid) {
-      InAppUpdate.checkForUpdate().then((info) {
-        setState(() {
-          if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-            if (info.immediateUpdateAllowed) {
-              InAppUpdate.performImmediateUpdate();
-            } else if (info.flexibleUpdateAllowed) {
-              InAppUpdate.startFlexibleUpdate().then((updateResult) {
-                if (updateResult == AppUpdateResult.success) {
-                  InAppUpdate.completeFlexibleUpdate();
-                }
-              });
-            }
-          }
-        });
-      }).catchError((e) {});
-    }
-
-    if (Global.preference.getString("changelog") != Global.packageInfo.version) {
-      showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
-    }
-    if (false) {
-      showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
-    }
   }
 
   int compareVersions(String version1, String version2) {
@@ -106,15 +83,46 @@ class _DpipState extends State<Dpip> {
           (DateTime.now().millisecondsSinceEpoch - (Global.preference.getInt("update-skip") ?? 0)) < 86400 * 3 * 1000;
 
       if ((update && !skip) || criticalUpdate) {
-        if (mounted) {
-          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            MaterialPageRoute(
-                builder: (context) => UpdateRequiredPage(
-                      showSkipButton: !criticalUpdate,
-                      lastVersion: lastVersion,
-                    )),
-            (Route<dynamic> route) => false,
-          );
+        if (!criticalUpdate && Platform.isAndroid) {
+          InAppUpdate.checkForUpdate().then((info) {
+            setState(() {
+              if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+                if (info.immediateUpdateAllowed) {
+                  InAppUpdate.performImmediateUpdate();
+                } else if (info.flexibleUpdateAllowed) {
+                  InAppUpdate.startFlexibleUpdate().then((updateResult) {
+                    if (updateResult == AppUpdateResult.success) {
+                      InAppUpdate.completeFlexibleUpdate();
+                    }
+                  });
+                }
+              }
+            });
+          }).catchError((e) {});
+        } else {
+          if (mounted) {
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(
+                  builder: (context) => UpdateRequiredPage(
+                        showSkipButton: !criticalUpdate,
+                        lastVersion: lastVersion,
+                      )),
+              (Route<dynamic> route) => false,
+            );
+          }
+        }
+      } else {
+        var data = await ExpTech().getAnnouncement();
+        if (data.last.show && Global.preference.getString("announcement") != data.last.time.toString()) {
+          Global.preference.setString("announcement", data.last.time.toString());
+          if (context.mounted) {
+            await showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
+          }
+        } else {
+          if (Global.preference.getString("changelog") != Global.packageInfo.version) {
+            Global.preference.setString("changelog", Global.packageInfo.version);
+            showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
+          }
         }
       }
 
@@ -136,12 +144,12 @@ class _DpipState extends State<Dpip> {
           onWillPop: () async => false,
           child: AlertDialog(
             icon: const Icon(Symbols.signal_disconnected_rounded),
-            title: Text("異常"),
-            content: Text("網路連線或伺服器異常。"),
+            title: const Text("異常"),
+            content: const Text("網路連線或伺服器異常。"),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: Text("重試"),
+                child: const Text("重試"),
                 onPressed: () {
                   Navigator.pop(context);
                   _restartApp();
