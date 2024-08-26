@@ -263,7 +263,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
         ),
       ),
       subtitle: Text(
-        '延遲: ${serviceStatus.count} ms',
+        context.i18n.delay(serviceStatus.count.toString()),
         style: TextStyle(
           color: isDarkMode ? Colors.white70 : Colors.black54,
         ),

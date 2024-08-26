@@ -566,7 +566,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              context.i18n.epicenter,
+                                              context.i18n.report_location,
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 letterSpacing: 2,
@@ -643,7 +643,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     ),
                                                   ),
                                                   Text(
-                                                    context.i18n.tsunami_depth(tsunami!.eq.depth.toString()),
+                                                    "${tsunami!.eq.depth}km",
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,
