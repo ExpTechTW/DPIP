@@ -296,7 +296,7 @@
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA（中央氣象署）",
+  "me_version": "版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -1259,5 +1259,129 @@
   "lightning_0_60": "60 分鐘內雲間閃電",
   "@lightning_0_60": {
     "description": "60 分鐘內發生的雲間閃電"
+  },
+  "abnormal": "異常",
+  "@abnormal": {
+    "description": "狀態：異常"
+  },
+  "network_or_server_error": "網路連線或伺服器異常。",
+  "@network_or_server_error": {
+    "description": "網路連線或伺服器異常。"
+  },
+  "retry": "重試",
+  "@retry": {
+    "description": "重試"
+  },
+  "photo_media_permission_request": "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。",
+  "@photo_media_permission_request": {
+    "description": "「地震報告」路徑 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
+  },
+  "no_notification_history": "沒有通知紀錄",
+  "@no_notification_history": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 沒有通知紀錄"
+  },
+  "emergency": "緊急",
+  "@emergency": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急"
+  },
+  "notification_details": "通知詳細資訊",
+  "@notification_details": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知詳細資訊"
+  },
+  "notification_area": "通知發送區域",
+  "@notification_area": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知發送區域"
+  },
+  "emergency_notification": "緊急通知",
+  "@emergency_notification": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急通知"
+  },
+  "general_notification": "一般通知",
+  "@general_notification": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 一般通知"
+  },
+  "sea": "海",
+  "@sea": {
+    "description": "海"
+  },
+  "please_allow_notification_permission": "請您到應用程式設定中找到並允許「通知」權限後再試一次。",
+  "@please_allow_notification_permission": {
+    "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
+  },
+  "please_allow_location_permission": "請您到應用程式設定中找到並允許「位置」權限後再試一次。",
+  "@please_allow_location_permission": {
+    "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
+  },
+  "no_data_available": "沒有可用的資料",
+  "@no_data_available": {
+    "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的資料"
+  },
+  "server_status_overview": "此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。",
+  "@server_status_overview": {
+    "description": "「設定」路徑 → 「伺服器狀態」→ 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
+  },
+  "all_normal": "全部正常",
+  "@all_normal": {
+    "description": "伺服器狀態：全部正常"
+  },
+  "all_abnormal": "全部異常",
+  "@all_abnormal": {
+    "description": "伺服器狀態：全部異常"
+  },
+  "partially_abnormal": "部分異常",
+  "@partially_abnormal": {
+    "description": "伺服器狀態：部分異常"
+  },
+  "normal": "正常",
+  "@normal": {
+    "description": "狀態：正常"
+  },
+  "unstable": "不穩定",
+  "@unstable": {
+    "description": "狀態：不穩定"
+  },
+  "no_data": "無資料",
+  "@no_data": {
+    "description": "狀態：無資料"
+  },
+  "automatic_foreground_positioning": "前景自動定位",
+  "@automatic_foreground_positioning": {
+    "description": "前景自動定位"
+  },
+  "south_latitude": "南緯 {lat_abs} 度",
+  "@south_latitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 南緯 {lat_abs} 度",
+    "placeholders": {
+      "lat_abs": {
+        "type": "String"
+      }
+    }
+  },
+  "north_latitude": "北緯 {lat} 度",
+  "@north_latitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 北緯 {lat} 度",
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      }
+    }
+  },
+  "west_longitude": "西經 {lon_abs} 度",
+  "@west_longitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 西經 {lon_abs} 度",
+    "placeholders": {
+      "lon_abs": {
+        "type": "String"
+      }
+    }
+  },
+  "east_longitude": "東經 {lon} 度",
+  "@east_longitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
+    "placeholders": {
+      "lon": {
+        "type": "String"
+      }
+    }
   }
 }
