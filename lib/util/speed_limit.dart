@@ -9,7 +9,7 @@ Future<void> showLimitDialog(BuildContext context) async {
       return AlertDialog(
         icon: const Icon(Symbols.error),
         title: const Text("無法變更"),
-        content: const Text("操作間隔過短，請稍等後再嘗試。"),
+        content: const Text("操作間隔過短，請稍後再嘗試。"),
         actionsAlignment: MainAxisAlignment.end,
         actions: [
           TextButton(
