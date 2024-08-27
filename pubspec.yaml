@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  audioplayers: ^5.2.1
   autostarter: ^0.0.1
   awesome_notifications_core: ^0.9.3
   awesome_notifications: ^0.9.3+1
@@ -78,15 +77,3 @@ flutter:
     - assets/location.json
     - assets/time.json
     - assets/box.json
-    - assets/eew.wav
-    - assets/eew_alert.wav
-    - assets/eq.wav
-    - assets/info.wav
-    - assets/int_report.wav
-    - assets/normal.wav
-    - assets/rain.wav
-    - assets/report.wav
-    - assets/tsunami.wav
-    - assets/update.wav
-    - assets/warn.wav
-    - assets/weather.wav
