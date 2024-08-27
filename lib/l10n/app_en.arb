@@ -264,11 +264,11 @@
   "@location_Not_set": {
     "description": "「設定」路徑 → 「所在地」設定 → 尚未設定"
   },
-  "location_city": "County/City",
+  "location_city": "Special Municipalities/County",
   "@location_city": {
     "description": "「設定」路徑 → 「所在地」設定 → 縣市"
   },
-  "location_town": "Country(Town, City, District)",
+  "location_town": "City/Town/District",
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
