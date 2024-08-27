@@ -4,7 +4,6 @@ import 'package:dpip/route/welcome/pages/about.dart';
 import 'package:dpip/route/welcome/pages/exptech.dart';
 import 'package:dpip/route/welcome/pages/notice.dart';
 import 'package:dpip/route/welcome/pages/permission.dart';
-import 'package:dpip/route/welcome/pages/tos.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeRoute extends StatefulWidget {

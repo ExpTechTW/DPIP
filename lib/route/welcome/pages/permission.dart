@@ -257,12 +257,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     );
   }
 
-  void _continueToTOS() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
-    );
-  }
+  // void _continueToTOS() {
+  //   Navigator.pushReplacement(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
