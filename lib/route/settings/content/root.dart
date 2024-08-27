@@ -1,3 +1,4 @@
+import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
@@ -16,6 +17,7 @@ class _SettingsRootViewState extends State<SettingsRootView> {
     const tileTitleTextStyle = TextStyle(
       fontWeight: FontWeight.bold,
     );
+    bool devEnabled = Global.preference.getBool("dev") ?? false;
 
     return Material(
       child: ListView(
@@ -93,6 +95,24 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               );
             },
           ),
+          if (devEnabled)
+            ListTile(
+              leading: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Icon(Symbols.experiment),
+              ),
+              title: Text(
+                context.i18n.login_exptech,
+                style: tileTitleTextStyle,
+              ),
+              subtitle: Text(context.i18n.login_exptech_title),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  "/login",
+                );
+              },
+            ),
         ],
       ),
     );

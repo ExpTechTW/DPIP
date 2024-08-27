@@ -1,4 +1,5 @@
 import "package:dpip/global.dart";
+import "package:dpip/route/welcome/pages/dev.dart";
 import "package:dpip/route/welcome/pages/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
@@ -12,6 +13,7 @@ class SettingsExperimentView extends StatefulWidget {
 
 class _SettingsExperimentViewState extends State<SettingsExperimentView> with WidgetsBindingObserver {
   bool monitorEnabled = Global.preference.getBool("monitor") ?? false;
+  bool devEnabled = Global.preference.getBool("dev") ?? false;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,21 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
                   MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
                 );
                 setState(() => monitorEnabled = Global.preference.getBool("monitor") ?? false);
+              }
+            },
+          ),
+          SwitchListTile(
+            title: Text(context.i18n.enable_dev),
+            value: devEnabled,
+            onChanged: (value) async {
+              if (!value) {
+                await Global.preference.setBool("dev", false);
+                setState(() => devEnabled = false);
+              } else {
+                await Navigator.of(context, rootNavigator: true).push(
+                  MaterialPageRoute(builder: (context) => const WelcomeDevPage()),
+                );
+                setState(() => devEnabled = Global.preference.getBool("dev") ?? false);
               }
             },
           ),

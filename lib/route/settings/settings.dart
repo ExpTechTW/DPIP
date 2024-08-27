@@ -1,6 +1,7 @@
 import "package:dpip/route/settings/content/experiment.dart";
 import "package:dpip/route/settings/content/locale.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/route/settings/content/login.dart";
 import "package:dpip/route/settings/content/root.dart";
 import "package:dpip/route/settings/content/theme.dart";
 import "package:dpip/util/extension/build_context.dart";
@@ -39,6 +40,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
       "/location": context.i18n.settings_location,
       "/theme": context.i18n.settings_theme,
       "/experiment": context.i18n.advanced_features,
+      "/login": context.i18n.login_exptech,
     };
 
     return PopScope(
@@ -99,6 +101,9 @@ class _SettingsRouteState extends State<SettingsRoute> {
                   break;
                 case "/experiment":
                   child = const SettingsExperimentView();
+                  break;
+                case "/login":
+                  child = const SettingsLoginView();
                   break;
                 default:
                   return PageRouteBuilder(
