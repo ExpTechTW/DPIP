@@ -349,7 +349,7 @@
   "@report_description_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
-  "eew_sound_title": "緊急地震速報効果音",
+  "eew_sound_title": "緊急地震速報の効果音",
   "@eew_sound_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 地震速報音效"
   },
@@ -855,7 +855,7 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "一切平安，無事件發生。",
+  "home_safety": "すべて安全で、事件もない。",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -1347,7 +1347,7 @@
       }
     }
   },
-  "delay": "延遲: {serviceStatus_count} ms",
+  "delay": "遅延： {serviceStatus_count} ms",
   "@delay": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
     "placeholders": {
