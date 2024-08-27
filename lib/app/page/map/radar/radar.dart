@@ -300,7 +300,7 @@ class _RadarMapState extends State<RadarMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: "圖例",
+                message: context.i18n.map_legend,
                 child: Container(
                   width: 30,
                   height: 30,
