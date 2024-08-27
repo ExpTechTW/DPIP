@@ -48,7 +48,7 @@ jobs:
           pull_request_labels: 'enhancement, good first issue'
           pull_request_assignees: 'crowdin-bot'
           pull_request_reviewers: 'yayacat'
-          pull_request_team_reviewers: 'DPIP Developers'
+          pull_request_team_reviewers: 'yayacat'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
