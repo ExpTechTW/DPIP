@@ -14,7 +14,7 @@ Future<void> showLocationDialog(BuildContext context) async {
         content: Text(
           context.i18n.location_setting_required,
         ),
-        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actionsAlignment: MainAxisAlignment.end,
         actions: [
           TextButton(
             child: Text(context.i18n.go_to_settings),

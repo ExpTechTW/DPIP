@@ -1,12 +1,13 @@
 import "dart:io";
 
+import "package:dpip/api/exptech.dart";
+import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/welcome/pages/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
-import "package:flutter/material.dart";
-import "package:dpip/api/exptech.dart";
-import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/util/need_location.dart";
+import "package:dpip/util/speed_limit.dart";
+import "package:flutter/material.dart";
 
 class SettingsExperimentView extends StatefulWidget {
   const SettingsExperimentView({super.key});
@@ -46,12 +47,19 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
             value: monitorEnabled,
             onChanged: (value) async {
               if (!value) {
-                String token = Global.preference.getString("fcm-token") ?? "";
-                if (token != "") {
-                  await ExpTech().sendMonitor(token, "0");
+                int limit = Global.preference.getInt("limit-monitor") ?? 0;
+                int now = DateTime.now().millisecondsSinceEpoch;
+                if (now - limit < 60000) {
+                  showLimitDialog(context);
+                } else {
+                  Global.preference.setInt("limit-monitor", now);
+                  String token = Global.preference.getString("fcm-token") ?? "";
+                  if (token != "") {
+                    await ExpTech().sendMonitor(token, "0");
+                  }
+                  await Global.preference.setBool("monitor", false);
+                  setState(() => monitorEnabled = false);
                 }
-                await Global.preference.setBool("monitor", false);
-                setState(() => monitorEnabled = false);
               } else {
                 _initUserLocation();
                 if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {

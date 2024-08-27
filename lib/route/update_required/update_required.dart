@@ -89,7 +89,8 @@ class UpdateRequiredPage extends StatelessWidget {
                     ),
                     elevation: 4,
                   ),
-                  child: Text(context.i18n.update_now, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child:
+                      Text(context.i18n.update_now, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 if (showSkipButton) ...[
                   const SizedBox(height: 16),

@@ -1,9 +1,10 @@
+import "package:dpip/api/exptech.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/speed_limit.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
-import "package:dpip/api/exptech.dart";
 
 class WelcomeTosPage extends StatefulWidget {
   const WelcomeTosPage({super.key});
@@ -48,7 +49,14 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     Global.preference.setBool("monitor", status);
     String token = Global.preference.getString("fcm-token") ?? "";
     if (token != "" && status) {
-      await ExpTech().sendMonitor(token, "1");
+      int limit = Global.preference.getInt("limit-monitor") ?? 0;
+      int now = DateTime.now().millisecondsSinceEpoch;
+      if (now - limit < 60000) {
+        showLimitDialog(context);
+      } else {
+        Global.preference.setInt("limit-monitor", now);
+        await ExpTech().sendMonitor(token, "1");
+      }
     }
     final state = WelcomeRouteState.of(context);
     if (state != null) {
