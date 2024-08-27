@@ -826,6 +826,10 @@
   "@login_exptech_title": {
     "description": "「設定」路徑 → 「Exptech 服務」副描述"
   },
+  "username": "使用者名稱",
+  "@username": {
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
+  },
   "email": "電子郵件",
   "@email": {
     "description": "「設定」路徑 → 「Exptech 服務」標題"

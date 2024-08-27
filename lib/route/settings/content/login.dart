@@ -16,6 +16,7 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
   bool devEnabled = Global.preference.getBool("dev") ?? false;
   bool isLoggedIn = Global.preference.getBool("isLoggedIn") ?? false;
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -29,7 +30,7 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       try {
-        String result = await ExpTech().loginUser(_emailController.text, _passwordController.text);
+        String result = await ExpTech().loginUser(_usernameController.text, _emailController.text, _passwordController.text);
         TalkerManager.instance.debug("登入: $result");
         Global.preference.setString("token",result);
         Global.preference.setBool("isLoggedIn",true);
@@ -77,6 +78,14 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
                 key: _formKey,
                 child: Column(
                   children: [
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: InputDecoration(
+                        labelText: context.i18n.username,
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _emailController,
                       decoration: InputDecoration(

@@ -439,7 +439,7 @@ class ExpTech {
     return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
   }
 
-  Future<String> loginUser(String email, String password) async {
+  Future<String> loginUser(String? name, String email, String password) async {
     final url = Uri.parse('https://api-1.exptech.dev/api/v3/et/login');
 
     final response = await post(
@@ -450,7 +450,7 @@ class ExpTech {
       body: jsonEncode({
         'email': email,
         'pass': password,
-        'name': 'me/dpip/${Global.packageInfo.version.toString()}/${Platform.isAndroid ? "Android" : "IOS"}',
+        'name': '${name ?? "me"}/dpip/${Global.packageInfo.version.toString()}/${Platform.isAndroid ? "Android" : "IOS"}',
       }),
     );
 
