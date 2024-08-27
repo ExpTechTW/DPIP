@@ -81,8 +81,8 @@ class Route {
 
   static Uri status() => Uri.parse("https://status.exptech.dev/api/v1/status/data?duration=1d");
 
-  static Uri monitor(String token, String status) =>
-      Uri.parse("https://api-1.exptech.dev/api/v1/notify/setting/$token/$status");
+  static Uri monitor(String token, String status) => Uri.parse(
+      "https://api-1.exptech.dev/api/v1/notify/setting/$token/$status/${DateTime.now().millisecondsSinceEpoch}");
 
   static Uri notifyTest(String token, String sound, String lat, String lng) => Uri.parse(
       "https://api-1.exptech.dev/api/v1/notify/test/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token/$sound");

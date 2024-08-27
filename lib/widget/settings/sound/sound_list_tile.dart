@@ -7,6 +7,7 @@ import "package:dpip/api/exptech.dart";
 import "package:dpip/global.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/util/need_location.dart";
+import "package:dpip/util/speed_limit.dart";
 
 class SoundListTile extends StatefulWidget {
   final String title;
@@ -53,7 +54,14 @@ class SoundListTileState extends State<SoundListTile> {
     } else {
       String token = Global.preference.getString("fcm-token") ?? "";
       if (token != "") {
-        await ExpTech().sendNotifyTest(token, widget.type, userLat.toString(), userLon.toString());
+        int limit = Global.preference.getInt("limit-sound-test") ?? 0;
+        int now = DateTime.now().millisecondsSinceEpoch;
+        if (now - limit < 5000) {
+          showLimitDialog(context);
+        } else {
+          Global.preference.setInt("limit-sound-test", now);
+          await ExpTech().sendNotifyTest(token, widget.type, userLat.toString(), userLon.toString());
+        }
       } else {
         context.scaffoldMessenger.showSnackBar(
           const SnackBar(
@@ -67,9 +75,7 @@ class SoundListTileState extends State<SoundListTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      trailing: !widget.enable!
-          ? const Icon(Symbols.disabled_by_default_rounded, fill: 1)
-          : const Icon(Symbols.play_circle, fill: 1),
+      trailing: !widget.enable! ? null : const Icon(Symbols.play_circle, fill: 1),
       title: Text("${widget.title}${!widget.enable! ? " (未啟用)" : ""}"),
       subtitle: Text(widget.subtitle),
       onTap: playSound,
