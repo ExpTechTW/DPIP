@@ -271,7 +271,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.nextPage() : null,
+            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.complete() : null,
             child: Text(context.i18n.next_step),
           ),
         ),
