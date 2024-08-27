@@ -437,4 +437,18 @@ class ExpTech {
 
     return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
   }
+
+  Future<String> sendMonitor(String token, String status) async {
+    final requestUrl = Route.monitor(token, status);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else if (res.statusCode == 204) {
+      return "${res.statusCode} $requestUrl";
+    } else {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+  }
 }
