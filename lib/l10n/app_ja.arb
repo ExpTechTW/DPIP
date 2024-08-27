@@ -256,7 +256,7 @@
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "この機能はデバイスのGPSを使用して、地理的な位置情報に基づいて、所在地を更新します。リアルタイムの天気情報や地震情報を提供して、最新の地域の状況を取得します。",
+  "settings_location_auto_description": "この機能はデバイスのGPSを使用して、地理的な位置情報に基づいて所在地を更新します。リアルタイムの天気情報や地震情報を提供し、最新の地域状況を取得します。",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
@@ -280,7 +280,7 @@
   "@settings_fcm": {
     "description": "「我」頁面標題 → 「FCM」標題"
   },
-  "settings_copy_fcm": "FCM Tokenはコピーしました",
+  "settings_copy_fcm": "FCMトークンをコピーしました",
   "@settings_copy_fcm": {
     "description": "「我」頁面標題 → 「FCM」標題 → 提示描述"
   },
@@ -927,7 +927,7 @@
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために設立されたが、その後校外に発展し、徐々に現在の形になった。",
+  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために設立されたが、その後校外に発展し、徐々に現在の形になりました。",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
@@ -947,15 +947,15 @@
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強い揺れは、通知メッセージよりも早くユーザーの場所に到着する可能性がある。",
+  "strong_shake_warning": "強い揺れは、通知よりも早くユーザーに到達する可能性があります。",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震情報は迅速な計算の結果であり、大きな誤差が生じる可能性があるため、注意と理解をもって利用する必要がある。",
+  "earthquake_alert_warning": "地震情報は迅速な計算の結果であり、大きな誤差が生じる可能性があるため、注意深く理解して利用する必要があります。",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "公的に認可されていない行為は、中華民国（台湾）の法律により危険となる可能性がありますので、必ず関連法規を遵守してください。",
+  "legal_risks": "公的に認可されていない行為は、中華民国（台湾）の法律により、リスクを伴う可能性がありますので、必ず関連法規を遵守してください。",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
@@ -963,7 +963,7 @@
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "私たちは常にユーザーの側に立ち、プライバシーの保護に継続的に取り組んできました。",
+  "privacy_commitment": "私たちは常にユーザーの側に立ち、プライバシーの保護に継続的に取り組んでいます。",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
@@ -999,23 +999,23 @@
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、中央気象署（CMA）が提供する情報ではなく、最終的には中央気象署が発表する情報に従うべき観測とは一致しない可能性がある。",
+  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、中央気象署（CMA）が提供する情報ではなく、最終的には中央気象署が発表する情報に従うべき観測結果とは一致しない可能性があります。",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震モニタで使用している観測点はExpTechが所有しており、中央気象署（CWA）の管理下にはありません。中央気象署を困らせることになりますので、故障やコメントを中央気象局に伝えないでください。",
+  "trem_station_warning": "強震モニタで使用している観測点はExpTechが所有しており、中央気象署（CWA）の管理下ではありません。中央気象署に故障やコメントを送信することは迷惑となりますので、行わないでください。",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "強震モニターはTREM(台湾リアルタイム地震モニタ)で台湾全体の現在の振動を観測するために使用され、リアルタイムの地震度表示機能として、地震が発生すると、観測点の色の変化を通じて地震波の伝播状況を観察することができます。",
+  "trem_monitor_description": "強震モニターはTREM（台湾リアルタイム地震モニタ）を用いて、台湾全体の振動を観測します。リアルタイムの地震度表示機能として、地震が発生した際には、観測点の色の変化を通じて地震波の伝播状況を観察することができます。",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
-  "station_noise_warning": "正常な状態であっても、日常的なノイズ（車、工場、工事など）により観測点の色が変化することがあります。また、観測点の故障によっても色が変わることがあります。データはリアルタイムであるため、故障の有無をその場で判断することはできません。",
+  "station_noise_warning": "正常な状態でも、日常的なノイズ（車、工場、工事など）により観測点の色が変化することがあります。また、観測点の故障によっても色が変わることがあります。データはリアルタイムで提供されるため、その場で故障の有無を判断することはできません。",
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022年6月上旬、台湾全土に観測点の配備を開始した。TREM-Net（TREM 地震観測網）は、SE-Net（強震観測網「加速度計」）とMS-Net（微震観測網「速度計」）の2つの観測網で構成され、地震時の様々なデータをまとめて記録する。",
+  "trem_net_deployment": "2022年6月上旬に、台湾全土で観測点の配備を開始しました。TREM-Net（TREM地震観測網）は、SE-Net（強震観測網「加速度計」）とMS-Net（微震観測網「速度計」）の2つの観測網から構成され、地震時の様々なデータをまとめて記録します。",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
@@ -1175,7 +1175,7 @@
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
-  "only_used_during_earthquake_alerts": "EEW発表された場合のみ",
+  "only_used_during_earthquake_alerts": "緊急地震速報が発表された場合のみ",
   "@only_used_during_earthquake_alerts": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
@@ -1239,7 +1239,7 @@
   "@retry": {
     "description": "重試"
   },
-  "photo_media_permission_request": "アプリケーションの設定で 「写真とメディア 」の許可を探して許可し、もう一度試してください。",
+  "photo_media_permission_request": "アプリケーションの設定で 「写真とメディア」の許可を探して許可し、もう一度試してください。",
   "@photo_media_permission_request": {
     "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
@@ -1251,11 +1251,11 @@
   "@emergency": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急"
   },
-  "notification_details": "通知詳細情報",
+  "notification_details": "通知の詳細情報",
   "@notification_details": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知詳細資訊"
   },
-  "notification_area": "送信地域に通知",
+  "notification_area": "通知の送信地域",
   "@notification_area": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知發送區域"
   },
@@ -1267,11 +1267,11 @@
   "@general_notification": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 一般通知"
   },
-  "please_allow_notification_permission": "アプリケーションの設定で 「通知 」の許可を探して許可し、もう一度試してください。",
+  "please_allow_notification_permission": "アプリケーションの設定で 「通知」の許可を探して許可し、もう一度試してください。",
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
-  "please_allow_location_permission": "アプリケーションの設定で 「位置 」の許可を探して許可し、もう一度試してください。",
+  "please_allow_location_permission": "アプリケーションの設定で 「位置」の許可を探して許可し、もう一度試してください。",
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
@@ -1283,11 +1283,11 @@
   "@server_status_overview": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
   },
-  "all_normal": "全て正常だ",
+  "all_normal": "全て正常",
   "@all_normal": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：全部正常"
   },
-  "all_abnormal": "全て異常だ",
+  "all_abnormal": "全て異常",
   "@all_abnormal": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：全部異常"
   },
