@@ -19,11 +19,11 @@
   },
   "monitor": "giám sát động đất",
   "@monitor": {
-    "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
+    "description": "「地圖」路徑 → 強震監視器、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
   "report": "Thông báo tin động đất",
   "@report": {
-    "description": "「地震報告」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
+    "description": "「更多」路徑 → 地震報告、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "map": "Bản đồ",
   "@map": {
@@ -63,7 +63,7 @@
   },
   "report_list_item_subtitle": "Độ lớn M {magnitude}　Độ sâu {depth} km",
   "@report_list_item_subtitle": {
-    "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",
+    "description": "「更多」路徑 → 「地震報告列表」頁面 → 地震報告條目 → 副標題",
     "placeholders": {
       "magnitude": {
         "type": "String",
@@ -77,7 +77,7 @@
   },
   "report_with_number": "Động đất đáng chú ý có mã báo cáo # {reportNumber}",
   "@report_with_number": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 副標題",
     "placeholders": {
       "reportNumber": {
         "type": "String"
@@ -86,47 +86,47 @@
   },
   "report_without_number": "Động đất nhẹ, cảm nhận được ở khu vực nhỏ",
   "@report_without_number": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 副標題"
   },
   "open_report_url": "Trang báo cáo",
   "@open_report_url": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
   "report_event_time": "Ngày giờ nhận biết động đất",
   "@report_event_time": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 發震時間"
   },
   "report_location": "nằm ở",
   "@report_location": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 位於、「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 位於"
   },
   "report_magnitude": "Cường độ",
   "@report_magnitude": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震規模"
   },
   "report_depth": "Độ sâu chấn tiêu",
   "@report_depth": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 震源深度"
   },
   "report_image": "Bản đồ báo cáo động đất",
   "@report_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖"
   },
   "report_intensity_image": "Bản đồ cường độ địa chấn",
   "@report_intensity_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 震度圖"
   },
   "report_pga_image": "Bản đồ gia tốc mặt đất tối đa",
   "@report_pga_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 最大地動加速度圖"
   },
   "report_pgv_image": "Bản đồ vận tốc mặt đất tối đa",
   "@report_pgv_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 最大地動速度圖"
   },
   "report_intensity": "Cường độ địa chấn tại các khu vực",
   "@report_intensity": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 各地震度"
   },
   "settings_locale": "Ngôn ngữ",
   "@settings_locale": {
@@ -170,51 +170,51 @@
   },
   "earthquake_warning_error": "Tạm thời không thể lấy dữ liệu cảnh báo động đất",
   "@earthquake_warning_error": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
   "no_earthquake_warning": "Hiện không có cảnh báo động đất nào có hiệu lực.",
   "@no_earthquake_warning": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 目前無生效中的地震速報"
   },
   "earthquake_warning": "Cảnh báo động đất sớm",
   "@earthquake_warning": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 地震速報"
   },
   "emergency_earthquake_warning": "Cảnh báo động đất sớm",
   "@emergency_earthquake_warning": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 緊急地震速報"
   },
   "location_estimate": "Dự đoán vị trí",
   "@location_estimate": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 所在地預估"
   },
   "seismic_waves": "Sóng địa chấn",
   "@seismic_waves": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 震波"
   },
   "monitor_unknown": "không rõ",
   "@monitor_unknown": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 未知"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 未知"
   },
   "monitor_arrival": "đến",
   "@monitor_arrival": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 抵達"
   },
   "monitor_after_seconds": "đến trong 5 giây",
   "@monitor_after_seconds": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 秒後抵達"
   },
   "report_replay": "phát lại",
   "@report_replay": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 重播按鈕"
   },
   "image_save": "Lưu trữ hình",
   "@image_save": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片"
   },
   "image_saved": "Đã lưu ảnh",
   "@image_saved": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
   "settings_Personalization": "Cá nhân hóa",
   "@settings_Personalization": {
@@ -278,23 +278,23 @@
   },
   "settings_fcm": "Sao chép FCM Token",
   "@settings_fcm": {
-    "description": "「設定」路徑 → 「FCM」標題"
+    "description": "「我」頁面標題 → 「FCM」標題"
   },
   "settings_copy_fcm": "Đã sao chép FCM Token",
   "@settings_copy_fcm": {
-    "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
+    "description": "「我」頁面標題 → 「FCM」標題 → 提示描述"
   },
   "report_offing": "Trận động đất này có thể gây ra một số biến động trên mặt biển.",
   "@report_offing": {
-    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
   "report_tsunami_attention": "Trận động đất này có thể gây ra sóng thần. Hãy chú ý theo dõi thông tin cập nhật.",
   "@report_tsunami_attention": {
-    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
   "report_error": "Đã xảy ra lỗi khi lấy báo cáo động đất. Vui lòng kiểm tra kết nối mạng và thử lại.",
   "@report_error": {
-    "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
+    "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
   "me_version": "Phiên bản\nDo ExpTech sản xuất\nNguồn: Cơ quan thời tiết trung ương (CWA)",
   "@me_version": {
@@ -539,7 +539,7 @@
   },
   "eew_no_x": "Bản tin số {serial}",
   "@eew_no_x": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 第 {serial} 報",
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 第 {serial} 報",
     "placeholders": {
       "serial": {
         "type": "String"
@@ -549,14 +549,6 @@
   "lightning": "Tia sét",
   "@lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電"
-  },
-  "cg_lightning": "Sét đánh xuống đất",
-  "@cg_lightning": {
-    "description": "「地圖」路徑 → 地圖列表 →「閃電」圖例 → 對地閃電"
-  },
-  "cc_lightning": "Tia chớp trên mây",
-  "@cc_lightning": {
-    "description": "「地圖」路徑 → 地圖列表 → 「閃電」圖例 → 雲間閃電"
   },
   "out_of_service": "Không còn hoạt động",
   "@out_of_service": {
@@ -855,10 +847,6 @@
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "epicenter": "Tâm chấn",
-  "@epicenter": {
-    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 震央"
-  },
   "scale": "Kích cỡ",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
@@ -867,58 +855,49 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "tsunami_depth": "{depth}km",
-  "@tsunami_depth": {
-    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {depth}km",
-    "placeholders": {
-      "depth": {
-        "type": "String"
-      }
-    }
-  },
-  "home_Safety": "Mọi việc đều an toàn, không có sự cố nào xảy ra.",
-  "@home_Safety": {
+  "home_safety": "一切平安，無事件發生。",
+  "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
   "update_log": "Nhật ký thay đổi",
   "@update_log": {
-    "description": "「設定」路徑 → 更新日誌"
+    "description": "「我」路徑 → 更新日誌"
   },
   "interval_3_days": "3 ngày",
   "@interval_3_days": {
-    "description": "3天"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3天"
   },
   "interval_2_days": "2 ngày",
   "@interval_2_days": {
-    "description": "2天"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2天"
   },
   "interval_24_hours": "24 giờ",
   "@interval_24_hours": {
-    "description": "24小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24小時"
   },
   "interval_12_hours": "12 giờ",
   "@interval_12_hours": {
-    "description": "12小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12小時"
   },
   "interval_6_hours": "6 giờ",
   "@interval_6_hours": {
-    "description": "6小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6小時"
   },
   "interval_3_hours": "3 giờ",
   "@interval_3_hours": {
-    "description": "3小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3小時"
   },
   "interval_1_hour": "1 giờ",
   "@interval_1_hour": {
-    "description": "1小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1小時"
   },
   "interval_10_minutes": "10 phút",
   "@interval_10_minutes": {
-    "description": "10分鐘"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10分鐘"
   },
   "interval_now": "Hôm nay",
   "@interval_now": {
-    "description": "今日"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 今日"
   },
   "welcome_message": "Chào mừng đến với DPIP",
   "@welcome_message": {
@@ -954,7 +933,7 @@
   },
   "notice": "Những điều cần lưu ý",
   "@notice": {
-    "description": "注意事項"
+    "description": "「歡迎」頁面 → 注意事項"
   },
   "notice_details": "DPIP sẽ cung cấp nhiều thông tin khác nhau từ ExpTech và Đài Loan Cơ quan Thời tiết Trung ương (CWA), vì vậy hãy lưu ý những điều sau khi sử dụng.",
   "@notice_details": {
@@ -1010,11 +989,11 @@
   },
   "disagree": "Không đồng ý",
   "@disagree": {
-    "description": "「歡迎」頁面 → 不同意"
+    "description": "「歡迎」頁面 → 強震監視器 → 不同意"
   },
   "agree": "Đồng ý",
   "@agree": {
-    "description": "「歡迎」頁面 → 同意"
+    "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
   "trem_service_description": "Bạn có thể xem dịch vụ “Strong Earthquake Monitor” từ TREM của ExpTech trong DPIP, vui lòng đọc các điều kiện sau và chọn kích hoạt dịch vụ hay không.",
   "@trem_service_description": {
@@ -1082,7 +1061,7 @@
   },
   "announcement": "Thông báo",
   "@announcement": {
-    "description": "公告"
+    "description": "「我」路徑 → 公告"
   },
   "new_announcement_prompt": "Hiện tại có thông báo mới, bạn có muốn xem không?",
   "@new_announcement_prompt": {
@@ -1090,31 +1069,27 @@
   },
   "no_announcements": "Không có thông báo bây giờ",
   "@no_announcements": {
-    "description": "「公告」 → 前沒有公告"
+    "description": "「公告」標題 → 目前沒有公告"
   },
   "contributor": "Người đóng góp",
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "Bản beta",
-  "@beta_version": {
-    "description": "應用程式的內部測試版本"
-  },
   "unable_to_load_changelog": "Không thể tải nhật ký thay đổi, vui lòng thử lại sau.",
   "@unable_to_load_changelog": {
-    "description": "「我」路徑 →「更新日誌」→ 無法載入更新日誌，請稍後再試。"
+    "description": "「我」路徑 →「更新日誌」標題 → 無法載入更新日誌，請稍後再試。"
   },
   "no_changelog": "Không có nhật ký thay đổi bây giờ",
   "@no_changelog": {
-    "description": "當前沒有任何更新日誌"
+    "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
   "announcement_details": "Thông báo Chi Tiết",
   "@announcement_details": {
-    "description": "「公告」 → 查看公告的具體內容"
+    "description": "「我」路徑 → 「公告」標題 → 查看公告的具體內容"
   },
   "version_details": "Phiên bản Chi Tiết",
   "@version_details": {
-    "description": "「更新日誌」 → 版本詳情"
+    "description": "「我」路徑 → 「更新日誌」標題 → 版本詳情"
   },
   "unable_to_obtain_permission": "không thể có được quyền truy cập",
   "@unable_to_obtain_permission": {
@@ -1188,10 +1163,6 @@
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
   },
-  "notification_log": "Bản ghi thông báo đã gửi",
-  "@notification_log": {
-    "description": "「我」路徑 → 通知發送紀錄"
-  },
   "app_logs": "Nhật ký ứng dụng",
   "@app_logs": {
     "description": "「我」路徑 → App 日誌"
@@ -1200,65 +1171,61 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "provide_services": "Cung cấp dịch vụ",
-  "@provide_services": {
-    "description": "描述應用程式提供服務的功能"
-  },
   "estimated_intensity_legend": "Chú giải cường độ ước tính",
   "@estimated_intensity_legend": {
-    "description": "描述預估震度的圖例"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
   "only_used_during_earthquake_alerts": "Chỉ được sử dụng trong cảnh báo động đất",
   "@only_used_during_earthquake_alerts": {
-    "description": "此項目僅在地震速報時使用"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
   "weak_5": "5⁻",
   "@weak_5": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5弱"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5弱"
   },
   "strong_5": "5⁺",
   "@strong_5": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5強"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5強"
   },
   "weak_6": "6⁻",
   "@weak_6": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6弱"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6弱"
   },
   "strong_6": "6⁺",
   "@strong_6": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6強"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6強"
   },
   "lightning_1_5": "Trong vòng 5 phút sét đánh xuống đất",
   "@lightning_1_5": {
-    "description": "5 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 5 分鐘內發生的對地閃電"
   },
   "lightning_1_10": "Trong vòng 10 phút sét đánh xuống đất",
   "@lightning_1_10": {
-    "description": "10 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 10 分鐘內發生的對地閃電"
   },
   "lightning_1_30": "Trong vòng 30 phút sét đánh xuống đất",
   "@lightning_1_30": {
-    "description": "30 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 30 分鐘內發生的對地閃電"
   },
   "lightning_1_60": "Trong vòng 60 phút sét đánh xuống đất",
   "@lightning_1_60": {
-    "description": "60 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 60 分鐘內發生的對地閃電"
   },
   "lightning_0_5": "Trong vòng 5 phút tia chớp trên mây",
   "@lightning_0_5": {
-    "description": "5 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 5 分鐘內發生的雲間閃電"
   },
   "lightning_0_10": "Trong vòng 10 phút tia chớp trên mây",
   "@lightning_0_10": {
-    "description": "10 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 10 分鐘內發生的雲間閃電"
   },
   "lightning_0_30": "Trong vòng 30 phút tia chớp trên mây",
   "@lightning_0_30": {
-    "description": "30 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 30 分鐘內發生的雲間閃電"
   },
   "lightning_0_60": "Trong vòng 60 phút tia chớp trên mây",
   "@lightning_0_60": {
-    "description": "60 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 60 分鐘內發生的雲間閃電"
   },
   "abnormal": "Bất thường",
   "@abnormal": {
@@ -1274,31 +1241,31 @@
   },
   "photo_media_permission_request": "Vui lòng vào Cài đặt ứng dụng để tìm và cấp quyền “Ảnh và phương tiện” rồi thử lại.",
   "@photo_media_permission_request": {
-    "description": "「地震報告」路徑 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
+    "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
   "no_notification_history": "Không có lịch sử thông báo",
   "@no_notification_history": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 沒有通知紀錄"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 沒有通知紀錄"
   },
   "emergency": "Khẩn cấp",
   "@emergency": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急"
   },
   "notification_details": "Chi tiết thông báo",
   "@notification_details": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知詳細資訊"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知詳細資訊"
   },
   "notification_area": "Thông báo khu vực gửi",
   "@notification_area": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知發送區域"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知發送區域"
   },
   "emergency_notification": "Thông báo khẩn cấp",
   "@emergency_notification": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急通知"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急通知"
   },
   "general_notification": "Thông cáo chung",
   "@general_notification": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 一般通知"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 一般通知"
   },
   "please_allow_notification_permission": "Vui lòng vào Cài đặt ứng dụng để tìm và cấp quyền “Thông báo” rồi thử lại.",
   "@please_allow_notification_permission": {
@@ -1310,35 +1277,35 @@
   },
   "no_data_available": "Không có dữ liệu có sẵn",
   "@no_data_available": {
-    "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的資料"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 沒有可用的資料"
   },
   "server_status_overview": "Trang này trình bày tổng quan về trạng thái của máy chủ tại nhiều thời điểm khác nhau. Dữ liệu thô được cập nhật sau mỗi 5 giây và phiên bản cô đọng được hiển thị tại đây để tối ưu hóa việc sử dụng mạng. Xin lưu ý rằng thông tin này chỉ mang tính tham khảo và trạng thái thực tế phải dựa trên thông báo.",
   "@server_status_overview": {
-    "description": "「設定」路徑 → 「伺服器狀態」→ 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
   },
   "all_normal": "Tất cả đều bình thường",
   "@all_normal": {
-    "description": "伺服器狀態：全部正常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：全部正常"
   },
   "all_abnormal": "Tất cả đều bất thường",
   "@all_abnormal": {
-    "description": "伺服器狀態：全部異常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：全部異常"
   },
   "partially_abnormal": "Sự bất thường một phần",
   "@partially_abnormal": {
-    "description": "伺服器狀態：部分異常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：部分異常"
   },
   "normal": "Bình thường",
   "@normal": {
-    "description": "狀態：正常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：正常"
   },
   "unstable": "Không ổn định",
   "@unstable": {
-    "description": "狀態：不穩定"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：不穩定"
   },
   "no_data": "Không có dữ liệu",
   "@no_data": {
-    "description": "狀態：無資料"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：無資料"
   },
   "automatic_foreground_positioning": "Tự động định vị tiền cảnh",
   "@automatic_foreground_positioning": {
@@ -1376,6 +1343,15 @@
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
     "placeholders": {
       "lon": {
+        "type": "String"
+      }
+    }
+  },
+  "delay": "延遲: {serviceStatus_count} ms",
+  "@delay": {
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
+    "placeholders": {
+      "serviceStatus_count": {
         "type": "String"
       }
     }
