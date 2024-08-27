@@ -296,7 +296,7 @@
   "@report_error": {
     "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "버전 {version}\nExpTech 탐구 기술에 의해 제작\n일부 데이터 출처: CWA (중앙 기상청)",
+  "me_version": "버전 {version}\nExpTech 탐색 과학에서 제작\n일부 데이터 출처 CWA(대만 기상청)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -361,7 +361,7 @@
   "@dp_info_sound_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 災防資訊"
   },
-  "other_title": "其他",
+  "other_title": "기타",
   "@other_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
   },
@@ -381,7 +381,7 @@
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
-  "torrential_rain_alert_sound": "호우 특보",
+  "torrential_rain_alert_sound": "집중 호우 특보",
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
@@ -586,9 +586,9 @@
   "@sunny": {
     "description": "天氣狀況：晴"
   },
-  "partly_cloudy": "구름 조금",
+  "partly_cloudy": "곳에 따라 구름 많음",
   "@partly_cloudy": {
-    "description": "天氣狀況：多雲時晴"
+    "description": "天氣狀況：局部多雲"
   },
   "cloudy": "구름 많음",
   "@cloudy": {
@@ -598,33 +598,33 @@
   "@overcast": {
     "description": "天氣狀況：陰"
   },
-  "foggy": "안개",
+  "foggy": "엷은 안개",
   "@foggy": {
-    "description": "天氣狀況：霧"
+    "description": "天氣狀況：薄霧"
   },
-  "patchy_rain_possible": "국지적인 비가 올 수 있습니다.",
+  "patchy_rain_possible": "곳에 따라 가벼운 비가 내릴 수 있습니다.",
   "@patchy_rain_possible": {
-    "description": "天氣狀況：可能有局部降雨"
+    "description": "天氣狀況：可能有局部小雨"
   },
-  "patchy_snow_possible": "국지적인 눈이 올 수 있습니다.",
+  "patchy_snow_possible": "곳에 따라 가벼운 눈이 내릴 수 있습니다.",
   "@patchy_snow_possible": {
-    "description": "天氣狀況：可能有局部降雪"
+    "description": "天氣狀況：可能有局部小雪"
   },
-  "patchy_sleet_possible": "국지적인 진눈깨비가 올 수 있습니다.",
+  "patchy_sleet_possible": "곳에 따라 진눈깨비가 내릴 수 있습니다.",
   "@patchy_sleet_possible": {
-    "description": "天氣狀況：可能有局部雨夾雪"
+    "description": "天氣狀況：可能有局部小雨夾雪"
   },
-  "patchy_freezing_drizzle_possible": "국지적으로 얼은 이슬비가 내릴 수 있습니다",
+  "patchy_freezing_drizzle_possible": "국지적으로 가벼운 언진눈이 내릴 수 있습니다.",
   "@patchy_freezing_drizzle_possible": {
-    "description": "天氣狀況：可能有局部凍毛毛雨"
+    "description": "天氣狀況：可能有局部小凍霧雨"
   },
-  "thundery_outbreaks_possible": "국지적인 뇌우가 내릴 수 있습니다.",
+  "thundery_outbreaks_possible": "국지적으로 뇌우가 발생할 수 있습니다.",
   "@thundery_outbreaks_possible": {
-    "description": "天氣狀況：可能有局部雷雨"
+    "description": "天氣狀況：可能有雷雨"
   },
-  "blowing_snow": "눈날림",
+  "blowing_snow": "눈보라",
   "@blowing_snow": {
-    "description": "天氣狀況：高吹雪"
+    "description": "天氣狀況：飛雪"
   },
   "blizzard": "눈보라",
   "@blizzard": {
@@ -638,21 +638,21 @@
   "@freezing_fog": {
     "description": "天氣狀況：凍霧"
   },
-  "patchy_light_drizzle": "국지성 이슬비",
+  "patchy_light_drizzle": "국지적으로 가는 비",
   "@patchy_light_drizzle": {
-    "description": "天氣狀況：局部毛毛雨"
+    "description": "天氣狀況：局部細雨"
   },
-  "light_drizzle": "이슬비",
+  "light_drizzle": "가는 비",
   "@light_drizzle": {
-    "description": "天氣狀況：毛毛雨"
+    "description": "天氣狀況：細雨"
   },
-  "freezing_drizzle": "얼은 이슬비",
+  "freezing_drizzle": "어는 이슬비",
   "@freezing_drizzle": {
-    "description": "天氣狀況：凍毛毛雨"
+    "description": "天氣狀況：凍霧雨"
   },
-  "heavy_freezing_drizzle": "강한 얼은 이슬비",
+  "heavy_freezing_drizzle": "많은 어는 이슬비",
   "@heavy_freezing_drizzle": {
-    "description": "天氣狀況：大凍毛毛雨"
+    "description": "天氣狀況：大凍霧雨"
   },
   "patchy_light_rain": "국지성 가랑비",
   "@patchy_light_rain": {
@@ -662,41 +662,41 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "한때 비",
+  "moderate_rain_at_times": "때때로 비",
   "@moderate_rain_at_times": {
-    "description": "天氣狀況：間歇降雨"
+    "description": "天氣狀況：偶爾有雨"
   },
   "moderate_rain": "비",
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
-  "heavy_rain_at_times": "한때 폭우",
+  "heavy_rain_at_times": "때때로 폭우",
   "@heavy_rain_at_times": {
-    "description": "天氣狀況：間歇大雨"
+    "description": "天氣狀況：偶爾有大雨"
   },
   "heavy_rain": "폭우",
   "@heavy_rain": {
     "description": "天氣狀況：大雨"
   },
-  "light_freezing_rain": "어는 비",
+  "light_freezing_rain": "약한 어는 비",
   "@light_freezing_rain": {
-    "description": "天氣狀況：凍雨"
+    "description": "天氣狀況：微凍雨"
   },
-  "moderate_or_heavy_freezing_rain": "어는 비",
+  "moderate_or_heavy_freezing_rain": "중간 또는 강한 어는 비",
   "@moderate_or_heavy_freezing_rain": {
-    "description": "天氣狀況：凍雨"
+    "description": "天氣狀況：中度或大凍雨"
   },
-  "light_sleet": "약한 진눈깨비",
+  "light_sleet": "약한 비와 눈",
   "@light_sleet": {
-    "description": "天氣狀況：小雨夾雪"
+    "description": "天氣狀況：微雨夾雪"
   },
-  "moderate_or_heavy_sleet": "진눈깨비",
+  "moderate_or_heavy_sleet": "중간 또는 강한 비와 눈",
   "@moderate_or_heavy_sleet": {
-    "description": "天氣狀況：雨夾雪"
+    "description": "天氣狀況：中度或大雨夾雪"
   },
   "patchy_light_snow": "국지성 약한 눈",
   "@patchy_light_snow": {
-    "description": "天氣狀況：局部小雪"
+    "description": "天氣狀況：零星小雪"
   },
   "light_snow": "약한 눈",
   "@light_snow": {
@@ -718,107 +718,107 @@
   "@heavy_snow": {
     "description": "天氣狀況：大雪"
   },
-  "ice_pellets": "싸라기눈",
+  "ice_pellets": "우박",
   "@ice_pellets": {
-    "description": "天氣狀況：冰霰"
+    "description": "天氣狀況：冰丸"
   },
   "light_rain_shower": "약한 소나기",
   "@light_rain_shower": {
     "description": "天氣狀況：小陣雨"
   },
-  "moderate_or_heavy_rain_shower": "소나기",
+  "moderate_or_heavy_rain_shower": "중간 또는 강한 소나기",
   "@moderate_or_heavy_rain_shower": {
-    "description": "天氣狀況：陣雨"
+    "description": "天氣狀況：中度或大陣雨"
   },
-  "torrential_rain_shower": "강한 소나기",
+  "torrential_rain_shower": "폭우",
   "@torrential_rain_shower": {
-    "description": "天氣狀況：大陣雨"
+    "description": "天氣狀況：暴雨"
   },
-  "light_sleet_showers": "약한 진눈깨비",
+  "light_sleet_showers": "작은 우박",
   "@light_sleet_showers": {
-    "description": "天氣狀況：小陣雨夾雪"
+    "description": "天氣狀況：小冰雹雨"
   },
-  "moderate_or_heavy_sleet_showers": "진눈깨비",
+  "moderate_or_heavy_sleet_showers": "중간 또는 큰 우박",
   "@moderate_or_heavy_sleet_showers": {
-    "description": "天氣狀況：陣雨夾雪"
+    "description": "天氣狀況：中度或大冰雹雨"
   },
   "light_snow_showers": "약한 소낙눈",
   "@light_snow_showers": {
     "description": "天氣狀況：小陣雪"
   },
-  "moderate_or_heavy_snow_showers": "소낙눈",
+  "moderate_or_heavy_snow_showers": "중간 또는 강한 눈보라",
   "@moderate_or_heavy_snow_showers": {
-    "description": "天氣狀況：陣雪"
+    "description": "天氣狀況：中度或大陣雪"
   },
-  "light_showers_of_ice_pellets": "약한 소나기를 동반한 싸라기눈",
+  "light_showers_of_ice_pellets": "우박과 가벼운 비",
   "@light_showers_of_ice_pellets": {
-    "description": "天氣狀況：小陣雨伴隨冰霰"
+    "description": "天氣狀況：冰丸小雨"
   },
-  "moderate_or_heavy_showers_of_ice_pellets": "소나기를 동반한 싸라기눈",
+  "moderate_or_heavy_showers_of_ice_pellets": "중간 또는 큰 우박",
   "@moderate_or_heavy_showers_of_ice_pellets": {
-    "description": "天氣狀況：陣雨伴隨冰霰"
+    "description": "天氣狀況：中度或大冰丸"
   },
   "patchy_light_rain_with_thunder": "국지성 약한 뇌우",
   "@patchy_light_rain_with_thunder": {
     "description": "天氣狀況：局部小雷雨"
   },
-  "moderate_or_heavy_rain_with_thunder": "뇌우",
+  "moderate_or_heavy_rain_with_thunder": "중간 또는 강한 뇌우",
   "@moderate_or_heavy_rain_with_thunder": {
-    "description": "天氣狀況：雷雨"
+    "description": "天氣狀況：中度或大雷雨"
   },
   "patchy_light_snow_with_thunder": "국지성 약한 뇌설",
   "@patchy_light_snow_with_thunder": {
     "description": "天氣狀況：局部小雪伴雷"
   },
-  "moderate_or_heavy_snow_with_thunder": "뇌설",
+  "moderate_or_heavy_snow_with_thunder": "중간 또는 강한 눈과 천둥",
   "@moderate_or_heavy_snow_with_thunder": {
-    "description": "天氣狀況：降雪伴雷"
+    "description": "天氣狀況：中度或大雪伴雷"
   },
-  "more": "更多",
+  "more": "더보기",
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "更多功能列表",
+  "more_features": "더 많은 기능",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_generally": "一般",
+  "me_generally": "일반",
   "@me_generally": {
     "description": "「我」路徑 → 一般"
   },
-  "me_debug": "除錯",
+  "me_debug": "디버그",
   "@me_debug": {
     "description": "「我」路徑 → 除錯"
   },
-  "official_web": "ExpTech 官網",
+  "official_web": "ExpTech 공식 웹사이트",
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"
   },
-  "notification_record": "行動通知推播紀錄",
+  "notification_record": "푸시 알림 기록",
   "@notification_record": {
     "description": "「我」路徑 → 行動通知推播紀錄"
   },
-  "advanced_features": "進階功能",
+  "advanced_features": "고급 기능",
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整的 DPIP 的進階功能",
+  "advanced_features_title": "DPIP 의 고급 기능 조정",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
-  "enable_monitor": "啟用強震監視器",
+  "enable_monitor": "강진 모니터링 활성화",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
-  "no_tsunami_information": "近期無海嘯資訊",
+  "no_tsunami_information": "최근에 쓰나미 정보가 없습니다.",
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_warning": "海嘯警報",
+  "tsunami_warning": "쓰나미 경보",
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "{id}號 第{serial}報",
+  "tsunami_number": "ID{id} 제{serial}보",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -831,39 +831,39 @@
       }
     }
   },
-  "tsunami_publish": "發布",
+  "tsunami_publish": "발표됨",
   "@tsunami_publish": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發布"
   },
-  "tsunami_renew": "更新",
+  "tsunami_renew": "갱신",
   "@tsunami_renew": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 更新"
   },
-  "tsunami_relieve": "解除",
+  "tsunami_relieve": "해제",
   "@tsunami_relieve": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
   },
-  "estimated_time_wave": "預估海嘯到達時間及波高",
+  "estimated_time_wave": "예상 쓰나미 도착 시간 및 파고",
   "@estimated_time_wave": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
   },
-  "observing_tsunamis": "各地觀測到的海嘯",
+  "observing_tsunamis": "각지에서 관측된 쓰나미",
   "@observing_tsunamis": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   },
-  "occurrence_time": "發生時間",
+  "occurrence_time": "발생 시각",
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "epicenter": "震央",
+  "epicenter": "진원지",
   "@epicenter": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 震央"
   },
-  "scale": "規模",
+  "scale": "규모",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
   },
-  "depth": "深度",
+  "depth": "깊이",
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
@@ -876,316 +876,508 @@
       }
     }
   },
-  "home_Safety": "一切平安，無事件發生。",
+  "home_Safety": "모든 것이 안전하며 사건이 발생하지 않았습니다.",
   "@home_Safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
-  "update_log": "更新日誌",
+  "update_log": "업데이트 로그",
   "@update_log": {
     "description": "「設定」路徑 → 更新日誌"
   },
-  "interval_3_days": "3天",
+  "interval_3_days": "3일",
   "@interval_3_days": {
     "description": "3天"
   },
-  "interval_2_days": "2天",
+  "interval_2_days": "2일",
   "@interval_2_days": {
     "description": "2天"
   },
-  "interval_24_hours": "24小時",
+  "interval_24_hours": "24시간",
   "@interval_24_hours": {
     "description": "24小時"
   },
-  "interval_12_hours": "12小時",
+  "interval_12_hours": "12시간",
   "@interval_12_hours": {
     "description": "12小時"
   },
-  "interval_6_hours": "6小時",
+  "interval_6_hours": "6시간",
   "@interval_6_hours": {
     "description": "6小時"
   },
-  "interval_3_hours": "3小時",
+  "interval_3_hours": "3시간",
   "@interval_3_hours": {
     "description": "3小時"
   },
-  "interval_1_hour": "1小時",
+  "interval_1_hour": "1시간",
   "@interval_1_hour": {
     "description": "1小時"
   },
-  "interval_10_minutes": "10分鐘",
+  "interval_10_minutes": "10분",
   "@interval_10_minutes": {
     "description": "10分鐘"
   },
-  "interval_now": "現在",
+  "interval_now": "오늘",
   "@interval_now": {
-    "description": "現在"
+    "description": "今日"
   },
-  "welcome_message": "歡迎使用 DPIP",
+  "welcome_message": "DPIP에 오신 것을 환영합니다",
   "@welcome_message": {
     "description": "「歡迎」頁面 → 歡迎使用 DPIP"
   },
-  "disaster_info_platform": "防災資訊平台",
+  "disaster_info_platform": "방재정보 플랫폼",
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+  "dpip_description": "DPIP는 TREM-Net(대만의 실시간 지진 관측 네트워크) 정보 및 중앙 기상청 자료를 통합하여 통합, 단일 및 편리한 방재 정보 응용 프로그램을 제공하는 대만 현지 팀이 설계한 앱입니다.",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
-  "next_step": "下一步",
+  "next_step": "다음 단계",
   "@next_step": {
     "description": "「歡迎」頁面 → 下一步"
   },
-  "who_we_are": "我們是誰？",
+  "who_we_are": "저희에 관하여",
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+  "exptech_studio_description": "ExpTech Studio는 대부분 학생으로 구성된 팀으로, 평균 연령이 20세 이하이며, 15명 이상의 인원이 참여하고 있습니다. 멤버들은 대만 북부, 중부, 남부, 일본, 한국, 중국의 학생들로 구성되어 있습니다.",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "우리의 목표",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+  "founding_mission": "설립 초기의 목적은 컴퓨터와 기술에 관심과 능력이 있는 학생들을 모집하는 것이었으며, 이후에는 학교 밖으로 발전하여 현재의 모습으로 발전하였습니다.",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
-  "notice": "注意事項",
+  "notice": "주의사항",
   "@notice": {
     "description": "注意事項"
   },
-  "notice_details": "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+  "notice_details": "DPIP는 ExpTech 및 대만 기상청으로부터 다양한 정보를 전달하므로, 다음 사항의 유의하여 사용하십시오.",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "任何資訊應以中央氣象署發布之內容為準。",
+  "official_info": "모든 정보는 대만 기상청에서 발표한 내용을 기준으로 합니다.",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
-  "information_reliability": "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。",
+  "information_reliability": "네트워크 상태, 서버 상태, 애플리케이션 상태, 상위 데이터 소스 상태 등 여러 요인에 따라 정보를 수신되지 않을 가능성이 있으며, 이를 방지하기 위해 최선을 다하겠지만 발생하지 않을 것이라고 보장하지는 않습니다.",
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強烈搖晃有機率比通知早抵達使用者所在地。",
+  "strong_shake_warning": "강한 진동이 알림보다 사용자 위치에 먼저 도착할 가능성이 있습니다.",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。",
+  "earthquake_alert_warning": "지진 속보는 빠른 계산 결과로, 상당한 오차가 있을 수 있으니 이해하고 신중히 사용해 주세요.",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。",
+  "legal_risks": "공식적으로 인정되지 않은 모든 행위는 법적 위험을 부담할 수 있으므로 관련 규범을 준수해야 합니다.",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
-  "permission": "權限",
+  "permission": "권한",
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
+  "privacy_commitment": "우리는 항상 사용자와 함께하며 사용자의 프라이버시를 위해 끊임없이 노력합니다.",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
-  "required_info_permissions": "所需的資訊和權限列表：",
+  "required_info_permissions": "필요한 정보 및 권한 목록:",
   "@required_info_permissions": {
     "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
-  "notification": "通知",
+  "notification": "알림",
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供通知服務",
+  "notification_service_description": "알림 서비스를 제공하기 위해 사용됨",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 用於提供通知服務"
   },
-  "location_based_service": "用於提供基於位置的服務",
+  "location_based_service": "위치 기반 서비스를 제공하기 위해 사용됨",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片",
+  "data_visualization_storage": "대만 기상청 또는 ExpTech에서 제공하는 데이터 시각화 이미지를 저장하는 데 사용",
   "@data_visualization_storage": {
-    "description": "「歡迎」頁面 → 用於存儲中央氣象署或 ExpTech 提供之數據可視化圖片"
+    "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
-  "disagree": "不同意",
+  "disagree": "동의하지 않음",
   "@disagree": {
     "description": "「歡迎」頁面 → 不同意"
   },
-  "agree": "同意",
+  "agree": "동의",
   "@agree": {
     "description": "「歡迎」頁面 → 同意"
   },
-  "trem_service_description": "在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。",
+  "trem_service_description": "DPIP 에서 ExpTech의 TREM 강진 모니터링 서비스를 확인할 수 있습니다. 아래 조건을 자세히 읽고 활성화 여부를 선택하세요.",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。",
+  "real_time_magnitude_warning": "표시된 실시간 진도는 대만 기상청에서 제공한 자료가 아니므로 대만 기상청에서 관측한 결과와 일치하지 않을 수 있으며, 대만 기상청에서 발표한 정보를 기준으로 삼아야 합니다.",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。",
+  "trem_station_warning": "지진 모니터에서 사용하는 지진계는 ExpTech 소유이며, 대만 기상청의 관리하에 있지 않습니다. 대만 기상청에 고장이나 의견을 전달하지 말아 주세요. 이로 인해 기상청에 불편을 초래할 수 있습니다.",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。",
+  "trem_monitor_description": "지진 모니터는 TREM(대만 즉시 지진 모니터링)에서 대만 전역의 현재 진동을 관측하여 실시간 진도 표시 기능을 제공합니다. 지진 발생 시에는 스테이션의 색상 변화를 통해 지진파 전파 상황을 관찰할 수 있습니다.",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
-  "station_noise_warning": "由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。",
+  "station_noise_warning": "일상적인 잡음(자동차, 공장, 건설 등) 때문에 평소에도 스테이션의 색상이 변할 수 있습니다. 또한, 실시간 데이터이기 때문에 현재로서는 고장 여부를 판단할 수 없으므로, 지진계 고장으로 인해 색상이 변할 수도 있습니다.",
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
+  "trem_net_deployment": "2022년 6월 초부터 대만 전역에 지진계를 배치하기 시작했습니다. TREM-Net(TREM 지진관측망)은 SE-Net(강진 관측망 '가속도계')과 MS-Net(미세 진동 관측망 '속도계')의 두 개의 관측 네트워크로 구성되어 있으며, 지진 발생 시 다양한 데이터를 기록합니다.",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
-  "discover_new_version": "發現新版本",
+  "discover_new_version": "새 버전 발견",
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
-  "update_to_latest_version": "更新至最新版本以獲得最佳體驗",
+  "update_to_latest_version": "최상의 경험을 위해 최신 버전으로 업데이트하기",
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
-  "current_version": "目前版本",
+  "current_version": "현재 버전",
   "@current_version": {
     "description": "「發現新版本」頁面 → 目前版本"
   },
-  "latest_version": "最新版本",
+  "latest_version": "최신 버전",
   "@latest_version": {
     "description": "「發現新版本」頁面 → 最新版本"
   },
-  "update_now": "立即更新",
+  "update_now": "지금 업데이트",
   "@update_now": {
     "description": "「發現新版本」頁面 → 立即更新"
   },
-  "skip_for_now": "暫時略過",
+  "skip_for_now": "지금은 건너뛰기",
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新完成",
+  "update_complete": "업데이트 완료",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIP 更新完成，要前往查看更新日誌嗎？",
+  "update_complete_prompt": "DPIP가 업데이트가 완료되었습니다. 업데이트 로그를 보러 가시겠습니까?",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
-  "remind_later": "稍後再說",
+  "remind_later": "나중에 보기",
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
-  "go_to_view": "前往查看",
+  "go_to_view": "보기로 이동",
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
-  "announcement": "公告",
+  "announcement": "공지",
   "@announcement": {
     "description": "公告"
   },
-  "new_announcement_prompt": "有新的公告，要前往查看嗎？",
+  "new_announcement_prompt": "새로운 공지가 있습니다. 확인하러 가시겠습니까?",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "目前沒有公告",
+  "no_announcements": "현재 공지가 없습니다.",
   "@no_announcements": {
     "description": "「公告」 → 前沒有公告"
   },
-  "contributor": "貢獻者",
+  "contributor": "기여자",
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "內測版",
+  "beta_version": "비공개 베타 버전",
   "@beta_version": {
     "description": "應用程式的內部測試版本"
   },
-  "unable_to_load_changelog": "無法載入更新日誌，請稍後再試。",
+  "unable_to_load_changelog": "업데이트 로그를 불러올 수 없습니다. 나중에 다시 시도해 주세요.",
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」→ 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "目前沒有更新日誌",
+  "no_changelog": "현재 업데이트 로그가 없습니다.",
   "@no_changelog": {
     "description": "當前沒有任何更新日誌"
   },
-  "announcement_details": "公告詳情",
+  "announcement_details": "구체적인 공지 사항",
   "@announcement_details": {
     "description": "「公告」 → 查看公告的具體內容"
   },
-  "version_details": "版本詳情",
+  "version_details": "버전 세부정보",
   "@version_details": {
     "description": "「更新日誌」 → 版本詳情"
   },
-  "unable_to_obtain_permission": "無法取得權限",
+  "unable_to_obtain_permission": "권한을 얻을 수 없습니다.",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
-  "error_saving_image": "儲存圖片時發生錯誤",
+  "error_saving_image": "이미지를 저장하는 동안 오류가 발생했습니다.",
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
-  "confirm": "確定",
+  "confirm": "확인",
   "@confirm": {
     "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
   },
-  "no_search_results": "無搜尋結果",
+  "no_search_results": "검색결과가 없습니다",
   "@no_search_results": {
     "description": "當搜尋無結果時顯示的訊息 → 儲存圖片時發生錯誤"
   },
-  "always_allow": "一律允許",
+  "always_allow": "모두 허용",
   "@always_allow": {
     "description": "「存取權限彈窗」 → 一律允許"
   },
-  "always": "永遠",
+  "always": "항상",
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_start_permission_info": "더 나은 자동 위치 추적 경험을 위해, DPIP가 백그라운드에서 자동으로 위치 정보를 설정할 수 있도록 '자동 실행 권한'을 부여해야 합니다.",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "auto_start_permission_experience": "더 나은 DPIP 경험을 위해, DPIP가 백그라운드에서 정상적으로 경고 알림을 수신할 수 있도록 '자동 실행 권한'을 부여해야 합니다.",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "auto_start_permission": "自啟動權限",
+  "auto_start_permission": "자동 실행 권한",
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_location_experience_info": "더 나은 자동 위치 추적 경험을 위해, DPIP가 백그라운드에서 자동으로 위치 정보를 설정할 수 있도록 '위치' 권한을 항상 허용해야 합니다.",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "unlimited_permission_experience_info": "더 나은 DPIP 경험을 위해, DPIP가 백그라운드에서 정상적으로 경고 알림을 수신할 수 있도록 '제한 없음' 권한을 부여해야 합니다.",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "power_saving_strategy": "省電策略",
+  "power_saving_strategy": "전원 절약 설정",
   "@power_saving_strategy": {
     "description": "「存取權限彈窗」 → 省電策略"
   },
-  "notification_permission_denied": "通知功能已被拒絕，請移至設定允許權限。",
+  "notification_permission_denied": "알림 기능이 거부되었습니다. 설정으로 이동하여 권한을 허용해 주세요.",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
-  "permission_request": "權限請求",
+  "permission_request": "권한 요청",
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
   },
-  "manual_permission_enablement": "需要使用者手動到設定開啟相關權限。",
+  "manual_permission_enablement": "사용자가 수동으로 설정에서 관련 권한을 활성화해야 합니다.",
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
-  "location_not_set": "尚未設定所在地",
+  "location_not_set": "위치가 설정되지 않았습니다.",
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
-  "location_setting_required": "DPIP 需要設定所在地才能正常運作。點擊「前往設定」設定所在地後再試一次。",
+  "location_setting_required": "DPIP는 위치 설정이 필요합니다. '설정으로 이동'을 클릭하여 위치를 설정한 후 다시 시도해 주세요.",
   "@location_setting_required": {
     "description": "提示用戶需要設定所在地才能正常運作的訊息"
   },
-  "go_to_settings": "前往設定",
+  "go_to_settings": "설정으로 이동",
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
+  },
+  "notification_log": "알림 발송 기록",
+  "@notification_log": {
+    "description": "「我」路徑 → 通知發送紀錄"
+  },
+  "app_logs": "앱 로그",
+  "@app_logs": {
+    "description": "「我」路徑 → App 日誌"
+  },
+  "copy_fcm_token_error": "FCM 토큰 복사 중 오류 발생",
+  "@copy_fcm_token_error": {
+    "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
+  },
+  "provide_services": "서비스 제공",
+  "@provide_services": {
+    "description": "描述應用程式提供服務的功能"
+  },
+  "estimated_intensity_legend": "예상 진도 범례",
+  "@estimated_intensity_legend": {
+    "description": "描述預估震度的圖例"
+  },
+  "only_used_during_earthquake_alerts": "지진 속보 시에만 사용",
+  "@only_used_during_earthquake_alerts": {
+    "description": "此項目僅在地震速報時使用"
+  },
+  "weak_5": "약한 5",
+  "@weak_5": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5弱"
+  },
+  "strong_5": "강한 5",
+  "@strong_5": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5強"
+  },
+  "weak_6": "약한 6",
+  "@weak_6": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6弱"
+  },
+  "strong_6": "강한 6",
+  "@strong_6": {
+    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6強"
+  },
+  "lightning_1_5": "5분 이내 지상 번개",
+  "@lightning_1_5": {
+    "description": "5 分鐘內發生的對地閃電"
+  },
+  "lightning_1_10": "10분 이내 지상 번개",
+  "@lightning_1_10": {
+    "description": "10 分鐘內發生的對地閃電"
+  },
+  "lightning_1_30": "30분 이내 지상 번개",
+  "@lightning_1_30": {
+    "description": "30 分鐘內發生的對地閃電"
+  },
+  "lightning_1_60": "60분 이내 지상 번개",
+  "@lightning_1_60": {
+    "description": "60 分鐘內發生的對地閃電"
+  },
+  "lightning_0_5": "5분 이내 구름 사이 번개",
+  "@lightning_0_5": {
+    "description": "5 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_10": "10분 이내 구름 사이 번개",
+  "@lightning_0_10": {
+    "description": "10 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_30": "30분 이내 구름 사이 번개",
+  "@lightning_0_30": {
+    "description": "30 分鐘內發生的雲間閃電"
+  },
+  "lightning_0_60": "60분 이내 구름 사이 번개",
+  "@lightning_0_60": {
+    "description": "60 分鐘內發生的雲間閃電"
+  },
+  "abnormal": "이상",
+  "@abnormal": {
+    "description": "狀態：異常"
+  },
+  "network_or_server_error": "네트워크 연결 또는 서버 이상",
+  "@network_or_server_error": {
+    "description": "網路連線或伺服器異常。"
+  },
+  "retry": "다시 시도",
+  "@retry": {
+    "description": "重試"
+  },
+  "photo_media_permission_request": "애플리케이션 설정에서 '사진 및 미디어' 권한을 찾아 허용한 후 다시 시도해 주세요.",
+  "@photo_media_permission_request": {
+    "description": "「地震報告」路徑 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
+  },
+  "no_notification_history": "알림 기록 없음",
+  "@no_notification_history": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 沒有通知紀錄"
+  },
+  "emergency": "긴급",
+  "@emergency": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急"
+  },
+  "notification_details": "알림 세부 정보",
+  "@notification_details": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知詳細資訊"
+  },
+  "notification_area": "알림 발송 지역",
+  "@notification_area": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知發送區域"
+  },
+  "emergency_notification": "긴급 알림",
+  "@emergency_notification": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急通知"
+  },
+  "general_notification": "일반 알림",
+  "@general_notification": {
+    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 一般通知"
+  },
+  "please_allow_notification_permission": "애플리케이션 설정에서 '알림' 권한을 찾아 허용한 후 다시 시도해 주세요.",
+  "@please_allow_notification_permission": {
+    "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
+  },
+  "please_allow_location_permission": "애플리케이션 설정에서 '위치' 권한을 찾아 허용한 후 다시 시도해 주세요.",
+  "@please_allow_location_permission": {
+    "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
+  },
+  "no_data_available": "사용할 수 있는 데이터가 없습니다.",
+  "@no_data_available": {
+    "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的資料"
+  },
+  "server_status_overview": "이 페이지는 서버의 시간대별 상태 개요를 보여줍니다. 원본 데이터는 5초마다 업데이트되며, 여기서는 네트워크 사용량을 최적화하기 위해 축약된 버전을 표시합니다. 참고로, 이 정보는 참고용일 뿐 실제 상황은 공지를 기준으로 합니다.",
+  "@server_status_overview": {
+    "description": "「設定」路徑 → 「伺服器狀態」→ 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
+  },
+  "all_normal": "모두 정상",
+  "@all_normal": {
+    "description": "伺服器狀態：全部正常"
+  },
+  "all_abnormal": "모두 이상",
+  "@all_abnormal": {
+    "description": "伺服器狀態：全部異常"
+  },
+  "partially_abnormal": "일부 이상",
+  "@partially_abnormal": {
+    "description": "伺服器狀態：部分異常"
+  },
+  "normal": "정상",
+  "@normal": {
+    "description": "狀態：正常"
+  },
+  "unstable": "불안정",
+  "@unstable": {
+    "description": "狀態：不穩定"
+  },
+  "no_data": "데이터 없음",
+  "@no_data": {
+    "description": "狀態：無資料"
+  },
+  "automatic_foreground_positioning": "전경 자동 위치 설정",
+  "@automatic_foreground_positioning": {
+    "description": "前景自動定位"
+  },
+  "south_latitude": "남위 {lat_abs} 도",
+  "@south_latitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 南緯 {lat_abs} 度",
+    "placeholders": {
+      "lat_abs": {
+        "type": "String"
+      }
+    }
+  },
+  "north_latitude": "북위 {lat} 도",
+  "@north_latitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 北緯 {lat} 度",
+    "placeholders": {
+      "lat": {
+        "type": "String"
+      }
+    }
+  },
+  "west_longitude": "서경 {lon_abs} 도",
+  "@west_longitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 西經 {lon_abs} 度",
+    "placeholders": {
+      "lon_abs": {
+        "type": "String"
+      }
+    }
+  },
+  "east_longitude": "동경 {lon} 도",
+  "@east_longitude": {
+    "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
+    "placeholders": {
+      "lon": {
+        "type": "String"
+      }
+    }
   }
 }
