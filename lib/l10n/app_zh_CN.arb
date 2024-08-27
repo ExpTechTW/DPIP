@@ -590,7 +590,7 @@
   "@overcast": {
     "description": "天氣狀況：陰"
   },
-  "foggy": "薄霧",
+  "foggy": "薄雾",
   "@foggy": {
     "description": "天氣狀況：薄霧"
   },
@@ -602,7 +602,7 @@
   "@patchy_snow_possible": {
     "description": "天氣狀況：可能有局部小雪"
   },
-  "patchy_sleet_possible": "可能有局部小雨夾雪",
+  "patchy_sleet_possible": "可能有局部小雨夹雪",
   "@patchy_sleet_possible": {
     "description": "天氣狀況：可能有局部小雨夾雪"
   },
@@ -1311,7 +1311,7 @@
   "@automatic_foreground_positioning": {
     "description": "前景自動定位"
   },
-  "south_latitude": "南緯 {lat_abs} 度",
+  "south_latitude": "南纬 {lat_abs} 度",
   "@south_latitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 南緯 {lat_abs} 度",
     "placeholders": {
@@ -1320,7 +1320,7 @@
       }
     }
   },
-  "north_latitude": "北緯 {lat} 度",
+  "north_latitude": "北纬 {lat} 度",
   "@north_latitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 北緯 {lat} 度",
     "placeholders": {
@@ -1329,7 +1329,7 @@
       }
     }
   },
-  "west_longitude": "西經 {lon_abs} 度",
+  "west_longitude": "西经 {lon_abs} 度",
   "@west_longitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 西經 {lon_abs} 度",
     "placeholders": {
@@ -1338,7 +1338,7 @@
       }
     }
   },
-  "east_longitude": "東經 {lon} 度",
+  "east_longitude": "东经 {lon} 度",
   "@east_longitude": {
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
     "placeholders": {
@@ -1347,7 +1347,7 @@
       }
     }
   },
-  "delay": "延遲: {serviceStatus_count} ms",
+  "delay": "延迟：{serviceStatus_count} ms",
   "@delay": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
     "placeholders": {
