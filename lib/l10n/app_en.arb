@@ -602,19 +602,19 @@
   "@patchy_snow_possible": {
     "description": "天氣狀況：可能有局部小雪"
   },
-  "patchy_sleet_possible": "可能有局部小雨夾雪",
+  "patchy_sleet_possible": "Possible localized light rain and sleet",
   "@patchy_sleet_possible": {
     "description": "天氣狀況：可能有局部小雨夾雪"
   },
-  "patchy_freezing_drizzle_possible": "可能有局部小凍霧雨",
+  "patchy_freezing_drizzle_possible": "There may be local light freezing fog and rain",
   "@patchy_freezing_drizzle_possible": {
     "description": "天氣狀況：可能有局部小凍霧雨"
   },
-  "thundery_outbreaks_possible": "可能有雷雨",
+  "thundery_outbreaks_possible": "There may be a thunderstorm",
   "@thundery_outbreaks_possible": {
     "description": "天氣狀況：可能有雷雨"
   },
-  "blowing_snow": "飛雪",
+  "blowing_snow": "blizzard",
   "@blowing_snow": {
     "description": "天氣狀況：飛雪"
   },
@@ -630,7 +630,7 @@
   "@freezing_fog": {
     "description": "天氣狀況：凍霧"
   },
-  "patchy_light_drizzle": "局部細雨",
+  "patchy_light_drizzle": "Partly drizzle",
   "@patchy_light_drizzle": {
     "description": "天氣狀況：局部細雨"
   },
