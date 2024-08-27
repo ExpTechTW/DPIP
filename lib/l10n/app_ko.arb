@@ -855,7 +855,7 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "一切平安，無事件發生。",
+  "home_safety": "모든 것이 평안합니다.",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -1347,7 +1347,7 @@
       }
     }
   },
-  "delay": "延遲: {serviceStatus_count} ms",
+  "delay": "지연: {serviceStatus_count} ms",
   "@delay": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
     "placeholders": {
