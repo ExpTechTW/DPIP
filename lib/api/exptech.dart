@@ -439,9 +439,8 @@ class ExpTech {
     return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
   }
 
-  Future<String> loginUser(String? name, String email, String password) async {
+  Future<String> login(String? name, String email, String password) async {
     final url = Uri.parse('https://api-1.exptech.dev/api/v3/et/login');
-
     final response = await post(
       url,
       headers: {
@@ -452,6 +451,20 @@ class ExpTech {
         'pass': password,
         'name': '${name ?? "me"}/dpip/${Global.packageInfo.version.toString()}/${Platform.isAndroid ? "Android" : "IOS"}',
       }),
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to login: ${response.statusCode}');
+    }
+  }
+
+  Future<String> logout(String token) async {
+    final url = Uri.parse('https://api-1.exptech.dev/api/v3/et/logout');
+    final response = await delete(
+      url,
+      headers: {'Authorization': 'Basic $token'},
     );
 
     if (response.statusCode == 200) {

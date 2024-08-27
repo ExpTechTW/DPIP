@@ -15,6 +15,7 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
   bool monitorEnabled = Global.preference.getBool("monitor") ?? false;
   bool devEnabled = Global.preference.getBool("dev") ?? false;
   bool isLoggedIn = Global.preference.getBool("isLoggedIn") ?? false;
+  String token = Global.preference.getString("token") ?? "";
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -30,11 +31,12 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       try {
-        String result = await ExpTech().loginUser(_usernameController.text, _emailController.text, _passwordController.text);
+        String result = await ExpTech().login(_usernameController.text, _emailController.text, _passwordController.text);
         TalkerManager.instance.debug("登入: $result");
         Global.preference.setString("token",result);
         Global.preference.setBool("isLoggedIn",true);
         setState(() {
+          token = result;
           isLoggedIn = true;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,8 +54,8 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
     }
   }
 
-  void _logout() {
-    // 这里应该实现实际的登出逻辑
+  Future<void> _logout() async {
+    await ExpTech().logout(token);
     Global.preference.remove("token");
     Global.preference.setBool("isLoggedIn",false);
     setState(() {
