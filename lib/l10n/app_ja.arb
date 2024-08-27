@@ -1043,11 +1043,11 @@
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新が完了",
+  "update_complete": "更新完了",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIPが更新されましたが、変更履歴をご覧になりたいですか？",
+  "update_complete_prompt": "DPIPが更新されました、変更履歴をご覧になりますか？",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
@@ -1063,7 +1063,7 @@
   "@announcement": {
     "description": "「我」路徑 → 公告"
   },
-  "new_announcement_prompt": "新発表をチェックしたい？",
+  "new_announcement_prompt": "新発表をチェックしますか？",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
@@ -1079,7 +1079,7 @@
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」標題 → 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "変更履歴はない。",
+  "no_changelog": "変更履歴はありません。",
   "@no_changelog": {
     "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
@@ -1091,7 +1091,7 @@
   "@version_details": {
     "description": "「我」路徑 → 「更新日誌」標題 → 版本詳情"
   },
-  "unable_to_obtain_permission": "権限が得られない",
+  "unable_to_obtain_permission": "権限がありません",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
@@ -1147,11 +1147,11 @@
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
   },
-  "manual_permission_enablement": "ユーザーは手動で設定ページに移動、関連する権限を開く必要がある。",
+  "manual_permission_enablement": "ユーザーは手動で設定ページに移動、関連する権限を有効にする必要があります。",
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
-  "location_not_set": "所在地を設定していない",
+  "location_not_set": "所在地を設定していません",
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
