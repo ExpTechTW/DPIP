@@ -13,6 +13,7 @@ import "package:dpip/model/station.dart";
 import "package:dpip/model/station_info.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/int.dart";
+import "package:dpip/util/extension/latlng.dart";
 import "package:dpip/util/geojson.dart";
 import "package:dpip/util/instrumental_intensity_color.dart";
 import "package:dpip/util/intensity_color.dart";
@@ -24,7 +25,6 @@ import "package:dpip/widget/map/map.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
-import "package:timezone/timezone.dart" as tz;
 
 import "eew_info.dart";
 
@@ -70,17 +70,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   double userLon = 0;
   double _ping = 0;
   String _formattedPing = "";
-  Map<String, double> _eewDist = {};
-  Map<String, int> _eewUpdateList = {};
-  Map<String, Map<String, int>> _userEewArriveTime = {};
-  Map<String, int> _userEewIntensity = {};
-  Map<String, Eew> _eewLastInfo = {};
+  final Map<String, double> _eewDist = {};
+  final Map<String, int> _eewUpdateList = {};
+  final Map<String, Map<String, int>> _userEewArriveTime = {};
+  final Map<String, int> _userEewIntensity = {};
+  final Map<String, Eew> _eewLastInfo = {};
   Rts? _rtsData;
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
-  bool _isEewBoxVisible = true;
+  final bool _isEewBoxVisible = true;
   bool isUserLocationValid = false;
-  int _isTsunamiVisible = 0;
   final Map<String, dynamic> _eewIntensityArea = {};
   final DraggableScrollableController sheetController = DraggableScrollableController();
   final sheetInitialSize = 0.2;
@@ -253,13 +252,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ),
     );
 
-    await _mapController.addGeoJsonSource(
-      "box-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": [],
-      },
-    );
+    await _mapController.addGeoJsonSource("box-geojson", GeoJsonBuilder.empty);
 
     await _mapController.addLayer(
         "box-geojson",
@@ -539,7 +532,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                 ),
                               ),
                               Text(
-                                "${DateFormat("yyyy/MM/dd HH:mm:ss").format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _eewLastInfo[eew.id]!.eq.time))} 發震",
+                                "${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} 發震",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: context.colors.onSurfaceVariant,
@@ -922,9 +915,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       return false;
     }).map((e) {
       StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
-      return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-          .setId(int.parse(e.key))
-          .setGeometry(info.latlng.toGeoJsonCoordinates());
+      return info.latlng.toFeatureBuilder().setId(int.parse(e.key));
     }).toList();
 
     return GeoJsonBuilder().setFeatures(features).build();
@@ -932,10 +923,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   Map<String, dynamic> _generateStationGeoJson([Rts? rtsData]) {
     if (rtsData == null) {
-      return {
-        "type": "FeatureCollection",
-        "features": [],
-      };
+      return GeoJsonBuilder.empty;
     }
 
     final features = _stations.entries.where((e) {
@@ -947,24 +935,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
       return true;
     }).map((e) {
-      Map<String, dynamic> properties = {"i": rtsData.station[e.key]?.i};
-
       StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
-      return {
-        "type": "Feature",
-        "properties": properties,
-        "id": e.key,
-        "geometry": {
-          "coordinates": [info.longitude, info.latitude],
-          "type": "Point"
-        }
-      };
+      return info.latlng.toFeatureBuilder().setProperty("i", rtsData.station[e.key]?.i).setId(int.parse(e.key));
     }).toList();
 
-    return {
-      "type": "FeatureCollection",
-      "features": features,
-    };
+    return GeoJsonBuilder().setFeatures(features).build();
   }
 
   dynamic _getStationColorExpression() {
@@ -1137,19 +1112,20 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
-                    DateFormat("yyyy/MM/dd HH:mm:ss").format((!_dataStatus())
-                        ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _lsatGetRtsDataTime)
+                    DateFormat(context.i18n.datetime_format).format((!_dataStatus())
+                        ? _lsatGetRtsDataTime.asTZDateTime
                         : (_timeReplay == 0)
-                            ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _getCurrentTime())
-                            : tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _timeReplay)),
+                            ? _getCurrentTime().asTZDateTime
+                            : _timeReplay.asTZDateTime),
                     style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: (!_dataStatus())
-                            ? Colors.red
-                            : (_timeReplay == 0)
-                                ? context.colors.onSurface
-                                : Colors.orangeAccent),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: (!_dataStatus())
+                          ? Colors.red
+                          : (_timeReplay == 0)
+                              ? context.colors.onSurface
+                              : Colors.orangeAccent,
+                    ),
                   ),
                 ),
               ),
@@ -1170,13 +1146,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                   child: Text(
                     (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
                     style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: (!_dataStatus())
-                            ? Colors.red
-                            : (_ping > 1)
-                                ? Colors.orange
-                                : Colors.green),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: (!_dataStatus())
+                          ? Colors.red
+                          : (_ping > 1)
+                              ? Colors.orange
+                              : Colors.green,
+                    ),
                   ),
                 ),
               ),
@@ -1188,11 +1165,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               top: 58,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [..._rtsUI],
+                children: _rtsUI,
               ),
             ),
           Positioned.fill(
-            child: EewDraggableSheet(eewUI: _eewUI),
+            child: EewDraggableSheet(child: _eewUI),
           ),
           if (_showLegend)
             Positioned(
@@ -1213,12 +1190,11 @@ class _TopInfoBox extends StatelessWidget {
   final int currentTime;
 
   const _TopInfoBox({
-    Key? key,
     required this.intensity,
     required this.isValid,
     this.arrivalTime,
     required this.currentTime,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1226,9 +1202,7 @@ class _TopInfoBox extends StatelessWidget {
       height: 120,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: intensity != null && intensity! > 0
-            ? IntensityColor.intensity(intensity!)
-            : Colors.transparent,
+        color: intensity != null && intensity! > 0 ? IntensityColor.intensity(intensity!) : Colors.transparent,
       ),
       child: Row(
         children: [
@@ -1241,9 +1215,8 @@ class _TopInfoBox extends StatelessWidget {
           ),
           Container(
             width: 1,
-            color: intensity != null && intensity! > 0
-                ? IntensityColor.onIntensity(intensity!)
-                : context.colors.outline,
+            color:
+                intensity != null && intensity! > 0 ? IntensityColor.onIntensity(intensity!) : context.colors.outline,
             margin: const EdgeInsets.symmetric(vertical: 16),
           ),
           Expanded(
@@ -1280,17 +1253,15 @@ class _IntensityBox extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          child: Center(
-            child: Text(
-              intensity == null ? "?" : intensity!.asIntensityDisplayLabel,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 32,
-                color: intensity == null || intensity == 0
-                    ? context.colors.onSurface
-                    : IntensityColor.onIntensity(intensity!),
-              ),
+        Center(
+          child: Text(
+            intensity == null ? "?" : intensity!.asIntensityDisplayLabel,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              color: intensity == null || intensity == 0
+                  ? context.colors.onSurface
+                  : IntensityColor.onIntensity(intensity!),
             ),
           ),
         ),
@@ -1305,7 +1276,6 @@ class _ArrivalTimeBox extends StatelessWidget {
   final int currentTime;
 
   const _ArrivalTimeBox({
-    super.key,
     required this.isValid,
     this.arrivalTime,
     required this.currentTime,
