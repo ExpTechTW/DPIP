@@ -1,5 +1,6 @@
 import "dart:io";
 
+import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 import "package:dpip/api/exptech.dart";
@@ -53,6 +54,12 @@ class SoundListTileState extends State<SoundListTile> {
       String token = Global.preference.getString("fcm-token") ?? "";
       if (token != "") {
         await ExpTech().sendNotifyTest(token, widget.type, userLat.toString(), userLon.toString());
+      } else {
+        context.scaffoldMessenger.showSnackBar(
+          const SnackBar(
+            content: Text("錯誤: 無法取得 FCM Token"),
+          ),
+        );
       }
     }
   }
