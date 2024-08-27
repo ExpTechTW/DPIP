@@ -1,8 +1,6 @@
 import "package:dpip/api/exptech.dart";
 import "package:dpip/global.dart";
-import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/util/speed_limit.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
@@ -44,25 +42,13 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     super.dispose();
   }
 
-  void complete(bool status) async {
+  void complete(BuildContext context,bool status) async {
     Global.preference.setBool("monitor", status);
     String token = Global.preference.getString("fcm-token") ?? "";
     if (token != "" && status) {
-      int limit = Global.preference.getInt("limit-monitor") ?? 0;
-      int now = DateTime.now().millisecondsSinceEpoch;
-      if (now - limit < 60000) {
-        showLimitDialog(context);
-      } else {
-        Global.preference.setInt("limit-monitor", now);
-        await ExpTech().sendMonitor(token, "1");
-      }
+      await ExpTech().sendMonitor(token, "1");
     }
-    final state = WelcomeRouteState.of(context);
-    if (state != null) {
-      state.complete();
-    } else {
-      Navigator.pop(context);
-    }
+    Navigator.pop(context);
   }
 
   @override
@@ -75,14 +61,14 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () => complete(false),
+                onPressed: () => complete(context,false),
                 child: Text(
                   context.i18n.disagree,
                   style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
               FilledButton(
-                onPressed: _isEnabled ? () => complete(true) : null,
+                onPressed: _isEnabled ? () => complete(context,true) : null,
                 child: Text(context.i18n.agree),
               ),
             ],
