@@ -10,14 +10,14 @@ import "package:dpip/util/need_location.dart";
 class SoundListTile extends StatefulWidget {
   final String title;
   final String subtitle;
-  final String file;
+  final String type;
   final bool? enable;
 
   const SoundListTile({
     super.key,
     required this.title,
     required this.subtitle,
-    required this.file,
+    required this.type,
     this.enable = true,
   });
 
@@ -52,7 +52,7 @@ class SoundListTileState extends State<SoundListTile> {
     } else {
       String token = Global.preference.getString("fcm-token") ?? "";
       if (token != "") {
-        await ExpTech().sendNotifyTest(token, widget.file, userLat.toString(), userLon.toString());
+        await ExpTech().sendNotifyTest(token, widget.type, userLat.toString(), userLon.toString());
       }
     }
   }
