@@ -5,6 +5,7 @@ import "package:dpip/route/settings/content/login.dart";
 import "package:dpip/route/settings/content/root.dart";
 import "package:dpip/route/settings/content/theme.dart";
 import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/page_route_builder/forward_back.dart";
 import "package:flutter/material.dart";
 
 class SettingsRoute extends StatefulWidget {
@@ -18,9 +19,12 @@ class SettingsRoute extends StatefulWidget {
 
 class _SettingsRouteState extends State<SettingsRoute> {
   final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
-  List<String> history = [];
+  final controller = ScrollController();
   final backTransition = const Interval(0, 0.5, curve: Easing.emphasizedAccelerate);
   final forwardTransition = const Interval(0.5, 1, curve: Easing.emphasizedDecelerate);
+
+  List<String> history = [];
+  double savedScrollOffset = 0;
 
   @override
   void initState() {
@@ -56,6 +60,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
             setState(() {
               history.removeLast();
             });
+            controller.animateTo(savedScrollOffset, duration: Durations.long4, curve: Easing.standard);
           }
         } else {
           Navigator.pop(context);
@@ -63,6 +68,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
       },
       child: Scaffold(
         body: NestedScrollView(
+          controller: controller,
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
               SliverAppBar.large(
@@ -78,77 +84,56 @@ class _SettingsRouteState extends State<SettingsRoute> {
           },
           body: Navigator(
             key: navKey,
-            onGenerateRoute: (settings) {
-              Widget child;
+            initialRoute: "/",
+            onGenerateInitialRoutes: (navigator, initialRoute) {
+              history.add(initialRoute);
 
-              if (settings.name != "/") {
-                setState(() {
-                  history.add(settings.name!);
-                });
-              } else {
+              return [
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) => const SettingsRootView(),
+                  transitionDuration: Durations.long4,
+                  reverseTransitionDuration: Durations.long4,
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    var slide = Tween(
+                      begin: Offset.zero,
+                      end: const Offset(-0.2, 0.0),
+                    ).chain(CurveTween(curve: backTransition));
+
+                    var fade = Tween(
+                      begin: 1.0,
+                      end: 0.0,
+                    ).chain(CurveTween(curve: backTransition));
+
+                    return SlideTransition(
+                      position: secondaryAnimation.drive(slide),
+                      child: FadeTransition(opacity: secondaryAnimation.drive(fade), child: child),
+                    );
+                  },
+                )
+              ];
+            },
+            onGenerateRoute: (settings) {
+              setState(() {
                 history.add(settings.name!);
-              }
+              });
+
+              savedScrollOffset = controller.position.pixels;
+              controller.animateTo(0, duration: Durations.long4, curve: Easing.standard);
 
               switch (settings.name) {
                 case "/locale":
-                  child = const SettingsLocaleView();
-                  break;
+                  return ForwardBackPageRouteBuilder(page: const SettingsLocaleView());
                 case "/location":
-                  child = const SettingsLocationView();
-                  break;
+                  return ForwardBackPageRouteBuilder(page: const SettingsLocationView());
                 case "/theme":
-                  child = const SettingsThemeView();
-                  break;
+                  return ForwardBackPageRouteBuilder(page: const SettingsThemeView());
                 case "/experiment":
-                  child = const SettingsExperimentView();
-                  break;
+                  return ForwardBackPageRouteBuilder(page: const SettingsExperimentView());
                 case "/login":
-                  child = const SettingsLoginView();
-                  break;
-                default:
-                  return PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => const SettingsRootView(),
-                    transitionDuration: Durations.long4,
-                    reverseTransitionDuration: Durations.long4,
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      var slide = Tween(
-                        begin: Offset.zero,
-                        end: const Offset(-0.2, 0.0),
-                      ).chain(CurveTween(curve: backTransition));
-
-                      var fade = Tween(
-                        begin: 1.0,
-                        end: 0.0,
-                      ).chain(CurveTween(curve: backTransition));
-
-                      return SlideTransition(
-                        position: secondaryAnimation.drive(slide),
-                        child: FadeTransition(opacity: secondaryAnimation.drive(fade), child: child),
-                      );
-                    },
-                  );
+                  return ForwardBackPageRouteBuilder(page: const SettingsLoginView());
               }
-              return PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => child,
-                transitionDuration: Durations.long4,
-                reverseTransitionDuration: Durations.long4,
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  var slide = Tween(
-                    begin: const Offset(0.2, 0.0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: forwardTransition));
 
-                  var fade = Tween(
-                    begin: 0.0,
-                    end: 1.0,
-                  ).chain(CurveTween(curve: forwardTransition));
-
-                  return SlideTransition(
-                    position: animation.drive(slide),
-                    child: FadeTransition(opacity: animation.drive(fade), child: child),
-                  );
-                },
-              );
+              return null;
             },
             onPopPage: (route, result) {
               return route.didPop(result);
