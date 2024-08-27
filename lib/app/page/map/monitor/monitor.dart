@@ -32,6 +32,7 @@ typedef PositionUpdateCallback = void Function();
 
 class MonitorPage extends StatefulWidget {
   final Function()? onPositionUpdate;
+
   const MonitorPage({super.key, required this.data, this.onPositionUpdate});
 
   final int data;
@@ -701,20 +702,59 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         ),
       );
     }
-    if (eewUI.isEmpty) {
-      eewUI.add(
-        Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20),
-          child: Text(
-            context.i18n.no_earthquake_warning,
-            textAlign: TextAlign.left,
-            style: const TextStyle(fontSize: 20),
+    // if (eewUI.isEmpty) {
+    //   eewUI.add(
+    //     Padding(
+    //       padding: const EdgeInsets.only(left: 20, right: 20),
+    //       child: Text(
+    //         context.i18n.no_earthquake_warning,
+    //         textAlign: TextAlign.left,
+    //         style: const TextStyle(fontSize: 20),
+    //       ),
+    //     ),
+    //   );
+    // } else {
+    //   _isEewBoxVisible = !_isEewBoxVisible;
+    // }
+    eewUI.add(
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: !_isEewBoxVisible ? Colors.grey : const Color(0xFFFFC800),
+              width: 2,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  context.i18n.emergency_earthquake_warning,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: context.colors.primary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _TopInfoBox(
+                  intensity: isUserLocationValid ? 4 : null,
+                  isValid: isUserLocationValid,
+                  arrivalTime: 20,
+                  currentTime: _getCurrentTime(),
+                ),
+              ],
+            ),
           ),
         ),
-      );
-    } else {
-      _isEewBoxVisible = !_isEewBoxVisible;
-    }
+      ),
+    );
+
     _eewUI = eewUI;
   }
 
@@ -1162,6 +1202,162 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             ),
         ],
       ),
+    );
+  }
+}
+
+class _TopInfoBox extends StatelessWidget {
+  final int? intensity;
+  final bool isValid;
+  final int? arrivalTime;
+  final int currentTime;
+
+  const _TopInfoBox({
+    Key? key,
+    required this.intensity,
+    required this.isValid,
+    this.arrivalTime,
+    required this.currentTime,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: intensity != null && intensity! > 0
+            ? IntensityColor.intensity(intensity!)
+            : Colors.transparent,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: _IntensityBox(
+              title: context.i18n.location_estimate,
+              intensity: intensity,
+            ),
+          ),
+          Container(
+            width: 1,
+            color: intensity != null && intensity! > 0
+                ? IntensityColor.onIntensity(intensity!)
+                : context.colors.outline,
+            margin: const EdgeInsets.symmetric(vertical: 16),
+          ),
+          Expanded(
+            flex: 2,
+            child: _ArrivalTimeBox(
+              isValid: isValid,
+              arrivalTime: arrivalTime,
+              currentTime: currentTime,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IntensityBox extends StatelessWidget {
+  final String title;
+  final int? intensity;
+
+  const _IntensityBox({super.key, required this.title, this.intensity});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: context.colors.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          child: Center(
+            child: Text(
+              intensity == null ? "?" : intensity!.asIntensityDisplayLabel,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 32,
+                color: intensity == null || intensity == 0
+                    ? context.colors.onSurface
+                    : IntensityColor.onIntensity(intensity!),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ArrivalTimeBox extends StatelessWidget {
+  final bool isValid;
+  final int? arrivalTime;
+  final int currentTime;
+
+  const _ArrivalTimeBox({
+    super.key,
+    required this.isValid,
+    this.arrivalTime,
+    required this.currentTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final remainingSeconds = isValid && arrivalTime != null ? ((arrivalTime! - currentTime) / 1000).floor() : null;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          context.i18n.seismic_waves,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: context.colors.onSurfaceVariant,
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (!isValid || remainingSeconds == null || remainingSeconds <= 0)
+          Text(
+            !isValid ? context.i18n.monitor_unknown : context.i18n.monitor_arrival,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              color: context.colors.onSurface,
+            ),
+          )
+        else
+          Column(
+            children: [
+              Text(
+                remainingSeconds.toString(),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                  color: context.colors.onSurface,
+                ),
+              ),
+              Text(
+                context.i18n.monitor_after_seconds,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                  color: context.colors.onSurface,
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }
