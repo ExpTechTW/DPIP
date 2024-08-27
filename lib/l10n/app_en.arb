@@ -296,7 +296,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "Version {version}\nProduced by ExpTech\nSome data sources CWA (Central Weather Agency)",
+  "me_version": "Version {version}\nMade by ExpTech\nPartial data source CWA",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -317,7 +317,7 @@
   "@sound_test_description": {
     "description": "「我」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
   },
-  "eew_alert_sound": "Earthquake Early Warning （Alert）",
+  "eew_alert_sound": "Earthquake Early Warning (Alert)",
   "@eew_alert_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
@@ -939,23 +939,23 @@
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "任何資訊應以中央氣象署發布之內容為準。",
+  "official_info": "All information should be considered authoritative only if it is consistent with what the Central Weather Administration has announced.",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
-  "information_reliability": "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。",
+  "information_reliability": "Due to factors such as network conditions, server performance, application issues, and the status of our data providers, there may be times when you do not receive information. We will do our best to prevent this from happening, but we cannot guarantee uninterrupted service.",
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強烈搖晃有機率比通知早抵達使用者所在地。",
+  "strong_shake_warning": "There's a chance that you will feel strong shaking before you receive the alert.",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。",
+  "earthquake_alert_warning": "Earthquake Early Warnings are estimates based on quick calculations and could be significantly inaccurate. Users should be aware of this and use the information judiciously.",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。",
+  "legal_risks": "Any action that is not officially approved could lead to legal consequences. It's essential to follow all applicable rules and regulations.",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
@@ -999,7 +999,7 @@
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。",
+  "real_time_magnitude_warning": "The real-time earthquake intensity displayed in DPIP is not official and may be different from their measurements. You should rely on the information released by the Central Weather Administration.",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
@@ -1011,7 +1011,7 @@
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
-  "station_noise_warning": "由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。",
+  "station_noise_warning": "The constant background noise from traffic, factories, construction, and other sources can cause the seismograph's color to change even when there's no real shake. Also, since the data is updated live, we can't always tell right away if there's a problem with the seismograph itself, so the color change can also be a hardware malfunction.",
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
@@ -1095,7 +1095,7 @@
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
-  "error_saving_image": "儲存圖片時發生錯誤",
+  "error_saving_image": "An error occurred while saving the image",
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
@@ -1103,7 +1103,7 @@
   "@confirm": {
     "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
   },
-  "no_search_results": "無搜尋結果",
+  "no_search_results": "No search results",
   "@no_search_results": {
     "description": "當搜尋無結果時顯示的訊息 → 儲存圖片時發生錯誤"
   },
@@ -1135,11 +1135,11 @@
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "power_saving_strategy": "省電策略",
+  "power_saving_strategy": "Disable Power Saving",
   "@power_saving_strategy": {
     "description": "「存取權限彈窗」 → 省電策略"
   },
-  "notification_permission_denied": "通知功能已被拒絕，請移至設定允許權限。",
+  "notification_permission_denied": "You have notification permissions declined. Please go to your device settings and enable notifications for this app.",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
