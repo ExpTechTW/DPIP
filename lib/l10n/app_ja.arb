@@ -305,7 +305,7 @@
       }
     }
   },
-  "source_language": "原始言語",
+  "source_language": "元言語",
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
@@ -321,7 +321,7 @@
   "@eew_alert_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
-  "eew_alert_description_sound": "緊急地震速報 推定最大震度5弱以上\nかつ現在地の予測震度4以上",
+  "eew_alert_description_sound": "緊急地震速報 推定最大震度5弱以上\nかつ現在地の予想震度4以上",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
@@ -329,7 +329,7 @@
   "@eew_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報"
   },
-  "eew_description_sound": "緊急地震速報 現在地の予測震度2以上",
+  "eew_description_sound": "緊急地震速報 現在地の予想震度2以上",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
@@ -365,11 +365,11 @@
   "@other_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "雷雨速報",
+  "thunderstorm_instant_messaging_sound": "リアルタイムな雷雨の情報",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "現在地に雷雨速報が発表",
+  "thunderstorm_instant_messaging_description_sound": "現在地にリアルタイムな雷雨の情報が発表",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -381,11 +381,11 @@
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
-  "torrential_rain_alert_sound": "豪雨警報",
+  "torrential_rain_alert_sound": "大雨警報",
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
-  "torrential_rain_alert_description_sound": "現在地に豪雨警報が発表",
+  "torrential_rain_alert_description_sound": "現在地に大雨警報が発表",
   "@torrential_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
@@ -401,7 +401,7 @@
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert_description_sound": "現在地に津波警報（注意）が発表\n予想される津波の高さ1ｍ未満",
+  "tsunami_alert_description_sound": "現在地に津波警報（注意）が発表\n予想波の高さ1ｍ未満",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
@@ -409,7 +409,7 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "現在地に津波警報（警報）が発表\n予想される津波の高さ1ｍ以上",
+  "tsunami_alert2_description_sound": "現在地に津波警報（警報）が発表\n予想波の高さ1ｍ以上",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
   },
@@ -421,11 +421,11 @@
   "@volcano_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
   },
-  "high_temperature_info_sound": "高温情報",
+  "high_temperature_info_sound": "高温注意情報",
   "@high_temperature_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
   },
-  "high_temperature_info_description_sound": "現在地に高温情報が発表",
+  "high_temperature_info_description_sound": "現在地に高温注意情報が発表",
   "@high_temperature_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
   },
@@ -654,7 +654,7 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "時々穏やかな雨",
+  "moderate_rain_at_times": "時々雨",
   "@moderate_rain_at_times": {
     "description": "天氣狀況：偶爾有雨"
   },
@@ -1171,7 +1171,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "推定震度凡例",
+  "estimated_intensity_legend": "推定震度の凡例",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
