@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dpip/route/welcome/pages/tos.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/log.dart';

@@ -25,6 +25,8 @@ import "package:dpip/widget/map/map.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:tutorial_coach_mark/tutorial_coach_mark.dart";
 
 import "eew_info.dart";
 
@@ -58,6 +60,7 @@ class MonitorPage extends StatefulWidget {
 class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
+  final monitor = Global.preference.getBool("monitor") ?? false;
 
   Timer? _dataUpdateTimer;
   Timer? _eewUpdateTimer;
@@ -88,6 +91,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   List<Widget> _eewUI = [];
   List<Widget> _rtsUI = [];
   bool _showLegend = false;
+  bool _showMonitorInfo = false;
+  List<TargetFocus> targets = [];
+  final monitorButtonKey = GlobalKey();
 
   @override
   void initState() {
@@ -101,6 +107,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
     MonitorPage.setActiveCallback(sendpositionUpdate);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (monitor) return;
+      initTargets();
+      showTutorial();
+    });
   }
 
   void sendpositionUpdate() {
@@ -134,8 +146,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
-
-    _updateCrossMarker();
   }
 
   void _loadMap() async {
@@ -285,7 +295,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _startDataUpdates() {
     _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      _updateRtsData();
+      if (monitor) {
+        _updateRtsData();
+      } else {
+        _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
+      }
       _updateEewData();
       setState(() {});
     });
@@ -372,7 +386,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       );
     }
 
-    await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers).build());
+    if (markers.isNotEmpty) {
+      await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers).build());
+    }
   }
 
   Future<void> _updateTsunamiLine() async {
@@ -996,7 +1012,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _toggleLegend() {
     setState(() {
+      _showMonitorInfo = false;
       _showLegend = !_showLegend;
+    });
+  }
+
+  void _toggleMonitorInfo() {
+    setState(() {
+      _showLegend = false;
+      _showMonitorInfo = !_showMonitorInfo;
     });
   }
 
@@ -1059,6 +1083,40 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     );
   }
 
+  void initTargets() {
+    targets.add(
+      TargetFocus(
+        identify: "monitorButton",
+        keyTarget: monitorButtonKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Text(
+                '點擊查看提示資訊',
+                style: context.theme.textTheme.titleLarge?.copyWith(
+                  color: context.colors.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showTutorial() {
+    TutorialCoachMark(
+        targets: targets,
+        colorShadow: context.colors.primary,
+        paddingFocus: 10,
+        opacityShadow: 0.95,
+        onFinish: () {
+          _toggleMonitorInfo();
+        }).show(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1099,6 +1157,34 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ),
             ),
           ),
+          if (!monitor)
+            Positioned(
+              key: monitorButtonKey,
+              right: 4,
+              top: 40,
+              child: Material(
+                color: context.colors.error,
+                elevation: 4.0,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: _toggleMonitorInfo,
+                  child: Tooltip(
+                    message: context.i18n.map_legend,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                        color: context.colors.onError,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Positioned(
             left: 4,
             top: 4,
@@ -1131,34 +1217,35 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ),
             ),
           ),
-          Positioned(
-            left: 4,
-            top: 32,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: (!_dataStatus())
-                          ? Colors.red
-                          : (_ping > 1)
-                              ? Colors.orange
-                              : Colors.green,
+          if (monitor)
+            Positioned(
+              left: 4,
+              top: 32,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: context.colors.surface.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: (!_dataStatus())
+                            ? Colors.red
+                            : (_ping > 1)
+                                ? Colors.orange
+                                : Colors.green,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
           if (_rtsUI.isNotEmpty)
             Positioned(
               left: 4,
@@ -1176,6 +1263,38 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               right: 6,
               top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
+            ),
+          if (_showMonitorInfo)
+            Positioned(
+              right: 6,
+              top: 75,
+              child: Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Symbols.warning_amber_rounded,
+                        size: 50,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '未啟用強震監視器',
+                        style: context.theme.textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '請至設定進階功能中開啟強震監視器。',
+                        style: context.theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
         ],
       ),

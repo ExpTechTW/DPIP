@@ -42,7 +42,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     super.dispose();
   }
 
-  void complete(BuildContext context,bool status) async {
+  void complete(BuildContext context, bool status) async {
     Global.preference.setBool("monitor", status);
     String token = Global.preference.getString("fcm-token") ?? "";
     if (token != "" && status) {
@@ -61,14 +61,14 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () => complete(context,false),
+                onPressed: () => complete(context, false),
                 child: Text(
                   context.i18n.disagree,
                   style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
               FilledButton(
-                onPressed: _isEnabled ? () => complete(context,true) : null,
+                onPressed: _isEnabled ? () => complete(context, true) : null,
                 child: Text(context.i18n.agree),
               ),
             ],

@@ -14,6 +14,8 @@ import "package:material_symbols_icons/symbols.dart";
 import "package:simple_icons/simple_icons.dart";
 import "package:url_launcher/url_launcher.dart";
 
+import "developer.dart";
+
 class MePage extends StatefulWidget {
   const MePage({super.key});
 
@@ -103,6 +105,16 @@ class _MePageState extends State<MePage> {
           },
         ),
         ListTileGroupHeader(title: context.i18n.me_debug),
+        ListTile(
+          leading: const Icon(Symbols.forum_rounded),
+          title: Text("開發者想說的話"),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DPIPInfoPage()),
+            );
+          },
+        ),
         ListTile(
           leading: const Icon(Symbols.bug_report),
           title: Text(context.i18n.app_logs),

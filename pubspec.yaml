@@ -57,6 +57,7 @@ dependencies:
   talker_flutter: ^3.6.0
   timezone: ^0.9.3
   url_launcher: ^6.3.0
+  tutorial_coach_mark: ^1.2.11
 
 dev_dependencies:
   flutter_test:

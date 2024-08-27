@@ -1,5 +1,4 @@
 import "package:dpip/app/page/map/lightning/lightning.dart";
-import "package:dpip/app/page/map/monitor/disable.dart";
 import "package:dpip/app/page/map/monitor/monitor.dart";
 import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/app/page/map/rain/rain.dart";
@@ -9,7 +8,6 @@ import "package:dpip/app/page/map/weather/humidity.dart";
 import "package:dpip/app/page/map/weather/pressure.dart";
 import "package:dpip/app/page/map/weather/temperature.dart";
 import "package:dpip/app/page/map/weather/wind.dart";
-import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
@@ -25,7 +23,6 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final controller = PageController();
   int currentIndex = 0;
-  final monitor = Global.preference.getBool("monitor") ?? false;
 
   late final destinations = [
     NavigationDrawerDestination(
@@ -101,18 +98,17 @@ class _MapPageState extends State<MapPage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: [
-          if (monitor) const MonitorPage(data: 0),
-          if (!monitor) const DisablePage(),
-          const RadarMap(),
-          const RainMap(),
-          const TemperatureMap(),
-          const HumidityMap(),
-          const PressureMap(),
-          const WindMap(),
-          const LightningMap(),
-          const TyphoonMap(),
-          const TsunamiMap(),
+        children: const [
+          MonitorPage(data: 0),
+          RadarMap(),
+          RainMap(),
+          TemperatureMap(),
+          HumidityMap(),
+          PressureMap(),
+          WindMap(),
+          LightningMap(),
+          TyphoonMap(),
+          TsunamiMap(),
         ],
       ),
     );
