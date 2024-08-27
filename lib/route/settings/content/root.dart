@@ -4,20 +4,56 @@ import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
+typedef DevUpdateCallback = void Function();
+
 class SettingsRootView extends StatefulWidget {
-  const SettingsRootView({super.key});
+  final Function()? onDevUpdate;
+  const SettingsRootView({super.key, this.onDevUpdate});
 
   @override
   State<SettingsRootView> createState() => _SettingsRootViewState();
+
+  static DevUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(DevUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updateDev() {
+    _activeCallback?.call();
+  }
 }
 
 class _SettingsRootViewState extends State<SettingsRootView> {
+  bool devEnabled = Global.preference.getBool("dev") ?? false;
+
+  @override
+  void initState() {
+    super.initState();
+    SettingsRootView.setActiveCallback(sendDevUpdate);
+  }
+
+  @override
+  void dispose() {
+    SettingsRootView.clearActiveCallback();
+    super.dispose();
+  }
+
+  void sendDevUpdate() {
+    devEnabled = Global.preference.getBool("dev") ?? false;
+    setState(() {});
+    widget.onDevUpdate?.call();
+}
+
   @override
   Widget build(BuildContext context) {
     const tileTitleTextStyle = TextStyle(
       fontWeight: FontWeight.bold,
     );
-    bool devEnabled = Global.preference.getBool("dev") ?? false;
 
     return Material(
       child: ListView(
