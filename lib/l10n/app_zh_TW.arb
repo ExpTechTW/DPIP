@@ -818,45 +818,49 @@
   "@dev_warning": {
     "description": "DPIP 開發模式下之服務因處於開發中有不正常的情況是合理的請回報官方ＤＣ回報相關問題"
   },
-  "login_exptech": "登入 Exptech 服務",
+  "login_exptech": "Exptech 服務",
   "@login_exptech": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "login_exptech_title": "Exptech 服務登入之入口",
   "@login_exptech_title": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」副描述"
+    "description": "「設定」路徑 → 「Exptech 服務」副描述"
   },
   "email": "電子郵件",
   "@email": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "please_enter_email": "請輸入電子郵件",
   "@please_enter_email": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
+  },
+  "please_enter_valid_email": "請輸入正確電子郵件",
+  "@please_enter_valid_email": {
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "password": "密碼",
   "@password": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "please_enter_password": "請輸入密碼",
   "@please_enter_password": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "login": "登入",
   "@login": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "login_successful": "登入成功",
   "@login_successful": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "logout": "登出",
   "@logout": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "logout_successful": "登出成功",
   "@logout_successful": {
-    "description": "「設定」路徑 → 「登入 Exptech 服務」標題"
+    "description": "「設定」路徑 → 「Exptech 服務」標題"
   },
   "no_tsunami_information": "近期無海嘯資訊",
   "@no_tsunami_information": {

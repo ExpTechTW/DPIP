@@ -1,4 +1,5 @@
 import "package:dpip/global.dart";
+import "package:dpip/route/settings/content/root.dart";
 import "package:dpip/route/welcome/pages/dev.dart";
 import "package:dpip/route/welcome/pages/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
@@ -50,6 +51,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
                 );
                 setState(() => devEnabled = Global.preference.getBool("dev") ?? false);
               }
+              SettingsRootView.updateDev();
             },
           ),
         ],

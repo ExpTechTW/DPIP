@@ -1,5 +1,7 @@
+import "package:dpip/api/exptech.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/util/log.dart";
 import "package:flutter/material.dart";
 
 class SettingsLoginView extends StatefulWidget {
@@ -12,7 +14,7 @@ class SettingsLoginView extends StatefulWidget {
 class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindingObserver {
   bool monitorEnabled = Global.preference.getBool("monitor") ?? false;
   bool devEnabled = Global.preference.getBool("dev") ?? false;
-  bool isLoggedIn = false; // 假设有一个方法来检查登录状态
+  bool isLoggedIn = Global.preference.getBool("isLoggedIn") ?? false;
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -24,20 +26,35 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // 这里应该实现实际的登录逻辑
-      setState(() {
-        isLoggedIn = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.i18n.login_successful)),
-      );
+      try {
+        String result = await ExpTech().loginUser(_emailController.text, _passwordController.text);
+        TalkerManager.instance.debug("登入: $result");
+        Global.preference.setString("token",result);
+        Global.preference.setBool("isLoggedIn",true);
+        setState(() {
+          isLoggedIn = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.i18n.login_successful)),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: $e')),
+        );
+        Global.preference.setBool("isLoggedIn",false);
+        setState(() {
+          isLoggedIn = false;
+        });
+      }
     }
   }
 
   void _logout() {
     // 这里应该实现实际的登出逻辑
+    Global.preference.remove("token");
+    Global.preference.setBool("isLoggedIn",false);
     setState(() {
       isLoggedIn = false;
     });
@@ -64,21 +81,25 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
                       controller: _emailController,
                       decoration: InputDecoration(
                         labelText: context.i18n.email,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return context.i18n.please_enter_email;
                         }
+                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (!emailRegex.hasMatch(value)) {
+                          return context.i18n.please_enter_valid_email;
+                        }
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _passwordController,
                       decoration: InputDecoration(
                         labelText: context.i18n.password,
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       obscureText: true,
                       validator: (value) {
@@ -88,7 +109,7 @@ class _SettingsLoginViewState extends State<SettingsLoginView> with WidgetsBindi
                         return null;
                       },
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _login,
                       child: Text(context.i18n.login),
