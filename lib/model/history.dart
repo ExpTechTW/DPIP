@@ -9,6 +9,7 @@ class History {
   final String id;
   final int status;
   final String type;
+  final String icon;
   final String author;
   final InfoTime time;
   final InfoText text;
@@ -18,6 +19,7 @@ class History {
     required this.id,
     required this.status,
     required this.type,
+    required this.icon,
     required this.author,
     required this.time,
     required this.text,

@@ -404,7 +404,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Text(
-                                context.i18n.home_Safety,
+                                context.i18n.home_safety,
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: context.colors.onSurfaceVariant,
@@ -430,7 +430,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
                             final item = TimeLineTile(
                               time: current.time.send,
-                              icon: Icon(ListIcons.getListIcon(current.type)),
+                              icon: Icon(ListIcons.getListIcon(current.icon)),
                               height: 100,
                               first: i == 0,
                               showDate: showDate,

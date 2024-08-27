@@ -38,7 +38,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.i18n.notification_log),
+        title: Text(context.i18n.notification_record),
         elevation: 0,
       ),
       body: SafeArea(

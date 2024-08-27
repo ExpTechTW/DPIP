@@ -74,7 +74,7 @@ class _MePageState extends State<MePage> {
         ),
         ListTile(
           leading: const Icon(Symbols.notification_add_rounded),
-          title: Text(context.i18n.notification_log),
+          title: Text(context.i18n.notification_record),
           onTap: () {
             Navigator.push(
               context,

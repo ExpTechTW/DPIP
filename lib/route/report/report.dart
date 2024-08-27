@@ -309,7 +309,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
               right: 0,
               child: Column(
                 children: [
-                  if (report!.magnitude >= 6 && report!.magnitude < 7 && report!.getLocation().contains(context.i18n.sea))
+                  // 不要翻譯這
+                  if (report!.magnitude >= 6 &&
+                      report!.magnitude < 7 &&
+                      (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
                       avatar: Icon(
                         Symbols.tsunami_rounded,
@@ -325,7 +328,9 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.theme.extendedColors.blue),
                     ),
-                  if (report!.magnitude >= 7 && report!.getLocation().contains(context.i18n.sea))
+                  // 不要翻譯這
+                  if (report!.magnitude >= 7 &&
+                      (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
                       label: Text(context.i18n.report_tsunami_attention, style: TextStyle(color: context.colors.error)),
