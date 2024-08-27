@@ -1,4 +1,5 @@
 import "package:dpip/app/page/map/lightning/lightning.dart";
+import "package:dpip/app/page/map/monitor/disable.dart";
 import "package:dpip/app/page/map/monitor/monitor.dart";
 import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/app/page/map/rain/rain.dart";
@@ -27,12 +28,11 @@ class _MapPageState extends State<MapPage> {
   final monitor = Global.preference.getBool("monitor") ?? false;
 
   late final destinations = [
-    if (monitor)
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.monitor_heart),
-        selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-        label: Text(context.i18n.monitor),
-      ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.monitor_heart),
+      selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+      label: Text(context.i18n.monitor),
+    ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.radar_rounded),
       selectedIcon: const Icon(Symbols.radar_rounded, fill: 1),
@@ -44,8 +44,8 @@ class _MapPageState extends State<MapPage> {
       label: Text(context.i18n.precipitation_monitor),
     ),
     NavigationDrawerDestination(
-      icon: const Icon(Symbols.temp_preferences_eco_rounded),
-      selectedIcon: const Icon(Symbols.temp_preferences_eco_rounded, fill: 1),
+      icon: const Icon(Symbols.thermometer_rounded),
+      selectedIcon: const Icon(Symbols.thermometer_rounded, fill: 1),
       label: Text(context.i18n.temperature_monitor),
     ),
     NavigationDrawerDestination(
@@ -103,6 +103,7 @@ class _MapPageState extends State<MapPage> {
         physics: const NeverScrollableScrollPhysics(),
         children: [
           if (monitor) const MonitorPage(data: 0),
+          if (!monitor) const DisablePage(),
           const RadarMap(),
           const RainMap(),
           const TemperatureMap(),

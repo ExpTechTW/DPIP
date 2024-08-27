@@ -50,7 +50,6 @@ class WelcomeRouteState extends State<WelcomeRoute> {
           WelcomeExpTechPage(),
           WelcomeNoticePage(),
           WelcomePermissionPage(),
-          WelcomeTosPage(),
         ],
       ),
     );

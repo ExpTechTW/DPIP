@@ -3,7 +3,6 @@ import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/log.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:dpip/api/exptech.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
@@ -18,23 +17,11 @@ Future<void> fcmInit() async {
 
 Future<void> onFcmTokenHandle(String token) async {
   Global.preference.setString("fcm-token", token);
-  bool setMonitor = Global.preference.getBool("set-monitor") ?? false;
-  if (token != "" && !setMonitor) {
-    Global.preference.setBool("set-monitor", true);
-    bool status = Global.preference.getBool("monitor") ?? false;
-    await ExpTech().sendMonitor(token, status ? "1" : "0");
-  }
 }
 
 Future<void> onNativeTokenHandle(String token) async {
   TalkerManager.instance.info('FCM Token:"$token"');
   Global.preference.setString("fcm-token", token);
-  bool setMonitor = Global.preference.getBool("set-monitor") ?? false;
-  if (token != "" && !setMonitor) {
-    Global.preference.setBool("set-monitor", true);
-    bool status = Global.preference.getBool("monitor") ?? false;
-    await ExpTech().sendMonitor(token, status ? "1" : "0");
-  }
 }
 
 Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {

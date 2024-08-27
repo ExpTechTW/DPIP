@@ -46,8 +46,8 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
   void complete(bool status) async {
     Global.preference.setBool("monitor", status);
     String token = Global.preference.getString("fcm-token") ?? "";
-    if (token != "") {
-      await ExpTech().sendMonitor(token, status ? "1" : "0");
+    if (token != "" && status) {
+      await ExpTech().sendMonitor(token, "1");
     }
     final state = WelcomeRouteState.of(context);
     if (state != null) {
