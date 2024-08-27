@@ -451,4 +451,18 @@ class ExpTech {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
   }
+
+  Future<String> sendNotifyTest(String token, String sound, String lat, String lng) async {
+    final requestUrl = Route.notifyTest(token, sound, lat, lng);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else if (res.statusCode == 204) {
+      return "${res.statusCode} $requestUrl";
+    } else {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+  }
 }

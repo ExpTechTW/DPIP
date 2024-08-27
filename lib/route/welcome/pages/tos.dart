@@ -32,8 +32,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
   }
 
   void _scrollListener() {
-    if (!_isEnabled &&
-        controller.offset >= controller.position.maxScrollExtent) {
+    if (!_isEnabled && controller.offset >= controller.position.maxScrollExtent) {
       setState(() => _isEnabled = true);
     }
   }
@@ -79,8 +78,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
                 onPressed: () => complete(false),
                 child: Text(
                   context.i18n.disagree,
-                  style:
-                      TextStyle(fontSize: 16, color: context.colors.onSurface),
+                  style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
               FilledButton(
