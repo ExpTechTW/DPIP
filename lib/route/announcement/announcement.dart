@@ -58,7 +58,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
   Future<void> _fetchAnnouncements() async {
     try {
-      final fetchedAnnouncements = await ExpTech().getAnnouncement();
+      final fetchedAnnouncements = (await ExpTech().getAnnouncement()).reversed.toList();
       setState(() {
         announcements = fetchedAnnouncements;
         isLoading = false;
