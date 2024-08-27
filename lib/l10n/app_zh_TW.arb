@@ -1163,10 +1163,6 @@
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
   },
-  "notification_log": "通知發送紀錄",
-  "@notification_log": {
-    "description": "「我」路徑 → 通知發送紀錄"
-  },
   "app_logs": "App 日誌",
   "@app_logs": {
     "description": "「我」路徑 → App 日誌"
@@ -1249,27 +1245,27 @@
   },
   "no_notification_history": "沒有通知紀錄",
   "@no_notification_history": {
-    "description": "「我」路徑 →「通知發送紀錄」標題 → 沒有通知紀錄"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 沒有通知紀錄"
   },
   "emergency": "緊急",
   "@emergency": {
-    "description": "「我」路徑 →「通知發送紀錄」標題 → 緊急"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急"
   },
   "notification_details": "通知詳細資訊",
   "@notification_details": {
-    "description": "「我」路徑 →「通知發送紀錄」標題 → 通知詳細資訊"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知詳細資訊"
   },
   "notification_area": "通知發送區域",
   "@notification_area": {
-    "description": "「我」路徑 →「通知發送紀錄」標題 → 通知發送區域"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知發送區域"
   },
   "emergency_notification": "緊急通知",
   "@emergency_notification": {
-    "description": "「我」路徑 →「通知發送紀錄」標題 → 緊急通知"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急通知"
   },
   "general_notification": "一般通知",
   "@general_notification": {
-    "description": "「我」路徑 →「通知發送紀錄」標題 → 一般通知"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 一般通知"
   },
   "please_allow_notification_permission": "請您到應用程式設定中找到並允許「通知」權限後再試一次。",
   "@please_allow_notification_permission": {
