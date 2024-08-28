@@ -667,7 +667,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      "警報地域",
+                                      "警報區域",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
