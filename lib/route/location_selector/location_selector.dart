@@ -22,23 +22,34 @@ class LocationSelectorRoute extends StatefulWidget {
 
 class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
   late List<String> data;
+  bool _isLoading = false;
 
   Future<void> setLocation(Location location) async {
-    await Global.preference.setString("location-city", location.city);
-    await Global.preference.setString("location-town", location.town);
+    setState(() => _isLoading = true);
+    try {
+      await Global.preference.setString("location-city", location.city);
+      await Global.preference.setString("location-town", location.town);
 
-    String fcmToken = Global.preference.getString("fcm-token") ?? "";
-    await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");
-    Global.preference.setDouble("user-lat", location.lat);
-    Global.preference.setDouble("user-lon", location.lng);
-    if (!mounted) return;
-    const MonitorPage(data: 0).createState();
-    const HomePage().createState();
-    HomePage.updatePosition();
-    HistoryPage.updatePosition();
-    RadarMap.updatePosition();
-    MonitorPage.updatePosition();
-    Navigator.popUntil(context, ModalRoute.withName("/settings"));
+      String fcmToken = Global.preference.getString("fcm-token") ?? "";
+      await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");
+      Global.preference.setDouble("user-lat", location.lat);
+      Global.preference.setDouble("user-lon", location.lng);
+
+      if (!mounted) return;
+      const MonitorPage(data: 0).createState();
+      const HomePage().createState();
+      HomePage.updatePosition();
+      HistoryPage.updatePosition();
+      RadarMap.updatePosition();
+      MonitorPage.updatePosition();
+      Navigator.popUntil(context, ModalRoute.withName("/settings"));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('發生錯誤: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -59,7 +70,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
         actions: [
           IconButton(
             icon: const Icon(Symbols.search),
-            onPressed: () async {
+            onPressed: _isLoading ? null : () async {
               final result = await showSearch<Location>(
                 context: context,
                 delegate: LocationSelectorSearchDelegate(),
@@ -72,41 +83,52 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
           )
         ],
       ),
-      body: ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          if (widget.city == null) {
-            return ListTile(
-              title: Text(data[index]),
-              trailing: const Icon(Symbols.arrow_right),
-              onTap: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    settings: RouteSettings(name: "/location_selector/${data[index]}"),
-                    builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
-                  ),
+      body: Stack(
+        children: [
+          ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              if (widget.city == null) {
+                return ListTile(
+                  title: Text(data[index]),
+                  trailing: const Icon(Symbols.arrow_right),
+                  onTap: _isLoading ? null : () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        settings: RouteSettings(name: "/location_selector/${data[index]}"),
+                        builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-          } else {
-            return RadioListTile(
-              title: Text(data[index]),
-              value: data[index],
-              groupValue: widget.town,
-              controlAffinity: ListTileControlAffinity.trailing,
-              onChanged: (value) async {
-                if (value == null) return;
+              } else {
+                return RadioListTile(
+                  title: Text(data[index]),
+                  value: data[index],
+                  groupValue: widget.town,
+                  controlAffinity: ListTileControlAffinity.trailing,
+                  onChanged: _isLoading ? null : (value) async {
+                    if (value == null) return;
 
-                final location = Global.location.entries.firstWhere((e) {
-                  return (e.value.city == widget.city) && (e.value.town == value);
-                }).value;
+                    final location = Global.location.entries.firstWhere((e) {
+                      return (e.value.city == widget.city) && (e.value.town == value);
+                    }).value;
 
-                await setLocation(location);
-              },
-            );
-          }
-        },
+                    await setLocation(location);
+                  },
+                );
+              }
+            },
+          ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
       ),
     );
   }
