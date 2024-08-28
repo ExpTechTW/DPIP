@@ -19,11 +19,11 @@
   },
   "monitor": "giám sát động đất",
   "@monitor": {
-    "description": "「地圖」路徑 → 強震監視器、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
+    "description": "「地圖」路徑 → 強震監視器、「設定」路徑 → 「通知測試」內容 →「地震資訊」標題 → 強震監視器"
   },
   "report": "Thông báo tin động đất",
   "@report": {
-    "description": "「更多」路徑 → 地震報告、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
+    "description": "「更多」路徑 → 地震報告、「設定」路徑 → 「通知測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "map": "Bản đồ",
   "@map": {
@@ -309,149 +309,149 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "sound_test": "Kiểm tra âm thanh",
-  "@sound_test": {
-    "description": "「我」路徑 → 「音效」標題 → 音效測試"
+  "notify_test": "通知測試",
+  "@notify_test": {
+    "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "sound_test_description": "Kiểm tra âm thanh cho thông tin thời tiết theo thời gian thực, cảnh báo động đất, v. v.",
-  "@sound_test_description": {
-    "description": "「我」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
+  "notify_test_description": "測試即時天氣資訊、地震速報等音效通知",
+  "@notify_test_description": {
+    "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
   "eew_alert_sound": "Cảnh báo động đất sớm",
   "@eew_alert_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
   "eew_alert_description_sound": "Cảnh báo động đất nhanh: Cường độ tối đa 5 yếu trở lên\nVà cường độ dự đoán tại vị trí hiện tại là 4 trở lên",
   "@eew_alert_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
   "eew_sound": "Cảnh báo động đất sớm",
   "@eew_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 地震速報"
   },
   "eew_description_sound": "Cảnh báo động đất nhanh: Cường độ dự đoán tại vị trí của bạn là 2 trở lên",
   "@eew_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
   "int_report_sound": "Cảnh báo nhanh về cường độ địa chấn",
   "@int_report_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」標題 → 震度速報"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」標題 → 震度速報"
   },
   "int_report_description_sound": "Mạng quan trắc TREM: Cường độ địa chấn đo được tại vị trí của bạn là 3 trở lên",
   "@int_report_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
   },
   "eq_description_sound": "Mạng quan trắc TREM phát hiện rung chuyển",
   "@eq_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
   },
   "report_description_sound": "Báo cáo động đất: Cường độ địa chấn tại vị trí của bạn là 3 trở lên",
   "@report_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
   "eew_sound_title": "Âm thanh cảnh báo động đất nhanh",
   "@eew_sound_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 地震速報音效"
+    "description": "「我」路徑 → 「通知測試」內容 → 地震速報音效"
   },
   "eew_info_sound_title": "Thông tin động đất",
   "@eew_info_sound_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 地震資訊"
+    "description": "「我」路徑 → 「通知測試」內容 → 地震資訊"
   },
   "dp_info_sound_title": "Thông tin phòng chống thiên tai",
   "@dp_info_sound_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 災防資訊"
+    "description": "「我」路徑 → 「通知測試」內容 → 災防資訊"
   },
   "other_title": "Khác",
   "@other_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
+    "description": "「我」路徑 → 「通知測試」內容 → 其他、「設定」路徑 → 其他"
   },
   "thunderstorm_instant_messaging_sound": "Thông tin cảnh những mưa lớn kèm theo sấm sét",
   "@thunderstorm_instant_messaging_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
   "thunderstorm_instant_messaging_description_sound": "Vị trí hiện tại đã ban hành thông tin cảnh mưa lớn kèm theo sấm sét",
   "@thunderstorm_instant_messaging_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
   "heavy_rain_alert_sound": "Cảnh báo mưa lớn",
   "@heavy_rain_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雨特報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 大雨特報"
   },
   "heavy_rain_alert_description_sound": "Vị trí hiện tại đã ban hành Cảnh báo mưa lớn.",
   "@heavy_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
   "torrential_rain_alert_sound": "Cảnh báo mưa rất lớn",
   "@torrential_rain_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
   "torrential_rain_alert_description_sound": "Vị trí hiện tại đã ban hành Cảnh báo mưa rất lớn.",
   "@torrential_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
   "flooding_alert_sound": "Cảnh báo ngập lụt",
   "@flooding_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 淹水警戒"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 淹水警戒"
   },
   "flooding_alert_description_sound": "Vị trí hiện tại đã ban hành Cảnh báo ngập lụt.",
   "@flooding_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
   },
   "tsunami_alert_sound": "Cảnh báo sóng thần (Cẩn thận)",
   "@tsunami_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
   },
   "tsunami_alert_description_sound": "Vị trí hiện tại đã ban hành Cảnh báo sóng thần (Lưu ý).\nDự kiến sóng cao dưới 1 mét.",
   "@tsunami_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
   "tsunami_alert2_sound": "Cảnh báo sóng thần (Cảnh báo)",
   "@tsunami_alert2_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
   "tsunami_alert2_description_sound": "Vị trí hiện tại đã ban hành Cảnh báo sóng thần (Cảnh báo).\nDự kiến sóng cao trên 1 mét.",
   "@tsunami_alert2_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
   },
   "volcano_info_sound": "Thông tin núi lửa",
   "@volcano_info_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 火山資訊"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 火山資訊"
   },
   "volcano_info_description_sound": "Vị trí hiện tại đã ban hành Thông tin về núi lửa",
   "@volcano_info_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
   },
   "high_temperature_info_sound": "Thông tin nhiệt độ cao",
   "@high_temperature_info_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 高溫資訊"
   },
   "high_temperature_info_description_sound": "Vị trí hiện tại đã ban hành Thông tin cảnh báo nhiệt độ cao.",
   "@high_temperature_info_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
   },
   "strong_wind_warning_sound": "Cảnh báo gió mạnh trên đất liền",
   "@strong_wind_warning_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 陸上強風特報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 陸上強風特報"
   },
   "strong_wind_warning_description_sound": "Vị trí hiện tại đã ban hành Cảnh báo gió mạnh trên đất liền.",
   "@strong_wind_warning_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 陸上強風特報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 陸上強風特報"
   },
   "other_alert_sound": "Các loại cảnh báo khác",
   "@other_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 其他類型警報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 其他類型警報"
   },
   "other_alert_description_sound": "Vị trí hiện tại đã ban hành cảnh báo loại khác.",
   "@other_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
   },
   "server_announcement_sound": "Thông báo máy chủ",
   "@server_announcement_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 伺服器公告"
   },
   "server_announcement_description_sound": "Thông báo từ ExpTech",
   "@server_announcement_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   },
   "monitor_list": "Danh sách bản đồ",
   "@monitor_list": {
@@ -1355,5 +1355,9 @@
         "type": "String"
       }
     }
+  },
+  "me_developer": "開發者想說的話",
+  "@me_developer": {
+    "description": "「我」路徑 → 「開發者想說的話」標題"
   }
 }
