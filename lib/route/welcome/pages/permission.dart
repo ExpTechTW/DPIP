@@ -194,9 +194,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   }
 
   Future<void> _handlePermissionChange(PermissionItem item, bool value) async {
-    if (_isRequestingPermission) {
-      return;
-    }
+    if (_isRequestingPermission) return;
 
     setState(() {
       _isRequestingPermission = true;
@@ -216,19 +214,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               await openAppSettings();
             }
           } else if (Platform.isIOS) {
-            await Firebase.initializeApp();
-            NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-              alert: true,
-              announcement: true,
-              badge: true,
-              carPlay: true,
-              criticalAlert: true,
-              provisional: true,
-              sound: true,
-            );
-            if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-              _isNotificationPermission = true;
-            }
+            _checkNotificationPermission();
           }
         }
       } else {
@@ -237,7 +223,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           await openAppSettings();
         }
       }
-
       item.isGranted = status.isGranted;
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -253,24 +238,23 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   void _showPermanentlyDeniedDialog(PermissionItem item) {
     showDialog(
       context: context,
-      builder: (BuildContext context) =>
-          AlertDialog(
-            title: Text(context.i18n.permission_request),
-            content: Text(context.i18n.manual_permission_enablement),
-            actions: [
-              TextButton(
-                child: Text(context.i18n.cancel),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              TextButton(
-                child: Text(context.i18n.confirm),
-                onPressed: () {
-                  openAppSettings();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(context.i18n.permission_request),
+        content: Text(context.i18n.manual_permission_enablement),
+        actions: [
+          TextButton(
+            child: Text(context.i18n.cancel),
+            onPressed: () => Navigator.of(context).pop(),
           ),
+          TextButton(
+            child: Text(context.i18n.confirm),
+            onPressed: () {
+              openAppSettings();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
     );
   }
 
