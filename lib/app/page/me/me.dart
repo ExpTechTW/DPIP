@@ -107,11 +107,11 @@ class _MePageState extends State<MePage> {
         ListTileGroupHeader(title: context.i18n.me_debug),
         ListTile(
           leading: const Icon(Symbols.forum_rounded),
-          title: Text("開發者想說的話"),
+          title: Text(context.i18n.me_developer),
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DPIPInfoPage()),
+              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
             );
           },
         ),
