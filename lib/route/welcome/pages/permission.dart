@@ -22,6 +22,13 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
+  void getNotify() {
+    if (!_isNotificationPermission) {
+      _checkNotificationPermission();
+    }
+    WelcomeRouteState.of(context)!.complete();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -263,7 +270,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.complete() : null,
+            onPressed: getNotify,
             child: Text(context.i18n.next_step),
           ),
         ),
