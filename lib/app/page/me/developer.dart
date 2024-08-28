@@ -97,12 +97,6 @@ class DPIPInfoPage extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                   ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              '感謝您使用 DPIP，讓我們一起為防災盡一份心力',
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
           ],
         ),
       ),
