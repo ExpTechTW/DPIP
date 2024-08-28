@@ -309,11 +309,11 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "notify_test": "通知測試",
+  "notify_test": "Notify Test",
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "notify_test_description": "測試即時天氣資訊、地震速報等音效通知",
+  "notify_test_description": "Test the Sounds of Real-Time Weather info and Earthquake Alerts",
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
@@ -638,15 +638,15 @@
   "@light_drizzle": {
     "description": "天氣狀況：細雨"
   },
-  "freezing_drizzle": "凍霧雨",
+  "freezing_drizzle": "Freezing Drizzle",
   "@freezing_drizzle": {
     "description": "天氣狀況：凍霧雨"
   },
-  "heavy_freezing_drizzle": "大凍霧雨",
+  "heavy_freezing_drizzle": "Heavy Freezing Drizzle",
   "@heavy_freezing_drizzle": {
     "description": "天氣狀況：大凍霧雨"
   },
-  "patchy_light_rain": "局部小雨",
+  "patchy_light_rain": "Light Rain",
   "@patchy_light_rain": {
     "description": "天氣狀況：局部小雨"
   },
@@ -722,7 +722,7 @@
   "@moderate_or_heavy_rain_shower": {
     "description": "天氣狀況：中度或大陣雨"
   },
-  "torrential_rain_shower": "暴雨",
+  "torrential_rain_shower": "Heavy Rain Shower",
   "@torrential_rain_shower": {
     "description": "天氣狀況：暴雨"
   },
@@ -794,7 +794,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整 DPIP 的進階功能",
+  "advanced_features_title": "Adjust the Advance Features of DPIP",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
@@ -802,11 +802,11 @@
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
-  "no_tsunami_information": "近期無海嘯資訊",
+  "no_tsunami_information": "No Tsunami Information",
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_warning": "海嘯警報",
+  "tsunami_warning": "Tsunami Warning",
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
@@ -827,11 +827,11 @@
   "@tsunami_publish": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發布"
   },
-  "tsunami_renew": "更新",
+  "tsunami_renew": "Update",
   "@tsunami_renew": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 更新"
   },
-  "tsunami_relieve": "解除",
+  "tsunami_relieve": "Cancelled",
   "@tsunami_relieve": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
   },
@@ -847,15 +847,15 @@
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "scale": "規模",
+  "scale": "Magnitude",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
   },
-  "depth": "深度",
+  "depth": "Depth",
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "一切平安，無事件發生。",
+  "home_safety": "All Safe, Nothing Happened.",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -1043,11 +1043,11 @@
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新完成",
+  "update_complete": "Update Complete",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIP 更新完成，要前往查看更新日誌嗎？",
+  "update_complete_prompt": "DPIP just Finished Updating, Want to look at the Update Log now?",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
@@ -1063,11 +1063,11 @@
   "@announcement": {
     "description": "「我」路徑 → 公告"
   },
-  "new_announcement_prompt": "有新的公告，要前往查看嗎？",
+  "new_announcement_prompt": "Do you want to check out the New Announcement?",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "目前沒有公告",
+  "no_announcements": "No Announcements",
   "@no_announcements": {
     "description": "「公告」標題 → 目前沒有公告"
   },
@@ -1075,7 +1075,7 @@
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "unable_to_load_changelog": "無法載入更新日誌，請稍後再試。",
+  "unable_to_load_changelog": "Unable to load the Change Log, Please Retry Later.",
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」標題 → 無法載入更新日誌，請稍後再試。"
   },
@@ -1091,7 +1091,7 @@
   "@version_details": {
     "description": "「我」路徑 → 「更新日誌」標題 → 版本詳情"
   },
-  "unable_to_obtain_permission": "無法取得權限",
+  "unable_to_obtain_permission": "Unable to get Permission",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
@@ -1099,7 +1099,7 @@
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
-  "confirm": "確定",
+  "confirm": "Confirm",
   "@confirm": {
     "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
   },
@@ -1111,19 +1111,19 @@
   "@always_allow": {
     "description": "「存取權限彈窗」 → 一律允許"
   },
-  "always": "永遠",
+  "always": "Always",
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_start_permission_info": "For better experience with DPIP, please give the \"Auto Start\" Permission to let us set your Local Information.",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "auto_start_permission_experience": "For better experience when using DPIP, you need to Enable the Permission for \"Auto Start\" to make sure DPIP is getting the info Normally.",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "auto_start_permission": "自啟動權限",
+  "auto_start_permission": "Auto Start Permission",
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
@@ -1356,7 +1356,7 @@
       }
     }
   },
-  "me_developer": "開發者想說的話",
+  "me_developer": "What the devs want to say",
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   }
