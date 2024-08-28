@@ -110,8 +110,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (monitor) return;
-      initTargets();
-      showTutorial();
+      bool disable_monitor_tip = Global.preference.getBool("disable_monitor_tip") ?? false;
+      if (!disable_monitor_tip) {
+        Global.preference.setBool("disable_monitor_tip", true);
+        initTargets();
+        showTutorial();
+      }
     });
   }
 
@@ -489,9 +493,25 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
       if (!mounted) return;
 
+      List<String> alertArea = [];
+
+      if (_eewLastInfo[eew.id]?.status == 1) {
+        _eewIntensityArea[eew.id].forEach((key, data) {
+          if (key != "max_i") {
+            int i = intensityFloatToInt(data["i"]);
+            if (i >= 4) {
+              String city = Global.location[key]?.city ?? "";
+              if (city != "" && !alertArea.contains(city)) {
+                alertArea.add(city);
+              }
+            }
+          }
+        });
+      }
+
       eewUI.add(
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
           child: Column(
             children: [
               Card(
@@ -499,7 +519,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
-                    color: const Color(0xFFFFC800),
+                    color: _eewLastInfo[eew.id]?.status == 1 ? const Color(0xFFC80000) : const Color(0xFFFFC800),
                     width: 2,
                   ),
                 ),
@@ -536,7 +556,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                         arrivalTime: _userEewArriveTime[eew.id]!["s"],
                         currentTime: _getCurrentTime(),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 10),
                       Card(
                         elevation: 2,
                         shape: RoundedRectangleBorder(
@@ -548,7 +568,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -582,6 +602,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     ],
                                   ),
                                   const SizedBox(width: 12),
+                                  Container(
+                                    width: 1,
+                                    height: 80,
+                                    color: context.colors.outline,
+                                  ),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,7 +633,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                "M ${_eewLastInfo[eew.id]?.eq.magnitude}",
+                                                "M${_eewLastInfo[eew.id]?.eq.magnitude}",
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   color: context.colors.onSurface,
@@ -630,41 +656,42 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 16),
-                              Divider(
-                                color: context.colors.outline,
-                                thickness: 1,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                "警報地域",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: context.colors.onSurface,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  "花蓮縣",
-                                  "臺東縣",
-                                  "南投縣",
-                                  "宜蘭縣",
-                                ]
-                                    .map((county) => Chip(
-                                          label: Text(
-                                            county,
-                                            style: TextStyle(
-                                              color: context.colors.onPrimaryContainer,
-                                            ),
-                                          ),
-                                          backgroundColor: context.colors.primaryContainer,
-                                        ))
-                                    .toList(),
-                              ),
+                              if (alertArea.isNotEmpty)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 8),
+                                    Divider(
+                                      color: context.colors.outline,
+                                      thickness: 1,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "警報地域",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: context.colors.onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: alertArea
+                                          .map((county) => Chip(
+                                                label: Text(
+                                                  county,
+                                                  style: TextStyle(
+                                                    color: context.colors.onPrimaryContainer,
+                                                  ),
+                                                ),
+                                                backgroundColor: context.colors.primaryContainer,
+                                              ))
+                                          .toList(),
+                                    ),
+                                  ],
+                                )
                             ],
                           ),
                         ),
@@ -1248,7 +1275,7 @@ class _TopInfoBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      height: 80,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: IntensityColor.intensity(intensity!),
@@ -1301,7 +1328,6 @@ class _IntensityBox extends StatelessWidget {
             color: IntensityColor.onIntensity(intensity),
           ),
         ),
-        const SizedBox(height: 8),
         Center(
           child: Text(
             intensity.asIntensityDisplayLabel,
@@ -1340,7 +1366,6 @@ class _ArrivalTimeBox extends StatelessWidget {
             color: IntensityColor.onIntensity(intensity),
           ),
         ),
-        const SizedBox(height: 8),
         if (!isValid || remainingSeconds == null || remainingSeconds <= 0)
           Text(
             !isValid ? context.i18n.monitor_unknown : context.i18n.monitor_arrival,
