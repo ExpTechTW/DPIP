@@ -28,7 +28,7 @@ class _MePageState extends State<MePage> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ListTileGroupHeader(title: context.i18n.me_generally),
+        ListTileGroupHeader(title: context.i18n.me_general),
         /**
          * 設定
          */

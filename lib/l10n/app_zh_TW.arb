@@ -774,9 +774,9 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_generally": "一般",
-  "@me_generally": {
-    "description": "「我」路徑 → 一般"
+  "me_general": "一般",
+  "@me_general": {
+    "description": "「我」路徑 → 一般、「我」路徑 →「行動通知推播紀錄」標題 → 一般"
   },
   "me_debug": "除錯",
   "@me_debug": {
@@ -1359,5 +1359,29 @@
   "me_developer": "開發者想說的話",
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
+  },
+  "alarm_area": "警報區域",
+  "@alarm_area": {
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
+  },
+  "estimated_intensity": "預估最大震度",
+  "@estimated_intensity": {
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
+  },
+  "time_earthquake": "發震",
+  "@time_earthquake": {
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 發震"
+  },
+  "no_earthquake_monitor": "未啟用強震監視器",
+  "@no_earthquake_monitor": {
+    "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
+  },
+  "settings_earthquake_monitor": "請至設定進階功能中開啟強震監視器。",
+  "@settings_earthquake_monitor": {
+    "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
+  },
+  "view_prompt_information": "點擊查看提示資訊",
+  "@view_prompt_information": {
+    "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   }
 }

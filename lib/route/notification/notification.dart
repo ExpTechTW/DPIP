@@ -157,7 +157,7 @@ class NotificationCard extends StatelessWidget {
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
       label: Text(
-        record.critical ? context.i18n.emergency : context.i18n.me_generally,
+        record.critical ? context.i18n.emergency : context.i18n.me_general,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
