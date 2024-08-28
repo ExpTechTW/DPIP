@@ -309,11 +309,11 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "notify_test": "通知測試",
+  "notify_test": "알림 테스트",
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "notify_test_description": "測試即時天氣資訊、地震速報等音效通知",
+  "notify_test_description": "실시간 날씨 정보, 지진 속보 등의 음성 알림을 테스트하다",
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
@@ -1356,7 +1356,7 @@
       }
     }
   },
-  "me_developer": "開發者想說的話",
+  "me_developer": "개발자가 하고 싶은 말",
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   }
