@@ -309,7 +309,7 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "notify_test": "通知測試",
+  "notify_test": "讯息测试",
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
@@ -1167,7 +1167,7 @@
   "@app_logs": {
     "description": "「我」路徑 → App 日誌"
   },
-  "copy_fcm_token_error": "複製 FCM Token 時發生錯誤",
+  "copy_fcm_token_error": "拷贝 FCM Token 时发生错误",
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
@@ -1271,7 +1271,7 @@
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
-  "please_allow_location_permission": "請您到應用程式設定中找到並允許「位置」權限後再試一次。",
+  "please_allow_location_permission": "请您到軟件设定中找到并允许「位置」权限后再试一次。",
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
@@ -1356,7 +1356,7 @@
       }
     }
   },
-  "me_developer": "開發者想說的話",
+  "me_developer": "开发者想说的话",
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   }
