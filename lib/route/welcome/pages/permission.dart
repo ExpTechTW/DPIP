@@ -24,7 +24,19 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
   void getNotify() async {
     if (!_isNotificationPermission) {
-      await _checkNotificationPermission();
+      await Permission.notification.request();
+      NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        announcement: true,
+        badge: true,
+        carPlay: true,
+        criticalAlert: true,
+        provisional: true,
+        sound: true,
+      );
+      if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+        _isNotificationPermission = true;
+      }
     }
     WelcomeRouteState.of(context)!.complete();
   }
@@ -46,18 +58,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       _isNotificationPermission = status.isGranted;
     } else if (Platform.isIOS) {
       await Firebase.initializeApp();
-      NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        announcement: true,
-        badge: true,
-        carPlay: true,
-        criticalAlert: true,
-        provisional: true,
-        sound: true,
-      );
-      if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-        _isNotificationPermission = true;
-      }
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+      _isNotificationPermission = settings.authorizationStatus == AuthorizationStatus.authorized;
     }
   }
 
@@ -214,7 +216,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               await openAppSettings();
             }
           } else if (Platform.isIOS) {
-            _checkNotificationPermission();
+            NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+              alert: true,
+              announcement: true,
+              badge: true,
+              carPlay: true,
+              criticalAlert: true,
+              provisional: true,
+              sound: true,
+            );
+            if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+              _isNotificationPermission = true;
+            }
           }
         }
       } else {
