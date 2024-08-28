@@ -22,9 +22,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
-  void getNotify() {
+  void getNotify() async {
     if (!_isNotificationPermission) {
-      _checkNotificationPermission();
+      await _checkNotificationPermission();
     }
     WelcomeRouteState.of(context)!.complete();
   }
@@ -243,23 +243,24 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   void _showPermanentlyDeniedDialog(PermissionItem item) {
     showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text(context.i18n.permission_request),
-        content: Text(context.i18n.manual_permission_enablement),
-        actions: [
-          TextButton(
-            child: Text(context.i18n.cancel),
-            onPressed: () => Navigator.of(context).pop(),
+      builder: (BuildContext context) =>
+          AlertDialog(
+            title: Text(context.i18n.permission_request),
+            content: Text(context.i18n.manual_permission_enablement),
+            actions: [
+              TextButton(
+                child: Text(context.i18n.cancel),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              TextButton(
+                child: Text(context.i18n.confirm),
+                onPressed: () {
+                  openAppSettings();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
-          TextButton(
-            child: Text(context.i18n.confirm),
-            onPressed: () {
-              openAppSettings();
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
     );
   }
 
