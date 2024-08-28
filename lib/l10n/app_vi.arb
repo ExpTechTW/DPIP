@@ -855,7 +855,7 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "一切平安，無事件發生。",
+  "home_safety": "Mọi việc đều an toàn, không có sự cố nào xảy ra.",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -1347,7 +1347,7 @@
       }
     }
   },
-  "delay": "延遲: {serviceStatus_count} ms",
+  "delay": "Độ trễ: {serviceStatus_count} ms",
   "@delay": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
     "placeholders": {
@@ -1356,7 +1356,7 @@
       }
     }
   },
-  "me_developer": "開發者想說的話",
+  "me_developer": "Những gì các nhà phát triển muốn nói",
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   }
