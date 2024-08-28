@@ -1208,7 +1208,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               left: 4,
               top: 58,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: _rtsUI,
               ),
             ),
