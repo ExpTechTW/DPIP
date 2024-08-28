@@ -46,8 +46,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       _isNotificationPermission = status.isGranted;
     } else if (Platform.isIOS) {
       await Firebase.initializeApp();
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      _isNotificationPermission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        announcement: true,
+        badge: true,
+        carPlay: true,
+        criticalAlert: true,
+        provisional: true,
+        sound: true,
+      );
+      if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+        _isNotificationPermission = true;
+      }
     }
   }
 
