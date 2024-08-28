@@ -309,12 +309,12 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "sound_test": "通知測試",
-  "@sound_test": {
+  "notify_test": "通知測試",
+  "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "sound_test_description": "測試即時天氣資訊、地震速報等音效通知",
-  "@sound_test_description": {
+  "notify_test_description": "測試即時天氣資訊、地震速報等音效通知",
+  "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
   "eew_alert_sound": "緊急地震速報",

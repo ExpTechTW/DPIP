@@ -50,8 +50,8 @@ class _MePageState extends State<MePage> {
          */
         ListTile(
           leading: const Icon(Symbols.audiotrack_sharp),
-          title: Text(context.i18n.sound_test),
-          subtitle: Text(context.i18n.sound_test_description),
+          title: Text(context.i18n.notify_test),
+          subtitle: Text(context.i18n.notify_test_description),
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(

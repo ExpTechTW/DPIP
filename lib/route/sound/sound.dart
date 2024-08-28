@@ -42,7 +42,7 @@ class _SettingsSoundViewState extends State<SoundRoute> {
                 floating: true,
                 title: Builder(
                   builder: (context) {
-                    return Text(context.i18n.sound_test);
+                    return Text(context.i18n.notify_test);
                   },
                 ),
               )
