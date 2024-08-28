@@ -1383,5 +1383,33 @@
   "view_prompt_information": "點擊查看提示資訊",
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
+  },
+  "feeling_temperature": "體感溫度:",
+  "@feeling_temperature": {
+    "description": "「首頁」路徑 → 「體感溫度:」描述"
+  },
+  "relative_humidity": "相對濕度:",
+  "@relative_humidity": {
+    "description": "「首頁」路徑 → 「相對濕度:」描述"
+  },
+  "uv_index": "紫外線指數:",
+  "@uv_index": {
+    "description": "「首頁」路徑 → 「紫外線指數:」描述"
+  },
+  "highest": "最高",
+  "@highest": {
+    "description": "「首頁」路徑 → 「最高」描述"
+  },
+  "lowest": "最低",
+  "@lowest": {
+    "description": "「首頁」路徑 → 「最低」描述"
+  },
+  "day": "日",
+  "@day": {
+    "description": "「首頁」路徑 → 「日」描述"
+  },
+  "hour": "時",
+  "@hour": {
+    "description": "「首頁」路徑 → 「時」描述"
   }
 }

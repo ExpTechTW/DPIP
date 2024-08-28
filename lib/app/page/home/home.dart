@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String formatDateTime(String dateTimeString) {
     try {
       DateTime dateTime = DateTime.parse(dateTimeString);
-      return "${dateTime.day.toString().padLeft(2, "0")}日${dateTime.hour.toString().padLeft(2, "0")}時";
+      return "${dateTime.day.toString().padLeft(2, "0")}${context.i18n.day}${dateTime.hour.toString().padLeft(2, "0")}${context.i18n.hour}";
     } catch (e) {
       return "Invalid Date";
     }
@@ -310,14 +310,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              "最高 ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["max"].round() ?? "--"}°",
+                                              "${context.i18n.highest} ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["max"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: context.colors.onSecondaryContainer.withOpacity(0.75),
                                               ),
                                             ),
                                             Text(
-                                              "最低 ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["min"].round() ?? "--"}°",
+                                              "${context.i18n.lowest} ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["min"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: context.colors.onSecondaryContainer.withOpacity(0.75),
@@ -344,21 +344,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "體感溫度: ${weatherData["realtime"]?["feel"]?["c"].round() ?? "--"}°",
+                                      "${context.i18n.feeling_temperature} ${weatherData["realtime"]?["feel"]?["c"].round() ?? "--"}°",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                       ),
                                     ),
                                     Text(
-                                      "相對濕度: ${weatherData["realtime"]?["humidity"] ?? "- -"}%",
+                                      "${context.i18n.relative_humidity} ${weatherData["realtime"]?["humidity"] ?? "- -"}%",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                       ),
                                     ),
                                     Text(
-                                      "紫外線指數: ${weatherData["realtime"]?["uv"] ?? "- -"}",
+                                      "${context.i18n.uv_index} ${weatherData["realtime"]?["uv"] ?? "- -"}",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
