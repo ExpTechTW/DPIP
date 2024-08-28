@@ -12,7 +12,7 @@ class DPIPInfoPage extends StatelessWidget {
         title: Text(context.i18n.me_developer),
         leading: IconButton(
           icon: const Icon(Symbols.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Container(
