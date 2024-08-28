@@ -21,8 +21,8 @@ class DPIPInfoPage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primary.withOpacity(0.05),
-              Theme.of(context).colorScheme.background,
+              context.theme.colorScheme.primary.withOpacity(0.05),
+              context.theme.colorScheme.surface,
             ],
           ),
         ),
@@ -96,9 +96,9 @@ class DPIPInfoPage extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'DPIP 開發者的話',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              style: context.theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: context.theme.colorScheme.primary,
                   ),
             ),
           ],
@@ -119,13 +119,13 @@ class DPIPInfoPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
+                Icon(icon, color: context.theme.colorScheme.primary, size: 28),
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: context.theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: context.theme.colorScheme.primary,
                       ),
                 ),
               ],
@@ -136,7 +136,7 @@ class DPIPInfoPage extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Text(
                         paragraph,
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        style: context.theme.textTheme.bodyLarge,
                       ),
                     ))
                 .toList(),
