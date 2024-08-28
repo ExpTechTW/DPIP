@@ -19,8 +19,8 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
   late ThemeData system;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _updateSystemTheme();
   }
 
@@ -29,7 +29,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
     system = ThemeData(brightness: brightness);
   }
 
-  setTheme(String theme) async {
+  Future<void> setTheme(String theme) async {
     DpipApp.of(context)!.changeTheme(theme);
     await Global.preference.setString("theme", theme);
     setState(() {
@@ -42,8 +42,6 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
 
   @override
   Widget build(BuildContext context) {
-    _updateSystemTheme();
-
     return Material(
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
