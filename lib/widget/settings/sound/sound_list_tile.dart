@@ -56,7 +56,7 @@ class SoundListTileState extends State<SoundListTile> {
       if (token != "") {
         int limit = Global.preference.getInt("limit-sound-test") ?? 0;
         int now = DateTime.now().millisecondsSinceEpoch;
-        if (now - limit < 5000) {
+        if (now - limit < 10000) {
           showLimitDialog(context);
         } else {
           Global.preference.setInt("limit-sound-test", now);

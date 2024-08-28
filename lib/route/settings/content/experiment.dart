@@ -48,7 +48,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
             onChanged: (value) async {
               int limit = Global.preference.getInt("limit-monitor") ?? 0;
               int now = DateTime.now().millisecondsSinceEpoch;
-              if (now - limit < 5000) {
+              if (now - limit < 10000) {
                 showLimitDialog(context);
               } else {
                 Global.preference.setInt("limit-monitor", now);
