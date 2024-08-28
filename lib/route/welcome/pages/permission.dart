@@ -25,17 +25,19 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   void getNotify() async {
     if (!_isNotificationPermission) {
       await Permission.notification.request();
-      NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        announcement: true,
-        badge: true,
-        carPlay: true,
-        criticalAlert: true,
-        provisional: true,
-        sound: true,
-      );
-      if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
-        _isNotificationPermission = true;
+      if (Platform.isIOS) {
+        NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          announcement: true,
+          badge: true,
+          carPlay: true,
+          criticalAlert: true,
+          provisional: true,
+          sound: true,
+        );
+        if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+          _isNotificationPermission = true;
+        }
       }
     }
     WelcomeRouteState.of(context)!.complete();
