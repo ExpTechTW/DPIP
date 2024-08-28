@@ -19,11 +19,11 @@
   },
   "monitor": "強震モニタ",
   "@monitor": {
-    "description": "「強震監視器」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
+    "description": "「地圖」路徑 → 強震監視器、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
   },
   "report": "地震情報",
   "@report": {
-    "description": "「地震報告」頁面標題、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
+    "description": "「更多」路徑 → 地震報告、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "map": "地図",
   "@map": {
@@ -63,7 +63,7 @@
   },
   "report_list_item_subtitle": "M {magnitude}　深さ {depth} km",
   "@report_list_item_subtitle": {
-    "description": "「地震報告列表」頁面 → 地震報告條目 → 副標題",
+    "description": "「更多」路徑 → 「地震報告列表」頁面 → 地震報告條目 → 副標題",
     "placeholders": {
       "magnitude": {
         "type": "String",
@@ -77,7 +77,7 @@
   },
   "report_with_number": "番号 {reportNumber} の顕著な地震",
   "@report_with_number": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題",
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 副標題",
     "placeholders": {
       "reportNumber": {
         "type": "String"
@@ -86,47 +86,47 @@
   },
   "report_without_number": "局地地震",
   "@report_without_number": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 副標題"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 副標題"
   },
   "open_report_url": "地震情報",
   "@open_report_url": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 開啟報告頁面按鈕 → 提示"
   },
   "report_event_time": "発生時刻",
   "@report_event_time": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 發震時間"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 發震時間"
   },
   "report_location": "緯度/経度",
   "@report_location": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 位於"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 位於、「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 位於"
   },
   "report_magnitude": "マグニチュード",
   "@report_magnitude": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震規模"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震規模"
   },
   "report_depth": "深さ",
   "@report_depth": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震源深度"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 震源深度"
   },
   "report_image": "地震情報図",
   "@report_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖"
   },
   "report_intensity_image": "震度分布図",
   "@report_intensity_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 震度圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 震度圖"
   },
   "report_pga_image": "地動最大加速度",
   "@report_pga_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動加速度圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 最大地動加速度圖"
   },
   "report_pgv_image": "地動最大速度",
   "@report_pgv_image": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 最大地動速度圖"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 最大地動速度圖"
   },
   "report_intensity": "各地の震度",
   "@report_intensity": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 各地震度"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 各地震度"
   },
   "settings_locale": "言語",
   "@settings_locale": {
@@ -170,51 +170,51 @@
   },
   "earthquake_warning_error": "最新の地震速報は取得できません",
   "@earthquake_warning_error": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 暫時無法取得地震速報資料"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
   "no_earthquake_warning": "地震速報が発表されていません",
   "@no_earthquake_warning": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 目前無生效中的地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 目前無生效中的地震速報"
   },
   "earthquake_warning": "地震速報",
   "@earthquake_warning": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 地震速報"
   },
   "emergency_earthquake_warning": "緊急地震速報",
   "@emergency_earthquake_warning": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 緊急地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 緊急地震速報"
   },
   "location_estimate": "現在地の予想",
   "@location_estimate": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 所在地預估"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 所在地預估"
   },
   "seismic_waves": "到達まで",
   "@seismic_waves": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 震波"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 震波"
   },
   "monitor_unknown": "不明",
   "@monitor_unknown": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 未知"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 未知"
   },
   "monitor_arrival": "到達",
   "@monitor_arrival": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 抵達"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 抵達"
   },
   "monitor_after_seconds": "秒",
   "@monitor_after_seconds": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 秒後抵達"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 秒後抵達"
   },
   "report_replay": "リプレイ",
   "@report_replay": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 重播按鈕"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 重播按鈕"
   },
   "image_save": "セーブ",
   "@image_save": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片"
   },
   "image_saved": "セーブしました",
   "@image_saved": {
-    "description": "「地震報告」路徑 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
   "settings_Personalization": "個人用設定",
   "@settings_Personalization": {
@@ -256,7 +256,7 @@
   "@settings_location_auto": {
     "description": "「設定」路徑 → 「啟用自動定位」標題"
   },
-  "settings_location_auto_description": "この機能はデバイスのGPSを使用して、地理的な位置情報に基づいて、所在地を更新します。リアルタイムの天気情報や地震情報を提供して、最新の地域の状況を取得します。",
+  "settings_location_auto_description": "この機能はデバイスのGPSを使用して、地理的な位置情報に基づいて所在地を更新します。リアルタイムの天気情報や地震情報を提供し、最新の地域状況を取得します。",
   "@settings_location_auto_description": {
     "description": "「設定」路徑 → 「啟用自動定位」副標題敘述"
   },
@@ -278,23 +278,23 @@
   },
   "settings_fcm": "FCMトークンをコピー",
   "@settings_fcm": {
-    "description": "「設定」路徑 → 「FCM」標題"
+    "description": "「我」頁面標題 → 「FCM」標題"
   },
-  "settings_copy_fcm": "FCM Tokenはコピーしました",
+  "settings_copy_fcm": "FCMトークンをコピーしました",
   "@settings_copy_fcm": {
-    "description": "「設定」路徑 → 「FCM」標題 → 提示描述"
+    "description": "「我」頁面標題 → 「FCM」標題 → 提示描述"
   },
   "report_offing": "この地震により若干の海面変動があります",
   "@report_offing": {
-    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起若干海面變動"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
   "report_tsunami_attention": "この地震により津波発生のおそれがあります 今後の情報にご注意ください",
   "@report_tsunami_attention": {
-    "description": "「地震報告」路徑 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
+    "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
   "report_error": "地震情報取得中にエラーが発生しました。ネットワークの状態をご確認の上、再度お試しください。",
   "@report_error": {
-    "description": "「地震報告」路徑 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
+    "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
   "me_version": "バージョン {version}\n製作：ExpTech Studio\n一部の情報源：CWA（中央気象署）",
   "@me_version": {
@@ -305,7 +305,7 @@
       }
     }
   },
-  "source_language": "原始言語",
+  "source_language": "元言語",
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
@@ -321,7 +321,7 @@
   "@eew_alert_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
-  "eew_alert_description_sound": "緊急地震速報 推定最大震度5弱以上\nかつ現在地の予測震度4以上",
+  "eew_alert_description_sound": "緊急地震速報 推定最大震度5弱以上\nかつ現在地の予想震度4以上",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
@@ -329,7 +329,7 @@
   "@eew_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報"
   },
-  "eew_description_sound": "緊急地震速報 現在地の予測震度2以上",
+  "eew_description_sound": "緊急地震速報 現在地の予想震度2以上",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
   },
@@ -349,7 +349,7 @@
   "@report_description_sound": {
     "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
   },
-  "eew_sound_title": "緊急地震速報効果音",
+  "eew_sound_title": "緊急地震速報の効果音",
   "@eew_sound_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 地震速報音效"
   },
@@ -365,11 +365,11 @@
   "@other_title": {
     "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "雷雨速報",
+  "thunderstorm_instant_messaging_sound": "リアルタイムな雷雨の情報",
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "現在地に雷雨速報が発表",
+  "thunderstorm_instant_messaging_description_sound": "現在地にリアルタイムな雷雨の情報が発表",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
@@ -381,11 +381,11 @@
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
-  "torrential_rain_alert_sound": "豪雨警報",
+  "torrential_rain_alert_sound": "大雨警報",
   "@torrential_rain_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
   },
-  "torrential_rain_alert_description_sound": "現在地に豪雨警報が発表",
+  "torrential_rain_alert_description_sound": "現在地に大雨警報が発表",
   "@torrential_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
   },
@@ -401,7 +401,7 @@
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert_description_sound": "現在地に津波警報（注意）が発表\n予想される津波の高さ1ｍ未満",
+  "tsunami_alert_description_sound": "現在地に津波警報（注意）が発表\n予想波の高さ1ｍ未満",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
@@ -409,7 +409,7 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "現在地に津波警報（警報）が発表\n予想される津波の高さ1ｍ以上",
+  "tsunami_alert2_description_sound": "現在地に津波警報（警報）が発表\n予想波の高さ1ｍ以上",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
   },
@@ -421,11 +421,11 @@
   "@volcano_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
   },
-  "high_temperature_info_sound": "高温情報",
+  "high_temperature_info_sound": "高温注意情報",
   "@high_temperature_info_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
   },
-  "high_temperature_info_description_sound": "現在地に高温情報が発表",
+  "high_temperature_info_description_sound": "現在地に高温注意情報が発表",
   "@high_temperature_info_description_sound": {
     "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
   },
@@ -539,7 +539,7 @@
   },
   "eew_no_x": "第 {serial} 報",
   "@eew_no_x": {
-    "description": "「強震監視器」路徑 → 資訊托盤 → 第 {serial} 報",
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 第 {serial} 報",
     "placeholders": {
       "serial": {
         "type": "String"
@@ -549,14 +549,6 @@
   "lightning": "落雷",
   "@lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電"
-  },
-  "cg_lightning": "対地放電（落雷）",
-  "@cg_lightning": {
-    "description": "「地圖」路徑 → 地圖列表 →「閃電」圖例 → 對地閃電"
-  },
-  "cc_lightning": "雲放電",
-  "@cc_lightning": {
-    "description": "「地圖」路徑 → 地圖列表 → 「閃電」圖例 → 雲間閃電"
   },
   "out_of_service": "圈外",
   "@out_of_service": {
@@ -662,7 +654,7 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "時々穏やかな雨",
+  "moderate_rain_at_times": "時々雨",
   "@moderate_rain_at_times": {
     "description": "天氣狀況：偶爾有雨"
   },
@@ -855,10 +847,6 @@
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "epicenter": "震源地",
-  "@epicenter": {
-    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 震央"
-  },
   "scale": "マグニチュード",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
@@ -867,58 +855,49 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "tsunami_depth": "{depth}km",
-  "@tsunami_depth": {
-    "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {depth}km",
-    "placeholders": {
-      "depth": {
-        "type": "String"
-      }
-    }
-  },
-  "home_Safety": "すべて安全で、事件もない。",
-  "@home_Safety": {
+  "home_safety": "すべて安全で、事件もない。",
+  "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
   "update_log": "更新履歴",
   "@update_log": {
-    "description": "「設定」路徑 → 更新日誌"
+    "description": "「我」路徑 → 更新日誌"
   },
   "interval_3_days": "3日",
   "@interval_3_days": {
-    "description": "3天"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3天"
   },
   "interval_2_days": "2日",
   "@interval_2_days": {
-    "description": "2天"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2天"
   },
   "interval_24_hours": "24時間",
   "@interval_24_hours": {
-    "description": "24小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24小時"
   },
   "interval_12_hours": "12時間",
   "@interval_12_hours": {
-    "description": "12小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12小時"
   },
   "interval_6_hours": "6時間",
   "@interval_6_hours": {
-    "description": "6小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6小時"
   },
   "interval_3_hours": "3時間",
   "@interval_3_hours": {
-    "description": "3小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3小時"
   },
   "interval_1_hour": "1時間",
   "@interval_1_hour": {
-    "description": "1小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1小時"
   },
   "interval_10_minutes": "10分間",
   "@interval_10_minutes": {
-    "description": "10分鐘"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10分鐘"
   },
   "interval_now": "今日",
   "@interval_now": {
-    "description": "今日"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 今日"
   },
   "welcome_message": "DPIPへようこそ",
   "@welcome_message": {
@@ -948,13 +927,13 @@
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために設立されたが、その後校外に発展し、徐々に現在の形になった。",
+  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために設立されたが、その後校外に発展し、徐々に現在の形になりました。",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
   "notice": "注意事項",
   "@notice": {
-    "description": "注意事項"
+    "description": "「歡迎」頁面 → 注意事項"
   },
   "notice_details": "DPIPでは、ExpTechや中央気象署（CWA）からの様々な情報をお届けしますので、ご利用の際には以下の点にご留意ください。",
   "@notice_details": {
@@ -968,15 +947,15 @@
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強い揺れは、通知メッセージよりも早くユーザーの場所に到着する可能性がある。",
+  "strong_shake_warning": "強い揺れは、通知よりも早くユーザーに到達する可能性があります。",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震情報は迅速な計算の結果であり、大きな誤差が生じる可能性があるため、注意と理解をもって利用する必要がある。",
+  "earthquake_alert_warning": "地震情報は迅速な計算の結果であり、大きな誤差が生じる可能性があるため、注意深く理解して利用する必要があります。",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
-  "legal_risks": "公的に認可されていない行為は、中華民国（台湾）の法律により危険となる可能性がありますので、必ず関連法規を遵守してください。",
+  "legal_risks": "公的に認可されていない行為は、中華民国（台湾）の法律により、リスクを伴う可能性がありますので、必ず関連法規を遵守してください。",
   "@legal_risks": {
     "description": "「歡迎」頁面 → 任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
   },
@@ -984,7 +963,7 @@
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "私たちは常にユーザーの側に立ち、プライバシーの保護に継続的に取り組んできました。",
+  "privacy_commitment": "私たちは常にユーザーの側に立ち、プライバシーの保護に継続的に取り組んでいます。",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
@@ -1010,33 +989,33 @@
   },
   "disagree": "拒否",
   "@disagree": {
-    "description": "「歡迎」頁面 → 不同意"
+    "description": "「歡迎」頁面 → 強震監視器 → 不同意"
   },
   "agree": "許可",
   "@agree": {
-    "description": "「歡迎」頁面 → 同意"
+    "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
   "trem_service_description": "ExpTech's TREMの強震モニターサービスはDPIPでご覧いただけますが、以下の条件をお読みいただき、この機能を有効にするかどうかをお選びください。",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、中央気象署（CMA）が提供する情報ではなく、最終的には中央気象署が発表する情報に従うべき観測とは一致しない可能性がある。",
+  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、中央気象署（CMA）が提供する情報ではなく、最終的には中央気象署が発表する情報に従うべき観測結果とは一致しない可能性があります。",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震モニタで使用している観測点はExpTechが所有しており、中央気象署（CWA）の管理下にはありません。中央気象署を困らせることになりますので、故障やコメントを中央気象局に伝えないでください。",
+  "trem_station_warning": "強震モニタで使用している観測点はExpTechが所有しており、中央気象署（CWA）の管理下ではありません。中央気象署に故障やコメントを送信することは迷惑となりますので、行わないでください。",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "強震モニターはTREM(台湾リアルタイム地震モニタ)で台湾全体の現在の振動を観測するために使用され、リアルタイムの地震度表示機能として、地震が発生すると、観測点の色の変化を通じて地震波の伝播状況を観察することができます。",
+  "trem_monitor_description": "強震モニターはTREM（台湾リアルタイム地震モニタ）を用いて、台湾全体の振動を観測します。リアルタイムの地震度表示機能として、地震が発生した際には、観測点の色の変化を通じて地震波の伝播状況を観察することができます。",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
-  "station_noise_warning": "正常な状態であっても、日常的なノイズ（車、工場、工事など）により観測点の色が変化することがあります。また、観測点の故障によっても色が変わることがあります。データはリアルタイムであるため、故障の有無をその場で判断することはできません。",
+  "station_noise_warning": "正常な状態でも、日常的なノイズ（車、工場、工事など）により観測点の色が変化することがあります。また、観測点の故障によっても色が変わることがあります。データはリアルタイムで提供されるため、その場で故障の有無を判断することはできません。",
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022年6月上旬、台湾全土に観測点の配備を開始した。TREM-Net（TREM 地震観測網）は、SE-Net（強震観測網「加速度計」）とMS-Net（微震観測網「速度計」）の2つの観測網で構成され、地震時の様々なデータをまとめて記録する。",
+  "trem_net_deployment": "2022年6月上旬に、台湾全土で観測点の配備を開始しました。TREM-Net（TREM地震観測網）は、SE-Net（強震観測網「加速度計」）とMS-Net（微震観測網「速度計」）の2つの観測網から構成され、地震時の様々なデータをまとめて記録します。",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
@@ -1064,11 +1043,11 @@
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新が完了",
+  "update_complete": "更新完了",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIPが更新されましたが、変更履歴をご覧になりたいですか？",
+  "update_complete_prompt": "DPIPが更新されました、変更履歴をご覧になりますか？",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
@@ -1082,41 +1061,37 @@
   },
   "announcement": "発表",
   "@announcement": {
-    "description": "公告"
+    "description": "「我」路徑 → 公告"
   },
-  "new_announcement_prompt": "新発表をチェックしたい？",
+  "new_announcement_prompt": "新発表をチェックしますか？",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
   "no_announcements": "現在発表なし",
   "@no_announcements": {
-    "description": "「公告」 → 前沒有公告"
+    "description": "「公告」標題 → 目前沒有公告"
   },
   "contributor": "貢献者",
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "beta_version": "ベータ版",
-  "@beta_version": {
-    "description": "應用程式的內部測試版本"
-  },
   "unable_to_load_changelog": "変更履歴を読み込めませんでした。",
   "@unable_to_load_changelog": {
-    "description": "「我」路徑 →「更新日誌」→ 無法載入更新日誌，請稍後再試。"
+    "description": "「我」路徑 →「更新日誌」標題 → 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "変更履歴はない。",
+  "no_changelog": "変更履歴はありません。",
   "@no_changelog": {
-    "description": "當前沒有任何更新日誌"
+    "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
   "announcement_details": "発表情報",
   "@announcement_details": {
-    "description": "「公告」 → 查看公告的具體內容"
+    "description": "「我」路徑 → 「公告」標題 → 查看公告的具體內容"
   },
   "version_details": "バージョン情報",
   "@version_details": {
-    "description": "「更新日誌」 → 版本詳情"
+    "description": "「我」路徑 → 「更新日誌」標題 → 版本詳情"
   },
-  "unable_to_obtain_permission": "権限が得られない",
+  "unable_to_obtain_permission": "権限がありません",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
@@ -1172,11 +1147,11 @@
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
   },
-  "manual_permission_enablement": "ユーザーは手動で設定ページに移動、関連する権限を開く必要がある。",
+  "manual_permission_enablement": "ユーザーは手動で設定ページに移動、関連する権限を有効にする必要があります。",
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
-  "location_not_set": "所在地を設定していない",
+  "location_not_set": "所在地を設定していません",
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
@@ -1188,10 +1163,6 @@
   "@go_to_settings": {
     "description": "引導用戶前往設定的選項"
   },
-  "notification_log": "通知の送信記録",
-  "@notification_log": {
-    "description": "「我」路徑 → 通知發送紀錄"
-  },
   "app_logs": "アプリログ",
   "@app_logs": {
     "description": "「我」路徑 → App 日誌"
@@ -1200,65 +1171,61 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "provide_services": "提供",
-  "@provide_services": {
-    "description": "描述應用程式提供服務的功能"
-  },
-  "estimated_intensity_legend": "推定震度凡例",
+  "estimated_intensity_legend": "推定震度の凡例",
   "@estimated_intensity_legend": {
-    "description": "描述預估震度的圖例"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
-  "only_used_during_earthquake_alerts": "EEW発表された場合のみ",
+  "only_used_during_earthquake_alerts": "緊急地震速報が発表された場合のみ",
   "@only_used_during_earthquake_alerts": {
-    "description": "此項目僅在地震速報時使用"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
   "weak_5": "5弱",
   "@weak_5": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5弱"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5弱"
   },
   "strong_5": "5強",
   "@strong_5": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 5強"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5強"
   },
   "weak_6": "6弱",
   "@weak_6": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6弱"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6弱"
   },
   "strong_6": "6強",
   "@strong_6": {
-    "description": "「地圖」路徑 → 地圖列表 → 「強震監視器」圖例 → 6強"
+    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6強"
   },
   "lightning_1_5": "5分間以内の対地放電（落雷）",
   "@lightning_1_5": {
-    "description": "5 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 5 分鐘內發生的對地閃電"
   },
   "lightning_1_10": "10分間以内の対地放電（落雷）",
   "@lightning_1_10": {
-    "description": "10 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 10 分鐘內發生的對地閃電"
   },
   "lightning_1_30": "30分間以内の対地放電（落雷）",
   "@lightning_1_30": {
-    "description": "30 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 30 分鐘內發生的對地閃電"
   },
   "lightning_1_60": "1時間以内の対地放電（落雷）",
   "@lightning_1_60": {
-    "description": "60 分鐘內發生的對地閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 60 分鐘內發生的對地閃電"
   },
   "lightning_0_5": "5分間以内の雲放電",
   "@lightning_0_5": {
-    "description": "5 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 5 分鐘內發生的雲間閃電"
   },
   "lightning_0_10": "10分間以内の雲放電",
   "@lightning_0_10": {
-    "description": "10 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 10 分鐘內發生的雲間閃電"
   },
   "lightning_0_30": "30分間以内の雲放電",
   "@lightning_0_30": {
-    "description": "30 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 30 分鐘內發生的雲間閃電"
   },
   "lightning_0_60": "1時間以内の雲放電",
   "@lightning_0_60": {
-    "description": "60 分鐘內發生的雲間閃電"
+    "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 60 分鐘內發生的雲間閃電"
   },
   "abnormal": "異常",
   "@abnormal": {
@@ -1272,73 +1239,73 @@
   "@retry": {
     "description": "重試"
   },
-  "photo_media_permission_request": "アプリケーションの設定で 「写真とメディア 」の許可を探して許可し、もう一度試してください。",
+  "photo_media_permission_request": "アプリケーションの設定で 「写真とメディア」の許可を探して許可し、もう一度試してください。",
   "@photo_media_permission_request": {
-    "description": "「地震報告」路徑 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
+    "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
   "no_notification_history": "通知記録なし",
   "@no_notification_history": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 沒有通知紀錄"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 沒有通知紀錄"
   },
   "emergency": "緊急",
   "@emergency": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急"
   },
-  "notification_details": "通知詳細情報",
+  "notification_details": "通知の詳細情報",
   "@notification_details": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知詳細資訊"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知詳細資訊"
   },
-  "notification_area": "送信地域に通知",
+  "notification_area": "通知の送信地域",
   "@notification_area": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 通知發送區域"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知發送區域"
   },
   "emergency_notification": "緊急通知",
   "@emergency_notification": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 緊急通知"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急通知"
   },
   "general_notification": "一般通知",
   "@general_notification": {
-    "description": "「設定」路徑 → 「通知發送紀錄」路徑 → 一般通知"
+    "description": "「我」路徑 →「行動通知推播紀錄」標題 → 一般通知"
   },
-  "please_allow_notification_permission": "アプリケーションの設定で 「通知 」の許可を探して許可し、もう一度試してください。",
+  "please_allow_notification_permission": "アプリケーションの設定で 「通知」の許可を探して許可し、もう一度試してください。",
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
-  "please_allow_location_permission": "アプリケーションの設定で 「位置 」の許可を探して許可し、もう一度試してください。",
+  "please_allow_location_permission": "アプリケーションの設定で 「位置」の許可を探して許可し、もう一度試してください。",
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
   "no_data_available": "情報なし",
   "@no_data_available": {
-    "description": "「設定」路徑 → 「伺服器狀態」→ 沒有可用的資料"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 沒有可用的資料"
   },
   "server_status_overview": "このページでは、様々な時間におけるサーバーの状態の概要を示します。生データは5秒ごとに更新されますが、ここではネットワーク利用を最適化するために凝縮したものを表示しています。この情報はあくまで参考情報であり、実際のステータスはアナウンスに基づいてください。",
   "@server_status_overview": {
-    "description": "「設定」路徑 → 「伺服器狀態」→ 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
   },
-  "all_normal": "全て正常だ",
+  "all_normal": "全て正常",
   "@all_normal": {
-    "description": "伺服器狀態：全部正常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：全部正常"
   },
-  "all_abnormal": "全て異常だ",
+  "all_abnormal": "全て異常",
   "@all_abnormal": {
-    "description": "伺服器狀態：全部異常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：全部異常"
   },
   "partially_abnormal": "部分的な異常",
   "@partially_abnormal": {
-    "description": "伺服器狀態：部分異常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 伺服器狀態：部分異常"
   },
   "normal": "正常",
   "@normal": {
-    "description": "狀態：正常"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：正常"
   },
   "unstable": "不安定",
   "@unstable": {
-    "description": "狀態：不穩定"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：不穩定"
   },
   "no_data": "データ無し",
   "@no_data": {
-    "description": "狀態：無資料"
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：無資料"
   },
   "automatic_foreground_positioning": "前景オートロケーション",
   "@automatic_foreground_positioning": {
@@ -1376,6 +1343,15 @@
     "description": "「地圖」路徑 → 「海嘯資訊」標題 → 東經 {lon} 度",
     "placeholders": {
       "lon": {
+        "type": "String"
+      }
+    }
+  },
+  "delay": "遅延： {serviceStatus_count} ms",
+  "@delay": {
+    "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
+    "placeholders": {
+      "serviceStatus_count": {
         "type": "String"
       }
     }
