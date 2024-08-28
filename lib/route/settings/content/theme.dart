@@ -16,18 +16,34 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
 
   final light = ThemeData(brightness: Brightness.light);
   final dark = ThemeData(brightness: Brightness.dark);
-  final system = ThemeData();
+  late ThemeData system;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateSystemTheme();
+  }
+
+  void _updateSystemTheme() {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    system = ThemeData(brightness: brightness);
+  }
 
   setTheme(String theme) async {
     DpipApp.of(context)!.changeTheme(theme);
     await Global.preference.setString("theme", theme);
     setState(() {
       themeMode = theme;
+      if (theme == "system") {
+        _updateSystemTheme();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    _updateSystemTheme();
+
     return Material(
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
