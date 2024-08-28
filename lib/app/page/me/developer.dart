@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import "package:dpip/util/extension/build_context.dart";
 import 'package:material_symbols_icons/symbols.dart';
 
 class DPIPInfoPage extends StatelessWidget {
@@ -8,7 +9,7 @@ class DPIPInfoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('開發者想說的話'),
+        title: Text(context.i18n.me_developer),
         leading: IconButton(
           icon: const Icon(Symbols.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
