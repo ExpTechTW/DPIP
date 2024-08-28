@@ -102,6 +102,12 @@ void androidSendPositionlisten() {
       const MonitorPage(data: 0).createState();
     }
   });
+  service.on("senddebug").listen((event) {
+    if (event != null) {
+      var notifyBody = event["notifyBody"];
+      TalkerManager.instance.debug("自動定位: $notifyBody");
+    }
+  });
 }
 
 Future<void> androidForegroundService() async {
@@ -219,6 +225,7 @@ void onStart(ServiceInstance service) async {
         String notifyTitle = "自動定位中";
         String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
         String notifyBody = "$date\n$lat,$lon $country";
+        service.invoke("senddebug", {"notifyBody": notifyBody});
 
         flutterLocalNotificationsPlugin.show(
           888,

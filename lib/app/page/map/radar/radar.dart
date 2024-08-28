@@ -188,6 +188,29 @@ class _RadarMapState extends State<RadarMap> {
           tileSize: 256,
         ));
 
+    _mapController.removeLayer("county-outline");
+    _mapController.removeLayer("county");
+
+    _mapController.addLayer(
+      "map",
+      "county",
+      FillLayerProperties(
+        fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
+        fillOpacity: 1,
+      ),
+      sourceLayer: "city",
+      belowLayerId: "radarLayer",
+    );
+
+    _mapController.addLayer(
+      "map",
+      "county-outline",
+      LineLayerProperties(
+        lineColor: context.colors.outline.toHexStringRGB(),
+      ),
+      sourceLayer: "city",
+    );
+
     _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(), belowLayerId: "county-outline");
 
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {

@@ -13,6 +13,7 @@ import "package:dpip/model/station.dart";
 import "package:dpip/model/station_info.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/int.dart";
+import "package:dpip/util/extension/latlng.dart";
 import "package:dpip/util/geojson.dart";
 import "package:dpip/util/instrumental_intensity_color.dart";
 import "package:dpip/util/intensity_color.dart";
@@ -24,7 +25,8 @@ import "package:dpip/widget/map/map.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
-import "package:timezone/timezone.dart" as tz;
+import "package:material_symbols_icons/symbols.dart";
+import "package:tutorial_coach_mark/tutorial_coach_mark.dart";
 
 import "eew_info.dart";
 
@@ -32,6 +34,7 @@ typedef PositionUpdateCallback = void Function();
 
 class MonitorPage extends StatefulWidget {
   final Function()? onPositionUpdate;
+
   const MonitorPage({super.key, required this.data, this.onPositionUpdate});
 
   final int data;
@@ -57,6 +60,7 @@ class MonitorPage extends StatefulWidget {
 class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
+  final monitor = Global.preference.getBool("monitor") ?? false;
 
   Timer? _dataUpdateTimer;
   Timer? _eewUpdateTimer;
@@ -69,17 +73,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   double userLon = 0;
   double _ping = 0;
   String _formattedPing = "";
-  Map<String, double> _eewDist = {};
-  Map<String, int> _eewUpdateList = {};
-  Map<String, Map<String, int>> _userEewArriveTime = {};
-  Map<String, int> _userEewIntensity = {};
-  Map<String, Eew> _eewLastInfo = {};
+  final Map<String, double> _eewDist = {};
+  final Map<String, int> _eewUpdateList = {};
+  final Map<String, Map<String, int>> _userEewArriveTime = {};
+  final Map<String, int> _userEewIntensity = {};
+  final Map<String, Eew> _eewLastInfo = {};
   Rts? _rtsData;
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
   bool _isEewBoxVisible = true;
   bool isUserLocationValid = false;
-  int _isTsunamiVisible = 0;
   final Map<String, dynamic> _eewIntensityArea = {};
   final DraggableScrollableController sheetController = DraggableScrollableController();
   final sheetInitialSize = 0.2;
@@ -88,6 +91,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   List<Widget> _eewUI = [];
   List<Widget> _rtsUI = [];
   bool _showLegend = false;
+  bool _showMonitorInfo = false;
+  List<TargetFocus> targets = [];
+  final monitorButtonKey = GlobalKey();
 
   @override
   void initState() {
@@ -101,6 +107,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
     MonitorPage.setActiveCallback(sendpositionUpdate);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (monitor) return;
+      bool disable_monitor_tip = Global.preference.getBool("disable_monitor_tip") ?? false;
+      if (!disable_monitor_tip) {
+        Global.preference.setBool("disable_monitor_tip", true);
+        initTargets();
+        showTutorial();
+      }
+    });
   }
 
   void sendpositionUpdate() {
@@ -134,8 +150,6 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
-
-    _updateCrossMarker();
   }
 
   void _loadMap() async {
@@ -252,13 +266,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       ),
     );
 
-    await _mapController.addGeoJsonSource(
-      "box-geojson",
-      {
-        "type": "FeatureCollection",
-        "features": [],
-      },
-    );
+    await _mapController.addGeoJsonSource("box-geojson", GeoJsonBuilder.empty);
 
     await _mapController.addLayer(
         "box-geojson",
@@ -291,7 +299,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _startDataUpdates() {
     _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      _updateRtsData();
+      if (monitor) {
+        _updateRtsData();
+      } else {
+        _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
+      }
       _updateEewData();
       setState(() {});
     });
@@ -378,7 +390,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       );
     }
 
-    await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers).build());
+    if (markers.isNotEmpty) {
+      await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers).build());
+    }
   }
 
   Future<void> _updateTsunamiLine() async {
@@ -479,221 +493,211 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
       if (!mounted) return;
 
+      List<String> alertArea = [];
+
+      if (_eewLastInfo[eew.id]?.status == 1) {
+        _eewIntensityArea[eew.id].forEach((key, data) {
+          if (key != "max_i") {
+            int i = intensityFloatToInt(data["i"]);
+            if (i >= 4) {
+              String city = Global.location[key]?.city ?? "";
+              if (city != "" && !alertArea.contains(city)) {
+                alertArea.add(city);
+              }
+            }
+          }
+        });
+      }
+
       eewUI.add(
         Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
           child: Column(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: !_isEewBoxVisible
-                        ? Colors.grey
-                        : _eewLastInfo[eew.id]?.status == 1
-                            ? const Color(0xFFC80000)
-                            : const Color(0xFFFFC800),
-                    width: 3,
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: _eewLastInfo[eew.id]?.status == 1 ? const Color(0xFFC80000) : const Color(0xFFFFC800),
+                    width: 2,
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _eewLastInfo[eew.id]?.status == 1
-                              ? context.i18n.emergency_earthquake_warning
-                              : context.i18n.earthquake_warning,
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: context.colors.onSurface,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _eewLastInfo[eew.id]?.status == 1
+                                ? context.i18n.emergency_earthquake_warning
+                                : context.i18n.earthquake_warning,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: context.colors.onSurface,
+                            ),
                           ),
-                        ),
-                        Text(
-                          context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ""),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: context.colors.onSurfaceVariant,
+                          Text(
+                            context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ""),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: context.colors.onSurfaceVariant,
+                            ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      _TopInfoBox(
+                        intensity: isUserLocationValid ? _userEewIntensity[eew.id] ?? 0 : null,
+                        isValid: isUserLocationValid,
+                        arrivalTime: _userEewArriveTime[eew.id]!["s"],
+                        currentTime: _getCurrentTime(),
+                      ),
+                      const SizedBox(height: 10),
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                _eewLastInfo[eew.id]!.eq.location,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  color: context.colors.onSurface,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "${DateFormat("yyyy/MM/dd HH:mm:ss").format(tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _eewLastInfo[eew.id]!.eq.time))} 發震",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: context.colors.onSurfaceVariant,
-                                ),
-                              ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    "M ${_eewLastInfo[eew.id]?.eq.magnitude}",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: context.colors.onSurface,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "預估最大震度",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: context.colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: IntensityColor.intensity(_eewLastInfo[eew.id]!.eq.max),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            _eewLastInfo[eew.id]!.eq.max.asIntensityDisplayLabel,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 28,
+                                              color: IntensityColor.onIntensity(_eewLastInfo[eew.id]!.eq.max),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    "${_eewLastInfo[eew.id]?.eq.depth} km",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: context.colors.onSurface,
-                                      fontWeight: FontWeight.bold,
+                                  const SizedBox(width: 12),
+                                  Container(
+                                    width: 1,
+                                    height: 80,
+                                    color: context.colors.outline,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _eewLastInfo[eew.id]!.eq.location,
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            color: context.colors.onSurface,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          "${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} 發震",
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: context.colors.onSurfaceVariant,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                "M${_eewLastInfo[eew.id]?.eq.magnitude}",
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: context.colors.onSurface,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Text(
+                                              "${_eewLastInfo[eew.id]?.eq.depth} km",
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                color: context.colors.onSurface,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: IntensityColor.intensity(_eewLastInfo[eew.id]!.eq.max),
-                          ),
-                          child: Center(
-                            child: Text(
-                              _eewLastInfo[eew.id]!.eq.max.asIntensityDisplayLabel,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 28,
-                                color: IntensityColor.onIntensity(_eewLastInfo[eew.id]!.eq.max),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Divider(color: context.colors.onSurface, height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
-                                ? Colors.transparent
-                                : IntensityColor.intensity(
-                                    (_userEewIntensity[eew.id] ?? 0),
-                                  ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                context.i18n.location_estimate,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
-                                      ? context.colors.onSurface
-                                      : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0),
-                                ),
-                              ),
-                              Text(
-                                (!isUserLocationValid) ? "?" : (_userEewIntensity[eew.id] ?? 0).asIntensityDisplayLabel,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 40,
-                                  color: (!isUserLocationValid || (_userEewIntensity[eew.id] ?? 0) == 0)
-                                      ? context.colors.onSurface
-                                      : IntensityColor.onIntensity(_userEewIntensity[eew.id] ?? 0),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 80,
-                          width: 150,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                context.i18n.seismic_waves,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: context.colors.onSurfaceVariant,
-                                ),
-                              ),
-                              (!isUserLocationValid ||
-                                      ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000).floor() <= 0)
-                                  ? Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          (!isUserLocationValid)
-                                              ? context.i18n.monitor_unknown
-                                              : context.i18n.monitor_arrival,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 36,
-                                            color: context.colors.onSurface,
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : Row(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          ((_userEewArriveTime[eew.id]!["s"]! - _getCurrentTime()) / 1000)
-                                              .floor()
-                                              .toString(),
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 36,
-                                            color: context.colors.onSurface,
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          context.i18n.monitor_after_seconds,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            color: context.colors.onSurface,
-                                          ),
-                                        ),
-                                      ],
+                              if (alertArea.isNotEmpty)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 8),
+                                    Divider(
+                                      color: context.colors.outline,
+                                      thickness: 1,
                                     ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "警報區域",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: context.colors.onSurface,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: alertArea
+                                          .map((county) => Chip(
+                                                label: Text(
+                                                  county,
+                                                  style: TextStyle(
+                                                    color: context.colors.onPrimaryContainer,
+                                                  ),
+                                                ),
+                                                backgroundColor: context.colors.primaryContainer,
+                                              ))
+                                          .toList(),
+                                    ),
+                                  ],
+                                )
                             ],
                           ),
-                        )
-                      ],
-                    ),
-                  ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -701,6 +705,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         ),
       );
     }
+
     if (eewUI.isEmpty) {
       eewUI.add(
         Padding(
@@ -715,6 +720,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     } else {
       _isEewBoxVisible = !_isEewBoxVisible;
     }
+
     _eewUI = eewUI;
   }
 
@@ -882,9 +888,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       return false;
     }).map((e) {
       StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
-      return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-          .setId(int.parse(e.key))
-          .setGeometry(info.latlng.toGeoJsonCoordinates());
+      return info.latlng.toFeatureBuilder().setId(int.parse(e.key));
     }).toList();
 
     return GeoJsonBuilder().setFeatures(features).build();
@@ -892,10 +896,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   Map<String, dynamic> _generateStationGeoJson([Rts? rtsData]) {
     if (rtsData == null) {
-      return {
-        "type": "FeatureCollection",
-        "features": [],
-      };
+      return GeoJsonBuilder.empty;
     }
 
     final features = _stations.entries.where((e) {
@@ -907,24 +908,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
       return true;
     }).map((e) {
-      Map<String, dynamic> properties = {"i": rtsData.station[e.key]?.i};
-
       StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
-      return {
-        "type": "Feature",
-        "properties": properties,
-        "id": e.key,
-        "geometry": {
-          "coordinates": [info.longitude, info.latitude],
-          "type": "Point"
-        }
-      };
+      return info.latlng.toFeatureBuilder().setProperty("i", rtsData.station[e.key]?.i).setId(int.parse(e.key));
     }).toList();
 
-    return {
-      "type": "FeatureCollection",
-      "features": features,
-    };
+    return GeoJsonBuilder().setFeatures(features).build();
   }
 
   dynamic _getStationColorExpression() {
@@ -981,7 +969,15 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
   void _toggleLegend() {
     setState(() {
+      _showMonitorInfo = false;
       _showLegend = !_showLegend;
+    });
+  }
+
+  void _toggleMonitorInfo() {
+    setState(() {
+      _showLegend = false;
+      _showMonitorInfo = !_showMonitorInfo;
     });
   }
 
@@ -1044,6 +1040,40 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     );
   }
 
+  void initTargets() {
+    targets.add(
+      TargetFocus(
+        identify: "monitorButton",
+        keyTarget: monitorButtonKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) {
+              return Text(
+                '點擊查看提示資訊',
+                style: context.theme.textTheme.titleLarge?.copyWith(
+                  color: context.colors.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showTutorial() {
+    TutorialCoachMark(
+        targets: targets,
+        colorShadow: context.colors.primary,
+        paddingFocus: 10,
+        opacityShadow: 0.95,
+        onFinish: () {
+          _toggleMonitorInfo();
+        }).show(context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1084,6 +1114,34 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ),
             ),
           ),
+          if (!monitor)
+            Positioned(
+              key: monitorButtonKey,
+              right: 4,
+              top: 40,
+              child: Material(
+                color: context.colors.error,
+                elevation: 4.0,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: _toggleMonitorInfo,
+                  child: Tooltip(
+                    message: context.i18n.map_legend,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                        color: context.colors.onError,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Positioned(
             left: 4,
             top: 4,
@@ -1097,71 +1155,262 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
-                    DateFormat("yyyy/MM/dd HH:mm:ss").format((!_dataStatus())
-                        ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _lsatGetRtsDataTime)
+                    DateFormat(context.i18n.datetime_format).format((!_dataStatus())
+                        ? _lsatGetRtsDataTime.asTZDateTime
                         : (_timeReplay == 0)
-                            ? tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _getCurrentTime())
-                            : tz.TZDateTime.fromMillisecondsSinceEpoch(tz.getLocation("Asia/Taipei"), _timeReplay)),
+                            ? _getCurrentTime().asTZDateTime
+                            : _timeReplay.asTZDateTime),
                     style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: (!_dataStatus())
-                            ? Colors.red
-                            : (_timeReplay == 0)
-                                ? context.colors.onSurface
-                                : Colors.orangeAccent),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: (!_dataStatus())
+                          ? Colors.red
+                          : (_timeReplay == 0)
+                              ? context.colors.onSurface
+                              : Colors.orangeAccent,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-          Positioned(
-            left: 4,
-            top: 32,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
-                    style: TextStyle(
+          if (monitor)
+            Positioned(
+              left: 4,
+              top: 32,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: context.colors.surface.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: (!_dataStatus())
                             ? Colors.red
                             : (_ping > 1)
                                 ? Colors.orange
-                                : Colors.green),
+                                : Colors.green,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
           if (_rtsUI.isNotEmpty)
             Positioned(
               left: 4,
               top: 58,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [..._rtsUI],
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _rtsUI,
               ),
             ),
-          Positioned.fill(
-            child: EewDraggableSheet(eewUI: _eewUI),
-          ),
           if (_showLegend)
             Positioned(
               right: 6,
               top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
             ),
+          if (_showMonitorInfo)
+            Positioned(
+              right: 6,
+              top: 75,
+              child: Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Symbols.warning_amber_rounded,
+                        size: 50,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '未啟用強震監視器',
+                        style: context.theme.textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '請至設定進階功能中開啟強震監視器。',
+                        style: context.theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          Positioned.fill(
+            child: EewDraggableSheet(child: _eewUI),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _TopInfoBox extends StatelessWidget {
+  final int? intensity;
+  final bool isValid;
+  final int? arrivalTime;
+  final int currentTime;
+
+  const _TopInfoBox({
+    required this.intensity,
+    required this.isValid,
+    this.arrivalTime,
+    required this.currentTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: IntensityColor.intensity(intensity!),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: _IntensityBox(
+              title: context.i18n.location_estimate,
+              intensity: intensity ?? 0,
+            ),
+          ),
+          Container(
+            width: 1,
+            color: IntensityColor.onIntensity(intensity!),
+            margin: const EdgeInsets.symmetric(vertical: 16),
+          ),
+          Expanded(
+            flex: 2,
+            child: _ArrivalTimeBox(
+              isValid: isValid,
+              arrivalTime: arrivalTime,
+              currentTime: currentTime,
+              intensity: intensity ?? 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IntensityBox extends StatelessWidget {
+  final String title;
+  final int intensity;
+
+  const _IntensityBox({required this.title, required this.intensity});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: IntensityColor.onIntensity(intensity),
+          ),
+        ),
+        Center(
+          child: Text(
+            intensity.asIntensityDisplayLabel,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              color: IntensityColor.onIntensity(intensity),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ArrivalTimeBox extends StatelessWidget {
+  final bool isValid;
+  final int? arrivalTime;
+  final int currentTime;
+  final int intensity;
+
+  const _ArrivalTimeBox({required this.isValid, this.arrivalTime, required this.currentTime, required this.intensity});
+
+  @override
+  Widget build(BuildContext context) {
+    final remainingSeconds = isValid && arrivalTime != null ? ((arrivalTime! - currentTime) / 1000).floor() : null;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          context.i18n.seismic_waves,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: IntensityColor.onIntensity(intensity),
+          ),
+        ),
+        if (!isValid || remainingSeconds == null || remainingSeconds <= 0)
+          Text(
+            !isValid ? context.i18n.monitor_unknown : context.i18n.monitor_arrival,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+              color: IntensityColor.onIntensity(intensity),
+            ),
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Baseline(
+                baseline: 30,
+                baselineType: TextBaseline.alphabetic,
+                child: Text(
+                  remainingSeconds.toString(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    color: IntensityColor.onIntensity(intensity),
+                    height: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Baseline(
+                baseline: 30,
+                baselineType: TextBaseline.alphabetic,
+                child: Text(
+                  context.i18n.monitor_after_seconds,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: IntensityColor.onIntensity(intensity),
+                    height: 1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 }

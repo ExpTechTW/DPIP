@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.1.900
+version: 2.2.0
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  audioplayers: ^5.2.1
   autostarter: ^0.0.1
   awesome_notifications_core: ^0.9.3
   awesome_notifications: ^0.9.3+1
@@ -58,6 +57,7 @@ dependencies:
   talker_flutter: ^3.6.0
   timezone: ^0.9.3
   url_launcher: ^6.3.0
+  tutorial_coach_mark: ^1.2.11
 
 dev_dependencies:
   flutter_test:
@@ -78,15 +78,3 @@ flutter:
     - assets/location.json
     - assets/time.json
     - assets/box.json
-    - assets/eew.wav
-    - assets/eew_alert.wav
-    - assets/eq.wav
-    - assets/info.wav
-    - assets/int_report.wav
-    - assets/normal.wav
-    - assets/rain.wav
-    - assets/report.wav
-    - assets/tsunami.wav
-    - assets/update.wav
-    - assets/warn.wav
-    - assets/weather.wav

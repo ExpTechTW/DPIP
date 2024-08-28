@@ -8,7 +8,6 @@ import "package:dpip/app/page/map/weather/humidity.dart";
 import "package:dpip/app/page/map/weather/pressure.dart";
 import "package:dpip/app/page/map/weather/temperature.dart";
 import "package:dpip/app/page/map/weather/wind.dart";
-import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
@@ -24,15 +23,13 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   final controller = PageController();
   int currentIndex = 0;
-  final monitor = Global.preference.getBool("monitor") ?? false;
 
   late final destinations = [
-    if (monitor)
-      NavigationDrawerDestination(
-        icon: const Icon(Symbols.monitor_heart),
-        selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-        label: Text(context.i18n.monitor),
-      ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.monitor_heart),
+      selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
+      label: Text(context.i18n.monitor),
+    ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.radar_rounded),
       selectedIcon: const Icon(Symbols.radar_rounded, fill: 1),
@@ -44,8 +41,8 @@ class _MapPageState extends State<MapPage> {
       label: Text(context.i18n.precipitation_monitor),
     ),
     NavigationDrawerDestination(
-      icon: const Icon(Symbols.temp_preferences_eco_rounded),
-      selectedIcon: const Icon(Symbols.temp_preferences_eco_rounded, fill: 1),
+      icon: const Icon(Symbols.thermometer_rounded),
+      selectedIcon: const Icon(Symbols.thermometer_rounded, fill: 1),
       label: Text(context.i18n.temperature_monitor),
     ),
     NavigationDrawerDestination(
@@ -101,17 +98,17 @@ class _MapPageState extends State<MapPage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: [
-          if (monitor) const MonitorPage(data: 0),
-          const RadarMap(),
-          const RainMap(),
-          const TemperatureMap(),
-          const HumidityMap(),
-          const PressureMap(),
-          const WindMap(),
-          const LightningMap(),
-          const TyphoonMap(),
-          const TsunamiMap(),
+        children: const [
+          MonitorPage(data: 0),
+          RadarMap(),
+          RainMap(),
+          TemperatureMap(),
+          HumidityMap(),
+          PressureMap(),
+          WindMap(),
+          LightningMap(),
+          TyphoonMap(),
+          TsunamiMap(),
         ],
       ),
     );

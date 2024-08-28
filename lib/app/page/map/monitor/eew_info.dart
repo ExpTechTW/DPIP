@@ -2,23 +2,10 @@ import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/sheet/bottom_sheet_drag_handle.dart";
 import "package:flutter/material.dart";
 
-class EewDraggableSheet extends StatefulWidget {
-  final List<Widget> eewUI;
+class EewDraggableSheet extends StatelessWidget {
+  final List<Widget> child;
 
-  const EewDraggableSheet({super.key, required this.eewUI});
-
-  @override
-  State<EewDraggableSheet> createState() => _EewDraggableSheetState();
-}
-
-class _EewDraggableSheetState extends State<EewDraggableSheet> {
-  final DraggableScrollableController _controller = DraggableScrollableController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const EewDraggableSheet({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +14,6 @@ class _EewDraggableSheetState extends State<EewDraggableSheet> {
       minChildSize: 0.2125,
       snapSizes: const [0.2125, 0.3725, 1],
       snap: true,
-      controller: _controller,
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -39,7 +25,7 @@ class _EewDraggableSheetState extends State<EewDraggableSheet> {
             controller: scrollController,
             children: [
               const BottomSheetDragHandle(),
-              ...widget.eewUI,
+              ...child,
             ],
           ),
         );
