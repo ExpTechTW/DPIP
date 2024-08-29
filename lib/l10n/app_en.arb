@@ -317,7 +317,7 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_sound": "Earthquake Early Warning (Alert)",
+  "eew_alert_sound": "Earthquake Early Warning",
   "@eew_alert_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
@@ -325,7 +325,7 @@
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
   },
-  "eew_sound": "Earthquake Early Warning",
+  "eew_sound": "Earthquake Alert",
   "@eew_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 地震速報"
   },
@@ -614,7 +614,7 @@
   "@thundery_outbreaks_possible": {
     "description": "天氣狀況：可能有雷雨"
   },
-  "blowing_snow": "blizzard",
+  "blowing_snow": "Blowing Snow",
   "@blowing_snow": {
     "description": "天氣狀況：飛雪"
   },
@@ -630,7 +630,7 @@
   "@freezing_fog": {
     "description": "天氣狀況：凍霧"
   },
-  "patchy_light_drizzle": "Partly drizzle",
+  "patchy_light_drizzle": "Patchy Light Drizzle",
   "@patchy_light_drizzle": {
     "description": "天氣狀況：局部細雨"
   },
@@ -646,7 +646,7 @@
   "@heavy_freezing_drizzle": {
     "description": "天氣狀況：大凍霧雨"
   },
-  "patchy_light_rain": "Light Rain",
+  "patchy_light_rain": "Patchy Light Rain",
   "@patchy_light_rain": {
     "description": "天氣狀況：局部小雨"
   },
@@ -855,7 +855,7 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "All Safe, Nothing Happened.",
+  "home_safety": "There are currently no events now",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
