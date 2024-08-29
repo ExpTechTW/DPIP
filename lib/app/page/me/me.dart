@@ -7,6 +7,7 @@ import "package:dpip/route/notification/notification.dart";
 import "package:dpip/route/settings/settings.dart";
 import "package:dpip/route/sound/sound.dart";
 import "package:dpip/route/status/status.dart";
+import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
@@ -147,6 +148,19 @@ class _MePageState extends State<MePage> {
                 ),
               );
             }
+          },
+        ),
+
+        /**
+         * 打開歡迎頁面
+         */
+        ListTile(
+          leading: const Icon(Icons.visibility),
+          title: const Text("打開歡迎頁面"),
+          onTap: () {
+            Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(builder: (context) => const WelcomeRoute()),
+            );
           },
         ),
 
