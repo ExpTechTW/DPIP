@@ -296,7 +296,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n由 ExpTech 探索科技制作\n部分资料来源 CWA(中央气象署)",
+  "me_version": "版本 {version}\n由 ExpTech 探索科技制作\n部分数据来源 CWA(中央气象署)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -855,7 +855,7 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "一切平安，無事件發生。",
+  "home_safety": "一切平安，无事件发生。",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -1175,7 +1175,7 @@
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
-  "only_used_during_earthquake_alerts": "僅用於地震速報時",
+  "only_used_during_earthquake_alerts": "仅用于地震预警时",
   "@only_used_during_earthquake_alerts": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
@@ -1239,7 +1239,7 @@
   "@retry": {
     "description": "重試"
   },
-  "photo_media_permission_request": "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。",
+  "photo_media_permission_request": "请您到应用程序设置中找到并允许「照片和介质」权限后再试一次。",
   "@photo_media_permission_request": {
     "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
@@ -1267,7 +1267,7 @@
   "@general_notification": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 一般通知"
   },
-  "please_allow_notification_permission": "請您到應用程式設定中找到並允許「通知」權限後再試一次。",
+  "please_allow_notification_permission": "请您到应用程序设置中找到并允许「通知」权限后再试一次。",
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
