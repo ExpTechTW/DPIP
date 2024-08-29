@@ -453,7 +453,7 @@
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
   },
-  "monitor_list": "地図一覧リスト",
+  "monitor_list": "地図リスト",
   "@monitor_list": {
     "description": "「地圖」路徑 → 地圖列表"
   },
@@ -497,11 +497,11 @@
   "@unit_dbz": {
     "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 單位：dBZ"
   },
-  "unit_mm": "単位：ミリメートル（mm）",
+  "unit_mm": "単位：ミリメートル (mm)",
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
   },
-  "unit_degrees_c": "単位：摂氏（℃）",
+  "unit_degrees_c": "単位：セルシウス度 (℃)",
   "@unit_degrees_c": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 單位：攝氏度 (°C)"
   },
@@ -509,7 +509,7 @@
   "@unit_relative_humidity": {
     "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 單位：相對濕度 (%)"
   },
-  "unit_hpa": "単位：ヘクトパスカル（hPa）",
+  "unit_hpa": "単位：ヘクトパスカル (hPa)",
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
   },
@@ -558,7 +558,7 @@
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
-  "unable_notification": "データが取得できない",
+  "unable_notification": "データが取得できません",
   "@unable_notification": {
     "description": "「通知」設定彈窗 → 無法取得通知權限"
   },
@@ -566,7 +566,7 @@
   "@again": {
     "description": "「通知」設定彈窗 → 再試一次 and "
   },
-  "unable_location": "位置情報が取得できない",
+  "unable_location": "位置情報が取得できません",
   "@unable_location": {
     "description": "「所在地」設定彈窗 → 無法取得位置權限"
   },
@@ -1083,7 +1083,7 @@
   "@no_changelog": {
     "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
-  "announcement_details": "発表情報",
+  "announcement_details": "お知らせの詳細",
   "@announcement_details": {
     "description": "「我」路徑 → 「公告」標題 → 查看公告的具體內容"
   },
