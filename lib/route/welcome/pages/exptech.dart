@@ -70,7 +70,7 @@ class WelcomeExpTechPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
