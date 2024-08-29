@@ -1411,5 +1411,9 @@
   "hour": "時",
   "@hour": {
     "description": "「首頁」路徑 → 「時」描述"
+  },
+  "not_enabled": " (未啟用)",
+  "@not_enabled": {
+    "description": "「設定」路徑 → 「通知測試」內容 →「 (未啟用)」副標題 "
   }
 }
