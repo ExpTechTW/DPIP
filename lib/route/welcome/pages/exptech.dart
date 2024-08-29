@@ -22,6 +22,7 @@ class WelcomeExpTechPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: context.padding,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 32, 0, 16),
@@ -70,7 +71,7 @@ class WelcomeExpTechPage extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(16),
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
