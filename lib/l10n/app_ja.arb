@@ -1059,15 +1059,15 @@
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
-  "announcement": "発表",
+  "announcement": "お知らせ",
   "@announcement": {
     "description": "「我」路徑 → 公告"
   },
-  "new_announcement_prompt": "新発表をチェックしますか？",
+  "new_announcement_prompt": "新しいお知らせをチェックしますか？",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "現在発表なし",
+  "no_announcements": "現時点は、お知らせがありません",
   "@no_announcements": {
     "description": "「公告」標題 → 目前沒有公告"
   },
