@@ -313,7 +313,7 @@
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "notify_test_description": "測試即時天氣資訊、地震速報等音效通知",
+  "notify_test_description": "测试实时天气信息、地震预警等音效通知",
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
