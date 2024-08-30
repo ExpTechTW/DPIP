@@ -654,7 +654,7 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "偶爾有雨",
+  "moderate_rain_at_times": "Occasional rain",
   "@moderate_rain_at_times": {
     "description": "天氣狀況：偶爾有雨"
   },
@@ -662,7 +662,7 @@
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
-  "heavy_rain_at_times": "偶爾有大雨",
+  "heavy_rain_at_times": "Occasional heavy rain",
   "@heavy_rain_at_times": {
     "description": "天氣狀況：偶爾有大雨"
   },
@@ -670,15 +670,15 @@
   "@heavy_rain": {
     "description": "天氣狀況：大雨"
   },
-  "light_freezing_rain": "微凍雨",
+  "light_freezing_rain": "Light freezing rain",
   "@light_freezing_rain": {
     "description": "天氣狀況：微凍雨"
   },
-  "moderate_or_heavy_freezing_rain": "中度或大凍雨",
+  "moderate_or_heavy_freezing_rain": "Moderate or heavy freezing rain",
   "@moderate_or_heavy_freezing_rain": {
     "description": "天氣狀況：中度或大凍雨"
   },
-  "light_sleet": "微雨夾雪",
+  "light_sleet": "Light sleet",
   "@light_sleet": {
     "description": "天氣狀況：微雨夾雪"
   },
