@@ -1,5 +1,5 @@
+import "package:dpip/api/exptech.dart";
 import "package:dpip/global.dart";
-import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
@@ -42,14 +42,13 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     super.dispose();
   }
 
-  void complete(bool status) {
+  void complete(BuildContext context, bool status) async {
     Global.preference.setBool("monitor", status);
-    final state = WelcomeRouteState.of(context);
-    if (state != null) {
-      state.complete();
-    } else {
-      Navigator.pop(context);
+    String token = Global.preference.getString("fcm-token") ?? "";
+    if (token != "" && status) {
+      await ExpTech().sendMonitor(token, "1");
     }
+    Navigator.pop(context);
   }
 
   @override
@@ -62,14 +61,14 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () => complete(false),
+                onPressed: () => complete(context, false),
                 child: Text(
                   context.i18n.disagree,
                   style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
               FilledButton(
-                onPressed: _isEnabled ? () => complete(true) : null,
+                onPressed: _isEnabled ? () => complete(context, true) : null,
                 child: Text(context.i18n.agree),
               ),
             ],

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dpip/route/welcome/pages/tos.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/log.dart';
@@ -257,13 +256,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     );
   }
 
-  void _continueToTOS() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -271,7 +263,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.nextPage() : null,
+            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.complete() : null,
             child: Text(context.i18n.next_step),
           ),
         ),

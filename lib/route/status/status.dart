@@ -69,7 +69,8 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
-                    child: Text(context.i18n.no_data_available, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                    child: Text(context.i18n.no_data_available,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                   );
                 }
 

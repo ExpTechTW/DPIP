@@ -14,6 +14,8 @@ import "package:material_symbols_icons/symbols.dart";
 import "package:simple_icons/simple_icons.dart";
 import "package:url_launcher/url_launcher.dart";
 
+import "developer.dart";
+
 class MePage extends StatefulWidget {
   const MePage({super.key});
 
@@ -48,8 +50,8 @@ class _MePageState extends State<MePage> {
          */
         ListTile(
           leading: const Icon(Symbols.audiotrack_sharp),
-          title: Text(context.i18n.sound_test),
-          subtitle: Text(context.i18n.sound_test_description),
+          title: Text(context.i18n.notify_test),
+          subtitle: Text(context.i18n.notify_test_description),
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
@@ -103,6 +105,16 @@ class _MePageState extends State<MePage> {
           },
         ),
         ListTileGroupHeader(title: context.i18n.me_debug),
+        ListTile(
+          leading: const Icon(Symbols.forum_rounded),
+          title: Text(context.i18n.me_developer),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
+            );
+          },
+        ),
         ListTile(
           leading: const Icon(Symbols.bug_report),
           title: Text(context.i18n.app_logs),
