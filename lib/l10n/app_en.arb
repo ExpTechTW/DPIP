@@ -682,19 +682,19 @@
   "@light_sleet": {
     "description": "天氣狀況：微雨夾雪"
   },
-  "moderate_or_heavy_sleet": "中度或大雨夾雪",
+  "moderate_or_heavy_sleet": "Moderate or heavy sleet",
   "@moderate_or_heavy_sleet": {
     "description": "天氣狀況：中度或大雨夾雪"
   },
-  "patchy_light_snow": "局部小雪",
+  "patchy_light_snow": "Flurries",
   "@patchy_light_snow": {
     "description": "天氣狀況：零星小雪"
   },
-  "light_snow": "小雪",
+  "light_snow": "Light snow",
   "@light_snow": {
     "description": "天氣狀況：小雪"
   },
-  "patchy_moderate_snow": "局部降雪",
+  "patchy_moderate_snow": "Snow flurries",
   "@patchy_moderate_snow": {
     "description": "天氣狀況：局部降雪"
   },
@@ -710,7 +710,7 @@
   "@heavy_snow": {
     "description": "天氣狀況：大雪"
   },
-  "ice_pellets": "冰丸",
+  "ice_pellets": "Ice pellets",
   "@ice_pellets": {
     "description": "天氣狀況：冰丸"
   },
@@ -907,7 +907,7 @@
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+  "dpip_description": "DPIP is an app designed by a local team in Taiwan. It integrates information from TREM-Net (Taiwan Rapid Earthquake Information Network) and data from the Central Weather Bureau, providing a comprehensive, unified, and convenient disaster prevention information application.",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
@@ -915,19 +915,19 @@
   "@next_step": {
     "description": "「歡迎」頁面 → 下一步"
   },
-  "who_we_are": "我們是誰？",
+  "who_we_are": "Who are we?",
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+  "exptech_studio_description": "ExpTech Studio is a group primarily composed of students, with an average age of under 20 and more than 15 members. The members are students from northern, central, and southern Taiwan, as well as Japan, South Korea, and China.",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "Our Original Intention",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+  "founding_mission": "The original intention was to recruit a group of students interested and skilled in computers and technology. It later expanded beyond the school and gradually developed into its current form.",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
@@ -1131,7 +1131,7 @@
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "unlimited_permission_experience_info": "For better experience when using DPIP, you need to Enable the Permission for \"Auto Start\" to make sure DPIP is getting the info Normally.",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
