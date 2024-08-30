@@ -64,7 +64,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text('錯誤: ${snapshot.error}',
+                    child: Text('${context.i18n.error_prefix} ${snapshot.error}',
                         style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 16)),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

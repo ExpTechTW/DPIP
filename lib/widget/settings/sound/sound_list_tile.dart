@@ -64,8 +64,8 @@ class SoundListTileState extends State<SoundListTile> {
         }
       } else {
         context.scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text("錯誤: 無法取得 FCM Token"),
+          SnackBar(
+            content: Text(context.i18n.error_fcm_token),
           ),
         );
       }
