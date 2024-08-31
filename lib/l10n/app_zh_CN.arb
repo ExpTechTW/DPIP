@@ -630,7 +630,7 @@
   "@freezing_fog": {
     "description": "天氣狀況：凍霧"
   },
-  "patchy_light_drizzle": "局部細雨",
+  "patchy_light_drizzle": "局地细雨",
   "@patchy_light_drizzle": {
     "description": "天氣狀況：局部細雨"
   },
