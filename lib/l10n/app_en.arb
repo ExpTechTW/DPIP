@@ -895,7 +895,7 @@
   "@interval_10_minutes": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10分鐘"
   },
-  "interval_now": "今日",
+  "interval_now": "today",
   "@interval_now": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 今日"
   },
