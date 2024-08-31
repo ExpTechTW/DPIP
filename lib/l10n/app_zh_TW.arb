@@ -785,6 +785,10 @@
   "@me_debug": {
     "description": "「我」路徑 → 除錯"
   },
+  "me_about": "關於",
+  "@me_about": {
+    "description": "「我」路徑 → 關於"
+  },
   "official_web": "ExpTech 官網",
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"

@@ -95,16 +95,6 @@ class _MePageState extends State<MePage> {
         ),
         ListTileGroupHeader(title: context.i18n.me_debug),
         ListTile(
-          leading: const Icon(Symbols.forum_rounded),
-          title: Text(context.i18n.me_developer),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
-            );
-          },
-        ),
-        ListTile(
           leading: const Icon(Symbols.bug_report),
           title: Text(context.i18n.app_logs),
           onTap: () {
@@ -138,13 +128,24 @@ class _MePageState extends State<MePage> {
             }
           },
         ),
+        ListTileGroupHeader(title: context.i18n.me_about),
+        ListTile(
+          leading: const Icon(Symbols.forum_rounded),
+          title: Text(context.i18n.me_developer),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
+            );
+          },
+        ),
 
         /**
          * 打開歡迎頁面
          */
         ListTile(
           leading: const Icon(Icons.visibility),
-          title: const Text("打開歡迎頁面"),
+          title: const Text("歡迎頁面"),
           onTap: () {
             Navigator.of(context, rootNavigator: true).push(
               MaterialPageRoute(builder: (context) => const WelcomeRoute()),
