@@ -100,7 +100,6 @@ class DpipAppState extends State<DpipApp> {
             : null;
 
         return MaterialApp(
-          debugShowCheckedModeBanner: false,
           navigatorKey: DpipApp.navigatorKey,
           navigatorObservers: [
             TalkerRouteObserver(TalkerManager.instance),
