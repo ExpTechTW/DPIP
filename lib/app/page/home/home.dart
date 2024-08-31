@@ -7,13 +7,13 @@ import "package:dpip/global.dart";
 import "package:dpip/model/history.dart";
 import "package:dpip/route/settings/settings.dart";
 import "package:dpip/util/extension/build_context.dart";
-// import "package:dpip/util/extension/color_scheme.dart";
-// import "package:dpip/util/list_icon.dart";
+import "package:dpip/util/extension/color_scheme.dart";
+import "package:dpip/util/list_icon.dart";
 import "package:dpip/util/need_location.dart";
 import "package:dpip/util/weather_icon.dart";
 import "package:dpip/widget/error/region_out_of_service.dart";
 import "package:dpip/widget/home/forecast_weather_card.dart";
-// import "package:dpip/widget/list/timeline_tile.dart";
+import "package:dpip/widget/list/timeline_tile.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
@@ -125,7 +125,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Future<void> refreshWeatherAll() async {
     if (region == null) return;
 
-    final data = await ExpTech().getWeatherAll(region!);
+    // final data = await ExpTech().getWeatherAll(region!);
+    final data = await ExpTech().getWeatherAll("100");
     final next15Hours = getNextHours(data["forecast"]["day"]);
 
     for (var hour in next15Hours) {
@@ -288,7 +289,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              "${weatherData["realtime"]?["temp"]?["c"].round() ?? "--"}°",
+                                              "${weatherData["temp"]?["now"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 68,
                                                 fontWeight: FontWeight.w500,
@@ -296,28 +297,28 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                                 height: 1,
                                               ),
                                             ),
-                                            Icon(
-                                              WeatherIcons.getWeatherIcon(
-                                                  weatherData["realtime"]?["condition"].toString() ?? "",
-                                                  weatherData["realtime"]?["is_day"] ?? 1),
-                                              fill: 1,
-                                              size: 48,
-                                              color: context.colors.onPrimaryContainer.withOpacity(0.75),
-                                            ),
+                                            // Icon(
+                                            //   WeatherIcons.getWeatherIcon(
+                                            //       weatherData["realtime"]?["condition"].toString() ?? "",
+                                            //       weatherData["realtime"]?["is_day"] ?? 1),
+                                            //   fill: 1,
+                                            //   size: 48,
+                                            //   color: context.colors.onPrimaryContainer.withOpacity(0.75),
+                                            // ),
                                           ],
                                         ),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              "最高 ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["max"].round() ?? "--"}°",
+                                              "最高 ${weatherData["temp"]?["high"]?["temp"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: context.colors.onSecondaryContainer.withOpacity(0.75),
                                               ),
                                             ),
                                             Text(
-                                              "最低 ${weatherData["forecast"]?["day"]?[0]?["weather"]?["temp"]?["c"]?["min"].round() ?? "--"}°",
+                                              "最低 ${weatherData["temp"]?["low"]?["temp"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: context.colors.onSecondaryContainer.withOpacity(0.75),
@@ -327,14 +328,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         ),
                                       ],
                                     ),
-                                    Text(
-                                      WeatherIcons.getWeatherContent(
-                                          context, weatherData["realtime"]?["condition"].toString() ?? ""),
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: context.colors.primary,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   WeatherIcons.getWeatherContent(
+                                    //       context, weatherData["realtime"]?["condition"].toString() ?? ""),
+                                    //   style: TextStyle(
+                                    //     fontSize: 20,
+                                    //     color: context.colors.primary,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -343,22 +344,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // Text(
+                                    //   "體感溫度: ${weatherData["feel"]?["c"].round() ?? "--"}°",
+                                    //   style: TextStyle(
+                                    //     fontSize: 16,
+                                    //     color: context.colors.onSurfaceVariant.withOpacity(0.75),
+                                    //   ),
+                                    // ),
                                     Text(
-                                      "體感溫度: ${weatherData["realtime"]?["feel"]?["c"].round() ?? "--"}°",
+                                      "相對濕度: ${weatherData["humidity"] ?? "- -"}%",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                       ),
                                     ),
                                     Text(
-                                      "相對濕度: ${weatherData["realtime"]?["humidity"] ?? "- -"}%",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: context.colors.onSurfaceVariant.withOpacity(0.75),
-                                      ),
-                                    ),
-                                    Text(
-                                      "紫外線指數: ${weatherData["realtime"]?["uv"] ?? "- -"}",
+                                      "紫外線指數: ${weatherData["uv"] ?? "- -"}",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
@@ -391,72 +392,72 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       //     );
                       //   },
                       // ),
-                      // Padding(
-                      //   padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                      //   child: Text(
-                      //     context.i18n.current_events,
-                      //     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
-                      //   ),
-                      // ),
-                      // Builder(
-                      //   builder: (context) {
-                      //     if (realtimeList.isEmpty) {
-                      //       return Padding(
-                      //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      //         child: Text(
-                      //           context.i18n.home_safety,
-                      //           style: TextStyle(
-                      //             fontSize: 16,
-                      //             color: context.colors.onSurfaceVariant,
-                      //           ),
-                      //         ),
-                      //       );
-                      //     }
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
+                        child: Text(
+                          context.i18n.current_events,
+                          style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                        ),
+                      ),
+                      Builder(
+                        builder: (context) {
+                          if (realtimeList.isEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: Text(
+                                context.i18n.home_safety,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: context.colors.onSurfaceVariant,
+                                ),
+                              ),
+                            );
+                          }
 
-                      //     List<Widget> children = [];
+                          List<Widget> children = [];
 
-                      //     for (var i = 0, n = realtimeList.length; i < n; i++) {
-                      //       final current = realtimeList[i];
-                      //       var showDate = false;
+                          for (var i = 0, n = realtimeList.length; i < n; i++) {
+                            final current = realtimeList[i];
+                            var showDate = false;
 
-                      //       if (i != 0) {
-                      //         final prev = realtimeList[i - 1];
-                      //         if (current.time.send.day != prev.time.send.day) {
-                      //           showDate = true;
-                      //         }
-                      //       } else {
-                      //         showDate = true;
-                      //       }
+                            if (i != 0) {
+                              final prev = realtimeList[i - 1];
+                              if (current.time.send.day != prev.time.send.day) {
+                                showDate = true;
+                              }
+                            } else {
+                              showDate = true;
+                            }
 
-                      //       final item = TimeLineTile(
-                      //         time: current.time.send,
-                      //         icon: Icon(ListIcons.getListIcon(current.icon)),
-                      //         height: 100,
-                      //         first: i == 0,
-                      //         showDate: showDate,
-                      //         color: context.theme.extendedColors.blueContainer,
-                      //         child: Column(
-                      //           crossAxisAlignment: CrossAxisAlignment.start,
-                      //           children: [
-                      //             Text(
-                      //               current.text.content["all"]!.subtitle,
-                      //               style: context.theme.textTheme.titleMedium,
-                      //             ),
-                      //             Text(current.text.description["all"]!),
-                      //           ],
-                      //         ),
-                      //         onTap: () {},
-                      //       );
+                            final item = TimeLineTile(
+                              time: current.time.send,
+                              icon: Icon(ListIcons.getListIcon(current.icon)),
+                              height: 100,
+                              first: i == 0,
+                              showDate: showDate,
+                              color: context.theme.extendedColors.blueContainer,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    current.text.content["all"]!.subtitle,
+                                    style: context.theme.textTheme.titleMedium,
+                                  ),
+                                  Text(current.text.description["all"]!),
+                                ],
+                              ),
+                              onTap: () {},
+                            );
 
-                      //       children.add(item);
-                      //     }
+                            children.add(item);
+                          }
 
-                      //     return Padding(
-                      //       padding: const EdgeInsets.symmetric(horizontal: 8),
-                      //       child: Column(children: children),
-                      //     );
-                      //   },
-                      // )
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(children: children),
+                          );
+                        },
+                      )
                     ],
             ),
           ),

@@ -36,7 +36,7 @@ class Route {
 
   static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
 
-  static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v1/weather/all/$postalCode");
+  static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v2/weather/realtime/$postalCode");
 
   static Uri station() => Uri.parse("$api/v1/trem/station");
 
