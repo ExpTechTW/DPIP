@@ -127,19 +127,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     // final data = await ExpTech().getWeatherAll(region!);
     final data = await ExpTech().getWeatherAll("100");
-    final next15Hours = getNextHours(data["forecast"]["day"]);
+    // final next15Hours = getNextHours(data["forecast"]["day"]);
 
-    for (var hour in next15Hours) {
-      weatherCard.add(
-        ForecastWeatherCard(
-          time: formatDateTime(hour["time"]),
-          minTemperature: (hour["temp"]?["c"]).round(),
-          maxTemperature: (hour["heat"]?["c"]).round(),
-          rain: hour["chance"]?["rain"],
-          icon: WeatherIcons.getWeatherIcon(hour["condition"].toString(), hour["is_day"] ?? 1),
-        ),
-      );
-    }
+    // for (var hour in next15Hours) {
+    //   weatherCard.add(
+    //     ForecastWeatherCard(
+    //       time: formatDateTime(hour["time"]),
+    //       minTemperature: (hour["temp"]?["c"]).round(),
+    //       maxTemperature: (hour["heat"]?["c"]).round(),
+    //       rain: hour["chance"]?["rain"],
+    //       icon: WeatherIcons.getWeatherIcon(hour["condition"].toString(), hour["is_day"] ?? 1),
+    //     ),
+    //   );
+    // }
     setState(() {
       weatherData = data;
     });
