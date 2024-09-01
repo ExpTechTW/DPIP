@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ),
                 TextSpan(
-                  text: tempParts.length > 1 ? '.${tempParts[1]}°C' : '°C',
+                  text: tempParts.length > 1 ? '.${tempParts[1]}°C' : '.0°C',
                   style: TextStyle(
                     fontSize: 34,
                     fontWeight: FontWeight.w500,
@@ -223,8 +223,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWeatherDetailItem('濕度', '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
           _buildWeatherDetailItem('降水量', '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm'),
+          _buildWeatherDetailItem('濕度', '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
         ],
       ),
     );
@@ -232,9 +232,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildWeatherDetailItem(String label, String value) {
     return Text(
-      '$label: $value',
+      '$label   $value',
       style: TextStyle(
-        fontSize: 16,
+        fontSize: 18,
         color: context.colors.onSurfaceVariant.withOpacity(0.75),
       ),
     );
