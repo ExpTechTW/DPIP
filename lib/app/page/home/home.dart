@@ -9,6 +9,8 @@ import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../util/weather_icon.dart';
+
 typedef PositionUpdateCallback = void Function();
 
 class HomePage extends StatefulWidget {
@@ -186,31 +188,55 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildTemperatureDisplay() {
     final tempParts = (weatherData['weather']?['data']?['air']?['temperature'] ?? '--').toString().split('.');
+    final weatherCode = weatherData['weather']?['weatherCode'] ?? 100;
+    const isDay = 1;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text.rich(
-            TextSpan(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextSpan(
-                  text: tempParts[0],
-                  style: TextStyle(
-                    fontSize: 68,
-                    fontWeight: FontWeight.w500,
-                    color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: tempParts[0],
+                        style: TextStyle(
+                          fontSize: 68,
+                          fontWeight: FontWeight.w500,
+                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                        ),
+                      ),
+                      TextSpan(
+                        text: tempParts.length > 1 ? '.${tempParts[1]}°C' : '.0°C',
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w500,
+                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                TextSpan(
-                  text: tempParts.length > 1 ? '.${tempParts[1]}°C' : '.0°C',
+                const SizedBox(height: 8),
+                Text(
+                  WeatherIcons.getWeatherContent(context, weatherCode.toString()),
                   style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w500,
-                    color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                    fontSize: 18,
+                    color: context.colors.onSurfaceVariant,
                   ),
                 ),
               ],
             ),
+          ),
+          Icon(
+            WeatherIcons.getWeatherIcon(weatherCode, isDay),
+            size: 80,
+            color: context.colors.primary,
           ),
         ],
       ),
