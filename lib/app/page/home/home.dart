@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (region == null) return;
 
     // final data = await ExpTech().getWeatherAll(region!);
-    final data = await ExpTech().getWeatherAll(region!);
+    final data = await ExpTech().getWeatherRealtime(region!);
     // final next15Hours = getNextHours(data["forecast"]["day"]);
 
     // for (var hour in next15Hours) {
