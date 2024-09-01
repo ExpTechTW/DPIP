@@ -178,11 +178,11 @@
   },
   "earthquake_warning": "地震速報",
   "@earthquake_warning": {
-    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 地震速報、「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 地震速報"
   },
   "emergency_earthquake_warning": "緊急地震速報",
   "@emergency_earthquake_warning": {
-    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 緊急地震速報"
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 緊急地震速報、「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 緊急地震速報"
   },
   "location_estimate": "所在地預估",
   "@location_estimate": {
@@ -317,17 +317,9 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_sound": "緊急地震速報",
-  "@eew_alert_sound": {
-    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 緊急地震速報"
-  },
   "eew_alert_description_sound": "地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
-  },
-  "eew_sound": "地震速報",
-  "@eew_sound": {
-    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」標題 → 地震速報"
   },
   "eew_description_sound": "地震速報 所在地預估震度 2 以上",
   "@eew_description_sound": {

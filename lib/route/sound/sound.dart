@@ -54,12 +54,12 @@ class _SettingsSoundViewState extends State<SoundRoute> {
             children: [
               ListTileGroupHeader(title: context.i18n.eew_sound_title),
               SoundListTile(
-                title: context.i18n.eew_alert_sound,
+                title: context.i18n.emergency_earthquake_warning,
                 subtitle: context.i18n.eew_alert_description_sound,
                 type: "eew_alert",
               ),
               SoundListTile(
-                title: context.i18n.eew_sound,
+                title: context.i18n.earthquake_warning,
                 subtitle: context.i18n.eew_description_sound,
                 type: "eew",
               ),
