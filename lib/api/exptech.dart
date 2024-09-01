@@ -218,8 +218,8 @@ class ExpTech {
     return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
   }
 
-  Future<Map<String, dynamic>> getWeatherAll(String region) async {
-    final requestUrl = Route.weatherAll(region);
+  Future<Map<String, dynamic>> getWeatherRealtime(String region) async {
+    final requestUrl = Route.weatherRealtime(region);
 
     var res = await get(requestUrl);
 
