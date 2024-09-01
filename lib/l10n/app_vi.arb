@@ -1,11 +1,11 @@
 {
   "@@locale": "vi",
   "@@context": "App level localization strings.",
-  "datetime_format": "yyyy/MM/dd HH:mm:ss",
+  "datetime_format": "MM/dd/yyyy HH:mm:ss",
   "@datetime_format": {
     "description": "日期時間顯示格式"
   },
-  "date_format": "yyyy/MM/dd",
+  "date_format": "MM/dd/yyyy",
   "@date_format": {
     "description": "日期顯示格式"
   },
@@ -33,7 +33,7 @@
   "@me": {
     "description": "「我」頁面標題"
   },
-  "settings": "cài đặt",
+  "settings": "Cài đặt",
   "@settings": {
     "description": "「設定」頁面標題"
   },
@@ -309,11 +309,11 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "notify_test": "通知測試",
+  "notify_test": "Kiểm tra thông báo",
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "notify_test_description": "測試即時天氣資訊、地震速報等音效通知",
+  "notify_test_description": "Kiểm tra thông báo âm thanh về thông tin thời tiết thời gian thực, báo cáo động đất, v. v.",
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
@@ -919,7 +919,7 @@
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio là một nhóm gồm hơn 15 sinh viên, phần lớn là những người có độ tuổi trung bình dưới 20. Các thành viên đến từ Đài Loan (Bắc, Trung và Nam), Nhật Bản, Hàn Quốc và Trung Quốc.",
+  "exptech_studio_description": "ExpTech Studio là một nhóm gồm hơn 15 Học sinh, phần lớn là những người có độ tuổi trung bình dưới 20. Các thành viên đến từ Đài Loan (Bắc, Trung và Nam), Nhật Bản, Hàn Quốc và Trung Quốc.",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
@@ -1007,7 +1007,7 @@
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "“Strong Earthquake Monitor” được sử dụng trong TREM (Taiwan Real-time Earthquake Monitoring) như một chức năng hiển thị địa chấn thời gian thực để quan sát rung động hiện tại trên khắp Đài Loan. Khi động đất xảy ra, sự lan truyền của sóng địa chấn có thể được quan sát thông qua sự thay đổi màu sắc của các điểm quan sát.",
+  "trem_monitor_description": "“giám sát động đất” được sử dụng trong TREM (Giám sát động đất theo thời gian thực tại Đài Loan.) như một chức năng hiển thị địa chấn thời gian thực để quan sát rung động hiện tại trên khắp Đài Loan. Khi động đất xảy ra, sự lan truyền của sóng địa chấn có thể được quan sát thông qua sự thay đổi màu sắc của các điểm quan sát.",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
@@ -1347,7 +1347,7 @@
       }
     }
   },
-  "delay": "Độ trễ: {serviceStatus_count} ms",
+  "delay": "Độ trễ: {serviceStatus_count} s",
   "@delay": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 延遲: {serviceStatus_count} ms",
     "placeholders": {
