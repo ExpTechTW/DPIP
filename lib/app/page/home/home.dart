@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final scrollController = ScrollController();
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   bool isAppBarVisible = false;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -49,12 +50,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _initData();
     _setupScrollListener();
     HomePage.setActiveCallback(_handlePositionUpdate);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
   }
 
   @override
   void dispose() {
     HomePage.clearActiveCallback();
     scrollController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -98,6 +102,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         animController.animateTo(scrollController.offset / 240);
       }
     });
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      setState(() {
+        country = _tabController.index == 0;
+        refreshRealtimeList();
+      });
+    }
   }
 
   @override
@@ -229,76 +242,69 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildLocationToggle() {
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Expanded(
-            child: _buildToggleButton(
-              icon: Symbols.public_rounded,
-              label: '全國',
-              isSelected: country,
-              onTap: () => _toggleView(true),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: _buildToggleButton(
-              icon: Symbols.my_location_rounded,
-              label: '所在地',
-              isSelected: !country,
-              onTap: () => _toggleView(false),
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        height: 36,
+        decoration: BoxDecoration(
+          color: context.colors.surfaceVariant.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            Expanded(child: _buildToggleButton(true, Symbols.public_rounded, '全國')),
+            Expanded(child: _buildToggleButton(false, Symbols.my_location_rounded, '所在地')),
+          ],
+        ),
       ),
     );
   }
 
-  void _toggleView(bool isCountry) {
-    setState(() {
-      country = isCountry;
-      refreshRealtimeList();
-    });
-  }
-
-  Widget _buildToggleButton({
-    required IconData icon,
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? context.colors.primaryContainer : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? context.colors.primary : context.colors.outline,
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  Widget _buildToggleButton(bool isCountry, IconData icon, String label) {
+    final isSelected = country == isCountry;
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: isSelected ? context.colors.primaryContainer.withOpacity(0.7) : Colors.transparent,
+              borderRadius: BorderRadius.horizontal(
+                left: isCountry ? const Radius.circular(18) : Radius.zero,
+                right: !isCountry ? const Radius.circular(18) : Radius.zero,
               ),
             ),
-          ],
+          ),
         ),
-      ),
+        InkWell(
+          onTap: () => setState(() {
+            country = isCountry;
+            refreshRealtimeList();
+          }),
+          child: Container(
+            height: 36,
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 16,
+                  color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant.withOpacity(0.8),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant.withOpacity(0.8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
