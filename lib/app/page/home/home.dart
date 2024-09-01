@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (region == null) return;
 
     // final data = await ExpTech().getWeatherAll(region!);
-    final data = await ExpTech().getWeatherAll("100");
+    final data = await ExpTech().getWeatherAll(region!);
     // final next15Hours = getNextHours(data["forecast"]["day"]);
 
     // for (var hour in next15Hours) {
@@ -289,7 +289,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              "${weatherData["temp"]?["now"].round() ?? "--"}°",
+                                              "${weatherData["weather"]?["data"]?["air"]?["temperature"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 68,
                                                 fontWeight: FontWeight.w500,
@@ -311,14 +311,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              "最高 ${weatherData["temp"]?["high"]?["temp"].round() ?? "--"}°",
+                                              "最高 ${weatherData["weather"]?["daily"]?["high"]?["temperature"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: context.colors.onSecondaryContainer.withOpacity(0.75),
                                               ),
                                             ),
                                             Text(
-                                              "最低 ${weatherData["temp"]?["low"]?["temp"].round() ?? "--"}°",
+                                              "最低 ${weatherData["weather"]?["daily"]?["low"]?["temperature"].round() ?? "--"}°",
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 color: context.colors.onSecondaryContainer.withOpacity(0.75),
@@ -352,19 +352,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     //   ),
                                     // ),
                                     Text(
-                                      "相對濕度: ${weatherData["humidity"] ?? "- -"}%",
+                                      "相對濕度: ${weatherData["weather"]?["data"]?["air"]?["relative_humidity"] ?? "- -"}%",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                       ),
                                     ),
                                     Text(
-                                      "紫外線指數: ${weatherData["uv"] ?? "- -"}",
+                                      "氣壓: ${weatherData["weather"]?["data"]?["air"]?["pressure"] ?? "- -"} 百帕(hPa)",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: context.colors.onSurfaceVariant.withOpacity(0.75),
                                       ),
                                     ),
+                                    // Text(
+                                    //   "紫外線指數: ${weatherData["uv"] ?? "- -"}",
+                                    //   style: TextStyle(
+                                    //     fontSize: 16,
+                                    //     color: context.colors.onSurfaceVariant.withOpacity(0.75),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
