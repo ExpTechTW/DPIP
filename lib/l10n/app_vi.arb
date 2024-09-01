@@ -481,7 +481,7 @@
   "@wind_direction_and_speed_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 風向/風速"
   },
-  "typhoon_monitor": "Cơn bão",
+  "typhoon_monitor": "gio bảo",
   "@typhoon_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 颱風"
   },
@@ -554,7 +554,7 @@
   "@out_of_service": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外"
   },
-  "out_of_service_only_taiwan": "Bạn đang ở ngoài khu vực dịch vụ, chỉ có tại Đài Loan.",
+  "out_of_service_only_taiwan": "Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm khác nhau trên khắp Đài Loan.",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
@@ -578,7 +578,7 @@
   "@sunny": {
     "description": "天氣狀況：晴"
   },
-  "partly_cloudy": "Mây một phần cục bộ có",
+  "partly_cloudy": "May nhiều phần cục bộ co",
   "@partly_cloudy": {
     "description": "天氣狀況：局部多雲"
   },
