@@ -70,16 +70,18 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
         actions: [
           IconButton(
             icon: const Icon(Symbols.search),
-            onPressed: _isLoading ? null : () async {
-              final result = await showSearch<Location>(
-                context: context,
-                delegate: LocationSelectorSearchDelegate(),
-              );
+            onPressed: _isLoading
+                ? null
+                : () async {
+                    final result = await showSearch<Location>(
+                      context: context,
+                      delegate: LocationSelectorSearchDelegate(),
+                    );
 
-              if (result == null) return;
+                    if (result == null) return;
 
-              await setLocation(result);
-            },
+                    await setLocation(result);
+                  },
           )
         ],
       ),
@@ -92,15 +94,17 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
                 return ListTile(
                   title: Text(data[index]),
                   trailing: const Icon(Symbols.arrow_right),
-                  onTap: _isLoading ? null : () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        settings: RouteSettings(name: "/location_selector/${data[index]}"),
-                        builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
-                      ),
-                    );
-                  },
+                  onTap: _isLoading
+                      ? null
+                      : () async {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              settings: RouteSettings(name: "/location_selector/${data[index]}"),
+                              builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
+                            ),
+                          );
+                        },
                 );
               } else {
                 return RadioListTile(
@@ -108,15 +112,17 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
                   value: data[index],
                   groupValue: widget.town,
                   controlAffinity: ListTileControlAffinity.trailing,
-                  onChanged: _isLoading ? null : (value) async {
-                    if (value == null) return;
+                  onChanged: _isLoading
+                      ? null
+                      : (value) async {
+                          if (value == null) return;
 
-                    final location = Global.location.entries.firstWhere((e) {
-                      return (e.value.city == widget.city) && (e.value.town == value);
-                    }).value;
+                          final location = Global.location.entries.firstWhere((e) {
+                            return (e.value.city == widget.city) && (e.value.town == value);
+                          }).value;
 
-                    await setLocation(location);
-                  },
+                          await setLocation(location);
+                        },
                 );
               }
             },

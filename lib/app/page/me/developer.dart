@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import "package:dpip/util/extension/build_context.dart";
+import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class DPIPInfoPage extends StatelessWidget {
@@ -97,9 +97,9 @@ class DPIPInfoPage extends StatelessWidget {
             Text(
               'DPIP 開發者的話',
               style: context.theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: context.theme.colorScheme.primary,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: context.theme.colorScheme.primary,
+              ),
             ),
           ],
         ),
@@ -124,9 +124,9 @@ class DPIPInfoPage extends StatelessWidget {
                 Text(
                   title,
                   style: context.theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: context.theme.colorScheme.primary,
-                      ),
+                    fontWeight: FontWeight.bold,
+                    color: context.theme.colorScheme.primary,
+                  ),
                 ),
               ],
             ),

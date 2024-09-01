@@ -1,225 +1,109 @@
-import "package:collection/collection.dart";
-import "package:dpip/api/exptech.dart";
-import "package:dpip/global.dart";
-import "package:dpip/model/history.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/util/extension/color_scheme.dart";
-import "package:dpip/util/list_icon.dart";
-import "package:dpip/widget/error/region_out_of_service.dart";
-import "package:dpip/widget/list/timeline_tile.dart";
-import "package:flutter/material.dart";
-
-typedef PositionUpdateCallback = void Function();
+import 'package:collection/collection.dart';
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/model/history.dart';
+import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/list_icon.dart';
+import 'package:dpip/widget/error/region_out_of_service.dart';
+import 'package:dpip/widget/list/timeline_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryPage extends StatefulWidget {
   final Function()? onPositionUpdate;
 
-  const HistoryPage({super.key, this.onPositionUpdate});
+  const HistoryPage({Key? key, this.onPositionUpdate}) : super(key: key);
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
 
-  static PositionUpdateCallback? _activeCallback;
+  static void updatePosition() => _activeCallback?.call();
 
-  static void setActiveCallback(PositionUpdateCallback callback) {
-    _activeCallback = callback;
-  }
+  static void setActiveCallback(VoidCallback callback) => _activeCallback = callback;
 
-  static void clearActiveCallback() {
-    _activeCallback = null;
-  }
+  static void clearActiveCallback() => _activeCallback = null;
 
-  static void updatePosition() {
-    _activeCallback?.call();
-  }
+  static VoidCallback? _activeCallback;
 }
 
 class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin {
   List<History> historyList = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
-  bool init = false;
-  String city = Global.preference.getString("location-city") ?? "";
-  String town = Global.preference.getString("location-town") ?? "";
+  bool country = false;
+  bool isLoading = true;
   String? region;
 
-  late final backgroundColor = Color.lerp(context.colors.surface, context.colors.surfaceTint, 0.08);
-
-  late final decorationTween = DecorationTween(
-    begin: BoxDecoration(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
-    end: BoxDecoration(
-      borderRadius: BorderRadius.zero,
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
-  ).chain(CurveTween(curve: Curves.linear));
-
-  final opacityTween = Tween(
-    begin: 0.0,
-    end: 1.0,
-  ).chain(CurveTween(curve: Curves.linear));
-
   final scrollController = ScrollController();
-  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
-
-  double headerHeight = 360;
+  late var animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   bool isAppBarVisible = false;
-
-  Future<void> refreshHistoryList() async {
-    if (region == null) return;
-
-    final data = await ExpTech().getHistoryRegion(region!);
-    setState(() {
-      init = true;
-      historyList = data.reversed.toList();
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    start();
-    HistoryPage.setActiveCallback(sendpositionUpdate);
+    animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _initData();
+    HistoryPage.setActiveCallback(_handlePositionUpdate);
+    _setupScrollListener();
   }
 
-  void start() {
-    city = Global.preference.getString("location-city") ?? "";
-    town = Global.preference.getString("location-town") ?? "";
-    region = Global.location.entries.firstWhereOrNull((l) => (l.value.city == city) && (l.value.town == town))?.key;
-    historyList = [];
-    if (region == null) {
-      setState(() {});
-      return;
-    }
-    refreshHistoryList();
-    double headerScrollHeight = headerHeight / 5 * 3;
+  void _setupScrollListener() {
     scrollController.addListener(() {
-      if (scrollController.offset > 1e-5) {
-        if (!isAppBarVisible) {
-          setState(() => isAppBarVisible = true);
+      if (mounted) {
+        setState(() => isAppBarVisible = scrollController.offset > 1e-5);
+        if (scrollController.offset < 180) {
+          animController.animateTo(scrollController.offset / 180);
         }
-      } else {
-        if (isAppBarVisible) {
-          setState(() => isAppBarVisible = false);
-        }
-      }
-
-      if (scrollController.offset < headerScrollHeight) {
-        animController.animateTo(scrollController.offset / headerScrollHeight, duration: Duration.zero);
       }
     });
-    setState(() {});
   }
 
-  void sendpositionUpdate() {
+  void _initData() {
+    final city = Global.preference.getString("location-city") ?? "";
+    final town = Global.preference.getString("location-town") ?? "";
+    region = Global.location.entries.firstWhereOrNull((l) => l.value.city == city && l.value.town == town)?.key;
+    refreshHistoryList();
+  }
+
+  void _handlePositionUpdate() {
     if (mounted) {
-      start();
+      _initData();
       widget.onPositionUpdate?.call();
+    }
+  }
+
+  Future<void> refreshHistoryList() async {
+    if (region == null) return;
+    setState(() => isLoading = true);
+    try {
+      final data = country ? await ExpTech().getHistory() : await ExpTech().getHistoryRegion(region!);
+      if (mounted) {
+        setState(() {
+          historyList = data.reversed.toList();
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final appBar = AppBar(
-      elevation: 4,
-      title: Text(context.i18n.history),
-    );
-
     return Scaffold(
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            RefreshIndicator(
-              onRefresh: refreshHistoryList,
-              child: ListView(
-                padding: EdgeInsets.only(bottom: context.padding.bottom),
-                controller: scrollController,
-                children: (region == null)
-                    ? [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 128),
-                          child: RegionOutOfService(),
-                        )
-                      ]
-                    : [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 32, 0, 8),
-                          child: Text(
-                            context.i18n.historical_events,
-                            style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
-                          ),
-                        ),
-                        Builder(
-                          builder: (context) {
-                            if (historyList.isEmpty) {
-                              if (init) {
-                                return Center(child: Text(context.i18n.no_historical_events));
-                              }
-                              return const Center(child: CircularProgressIndicator());
-                            }
-
-                            List<Widget> children = [];
-
-                            for (var i = 0, n = historyList.length; i < n; i++) {
-                              final current = historyList[i];
-                              var showDate = false;
-
-                              if (i != 0) {
-                                final prev = historyList[i - 1];
-                                if (current.time.send.day != prev.time.send.day) {
-                                  showDate = true;
-                                }
-                              } else {
-                                showDate = true;
-                              }
-
-                              final item = TimeLineTile(
-                                time: current.time.send,
-                                icon: Icon(ListIcons.getListIcon(current.icon)),
-                                height: 100,
-                                first: i == 0,
-                                showDate: showDate,
-                                color: context.theme.extendedColors.blueContainer,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(current.text.content["all"]!.subtitle,
-                                        style: context.theme.textTheme.titleMedium),
-                                    Text(current.text.description["all"]!),
-                                  ],
-                                ),
-                                onTap: () {},
-                              );
-
-                              children.add(item);
-                            }
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Column(
-                                children: children,
-                              ),
-                            );
-                          },
-                        )
-                      ],
-              ),
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Visibility(
-                visible: isAppBarVisible,
-                child: FadeTransition(
-                  opacity: animController.drive(opacityTween),
-                  child: appBar,
-                ),
+            _buildLocationToggle(),
+            Expanded(
+              child: Stack(
+                children: [
+                  _buildMainContent(),
+                  _buildAppBar(),
+                ],
               ),
             ),
           ],
@@ -228,10 +112,181 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     );
   }
 
+  Widget _buildMainContent() {
+    return RefreshIndicator(
+      onRefresh: refreshHistoryList,
+      child: CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: context.padding.bottom),
+            sliver: _buildHistoryList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationToggle() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildToggleButton(
+              icon: Symbols.public_rounded,
+              label: '全國',
+              isSelected: country,
+              onTap: () => _toggleView(true),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _buildToggleButton(
+              icon: Symbols.my_location_rounded,
+              label: '所在地',
+              isSelected: !country,
+              onTap: () => _toggleView(false),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleButton({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? context.colors.primaryContainer : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? context.colors.primary : context.colors.outline,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryList() {
+    if (region == null) {
+      return const SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.only(top: 128),
+          child: RegionOutOfService(),
+        ),
+      );
+    }
+
+    if (isLoading) {
+      return const SliverToBoxAdapter(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (historyList.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Center(child: Text(context.i18n.no_historical_events)),
+      );
+    }
+
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          if (index == 0) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+              child: Text(
+                context.i18n.historical_events,
+                style: context.theme.textTheme.headlineSmall,
+              ),
+            );
+          }
+          final historyIndex = index - 1;
+          final history = historyList[historyIndex];
+          final showDate = historyIndex == 0 || history.time.send.day != historyList[historyIndex - 1].time.send.day;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: TimeLineTile(
+              time: history.time.send,
+              icon: Icon(ListIcons.getListIcon(history.icon)),
+              height: 100,
+              first: historyIndex == 0,
+              showDate: showDate,
+              color: context.colors.secondaryContainer,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(history.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
+                  Text(history.text.description["all"]!),
+                ],
+              ),
+              onTap: () {},
+            ),
+          );
+        },
+        childCount: historyList.isEmpty ? 1 : historyList.length + 1,
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: AnimatedOpacity(
+        opacity: isAppBarVisible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 200),
+        child: AppBar(
+          elevation: 4,
+          title: Text(context.i18n.history),
+          backgroundColor: context.colors.surface.withOpacity(0.8),
+        ),
+      ),
+    );
+  }
+
+  void _toggleView(bool isCountry) {
+    setState(() {
+      country = isCountry;
+      refreshHistoryList();
+    });
+  }
+
   @override
   void dispose() {
     HistoryPage.clearActiveCallback();
     scrollController.dispose();
+    animController.dispose();
     super.dispose();
   }
 }
