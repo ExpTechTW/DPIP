@@ -714,11 +714,11 @@
   "@ice_pellets": {
     "description": "天氣狀況：冰丸"
   },
-  "light_rain_shower": "小陣雨",
+  "light_rain_shower": "Drizzle",
   "@light_rain_shower": {
     "description": "天氣狀況：小陣雨"
   },
-  "moderate_or_heavy_rain_shower": "中度或大陣雨",
+  "moderate_or_heavy_rain_shower": "Moderate/ Heavy shower",
   "@moderate_or_heavy_rain_shower": {
     "description": "天氣狀況：中度或大陣雨"
   },
@@ -726,35 +726,35 @@
   "@torrential_rain_shower": {
     "description": "天氣狀況：暴雨"
   },
-  "light_sleet_showers": "小冰雹雨",
+  "light_sleet_showers": "Hail",
   "@light_sleet_showers": {
     "description": "天氣狀況：小冰雹雨"
   },
-  "moderate_or_heavy_sleet_showers": "中度或大冰雹雨",
+  "moderate_or_heavy_sleet_showers": "Several hail",
   "@moderate_or_heavy_sleet_showers": {
     "description": "天氣狀況：中度或大冰雹雨"
   },
-  "light_snow_showers": "小陣雪",
+  "light_snow_showers": "Light snow/ Flurries",
   "@light_snow_showers": {
     "description": "天氣狀況：小陣雪"
   },
-  "moderate_or_heavy_snow_showers": "中度或大陣雪",
+  "moderate_or_heavy_snow_showers": "Heavy snow",
   "@moderate_or_heavy_snow_showers": {
     "description": "天氣狀況：中度或大陣雪"
   },
-  "light_showers_of_ice_pellets": "冰丸小雨",
+  "light_showers_of_ice_pellets": "Ice pellets/ Sleet",
   "@light_showers_of_ice_pellets": {
     "description": "天氣狀況：冰丸小雨"
   },
-  "moderate_or_heavy_showers_of_ice_pellets": "中度或大冰丸",
+  "moderate_or_heavy_showers_of_ice_pellets": "Moderate/ Heavy Sleet",
   "@moderate_or_heavy_showers_of_ice_pellets": {
     "description": "天氣狀況：中度或大冰丸"
   },
-  "patchy_light_rain_with_thunder": "局部小雷雨",
+  "patchy_light_rain_with_thunder": "Light thunderstorm",
   "@patchy_light_rain_with_thunder": {
     "description": "天氣狀況：局部小雷雨"
   },
-  "moderate_or_heavy_rain_with_thunder": "中度或大雷雨",
+  "moderate_or_heavy_rain_with_thunder": "Moderate/ Heavy thunderstorm",
   "@moderate_or_heavy_rain_with_thunder": {
     "description": "天氣狀況：中度或大雷雨"
   },
@@ -770,7 +770,7 @@
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "更多功能列表",
+  "more_features": "More features",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
@@ -835,15 +835,15 @@
   "@tsunami_relieve": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
   },
-  "estimated_time_wave": "預估海嘯到達時間及波高",
+  "estimated_time_wave": "Estimated tsunami arrival time and wave height",
   "@estimated_time_wave": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
   },
-  "observing_tsunamis": "各地觀測到的海嘯",
+  "observing_tsunamis": "Tsunami observed in different areas",
   "@observing_tsunamis": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   },
-  "occurrence_time": "發生時間",
+  "occurrence_time": "Time of occurrence",
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
@@ -935,7 +935,7 @@
   "@notice": {
     "description": "「歡迎」頁面 → 注意事項"
   },
-  "notice_details": "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+  "notice_details": "DPIP will relay various information from ExpTech and the Central Weather Administration, Taiwan. Please note the following points when using it.",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
@@ -967,7 +967,7 @@
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
-  "required_info_permissions": "所需的資訊和權限列表：",
+  "required_info_permissions": "Required information and permissions ：",
   "@required_info_permissions": {
     "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
@@ -975,11 +975,11 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供通知服務",
+  "notification_service_description": "To provide notification service",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 用於提供通知服務"
   },
-  "location_based_service": "用於提供基於位置的服務",
+  "location_based_service": "To provide services base on location",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
@@ -1023,7 +1023,7 @@
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
-  "update_to_latest_version": "更新至最新版本以獲得最佳體驗",
+  "update_to_latest_version": "Please update to the latest version for the best experience",
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
@@ -1055,7 +1055,7 @@
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
-  "go_to_view": "前往查看",
+  "go_to_view": "Go!",
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
@@ -1079,7 +1079,7 @@
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」標題 → 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "目前沒有更新日誌",
+  "no_changelog": "No update logs",
   "@no_changelog": {
     "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
