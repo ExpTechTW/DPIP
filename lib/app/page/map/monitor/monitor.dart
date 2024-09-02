@@ -81,7 +81,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   Rts? _rtsData;
   bool _isMarkerVisible = true;
   bool _isBoxVisible = true;
-  final bool _isEewBoxVisible = true;
+  bool _isEewBoxVisible = true;
   bool isUserLocationValid = false;
   final Map<String, dynamic> _eewIntensityArea = {};
   final DraggableScrollableController sheetController = DraggableScrollableController();
