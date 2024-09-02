@@ -133,13 +133,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton.icon(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            settings: const RouteSettings(name: '/settings'),
-            builder: (context) => const SettingsRoute(initialRoute: '/location'),
-          ),
-        ),
+        onPressed: () {
+          Navigator.pushNamed(
+            context,
+            '/settings',
+            arguments: const SettingsRoute(initialRoute: '/location'),
+          );
+        },
         icon: const Icon(Symbols.pin_drop_rounded),
         label: Text('$city$town', style: const TextStyle(fontSize: 20)),
       ),
