@@ -38,8 +38,26 @@ class ExpTech {
     return EarthquakeReport.fromJson(json);
   }
 
-  Future<List<PartialEarthquakeReport>> getReportList({int? limit = 50, int? page = 1}) async {
-    final requestUrl = Route.reportList(limit: limit, page: page);
+  Future<List<PartialEarthquakeReport>> getReportList({
+    int? limit = 50,
+    int? page = 1,
+    int? minIntensity = 0,
+    int? maxIntensity = 9,
+    int? minMagnitude = 0,
+    int? maxMagnitude = 8,
+    int? minDepth = 0,
+    int? maxDepth = 700,
+  }) async {
+    final requestUrl = Route.reportList(
+      limit: limit,
+      page: page,
+      minIntensity: minIntensity,
+      maxIntensity: maxIntensity,
+      minMagnitude: minMagnitude,
+      maxMagnitude: maxMagnitude,
+      minDepth: minDepth,
+      maxDepth: maxDepth,
+    );
 
     var res = await get(requestUrl);
 

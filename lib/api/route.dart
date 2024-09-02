@@ -22,7 +22,20 @@ class Route {
     return "https://lb-$i.exptech.dev/api";
   }
 
-  static Uri reportList({int? limit = 50, int? page = 1}) => Uri.parse("$api/v2/eq/report?limit=$limit&page=$page");
+  static Uri reportList({
+    int? limit,
+    int? page,
+    int? minIntensity,
+    int? maxIntensity,
+    int? minMagnitude,
+    int? maxMagnitude,
+    int? minDepth,
+    int? maxDepth,
+  }) {
+    String url =
+        "$onlyapi/v2/eq/report?limit=$limit&page=$page&minIntensity=$minIntensity&maxIntensity=$maxIntensity&minMagnitude=$minMagnitude&maxMagnitude=$maxMagnitude&minDepth=$minDepth&maxDepth=$maxDepth";
+    return Uri.parse(url);
+  }
 
   static Uri report(String reportId) => Uri.parse("$api/v2/eq/report/$reportId");
 
