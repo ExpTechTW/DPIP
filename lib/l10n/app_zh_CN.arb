@@ -309,7 +309,7 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "notify_test": "讯息测试",
+  "notify_test": "通知测试",
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
@@ -606,7 +606,7 @@
   "@patchy_sleet_possible": {
     "description": "天氣狀況：可能有局部小雨夾雪"
   },
-  "patchy_freezing_drizzle_possible": "可能有局部小凍霧雨",
+  "patchy_freezing_drizzle_possible": "可能有局部冻雨",
   "@patchy_freezing_drizzle_possible": {
     "description": "天氣狀況：可能有局部小凍霧雨"
   },
@@ -614,7 +614,7 @@
   "@thundery_outbreaks_possible": {
     "description": "天氣狀況：可能有雷雨"
   },
-  "blowing_snow": "飛雪",
+  "blowing_snow": "飞雪",
   "@blowing_snow": {
     "description": "天氣狀況：飛雪"
   },
@@ -634,15 +634,15 @@
   "@patchy_light_drizzle": {
     "description": "天氣狀況：局部細雨"
   },
-  "light_drizzle": "細雨",
+  "light_drizzle": "细雨",
   "@light_drizzle": {
     "description": "天氣狀況：細雨"
   },
-  "freezing_drizzle": "凍霧雨",
+  "freezing_drizzle": "冻雾雨",
   "@freezing_drizzle": {
     "description": "天氣狀況：凍霧雨"
   },
-  "heavy_freezing_drizzle": "大凍霧雨",
+  "heavy_freezing_drizzle": "大冻雾雨",
   "@heavy_freezing_drizzle": {
     "description": "天氣狀況：大凍霧雨"
   },
@@ -654,7 +654,7 @@
   "@light_rain": {
     "description": "天氣狀況：小雨"
   },
-  "moderate_rain_at_times": "偶爾有雨",
+  "moderate_rain_at_times": "偶尔有雨",
   "@moderate_rain_at_times": {
     "description": "天氣狀況：偶爾有雨"
   },
@@ -662,7 +662,7 @@
   "@moderate_rain": {
     "description": "天氣狀況：雨"
   },
-  "heavy_rain_at_times": "偶爾有大雨",
+  "heavy_rain_at_times": "偶尔有大雨",
   "@heavy_rain_at_times": {
     "description": "天氣狀況：偶爾有大雨"
   },
@@ -670,19 +670,19 @@
   "@heavy_rain": {
     "description": "天氣狀況：大雨"
   },
-  "light_freezing_rain": "微凍雨",
+  "light_freezing_rain": "微冻雨",
   "@light_freezing_rain": {
     "description": "天氣狀況：微凍雨"
   },
-  "moderate_or_heavy_freezing_rain": "中度或大凍雨",
+  "moderate_or_heavy_freezing_rain": "中或大冻雨",
   "@moderate_or_heavy_freezing_rain": {
     "description": "天氣狀況：中度或大凍雨"
   },
-  "light_sleet": "微雨夾雪",
+  "light_sleet": "微雨夹雪",
   "@light_sleet": {
     "description": "天氣狀況：微雨夾雪"
   },
-  "moderate_or_heavy_sleet": "中度或大雨夾雪",
+  "moderate_or_heavy_sleet": "中或大雨夹雪",
   "@moderate_or_heavy_sleet": {
     "description": "天氣狀況：中度或大雨夾雪"
   },
@@ -710,7 +710,7 @@
   "@heavy_snow": {
     "description": "天氣狀況：大雪"
   },
-  "ice_pellets": "冰丸",
+  "ice_pellets": "冰粒",
   "@ice_pellets": {
     "description": "天氣狀況：冰丸"
   },
@@ -718,7 +718,7 @@
   "@light_rain_shower": {
     "description": "天氣狀況：小陣雨"
   },
-  "moderate_or_heavy_rain_shower": "中度或大陣雨",
+  "moderate_or_heavy_rain_shower": "中或大阵雨",
   "@moderate_or_heavy_rain_shower": {
     "description": "天氣狀況：中度或大陣雨"
   },
@@ -730,7 +730,7 @@
   "@light_sleet_showers": {
     "description": "天氣狀況：小冰雹雨"
   },
-  "moderate_or_heavy_sleet_showers": "中度或大冰雹雨",
+  "moderate_or_heavy_sleet_showers": "中或大冰雹雨",
   "@moderate_or_heavy_sleet_showers": {
     "description": "天氣狀況：中度或大冰雹雨"
   },
@@ -738,11 +738,11 @@
   "@light_snow_showers": {
     "description": "天氣狀況：小陣雪"
   },
-  "moderate_or_heavy_snow_showers": "中度或大陣雪",
+  "moderate_or_heavy_snow_showers": "中或大阵雪",
   "@moderate_or_heavy_snow_showers": {
     "description": "天氣狀況：中度或大陣雪"
   },
-  "light_showers_of_ice_pellets": "冰丸小雨",
+  "light_showers_of_ice_pellets": "冰粒小雨",
   "@light_showers_of_ice_pellets": {
     "description": "天氣狀況：冰丸小雨"
   },
@@ -754,7 +754,7 @@
   "@patchy_light_rain_with_thunder": {
     "description": "天氣狀況：局部小雷雨"
   },
-  "moderate_or_heavy_rain_with_thunder": "中度或大雷雨",
+  "moderate_or_heavy_rain_with_thunder": "中或大雷雨",
   "@moderate_or_heavy_rain_with_thunder": {
     "description": "天氣狀況：中度或大雷雨"
   },
