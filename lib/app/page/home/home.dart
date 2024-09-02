@@ -129,26 +129,43 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
+  Widget _buildLocationButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton.icon(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            settings: const RouteSettings(name: '/settings'),
+            builder: (context) => const SettingsRoute(initialRoute: '/location'),
+          ),
+        ),
+        icon: const Icon(Symbols.pin_drop_rounded),
+        label: Text('$city$town', style: const TextStyle(fontSize: 20)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          _buildMainContent(context),
+          _buildMainContent(),
           _buildAppBar(),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent(BuildContext context) {
+  Widget _buildMainContent() {
     return RefreshIndicator(
       onRefresh: refreshRealtimeList,
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: scrollController,
         children: [
-          _buildWeatherHeader(context),
+          _buildWeatherHeader(),
           _buildLocationToggle(),
           _buildEventsList(),
         ],
@@ -156,7 +173,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildWeatherHeader(BuildContext context) {
+  Widget _buildWeatherHeader() {
     return Container(
       height: 360,
       padding: EdgeInsets.only(top: context.padding.top),
@@ -175,27 +192,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLocationButton(context),
+          _buildLocationButton(),
           _buildTemperatureDisplay(),
           _buildWeatherDetails(),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLocationButton(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton.icon(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            settings: const RouteSettings(name: '/settings'),
-            builder: (context) => const SettingsRoute(initialRoute: '/location'),
-          ),
-        ),
-        icon: const Icon(Symbols.pin_drop_rounded),
-        label: Text('$city$town', style: const TextStyle(fontSize: 20)),
       ),
     );
   }
