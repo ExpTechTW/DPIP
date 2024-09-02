@@ -136,7 +136,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: () {
-              print("1");
               Navigator.push(
                 context,
                 MaterialPageRoute(
