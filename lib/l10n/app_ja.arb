@@ -369,15 +369,15 @@
   "@thunderstorm_instant_messaging_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
   },
-  "thunderstorm_instant_messaging_description_sound": "現在地にリアルタイムな雷雨の情報が発表",
+  "thunderstorm_instant_messaging_description_sound": "現在地に雷雨警報が発表",
   "@thunderstorm_instant_messaging_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
   },
-  "heavy_rain_alert_sound": "大雨警報",
+  "heavy_rain_alert_sound": "大雨注意報",
   "@heavy_rain_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 大雨特報"
   },
-  "heavy_rain_alert_description_sound": "現在地に大雨警報が発表",
+  "heavy_rain_alert_description_sound": "現在地に大雨注意報が発表",
   "@heavy_rain_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
   },
