@@ -102,10 +102,10 @@ class _ReportListPageState extends State<ReportListPage> {
       summaries.add(
           '最大震度: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}');
     }
-    if (_magnitudeRange.start > 0 || _magnitudeRange.end < 10) {
+    if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
       summaries.add('規模: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
     }
-    if (_depthRange.start > 0 || _depthRange.end < 700) {
+    if (_depthRange.start > 0 || (_depthRange.end > 0 && _depthRange.end < 700)) {
       summaries.add('深度: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
     }
 
