@@ -158,7 +158,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       body: SafeArea(
         child: Column(
           children: [
-            _buildLocationButton(),
             Expanded(
               child: Stack(
                 children: [
@@ -207,7 +206,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // _buildLocationButton(),
+          _buildLocationButton(),
           _buildTemperatureDisplay(),
           _buildWeatherDetails(),
         ],
