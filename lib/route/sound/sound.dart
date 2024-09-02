@@ -3,6 +3,7 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/list/tile_group_header.dart';
 import 'package:dpip/widget/settings/sound/sound_list_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class SoundRoute extends StatefulWidget {
   const SoundRoute({super.key});
@@ -12,54 +13,58 @@ class SoundRoute extends StatefulWidget {
 }
 
 class _SoundRouteState extends State<SoundRoute> {
-  final monitor = Global.preference.getBool("monitor") ?? false;
-
   @override
   Widget build(BuildContext context) {
+    const tileTitleTextStyle = TextStyle(
+      fontWeight: FontWeight.bold,
+    );
+
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
-        if (didPop) return;
-        Navigator.pop(context);
-      },
       child: Scaffold(
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar.large(
-                pinned: true,
-                floating: true,
-                title: Text(context.i18n.notify_test),
-              )
-            ];
-          },
-          body: ListView(
-            padding: EdgeInsets.only(bottom: context.padding.bottom),
-            controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
-            children: [
-              _buildCategoryTile(context.i18n.eew_sound_title, 'eew'),
-              _buildCategoryTile(context.i18n.eew_info_sound_title, 'eq'),
-              _buildCategoryTile('雷雨即時訊息', 'rain'),
-              _buildCategoryTile('天氣警特報', 'weather'),
-              _buildCategoryTile('避難資訊', 'evacuation'),
-              _buildCategoryTile(context.i18n.tsunami_alert_sound, 'tsunami'),
-              _buildCategoryTile(context.i18n.other_title, 'other'),
-            ],
-          ),
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar.large(
+              pinned: true,
+              floating: true,
+              title: Text(context.i18n.notify_test),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                ListTileGroupHeader(title: context.i18n.eew_sound_title),
+                _buildSoundTile(context, '緊急地震速報', 'eew', Symbols.warning, tileTitleTextStyle),
+                ListTileGroupHeader(title: context.i18n.eew_info_sound_title),
+                _buildSoundTile(context, '地震資訊', 'eq', Symbols.info, tileTitleTextStyle),
+                ListTileGroupHeader(title: '氣象警報'),
+                _buildSoundTile(context, '雷雨即時訊息', 'rain', Symbols.thunderstorm, tileTitleTextStyle),
+                _buildSoundTile(context, '天氣警特報', 'weather', Symbols.cloudy_snowing, tileTitleTextStyle),
+                ListTileGroupHeader(title: '災害資訊'),
+                _buildSoundTile(context, '避難資訊', 'evacuation', Symbols.directions_run, tileTitleTextStyle),
+                _buildSoundTile(
+                    context, context.i18n.tsunami_alert_sound, 'tsunami', Symbols.waves, tileTitleTextStyle),
+                ListTileGroupHeader(title: context.i18n.other_title),
+                _buildSoundTile(context, '其他通知', 'other', Symbols.notifications, tileTitleTextStyle),
+              ]),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCategoryTile(String title, String route) {
+  Widget _buildSoundTile(BuildContext context, String title, String route, IconData icon, TextStyle titleStyle) {
     return ListTile(
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
+      leading: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Icon(icon),
+      ),
+      title: Text(title, style: titleStyle),
+      trailing: const Icon(Symbols.chevron_right),
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SoundDetailPage(category: route),
+            builder: (context) => SoundDetailPage(category: route, title: title),
           ),
         );
       },
@@ -69,14 +74,18 @@ class _SoundRouteState extends State<SoundRoute> {
 
 class SoundDetailPage extends StatelessWidget {
   final String category;
+  final String title;
 
-  const SoundDetailPage({super.key, required this.category});
+  const SoundDetailPage({super.key, required this.category, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(category)),
+      appBar: AppBar(
+        title: Text(title),
+      ),
       body: ListView(
+        padding: EdgeInsets.only(bottom: context.padding.bottom),
         children: _buildListItems(context),
       ),
     );
@@ -85,125 +94,55 @@ class SoundDetailPage extends StatelessWidget {
   List<Widget> _buildListItems(BuildContext context) {
     final monitor = Global.preference.getBool("monitor") ?? false;
 
+    Widget buildSoundListTile(String title, String subtitle, String type, {bool? enable}) {
+      return SoundListTile(
+        title: title,
+        subtitle: subtitle,
+        type: type,
+        enable: enable ?? true,
+      );
+    }
+
     switch (category) {
       case 'eew':
         return [
-          SoundListTile(
-            title: '緊急地震速報(重大)',
-            subtitle: context.i18n.eew_alert_description_sound,
-            type: "eew_alert",
-          ),
-          SoundListTile(
-            title: '緊急地震速報(一般)',
-            subtitle: context.i18n.eew_description_sound,
-            type: "eew",
-          ),
-          SoundListTile(
-            title: '地震速報(重大)',
-            subtitle: '重大地震速報通知音效',
-            type: "eew_major",
-          ),
-          SoundListTile(
-            title: '地震速報(一般)',
-            subtitle: '一般地震速報通知音效',
-            type: "eew_minor",
-          ),
+          buildSoundListTile('緊急地震速報(重大)', context.i18n.eew_alert_description_sound, "eew_alert"),
+          buildSoundListTile('緊急地震速報(一般)', context.i18n.eew_description_sound, "eew"),
+          buildSoundListTile('地震速報(重大)', '重大地震速報通知音效', "eew_major"),
+          buildSoundListTile('地震速報(一般)', '一般地震速報通知音效', "eew_minor"),
         ];
       case 'eq':
         return [
-          SoundListTile(
-            title: '震度速報(一般)',
-            subtitle: '一般震度速報通知音效',
-            type: "int_report",
-            enable: monitor,
-          ),
-          SoundListTile(
-            title: '震度速報(靜默通知)',
-            subtitle: '靜默震度速報通知',
-            type: "int_report_silent",
-            enable: monitor,
-          ),
-          SoundListTile(
-            title: '強震監視器(一般)',
-            subtitle: context.i18n.eq_description_sound,
-            type: "eq",
-            enable: monitor,
-          ),
-          SoundListTile(
-            title: '地震報告(一般)',
-            subtitle: context.i18n.report_description_sound,
-            type: "report",
-          ),
-          SoundListTile(
-            title: '地震報告(靜默通知)',
-            subtitle: '靜默地震報告通知',
-            type: "report_silent",
-          ),
+          buildSoundListTile('震度速報(一般)', '一般震度速報通知音效', "int_report", enable: monitor),
+          buildSoundListTile('震度速報(靜默通知)', '靜默震度速報通知', "int_report_silent", enable: monitor),
+          buildSoundListTile('強震監視器(一般)', context.i18n.eq_description_sound, "eq", enable: monitor),
+          buildSoundListTile('地震報告(一般)', context.i18n.report_description_sound, "report"),
+          buildSoundListTile('地震報告(靜默通知)', '靜默地震報告通知', "report_silent"),
         ];
       case 'rain':
         return [
-          SoundListTile(
-            title: '重大',
-            subtitle: context.i18n.thunderstorm_instant_messaging_description_sound,
-            type: "thunderstorm_major",
-          ),
-          SoundListTile(
-            title: '一般',
-            subtitle: '一般雷雨即時訊息通知音效',
-            type: "thunderstorm",
-          ),
+          buildSoundListTile('重大', context.i18n.thunderstorm_instant_messaging_description_sound, "thunderstorm_major"),
+          buildSoundListTile('一般', '一般雷雨即時訊息通知音效', "thunderstorm"),
         ];
       case 'weather':
         return [
-          SoundListTile(
-            title: '重大',
-            subtitle: '重大天氣警特報通知音效',
-            type: "weather_major",
-          ),
-          SoundListTile(
-            title: '一般',
-            subtitle: '一般天氣警特報通知音效',
-            type: "weather_minor",
-          ),
+          buildSoundListTile('重大', '重大天氣警特報通知音效', "weather_major"),
+          buildSoundListTile('一般', '一般天氣警特報通知音效', "weather_minor"),
         ];
       case 'evacuation':
         return [
-          SoundListTile(
-            title: '重大',
-            subtitle: '重大避難資訊通知音效',
-            type: "evacuation_major",
-          ),
-          SoundListTile(
-            title: '一般',
-            subtitle: '一般避難資訊通知音效',
-            type: "evacuation_minor",
-          ),
+          buildSoundListTile('重大', '重大避難資訊通知音效', "evacuation_major"),
+          buildSoundListTile('一般', '一般避難資訊通知音效', "evacuation_minor"),
         ];
       case 'tsunami':
         return [
-          SoundListTile(
-            title: '重大',
-            subtitle: context.i18n.tsunami_alert_description_sound,
-            type: "tsunami_warn",
-          ),
-          SoundListTile(
-            title: '一般',
-            subtitle: context.i18n.tsunami_alert2_description_sound,
-            type: "tsunami",
-          ),
-          SoundListTile(
-            title: '太平洋海嘯消息(靜默通知)',
-            subtitle: '靜默太平洋海嘯消息通知',
-            type: "tsunami_pacific_silent",
-          ),
+          buildSoundListTile('重大', context.i18n.tsunami_alert_description_sound, "tsunami_warn"),
+          buildSoundListTile('一般', context.i18n.tsunami_alert2_description_sound, "tsunami"),
+          buildSoundListTile('太平洋海嘯消息(靜默通知)', '靜默太平洋海嘯消息通知', "tsunami_pacific_silent"),
         ];
       case 'other':
         return [
-          SoundListTile(
-            title: '公告',
-            subtitle: context.i18n.server_announcement_description_sound,
-            type: "announcement",
-          ),
+          buildSoundListTile('公告', context.i18n.server_announcement_description_sound, "announcement"),
         ];
       default:
         return [];
