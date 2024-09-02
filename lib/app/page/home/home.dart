@@ -82,9 +82,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _loadLocationData() {
-    city = Global.preference.getString('location-city') ?? '';
-    town = Global.preference.getString('location-town') ?? '';
-    region = Global.location.entries.firstWhereOrNull((l) => l.value.city == city && l.value.town == town)?.key;
+    int code = Global.preference.getInt("user-code") ?? -1;
+    city = Global.location[code.toString()]?.city ?? "";
+    town = Global.location[code.toString()]?.town ?? "";
+    region = code == -1 ? null : code.toString();
   }
 
   Future<void> _refreshWeatherData() async {

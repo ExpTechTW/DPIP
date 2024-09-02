@@ -48,8 +48,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
 
-  String? city = Global.preference.getString("location-city");
-  String? town = Global.preference.getString("location-town");
+  String? city;
+  String? town;
+  int code = -1;
 
   Future<bool> requestLocationAlwaysPermission() async {
     var status = await Permission.locationWhenInUse.status;
@@ -319,8 +320,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       androidstopBackgroundService(isAutoLocatingEnabled);
     }
 
-    Global.preference.remove("location-city");
-    Global.preference.remove("location-town");
+    Global.preference.setInt("user-code", -1);
     Global.preference.remove("user-lat");
     Global.preference.remove("user-lon");
 
@@ -366,6 +366,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     WidgetsBinding.instance.addObserver(this);
     permissionStatusUpdate();
     SettingsLocationView.setActiveCallback(sendpositionUpdate);
+
+    code = Global.preference.getInt("user-code") ?? -1;
+    if (code != -1) {
+      city = Global.location[code.toString()]?.city;
+      town = Global.location[code.toString()]?.town;
+    }
   }
 
   @override
@@ -406,8 +412,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
   void sendpositionUpdate() {
     if (mounted) {
-      city = Global.preference.getString("location-city");
-      town = Global.preference.getString("location-town");
+      code = Global.preference.getInt("user-code") ?? -1;
+      if (code != -1) {
+        city = Global.location[code.toString()]?.city;
+        town = Global.location[code.toString()]?.town;
+      }
       setState(() {});
       widget.onPositionUpdate?.call(city, town);
     }
@@ -550,8 +559,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               );
 
               setState(() {
-                city = Global.preference.getString("location-city");
-                town = Global.preference.getString("location-town");
+                sendpositionUpdate();
               });
             },
           ),
@@ -583,8 +591,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               );
 
               setState(() {
-                city = Global.preference.getString("location-city");
-                town = Global.preference.getString("location-town");
+                sendpositionUpdate();
               });
             },
           )

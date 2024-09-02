@@ -64,9 +64,10 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   }
 
   void _initData() {
-    city = Global.preference.getString("location-city") ?? "";
-    town = Global.preference.getString("location-town") ?? "";
-    region = Global.location.entries.firstWhereOrNull((l) => l.value.city == city && l.value.town == town)?.key;
+    int code = Global.preference.getInt("user-code") ?? -1;
+    city = Global.location[code.toString()]?.city ?? "";
+    town = Global.location[code.toString()]?.town ?? "";
+    region = code == -1 ? null : code.toString();
     refreshHistoryList();
   }
 

@@ -1,3 +1,4 @@
+import "package:collection/collection.dart";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/history/history.dart";
 import "package:dpip/app/page/home/home.dart";
@@ -27,8 +28,10 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
   Future<void> setLocation(Location location) async {
     setState(() => _isLoading = true);
     try {
-      await Global.preference.setString("location-city", location.city);
-      await Global.preference.setString("location-town", location.town);
+      String? code = Global.location.entries
+          .firstWhereOrNull((l) => l.value.city == location.city && l.value.town == location.town)
+          ?.key;
+      Global.preference.setInt("user-code", code == null ? -1 : int.parse(code));
 
       String fcmToken = Global.preference.getString("fcm-token") ?? "";
       await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");

@@ -69,25 +69,27 @@ class GeoJsonHelper {
   }
 
   static List<List<double>> _convertToDoubleList(List<dynamic> coordinates) {
-    return coordinates
-        .map<List<double>>((coord) => (coord as List<dynamic>).map<double>((e) => e.toDouble()).toList())
-        .toList();
+    return coordinates.map<List<double>>((coord) {
+      if (coord is List) {
+        return coord.map<double>((e) => e is num ? e.toDouble() : 0.0).toList();
+      } else {
+        return <double>[0.0, 0.0];
+      }
+    }).toList();
   }
 
   static bool _isPointInPolygon(double lat, double lng, List<List<double>> polygon) {
     bool isInside = false;
     int j = polygon.length - 1;
-
     for (int i = 0; i < polygon.length; i++) {
-      if (((polygon[i][1] > lat) != (polygon[j][1] > lat)) &&
-          (lng <
-              (polygon[j][0] - polygon[i][0]) * (lat - polygon[i][1]) / (polygon[j][1] - polygon[i][1]) +
-                  polygon[i][0])) {
-        isInside = !isInside;
-      }
+      double xi = polygon[i][0], yi = polygon[i][1];
+      double xj = polygon[j][0], yj = polygon[j][1];
+
+      bool intersect = ((yi > lat) != (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+      if (intersect) isInside = !isInside;
+
       j = i;
     }
-
     return isInside;
   }
 }

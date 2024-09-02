@@ -2,6 +2,7 @@ import "dart:async";
 import "dart:io";
 import "dart:ui";
 
+import "package:collection/collection.dart";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/history/history.dart";
 import "package:dpip/app/page/home/home.dart";
@@ -17,6 +18,8 @@ import "package:flutter_background_service/flutter_background_service.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:intl/intl.dart";
 import "package:permission_handler/permission_handler.dart";
+
+import "../util/location_to_code.dart";
 
 Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();
@@ -65,41 +68,26 @@ void androidSendPositionlisten() {
     if (event != null) {
       var positionData = event.values.first;
       var position = positionData["position"];
-      String country = position["country"];
-      List<String> parts = country.split(" ");
 
-      if (parts.length == 3) {
-        String code = parts[2];
+      double lat = event.values.first["lat"] ?? 0;
+      double lng = event.values.first["lng"] ?? 0;
 
-        if (Global.location.containsKey(code)) {
-          Location locationInfo = Global.location[code]!;
+      GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(lat, lng);
 
-          Global.preference.setString("location-city", locationInfo.city);
-          Global.preference.setString("location-town", locationInfo.town);
-
-          SettingsLocationView.updatePosition();
-          HomePage.updatePosition();
-          HistoryPage.updatePosition();
-          RadarMap.updatePosition();
-          MonitorPage.updatePosition();
-        }
+      if (location != null) {
+        Global.preference.setInt("user-code", location.code);
       } else {
-        Global.preference.remove("location-city");
-        Global.preference.remove("location-town");
-        Global.preference.setDouble("user-lat", 0.0);
-        Global.preference.setDouble("user-lon", 0.0);
-        SettingsLocationView.updatePosition();
-        HomePage.updatePosition();
-        HistoryPage.updatePosition();
-        RadarMap.updatePosition();
-        MonitorPage.updatePosition();
+        Global.preference.setInt("user-code", -1);
       }
 
-      var latitude = position["latitude"];
-      var longitude = position["longitude"];
-      Global.preference.setDouble("user-lat", (latitude as num?)?.toDouble() ?? 0.0);
-      Global.preference.setDouble("user-lon", (longitude as num?)?.toDouble() ?? 0.0);
+      Global.preference.setDouble("user-lat", lat);
+      Global.preference.setDouble("user-lon", lng);
       const MonitorPage(data: 0).createState();
+      SettingsLocationView.updatePosition();
+      HomePage.updatePosition();
+      HistoryPage.updatePosition();
+      RadarMap.updatePosition();
+      MonitorPage.updatePosition();
     }
   });
   service.on("senddebug").listen((event) {
@@ -206,7 +194,7 @@ void onStart(ServiceInstance service) async {
     service.on("removeposition").listen((event) {
       Global.preference.remove("user-lat");
       Global.preference.remove("user-lon");
-      Global.preference.remove("user-country");
+      Global.preference.setInt("user-code", -1);
     });
 
     void task() async {
@@ -251,7 +239,7 @@ void onStart(ServiceInstance service) async {
     }
 
     task();
-    timer = Timer.periodic(const Duration(minutes: 5), (timer) async {
+    timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
       task();
     });
   }
