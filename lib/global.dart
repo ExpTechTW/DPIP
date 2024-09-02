@@ -2,6 +2,7 @@ import "dart:convert";
 
 import "package:dpip/api/exptech.dart";
 import "package:dpip/model/location/location.dart";
+import "package:dpip/util/location_to_code.dart";
 import "package:flutter/services.dart";
 import "package:package_info_plus/package_info_plus.dart";
 import "package:shared_preferences/shared_preferences.dart";
@@ -22,16 +23,6 @@ class Global {
     location = data.map((key, value) => MapEntry(key, Location.fromJson(value)));
   }
 
-  static loadGeoJsonData() async {
-    final twCounty = await rootBundle.loadString("assets/map/tw_county.json");
-    final twTown = await rootBundle.loadString("assets/map/tw_town.json");
-
-    geojson = {
-      "tw_county": jsonDecode(twCounty),
-      "tw_town": jsonDecode(twTown),
-    };
-  }
-
   static Future init() async {
     packageInfo = await PackageInfo.fromPlatform();
     preference = await SharedPreferences.getInstance();
@@ -39,6 +30,7 @@ class Global {
     box = jsonDecode(await rootBundle.loadString("assets/box.json"));
 
     await loadLocationData();
-    await loadGeoJsonData();
+    await GeoJsonHelper.loadGeoJson('assets/map/town.json');
+    print(GeoJsonHelper.checkPointInPolygons(22.9622, 120.28));
   }
 }
