@@ -16,6 +16,7 @@ class _ReportListPageState extends State<ReportListPage> {
   List<PartialEarthquakeReport> reportList = [];
   DateTime? lastFetchTime;
   bool isLoading = false;
+  bool isLoadingEnd = false;
   int _currentPage = 1;
   int _loadedPage = 0;
 
@@ -28,6 +29,7 @@ class _ReportListPageState extends State<ReportListPage> {
     if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
       return;
     }
+    if (isLoadingEnd) return;
 
     setState(() {
       isLoading = true;
@@ -41,6 +43,7 @@ class _ReportListPageState extends State<ReportListPage> {
 
   void _loadMore() {
     if (isLoading) return;
+    if (isLoadingEnd) return;
     if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
       setState(() {
         _currentPage++;
@@ -173,10 +176,15 @@ class _ReportListPageState extends State<ReportListPage> {
                     itemCount: reportList.length + 1,
                     itemBuilder: (context, index) {
                       if (index == reportList.length) {
+                        if (!isLoading) {
+                          isLoadingEnd = true;
+                        } else if (isLoading) {
+                          isLoadingEnd = false;
+                        }
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Center(
-                            child: isLoading ? CircularProgressIndicator() : Text('到底了'),
+                            child: isLoading ? const CircularProgressIndicator() : const Text('到底了'),
                           ),
                         );
                       }
