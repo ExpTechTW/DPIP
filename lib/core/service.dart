@@ -215,7 +215,9 @@ void onStart(ServiceInstance service) async {
         service.invoke("sendposition", {"position": position.toJson()});
         String lat = position.lat.toString();
         String lon = position.lng.toString();
-        String location = position.code == null ? "服務區域外" : "${Global.location[position.code.toString()]?.city}${Global.location[position.code.toString()]?.town}";
+        String location = position.code == null
+            ? "服務區域外"
+            : "${Global.location[position.code.toString()]?.city}${Global.location[position.code.toString()]?.town}";
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);

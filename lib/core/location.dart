@@ -1,10 +1,9 @@
 import "dart:async";
 
 import "package:dpip/global.dart";
+import "package:dpip/util/location_to_code.dart";
 import "package:dpip/util/log.dart";
 import "package:geolocator/geolocator.dart";
-
-import "package:dpip/util/location_to_code.dart";
 
 StreamSubscription<Position>? positionStreamSubscription;
 Timer? restartTimer;
