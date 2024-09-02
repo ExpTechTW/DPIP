@@ -975,9 +975,9 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之資料視覺化圖片",
+  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據視覺化圖片",
   "@data_visualization_storage": {
-    "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之資料視覺化圖片"
+    "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據視覺化圖片"
   },
   "disagree": "不同意",
   "@disagree": {
