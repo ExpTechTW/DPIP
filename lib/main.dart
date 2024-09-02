@@ -9,7 +9,6 @@ import "package:flutter/services.dart";
 import "package:flutter_gen/gen_l10n/app_localizations.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:flutter_localized_locales/flutter_localized_locales.dart";
-import "package:hooks_riverpod/hooks_riverpod.dart";
 import "package:talker_flutter/talker_flutter.dart";
 import "package:timezone/data/latest.dart";
 
@@ -29,11 +28,7 @@ void main() async {
   await Global.init();
   TalkerManager.instance.info('global init');
   initializeTimeZones();
-  runApp(
-    const ProviderScope(
-      child: DpipApp(),
-    ),
-  );
+  runApp(const DpipApp());
 }
 
 class DpipApp extends StatefulWidget {
