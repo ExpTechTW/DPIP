@@ -465,7 +465,7 @@
   "@precipitation_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 降水"
   },
-  "temperature_monitor": "地区温度",
+  "temperature_monitor": "气温",
   "@temperature_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫"
   },
@@ -517,7 +517,7 @@
   "@history": {
     "description": "「歷史」頁面標題"
   },
-  "historical_events": "3天內的歷史事件信息",
+  "historical_events": "3天內的历史事件信息",
   "@historical_events": {
     "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
   },
@@ -529,11 +529,11 @@
   "@hourly_forecast": {
     "description": "「首頁」路徑 → 「每小時預報」標題"
   },
-  "current_events": "目前的事件信息",
+  "current_events": "当前事件信息",
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
-  "no_events": "目前沒有事件信息",
+  "no_events": "当前无事件信息",
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
@@ -746,7 +746,7 @@
   "@light_showers_of_ice_pellets": {
     "description": "天氣狀況：冰丸小雨"
   },
-  "moderate_or_heavy_showers_of_ice_pellets": "中度或大冰丸",
+  "moderate_or_heavy_showers_of_ice_pellets": "中或大冰雹",
   "@moderate_or_heavy_showers_of_ice_pellets": {
     "description": "天氣狀況：中度或大冰丸"
   },
@@ -762,7 +762,7 @@
   "@patchy_light_snow_with_thunder": {
     "description": "天氣狀況：局部小雪伴雷"
   },
-  "moderate_or_heavy_snow_with_thunder": "中度或大雪伴雷",
+  "moderate_or_heavy_snow_with_thunder": "中或大雷打雪",
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：中度或大雪伴雷"
   },
@@ -770,7 +770,7 @@
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "更多選項列表",
+  "more_features": "更多功能列表",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
@@ -786,7 +786,7 @@
   "@official_web": {
     "description": "「我」路徑 → ExpTech 官網"
   },
-  "notification_record": "行动通知推播纪录",
+  "notification_record": "通知推送记录",
   "@notification_record": {
     "description": "「我」路徑 → 行動通知推播紀錄"
   },
@@ -794,7 +794,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整 DPIP 的高级选项",
+  "advanced_features_title": "调整 DPIP 的高级选项",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
@@ -802,7 +802,7 @@
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
-  "no_tsunami_information": "近期无海啸资讯",
+  "no_tsunami_information": "近期无海啸信息",
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
@@ -903,11 +903,11 @@
   "@welcome_message": {
     "description": "「歡迎」頁面 → 歡迎使用 DPIP"
   },
-  "disaster_info_platform": "防災信息平台",
+  "disaster_info_platform": "防灾信息平台",
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由台湾本土团队设计的 App，集成 TREM-Net (台湾即时地震观测网) 之信息，以及中央气象署数据，提供一个集成、单一且便利的防灾信息应用進程。",
+  "dpip_description": "DPIP 是一款由台湾本土团队设计的 App，集成 TREM-Net (台湾即时地震观测网) 的信息及中央气象署数据，提供一个集成、单一且便利的防灾信息应用。",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
@@ -923,7 +923,7 @@
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "我们的初衷",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
@@ -935,11 +935,11 @@
   "@notice": {
     "description": "「歡迎」頁面 → 注意事項"
   },
-  "notice_details": "DPIP 将交付来自 ExpTech 及中央气象署的各种信息，使用时请注意以下几点。",
+  "notice_details": "DPIP 会传输来自 ExpTech 及中央气象署的各种信息，使用时请注意以下几点。",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "任何信息应以中央气象署发布之内容为准。",
+  "official_info": "任何信息应以中央气象署发布内容为准。",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
@@ -1111,15 +1111,15 @@
   "@always_allow": {
     "description": "「存取權限彈窗」 → 一律允許"
   },
-  "always": "永远",
+  "always": "永久",
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "为了获得更好的自动定位体验，您需要给予「自启动权限」以便让 DPIP 在背景自动设置所在地信息。",
+  "auto_start_permission_info": "为了获得更好的自动定位体验，您需要授予「自启动权限」以便让 DPIP 在后台自动设置所在地信息。",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "为了获得更好的 DPIP 体验，您需要给予「自启动权限」以便让 DPIP 在背景有正常接收警讯通知。",
+  "auto_start_permission_experience": "为了获得更好的 DPIP 体验，您需要授予「自启动权限」以便让 DPIP 在后台正常接收警报通知。",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -1127,11 +1127,11 @@
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "为了获得更好的自动定位体验，您需要给予「无限制」以便让 DPIP 在背景自动设置所在地信息。",
+  "auto_location_experience_info": "为了获得更好的自动定位体验，您需要授予「无限制」以便让 DPIP 在后台自动设置所在地信息。",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "为了获得更好的 DPIP 体验，您需要给予「无限制」以便让 DPIP 在背景有正常接收警讯通知。",
+  "unlimited_permission_experience_info": "为了获得更好的 DPIP 体验，您需要授予「无限制」以便让 DPIP 在后台有正常接收警讯通知。",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -1139,7 +1139,7 @@
   "@power_saving_strategy": {
     "description": "「存取權限彈窗」 → 省電策略"
   },
-  "notification_permission_denied": "通知功能已被拒绝，请移至設置允许权限。",
+  "notification_permission_denied": "通知功能已被拒绝，请移至设置允许权限。",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
@@ -1147,7 +1147,7 @@
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
   },
-  "manual_permission_enablement": "需要使用者手动到設置开启相关权限。",
+  "manual_permission_enablement": "需要用户手动前往设置开启相关权限。",
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
@@ -1167,7 +1167,7 @@
   "@app_logs": {
     "description": "「我」路徑 → App 日誌"
   },
-  "copy_fcm_token_error": "拷贝 FCM Token 时发生错误",
+  "copy_fcm_token_error": "复制 FCM Token 时发生错误",
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
@@ -1239,11 +1239,11 @@
   "@retry": {
     "description": "重試"
   },
-  "photo_media_permission_request": "请您到应用程序设置中找到并允许「照片和介质」权限后再试一次。",
+  "photo_media_permission_request": "请您到应用程序设置中找到并允许「照片和媒体」权限后再试一次。",
   "@photo_media_permission_request": {
     "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
-  "no_notification_history": "没有通知纪录",
+  "no_notification_history": "没有通知记录",
   "@no_notification_history": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 沒有通知紀錄"
   },
@@ -1251,7 +1251,7 @@
   "@emergency": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急"
   },
-  "notification_details": "通知详细资讯",
+  "notification_details": "通知详细信息",
   "@notification_details": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知詳細資訊"
   },
