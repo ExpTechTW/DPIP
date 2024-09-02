@@ -20,7 +20,6 @@ class _SoundRouteState extends State<SoundRoute> {
     );
 
     return PopScope(
-      canPop: true,
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
