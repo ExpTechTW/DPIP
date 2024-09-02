@@ -260,16 +260,32 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
             child: TimeLineTile(
               time: history.time.send,
               icon: Icon(ListIcons.getListIcon(history.icon)),
-              height: 100,
+              height: 140,
               first: historyIndex == 0,
               showDate: showDate,
               color: context.colors.secondaryContainer,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(history.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
-                  Text(history.text.description["all"]!),
-                  if (shouldShowArrow(history)) const Icon(Icons.arrow_forward_ios),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          history.text.content["all"]!.subtitle,
+                          style: context.theme.textTheme.titleMedium,
+                        ),
+                        Text(
+                          history.text.description["all"]!,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (shouldShowArrow(history))
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(Icons.arrow_forward_ios),
+                    ),
                 ],
               ),
               onTap: () => handleEventList(context, history),

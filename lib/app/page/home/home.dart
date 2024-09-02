@@ -387,15 +387,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             return TimeLineTile(
               time: current.time.send,
               icon: Icon(ListIcons.getListIcon(current.icon)),
-              height: 100,
+              height: 140,
               first: index == 0,
               showDate: showDate,
               color: context.colors.error,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(current.text.content['all']!.subtitle, style: context.theme.textTheme.titleMedium),
-                  Text(current.text.description['all']!),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          current.text.content["all"]!.subtitle,
+                          style: context.theme.textTheme.titleMedium,
+                        ),
+                        Text(
+                          current.text.description["all"]!,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (shouldShowArrow(current))
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Icon(Icons.arrow_forward_ios),
+                    ),
                 ],
               ),
               onTap: () => handleEventList(context, current),

@@ -1,3 +1,4 @@
+import 'package:dpip/route/announcement/announcement.dart';
 import 'package:flutter/material.dart';
 
 class TypeConfig {
@@ -7,10 +8,14 @@ class TypeConfig {
   TypeConfig({required this.buildPage, this.showArrow = true});
 }
 
-final Map<String, TypeConfig> typeConfigs = {};
+final Map<String, TypeConfig> typeConfigs = {
+  'thunderstorm': TypeConfig(
+    buildPage: (item) => AnnouncementPage(),
+  ),
+};
 
 bool shouldShowArrow(dynamic item) {
-  return typeConfigs[item.type]?.showArrow ?? false;
+  return typeConfigs[item.type] != null ? true : false;
 }
 
 void handleEventList(BuildContext context, dynamic current) {
