@@ -471,6 +471,8 @@ class ExpTech {
       return response.body;
     } else {
       throw Exception('Failed to login: ${response.statusCode}');
+    }
+  }
 
   Future<String> sendMonitor(String token, String status) async {
     final requestUrl = Route.monitor(token, status);
