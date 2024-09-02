@@ -1,6 +1,34 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
+class GeoJsonProperties {
+  final String town;
+  final String county;
+  final String name;
+  final int code;
+
+  GeoJsonProperties({
+    required this.town,
+    required this.county,
+    required this.name,
+    required this.code,
+  });
+
+  factory GeoJsonProperties.fromJson(Map<String, dynamic> json) {
+    return GeoJsonProperties(
+      town: json['TOWN'] as String,
+      county: json['COUNTY'] as String,
+      name: json['NAME'] as String,
+      code: json['CODE'] as int,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'GeoJsonProperties(town: $town, county: $county, name: $name, code: $code)';
+  }
+}
+
 class GeoJsonHelper {
   static Map<String, dynamic>? _geoJsonData;
 
@@ -9,7 +37,7 @@ class GeoJsonHelper {
     _geoJsonData = json.decode(geojsonStr);
   }
 
-  static Map<String, dynamic>? checkPointInPolygons(double lat, double lng) {
+  static GeoJsonProperties? checkPointInPolygons(double lat, double lng) {
     if (_geoJsonData == null) return null;
     for (final feature in _geoJsonData!['features']) {
       if (feature['geometry']['type'] == 'Polygon' || feature['geometry']['type'] == 'MultiPolygon') {
@@ -17,7 +45,7 @@ class GeoJsonHelper {
 
         for (final polygon in polygons) {
           if (_isPointInPolygon(lat, lng, polygon)) {
-            return feature['properties'];
+            return GeoJsonProperties.fromJson(feature['properties']);
           }
         }
       }

@@ -31,6 +31,5 @@ class Global {
 
     await loadLocationData();
     await GeoJsonHelper.loadGeoJson('assets/map/town.json');
-    print(GeoJsonHelper.checkPointInPolygons(22.9622, 120.28));
   }
 }

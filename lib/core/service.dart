@@ -213,9 +213,9 @@ void onStart(ServiceInstance service) async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
         service.invoke("sendposition", {"position": position.toJson()});
-        String lat = position.position.latitude.toStringAsFixed(6);
-        String lon = position.position.longitude.toStringAsFixed(6);
-        String country = position.position.country;
+        String lat = position.lat.toString();
+        String lon = position.lng.toString();
+        String location = position.code == null ? "服務區域外" : "${Global.location[position.code.toString()]?.city}${Global.location[position.code.toString()]?.town}";
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
@@ -224,7 +224,7 @@ void onStart(ServiceInstance service) async {
 
         String notifyTitle = "自動定位中";
         String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
-        String notifyBody = "$date\n$lat,$lon $country";
+        String notifyBody = "$date\n$lat,$lon $location";
         service.invoke("senddebug", {"notifyBody": notifyBody});
 
         flutterLocalNotificationsPlugin.show(
