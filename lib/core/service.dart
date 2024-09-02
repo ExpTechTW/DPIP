@@ -66,9 +66,6 @@ void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
 void androidSendPositionlisten() {
   service.on("sendposition").listen((event) {
     if (event != null) {
-      var positionData = event.values.first;
-      var position = positionData["position"];
-
       double lat = event.values.first["lat"] ?? 0;
       double lng = event.values.first["lng"] ?? 0;
 
