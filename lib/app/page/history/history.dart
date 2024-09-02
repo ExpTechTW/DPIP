@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
+import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/widget/error/region_out_of_service.dart';
@@ -9,8 +10,6 @@ import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-import '../../../route/settings/settings.dart';
 
 class HistoryPage extends StatefulWidget {
   final Function()? onPositionUpdate;
