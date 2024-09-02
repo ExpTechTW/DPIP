@@ -48,7 +48,7 @@ android {
         applicationId "com.exptech.dpip"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
-        versionCode 300006
+        versionCode 300007
         versionName flutterVersionName
         multiDexEnabled true
     }
