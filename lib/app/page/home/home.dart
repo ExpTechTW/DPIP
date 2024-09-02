@@ -212,7 +212,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                       TextSpan(
-                        text: tempParts.length > 1 ? '.${tempParts[1]}°C' : '.0°C',
+                        text: tempParts[0] == '--'
+                            ? "-"
+                            : tempParts.length > 1
+                                ? '.${tempParts[1]}°C'
+                                : '.0°C',
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w500,
