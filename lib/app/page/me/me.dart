@@ -65,32 +65,12 @@ class _MePageState extends State<MePage> {
          * 更新日誌
          */
         ListTile(
-          leading: const Icon(Symbols.announcement_rounded),
+          leading: const Icon(Symbols.campaign_rounded, fill: 1),
           title: Text(context.i18n.announcement),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AnnouncementPage()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Symbols.notification_add_rounded),
-          title: Text(context.i18n.notification_record),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NotificationHistoryPage()),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Symbols.dns_rounded),
-          title: Text(context.i18n.server_status),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ServerStatusPage()),
             );
           },
         ),
@@ -102,6 +82,14 @@ class _MePageState extends State<MePage> {
               context,
               MaterialPageRoute(builder: (context) => const ChangelogPage()),
             );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Symbols.favorite_rounded, fill: 1),
+          title: Text(context.i18n.donate),
+          subtitle: const Text("幫助我們維護伺服器的穩定和長久發展"),
+          onTap: () {
+            launchUrl(Uri.parse("https://exptech.com.tw/donate"));
           },
         ),
         ListTileGroupHeader(title: context.i18n.me_debug),
@@ -198,13 +186,6 @@ class _MePageState extends State<MePage> {
                       label: Text(context.i18n.contributor),
                     ),
                     ActionChip(
-                      avatar: const Icon(Symbols.favorite_rounded, fill: 1),
-                      label: Text(context.i18n.donate),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://exptech.com.tw/donate"));
-                      },
-                    ),
-                    ActionChip(
                       avatar: const Icon(SimpleIcons.github),
                       label: const Text("GitHub"),
                       onPressed: () {
@@ -223,6 +204,26 @@ class _MePageState extends State<MePage> {
                       label: Text(context.i18n.official_web),
                       onPressed: () {
                         launchUrl(Uri.parse("https://exptech.com.tw/dpip"));
+                      },
+                    ),
+                    ActionChip(
+                      avatar: const Icon(Symbols.notifications_rounded),
+                      label: Text(context.i18n.notification_record),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const NotificationHistoryPage()),
+                        );
+                      },
+                    ),
+                    ActionChip(
+                      avatar: const Icon(Symbols.dns_rounded),
+                      label: Text(context.i18n.server_status),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ServerStatusPage()),
+                        );
                       },
                     ),
                     ActionChip(
