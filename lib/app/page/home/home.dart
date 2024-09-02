@@ -5,11 +5,12 @@ import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/list_icon.dart';
+import 'package:dpip/util/weather_icon.dart';
+import 'package:dpip/widget/error/region_out_of_service.dart';
+import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-import '../../../util/weather_icon.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -40,7 +41,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<History> realtimeList = [];
   Map<String, dynamic> weatherData = {};
   bool country = false;
-  String city = '', town = '', region = '';
+  String city = '';
+  String town = '';
+  bool isLoading = true;
+  String? region;
   final scrollController = ScrollController();
   late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
   bool isAppBarVisible = false;
@@ -80,20 +84,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void _loadLocationData() {
     city = Global.preference.getString('location-city') ?? '';
     town = Global.preference.getString('location-town') ?? '';
-    region = Global.location.entries.firstWhereOrNull((l) => l.value.city == city && l.value.town == town)?.key ?? '';
+    region = Global.location.entries.firstWhereOrNull((l) => l.value.city == city && l.value.town == town)?.key;
   }
 
   Future<void> _refreshWeatherData() async {
-    if (region.isEmpty) return;
-    final data = await ExpTech().getWeatherRealtime(region);
+    if (region == null) return;
+    final data = await ExpTech().getWeatherRealtime(region!);
     setState(() => weatherData = data);
   }
 
   Future<void> refreshRealtimeList() async {
-    if (region.isEmpty) return;
-    final data = country ? await ExpTech().getRealtime() : await ExpTech().getRealtimeRegion(region);
-    if (mounted) {
-      setState(() => realtimeList = data.reversed.toList());
+    if (region == null && !country) return;
+    setState(() => isLoading = true);
+    try {
+      final data = country ? await ExpTech().getRealtime() : await ExpTech().getRealtimeRegion(region!);
+      if (mounted) {
+        setState(() {
+          realtimeList = data.reversed.toList();
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -339,6 +353,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildEventsList() {
+    if (region == null && !country) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 20),
+        child: RegionOutOfService(),
+      );
+    }
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (realtimeList.isEmpty) {
+      return Center(child: Text(context.i18n.no_historical_events));
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -349,38 +378,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
           ),
         ),
-        realtimeList.isEmpty
-            ? Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  context.i18n.home_safety,
-                  style: TextStyle(fontSize: 16, color: context.colors.onSurfaceVariant),
-                ),
-              )
-            : Column(
-                children: realtimeList.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final current = entry.value;
-                  final showDate = index == 0 || current.time.send.day != realtimeList[index - 1].time.send.day;
+        Column(
+          children: realtimeList.asMap().entries.map((entry) {
+            final index = entry.key;
+            final current = entry.value;
+            final showDate = index == 0 || current.time.send.day != realtimeList[index - 1].time.send.day;
 
-                  return TimeLineTile(
-                    time: current.time.send,
-                    icon: Icon(ListIcons.getListIcon(current.icon)),
-                    height: 100,
-                    first: index == 0,
-                    showDate: showDate,
-                    color: context.colors.error,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(current.text.content['all']!.subtitle, style: context.theme.textTheme.titleMedium),
-                        Text(current.text.description['all']!),
-                      ],
-                    ),
-                    onTap: () {},
-                  );
-                }).toList(),
+            return TimeLineTile(
+              time: current.time.send,
+              icon: Icon(ListIcons.getListIcon(current.icon)),
+              height: 100,
+              first: index == 0,
+              showDate: showDate,
+              color: context.colors.error,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(current.text.content['all']!.subtitle, style: context.theme.textTheme.titleMedium),
+                  Text(current.text.description['all']!),
+                ],
               ),
+              onTap: () => handleEventList(context, current),
+            );
+          }).toList(),
+        ),
       ],
     );
   }

@@ -5,9 +5,12 @@ import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/widget/error/region_out_of_service.dart';
+import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
+import '../../../route/settings/settings.dart';
 
 class HistoryPage extends StatefulWidget {
   final Function()? onPositionUpdate;
@@ -31,6 +34,8 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   bool country = false;
   bool isLoading = true;
   String? region;
+  String city = '';
+  String town = '';
 
   final scrollController = ScrollController();
   late AnimationController animController;
@@ -60,8 +65,8 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   }
 
   void _initData() {
-    final city = Global.preference.getString("location-city") ?? "";
-    final town = Global.preference.getString("location-town") ?? "";
+    city = Global.preference.getString("location-city") ?? "";
+    town = Global.preference.getString("location-town") ?? "";
     region = Global.location.entries.firstWhereOrNull((l) => l.value.city == city && l.value.town == town)?.key;
     refreshHistoryList();
   }
@@ -74,7 +79,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   }
 
   Future<void> refreshHistoryList() async {
-    if (region == null) return;
+    if (region == null && !country) return;
     setState(() => isLoading = true);
     try {
       final data = country ? await ExpTech().getHistory() : await ExpTech().getHistoryRegion(region!);
@@ -91,12 +96,30 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     }
   }
 
+  Widget _buildLocationButton() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton.icon(
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            settings: const RouteSettings(name: '/settings'),
+            builder: (context) => const SettingsRoute(initialRoute: '/location'),
+          ),
+        ),
+        icon: const Icon(Symbols.pin_drop_rounded),
+        label: Text('$city$town', style: const TextStyle(fontSize: 20)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
+            _buildLocationButton(),
             _buildLocationToggle(),
             Expanded(
               child: Stack(
@@ -196,7 +219,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   }
 
   Widget _buildHistoryList() {
-    if (region == null) {
+    if (region == null && !country) {
       return const SliverToBoxAdapter(
         child: Padding(
           padding: EdgeInsets.only(top: 128),
@@ -247,9 +270,10 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
                 children: [
                   Text(history.text.content["all"]!.subtitle, style: context.theme.textTheme.titleMedium),
                   Text(history.text.description["all"]!),
+                  if (shouldShowArrow(history)) const Icon(Icons.arrow_forward_ios),
                 ],
               ),
-              onTap: () {},
+              onTap: () => handleEventList(context, history),
             ),
           );
         },
