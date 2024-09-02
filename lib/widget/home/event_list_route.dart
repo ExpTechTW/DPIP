@@ -1,16 +1,16 @@
-import 'package:dpip/route/announcement/announcement.dart';
+import 'package:dpip/model/history.dart';
+import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:flutter/material.dart';
 
 class TypeConfig {
-  final Widget Function(dynamic item) buildPage;
-  final bool showArrow;
+  final Widget Function(History item) buildPage;
 
-  TypeConfig({required this.buildPage, this.showArrow = true});
+  TypeConfig({required this.buildPage});
 }
 
 final Map<String, TypeConfig> typeConfigs = {
   'thunderstorm': TypeConfig(
-    buildPage: (item) => AnnouncementPage(),
+    buildPage: (History item) => ThunderstormPage(item: item),
   ),
 };
 
