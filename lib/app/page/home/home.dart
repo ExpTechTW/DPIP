@@ -134,21 +134,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          _buildMainContent(),
+          _buildMainContent(context),
           _buildAppBar(),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent() {
+  Widget _buildMainContent(BuildContext context) {
     return RefreshIndicator(
       onRefresh: refreshRealtimeList,
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: scrollController,
         children: [
-          _buildWeatherHeader(),
+          _buildWeatherHeader(context),
           _buildLocationToggle(),
           _buildEventsList(),
         ],
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildWeatherHeader() {
+  Widget _buildWeatherHeader(BuildContext context) {
     return Container(
       height: 360,
       padding: EdgeInsets.only(top: context.padding.top),
@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLocationButton(),
+          _buildLocationButton(context),
           _buildTemperatureDisplay(),
           _buildWeatherDetails(),
         ],
@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildLocationButton() {
+  Widget _buildLocationButton(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton.icon(
