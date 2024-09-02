@@ -130,30 +130,46 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildLocationButton() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton.icon(
-        onPressed: () {
-          Navigator.pushNamed(
-            context,
-            '/settings',
-            arguments: const SettingsRoute(initialRoute: '/location'),
-          );
-        },
-        icon: const Icon(Symbols.pin_drop_rounded),
-        label: Text('$city$town', style: const TextStyle(fontSize: 20)),
-      ),
+    return Builder(
+      builder: (context) {
+        return Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () {
+              print("1");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  settings: const RouteSettings(name: '/settings'),
+                  builder: (context) => const SettingsRoute(initialRoute: '/location'),
+                ),
+              );
+            },
+            icon: const Icon(Symbols.pin_drop_rounded),
+            label: Text('$city$town', style: const TextStyle(fontSize: 20)),
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          _buildMainContent(),
-          _buildAppBar(),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildLocationButton(),
+            Expanded(
+              child: Stack(
+                children: [
+                  _buildMainContent(),
+                  _buildAppBar(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -192,7 +208,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLocationButton(),
+          // _buildLocationButton(),
           _buildTemperatureDisplay(),
           _buildWeatherDetails(),
         ],
