@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool isLoading = true;
   String? region;
   final scrollController = ScrollController();
-  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+  late final animController = AnimationController(vsync: this, duration: Duration.zero);
   bool isAppBarVisible = false;
   late TabController _tabController;
 
@@ -115,7 +115,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _setupScrollListener() {
     scrollController.addListener(() {
-      setState(() => isAppBarVisible = scrollController.offset > 1e-5);
+      setState(() => isAppBarVisible = scrollController.offset > 1e-4);
+
       if (scrollController.offset < 240) {
         animController.animateTo(scrollController.offset / 240);
       }
@@ -157,19 +158,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  _buildMainContent(),
-                  _buildAppBar(),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: Stack(
+        children: [
+          _buildMainContent(),
+          _buildAppBar(),
+        ],
       ),
     );
   }
@@ -177,12 +170,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildMainContent() {
     return RefreshIndicator(
       onRefresh: refreshRealtimeList,
+      displacement: 60,
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: scrollController,
         children: [
           _buildWeatherHeader(),
-          _buildLocationToggle(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 0, 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    context.i18n.current_events,
+                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                  ),
+                ),
+                _buildLocationToggle(),
+              ],
+            ),
+          ),
           _buildEventsList(),
         ],
       ),
@@ -284,9 +291,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildWeatherDetailItem(
-              context.i18n.home_precipitation, '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm/h'),
-          _buildWeatherDetailItem(context.i18n.humidity_monitor,
-              '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
+            context.i18n.home_precipitation,
+            '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm/h',
+          ),
+          _buildWeatherDetailItem(
+            context.i18n.humidity_monitor,
+            '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %',
+          ),
         ],
       ),
     );
@@ -305,68 +316,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildLocationToggle() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        height: 36,
-        decoration: BoxDecoration(
-          color: context.colors.surfaceVariant.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          children: [
-            Expanded(child: _buildToggleButton(true, Symbols.public_rounded, context.i18n.home_area)),
-            Expanded(child: _buildToggleButton(false, Symbols.my_location_rounded, context.i18n.settings_location)),
-          ],
-        ),
+      child: SegmentedButton(
+        showSelectedIcon: false,
+        segments: [
+          ButtonSegment(
+            icon: const Icon(Symbols.public_rounded),
+            tooltip: context.i18n.home_area,
+            value: true,
+          ),
+          ButtonSegment(
+            icon: const Icon(Symbols.home_rounded),
+            tooltip: context.i18n.settings_location,
+            value: false,
+          ),
+        ],
+        selected: {country},
+        onSelectionChanged: (p0) => setState(() {
+          country = p0.first;
+          refreshRealtimeList();
+        }),
       ),
-    );
-  }
-
-  Widget _buildToggleButton(bool isCountry, IconData icon, String label) {
-    final isSelected = country == isCountry;
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              color: isSelected ? context.colors.primaryContainer.withOpacity(0.7) : Colors.transparent,
-              borderRadius: BorderRadius.horizontal(
-                left: isCountry ? const Radius.circular(18) : Radius.zero,
-                right: !isCountry ? const Radius.circular(18) : Radius.zero,
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () => setState(() {
-            country = isCountry;
-            refreshRealtimeList();
-          }),
-          child: Container(
-            height: 36,
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 16,
-                  color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant.withOpacity(0.8),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant.withOpacity(0.8),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -389,13 +358,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 0, 8),
-          child: Text(
-            context.i18n.current_events,
-            style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
-          ),
-        ),
         Column(
           children: realtimeList.asMap().entries.map((entry) {
             final index = entry.key;
@@ -446,13 +408,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       top: 0,
       left: 0,
       right: 0,
-      child: AnimatedOpacity(
-        opacity: isAppBarVisible ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 200),
-        child: AppBar(
-          elevation: 4,
-          title: Text(context.i18n.home),
-          backgroundColor: context.colors.surface.withOpacity(0.8),
+      child: Visibility(
+        visible: isAppBarVisible,
+        child: FadeTransition(
+          opacity: animController.drive(Tween(begin: 0.0, end: 1.0)),
+          child: AppBar(
+            elevation: 4,
+            title: Text(context.i18n.home),
+          ),
         ),
       ),
     );
