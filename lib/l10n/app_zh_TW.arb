@@ -1483,9 +1483,9 @@
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
-  "history_valid_until": "套用",
+  "history_valid_until": "有效至",
   "@history_valid_until": {
-    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
+    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
   },
   "history_influence_area": "影響區域：",
   "@history_influence_area": {
