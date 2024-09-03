@@ -2,7 +2,6 @@ import "dart:async";
 import "dart:io";
 import "dart:ui";
 
-import "package:collection/collection.dart";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/history/history.dart";
 import "package:dpip/app/page/home/home.dart";
@@ -10,7 +9,6 @@ import "package:dpip/app/page/map/monitor/monitor.dart";
 import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/location/location.dart";
 import "package:dpip/route/settings/content/location.dart";
 import "package:dpip/util/log.dart";
 import "package:flutter/cupertino.dart";
@@ -18,8 +16,7 @@ import "package:flutter_background_service/flutter_background_service.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:intl/intl.dart";
 import "package:permission_handler/permission_handler.dart";
-
-import "../util/location_to_code.dart";
+import "package:dpip/util/location_to_code.dart";
 
 Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();

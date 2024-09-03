@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
