@@ -1747,7 +1747,7 @@
   "@sunny_with_severe_thunderhail": {
     "description": "天氣狀況：晴天伴有強雷雹"
   },
-  "sunny_with_thunder": "context.i18n.sunny_with_thunder",
+  "sunny_with_thunder": "晴天伴有雷",
   "@sunny_with_thunder": {
     "description": "天氣狀況：晴天伴有雷"
   },
@@ -1827,7 +1827,7 @@
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
-  "partly_cloudy_with_thunder": "context.i18n.partly_cloudy_with_thunder",
+  "partly_cloudy_with_thunder": "多雲伴有雷",
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
@@ -1903,7 +1903,7 @@
   "@overcast_with_severe_thunderhail": {
     "description": "天氣狀況：陰天伴有強雷雹"
   },
-  "overcast_with_thunder": "context.i18n.overcast_with_thunder",
+  "overcast_with_thunder": "陰天伴有雷",
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
