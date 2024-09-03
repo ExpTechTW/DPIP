@@ -1,28 +1,329 @@
+import 'dart:async';
+import 'dart:io';
+import "dart:ui" as ui;
+
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/map/radar/radar.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/list_icon.dart';
+import 'package:dpip/util/map_utils.dart';
+import 'package:dpip/util/need_location.dart';
+import 'package:dpip/util/radar_color.dart';
+import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
 
-import '../../util/list_icon.dart';
-
-class ThunderstormPage extends StatelessWidget {
+class ThunderstormPage extends StatefulWidget {
   final History item;
 
   const ThunderstormPage({super.key, required this.item});
 
   @override
+  _ThunderstormPageState createState() => _ThunderstormPageState();
+}
+
+class _ThunderstormPageState extends State<ThunderstormPage> {
+  late MapLibreMapController _mapController;
+  List<String> radarList = [];
+  double userLat = 0;
+  double userLon = 0;
+  bool isUserLocationValid = false;
+  bool _showLegend = false;
+  Timer? _blinkTimer;
+  int _blink = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    _blinkTimer?.cancel();
+    super.dispose();
+  }
+
+  String getTileUrl(String timestamp) {
+    return "https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png";
+  }
+
+  Future<void> _loadMapImages(bool isDark) async {
+    await loadGPSImage(_mapController);
+  }
+
+  void _initMap(MapLibreMapController controller) {
+    _mapController = controller;
+  }
+
+  Future<void> _addUserLocationMarker() async {
+    if (isUserLocationValid) {
+      await _mapController.removeLayer("markers");
+      await _mapController.addLayer(
+        "markers-geojson",
+        "markers",
+        const SymbolLayerProperties(
+          symbolZOrder: "source",
+          iconSize: [
+            Expressions.interpolate,
+            ["linear"],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: "gps",
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    }
+  }
+
+  void _loadMap() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    await _loadMapImages(isDark);
+
+    radarList = await ExpTech().getRadarList();
+
+    String newTileUrl = getTileUrl(radarList.last);
+
+    await _mapController.addSource(
+      "radarSource",
+      RasterSourceProperties(
+        tiles: [newTileUrl],
+        tileSize: 256,
+      ),
+    );
+
+    await _mapController.addLayer(
+      "map",
+      "county",
+      FillLayerProperties(
+        fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
+        fillOpacity: 1,
+      ),
+      sourceLayer: "city",
+      belowLayerId: "radarLayer",
+    );
+
+    await _mapController.addLayer(
+      "map",
+      "town-outline-default",
+      LineLayerProperties(
+        lineColor: context.colors.outline.toHexStringRGB(),
+        lineWidth: 1,
+      ),
+      sourceLayer: "town",
+    );
+
+    await _mapController.addLayer(
+      "map",
+      "town-outline-highlighted",
+      const LineLayerProperties(
+        lineColor: "#9e10fd",
+        lineWidth: 6,
+      ),
+      sourceLayer: "town",
+      filter: [
+        'in',
+        ['get', 'CODE'],
+        ['literal', widget.item.area]
+      ],
+    );
+
+    await _mapController.addLayer(
+      "radarSource",
+      "radarLayer",
+      const RasterLayerProperties(),
+      belowLayerId: "county-outline",
+    );
+
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
+
+    await _mapController.addSource(
+      "markers-geojson",
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+    );
+
+    start();
+
+    print(widget.item.area);
+
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+      if (!mounted) return;
+      await _mapController.setLayerProperties(
+          "town-outline-highlighted", LineLayerProperties(lineOpacity: (_blink < 6) ? 1 : 0));
+      _blink++;
+      if (_blink >= 8) _blink = 0;
+    });
+  }
+
+  void start() async {
+    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
+    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+
+    isUserLocationValid = (userLon != 0 && userLat != 0);
+
+    if (isUserLocationValid) {
+      await _mapController.setGeoJsonSource(
+        "markers-geojson",
+        {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "coordinates": [userLon, userLat],
+                "type": "Point"
+              }
+            }
+          ],
+        },
+      );
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    }
+
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+      await showLocationDialog(context);
+    }
+
+    await _addUserLocationMarker();
+
+    setState(() {});
+  }
+
+  void _toggleLegend() {
+    setState(() {
+      _showLegend = !_showLegend;
+    });
+  }
+
+  Widget _buildLegend() {
+    return MapLegend(
+      children: [
+        _buildColorBar(),
+        const SizedBox(height: 8),
+        _buildColorBarLabels(),
+        const SizedBox(height: 12),
+        Text(context.i18n.unit_dbz, style: context.theme.textTheme.labelMedium),
+      ],
+    );
+  }
+
+  Widget _buildColorBar() {
+    return SizedBox(
+      height: 20,
+      width: 300,
+      child: CustomPaint(
+        painter: ColorBarPainter(dBZColors),
+      ),
+    );
+  }
+
+  Widget _buildColorBarLabels() {
+    final labels = List.generate(14, (index) => (index * 5).toString());
+    return SizedBox(
+      width: 300,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: labels
+            .map((label) => Text(
+                  label,
+                  style: const TextStyle(fontSize: 9),
+                ))
+            .toList(),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final TZDateTime radarDateTime =
+        TZDateTime.fromMillisecondsSinceEpoch(UTC, radarList.isEmpty ? 0 : int.parse(radarList.last));
+    final TZDateTime radarTime = TZDateTime.from(radarDateTime, getLocation('Asia/Taipei'));
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(item.text.content['all']?.title ?? ""),
+        title: Text(widget.item.text.content['all']?.title ?? ""),
+        elevation: 0,
       ),
       body: Stack(
         children: [
-          const DpipMap(),
+          DpipMap(
+            onMapCreated: _initMap,
+            onStyleLoadedCallback: _loadMap,
+            rotateGesturesEnabled: true,
+          ),
+          Positioned(
+            right: 4,
+            top: 104,
+            child: Material(
+              color: context.colors.secondary,
+              elevation: 4.0,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: _toggleLegend,
+                child: Tooltip(
+                  message: context.i18n.map_legend,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _showLegend ? Icons.close : Icons.info_outline,
+                      size: 20,
+                      color: context.colors.onSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_showLegend)
+            Positioned(
+              right: 6,
+              top: 150, // Adjusted to be above the legend button
+              child: _buildLegend(),
+            ),
+          Positioned(
+            left: 4,
+            top: 104,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: context.colors.surface.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: context.colors.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           _buildDraggableSheet(context),
         ],
       ),
@@ -33,7 +334,6 @@ class ThunderstormPage extends StatelessWidget {
     return DraggableScrollableSheet(
       initialChildSize: 0.3,
       minChildSize: 0.1,
-      maxChildSize: 0.9,
       snap: true,
       snapSizes: const [0.1, 0.3, 0.9],
       builder: (BuildContext context, ScrollController scrollController) {
@@ -86,7 +386,11 @@ class ThunderstormPage extends StatelessWidget {
   }
 
   Widget _buildWarningHeader(BuildContext context) {
-    final String subtitle = item.text.content["all"]?.subtitle ?? "";
+    final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
+    final int expireTimestamp = widget.item.time.expires['all'];
+    final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
+    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC);
+
     return Row(
       children: [
         Container(
@@ -95,13 +399,50 @@ class ThunderstormPage extends StatelessWidget {
             color: context.colors.secondaryContainer,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(ListIcons.getListIcon(item.icon), size: 32),
+          child: Icon(ListIcons.getListIcon(widget.item.icon), size: 32),
         ),
         const SizedBox(width: 16),
         Expanded(
-          child: Text(
-            subtitle,
-            style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                subtitle,
+                style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              if (isExpired)
+                Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: context.colors.error,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    "已結束",
+                    style: context.theme.textTheme.bodySmall?.copyWith(
+                      color: context.colors.onError,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              if (!isExpired)
+                Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: context.colors.secondaryContainer,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    "生效中",
+                    style: context.theme.textTheme.bodySmall?.copyWith(
+                      color: context.colors.onSecondaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -109,16 +450,17 @@ class ThunderstormPage extends StatelessWidget {
   }
 
   Widget _buildWarningDetails(BuildContext context) {
-    final DateTime sendTime = item.time.send;
-    final int expireTimestamp = item.time.expires['all'];
-    final TZDateTime utcDateTime = TZDateTime.fromMillisecondsSinceEpoch(UTC, expireTimestamp);
-    final TZDateTime expireTime = TZDateTime.from(utcDateTime, getLocation('Asia/Taipei'));
-    final String description = item.text.description["all"] ?? "";
+    final DateTime sendTime = widget.item.time.send;
+    final int expireTimestamp = widget.item.time.expires['all'];
+    final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
+    final String description = widget.item.text.description["all"] ?? "";
+    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC);
+    final DateTime localExpireTime = expireTimeUTC.toLocal();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTimeBar(context, sendTime, expireTime),
+        _buildTimeBar(context, sendTime, localExpireTime, isExpired),
         const SizedBox(height: 15),
         Card(
           elevation: 2,
@@ -135,9 +477,15 @@ class ThunderstormPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeBar(BuildContext context, DateTime sendTime, DateTime expireTime) {
+  TZDateTime _convertToTZDateTime(int timestamp) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    TZDateTime taipeTime = TZDateTime.from(dateTime, getLocation('Asia/Taipei'));
+    return taipeTime.toUtc();
+  }
+
+  Widget _buildTimeBar(BuildContext context, DateTime sendTime, DateTime expireTime, bool isExpired) {
     final Duration duration = expireTime.difference(sendTime);
-    final Duration elapsed = DateTime.now().difference(sendTime);
+    final Duration elapsed = isExpired ? duration : DateTime.now().difference(sendTime);
     final double progress = elapsed.inSeconds / duration.inSeconds;
 
     return Card(
@@ -152,10 +500,14 @@ class ThunderstormPage extends StatelessWidget {
             const SizedBox(height: 12),
             _buildTimeInfo(context, Icons.timer_off, context.i18n.history_valid_until, expireTime),
             const SizedBox(height: 16),
-            LinearProgressIndicator(
-              value: progress.clamp(0.0, 1.0),
-              backgroundColor: context.colors.surfaceVariant,
-              valueColor: AlwaysStoppedAnimation<Color>(context.colors.primary),
+            Stack(
+              children: [
+                LinearProgressIndicator(
+                  value: progress.clamp(0.0, 1.0),
+                  backgroundColor: context.colors.surfaceVariant,
+                  valueColor: AlwaysStoppedAnimation<Color>(isExpired ? context.colors.error : context.colors.primary),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Row(
@@ -191,7 +543,7 @@ class ThunderstormPage extends StatelessWidget {
   }
 
   Widget _buildAffectedAreas(BuildContext context) {
-    final List<int> areaCodes = List<int>.from(item.area);
+    final List<int> areaCodes = List<int>.from(widget.item.area);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -222,11 +574,7 @@ class ThunderstormPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         color: context.colors.surfaceVariant,
         child: InkWell(
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('選擇了 $city$town')),
-            );
-          },
+          onTap: () {},
           borderRadius: BorderRadius.circular(20),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
