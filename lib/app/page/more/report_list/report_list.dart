@@ -184,7 +184,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Center(
-                            child: isLoading ? const CircularProgressIndicator() : const Text('到底了'),
+                            child: isLoading ? const CircularProgressIndicator() : Text(context.i18n.report_end),
                           ),
                         );
                       }

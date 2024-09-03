@@ -1559,6 +1559,10 @@
   "@report_filter_apply": {
     "description": "「更多」路徑 → 地震報告 → 「過濾器」圖例 → 彈出資訊 → 套用"
   },
+  "report_end": "到底了",
+  "@report_end": {
+    "description": "「更多」路徑 → 地震報告 → 使用「過濾器」 → 到底了"
+  },
   "history_send_time": "發送時間",
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
