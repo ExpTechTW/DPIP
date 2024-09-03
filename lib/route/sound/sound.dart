@@ -31,18 +31,22 @@ class _SoundRouteState extends State<SoundRoute> {
             SliverList(
               delegate: SliverChildListDelegate([
                 ListTileGroupHeader(title: context.i18n.eew_sound_title),
-                _buildSoundTile(context, context.i18n.emergency_earthquake_warning, 'eew', Symbols.warning, tileTitleTextStyle),
+                _buildSoundTile(
+                    context, context.i18n.emergency_earthquake_warning, 'eew', Symbols.warning, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.eew_info_sound_title),
                 _buildSoundTile(context, '地震資訊', 'eq', Symbols.info, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.sound_weather_warning),
-                _buildSoundTile(context, context.i18n.sound_rain_instant, 'rain', Symbols.thunderstorm, tileTitleTextStyle),
-                _buildSoundTile(context, context.i18n.sound_weather_alert, 'weather', Symbols.cloudy_snowing, tileTitleTextStyle),
-                ListTileGroupHeader(title: context.i18n.sound_disaster),
-                _buildSoundTile(context, context.i18n.sound_evacuation, 'evacuation', Symbols.directions_run, tileTitleTextStyle),
                 _buildSoundTile(
-                    context, context.i18n.tsunami_warning, 'tsunami', Symbols.tsunami, tileTitleTextStyle),
+                    context, context.i18n.sound_rain_instant, 'rain', Symbols.thunderstorm, tileTitleTextStyle),
+                _buildSoundTile(
+                    context, context.i18n.sound_weather_alert, 'weather', Symbols.cloudy_snowing, tileTitleTextStyle),
+                ListTileGroupHeader(title: context.i18n.sound_disaster),
+                _buildSoundTile(
+                    context, context.i18n.sound_evacuation, 'evacuation', Symbols.directions_run, tileTitleTextStyle),
+                _buildSoundTile(context, context.i18n.tsunami_warning, 'tsunami', Symbols.tsunami, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.other_title),
-                _buildSoundTile(context, context.i18n.sound_other_notifications, 'other', Symbols.notifications, tileTitleTextStyle),
+                _buildSoundTile(context, context.i18n.sound_other_notifications, 'other', Symbols.notifications,
+                    tileTitleTextStyle),
               ]),
             ),
           ],
@@ -107,20 +111,27 @@ class SoundDetailPage extends StatelessWidget {
         return [
           buildSoundListTile(context.i18n.sound_eew_alert_major, context.i18n.eew_alert_description_sound, "eew_alert"),
           buildSoundListTile(context.i18n.sound_eew_minor, context.i18n.eew_description_sound, "eew"),
-          buildSoundListTile(context.i18n.sound_earthquake_eew_major, context.i18n.sound_earthquake_eew_major_h2, "eew_major"),
-          buildSoundListTile(context.i18n.sound_earthquake_eew_minor, context.i18n.sound_earthquake_eew_minor_h2, "eew_minor"),
+          buildSoundListTile(
+              context.i18n.sound_earthquake_eew_major, context.i18n.sound_earthquake_eew_major_h2, "eew_major"),
+          buildSoundListTile(
+              context.i18n.sound_earthquake_eew_minor, context.i18n.sound_earthquake_eew_minor_h2, "eew_minor"),
         ];
       case 'eq':
         return [
-          buildSoundListTile(context.i18n.sound_int_report_minor, context.i18n.sound_int_report_minor_h2, "int_report", enable: monitor),
-          buildSoundListTile(context.i18n.sound_int_report_silent, context.i18n.sound_int_report_silent_h2, "int_report_silent", enable: monitor),
-          buildSoundListTile(context.i18n.sound_monitor_minor, context.i18n.eq_description_sound, "eq", enable: monitor),
+          buildSoundListTile(context.i18n.sound_int_report_minor, context.i18n.sound_int_report_minor_h2, "int_report",
+              enable: monitor),
+          buildSoundListTile(
+              context.i18n.sound_int_report_silent, context.i18n.sound_int_report_silent_h2, "int_report_silent",
+              enable: monitor),
+          buildSoundListTile(context.i18n.sound_monitor_minor, context.i18n.eq_description_sound, "eq",
+              enable: monitor),
           buildSoundListTile(context.i18n.sound_report_minor, context.i18n.report_description_sound, "report"),
           buildSoundListTile(context.i18n.sound_report_silent, context.i18n.sound_report_silent_h2, "report_silent"),
         ];
       case 'rain':
         return [
-          buildSoundListTile(context.i18n.sound_major, context.i18n.thunderstorm_instant_messaging_description_sound, "thunderstorm_major"),
+          buildSoundListTile(context.i18n.sound_major, context.i18n.thunderstorm_instant_messaging_description_sound,
+              "thunderstorm_major"),
           buildSoundListTile(context.i18n.me_general, context.i18n.sound_rain_minor_h2, "thunderstorm"),
         ];
       case 'weather':
@@ -137,11 +148,13 @@ class SoundDetailPage extends StatelessWidget {
         return [
           buildSoundListTile(context.i18n.sound_major, context.i18n.tsunami_alert_description_sound, "tsunami_warn"),
           buildSoundListTile(context.i18n.me_general, context.i18n.tsunami_alert2_description_sound, "tsunami"),
-          buildSoundListTile(context.i18n.sound_tsunami_silent, context.i18n.sound_tsunami_silent_h2, "tsunami_pacific_silent"),
+          buildSoundListTile(
+              context.i18n.sound_tsunami_silent, context.i18n.sound_tsunami_silent_h2, "tsunami_pacific_silent"),
         ];
       case 'other':
         return [
-          buildSoundListTile(context.i18n.announcement, context.i18n.server_announcement_description_sound, "announcement"),
+          buildSoundListTile(
+              context.i18n.announcement, context.i18n.server_announcement_description_sound, "announcement"),
         ];
       default:
         return [];

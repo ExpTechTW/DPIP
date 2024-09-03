@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
@@ -62,7 +65,10 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     });
   }
 
-  void _initData() {
+  void _initData() async {
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
     int code = Global.preference.getInt("user-code") ?? -1;
     city = Global.location[code.toString()]?.city ?? "";
     town = Global.location[code.toString()]?.town ?? "";
