@@ -758,11 +758,11 @@
   "@moderate_or_heavy_rain_with_thunder": {
     "description": "天氣狀況：中度或大雷雨"
   },
-  "patchy_light_snow_with_thunder": "局部小雪伴雷",
+  "patchy_light_snow_with_thunder": "Partly Light Snow with Thunder",
   "@patchy_light_snow_with_thunder": {
     "description": "天氣狀況：局部小雪伴雷"
   },
-  "moderate_or_heavy_snow_with_thunder": "中度或大雪伴雷",
+  "moderate_or_heavy_snow_with_thunder": "Medium or Heavy Snow with Thunder",
   "@moderate_or_heavy_snow_with_thunder": {
     "description": "天氣狀況：中度或大雪伴雷"
   },
@@ -963,7 +963,7 @@
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
+  "privacy_commitment": "We advocate for the privacy of all users.",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
   },
@@ -983,7 +983,7 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
+  "data_visualization_storage": "Use for saving visualize data form CWA and ExpTech.",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
