@@ -12,6 +12,7 @@ import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:timezone/timezone.dart';
 
 class HistoryPage extends StatefulWidget {
   final Function()? onPositionUpdate;
@@ -188,6 +189,12 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
     );
   }
 
+  TZDateTime _convertToTZDateTime(int timestamp) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    TZDateTime taipeTime = TZDateTime.from(dateTime, getLocation('Asia/Taipei'));
+    return taipeTime;
+  }
+
   Widget _buildHistoryList() {
     if (region == null && !country) {
       return const SliverToBoxAdapter(
@@ -226,15 +233,20 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
           final history = historyList[historyIndex];
           final showDate = historyIndex == 0 || history.time.send.day != historyList[historyIndex - 1].time.send.day;
 
+          final int expireTimestamp = history.time.expires['all'];
+          final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
+          final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: TimeLineTile(
               time: history.time.send,
-              icon: Icon(ListIcons.getListIcon(history.icon)),
+              icon: Icon(ListIcons.getListIcon(history.icon),
+                  color: isExpired ? context.colors.onError : context.colors.onSecondaryContainer),
               height: 140,
               first: historyIndex == 0,
               showDate: showDate,
-              color: context.colors.secondaryContainer,
+              color: isExpired ? context.colors.error : context.colors.secondaryContainer,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
