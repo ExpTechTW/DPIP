@@ -31,18 +31,18 @@ class _SoundRouteState extends State<SoundRoute> {
             SliverList(
               delegate: SliverChildListDelegate([
                 ListTileGroupHeader(title: context.i18n.eew_sound_title),
-                _buildSoundTile(context, '緊急地震速報', 'eew', Symbols.warning, tileTitleTextStyle),
+                _buildSoundTile(context, context.i18n.emergency_earthquake_warning, 'eew', Symbols.warning, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.eew_info_sound_title),
                 _buildSoundTile(context, '地震資訊', 'eq', Symbols.info, tileTitleTextStyle),
-                ListTileGroupHeader(title: '氣象警報'),
-                _buildSoundTile(context, '雷雨即時訊息', 'rain', Symbols.thunderstorm, tileTitleTextStyle),
-                _buildSoundTile(context, '天氣警特報', 'weather', Symbols.cloudy_snowing, tileTitleTextStyle),
-                ListTileGroupHeader(title: '災害資訊'),
-                _buildSoundTile(context, '避難資訊', 'evacuation', Symbols.directions_run, tileTitleTextStyle),
+                ListTileGroupHeader(title: context.i18n.sound_weather_warning),
+                _buildSoundTile(context, context.i18n.sound_rain_instant, 'rain', Symbols.thunderstorm, tileTitleTextStyle),
+                _buildSoundTile(context, context.i18n.sound_weather_alert, 'weather', Symbols.cloudy_snowing, tileTitleTextStyle),
+                ListTileGroupHeader(title: context.i18n.sound_disaster),
+                _buildSoundTile(context, context.i18n.sound_evacuation, 'evacuation', Symbols.directions_run, tileTitleTextStyle),
                 _buildSoundTile(
-                    context, context.i18n.tsunami_alert_sound, 'tsunami', Symbols.tsunami, tileTitleTextStyle),
+                    context, context.i18n.tsunami_warning, 'tsunami', Symbols.tsunami, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.other_title),
-                _buildSoundTile(context, '其他通知', 'other', Symbols.notifications, tileTitleTextStyle),
+                _buildSoundTile(context, context.i18n.sound_other_notifications, 'other', Symbols.notifications, tileTitleTextStyle),
               ]),
             ),
           ],
@@ -105,43 +105,43 @@ class SoundDetailPage extends StatelessWidget {
     switch (category) {
       case 'eew':
         return [
-          buildSoundListTile('緊急地震速報(重大)', context.i18n.eew_alert_description_sound, "eew_alert"),
-          buildSoundListTile('緊急地震速報(一般)', context.i18n.eew_description_sound, "eew"),
-          buildSoundListTile('地震速報(重大)', '重大地震速報通知音效', "eew_major"),
-          buildSoundListTile('地震速報(一般)', '一般地震速報通知音效', "eew_minor"),
+          buildSoundListTile(context.i18n.sound_eew_alert_major, context.i18n.eew_alert_description_sound, "eew_alert"),
+          buildSoundListTile(context.i18n.sound_eew_minor, context.i18n.eew_description_sound, "eew"),
+          buildSoundListTile(context.i18n.sound_earthquake_eew_major, context.i18n.sound_earthquake_eew_major_h2, "eew_major"),
+          buildSoundListTile(context.i18n.sound_earthquake_eew_minor, context.i18n.sound_earthquake_eew_minor_h2, "eew_minor"),
         ];
       case 'eq':
         return [
-          buildSoundListTile('震度速報(一般)', '一般震度速報通知音效', "int_report", enable: monitor),
-          buildSoundListTile('震度速報(無聲通知)', '無聲震度速報通知', "int_report_silent", enable: monitor),
-          buildSoundListTile('強震監視器(一般)', context.i18n.eq_description_sound, "eq", enable: monitor),
-          buildSoundListTile('地震報告(一般)', context.i18n.report_description_sound, "report"),
-          buildSoundListTile('地震報告(無聲通知)', '無聲地震報告通知', "report_silent"),
+          buildSoundListTile(context.i18n.sound_int_report_minor, context.i18n.sound_int_report_minor_h2, "int_report", enable: monitor),
+          buildSoundListTile(context.i18n.sound_int_report_silent, context.i18n.sound_int_report_silent_h2, "int_report_silent", enable: monitor),
+          buildSoundListTile(context.i18n.sound_monitor_minor, context.i18n.eq_description_sound, "eq", enable: monitor),
+          buildSoundListTile(context.i18n.sound_report_minor, context.i18n.report_description_sound, "report"),
+          buildSoundListTile(context.i18n.sound_report_silent, context.i18n.sound_report_silent_h2, "report_silent"),
         ];
       case 'rain':
         return [
-          buildSoundListTile('重大', context.i18n.thunderstorm_instant_messaging_description_sound, "thunderstorm_major"),
-          buildSoundListTile('一般', '一般雷雨即時訊息通知音效', "thunderstorm"),
+          buildSoundListTile(context.i18n.sound_major, context.i18n.thunderstorm_instant_messaging_description_sound, "thunderstorm_major"),
+          buildSoundListTile(context.i18n.me_general, context.i18n.sound_rain_minor_h2, "thunderstorm"),
         ];
       case 'weather':
         return [
-          buildSoundListTile('重大', '重大天氣警特報通知音效', "weather_major"),
-          buildSoundListTile('一般', '一般天氣警特報通知音效', "weather_minor"),
+          buildSoundListTile(context.i18n.sound_major, context.i18n.sound_weather_major_h2, "weather_major"),
+          buildSoundListTile(context.i18n.me_general, context.i18n.sound_weather_minor_h2, "weather_minor"),
         ];
       case 'evacuation':
         return [
-          buildSoundListTile('重大', '重大避難資訊通知音效', "evacuation_major"),
-          buildSoundListTile('一般', '一般避難資訊通知音效', "evacuation_minor"),
+          buildSoundListTile(context.i18n.sound_major, context.i18n.sound_evacuation_major_h2, "evacuation_major"),
+          buildSoundListTile(context.i18n.me_general, context.i18n.sound_evacuation_minor_h2, "evacuation_minor"),
         ];
       case 'tsunami':
         return [
-          buildSoundListTile('重大', context.i18n.tsunami_alert_description_sound, "tsunami_warn"),
-          buildSoundListTile('一般', context.i18n.tsunami_alert2_description_sound, "tsunami"),
-          buildSoundListTile('太平洋海嘯消息(無聲通知)', '無聲太平洋海嘯消息通知', "tsunami_pacific_silent"),
+          buildSoundListTile(context.i18n.sound_major, context.i18n.tsunami_alert_description_sound, "tsunami_warn"),
+          buildSoundListTile(context.i18n.me_general, context.i18n.tsunami_alert2_description_sound, "tsunami"),
+          buildSoundListTile(context.i18n.sound_tsunami_silent, context.i18n.sound_tsunami_silent_h2, "tsunami_pacific_silent"),
         ];
       case 'other':
         return [
-          buildSoundListTile('公告', context.i18n.server_announcement_description_sound, "announcement"),
+          buildSoundListTile(context.i18n.announcement, context.i18n.server_announcement_description_sound, "announcement"),
         ];
       default:
         return [];
