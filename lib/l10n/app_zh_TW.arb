@@ -400,21 +400,21 @@
   "@flooding_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
   },
-  "tsunami_alert_sound": "海嘯警報（注意）",
+  "tsunami_alert_sound": "海嘯警報（警報）",
   "@tsunami_alert_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
-  },
-  "tsunami_alert_description_sound": "所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下",
-  "@tsunami_alert_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
-  },
-  "tsunami_alert2_sound": "海嘯警報（警報）",
-  "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上",
-  "@tsunami_alert2_description_sound": {
+  "tsunami_alert_description_sound": "所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上",
+  "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
+  },
+  "tsunami_alert2_sound": "海嘯警報（注意）",
+  "@tsunami_alert2_sound": {
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
+  },
+  "tsunami_alert2_description_sound": "所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下",
+  "@tsunami_alert2_description_sound": {
+    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
   },
   "volcano_info_sound": "火山資訊",
   "@volcano_info_sound": {

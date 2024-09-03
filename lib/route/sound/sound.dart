@@ -40,7 +40,7 @@ class _SoundRouteState extends State<SoundRoute> {
                 ListTileGroupHeader(title: '災害資訊'),
                 _buildSoundTile(context, '避難資訊', 'evacuation', Symbols.directions_run, tileTitleTextStyle),
                 _buildSoundTile(
-                    context, context.i18n.tsunami_alert_sound, 'tsunami', Symbols.waves, tileTitleTextStyle),
+                    context, context.i18n.tsunami_alert_sound, 'tsunami', Symbols.tsunami, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.other_title),
                 _buildSoundTile(context, '其他通知', 'other', Symbols.notifications, tileTitleTextStyle),
               ]),
@@ -113,10 +113,10 @@ class SoundDetailPage extends StatelessWidget {
       case 'eq':
         return [
           buildSoundListTile('震度速報(一般)', '一般震度速報通知音效', "int_report", enable: monitor),
-          buildSoundListTile('震度速報(靜默通知)', '靜默震度速報通知', "int_report_silent", enable: monitor),
+          buildSoundListTile('震度速報(無聲通知)', '無聲震度速報通知', "int_report_silent", enable: monitor),
           buildSoundListTile('強震監視器(一般)', context.i18n.eq_description_sound, "eq", enable: monitor),
           buildSoundListTile('地震報告(一般)', context.i18n.report_description_sound, "report"),
-          buildSoundListTile('地震報告(靜默通知)', '靜默地震報告通知', "report_silent"),
+          buildSoundListTile('地震報告(無聲通知)', '無聲地震報告通知', "report_silent"),
         ];
       case 'rain':
         return [
@@ -137,7 +137,7 @@ class SoundDetailPage extends StatelessWidget {
         return [
           buildSoundListTile('重大', context.i18n.tsunami_alert_description_sound, "tsunami_warn"),
           buildSoundListTile('一般', context.i18n.tsunami_alert2_description_sound, "tsunami"),
-          buildSoundListTile('太平洋海嘯消息(靜默通知)', '靜默太平洋海嘯消息通知', "tsunami_pacific_silent"),
+          buildSoundListTile('太平洋海嘯消息(無聲通知)', '無聲太平洋海嘯消息通知', "tsunami_pacific_silent"),
         ];
       case 'other':
         return [
