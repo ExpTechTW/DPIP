@@ -404,7 +404,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               height: 140,
               first: index == 0,
               showDate: showDate,
-              color: context.colors.error,
+              color: context.colors.secondaryContainer,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
