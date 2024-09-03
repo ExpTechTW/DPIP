@@ -9,7 +9,7 @@ Future<void> notifyInit() async {
       [
         NotificationChannel(
             channelGroupKey: 'group_eew',
-            channelKey: "eew_alert",
+            channelKey: "eew_alert-important",
             channelName: "緊急地震速報(重大)",
             channelDescription: "最大震度 5 弱以上以及所在地(鄉鎮)預估震度 4 以上",
             importance: NotificationImportance.Max,
@@ -25,7 +25,7 @@ Future<void> notifyInit() async {
             locked: true),
         NotificationChannel(
             channelGroupKey: 'group_eew',
-            channelKey: "eew",
+            channelKey: "eew_alert-general",
             channelName: "緊急地震速報(一般)",
             channelDescription: "最大震度 5 弱以上以及所在地(鄉鎮)預估震度 2 以上",
             importance: NotificationImportance.Max,
@@ -40,7 +40,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eew',
-            channelKey: "eew_silent",
+            channelKey: "eew_alert-silent",
             channelName: "緊急地震速報(無聲通知)",
             channelDescription: "最大震度 5 弱以上以及所在地(鄉鎮)預估震度 1 以上",
             importance: NotificationImportance.Low,
@@ -52,7 +52,7 @@ Future<void> notifyInit() async {
             vibrationPattern: lowVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eew',
-            channelKey: "eew_alert",
+            channelKey: "eew-important",
             channelName: "地震速報(重大)",
             channelDescription: "所在地(鄉鎮)預估震度 4 以上",
             importance: NotificationImportance.Max,
@@ -68,7 +68,7 @@ Future<void> notifyInit() async {
             locked: true),
         NotificationChannel(
             channelGroupKey: 'group_eew',
-            channelKey: "eew",
+            channelKey: "eew-general",
             channelName: "地震速報(一般)",
             channelDescription: "所在地(鄉鎮)預估震度 2 以上",
             importance: NotificationImportance.Max,
@@ -83,7 +83,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eew',
-            channelKey: "eew_silence",
+            channelKey: "eew-silence",
             channelName: "地震速報 (無聲通知)",
             channelDescription: "所在地(鄉鎮)預估震度 1 以上",
             importance: NotificationImportance.Low,
@@ -95,7 +95,7 @@ Future<void> notifyInit() async {
             vibrationPattern: lowVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eq',
-            channelKey: "int_report",
+            channelKey: "int_report-general",
             channelName: "震度速報(一般)",
             channelDescription: "所在地(鄉鎮)實測震度 3 以上",
             importance: NotificationImportance.High,
@@ -108,7 +108,7 @@ Future<void> notifyInit() async {
             vibrationPattern: highVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eq',
-            channelKey: "int_report_silence",
+            channelKey: "int_report-silence",
             channelName: "震度速報 (無聲通知)",
             channelDescription: "所在地(鄉鎮)實測震度 1 以上",
             importance: NotificationImportance.Low,
@@ -133,7 +133,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eq',
-            channelKey: "report",
+            channelKey: "report-general",
             channelName: "地震報告(一般)",
             channelDescription: "地震報告所在地震度 3 以上",
             importance: NotificationImportance.Default,
@@ -146,7 +146,7 @@ Future<void> notifyInit() async {
             vibrationPattern: lowVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_eq',
-            channelKey: "report_silence",
+            channelKey: "report-silence",
             channelName: "地震報告 (無聲通知)",
             channelDescription: "地震報告所在地震度 3 以下的地區",
             groupAlertBehavior: GroupAlertBehavior.Children,
@@ -158,7 +158,7 @@ Future<void> notifyInit() async {
             enableVibration: false),
         NotificationChannel(
             channelGroupKey: 'group_rain',
-            channelKey: "thunderstorm",
+            channelKey: "thunderstorm-general",
             channelName: "雷雨即時訊息(一般)",
             channelDescription: "所在地(鄉鎮)發布雷雨即時訊息或山區暴雨時",
             importance: NotificationImportance.High,
@@ -171,7 +171,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_weather',
-            channelKey: "weather_major",
+            channelKey: "weather_major-important",
             channelName: "天氣警特報(重大)",
             channelDescription: "所在地(鄉鎮)發布紅色燈號之天氣警特報",
             importance: NotificationImportance.Max,
@@ -187,7 +187,7 @@ Future<void> notifyInit() async {
             locked: true),
         NotificationChannel(
             channelGroupKey: 'group_weather',
-            channelKey: "weather_minor",
+            channelKey: "weather_minor-general",
             channelName: "天氣警特報(一般)",
             channelDescription: "所在地(鄉鎮)發布上述除外燈號之天氣警特報",
             importance: NotificationImportance.Default,
@@ -200,7 +200,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_evacuation',
-            channelKey: "evacuation_major",
+            channelKey: "evacuation_major-important",
             channelName: "避難資訊(重大)",
             channelDescription: "所在地(鄉鎮)發布防空、土石流、淹水或堰塞湖避難警訊時",
             importance: NotificationImportance.Max,
@@ -216,7 +216,7 @@ Future<void> notifyInit() async {
             locked: true),
         NotificationChannel(
             channelGroupKey: 'group_evacuation',
-            channelKey: "evacuation_minor",
+            channelKey: "evacuation_minor-general",
             channelName: "避難資訊(一般)",
             channelDescription: "所在地(鄉鎮)發布防空、土石流、淹水或堰塞湖避難警訊時",
             importance: NotificationImportance.High,
@@ -229,7 +229,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_tsunami',
-            channelKey: "tsunami_warn",
+            channelKey: "tsunami-important",
             channelName: "海嘯資訊(重大)",
             channelDescription: "海嘯警報發布時，沿海地區鄉鎮",
             importance: NotificationImportance.High,
@@ -242,7 +242,7 @@ Future<void> notifyInit() async {
             vibrationPattern: mediumVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_tsunami',
-            channelKey: "tsunami",
+            channelKey: "tsunami-general",
             channelName: "海嘯資訊(一般)",
             channelDescription: "海嘯警報發布時，上述除外地區",
             importance: NotificationImportance.Default,
@@ -255,7 +255,7 @@ Future<void> notifyInit() async {
             vibrationPattern: lowVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_tsunami',
-            channelKey: "tsunami_pacific_silent",
+            channelKey: "tsunami-silent",
             channelName: "太平洋海嘯消息 (無聲通知)",
             channelDescription: "地震報告所在地震度 3 以下的地區",
             groupAlertBehavior: GroupAlertBehavior.Children,
@@ -267,7 +267,7 @@ Future<void> notifyInit() async {
             enableVibration: false),
         NotificationChannel(
             channelGroupKey: 'group_other',
-            channelKey: "announcement",
+            channelKey: "announcement-general",
             channelName: "其他通知",
             channelDescription: "發送公告時",
             importance: NotificationImportance.Default,
