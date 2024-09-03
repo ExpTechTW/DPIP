@@ -1,4 +1,5 @@
 import "dart:io";
+import "dart:math";
 
 import "package:dpip/api/exptech.dart";
 import "package:dpip/core/ios_get_location.dart";
@@ -17,12 +18,14 @@ class WindData {
   final double longitude;
   final int direction;
   final double speed;
+  final String id;
 
   WindData({
     required this.latitude,
     required this.longitude,
     required this.direction,
     required this.speed,
+    required this.id,
   });
 }
 
@@ -76,6 +79,7 @@ class _WindMapState extends State<WindMap> {
     windDataList = weatherData
         .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
         .map((station) => WindData(
+            id: station.id,
             latitude: station.station.lat,
             longitude: station.station.lng,
             direction: (station.data.wind.direction + 180) % 360,
@@ -142,6 +146,7 @@ class _WindMapState extends State<WindMap> {
         .map((data) => {
               "type": "Feature",
               "properties": {
+                "id": data.id,
                 "direction": data.direction,
                 "speed": data.speed,
               },
@@ -245,6 +250,12 @@ class _WindMapState extends State<WindMap> {
       ],
     );
 
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+      final featureCollections = await _mapController.queryRenderedFeatures(point, ["wind-arrows"], null);
+
+      String id = featureCollections[0]["properties"]["id"];
+    });
+
     await _mapController.removeLayer("wind-speed-labels");
     await _mapController.addSymbolLayer(
       "wind-data",
@@ -310,11 +321,25 @@ class _WindMapState extends State<WindMap> {
     super.dispose();
   }
 
+  void _onMapClick(Point<double> point, LatLng coordinates) async {
+    // final features = await _mapController.queryRenderedFeatures(
+    //     point,
+    //     ["wind-arrows"],
+    //     null
+    // );
+    //
+    // print("Queried features: $features");
+    print("---");
+    print(point);
+    print(coordinates);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         DpipMap(
+          onMapClick: _onMapClick,
           onMapCreated: _initMap,
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
@@ -364,6 +389,7 @@ class _WindMapState extends State<WindMap> {
                 windDataList = weatherData
                     .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
                     .map((station) => WindData(
+                        id: station.id,
                         latitude: station.station.lat,
                         longitude: station.station.lng,
                         direction: (station.data.wind.direction + 180) % 360,
