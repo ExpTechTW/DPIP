@@ -8,6 +8,7 @@ import "package:dpip/global.dart";
 import "package:dpip/route/settings/content/location.dart";
 import "package:dpip/util/location_to_code.dart";
 import "package:flutter/services.dart";
+import "package:dpip/util/log.dart";
 
 const _channel = MethodChannel("com.exptech.dpip/data");
 Completer<void>? _completer;
@@ -19,19 +20,25 @@ Future<void> getSavedLocation() async {
 
   _completer = Completer<void>();
 
-  final result = await _channel.invokeMethod<Map<dynamic, dynamic>>("getSavedLocation");
-  final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
-  await Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
-  await Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
+  try {
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>("getSavedLocation");
+    final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
+    await Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
+    await Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
 
-  GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?["lat"], data?["lon"]);
+    GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?["lat"], data?["lon"]);
 
-  if (location != null) {
-    await Global.preference.setInt("user-code", location.code);
+    if (location != null) {
+      await Global.preference.setInt("user-code", location.code);
+    } else {
+      await Global.preference.setInt("user-code", -1);
+    }
     _updateAllPositions();
-  } else {
-    await Global.preference.setInt("user-code", -1);
-    _updateAllPositions();
+  } catch (e) {
+    TalkerManager.instance.error("Error in getSavedLocation: $e");
+  } finally {
+    _completer?.complete();
+    _completer = null;
   }
 }
 
