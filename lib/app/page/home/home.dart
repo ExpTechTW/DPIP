@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildWeatherDetailItem(
-              context.i18n.home_precipitation, '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm'),
+              context.i18n.home_precipitation, '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm/h'),
           _buildWeatherDetailItem(context.i18n.humidity_monitor,
               '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
         ],
