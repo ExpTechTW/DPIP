@@ -272,7 +272,7 @@
   "@location_town": {
     "description": "「設定」路徑 → 「所在地」設定 → 鄉鎮"
   },
-  "location_select": "выберите местоположение ",
+  "location_select": "выберите местоположение",
   "@location_select": {
     "description": "「設定」路徑 → 「所在地」設定 → 選擇所在地"
   },
