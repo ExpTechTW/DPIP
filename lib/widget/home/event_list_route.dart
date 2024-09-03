@@ -12,6 +12,9 @@ final Map<String, TypeConfig> typeConfigs = {
   'thunderstorm': TypeConfig(
     buildPage: (History item) => ThunderstormPage(item: item),
   ),
+  'rain': TypeConfig(
+    buildPage: (History item) => ThunderstormPage(item: item),
+  ),
 };
 
 bool shouldShowArrow(dynamic item) {
