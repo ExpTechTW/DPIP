@@ -34,41 +34,15 @@ class DPIPInfoPage extends StatelessWidget {
             _buildInfoCard(
                 context,
                 context.i18n.introduction,
-                [
-                  context.i18n.first_gratitude,
-                  context.i18n.dpip_goal,
-                  context.i18n.development_investment
-                ],
+                [context.i18n.first_gratitude, context.i18n.dpip_goal, context.i18n.development_investment],
                 Symbols.info_rounded),
             _buildInfoCard(
-                context,
-                context.i18n.profit_model,
-                [
-                  context.i18n.profit_discussion
-                ],
-                Symbols.monetization_on_rounded),
-            _buildInfoCard(
-                context,
-                context.i18n.profit_difficulty,
-                [
-                  context.i18n.user_payment_survey
-                ],
+                context, context.i18n.profit_model, [context.i18n.profit_discussion], Symbols.monetization_on_rounded),
+            _buildInfoCard(context, context.i18n.profit_difficulty, [context.i18n.user_payment_survey],
                 Symbols.trending_down_rounded),
-            _buildInfoCard(
-                context,
-                context.i18n.why_no_ads,
-                [
-                  context.i18n.no_ads_reason
-                ],
-                Symbols.block_rounded),
-            _buildInfoCard(
-                context,
-                context.i18n.charge_public,
-                [
-                  context.i18n.no_fee_reason,
-                  context.i18n.public_charge_consideration
-                ],
-                Symbols.attach_money_rounded),
+            _buildInfoCard(context, context.i18n.why_no_ads, [context.i18n.no_ads_reason], Symbols.block_rounded),
+            _buildInfoCard(context, context.i18n.charge_public,
+                [context.i18n.no_fee_reason, context.i18n.public_charge_consideration], Symbols.attach_money_rounded),
             _buildInfoCard(
                 context,
                 context.i18n.how_to_profit,

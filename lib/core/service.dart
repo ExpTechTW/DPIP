@@ -10,13 +10,13 @@ import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/util/location_to_code.dart";
 import "package:dpip/util/log.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter_background_service/flutter_background_service.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:intl/intl.dart";
 import "package:permission_handler/permission_handler.dart";
-import "package:dpip/util/location_to_code.dart";
 
 Timer? timer;
 FlutterBackgroundService service = FlutterBackgroundService();

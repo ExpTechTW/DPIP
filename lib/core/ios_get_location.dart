@@ -7,8 +7,8 @@ import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/settings/content/location.dart";
 import "package:dpip/util/location_to_code.dart";
-import "package:flutter/services.dart";
 import "package:dpip/util/log.dart";
+import "package:flutter/services.dart";
 
 const _channel = MethodChannel("com.exptech.dpip/data");
 Completer<void>? _completer;

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
@@ -80,7 +83,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     await refreshRealtimeList();
   }
 
-  void _loadLocationData() {
+  void _loadLocationData() async {
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      await getSavedLocation();
+    }
     int code = Global.preference.getInt("user-code") ?? -1;
     city = Global.location[code.toString()]?.city ?? "";
     town = Global.location[code.toString()]?.town ?? "";
@@ -281,8 +287,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWeatherDetailItem(context.i18n.home_precipitation, '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm'),
-          _buildWeatherDetailItem(context.i18n.humidity_monitor, '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
+          _buildWeatherDetailItem(
+              context.i18n.home_precipitation, '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm'),
+          _buildWeatherDetailItem(context.i18n.humidity_monitor,
+              '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
         ],
       ),
     );
