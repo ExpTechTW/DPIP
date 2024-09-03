@@ -27,10 +27,10 @@ Future<void> getSavedLocation() async {
   GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?["lat"], data?["lon"]);
 
   if (location != null) {
-    Global.preference.setInt("user-code", location.code);
+    await Global.preference.setInt("user-code", location.code);
     _updateAllPositions();
   } else {
-    Global.preference.setInt("user-code", -1);
+    await Global.preference.setInt("user-code", -1);
     _updateAllPositions();
   }
 }
