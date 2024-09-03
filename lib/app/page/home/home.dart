@@ -78,12 +78,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _initData() async {
-    _loadLocationData();
-    await _refreshWeatherData();
-    await refreshRealtimeList();
-  }
-
-  void _loadLocationData() async {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
@@ -91,6 +85,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     city = Global.location[code.toString()]?.city ?? "";
     town = Global.location[code.toString()]?.town ?? "";
     region = code == -1 ? null : code.toString();
+    await _refreshWeatherData();
+    await refreshRealtimeList();
   }
 
   Future<void> _refreshWeatherData() async {
