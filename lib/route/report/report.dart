@@ -312,6 +312,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   // 不要翻譯這
                   if (report!.magnitude >= 6 &&
                       report!.magnitude < 7 &&
+                      report!.depth <= 30 &&
                       (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
                       avatar: Icon(
@@ -330,6 +331,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                     ),
                   // 不要翻譯這
                   if (report!.magnitude >= 7 &&
+                      report!.depth <= 30 &&
                       (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
