@@ -29,7 +29,7 @@ class _MePageState extends State<MePage> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ListTileGroupHeader(title: context.i18n.me_generally),
+        ListTileGroupHeader(title: context.i18n.me_general),
         /**
          * 設定
          */
@@ -88,7 +88,7 @@ class _MePageState extends State<MePage> {
         ListTile(
           leading: const Icon(Symbols.favorite_rounded, fill: 1),
           title: Text(context.i18n.donate),
-          subtitle: const Text("幫助我們維護伺服器的穩定和長久發展"),
+          subtitle: Text(context.i18n.donate_h2),
           onTap: () {
             launchUrl(Uri.parse("https://exptech.com.tw/donate"));
           },
@@ -145,7 +145,7 @@ class _MePageState extends State<MePage> {
          */
         ListTile(
           leading: const Icon(Icons.visibility),
-          title: const Text("歡迎頁面"),
+          title: Text(context.i18n.me_welcome),
           onTap: () {
             Navigator.of(context, rootNavigator: true).push(
               MaterialPageRoute(builder: (context) => const WelcomeRoute()),

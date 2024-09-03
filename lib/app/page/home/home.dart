@@ -282,8 +282,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWeatherDetailItem('降水量', '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm'),
-          _buildWeatherDetailItem('濕度', '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
+          _buildWeatherDetailItem(context.i18n.home_precipitation, '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm'),
+          _buildWeatherDetailItem(context.i18n.humidity_monitor, '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %'),
         ],
       ),
     );
@@ -310,8 +310,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         child: Row(
           children: [
-            Expanded(child: _buildToggleButton(true, Symbols.public_rounded, '全國')),
-            Expanded(child: _buildToggleButton(false, Symbols.my_location_rounded, '所在地')),
+            Expanded(child: _buildToggleButton(true, Symbols.public_rounded, context.i18n.home_area)),
+            Expanded(child: _buildToggleButton(false, Symbols.my_location_rounded, context.i18n.settings_location)),
           ],
         ),
       ),

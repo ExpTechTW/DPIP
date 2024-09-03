@@ -103,16 +103,16 @@ class _ReportListPageState extends State<ReportListPage> {
 
     if (_intensityRange.start > 0 || _intensityRange.end < 8) {
       summaries.add(
-          '最大震度: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}');
+          '${context.i18n.max_earthquake_intensity}: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}');
     }
     if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
-      summaries.add('規模: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
+      summaries.add('${context.i18n.scale}: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
     }
     if (_depthRange.start > 0 || (_depthRange.end > 0 && _depthRange.end < 700)) {
-      summaries.add('深度: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
+      summaries.add('${context.i18n.depth}: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
     }
 
-    return summaries.isEmpty ? '全部' : summaries.join(', ');
+    return summaries.isEmpty ? context.i18n.report_all : summaries.join(', ');
   }
 
   @override
@@ -135,10 +135,10 @@ class _ReportListPageState extends State<ReportListPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("過濾器"),
+            Text(context.i18n.report_filter),
             Text(
               _getFilterSummary(),
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),
@@ -225,12 +225,12 @@ class _ReportListPageState extends State<ReportListPage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Text("過濾器"),
+              title: Text(context.i18n.report_filter),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text("最大震度"),
+                    Text(context.i18n.max_earthquake_intensity),
                     RangeSlider(
                       values: _intensityRange,
                       min: 0,
@@ -249,7 +249,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         });
                       },
                     ),
-                    Text("規模"),
+                    Text(context.i18n.scale),
                     RangeSlider(
                       values: _magnitudeRange,
                       min: 0,
@@ -268,7 +268,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         });
                       },
                     ),
-                    Text("深度"),
+                    Text(context.i18n.depth),
                     RangeSlider(
                       values: _depthRange,
                       min: 0,
@@ -292,7 +292,7 @@ class _ReportListPageState extends State<ReportListPage> {
               ),
               actions: [
                 TextButton(
-                  child: Text("重置"),
+                  child: Text(context.i18n.report_filter_reset),
                   onPressed: () {
                     setState(() {
                       _intensityRange = const RangeValues(0, 8);
@@ -302,7 +302,7 @@ class _ReportListPageState extends State<ReportListPage> {
                   },
                 ),
                 TextButton(
-                  child: Text("套用"),
+                  child: Text(context.i18n.report_filter_apply),
                   onPressed: () {
                     Navigator.of(context).pop();
                     this.setState(() {

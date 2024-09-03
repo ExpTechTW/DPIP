@@ -50,11 +50,11 @@ class ThunderstormPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '發送時間: $formattedSendTime',
+                        '${context.i18n.history_send_time}: $formattedSendTime',
                         style: context.theme.textTheme.titleMedium,
                       ),
                       Text(
-                        '有效至: $formattedExpireTime',
+                        '${context.i18n.history_valid_until}: $formattedExpireTime',
                         style: context.theme.textTheme.bodyMedium,
                       ),
                     ],
@@ -69,7 +69,7 @@ class ThunderstormPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '影響區域：',
+              context.i18n.history_influence_area,
               style: context.theme.textTheme.bodyLarge,
             ),
             Wrap(

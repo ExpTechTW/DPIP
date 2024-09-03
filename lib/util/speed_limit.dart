@@ -1,3 +1,4 @@
+import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
@@ -8,12 +9,12 @@ Future<void> showLimitDialog(BuildContext context) async {
     builder: (context) {
       return AlertDialog(
         icon: const Icon(Symbols.error),
-        title: const Text("無效操作"),
-        content: const Text("操作間隔過短，請稍後再嘗試。"),
+        title: Text(context.i18n.invalid_operation),
+        content: Text(context.i18n.operation_interval_too_short),
         actionsAlignment: MainAxisAlignment.end,
         actions: [
           TextButton(
-            child: const Text("知道了"),
+            child: Text(context.i18n.got_it),
             onPressed: () {
               Navigator.pop(context);
             },

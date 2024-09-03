@@ -64,8 +64,8 @@ class SoundListTileState extends State<SoundListTile> {
         }
       } else {
         context.scaffoldMessenger.showSnackBar(
-          const SnackBar(
-            content: Text("錯誤: 無法取得 FCM Token"),
+          SnackBar(
+            content: Text(context.i18n.error_fcm_token),
           ),
         );
       }
@@ -76,7 +76,7 @@ class SoundListTileState extends State<SoundListTile> {
   Widget build(BuildContext context) {
     return ListTile(
       trailing: !widget.enable! ? null : const Icon(Symbols.play_circle, fill: 1),
-      title: Text("${widget.title}${!widget.enable! ? " (未啟用)" : ""}"),
+      title: Text("${widget.title}${!widget.enable! ? context.i18n.not_enabled : ""}"),
       subtitle: Text(widget.subtitle),
       onTap: playSound,
     );

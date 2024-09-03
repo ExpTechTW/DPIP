@@ -574,7 +574,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "預估最大震度",
+                                        context.i18n.estimated_intensity,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: context.colors.onSurfaceVariant,
@@ -622,7 +622,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          "${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} 發震",
+                                          "${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} ${context.i18n.time_earthquake}",
                                           style: TextStyle(
                                             fontSize: 14,
                                             color: context.colors.onSurfaceVariant,
@@ -667,7 +667,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      "警報區域",
+                                      context.i18n.alarm_area,
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -1050,7 +1050,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             align: ContentAlign.bottom,
             builder: (context, controller) {
               return Text(
-                '點擊查看提示資訊',
+                context.i18n.view_prompt_information,
                 style: context.theme.textTheme.titleLarge?.copyWith(
                   color: context.colors.onPrimary,
                   fontWeight: FontWeight.bold,
@@ -1237,12 +1237,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        '未啟用強震監視器',
+                        context.i18n.no_earthquake_monitor,
                         style: context.theme.textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        '請至設定進階功能中開啟強震監視器。',
+                        context.i18n.settings_earthquake_monitor,
                         style: context.theme.textTheme.bodyMedium,
                       ),
                     ],
