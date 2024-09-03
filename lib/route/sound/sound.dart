@@ -115,10 +115,13 @@ class SoundDetailPage extends StatelessWidget {
         return [
           buildSoundListTile(context.i18n.sound_eew_alert_major, context.i18n.eew_alert_description_sound, "eew_alert"),
           buildSoundListTile(context.i18n.sound_eew_minor, context.i18n.eew_description_sound, "eew"),
+          buildSoundListTile(context.i18n.sound_eew_silent, context.i18n.sound_eew_silent_h2, "eew_silent"),
           buildSoundListTile(
               context.i18n.sound_earthquake_eew_major, context.i18n.sound_earthquake_eew_major_h2, "eew_major"),
           buildSoundListTile(
               context.i18n.sound_earthquake_eew_minor, context.i18n.sound_earthquake_eew_minor_h2, "eew_minor"),
+          buildSoundListTile(
+              context.i18n.sound_earthquake_eew_silent, context.i18n.sound_earthquake_eew_silent_h2, "eew_silent"),
         ];
       case 'eq':
         return [

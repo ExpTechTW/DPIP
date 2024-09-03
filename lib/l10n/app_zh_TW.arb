@@ -442,7 +442,7 @@
   },
   "server_announcement_description_sound": "ExpTech 發布之公告",
   "@server_announcement_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → ExpTech 發布之公告"
   },
   "monitor_list": "地圖列表",
   "@monitor_list": {
@@ -1571,6 +1571,14 @@
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
   },
+  "sound_eew_silent": "緊急地震速報(無聲)",
+  "@sound_eew_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
+  },
+  "sound_eew_silent_h2": "最大震度 5 弱以上\n且所在地(鄉鎮)預估震度 1 以上",
+  "@sound_eew_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上\n且所在地(鄉鎮)預估震度 1 以上"
+  },
   "sound_earthquake_eew_major": "地震速報(重大)",
   "@sound_earthquake_eew_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(重大)"
@@ -1586,6 +1594,14 @@
   "sound_earthquake_eew_minor_h2": "所在地(鄉鎮)預估震度 2 以上",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
+  },
+  "sound_earthquake_eew_silent": "地震速報(無聲)",
+  "@sound_earthquake_eew_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
+  },
+  "sound_earthquake_eew_silent_h2": "所在地(鄉鎮)預估震度 1 以上",
+  "@sound_earthquake_eew_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
   "sound_int_report_minor": "震度速報(一般)",
   "@sound_report_minor": {
