@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class AdvancedWeatherChart extends StatefulWidget {
-  const AdvancedWeatherChart({Key? key}) : super(key: key);
+  const AdvancedWeatherChart({super.key});
 
   @override
   State<AdvancedWeatherChart> createState() => _AdvancedWeatherChartState();
@@ -13,7 +13,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   int touchedIndex = -1;
 
   final Map<String, List<double>> weatherData = {
-    'temperature': [22, 23, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 16, 18, 20, 22, 24, 25, 26, 25, 24, 23, 22],
+    'temperature': [22, 23, 25, 24, 23, -99, 21, 20, 19, 18, 17, 16, 15, 16, 18, 20, 22, 24, 25, 26, 25, 24, 23, 22],
     'wind_speed': [5, 6, 7, 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 4],
     'precipitation': [
       0,
@@ -68,33 +68,34 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       1011,
       1012
     ],
-    'wind_direction': [
-      0,
-      45,
-      90,
-      135,
-      180,
-      225,
-      270,
-      315,
-      0,
-      45,
-      90,
-      135,
-      180,
-      225,
-      270,
-      315,
-      0,
-      45,
-      90,
-      135,
-      180,
-      225,
-      270,
-      315
-    ],
   };
+
+  final List<double> windDirection = [
+    0,
+    45,
+    90,
+    135,
+    180,
+    225,
+    270,
+    315,
+    0,
+    45,
+    90,
+    135,
+    180,
+    225,
+    270,
+    315,
+    0,
+    45,
+    90,
+    135,
+    180,
+    225,
+    270,
+    315
+  ];
 
   final Map<String, String> dataTypeToChineseMap = {
     'temperature': '溫度',
@@ -102,7 +103,6 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     'precipitation': '降水',
     'humidity': '濕度',
     'pressure': '氣壓',
-    'wind_direction': '風向',
   };
 
   final Map<String, String> units = {
@@ -111,7 +111,6 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     'precipitation': 'mm',
     'humidity': '%',
     'pressure': 'hPa',
-    'wind_direction': '°',
   };
 
   Color getDataTypeColor(String dataType) {
@@ -119,7 +118,6 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       case 'temperature':
         return Colors.red;
       case 'wind_speed':
-      case 'wind_direction':
         return Colors.orange;
       case 'precipitation':
         return Colors.blue;
@@ -159,7 +157,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   Widget _buildHeader() {
     String displayValue = touchedIndex != -1
-        ? '${touchedIndex}時: ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
+        ? '$touchedIndex時: ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
         : '24小時平均: ${_calculate24HourAverage()}${units[selectedDataType]}';
 
     return Card(
@@ -169,9 +167,19 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
-              style: Theme.of(context).textTheme.headlineSmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                if (selectedDataType == 'wind_speed')
+                  Transform.rotate(
+                    angle: (windDirection[touchedIndex != -1 ? touchedIndex : 0] + 180) % 360,
+                    child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType)),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             Text(
@@ -188,11 +196,10 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   String _calculate24HourAverage() {
-    if (selectedDataType == 'wind_direction') {
-      return ''; // 風向不計算平均
-    }
-    double sum = weatherData[selectedDataType]!.reduce((a, b) => a + b);
-    return (sum / 24).toStringAsFixed(1);
+    List<double> validData = weatherData[selectedDataType]!.where((value) => value != -99).toList();
+    if (validData.isEmpty) return 'N/A';
+    double sum = validData.reduce((a, b) => a + b);
+    return (sum / validData.length).toStringAsFixed(1);
   }
 
   Widget _buildChart() {
@@ -202,11 +209,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         padding: const EdgeInsets.all(16),
         child: AspectRatio(
           aspectRatio: 16 / 9,
-          child: selectedDataType == 'precipitation'
-              ? _buildBarChart()
-              : selectedDataType == 'wind_direction'
-                  ? _buildWindDirectionChart()
-                  : _buildLineChart(),
+          child: selectedDataType == 'precipitation' ? _buildBarChart() : _buildLineChart(),
         ),
       ),
     );
@@ -214,6 +217,15 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   Widget _buildLineChart() {
     Color lineColor = getDataTypeColor(selectedDataType);
+    List<FlSpot> spots = [];
+    for (int i = 0; i < weatherData[selectedDataType]!.length; i++) {
+      if (weatherData[selectedDataType]![i] == -99) {
+        spots.add(FlSpot.nullSpot);
+      } else {
+        spots.add(FlSpot(i.toDouble(), weatherData[selectedDataType]![i]));
+      }
+    }
+
     return LineChart(
       LineChartData(
         gridData: const FlGridData(show: false),
@@ -238,11 +250,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         borderData: FlBorderData(show: true),
         lineBarsData: [
           LineChartBarData(
-            spots: weatherData[selectedDataType]!
-                .asMap()
-                .entries
-                .map((entry) => FlSpot(entry.key.toDouble(), entry.value))
-                .toList(),
+            spots: spots,
             isCurved: true,
             color: lineColor,
             barWidth: 3,
@@ -300,7 +308,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         extraLinesData: ExtraLinesData(
           horizontalLines: [
             HorizontalLine(
-              y: weatherData[selectedDataType]!.reduce((a, b) => a + b) / 24,
+              y: double.parse(_calculate24HourAverage()),
               color: Colors.black45,
               strokeWidth: 1,
               dashArray: [5, 5],
@@ -315,7 +323,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     Color barColor = getDataTypeColor(selectedDataType);
     return BarChart(
       BarChartData(
-        gridData: FlGridData(show: false),
+        gridData: const FlGridData(show: false),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
@@ -331,8 +339,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               getTitlesWidget: (value, meta) => Text(value.toInt().toString()),
             ),
           ),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         borderData: FlBorderData(show: true),
         barGroups: weatherData['precipitation']!
@@ -374,12 +382,6 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         ),
       ),
     );
-  }
-
-  Widget _buildWindDirectionChart() {
-    // 這裡應該實現風向圖表，可能需要使用自定義繪製或其他圖表庫
-    // 作為占位符，我們返回一個簡單的文本
-    return const Center(child: Text('風向圖表 - 需要自定義實現'));
   }
 
   Widget _buildDataTypeSelector() {
@@ -428,7 +430,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 Container(
                   width: 20,
                   height: 1,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
                         color: Colors.black45,
