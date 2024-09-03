@@ -34,7 +34,7 @@ class _SoundRouteState extends State<SoundRoute> {
                 _buildSoundTile(
                     context, context.i18n.emergency_earthquake_warning, 'eew', Symbols.warning, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.eew_info_sound_title),
-                _buildSoundTile(context, '地震資訊', 'eq', Symbols.info, tileTitleTextStyle),
+                _buildSoundTile(context, context.i18n.eew_info_sound_title, 'eq', Symbols.info, tileTitleTextStyle),
                 ListTileGroupHeader(title: context.i18n.sound_weather_warning),
                 _buildSoundTile(
                     context, context.i18n.sound_rain_instant, 'rain', Symbols.thunderstorm, tileTitleTextStyle),
