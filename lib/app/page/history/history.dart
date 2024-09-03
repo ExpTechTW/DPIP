@@ -124,8 +124,13 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       body: SafeArea(
         child: Column(
           children: [
-            _buildLocationButton(),
-            _buildLocationToggle(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildLocationToggle(),
+                _buildLocationButton(),
+              ],
+            ),
             Expanded(
               child: Stack(
                 children: [
@@ -157,69 +162,29 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 
   Widget _buildLocationToggle() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        height: 36,
-        decoration: BoxDecoration(
-          color: context.colors.surfaceVariant.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Row(
-          children: [
-            Expanded(child: _buildToggleButton(true, Symbols.public_rounded, '全國')),
-            Expanded(child: _buildToggleButton(false, Symbols.my_location_rounded, '所在地')),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: SegmentedButton(
+        showSelectedIcon: false,
+        segments: [
+          ButtonSegment(
+            label: const Text("全國"),
+            icon: const Icon(Symbols.public_rounded),
+            tooltip: context.i18n.home_area,
+            value: true,
+          ),
+          ButtonSegment(
+            label: const Text("所在地"),
+            icon: const Icon(Symbols.home_rounded),
+            tooltip: context.i18n.settings_location,
+            value: false,
+          ),
+        ],
+        selected: {country},
+        onSelectionChanged: (p0) => setState(() {
+          country = p0.first;
+          refreshHistoryList();
+        }),
       ),
-    );
-  }
-
-  Widget _buildToggleButton(bool isCountry, IconData icon, String label) {
-    final isSelected = country == isCountry;
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            decoration: BoxDecoration(
-              color: isSelected ? context.colors.primaryContainer.withOpacity(0.7) : Colors.transparent,
-              borderRadius: BorderRadius.horizontal(
-                left: isCountry ? const Radius.circular(18) : Radius.zero,
-                right: !isCountry ? const Radius.circular(18) : Radius.zero,
-              ),
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () => setState(() {
-            country = isCountry;
-            refreshHistoryList();
-          }),
-          child: Container(
-            height: 36,
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 16,
-                  color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant.withOpacity(0.8),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? context.colors.primary : context.colors.onSurfaceVariant.withOpacity(0.8),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
     );
   }
 
