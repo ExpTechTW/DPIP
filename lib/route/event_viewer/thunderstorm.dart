@@ -76,8 +76,10 @@ class ThunderstormPage extends StatelessWidget {
               spacing: 8,
               children: areaCodes
                   .map((code) => Chip(
-                        label:
-                            Text("${Global.location[code.toString()]?.city}${Global.location[code.toString()]?.town}"),
+                        label: Text(
+                          "${Global.location[code.toString()]?.city}${Global.location[code.toString()]?.town}",
+                          style: const TextStyle(color: Colors.black),
+                        ),
                         backgroundColor: Colors.lightBlueAccent,
                       ))
                   .toList(),
