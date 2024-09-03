@@ -9,39 +9,123 @@ class AdvancedWeatherChart extends StatefulWidget {
 }
 
 class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
-  String selectedDataType = '溫度';
+  String selectedDataType = 'temperature';
   int touchedIndex = -1;
 
   final Map<String, List<double>> weatherData = {
-    '溫度': [22, 23, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 16, 18, 20, 22, 24, 25, 26, 25, 24, 23, 22],
-    '風速': [5, 6, 7, 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 4],
-    '降水': [0, 0.5, 1.2, 0.8, 0.3, 0, 0, 0, 0.1, 0.4, 0.2, 0, 0, 0, 0.1, 0.3, 0.5, 0.7, 0.4, 0.2, 0.1, 0, 0, 0],
-    '濕度': [65, 67, 70, 72, 75, 73, 70, 68, 65, 63, 60, 58, 55, 53, 50, 52, 55, 58, 60, 63, 65, 68, 70, 72],
-    '氣壓': [1013, 1012, 1011, 1010, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1016, 1015, 1014, 1013, 1012, 1011, 1010, 1009, 1010, 1011, 1012],
-    '風向': [0, 45, 90, 135, 180, 225, 270, 315, 0, 45, 90, 135, 180, 225, 270, 315, 0, 45, 90, 135, 180, 225, 270, 315],
+    'temperature': [22, 23, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 16, 18, 20, 22, 24, 25, 26, 25, 24, 23, 22],
+    'wind_speed': [5, 6, 7, 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 4],
+    'precipitation': [
+      0,
+      0.5,
+      1.2,
+      0.8,
+      0.3,
+      0,
+      0,
+      0,
+      0.1,
+      0.4,
+      0.2,
+      0,
+      0,
+      0,
+      0.1,
+      0.3,
+      0.5,
+      0.7,
+      0.4,
+      0.2,
+      0.1,
+      0,
+      0,
+      0
+    ],
+    'humidity': [65, 67, 70, 72, 75, 73, 70, 68, 65, 63, 60, 58, 55, 53, 50, 52, 55, 58, 60, 63, 65, 68, 70, 72],
+    'pressure': [
+      1013,
+      1012,
+      1011,
+      1010,
+      1009,
+      1010,
+      1011,
+      1012,
+      1013,
+      1014,
+      1015,
+      1016,
+      1017,
+      1016,
+      1015,
+      1014,
+      1013,
+      1012,
+      1011,
+      1010,
+      1009,
+      1010,
+      1011,
+      1012
+    ],
+    'wind_direction': [
+      0,
+      45,
+      90,
+      135,
+      180,
+      225,
+      270,
+      315,
+      0,
+      45,
+      90,
+      135,
+      180,
+      225,
+      270,
+      315,
+      0,
+      45,
+      90,
+      135,
+      180,
+      225,
+      270,
+      315
+    ],
+  };
+
+  final Map<String, String> dataTypeToChineseMap = {
+    'temperature': '溫度',
+    'wind_speed': '風速',
+    'precipitation': '降水',
+    'humidity': '濕度',
+    'pressure': '氣壓',
+    'wind_direction': '風向',
   };
 
   final Map<String, String> units = {
-    '溫度': '°C',
-    '風速': 'm/s',
-    '降水': 'mm',
-    '濕度': '%',
-    '氣壓': 'hPa',
-    '風向': '°',
+    'temperature': '°C',
+    'wind_speed': 'm/s',
+    'precipitation': 'mm',
+    'humidity': '%',
+    'pressure': 'hPa',
+    'wind_direction': '°',
   };
 
   Color getDataTypeColor(String dataType) {
     switch (dataType) {
-      case '溫度':
+      case 'temperature':
         return Colors.red;
-      case '風速':
-      case '風向':
+      case 'wind_speed':
+      case 'wind_direction':
         return Colors.orange;
-      case '降水':
+      case 'precipitation':
         return Colors.blue;
-      case '濕度':
+      case 'humidity':
         return Colors.purple;
-      case '氣壓':
+      case 'pressure':
         return Colors.green;
       default:
         return Colors.grey;
@@ -86,16 +170,16 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '24小時$selectedDataType趨勢',
+              '24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
             Text(
               displayValue,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: getDataTypeColor(selectedDataType),
-                fontWeight: FontWeight.bold,
-              ),
+                    color: getDataTypeColor(selectedDataType),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ],
         ),
@@ -104,7 +188,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   String _calculate24HourAverage() {
-    if (selectedDataType == '風向') {
+    if (selectedDataType == 'wind_direction') {
       return ''; // 風向不計算平均
     }
     double sum = weatherData[selectedDataType]!.reduce((a, b) => a + b);
@@ -118,11 +202,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         padding: const EdgeInsets.all(16),
         child: AspectRatio(
           aspectRatio: 16 / 9,
-          child: selectedDataType == '降水'
+          child: selectedDataType == 'precipitation'
               ? _buildBarChart()
-              : selectedDataType == '風向'
-              ? _buildWindDirectionChart()
-              : _buildLineChart(),
+              : selectedDataType == 'wind_direction'
+                  ? _buildWindDirectionChart()
+                  : _buildLineChart(),
         ),
       ),
     );
@@ -132,7 +216,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     Color lineColor = getDataTypeColor(selectedDataType);
     return LineChart(
       LineChartData(
-        gridData: FlGridData(show: false),
+        gridData: const FlGridData(show: false),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
@@ -148,8 +232,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               getTitlesWidget: (value, meta) => Text(value.toInt().toString()),
             ),
           ),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         borderData: FlBorderData(show: true),
         lineBarsData: [
@@ -163,7 +247,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             color: lineColor,
             barWidth: 3,
             isStrokeCapRound: true,
-            dotData: FlDotData(show: false),
+            dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
               color: lineColor.withOpacity(0.3),
@@ -180,23 +264,38 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             setState(() {
               if (event is FlPanEndEvent || event is FlTapUpEvent || event is FlLongPressEnd) {
                 touchedIndex = -1;
-              } else if (touchResponse?.lineBarSpots != null &&
-                  touchResponse!.lineBarSpots!.isNotEmpty) {
+              } else if (touchResponse?.lineBarSpots != null && touchResponse!.lineBarSpots!.isNotEmpty) {
                 touchedIndex = touchResponse.lineBarSpots![0].x.toInt();
               }
             });
           },
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-              return touchedBarSpots.map((barSpot) {
-                final flSpot = barSpot;
-                return LineTooltipItem(
-                  '${flSpot.y}${units[selectedDataType]}',
-                  const TextStyle(color: Colors.white),
-                );
-              }).toList();
+              return List.filled(touchedBarSpots.length, null);
             },
           ),
+          getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+            return spotIndexes.map((spotIndex) {
+              return TouchedSpotIndicatorData(
+                const FlLine(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                  dashArray: [5, 5],
+                ),
+                FlDotData(
+                  show: true,
+                  getDotPainter: (spot, percent, barData, index) {
+                    return FlDotCirclePainter(
+                      radius: 3,
+                      color: Colors.white,
+                      strokeWidth: 2,
+                      strokeColor: Colors.grey,
+                    );
+                  },
+                ),
+              );
+            }).toList();
+          },
         ),
         extraLinesData: ExtraLinesData(
           horizontalLines: [
@@ -236,13 +335,13 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         borderData: FlBorderData(show: true),
-        barGroups: weatherData['降水']!
+        barGroups: weatherData['precipitation']!
             .asMap()
             .entries
             .map((entry) => BarChartGroupData(
-          x: entry.key,
-          barRods: [BarChartRodData(toY: entry.value, color: barColor)],
-        ))
+                  x: entry.key,
+                  barRods: [BarChartRodData(toY: entry.value, color: barColor)],
+                ))
             .toList(),
         barTouchData: BarTouchData(
           touchCallback: (FlTouchEvent event, BarTouchResponse? touchResponse) {
@@ -257,7 +356,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           touchTooltipData: BarTouchTooltipData(
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
               return BarTooltipItem(
-                '${rod.toY}${units['降水']}',
+                '${rod.toY}${units['precipitation']}',
                 const TextStyle(color: Colors.white),
               );
             },
@@ -266,7 +365,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         extraLinesData: ExtraLinesData(
           horizontalLines: [
             HorizontalLine(
-              y: weatherData['降水']!.reduce((a, b) => a + b) / 24,
+              y: weatherData['precipitation']!.reduce((a, b) => a + b) / 24,
               color: Colors.black45,
               strokeWidth: 1,
               dashArray: [5, 5],
@@ -295,9 +394,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       },
       itemBuilder: (BuildContext context) => weatherData.keys
           .map((String choice) => PopupMenuItem<String>(
-        value: choice,
-        child: Text(choice),
-      ))
+                value: choice,
+                child: Text(dataTypeToChineseMap[choice]!),
+              ))
           .toList(),
     );
   }
@@ -320,7 +419,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                   color: getDataTypeColor(selectedDataType),
                 ),
                 const SizedBox(width: 8),
-                Text(selectedDataType),
+                Text(dataTypeToChineseMap[selectedDataType]!),
               ],
             ),
             const SizedBox(height: 8),
