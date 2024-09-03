@@ -277,6 +277,7 @@ class WeatherIcons {
 
   static String getWeatherContent(BuildContext context, String code) {
     Map<String, String> iconLabel = {
+      "-99": "系統異常",
       "100": context.i18n.sunny,
       "101": "晴有霾",
       "102": "晴有靄",

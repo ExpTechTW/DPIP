@@ -217,7 +217,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildTemperatureDisplay() {
     final tempParts = (weatherData['weather']?['data']?['air']?['temperature'] ?? '--').toString().split('.');
-    final weatherCode = weatherData['weather']?['data']?['weatherCode'] ?? 100;
+    final weatherCode = weatherData['weather']?['data']?['weather'] == "-99" ? -99 :
+    weatherData['weather']?['data']?['weatherCode'] ?? 100;
     const isDay = 1;
 
     return Padding(
