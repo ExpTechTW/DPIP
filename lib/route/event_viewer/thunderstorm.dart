@@ -158,8 +158,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
     start();
 
-    print(widget.item.area);
-
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
       if (!mounted) return;
       await _mapController.setLayerProperties(
@@ -324,6 +322,30 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               ),
             ),
           ),
+          Positioned(
+            left: 4,
+            top: 132,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: BackdropFilter(
+                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: context.colors.surface.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    "雷達合成回波",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: context.colors.onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           _buildDraggableSheet(context),
         ],
       ),
@@ -389,7 +411,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
     final int expireTimestamp = widget.item.time.expires['all'];
     final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
-    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC);
+    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
 
     return Row(
       children: [
@@ -454,8 +476,10 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final int expireTimestamp = widget.item.time.expires['all'];
     final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
     final String description = widget.item.text.description["all"] ?? "";
-    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC);
-    final DateTime localExpireTime = expireTimeUTC.toLocal();
+    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+    final DateTime localExpireTime = expireTimeUTC;
+
+    print(localExpireTime);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -480,7 +504,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   TZDateTime _convertToTZDateTime(int timestamp) {
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
     TZDateTime taipeTime = TZDateTime.from(dateTime, getLocation('Asia/Taipei'));
-    return taipeTime.toUtc();
+    return taipeTime;
   }
 
   Widget _buildTimeBar(BuildContext context, DateTime sendTime, DateTime expireTime, bool isExpired) {
