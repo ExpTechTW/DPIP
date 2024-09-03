@@ -134,8 +134,6 @@ class SoundDetailPage extends StatelessWidget {
         ];
       case 'rain':
         return [
-          buildSoundListTile(context.i18n.sound_major, context.i18n.thunderstorm_instant_messaging_description_sound,
-              "thunderstorm_major"),
           buildSoundListTile(context.i18n.me_general, context.i18n.sound_rain_minor_h2, "thunderstorm"),
         ];
       case 'weather':

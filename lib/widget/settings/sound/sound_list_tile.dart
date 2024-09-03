@@ -75,7 +75,7 @@ class SoundListTileState extends State<SoundListTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      trailing: !widget.enable! ? null : const Icon(Symbols.play_circle, fill: 1),
+      trailing: !widget.enable! ? null : const Icon(Symbols.volume_up, fill: 1),
       title: Text("${widget.title}${!widget.enable! ? context.i18n.not_enabled : ""}"),
       subtitle: Text(widget.subtitle),
       onTap: playSound,
