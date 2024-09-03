@@ -277,7 +277,7 @@ class WeatherIcons {
 
   static String getWeatherContent(BuildContext context, String code) {
     Map<String, String> iconLabel = {
-      "0": context.i18n.weather_system_abnormal,
+      "0": context.i18n.get_weather_abnormal,
       "100": context.i18n.sunny,
       "101": context.i18n.sunny_with_haze,
       "102": context.i18n.sunny_with_mist,

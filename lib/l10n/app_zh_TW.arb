@@ -1907,8 +1907,8 @@
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
-  "weather_system_abnormal": "天氣系統異常",
-  "@weather_system_abnormal": {
-    "description": "天氣系統異常"
+  "get_weather_abnormal": "取得天氣異常",
+  "@get_weather_abnormal": {
+    "description": "取得天氣異常"
   }
 }
