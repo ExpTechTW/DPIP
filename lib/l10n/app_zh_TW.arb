@@ -348,101 +348,29 @@
   "@eew_info_sound_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 地震資訊"
   },
-  "dp_info_sound_title": "災防資訊",
-  "@dp_info_sound_title": {
-    "description": "「我」路徑 → 「通知測試」內容 → 災防資訊"
-  },
   "other_title": "其他",
   "@other_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "大雷雨即時訊息",
-  "@thunderstorm_instant_messaging_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
-  },
-  "thunderstorm_instant_messaging_description_sound": "所在地發布 大雷雨即時訊息",
-  "@thunderstorm_instant_messaging_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
-  },
-  "heavy_rain_alert_sound": "大雨特報",
-  "@heavy_rain_alert_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 大雨特報"
-  },
-  "heavy_rain_alert_description_sound": "所在地發布 大雨特報",
-  "@heavy_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
-  },
-  "torrential_rain_alert_sound": "豪雨特報",
-  "@torrential_rain_alert_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 豪雨特報"
-  },
-  "torrential_rain_alert_description_sound": "所在地發布 豪雨特報",
-  "@torrential_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
-  },
-  "flooding_alert_sound": "淹水警戒",
-  "@flooding_alert_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 淹水警戒"
-  },
-  "flooding_alert_description_sound": "所在地發布 淹水警戒",
-  "@flooding_alert_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
-  },
   "tsunami_alert_sound": "海嘯警報（警報）",
   "@tsunami_alert_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
   "tsunami_alert_description_sound": "海嘯警報發布時\n沿海地區鄉鎮",
   "@tsunami_alert_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
   "tsunami_alert2_sound": "海嘯警報（注意）",
   "@tsunami_alert2_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
   "tsunami_alert2_description_sound": "海嘯警報發布時\n上述除外地區",
   "@tsunami_alert2_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 海嘯警報發布時\n上述除外地區"
-  },
-  "volcano_info_sound": "火山資訊",
-  "@volcano_info_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 火山資訊"
-  },
-  "volcano_info_description_sound": "所在地發布 火山資訊",
-  "@volcano_info_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
-  },
-  "high_temperature_info_sound": "高溫資訊",
-  "@high_temperature_info_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 高溫資訊"
-  },
-  "high_temperature_info_description_sound": "所在地發布 高溫資訊",
-  "@high_temperature_info_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
-  },
-  "strong_wind_warning_sound": "陸上強風特報",
-  "@strong_wind_warning_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 陸上強風特報"
-  },
-  "strong_wind_warning_description_sound": "所在地發布 陸上強風特報",
-  "@strong_wind_warning_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 陸上強風特報"
-  },
-  "other_alert_sound": "其他類型警報",
-  "@other_alert_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 其他類型警報"
-  },
-  "other_alert_description_sound": "所在地發布 其他類型警報",
-  "@other_alert_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
-  },
-  "server_announcement_sound": "伺服器公告",
-  "@server_announcement_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → 伺服器公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
   "server_announcement_description_sound": "ExpTech 發布之公告",
   "@server_announcement_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → ExpTech 發布之公告"
   },
   "monitor_list": "地圖列表",
   "@monitor_list": {
@@ -1555,9 +1483,9 @@
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
-  "history_valid_until": "套用",
+  "history_valid_until": "有效至",
   "@history_valid_until": {
-    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
+    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
   },
   "history_influence_area": "影響區域：",
   "@history_influence_area": {
@@ -1570,6 +1498,14 @@
   "sound_eew_minor": "緊急地震速報(一般)",
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
+  },
+  "sound_eew_silent": "緊急地震速報(無聲)",
+  "@sound_eew_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
+  },
+  "sound_eew_silent_h2": "最大震度 5 弱以上\n且所在地(鄉鎮)預估震度 1 以上",
+  "@sound_eew_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上\n且所在地(鄉鎮)預估震度 1 以上"
   },
   "sound_earthquake_eew_major": "地震速報(重大)",
   "@sound_earthquake_eew_major": {
@@ -1586,6 +1522,14 @@
   "sound_earthquake_eew_minor_h2": "所在地(鄉鎮)預估震度 2 以上",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
+  },
+  "sound_earthquake_eew_silent": "地震速報(無聲)",
+  "@sound_earthquake_eew_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
+  },
+  "sound_earthquake_eew_silent_h2": "所在地(鄉鎮)預估震度 1 以上",
+  "@sound_earthquake_eew_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
   "sound_int_report_minor": "震度速報(一般)",
   "@sound_report_minor": {
