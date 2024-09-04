@@ -13,6 +13,8 @@ import "package:dpip/widget/map/map.dart";
 import "package:flutter/material.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
 
+import "../meteor.dart";
+
 class WindData {
   final double latitude;
   final double longitude;
@@ -44,6 +46,7 @@ class _WindMapState extends State<WindMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  String? _selectedStationId;
 
   List<WindData> windDataList = [];
 
@@ -54,6 +57,22 @@ class _WindMapState extends State<WindMap> {
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
+  }
+
+  Future<void> _updateWindData(List<WeatherStation> weatherData) async {
+    windDataList = weatherData
+        .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+        .map((station) => WindData(
+      id: station.id,
+      latitude: station.station.lat,
+      longitude: station.station.lng,
+      direction: (station.data.wind.direction + 180) % 360,
+      speed: station.data.wind.speed,
+    ))
+        .toList();
+
+    await addDynamicWindArrows(windDataList);
+    setState(() {});
   }
 
   void _loadMap() async {
@@ -76,17 +95,7 @@ class _WindMapState extends State<WindMap> {
 
     List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
-    windDataList = weatherData
-        .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-        .map((station) => WindData(
-            id: station.id,
-            latitude: station.station.lat,
-            longitude: station.station.lng,
-            direction: (station.data.wind.direction + 180) % 360,
-            speed: station.data.wind.speed))
-        .toList();
-
-    await addDynamicWindArrows(windDataList);
+    _updateWindData(weatherData);
 
     if (isUserLocationValid) {
       await _mapController.addSource(
@@ -251,9 +260,22 @@ class _WindMapState extends State<WindMap> {
     );
 
     _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
-      final featureCollections = await _mapController.queryRenderedFeatures(point, ["wind-arrows"], null);
+      final features = await _mapController.queryRenderedFeatures(
+        point,
+        ['wind-arrows'],
+        null,
+      );
 
-      String id = featureCollections[0]["properties"]["id"];
+      if (features.isNotEmpty) {
+        final stationId = features[0]['properties']['id'] as String;
+        setState(() {
+          _selectedStationId = stationId;
+        });
+      } else {
+        setState(() {
+          _selectedStationId = null;
+        });
+      }
     });
 
     await _mapController.removeLayer("wind-speed-labels");
@@ -321,25 +343,11 @@ class _WindMapState extends State<WindMap> {
     super.dispose();
   }
 
-  void _onMapClick(Point<double> point, LatLng coordinates) async {
-    // final features = await _mapController.queryRenderedFeatures(
-    //     point,
-    //     ["wind-arrows"],
-    //     null
-    // );
-    //
-    // print("Queried features: $features");
-    print("---");
-    print(point);
-    print(coordinates);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         DpipMap(
-          onMapClick: _onMapClick,
           onMapCreated: _initMap,
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
@@ -348,7 +356,7 @@ class _WindMapState extends State<WindMap> {
           left: 4,
           bottom: 4,
           child: Material(
-            color: context.colors.secondary,
+            color: Theme.of(context).colorScheme.secondary,
             elevation: 4.0,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -363,14 +371,20 @@ class _WindMapState extends State<WindMap> {
                   child: Icon(
                     _showLegend ? Icons.close : Icons.info_outline,
                     size: 20,
-                    color: context.colors.onSecondary,
+                    color: Theme.of(context).colorScheme.onSecondary,
                   ),
                 ),
               ),
             ),
           ),
         ),
-        if (weather_list.isNotEmpty)
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50,
+            child: _buildLegend(),
+          ),
+        if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
             right: 0,
@@ -378,35 +392,56 @@ class _WindMapState extends State<WindMap> {
             child: TimeSelector(
               timeList: weather_list,
               onTimeExpanded: () {
-                _showLegend = false;
-                setState(() {});
+                setState(() {
+                  _showLegend = false;
+                });
               },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
-
-                windDataList = [];
-
-                windDataList = weatherData
-                    .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-                    .map((station) => WindData(
-                        id: station.id,
-                        latitude: station.station.lat,
-                        longitude: station.station.lng,
-                        direction: (station.data.wind.direction + 180) % 360,
-                        speed: station.data.wind.speed))
-                    .toList();
-
-                await addDynamicWindArrows(windDataList);
-                await _addUserLocationMarker();
-                setState(() {});
+                await _updateWindData(weatherData);
               },
             ),
           ),
-        if (_showLegend)
+        if (_selectedStationId != null)
           Positioned(
-            left: 6,
-            bottom: 50, // Adjusted to be above the legend button
-            child: _buildLegend(),
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: AdvancedWeatherChart(
+                          stationId: _selectedStationId!,
+                          onClose: () {
+                            setState(() {
+                              _selectedStationId = null;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
       ],
     );

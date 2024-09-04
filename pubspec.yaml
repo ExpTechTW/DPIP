@@ -53,6 +53,7 @@ dependencies:
   timezone: ^0.9.3
   url_launcher: ^6.3.0
   tutorial_coach_mark: ^1.2.11
+  fl_chart: ^0.69.0
 
 dev_dependencies:
   flutter_test:

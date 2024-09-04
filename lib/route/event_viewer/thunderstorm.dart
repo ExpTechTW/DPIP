@@ -39,11 +39,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   int _blink = 0;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     _mapController.dispose();
     _blinkTimer?.cancel();
@@ -478,8 +473,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final String description = widget.item.text.description["all"] ?? "";
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     final DateTime localExpireTime = expireTimeUTC;
-
-    print(localExpireTime);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
