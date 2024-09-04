@@ -54,7 +54,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool isAppBarVisible = false;
   late TabController _tabController;
   late PageController _pageController;
-  bool isCountryView = true;
 
   @override
   void initState() {
@@ -204,7 +203,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               controller: _pageController,
               onPageChanged: (index) {
                 setState(() {
-                  isCountryView = index == 0;
+                  country = index == 0;
                   refreshRealtimeList();
                 });
               },
@@ -239,6 +238,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         selected: {country},
         onSelectionChanged: (p0) => setState(() {
           country = p0.first;
+          _pageController.animateToPage(
+            country ? 0 : 1,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
           refreshRealtimeList();
         }),
       ),
