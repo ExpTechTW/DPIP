@@ -54,13 +54,15 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     });
   }
 
-  final Map<String, String> dataTypeToChineseMap = {
-    'temperature': '溫度',
-    'wind_speed': '風速/風向',
-    'precipitation': '降水',
-    'humidity': '濕度',
-    'pressure': '氣壓',
-  };
+  Map<String, String> get dataTypeToChineseMap {
+    return {
+      'temperature': context.i18n.temperature_monitor,
+      'wind_speed': context.i18n.wind_direction_and_speed_monitor,
+      'precipitation': context.i18n.precipitation_monitor,
+      'humidity': context.i18n.humidity_monitor,
+      'pressure': context.i18n.pressure_monitor,
+    };
+  }
 
   final Map<String, String> units = {
     'temperature': '°C',
@@ -142,7 +144,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   Widget _buildHeader() {
     String displayValue = touchedIndex != -1
         ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
-        : '平均   ${_calculate24HourAverage()}${units[selectedDataType]}';
+        : '${context.i18n.map_average}   ${_calculate24HourAverage()}${units[selectedDataType]}';
 
     return Card(
       elevation: 4,
@@ -571,7 +573,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               ),
             ),
             const SizedBox(width: 8),
-            const Text('平均'),
+            Text(context.i18n.map_average),
           ],
         ),
       ],

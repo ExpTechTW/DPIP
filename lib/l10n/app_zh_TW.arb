@@ -1658,5 +1658,9 @@
   "get_weather_abnormal": "取得天氣異常",
   "@get_weather_abnormal": {
     "description": "取得天氣異常"
+  },
+  "map_average": "平均",
+  "@map_average": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
   }
 }
