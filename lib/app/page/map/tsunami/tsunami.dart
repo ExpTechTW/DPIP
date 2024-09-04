@@ -126,7 +126,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             "name": actualStation.name,
             "id": actualStation.id,
             "waveHeight": actualStation.waveHeight,
-            "arrivalTime": DateFormat("dd日HH:mm").format(_convertTimestamp(actualStation.arrivalTime)),
+            "arrivalTime": DateFormat("MM/dd HH:mm").format(_convertTimestamp(actualStation.arrivalTime)),
           },
           "geometry": {
             "type": "Point",
@@ -175,11 +175,11 @@ class _TsunamiMapState extends State<TsunamiMap> {
           textField: [
             Expressions.concat,
             ["get", "name"],
-            " ",
-            ["get", "waveHeight"],
-            "cm\n",
+            "\n",
             ["get", "arrivalTime"],
-            " ${context.i18n.monitor_arrival}"
+            "\n",
+            ["get", "waveHeight"],
+            "cm\n${context.i18n.monitor_arrival}"
           ],
           textSize: 12,
           textColor: "#ffffff",
@@ -188,7 +188,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
           textFont: ["Noto Sans Regular"],
           textOffset: [
             Expressions.literal,
-            [0, 2]
+            [0, 3.5]
           ],
         ),
         minzoom: 7,
