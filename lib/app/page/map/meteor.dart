@@ -114,9 +114,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 _buildChart(),
-                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -178,6 +177,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            const SizedBox(height: 8),
             AspectRatio(
               aspectRatio: 16 / 9,
               child: selectedDataType == 'precipitation' ? _buildBarChart() : _buildLineChart(),
