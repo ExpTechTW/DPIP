@@ -1,9 +1,9 @@
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryTimelineItem extends StatelessWidget {
   final History history;
@@ -48,7 +48,7 @@ class HistoryTimelineItem extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: isExpired ? context.colors.error : context.colors.primaryContainer,
                       ),
-                      child: Icon(Symbols.rainy_rounded,
+                      child: Icon(ListIcons.getListIcon(history.icon),
                           color: isExpired ? context.colors.onError : context.colors.onPrimaryContainer),
                     ),
                   ),
