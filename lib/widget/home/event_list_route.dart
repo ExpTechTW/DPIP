@@ -3,35 +3,23 @@ import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:dpip/route/report/report.dart';
 import 'package:flutter/material.dart';
 
-class TypeConfig {
-  final Widget Function(History item) buildPage;
-
-  TypeConfig({required this.buildPage});
-}
-
-final Map<String, TypeConfig> typeConfigs = {
-  'thunderstorm': TypeConfig(
-    buildPage: (History item) => ThunderstormPage(item: item),
-  ),
-  'rain': TypeConfig(
-    buildPage: (History item) => ThunderstormPage(item: item),
-  ),
-  'earthquake': TypeConfig(
-    buildPage: (History item) => ReportRoute(id: item.addition?["id"]),
-  ),
+final Map<String, Widget Function(History item)> typeConfigs = {
+  'thunderstorm': (History item) => ThunderstormPage(item: item),
+  'rain': (History item) => ThunderstormPage(item: item),
+  'earthquake': (History item) => ReportRoute(id: item.addition?["id"]),
 };
 
-bool shouldShowArrow(dynamic item) {
+bool shouldShowArrow(History item) {
   return typeConfigs[item.type] != null ? true : false;
 }
 
-void handleEventList(BuildContext context, dynamic current) {
-  final config = typeConfigs[current.type];
-  if (config != null) {
+void handleEventList(BuildContext context, History current) {
+  final build = typeConfigs[current.type];
+  if (build != null) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => config.buildPage(current),
+        builder: (context) => build(current),
       ),
     );
   } else {
