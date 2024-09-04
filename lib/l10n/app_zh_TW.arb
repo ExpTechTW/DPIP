@@ -246,7 +246,7 @@
   },
   "settings_location": "所在地",
   "@settings_location": {
-    "description": "「設定」路徑 → 「所在地」副標題、「首頁」標題頁面 → 降水量"
+    "description": "「設定」路徑 → 「所在地」副標題、「歷史」標題頁面 → 降水量"
   },
   "settings_location_description": "調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等",
   "@settings_location_description": {
@@ -320,17 +320,13 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "最大震度 5 弱以上且\n所在地(鄉鎮)預估震度 4 以上",
+  "eew_alert_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上",
   "@eew_alert_description_sound": {
-    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以且\n所在地(鄉鎮)預估震度 4 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "最大震度 5 弱以上且\n所在地(鄉鎮)預估震度 2 以上",
+  "eew_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上",
   "@eew_description_sound": {
-    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上且\n所在地(鄉鎮)預估震度 2 以上"
-  },
-  "int_report_description_sound": "TREM 觀測網 所在地實測震度 3 以上",
-  "@int_report_description_sound": {
-    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
   "eq_description_sound": "偵測到晃動",
   "@eq_description_sound": {
@@ -444,10 +440,6 @@
   "@no_historical_events": {
     "description": "「歷史」路徑 → 沒有歷史事件資訊"
   },
-  "hourly_forecast": "每小時預報",
-  "@hourly_forecast": {
-    "description": "「首頁」路徑 → 「每小時預報」標題"
-  },
   "current_events": "目前的事件資訊",
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
@@ -516,10 +508,6 @@
   "me_debug": "除錯",
   "@me_debug": {
     "description": "「我」路徑 → 除錯"
-  },
-  "me_about": "關於",
-  "@me_about": {
-    "description": "「我」路徑 → 關於"
   },
   "official_web": "ExpTech 官網",
   "@official_web": {
@@ -1095,6 +1083,10 @@
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   },
+  "me_about": "關於",
+  "@me_about": {
+    "description": "「我」路徑 → 關於"
+  },
   "alarm_area": "警報區域",
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
@@ -1315,9 +1307,9 @@
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
-  "sound_eew_silent_h2": "最大震度 5 弱以上\n且所在地(鄉鎮)預估震度 1 以上",
+  "sound_eew_silent_h2": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上",
   "@sound_eew_silent_h2": {
-    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上\n且所在地(鄉鎮)預估震度 1 以上"
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上"
   },
   "sound_earthquake_eew_major": "地震速報(重大)",
   "@sound_earthquake_eew_major": {
