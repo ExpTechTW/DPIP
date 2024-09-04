@@ -11,6 +11,7 @@ import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/util/need_location.dart';
+import 'package:dpip/util/parser.dart';
 import 'package:dpip/util/radar_color.dart';
 import 'package:dpip/widget/chip/label_chip.dart';
 import 'package:dpip/widget/map/legend.dart';
@@ -370,7 +371,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   Widget _buildWarningHeader() {
     final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
     final int expireTimestamp = widget.item.time.expires['all']!;
-    final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
+    final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
 
     return Padding(
@@ -418,7 +419,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   Widget _buildWarningDetails() {
     final DateTime sendTime = widget.item.time.send;
     final int expireTimestamp = widget.item.time.expires['all']!;
-    final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
+    final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
     final String description = widget.item.text.description["all"] ?? "";
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     final DateTime localExpireTime = expireTimeUTC;
@@ -437,12 +438,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         _buildTimeBar(context, sendTime, localExpireTime, isExpired),
       ],
     );
-  }
-
-  TZDateTime _convertToTZDateTime(int timestamp) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    TZDateTime taipeTime = TZDateTime.from(dateTime, getLocation('Asia/Taipei'));
-    return taipeTime;
   }
 
   Widget _buildTimeBar(BuildContext context, DateTime sendTime, DateTime expireTime, bool isExpired) {
