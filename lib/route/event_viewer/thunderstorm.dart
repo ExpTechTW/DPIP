@@ -392,7 +392,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Widget _buildWarningHeader(BuildContext context) {
     final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
-    final int expireTimestamp = widget.item.time.expires['all'];
+    final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
 
@@ -456,7 +456,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Widget _buildWarningDetails(BuildContext context) {
     final DateTime sendTime = widget.item.time.send;
-    final int expireTimestamp = widget.item.time.expires['all'];
+    final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
     final String description = widget.item.text.description["all"] ?? "";
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());

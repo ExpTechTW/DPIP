@@ -1,7 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/timeline_item.dart';
 import 'package:dpip/model/history.dart';
+import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HistoryCountryTab extends StatefulWidget {
   const HistoryCountryTab({super.key});
@@ -31,28 +35,47 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        list.currentState?.show();
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      list.currentState?.show();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
+
     return RefreshIndicator(
       key: list,
       onRefresh: refreshHistoryList,
       child: ListView.builder(
         padding: EdgeInsets.zero,
-        itemCount: historyList.length,
+        itemCount: grouped.isEmpty ? 1 : grouped.length,
         itemBuilder: (context, index) {
-          final history = historyList[index];
-          return HistoryTimelineItem(
-            history: history,
-            first: index == 0,
-            last: index == historyList.length - 1,
-          );
+          if (grouped.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: Center(
+                child: Text(context.i18n.home_safety),
+              ),
+            );
+          }
+
+          final key = grouped.keys.elementAt(index);
+          final historyGroup = grouped[key]!;
+
+          return Column(children: [
+            TimelineItem(
+                child: Text(
+              key,
+              style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.secondary),
+            )),
+            ...historyGroup.map((history) {
+              return HistoryTimelineItem(
+                history: history,
+                last: index == historyList.length - 1,
+              );
+            })
+          ]);
         },
       ),
     );

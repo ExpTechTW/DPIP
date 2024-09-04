@@ -1,6 +1,8 @@
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryTimelineItem extends StatelessWidget {
@@ -33,9 +35,7 @@ class HistoryTimelineItem extends StatelessWidget {
                     bottom: last ? null : 0,
                     height: last ? 42 : null,
                     width: 1,
-                    child: Container(
-                      color: context.colors.outlineVariant,
-                    ),
+                    child: Container(color: context.colors.outlineVariant),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
@@ -59,16 +59,22 @@ class HistoryTimelineItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      history.text.content["all"]!.title,
-                      style: context.theme.textTheme.labelMedium?.copyWith(color: context.colors.secondary),
+                      DateFormat(context.i18n.time_format).format(history.time.send),
+                      style: context.theme.textTheme.labelMedium?.copyWith(color: context.colors.outline),
                     ),
                     Text(
                       history.text.content["all"]!.subtitle,
                       style: context.theme.textTheme.titleMedium,
                     ),
                     Text(
+                      "${DateFormat(context.i18n.datetime_format).format(parseDateTime(history.time.expires["all"]))} 失效",
+                      style: context.theme.textTheme.bodyMedium,
+                    ),
+                    Text(
                       history.text.description["all"]!,
                       style: context.theme.textTheme.bodyMedium,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

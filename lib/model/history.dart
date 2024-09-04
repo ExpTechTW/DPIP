@@ -34,7 +34,7 @@ class History {
 class InfoTime {
   @JsonKey(fromJson: parseDateTime, toJson: dateTimeToJson)
   final TZDateTime send;
-  final Map expires;
+  final Map<String, int> expires;
 
   InfoTime({
     required this.send,
