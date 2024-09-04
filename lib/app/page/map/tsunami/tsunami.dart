@@ -171,7 +171,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
       await _mapController.addSymbolLayer(
         "tsunami-data",
         "tsunami-actual-labels",
-        const SymbolLayerProperties(
+        SymbolLayerProperties(
           textField: [
             Expressions.concat,
             ["get", "name"],
@@ -179,7 +179,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             ["get", "waveHeight"],
             "cm\n",
             ["get", "arrivalTime"],
-            " 抵達"
+            " ${context.i18n.monitor_arrival}"
           ],
           textSize: 12,
           textColor: "#ffffff",
