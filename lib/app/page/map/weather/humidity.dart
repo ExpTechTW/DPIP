@@ -207,6 +207,7 @@ class _HumidityMapState extends State<HumidityMap> {
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
+        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
         setState(() {
           _selectedStationId = stationId;
         });

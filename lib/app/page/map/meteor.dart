@@ -7,6 +7,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+typedef StationIdUpdateCallback = void Function(String?);
+
 class AdvancedWeatherChart extends StatefulWidget {
   final String stationId;
   final VoidCallback onClose;
@@ -21,6 +23,20 @@ class AdvancedWeatherChart extends StatefulWidget {
 
   @override
   State<AdvancedWeatherChart> createState() => _AdvancedWeatherChartState();
+
+  static StationIdUpdateCallback? _activeCallback;
+
+  static void setActiveCallback(StationIdUpdateCallback callback) {
+    _activeCallback = callback;
+  }
+
+  static void clearActiveCallback() {
+    _activeCallback = null;
+  }
+
+  static void updateStationId(String? getstationId) {
+    _activeCallback?.call(getstationId);
+  }
 }
 
 class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
@@ -30,16 +46,32 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   Map<String, List<double>> weatherData = {};
   List<double> windDirection = [];
   MeteorStation? data;
+  String? stationId;
 
   @override
   void initState() {
     super.initState();
+    stationId = widget.stationId;
     _fetchWeatherData();
     selectedDataType = widget.type;
+    AdvancedWeatherChart.setActiveCallback(_handleStationIdUpdate);
+  }
+
+  @override
+  void dispose() {
+    AdvancedWeatherChart.clearActiveCallback();
+    super.dispose();
+  }
+
+  void _handleStationIdUpdate(String? getstationId) {
+    if (mounted) {
+      stationId = getstationId;
+      _fetchWeatherData();
+    }
   }
 
   Future<void> _fetchWeatherData() async {
-    data = await ExpTech().getMeteorStation(widget.stationId);
+    data = await ExpTech().getMeteorStation(stationId!);
     setState(() {
       windDirection = data!.windDirection.reversed.toList();
       weatherData = {
@@ -108,7 +140,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 style: context.theme.textTheme.titleLarge,
               ),
               Text(
-                widget.stationId,
+                stationId!,
                 style: context.theme.textTheme.bodyMedium?.copyWith(
                   color: context.colors.onSurface.withOpacity(0.7),
                 ),
