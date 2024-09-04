@@ -21,8 +21,8 @@ class DPIPInfoPage extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              context.theme.colorScheme.primary.withOpacity(0.05),
-              context.theme.colorScheme.surface,
+              context.colors.primary.withOpacity(0.05),
+              context.colors.surface,
             ],
           ),
         ),
@@ -72,7 +72,7 @@ class DPIPInfoPage extends StatelessWidget {
               context.i18n.developer_message,
               style: context.theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: context.theme.colorScheme.primary,
+                color: context.colors.primary,
               ),
             ),
           ],
@@ -93,13 +93,13 @@ class DPIPInfoPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: context.theme.colorScheme.primary, size: 28),
+                Icon(icon, color: context.colors.primary, size: 28),
                 const SizedBox(width: 12),
                 Text(
                   title,
                   style: context.theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: context.theme.colorScheme.primary,
+                    color: context.colors.primary,
                   ),
                 ),
               ],

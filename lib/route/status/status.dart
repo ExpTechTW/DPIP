@@ -65,7 +65,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text('${context.i18n.error_prefix} ${snapshot.error}',
-                        style: TextStyle(color: context.theme.colorScheme.error, fontSize: 16)),
+                        style: TextStyle(color: context.colors.error, fontSize: 16)),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(

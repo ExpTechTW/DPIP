@@ -355,7 +355,7 @@ class _WindMapState extends State<WindMap> {
           left: 4,
           bottom: 4,
           child: Material(
-            color: context.theme.colorScheme.secondary,
+            color: context.colors.secondary,
             elevation: 4.0,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -370,7 +370,7 @@ class _WindMapState extends State<WindMap> {
                   child: Icon(
                     _showLegend ? Icons.close : Icons.info_outline,
                     size: 20,
-                    color: context.theme.colorScheme.onSecondary,
+                    color: context.colors.onSecondary,
                   ),
                 ),
               ),
