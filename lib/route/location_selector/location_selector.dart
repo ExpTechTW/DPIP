@@ -47,7 +47,6 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
       const MonitorPage(data: 0).createState();
       const HomePage().createState();
       HomePage.updatePosition();
-      HistoryPage.updatePosition();
       RadarMap.updatePosition();
       MonitorPage.updatePosition();
       Navigator.popUntil(context, ModalRoute.withName("/settings"));

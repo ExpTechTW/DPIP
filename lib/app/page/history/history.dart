@@ -5,20 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryPage extends StatefulWidget {
-  final Function()? onPositionUpdate;
-
-  const HistoryPage({super.key, this.onPositionUpdate});
+  const HistoryPage({super.key});
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
-
-  static void updatePosition() => _activeCallback?.call();
-
-  static void setActiveCallback(VoidCallback callback) => _activeCallback = callback;
-
-  static void clearActiveCallback() => _activeCallback = null;
-
-  static VoidCallback? _activeCallback;
 }
 
 class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin {
@@ -62,7 +52,6 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
 
   @override
   void dispose() {
-    HistoryPage.clearActiveCallback();
     controller.dispose();
     super.dispose();
   }

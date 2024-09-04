@@ -46,7 +46,6 @@ void _updateAllPositions() {
   SettingsLocationView.updatePosition();
   RadarMap.updatePosition();
   HomePage.updatePosition();
-  HistoryPage.updatePosition();
   MonitorPage.updatePosition();
 }
 

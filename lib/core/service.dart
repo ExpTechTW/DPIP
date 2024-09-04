@@ -79,7 +79,6 @@ void androidSendPositionlisten() {
       const MonitorPage(data: 0).createState();
       SettingsLocationView.updatePosition();
       HomePage.updatePosition();
-      HistoryPage.updatePosition();
       RadarMap.updatePosition();
       MonitorPage.updatePosition();
     }
