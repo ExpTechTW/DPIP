@@ -18,6 +18,7 @@ import "package:dpip/model/weather/rain.dart";
 import "package:dpip/model/weather/typhoon.dart";
 import "package:dpip/model/weather/weather.dart";
 import "package:http/http.dart";
+import "package:dpip/model/meteor_station.dart";
 
 class ExpTech {
   String? apikey;
@@ -482,5 +483,19 @@ class ExpTech {
     } else {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
+  }
+
+  Future<MeteorStation> getMeteorStation(String id) async {
+    final requestUrl = Route.meteorStation(id);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final Map<String, dynamic> jsonData = jsonDecode(res.body);
+
+    return MeteorStation.fromJson(jsonData);
   }
 }
