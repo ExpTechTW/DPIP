@@ -6,6 +6,7 @@ import "package:dpip/model/announcement.dart";
 import "package:dpip/model/crowdin/localization_progress.dart";
 import "package:dpip/model/eew.dart";
 import "package:dpip/model/history.dart";
+import "package:dpip/model/meteor_station.dart";
 import "package:dpip/model/notification_record.dart";
 import "package:dpip/model/report/earthquake_report.dart";
 import "package:dpip/model/report/partial_earthquake_report.dart";
@@ -18,7 +19,6 @@ import "package:dpip/model/weather/rain.dart";
 import "package:dpip/model/weather/typhoon.dart";
 import "package:dpip/model/weather/weather.dart";
 import "package:http/http.dart";
-import "package:dpip/model/meteor_station.dart";
 
 class ExpTech {
   String? apikey;

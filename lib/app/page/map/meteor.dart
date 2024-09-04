@@ -1,19 +1,20 @@
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/meteor_station.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import 'package:dpip/api/exptech.dart';
 
 class AdvancedWeatherChart extends StatefulWidget {
   final String stationId;
   final VoidCallback onClose;
+  final String? type;
 
   const AdvancedWeatherChart({
     super.key,
     required this.stationId,
     required this.onClose,
+    this.type = 'temperature',
   });
 
   @override
@@ -21,7 +22,7 @@ class AdvancedWeatherChart extends StatefulWidget {
 }
 
 class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
-  String selectedDataType = 'temperature';
+  String? selectedDataType;
   int touchedIndex = -1;
   bool isLoading = true;
   Map<String, List<double>> weatherData = {};
@@ -32,6 +33,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   void initState() {
     super.initState();
     _fetchWeatherData();
+    selectedDataType = widget.type;
   }
 
   Future<void> _fetchWeatherData() async {
@@ -52,7 +54,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   final Map<String, String> dataTypeToChineseMap = {
     'temperature': '溫度',
-    'wind_speed': '風速',
+    'wind_speed': '風速/風向',
     'precipitation': '降水',
     'humidity': '濕度',
     'pressure': '氣壓',
@@ -94,7 +96,13 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             onPressed: widget.onClose,
           ),
           automaticallyImplyLeading: false,
-          title: Text('${widget.stationId} ${data?.station.county ?? ""}${data?.station.name ?? ""}'),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${data?.station.county ?? ""}${data?.station.name ?? ""}', style: const TextStyle(fontSize: 22)),
+              Text(widget.stationId, style: const TextStyle(fontSize: 16))
+            ],
+          ),
           actions: [_buildDataTypeSelector(), const SizedBox(width: 8)],
         ),
         if (isLoading)
@@ -139,7 +147,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 Text(
                   displayValue,
                   style: context.theme.textTheme.titleSmall?.copyWith(
-                    color: getDataTypeColor(selectedDataType),
+                    color: getDataTypeColor(selectedDataType!),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -148,7 +156,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             if (selectedDataType == 'wind_speed' && touchedIndex != -1)
               Transform.rotate(
                 angle: (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
-                child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType), size: 48),
+                child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType!), size: 48),
               ),
           ],
         ),
@@ -183,7 +191,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildLineChart() {
-    Color lineColor = getDataTypeColor(selectedDataType);
+    Color lineColor = getDataTypeColor(selectedDataType!);
     List<FlSpot> spots = [];
     for (int i = 0; i < weatherData[selectedDataType]!.length; i++) {
       if (weatherData[selectedDataType]![i] == -99) {
@@ -295,7 +303,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildBarChart() {
-    Color barColor = getDataTypeColor(selectedDataType);
+    Color barColor = getDataTypeColor(selectedDataType!);
     return BarChart(
       BarChartData(
         gridData: const FlGridData(show: false),
@@ -441,7 +449,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             Container(
               width: 20,
               height: 3,
-              color: getDataTypeColor(selectedDataType),
+              color: getDataTypeColor(selectedDataType!),
             ),
             const SizedBox(width: 8),
             Text(dataTypeToChineseMap[selectedDataType]!),

@@ -1,6 +1,8 @@
 import "dart:io";
+import "dart:math";
 
 import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/weather/weather.dart";
@@ -19,6 +21,7 @@ class HumidityData {
   final String stationName;
   final String county;
   final String town;
+  final String id;
 
   HumidityData({
     required this.latitude,
@@ -27,6 +30,7 @@ class HumidityData {
     required this.stationName,
     required this.county,
     required this.town,
+    required this.id,
   });
 }
 
@@ -45,6 +49,7 @@ class _HumidityMapState extends State<HumidityMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  String? _selectedStationId;
 
   List<HumidityData> humidityDataList = [];
 
@@ -79,6 +84,7 @@ class _HumidityMapState extends State<HumidityMap> {
     humidityDataList = weatherData
         .where((station) => station.data.air.relative_humidity != -99)
         .map((station) => HumidityData(
+              id: station.id,
               latitude: station.station.lat,
               longitude: station.station.lng,
               humidity: station.data.air.relative_humidity,
@@ -148,6 +154,7 @@ class _HumidityMapState extends State<HumidityMap> {
         .map((data) => {
               "type": "Feature",
               "properties": {
+                "id": data.id,
                 "humidity": data.humidity,
               },
               "geometry": {
@@ -190,6 +197,25 @@ class _HumidityMapState extends State<HumidityMap> {
         circleStrokeOpacity: 0.7,
       ),
     );
+
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+      final features = await _mapController.queryRenderedFeatures(
+        point,
+        ['humidity-circles'],
+        null,
+      );
+
+      if (features.isNotEmpty) {
+        final stationId = features[0]['properties']['id'] as String;
+        setState(() {
+          _selectedStationId = stationId;
+        });
+      } else {
+        setState(() {
+          _selectedStationId = null;
+        });
+      }
+    });
 
     await _mapController.removeLayer("humidity-labels");
     await _mapController.addSymbolLayer(
@@ -303,7 +329,7 @@ class _HumidityMapState extends State<HumidityMap> {
             ),
           ),
         ),
-        if (weather_list.isNotEmpty)
+        if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
             right: 0,
@@ -322,6 +348,7 @@ class _HumidityMapState extends State<HumidityMap> {
                 humidityDataList = weatherData
                     .where((station) => station.data.air.relative_humidity != -99)
                     .map((station) => HumidityData(
+                          id: station.id,
                           latitude: station.station.lat,
                           longitude: station.station.lng,
                           humidity: station.data.air.relative_humidity,
@@ -342,6 +369,48 @@ class _HumidityMapState extends State<HumidityMap> {
             left: 6,
             bottom: 50, // Adjusted to be above the legend button
             child: _buildLegend(),
+          ),
+        if (_selectedStationId != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: AdvancedWeatherChart(
+                          type: "humidity",
+                          stationId: _selectedStationId!,
+                          onClose: () {
+                            setState(() {
+                              _selectedStationId = null;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
       ],
     );

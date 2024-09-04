@@ -1,6 +1,8 @@
 import "dart:io";
+import "dart:math";
 
 import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/weather/weather.dart";
@@ -19,6 +21,7 @@ class PressureData {
   final String stationName;
   final String county;
   final String town;
+  final String id;
 
   PressureData({
     required this.latitude,
@@ -27,6 +30,7 @@ class PressureData {
     required this.stationName,
     required this.county,
     required this.town,
+    required this.id,
   });
 }
 
@@ -45,6 +49,7 @@ class _PressureMapState extends State<PressureMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  String? _selectedStationId;
 
   List<PressureData> pressureDataList = [];
 
@@ -79,6 +84,7 @@ class _PressureMapState extends State<PressureMap> {
     pressureDataList = weatherData
         .where((station) => station.data.air.pressure != -99)
         .map((station) => PressureData(
+              id: station.id,
               latitude: station.station.lat,
               longitude: station.station.lng,
               pressure: station.data.air.pressure,
@@ -148,6 +154,7 @@ class _PressureMapState extends State<PressureMap> {
         .map((data) => {
               "type": "Feature",
               "properties": {
+                "id": data.id,
                 "pressure": data.pressure,
               },
               "geometry": {
@@ -192,6 +199,25 @@ class _PressureMapState extends State<PressureMap> {
         circleStrokeOpacity: 0.7,
       ),
     );
+
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+      final features = await _mapController.queryRenderedFeatures(
+        point,
+        ['pressure-circles'],
+        null,
+      );
+
+      if (features.isNotEmpty) {
+        final stationId = features[0]['properties']['id'] as String;
+        setState(() {
+          _selectedStationId = stationId;
+        });
+      } else {
+        setState(() {
+          _selectedStationId = null;
+        });
+      }
+    });
 
     await _mapController.removeLayer("pressure-labels");
     await _mapController.addSymbolLayer(
@@ -307,7 +333,7 @@ class _PressureMapState extends State<PressureMap> {
             ),
           ),
         ),
-        if (weather_list.isNotEmpty)
+        if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
             right: 0,
@@ -326,6 +352,7 @@ class _PressureMapState extends State<PressureMap> {
                 pressureDataList = weatherData
                     .where((station) => station.data.air.pressure != -99)
                     .map((station) => PressureData(
+                          id: station.id,
                           latitude: station.station.lat,
                           longitude: station.station.lng,
                           pressure: station.data.air.pressure,
@@ -346,6 +373,48 @@ class _PressureMapState extends State<PressureMap> {
             left: 6,
             bottom: 50, // Adjusted to be above the legend button
             child: _buildLegend(),
+          ),
+        if (_selectedStationId != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.7,
+              ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: AdvancedWeatherChart(
+                          type: "pressure",
+                          stationId: _selectedStationId!,
+                          onClose: () {
+                            setState(() {
+                              _selectedStationId = null;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
       ],
     );

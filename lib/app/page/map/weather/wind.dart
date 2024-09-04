@@ -2,6 +2,7 @@ import "dart:io";
 import "dart:math";
 
 import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/weather/weather.dart";
@@ -12,8 +13,6 @@ import "package:dpip/widget/map/legend.dart";
 import "package:dpip/widget/map/map.dart";
 import "package:flutter/material.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
-
-import "../meteor.dart";
 
 class WindData {
   final double latitude;
@@ -63,12 +62,12 @@ class _WindMapState extends State<WindMap> {
     windDataList = weatherData
         .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
         .map((station) => WindData(
-      id: station.id,
-      latitude: station.station.lat,
-      longitude: station.station.lng,
-      direction: (station.data.wind.direction + 180) % 360,
-      speed: station.data.wind.speed,
-    ))
+              id: station.id,
+              latitude: station.station.lat,
+              longitude: station.station.lng,
+              direction: (station.data.wind.direction + 180) % 360,
+              speed: station.data.wind.speed,
+            ))
         .toList();
 
     await addDynamicWindArrows(windDataList);
@@ -262,7 +261,7 @@ class _WindMapState extends State<WindMap> {
     _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
       final features = await _mapController.queryRenderedFeatures(
         point,
-        ['wind-arrows'],
+        ['wind-arrows', "wind-circles"],
         null,
       );
 
@@ -429,6 +428,7 @@ class _WindMapState extends State<WindMap> {
                     Flexible(
                       child: SingleChildScrollView(
                         child: AdvancedWeatherChart(
+                          type: "wind_speed",
                           stationId: _selectedStationId!,
                           onClose: () {
                             setState(() {
