@@ -31,14 +31,17 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
   String? region;
 
   Future<void> refreshHistoryList() async {
+    if (!mounted) return;
     setState(() => isLoading = true);
     try {
       final data = await ExpTech().getHistoryRegion(region!);
+      if (!mounted) return;
       setState(() {
         historyList = data.reversed.toList();
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }
@@ -62,7 +65,7 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
   @override
   Widget build(BuildContext context) {
     final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
-    if (region == "-1") {
+    if (region == null) {
       return const RegionOutOfService();
     }
 

@@ -22,14 +22,17 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
   List<History> historyList = [];
 
   Future<void> refreshHistoryList() async {
+    if (!mounted) return;
     setState(() => isLoading = true);
     try {
       final data = await ExpTech().getHistory();
+      if (!mounted) return;
       setState(() {
         historyList = data.reversed.toList();
         isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }
