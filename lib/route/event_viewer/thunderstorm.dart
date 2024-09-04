@@ -22,6 +22,7 @@ import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 
 class ThunderstormPage extends StatefulWidget {
@@ -457,9 +458,9 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTimeInfo(context, Icons.access_time, context.i18n.history_send_time, sendTime),
+          _buildTimeInfo(context, Symbols.schedule_rounded, context.i18n.history_send_time, sendTime),
           const SizedBox(height: 12),
-          _buildTimeInfo(context, Icons.timer_off, context.i18n.history_valid_until, expireTime),
+          _buildTimeInfo(context, Symbols.flag_rounded, context.i18n.history_valid_until, expireTime),
           const SizedBox(height: 16),
           Stack(
             children: [
@@ -494,7 +495,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           children: [
             Text(
               label,
-              style: context.theme.textTheme.labelMedium?.copyWith(
+              style: context.theme.textTheme.labelLarge?.copyWith(
                 color: context.colors.onSurfaceVariant,
               ),
             ),
@@ -555,47 +556,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     return DetailFieldTile(
       label: context.i18n.history_affected_area,
       child: Column(children: areas),
-    );
-  }
-
-  Widget _buildAreaChip(BuildContext context, int code) {
-    final location = Global.location[code.toString()];
-    final city = location?.city ?? '';
-    final town = location?.town ?? '';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8, right: 8),
-      child: Material(
-        elevation: 2,
-        shadowColor: context.colors.shadow,
-        borderRadius: BorderRadius.circular(20),
-        color: context.colors.surfaceVariant,
-        child: InkWell(
-          onTap: () {},
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.location_on,
-                  size: 16,
-                  color: context.colors.primary,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  "$city$town",
-                  style: TextStyle(
-                    color: context.colors.onSurfaceVariant,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
