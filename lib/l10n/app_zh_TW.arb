@@ -497,193 +497,9 @@
   "@sunny": {
     "description": "天氣狀況：晴"
   },
-  "partly_cloudy": "局部多雲",
-  "@partly_cloudy": {
-    "description": "天氣狀況：局部多雲"
-  },
-  "cloudy": "多雲",
-  "@cloudy": {
-    "description": "天氣狀況：多雲"
-  },
   "overcast": "陰",
   "@overcast": {
     "description": "天氣狀況：陰"
-  },
-  "foggy": "薄霧",
-  "@foggy": {
-    "description": "天氣狀況：薄霧"
-  },
-  "patchy_rain_possible": "可能有局部小雨",
-  "@patchy_rain_possible": {
-    "description": "天氣狀況：可能有局部小雨"
-  },
-  "patchy_snow_possible": "可能有局部小雪",
-  "@patchy_snow_possible": {
-    "description": "天氣狀況：可能有局部小雪"
-  },
-  "patchy_sleet_possible": "可能有局部小雨夾雪",
-  "@patchy_sleet_possible": {
-    "description": "天氣狀況：可能有局部小雨夾雪"
-  },
-  "patchy_freezing_drizzle_possible": "可能有局部小凍霧雨",
-  "@patchy_freezing_drizzle_possible": {
-    "description": "天氣狀況：可能有局部小凍霧雨"
-  },
-  "thundery_outbreaks_possible": "可能有雷雨",
-  "@thundery_outbreaks_possible": {
-    "description": "天氣狀況：可能有雷雨"
-  },
-  "blowing_snow": "飛雪",
-  "@blowing_snow": {
-    "description": "天氣狀況：飛雪"
-  },
-  "blizzard": "暴風雪",
-  "@blizzard": {
-    "description": "天氣狀況：暴風雪"
-  },
-  "fog": "霧",
-  "@fog": {
-    "description": "天氣狀況：霧"
-  },
-  "freezing_fog": "凍霧",
-  "@freezing_fog": {
-    "description": "天氣狀況：凍霧"
-  },
-  "patchy_light_drizzle": "局部細雨",
-  "@patchy_light_drizzle": {
-    "description": "天氣狀況：局部細雨"
-  },
-  "light_drizzle": "細雨",
-  "@light_drizzle": {
-    "description": "天氣狀況：細雨"
-  },
-  "freezing_drizzle": "凍霧雨",
-  "@freezing_drizzle": {
-    "description": "天氣狀況：凍霧雨"
-  },
-  "heavy_freezing_drizzle": "大凍霧雨",
-  "@heavy_freezing_drizzle": {
-    "description": "天氣狀況：大凍霧雨"
-  },
-  "patchy_light_rain": "局部小雨",
-  "@patchy_light_rain": {
-    "description": "天氣狀況：局部小雨"
-  },
-  "light_rain": "小雨",
-  "@light_rain": {
-    "description": "天氣狀況：小雨"
-  },
-  "moderate_rain_at_times": "偶爾有雨",
-  "@moderate_rain_at_times": {
-    "description": "天氣狀況：偶爾有雨"
-  },
-  "moderate_rain": "雨",
-  "@moderate_rain": {
-    "description": "天氣狀況：雨"
-  },
-  "heavy_rain_at_times": "偶爾有大雨",
-  "@heavy_rain_at_times": {
-    "description": "天氣狀況：偶爾有大雨"
-  },
-  "heavy_rain": "大雨",
-  "@heavy_rain": {
-    "description": "天氣狀況：大雨"
-  },
-  "light_freezing_rain": "微凍雨",
-  "@light_freezing_rain": {
-    "description": "天氣狀況：微凍雨"
-  },
-  "moderate_or_heavy_freezing_rain": "中度或大凍雨",
-  "@moderate_or_heavy_freezing_rain": {
-    "description": "天氣狀況：中度或大凍雨"
-  },
-  "light_sleet": "微雨夾雪",
-  "@light_sleet": {
-    "description": "天氣狀況：微雨夾雪"
-  },
-  "moderate_or_heavy_sleet": "中度或大雨夾雪",
-  "@moderate_or_heavy_sleet": {
-    "description": "天氣狀況：中度或大雨夾雪"
-  },
-  "patchy_light_snow": "局部小雪",
-  "@patchy_light_snow": {
-    "description": "天氣狀況：零星小雪"
-  },
-  "light_snow": "小雪",
-  "@light_snow": {
-    "description": "天氣狀況：小雪"
-  },
-  "patchy_moderate_snow": "局部降雪",
-  "@patchy_moderate_snow": {
-    "description": "天氣狀況：局部降雪"
-  },
-  "moderate_snow": "雪",
-  "@moderate_snow": {
-    "description": "天氣狀況：雪"
-  },
-  "patchy_heavy_snow": "局部大雪",
-  "@patchy_heavy_snow": {
-    "description": "天氣狀況：局部大雪"
-  },
-  "heavy_snow": "大雪",
-  "@heavy_snow": {
-    "description": "天氣狀況：大雪"
-  },
-  "ice_pellets": "冰丸",
-  "@ice_pellets": {
-    "description": "天氣狀況：冰丸"
-  },
-  "light_rain_shower": "小陣雨",
-  "@light_rain_shower": {
-    "description": "天氣狀況：小陣雨"
-  },
-  "moderate_or_heavy_rain_shower": "中度或大陣雨",
-  "@moderate_or_heavy_rain_shower": {
-    "description": "天氣狀況：中度或大陣雨"
-  },
-  "torrential_rain_shower": "暴雨",
-  "@torrential_rain_shower": {
-    "description": "天氣狀況：暴雨"
-  },
-  "light_sleet_showers": "小冰雹雨",
-  "@light_sleet_showers": {
-    "description": "天氣狀況：小冰雹雨"
-  },
-  "moderate_or_heavy_sleet_showers": "中度或大冰雹雨",
-  "@moderate_or_heavy_sleet_showers": {
-    "description": "天氣狀況：中度或大冰雹雨"
-  },
-  "light_snow_showers": "小陣雪",
-  "@light_snow_showers": {
-    "description": "天氣狀況：小陣雪"
-  },
-  "moderate_or_heavy_snow_showers": "中度或大陣雪",
-  "@moderate_or_heavy_snow_showers": {
-    "description": "天氣狀況：中度或大陣雪"
-  },
-  "light_showers_of_ice_pellets": "冰丸小雨",
-  "@light_showers_of_ice_pellets": {
-    "description": "天氣狀況：冰丸小雨"
-  },
-  "moderate_or_heavy_showers_of_ice_pellets": "中度或大冰丸",
-  "@moderate_or_heavy_showers_of_ice_pellets": {
-    "description": "天氣狀況：中度或大冰丸"
-  },
-  "patchy_light_rain_with_thunder": "局部小雷雨",
-  "@patchy_light_rain_with_thunder": {
-    "description": "天氣狀況：局部小雷雨"
-  },
-  "moderate_or_heavy_rain_with_thunder": "中度或大雷雨",
-  "@moderate_or_heavy_rain_with_thunder": {
-    "description": "天氣狀況：中度或大雷雨"
-  },
-  "patchy_light_snow_with_thunder": "局部小雪伴雷",
-  "@patchy_light_snow_with_thunder": {
-    "description": "天氣狀況：局部小雪伴雷"
-  },
-  "moderate_or_heavy_snow_with_thunder": "中度或大雪伴雷",
-  "@moderate_or_heavy_snow_with_thunder": {
-    "description": "天氣狀況：中度或大雪伴雷"
   },
   "more": "更多",
   "@more": {
@@ -889,10 +705,6 @@
   "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-  },
-  "required_info_permissions": "所需的資訊和權限列表：",
-  "@required_info_permissions": {
-    "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
   "notification": "通知",
   "@notification": {
@@ -1443,9 +1255,9 @@
   "@home_precipitation": {
     "description": "「首頁」頁面 → 降水量"
   },
-  "home_area": "全國",
-  "@home_area": {
-    "description": "「首頁」頁面 → 全國"
+  "history_nationwide": "全國",
+  "@history_nationwide": {
+    "description": "「歷史」頁面 → 全國"
   },
   "me_welcome": "歡迎頁面",
   "@me_welcome": {

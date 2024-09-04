@@ -39,7 +39,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
               tabs: [
                 Tab(
                   icon: const Icon(Symbols.public_rounded),
-                  text: context.i18n.home_area,
+                  text: context.i18n.history_nationwide,
                 ),
                 Tab(
                   icon: const Icon(Symbols.home_rounded),

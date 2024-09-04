@@ -321,7 +321,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         segments: [
           ButtonSegment(
             icon: const Icon(Symbols.public_rounded),
-            tooltip: context.i18n.home_area,
+            tooltip: context.i18n.history_nationwide,
             value: true,
           ),
           ButtonSegment(
