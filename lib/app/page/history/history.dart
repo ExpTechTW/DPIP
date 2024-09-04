@@ -15,6 +15,15 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   late final controller = TabController(length: 2, vsync: this, initialIndex: 1);
 
   @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      if (!mounted || !controller.indexIsChanging) return;
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return NestedScrollView(
       headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -28,11 +37,17 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
               controller: controller,
               tabs: [
                 Tab(
-                  icon: const Icon(Symbols.public_rounded),
+                  icon: Icon(
+                    Symbols.globe_asia_rounded,
+                    fill: controller.index == 0 ? 1 : 0,
+                  ),
                   text: context.i18n.history_nationwide,
                 ),
                 Tab(
-                  icon: const Icon(Symbols.home_rounded),
+                  icon: Icon(
+                    Symbols.home_rounded,
+                    fill: controller.index == 1 ? 1 : 0,
+                  ),
                   text: context.i18n.settings_location,
                 ),
               ],
@@ -42,6 +57,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       },
       body: TabBarView(
         controller: controller,
+        physics: const NeverScrollableScrollPhysics(),
         children: const [
           HistoryCountryTab(),
           HistoryLocationTab(),
