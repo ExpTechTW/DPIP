@@ -37,14 +37,14 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   Future<void> _fetchWeatherData() async {
     data = await ExpTech().getMeteorStation(widget.stationId);
     setState(() {
-      windDirection = data!.windDirection;
+      windDirection = data!.windDirection.reversed.toList();
       weatherData = {
-        'temperature': data!.temperature,
-        'wind_speed': data!.windSpeed,
-        'precipitation': data!.precipitation,
-        'humidity': data!.humidity,
-        'pressure': data!.pressure,
-        'time': data!.time.map((item) => double.tryParse(item.toString()) ?? 0).toList(),
+        'temperature': data!.temperature.reversed.toList(),
+        'wind_speed': data!.windSpeed.reversed.toList(),
+        'precipitation': data!.precipitation.reversed.toList(),
+        'humidity': data!.humidity.reversed.toList(),
+        'pressure': data!.pressure.reversed.toList(),
+        'time': data!.time.reversed.toList().map((item) => double.tryParse(item.toString()) ?? 0).toList(),
       };
       isLoading = false;
     });
