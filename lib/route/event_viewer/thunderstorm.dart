@@ -99,6 +99,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       ),
     );
 
+    _mapController.removeLayer("county");
     await _mapController.addLayer(
       "map",
       "county",
