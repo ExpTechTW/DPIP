@@ -53,7 +53,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final animController = AnimationController(vsync: this, duration: Duration.zero);
   bool isAppBarVisible = false;
   late TabController _tabController;
-  late PageController _pageController;
 
   @override
   void initState() {
@@ -62,7 +61,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _setupScrollListener();
     HomePage.setActiveCallback(_handlePositionUpdate);
     _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
-    _pageController = PageController(initialPage: 1);
     _tabController.addListener(_handleTabSelection);
   }
 
@@ -70,7 +68,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void dispose() {
     HomePage.clearActiveCallback();
     scrollController.dispose();
-    _pageController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -197,22 +194,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height - 200,
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  country = index == 0;
-                  refreshRealtimeList();
-                });
-              },
-              children: [
-                _buildHomeList(isCountryView: true),
-                _buildHomeList(isCountryView: false),
-              ],
-            ),
-          ),
+          _buildHomeList(isCountryView: country),
         ],
       ),
     );
@@ -238,11 +220,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         selected: {country},
         onSelectionChanged: (p0) => setState(() {
           country = p0.first;
-          _pageController.animateToPage(
-            country ? 0 : 1,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
           refreshRealtimeList();
         }),
       ),
