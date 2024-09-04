@@ -26,6 +26,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   bool isLoading = true;
   Map<String, List<double>> weatherData = {};
   List<double> windDirection = [];
+  MeteorStation? data;
 
   @override
   void initState() {
@@ -34,16 +35,16 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Future<void> _fetchWeatherData() async {
-    MeteorStation data = await ExpTech().getMeteorStation(widget.stationId);
+    data = await ExpTech().getMeteorStation(widget.stationId);
     setState(() {
-      windDirection = data.windDirection;
+      windDirection = data!.windDirection;
       weatherData = {
-        'temperature': data.temperature,
-        'wind_speed': data.windSpeed,
-        'precipitation': data.precipitation,
-        'humidity': data.humidity,
-        'pressure': data.pressure,
-        'time': data.time.map((item) => double.tryParse(item.toString()) ?? 0).toList(),
+        'temperature': data!.temperature,
+        'wind_speed': data!.windSpeed,
+        'precipitation': data!.precipitation,
+        'humidity': data!.humidity,
+        'pressure': data!.pressure,
+        'time': data!.time.map((item) => double.tryParse(item.toString()) ?? 0).toList(),
       };
       isLoading = false;
     });
@@ -93,7 +94,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             onPressed: widget.onClose,
           ),
           automaticallyImplyLeading: false,
-          title: Text('Station ${widget.stationId}'),
+          title: Text('${widget.stationId} ${data?.station.county ?? ""}${data?.station.name ?? ""}'),
           actions: [_buildDataTypeSelector(), const SizedBox(width: 8)],
         ),
         if (isLoading)
@@ -118,8 +119,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   Widget _buildHeader() {
     String displayValue = touchedIndex != -1
-        ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))} - ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
-        : '24小時平均: ${_calculate24HourAverage()}${units[selectedDataType]}';
+        ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
+        : '24小時平均   ${_calculate24HourAverage()}${units[selectedDataType]}';
 
     return Card(
       elevation: 4,
@@ -340,9 +341,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                   barRods: [
                     BarChartRodData(
                       toY: entry.value == -99 ? 0 : entry.value,
-                      color: touchedIndex != -1 && touchedIndex != entry.key
-                          ? Colors.grey // 非選中的柱狀圖設為灰色
-                          : barColor, // 選中的柱狀圖保持原色
+                      color: touchedIndex != -1 && touchedIndex != entry.key ? Colors.grey : barColor,
                       width: 3,
                     )
                   ],
