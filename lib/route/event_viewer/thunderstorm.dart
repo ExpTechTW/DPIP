@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import "dart:ui" as ui;
 
+import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/core/ios_get_location.dart';
@@ -14,6 +15,7 @@ import 'package:dpip/util/need_location.dart';
 import 'package:dpip/util/parser.dart';
 import 'package:dpip/util/radar_color.dart';
 import 'package:dpip/widget/chip/label_chip.dart';
+import 'package:dpip/widget/list/detail_field_tile.dart';
 import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
@@ -464,7 +466,8 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               LinearProgressIndicator(
                 value: progress.clamp(0.0, 1.0),
                 borderRadius: BorderRadius.circular(8),
-                color: isExpired ? context.colors.error : context.colors.primary,
+                color: isExpired ? context.colors.outline : context.colors.primary,
+                backgroundColor: context.colors.outlineVariant,
               ),
             ],
           ),
@@ -506,21 +509,52 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final List<int> areaCodes = List<int>.from(widget.item.area);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.i18n.history_influence_area,
-          style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+    final grouped = groupBy(widget.item.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
+    List<Widget> areas = [];
+
+    for (final MapEntry(key: city, value: locations) in grouped.entries) {
+      areas.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      city,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: locations.map((e) {
+                        return Chip(
+                          padding: const EdgeInsets.all(4),
+                          side: BorderSide(color: context.colors.outline),
+                          backgroundColor: context.colors.surfaceContainerHigh,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          label: Text(e.town),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: areaCodes.map((code) => _buildAreaChip(context, code)).toList(),
-        ),
-      ],
+      );
+    }
+
+    return DetailFieldTile(
+      label: context.i18n.history_affected_area,
+      child: Column(children: areas),
     );
   }
 

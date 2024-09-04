@@ -1,11 +1,11 @@
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/widgets.dart";
 
-class ReportDetailField extends StatelessWidget {
+class DetailFieldTile extends StatelessWidget {
   final String label;
   final Widget child;
 
-  const ReportDetailField({
+  const DetailFieldTile({
     super.key,
     required this.label,
     required this.child,
