@@ -99,18 +99,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       ),
     );
 
-    _mapController.removeLayer("county");
-    await _mapController.addLayer(
-      "map",
-      "county",
-      FillLayerProperties(
-        fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
-        fillOpacity: 1,
-      ),
-      sourceLayer: "city",
-      belowLayerId: "radarLayer",
-    );
-
     await _mapController.addLayer(
       "map",
       "town-outline-default",
