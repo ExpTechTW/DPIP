@@ -53,6 +53,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final animController = AnimationController(vsync: this, duration: Duration.zero);
   bool isAppBarVisible = false;
   late TabController _tabController;
+  late PageController _pageController;
+  bool isCountryView = true;
 
   @override
   void initState() {
@@ -60,7 +62,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _initData();
     _setupScrollListener();
     HomePage.setActiveCallback(_handlePositionUpdate);
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this, initialIndex: 1);
+    _pageController = PageController(initialPage: 1);
     _tabController.addListener(_handleTabSelection);
   }
 
@@ -68,6 +71,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void dispose() {
     HomePage.clearActiveCallback();
     scrollController.dispose();
+    _pageController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -171,11 +175,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildMainContent() {
     return RefreshIndicator(
-      onRefresh: refreshRealtimeList,
-      displacement: 60,
+      onRefresh: () async {
+        await _refreshWeatherData();
+        await refreshRealtimeList();
+      },
       child: ListView(
-        padding: EdgeInsets.only(bottom: context.padding.bottom),
         controller: scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         children: [
           _buildWeatherHeader(),
           Padding(
@@ -192,13 +198,54 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-          _buildHomeList()
+          SizedBox(
+            height: MediaQuery.of(context).size.height - 200,
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  isCountryView = index == 0;
+                  refreshRealtimeList();
+                });
+              },
+              children: [
+                _buildHomeList(isCountryView: true),
+                _buildHomeList(isCountryView: false),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildHomeList() {
+  Widget _buildLocationToggle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: SegmentedButton(
+        showSelectedIcon: false,
+        segments: [
+          ButtonSegment(
+            icon: const Icon(Symbols.public_rounded),
+            tooltip: context.i18n.history_nationwide,
+            value: true,
+          ),
+          ButtonSegment(
+            icon: const Icon(Symbols.home_rounded),
+            tooltip: context.i18n.settings_location,
+            value: false,
+          ),
+        ],
+        selected: {country},
+        onSelectionChanged: (p0) => setState(() {
+          country = p0.first;
+          refreshRealtimeList();
+        }),
+      ),
+    );
+  }
+
+  Widget _buildHomeList({required bool isCountryView}) {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -350,32 +397,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       style: TextStyle(
         fontSize: 18,
         color: context.colors.onSurfaceVariant.withOpacity(0.75),
-      ),
-    );
-  }
-
-  Widget _buildLocationToggle() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: SegmentedButton(
-        showSelectedIcon: false,
-        segments: [
-          ButtonSegment(
-            icon: const Icon(Symbols.public_rounded),
-            tooltip: context.i18n.history_nationwide,
-            value: true,
-          ),
-          ButtonSegment(
-            icon: const Icon(Symbols.home_rounded),
-            tooltip: context.i18n.settings_location,
-            value: false,
-          ),
-        ],
-        selected: {country},
-        onSelectionChanged: (p0) => setState(() {
-          country = p0.first;
-          refreshRealtimeList();
-        }),
       ),
     );
   }
