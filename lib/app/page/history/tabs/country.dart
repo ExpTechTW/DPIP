@@ -41,6 +41,7 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!mounted) return;
       list.currentState?.show();
     });
   }

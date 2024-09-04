@@ -22,7 +22,7 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin {
-  late final controller = TabController(length: 2, vsync: this);
+  late final controller = TabController(length: 2, vsync: this, initialIndex: 1);
 
   @override
   Widget build(BuildContext context) {

@@ -58,6 +58,7 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
     region = code?.toString();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!mounted) return;
       list.currentState?.show();
     });
   }
