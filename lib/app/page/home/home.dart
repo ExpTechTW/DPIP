@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';

@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/time_convert.dart';

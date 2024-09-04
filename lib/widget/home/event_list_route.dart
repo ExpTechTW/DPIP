@@ -1,4 +1,5 @@
 import 'package:dpip/model/history.dart';
+import 'package:dpip/route/event_viewer/intensity.dart';
 import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:dpip/route/report/report.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ final Map<String, Widget Function(History item)> typeConfigs = {
   'thunderstorm': (History item) => ThunderstormPage(item: item),
   'rain': (History item) => ThunderstormPage(item: item),
   'earthquake': (History item) => ReportRoute(id: item.addition?["id"]),
+  'intensity': (History item) => IntensityPage(item: item),
 };
 
 bool shouldShowArrow(History item) {
