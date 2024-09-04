@@ -249,6 +249,12 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     double minY = double.infinity;
     double maxY = double.negativeInfinity;
 
+    bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+
+    if (_invalid) {
+      return const Center(child: Text('沒有有效資料可顯示'));
+    }
+
     for (int i = 0; i < weatherData[selectedDataType]!.length; i++) {
       if (weatherData[selectedDataType]![i] == -99) {
         spots.add(FlSpot.nullSpot);
@@ -404,6 +410,12 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   Widget _buildBarChart() {
     Color barColor = getDataTypeColor(selectedDataType!)[0];
     Color abnormalColor = Colors.red.withOpacity(0.3);
+
+    bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+
+    if (_invalid) {
+      return const Center(child: Text('沒有有效資料可顯示'));
+    }
 
     double maxRainfall = weatherData[selectedDataType]!
         .where((value) => value != -99)

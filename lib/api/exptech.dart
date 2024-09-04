@@ -498,4 +498,18 @@ class ExpTech {
 
     return MeteorStation.fromJson(jsonData);
   }
+
+  Future<List<History>> getEvent(String id) async {
+    final requestUrl = Route.event(id);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode != 200) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+
+    final List<dynamic> jsonData = jsonDecode(res.body);
+
+    return jsonData.map((item) => History.fromJson(item)).toList();
+  }
 }

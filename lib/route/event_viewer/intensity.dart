@@ -42,10 +42,19 @@ class _IntensityPageState extends State<IntensityPage> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  Timer? _update;
+  History? data;
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.item;
+  }
 
   @override
   void dispose() {
     _mapController.dispose();
+    _update?.cancel();
     super.dispose();
   }
 
@@ -98,32 +107,6 @@ class _IntensityPageState extends State<IntensityPage> {
       const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
     );
 
-    Map<String, dynamic> originalArea = widget.item.addition?['area'];
-    Map<String, int> invertedArea = {};
-
-    originalArea.forEach((key, value) {
-      for (var code in value) {
-        invertedArea[code.toString()] = int.parse(key);
-      }
-    });
-    print(invertedArea);
-
-    await _mapController.setLayerProperties(
-      "town",
-      FillLayerProperties(
-        fillColor: [
-          "match",
-          ["get", "CODE"],
-          ...invertedArea.entries.expand((entry) => [
-                int.parse(entry.key),
-                IntensityColor.intensity(entry.value).toHexStringRGB(),
-              ]),
-          context.colors.surfaceContainerHighest.toHexStringRGB(),
-        ],
-        fillOpacity: 1,
-      ),
-    );
-
     start();
   }
 
@@ -161,6 +144,44 @@ class _IntensityPageState extends State<IntensityPage> {
     await _addUserLocationMarker();
 
     setState(() {});
+
+    getEventInfo();
+
+    if (widget.item.addition?["final"] != 1) {
+      _update = Timer.periodic(const Duration(seconds: 1), (_) async {
+        data = (await ExpTech().getEvent(widget.item.id))[0];
+        getEventInfo();
+        if (data?.addition?["final"] == 1) {
+          _update?.cancel();
+        }
+      });
+    }
+  }
+
+  void getEventInfo() async {
+    Map<String, dynamic> originalArea = data?.addition?['area'];
+    Map<String, int> invertedArea = {};
+
+    originalArea.forEach((key, value) {
+      for (var code in value) {
+        invertedArea[code.toString()] = int.parse(key);
+      }
+    });
+    _mapController.setLayerProperties(
+      "town",
+      FillLayerProperties(
+        fillColor: [
+          "match",
+          ["get", "CODE"],
+          ...invertedArea.entries.expand((entry) => [
+                int.parse(entry.key),
+                IntensityColor.intensity(entry.value).toHexStringRGB(),
+              ]),
+          context.colors.surfaceContainerHighest.toHexStringRGB(),
+        ],
+        fillOpacity: 1,
+      ),
+    );
   }
 
   void _toggleLegend() {
@@ -371,7 +392,7 @@ class _IntensityPageState extends State<IntensityPage> {
               ),
               const SizedBox(width: 8),
               LabelChip(
-                label: "第${widget.item.addition?["serial"]}報${(widget.item.addition?["final"] == 1) ? "(最終)" : ""}",
+                label: "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? "(最終)" : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
@@ -387,7 +408,7 @@ class _IntensityPageState extends State<IntensityPage> {
     final DateTime sendTime = widget.item.time.send;
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
-    final String description = widget.item.text.description["all"] ?? "";
+    final String description = data?.text.description["all"] ?? "";
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     final DateTime localExpireTime = expireTimeUTC;
 
@@ -449,7 +470,7 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final grouped = groupBy(widget.item.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
+    final grouped = groupBy(data!.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
     List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {

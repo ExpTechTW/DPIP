@@ -66,6 +66,8 @@ class Route {
 
   static Uri meteorStation(String id) => Uri.parse("$onlyapi/v1/meteor/station/$id");
 
+  static Uri event(String id) => Uri.parse("$onlyapi/v1/dpip/event/$id");
+
   static Uri rainList() => Uri.parse("$onlyapi/v1/meteor/rain/list");
 
   static Uri rain(String time) => Uri.parse("$onlyapi/v1/meteor/rain/$time");
