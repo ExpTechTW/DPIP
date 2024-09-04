@@ -12,8 +12,10 @@ import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/util/need_location.dart';
 import 'package:dpip/util/radar_color.dart';
+import 'package:dpip/widget/chip/label_chip.dart';
 import 'package:dpip/widget/map/legend.dart';
 import 'package:dpip/widget/map/map.dart';
+import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -341,120 +343,79 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       minChildSize: 0.15,
       snap: true,
       snapSizes: const [0.15, 0.35, 1],
-      builder: (BuildContext context, ScrollController scrollController) {
+      builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: context.colors.onPrimary,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
+            color: context.colors.surfaceContainer,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            boxShadow: kElevationToShadow[4],
           ),
-          child: SingleChildScrollView(
+          child: ListView(
             controller: scrollController,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildDragHandle(),
-                  const SizedBox(height: 15),
-                  _buildWarningHeader(context),
-                  const SizedBox(height: 15),
-                  _buildWarningDetails(context),
-                  const SizedBox(height: 20),
-                  _buildAffectedAreas(context),
-                ],
-              ),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              const BottomSheetDragHandle(),
+              _buildWarningHeader(),
+              const Divider(),
+              _buildWarningDetails(),
+              const SizedBox(height: 20),
+              _buildAffectedAreas(),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildDragHandle() {
-    return Center(
-      child: Container(
-        width: 40,
-        height: 5,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWarningHeader(BuildContext context) {
+  Widget _buildWarningHeader() {
     final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
 
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: context.colors.secondaryContainer,
-            borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: context.colors.secondaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(ListIcons.getListIcon(widget.item.icon), size: 28),
           ),
-          child: Icon(ListIcons.getListIcon(widget.item.icon), size: 32),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(width: 12),
+          Row(
             children: [
               Text(
                 subtitle,
-                style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              if (isExpired)
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: context.colors.error,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    context.i18n.completed,
-                    style: context.theme.textTheme.bodySmall?.copyWith(
-                      color: context.colors.onError,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                style: context.theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
-              if (!isExpired)
-                Container(
-                  margin: const EdgeInsets.only(top: 4),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: context.colors.secondaryContainer,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    context.i18n.active,
-                    style: context.theme.textTheme.bodySmall?.copyWith(
-                      color: context.colors.onSecondaryContainer,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              if (isExpired)
+                LabelChip(
+                  label: context.i18n.completed,
+                  backgroundColor: context.colors.surfaceContainer,
+                  foregroundColor: context.colors.onSurfaceVariant,
+                )
+              else
+                LabelChip(
+                  label: context.i18n.active,
+                  backgroundColor: context.colors.secondaryContainer,
+                  foregroundColor: context.colors.onSecondaryContainer,
+                  outlineColor: context.colors.secondaryContainer,
                 ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildWarningDetails(BuildContext context) {
+  Widget _buildWarningDetails() {
     final DateTime sendTime = widget.item.time.send;
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = _convertToTZDateTime(expireTimestamp);
@@ -465,19 +426,15 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTimeBar(context, sendTime, localExpireTime, isExpired),
-        const SizedBox(height: 15),
-        Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              description,
-              style: context.theme.textTheme.bodyLarge,
-            ),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            description,
+            style: context.theme.textTheme.bodyLarge,
           ),
         ),
+        _buildTimeBar(context, sendTime, localExpireTime, isExpired),
       ],
     );
   }
@@ -493,37 +450,38 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final Duration elapsed = isExpired ? duration : DateTime.now().difference(sendTime);
     final double progress = elapsed.inSeconds / duration.inSeconds;
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTimeInfo(context, Icons.access_time, context.i18n.history_send_time, sendTime),
-            const SizedBox(height: 12),
-            _buildTimeInfo(context, Icons.timer_off, context.i18n.history_valid_until, expireTime),
-            const SizedBox(height: 16),
-            Stack(
-              children: [
-                LinearProgressIndicator(
-                  value: progress.clamp(0.0, 1.0),
-                  backgroundColor: context.colors.surfaceVariant,
-                  valueColor: AlwaysStoppedAnimation<Color>(isExpired ? context.colors.error : context.colors.primary),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(DateFormat('MM/dd HH:mm').format(sendTime), style: context.theme.textTheme.bodySmall),
-                Text(DateFormat('MM/dd HH:mm').format(expireTime), style: context.theme.textTheme.bodySmall),
-              ],
-            ),
-          ],
-        ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTimeInfo(context, Icons.access_time, context.i18n.history_send_time, sendTime),
+          const SizedBox(height: 12),
+          _buildTimeInfo(context, Icons.timer_off, context.i18n.history_valid_until, expireTime),
+          const SizedBox(height: 16),
+          Stack(
+            children: [
+              LinearProgressIndicator(
+                value: progress.clamp(0.0, 1.0),
+                borderRadius: BorderRadius.circular(8),
+                color: isExpired ? context.colors.error : context.colors.primary,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(DateFormat('MM/dd HH:mm').format(sendTime), style: context.theme.textTheme.labelMedium),
+              Text(DateFormat('MM/dd HH:mm').format(expireTime), style: context.theme.textTheme.labelMedium),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -531,15 +489,20 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   Widget _buildTimeInfo(BuildContext context, IconData icon, String label, DateTime time) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: context.colors.secondary),
+        Icon(icon, color: context.colors.secondary),
         const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: context.theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              label,
+              style: context.theme.textTheme.labelMedium?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
             Text(
               DateFormat('yyyy/MM/dd HH:mm').format(time),
-              style: context.theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: context.theme.textTheme.bodyLarge,
             ),
           ],
         ),
@@ -547,7 +510,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     );
   }
 
-  Widget _buildAffectedAreas(BuildContext context) {
+  Widget _buildAffectedAreas() {
     final List<int> areaCodes = List<int>.from(widget.item.area);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
