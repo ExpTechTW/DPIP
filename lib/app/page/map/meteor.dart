@@ -65,7 +65,10 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   void _handleStationIdUpdate(String? getstationId) {
     if (mounted) {
-      stationId = getstationId;
+      setState(() {
+        stationId = getstationId;
+        isLoading = true;
+      });
       _fetchWeatherData();
     }
   }
