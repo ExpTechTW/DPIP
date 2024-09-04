@@ -586,11 +586,11 @@
   "@cloudy": {
     "description": "天氣狀況：多雲"
   },
-  "overcast": "Negative",
+  "overcast": "Overcast",
   "@overcast": {
     "description": "天氣狀況：陰"
   },
-  "foggy": "mist",
+  "foggy": "Foggy",
   "@foggy": {
     "description": "天氣狀況：薄霧"
   },
@@ -907,7 +907,7 @@
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP is an app designed by a local team in Taiwan. It integrates information from TREM-Net (Taiwan Rapid Earthquake Information Network) and data from the Central Weather Bureau, providing a comprehensive, unified, and convenient disaster prevention information application.",
+  "dpip_description": "DPIP is an app designed by a local team in Taiwan. It integrates information from TREM-Net (Taiwan Real-time Earthquake Monitoring Network) and data from the Central Weather Administration, providing a comprehensive, unified, and convenient disaster prevention information application.",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
