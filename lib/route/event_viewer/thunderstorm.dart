@@ -83,7 +83,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   void _loadMap() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
