@@ -94,18 +94,32 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       children: [
         AppBar(
           leading: IconButton(
-            icon: const Icon(Icons.close),
+            icon: const Icon(Icons.arrow_back),
             onPressed: widget.onClose,
           ),
           automaticallyImplyLeading: false,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('${data?.station.county ?? ""}${data?.station.name ?? ""}', style: const TextStyle(fontSize: 22)),
-              Text(widget.stationId, style: const TextStyle(fontSize: 16))
+              Text(
+                '${data?.station.county ?? ""}${data?.station.name ?? ""}',
+                style: context.theme.textTheme.titleLarge,
+              ),
+              Text(
+                widget.stationId,
+                style: context.theme.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.onSurface.withOpacity(0.7),
+                ),
+              ),
             ],
           ),
-          actions: [_buildDataTypeSelector(), const SizedBox(width: 8)],
+          actions: [
+            _buildDataTypeSelector(),
+            const SizedBox(width: 16),
+          ],
+          elevation: 0,
+          backgroundColor: context.colors.surface,
+          foregroundColor: context.colors.onSurface,
         ),
         if (isLoading)
           const CircularProgressIndicator()
@@ -349,7 +363,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       ),
     );
   }
-  
+
   Widget _buildBarChart() {
     Color barColor = getDataTypeColor(selectedDataType!)[0];
     Color abnormalColor = Colors.red.withOpacity(0.3);
