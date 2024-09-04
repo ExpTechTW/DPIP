@@ -46,10 +46,9 @@ class HistoryTimelineItem extends StatelessWidget {
                       width: 42,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isExpired ? context.colors.error : context.colors.primaryContainer,
+                        color: isExpired ? Colors.transparent : context.colors.primaryContainer,
                       ),
-                      child: Icon(ListIcons.getListIcon(history.icon),
-                          color: isExpired ? context.colors.onError : context.colors.onPrimaryContainer),
+                      child: Icon(ListIcons.getListIcon(history.icon)),
                     ),
                   ),
                 ],
