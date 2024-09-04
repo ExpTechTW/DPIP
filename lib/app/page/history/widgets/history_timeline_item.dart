@@ -1,9 +1,9 @@
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/widget/home/event_list_route.dart';
 
 class HistoryTimelineItem extends StatelessWidget {
   final History history;
@@ -91,7 +91,7 @@ class HistoryTimelineItem extends StatelessWidget {
                     if (shouldShowArrow(history))
                       Padding(
                         padding: const EdgeInsets.only(left: 4),
-                        child: Icon(Icons.arrow_forward_ios, color: context.colors.outline,size: 12),
+                        child: Icon(Icons.arrow_forward_ios, color: context.colors.outline, size: 12),
                       ),
                   ],
                 ),

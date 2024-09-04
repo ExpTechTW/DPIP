@@ -1,18 +1,20 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/list_icon.dart';
+import 'package:dpip/util/time_convert.dart';
 import 'package:dpip/util/weather_icon.dart';
-import 'package:dpip/widget/error/region_out_of_service.dart';
-import 'package:dpip/widget/home/event_list_route.dart';
-import 'package:dpip/widget/list/timeline_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:timezone/timezone.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -190,9 +192,48 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ],
             ),
           ),
-          _buildEventsList(),
+          _buildHomeList()
         ],
       ),
+    );
+  }
+
+  Widget _buildHomeList() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (realtimeList.isEmpty) {
+      return Center(child: Text(context.i18n.home_safety));
+    }
+
+    final grouped = groupBy(realtimeList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
+
+    return Column(
+      children: grouped.entries.map((entry) {
+        final date = entry.key;
+        final historyGroup = entry.value;
+        return Column(
+          children: [
+            TimelineItem(
+              child: Text(
+                date,
+                style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.secondary),
+              ),
+            ),
+            ...historyGroup.map((history) {
+              final int? expireTimestamp = history.time.expires['all'];
+              final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+              final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+              return HistoryTimelineItem(
+                isExpired: isExpired,
+                history: history,
+                last: history == realtimeList.last,
+              );
+            }),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -336,70 +377,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           refreshRealtimeList();
         }),
       ),
-    );
-  }
-
-  Widget _buildEventsList() {
-    if (region == null && !country) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 20),
-        child: RegionOutOfService(),
-      );
-    }
-
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (realtimeList.isEmpty) {
-      return Center(child: Text(context.i18n.no_historical_events));
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: realtimeList.asMap().entries.map((entry) {
-            final index = entry.key;
-            final current = entry.value;
-            final showDate = index == 0 || current.time.send.day != realtimeList[index - 1].time.send.day;
-
-            return TimeLineTile(
-              time: current.time.send,
-              icon: Icon(ListIcons.getListIcon(current.icon)),
-              height: 140,
-              first: index == 0,
-              showDate: showDate,
-              color: context.colors.secondaryContainer,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          current.text.content["all"]!.subtitle,
-                          style: context.theme.textTheme.titleMedium,
-                        ),
-                        Text(
-                          current.text.description["all"]!,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (shouldShowArrow(current))
-                    const Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Icon(Icons.arrow_forward_ios),
-                    ),
-                ],
-              ),
-              onTap: () => handleEventList(context, current),
-            );
-          }).toList(),
-        ),
-      ],
     );
   }
 
