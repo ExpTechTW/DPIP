@@ -9,12 +9,14 @@ class HistoryTimelineItem extends StatelessWidget {
   final History history;
   final bool first;
   final bool last;
+  final bool isExpired;
 
   const HistoryTimelineItem({
     super.key,
     required this.history,
     this.first = false,
     this.last = false,
+    required this.isExpired,
   });
 
   @override
@@ -44,7 +46,7 @@ class HistoryTimelineItem extends StatelessWidget {
                       width: 42,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: context.colors.primaryContainer,
+                        color: isExpired ? context.colors.error : context.colors.primaryContainer,
                       ),
                       child: const Icon(Symbols.rainy_rounded),
                     ),

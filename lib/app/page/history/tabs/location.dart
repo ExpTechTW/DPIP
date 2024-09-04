@@ -8,9 +8,11 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/util/time_convert.dart';
 import 'package:dpip/widget/error/region_out_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart';
 
 class HistoryLocationTab extends StatefulWidget {
   const HistoryLocationTab({super.key});
@@ -91,7 +93,11 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
               ),
             ),
             ...historyGroup.map((history) {
+              final int? expireTimestamp = history.time.expires['all'];
+              final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+              final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
               return HistoryTimelineItem(
+                isExpired: isExpired,
                 history: history,
                 last: index == historyList.length - 1,
               );
