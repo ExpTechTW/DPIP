@@ -238,7 +238,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final TZDateTime radarTime = TZDateTime.from(radarDateTime, getLocation('Asia/Taipei'));
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(widget.item.text.content['all']?.title ?? ""),
         elevation: 0,
@@ -252,7 +251,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           ),
           Positioned(
             right: 4,
-            top: 104,
+            top: 4,
             child: Material(
               color: context.colors.secondary,
               elevation: 4.0,
@@ -279,12 +278,12 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           if (_showLegend)
             Positioned(
               right: 6,
-              top: 150, // Adjusted to be above the legend button
+              top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
             ),
           Positioned(
             left: 4,
-            top: 104,
+            top: 4,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -308,7 +307,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           ),
           Positioned(
             left: 4,
-            top: 132,
+            top: 32,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: BackdropFilter(
@@ -338,10 +337,10 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Widget _buildDraggableSheet(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.3,
-      minChildSize: 0.1,
+      initialChildSize: 0.35,
+      minChildSize: 0.15,
       snap: true,
-      snapSizes: const [0.1, 0.3, 0.9],
+      snapSizes: const [0.15, 0.35, 1],
       builder: (BuildContext context, ScrollController scrollController) {
         return Container(
           decoration: BoxDecoration(
