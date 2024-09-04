@@ -50,7 +50,11 @@ class LocationService {
     } else {
       TalkerManager.instance.debug("距離: $distance 不更新位置");
     }
-    Global.preference.setInt("user-code", location?.code ?? -1);
+    if (location?.code == null) {
+      Global.preference.remove("user-code");
+    } else {
+      Global.preference.setInt("user-code", location!.code);
+    }
 
     return GetLocationResult(location?.code, positionchange, position.latitude, position.longitude);
   }

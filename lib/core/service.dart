@@ -71,7 +71,7 @@ void androidSendPositionlisten() {
       if (location != null) {
         Global.preference.setInt("user-code", location.code);
       } else {
-        Global.preference.setInt("user-code", -1);
+        Global.preference.remove("user-code");
       }
 
       Global.preference.setDouble("user-lat", lat);
@@ -188,7 +188,7 @@ void onStart(ServiceInstance service) async {
     service.on("removeposition").listen((event) {
       Global.preference.remove("user-lat");
       Global.preference.remove("user-lon");
-      Global.preference.setInt("user-code", -1);
+      Global.preference.remove("user-code");
     });
 
     void task() async {

@@ -31,7 +31,12 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
       String? code = Global.location.entries
           .firstWhereOrNull((l) => l.value.city == location.city && l.value.town == location.town)
           ?.key;
-      Global.preference.setInt("user-code", code == null ? -1 : int.parse(code));
+
+      if (code == null) {
+        Global.preference.remove("user-code");
+      } else {
+        Global.preference.setInt("user-code", int.parse(code));
+      }
 
       String fcmToken = Global.preference.getString("fcm-token") ?? "";
       await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");

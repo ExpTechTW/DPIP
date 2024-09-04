@@ -1,9 +1,9 @@
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:dpip/widget/home/event_list_route.dart';
 
 class HistoryTimelineItem extends StatelessWidget {
   final History history;
@@ -22,7 +22,7 @@ class HistoryTimelineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () => handleEventList(context, history),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -48,7 +48,8 @@ class HistoryTimelineItem extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: isExpired ? context.colors.error : context.colors.primaryContainer,
                       ),
-                      child: const Icon(Symbols.rainy_rounded),
+                      child: Icon(Symbols.rainy_rounded,
+                          color: isExpired ? context.colors.onError : context.colors.onPrimaryContainer),
                     ),
                   ),
                 ],
@@ -57,27 +58,41 @@ class HistoryTimelineItem extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      DateFormat(context.i18n.time_format).format(history.time.send),
-                      style: context.theme.textTheme.labelMedium?.copyWith(color: context.colors.outline),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat(context.i18n.time_format).format(history.time.send),
+                            style: context.theme.textTheme.labelMedium?.copyWith(color: context.colors.outline),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            history.text.content["all"]!.subtitle,
+                            style: context.theme.textTheme.titleMedium,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Flexible(
+                            child: Text(
+                              history.text.description["all"]!,
+                              style: context.theme.textTheme.bodyMedium,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    Text(
-                      history.text.content["all"]!.subtitle,
-                      style: context.theme.textTheme.titleMedium,
-                    ),
-                    Text(
-                      "${DateFormat(context.i18n.datetime_format).format(parseDateTime(history.time.expires["all"]))} 失效",
-                      style: context.theme.textTheme.bodyMedium,
-                    ),
-                    Text(
-                      history.text.description["all"]!,
-                      style: context.theme.textTheme.bodyMedium,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    if (shouldShowArrow(history))
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: Icon(Icons.arrow_forward_ios, color: context.colors.outline,size: 12),
+                      ),
                   ],
                 ),
               ),

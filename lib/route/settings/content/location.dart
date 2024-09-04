@@ -321,7 +321,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       androidstopBackgroundService(isAutoLocatingEnabled);
     }
 
-    Global.preference.setInt("user-code", -1);
+    Global.preference.remove("user-code");
     Global.preference.remove("user-lat");
     Global.preference.remove("user-lon");
 

@@ -31,7 +31,7 @@ Future<void> getSavedLocation() async {
     if (location != null) {
       await Global.preference.setInt("user-code", location.code);
     } else {
-      await Global.preference.setInt("user-code", -1);
+      await Global.preference.remove("user-code");
     }
     _updateAllPositions();
   } catch (e) {
