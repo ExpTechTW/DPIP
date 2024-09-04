@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/page/history/tabs/country.dart';
+import 'package:dpip/app/page/history/tabs/location.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
@@ -39,44 +41,15 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
   String city = '';
   String town = '';
 
-  final scrollController = ScrollController();
-  late AnimationController animController;
-  bool isAppBarVisible = false;
+  late final controller = TabController(length: 2, vsync: this);
 
   @override
   void initState() {
     super.initState();
-    animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _initData();
-    HistoryPage.setActiveCallback(_handlePositionUpdate);
-    _setupScrollListener();
+    // HistoryPage.setActiveCallback(_handlePositionUpdate);
   }
 
-  void _setupScrollListener() {
-    scrollController.addListener(() {
-      if (mounted) {
-        setState(() => isAppBarVisible = scrollController.offset > 1e-5);
-        if (scrollController.offset < 180) {
-          animController.animateTo(scrollController.offset / 180);
-        }
-      }
-    });
-  }
-
-  void _initData() async {
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
-      await getSavedLocation();
-    }
-    int code = Global.preference.getInt("user-code") ?? -1;
-    city = Global.location[code.toString()]?.city ?? "";
-    town = Global.location[code.toString()]?.town ?? "";
-    region = code == -1 ? null : code.toString();
-    refreshHistoryList();
-  }
-
+/* 
   void _handlePositionUpdate() {
     if (mounted) {
       _initData();
@@ -117,49 +90,43 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
         label: Text('$city$town', style: const TextStyle(fontSize: 20)),
       ),
     );
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildLocationToggle(),
-                _buildLocationButton(),
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        return [
+          SliverAppBar(
+            pinned: true,
+            floating: true,
+            snap: true,
+            title: Text(context.i18n.history),
+            bottom: TabBar(
+              controller: controller,
+              tabs: [
+                Tab(
+                  icon: const Icon(Symbols.public_rounded),
+                  text: context.i18n.home_area,
+                ),
+                Tab(
+                  icon: const Icon(Symbols.home_rounded),
+                  text: context.i18n.settings_location,
+                ),
               ],
             ),
-            Expanded(
-              child: Stack(
-                children: [
-                  _buildMainContent(),
-                  _buildAppBar(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContent() {
-    return RefreshIndicator(
-      onRefresh: refreshHistoryList,
-      child: CustomScrollView(
-        controller: scrollController,
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.only(bottom: context.padding.bottom),
-            sliver: _buildHistoryList(),
           ),
+        ];
+      },
+      body: TabBarView(
+        controller: controller,
+        children: const [
+          HistoryCountryTab(),
+          HistoryLocationTab(),
         ],
       ),
     );
-  }
+  } /* 
 
   Widget _buildLocationToggle() {
     return Padding(
@@ -279,29 +246,11 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       ),
     );
   }
-
-  Widget _buildAppBar() {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: AnimatedOpacity(
-        opacity: isAppBarVisible ? 1.0 : 0.0,
-        duration: const Duration(milliseconds: 200),
-        child: AppBar(
-          elevation: 4,
-          title: Text(context.i18n.history),
-          backgroundColor: context.colors.surface.withOpacity(0.8),
-        ),
-      ),
-    );
-  }
+ */
 
   @override
   void dispose() {
     HistoryPage.clearActiveCallback();
-    scrollController.dispose();
-    animController.dispose();
     super.dispose();
   }
 }
