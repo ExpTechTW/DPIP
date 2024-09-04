@@ -22,8 +22,10 @@ class HistoryTimelineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasDetail = shouldShowArrow(history);
+
     return InkWell(
-      onTap: () => handleEventList(context, history),
+      onTap: hasDetail ? () => handleEventList(context, history) : null,
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,7 +94,7 @@ class HistoryTimelineItem extends StatelessWidget {
                 ),
               ),
             ),
-            if (shouldShowArrow(history))
+            if (hasDetail)
               Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: Icon(
