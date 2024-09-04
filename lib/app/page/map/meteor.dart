@@ -109,7 +109,6 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 const SizedBox(height: 16),
                 _buildChart(),
                 const SizedBox(height: 16),
-                _buildLegend(),
               ],
             ),
           ),
@@ -120,37 +119,37 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   Widget _buildHeader() {
     String displayValue = touchedIndex != -1
         ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
-        : '24小時平均   ${_calculate24HourAverage()}${units[selectedDataType]}';
+        : '平均   ${_calculate24HourAverage()}${units[selectedDataType]}';
 
     return Card(
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
                   style: context.theme.textTheme.titleMedium,
                 ),
-                if (selectedDataType == 'wind_speed')
-                  Transform.rotate(
-                    angle: (windDirection[touchedIndex != -1 ? touchedIndex : 0] + 180) % 360 * 3.14159 / 180,
-                    child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType)),
+                const SizedBox(height: 8),
+                Text(
+                  displayValue,
+                  style: context.theme.textTheme.titleSmall?.copyWith(
+                    color: getDataTypeColor(selectedDataType),
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              displayValue,
-              style: context.theme.textTheme.titleSmall?.copyWith(
-                color: getDataTypeColor(selectedDataType),
-                fontWeight: FontWeight.bold,
+            if (selectedDataType == 'wind_speed' && touchedIndex != -1)
+              Transform.rotate(
+                angle: (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
+                child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType), size: 48),
               ),
-            ),
           ],
         ),
       ),
@@ -169,9 +168,15 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: selectedDataType == 'precipitation' ? _buildBarChart() : _buildLineChart(),
+        child: Column(
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: selectedDataType == 'precipitation' ? _buildBarChart() : _buildLineChart(),
+            ),
+            const SizedBox(height: 8),
+            _buildLegend(),
+          ],
         ),
       ),
     );
@@ -429,49 +434,40 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildLegend() {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      children: [
+        Row(
           children: [
-            Text('圖例', style: context.theme.textTheme.titleSmall),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 3,
-                  color: getDataTypeColor(selectedDataType),
-                ),
-                const SizedBox(width: 8),
-                Text(dataTypeToChineseMap[selectedDataType]!),
-              ],
+            Container(
+              width: 20,
+              height: 3,
+              color: getDataTypeColor(selectedDataType),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Container(
-                  width: 20,
-                  height: 1,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey,
-                        width: 1,
-                        style: BorderStyle.solid,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Text('24小時平均'),
-              ],
-            ),
+            const SizedBox(width: 8),
+            Text(dataTypeToChineseMap[selectedDataType]!),
           ],
         ),
-      ),
+        const SizedBox(width: 15),
+        Row(
+          children: [
+            Container(
+              width: 20,
+              height: 1,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 1,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text('平均'),
+          ],
+        ),
+      ],
     );
   }
 }
