@@ -332,6 +332,10 @@ class _IntensityPageState extends State<IntensityPage> {
               _buildWarningHeader(),
               const Divider(),
               _buildWarningDetails(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
+                child: Text("僅供參考實際應以中央氣象署發布之內容為準", style: TextStyle(color: context.colors.error)),
+              ),
               const SizedBox(height: 20),
               _buildAffectedAreas(),
             ],
