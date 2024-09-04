@@ -494,7 +494,7 @@ class _RainMapState extends State<RainMap> {
                 maxHeight: MediaQuery.of(context).size.height * 0.7,
               ),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: context.theme.cardColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),

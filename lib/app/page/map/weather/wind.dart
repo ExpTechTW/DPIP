@@ -355,7 +355,7 @@ class _WindMapState extends State<WindMap> {
           left: 4,
           bottom: 4,
           child: Material(
-            color: Theme.of(context).colorScheme.secondary,
+            color: context.theme.colorScheme.secondary,
             elevation: 4.0,
             shape: const CircleBorder(),
             clipBehavior: Clip.antiAlias,
@@ -370,7 +370,7 @@ class _WindMapState extends State<WindMap> {
                   child: Icon(
                     _showLegend ? Icons.close : Icons.info_outline,
                     size: 20,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                    color: context.theme.colorScheme.onSecondary,
                   ),
                 ),
               ),
@@ -411,7 +411,7 @@ class _WindMapState extends State<WindMap> {
                 maxHeight: MediaQuery.of(context).size.height * 0.7,
               ),
               decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
+                color: context.theme.cardColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
