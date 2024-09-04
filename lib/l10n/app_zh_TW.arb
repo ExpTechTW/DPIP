@@ -364,9 +364,9 @@
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "ExpTech 發布之公告",
+  "server_announcement_description_sound": "發送公告時",
   "@server_announcement_description_sound": {
-    "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → ExpTech 發布之公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
   "monitor_list": "地圖列表",
   "@monitor_list": {
