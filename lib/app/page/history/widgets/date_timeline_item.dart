@@ -1,7 +1,5 @@
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:timezone/timezone.dart';
 
 class DateTimelineItem extends StatelessWidget {
   final String date;
