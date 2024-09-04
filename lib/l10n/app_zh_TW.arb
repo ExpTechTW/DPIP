@@ -1678,5 +1678,9 @@
   "error_occurred": "發生錯誤:",
   "@error_occurred": {
     "description": "Weather Status: An error occurred:"
+  },
+  "history_final": "(最終)",
+  "@history_final": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → (最終)"
   }
 }

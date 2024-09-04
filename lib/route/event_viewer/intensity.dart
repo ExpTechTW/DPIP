@@ -392,7 +392,7 @@ class _IntensityPageState extends State<IntensityPage> {
               ),
               const SizedBox(width: 8),
               LabelChip(
-                label: "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? "(最終)" : ""}",
+                label: "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? context.i18n.history_final : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
