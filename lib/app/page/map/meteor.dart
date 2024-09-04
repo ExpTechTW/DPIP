@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/meteor_station.dart';
 import 'package:dpip/util/extension/build_context.dart';
@@ -68,20 +70,20 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     'pressure': 'hPa',
   };
 
-  Color getDataTypeColor(String dataType) {
+  List<Color> getDataTypeColor(String dataType) {
     switch (dataType) {
       case 'temperature':
-        return Colors.red;
+        return [Colors.deepOrangeAccent, Colors.orangeAccent];
       case 'wind_speed':
-        return Colors.orange;
+        return [Colors.green, Colors.blue];
       case 'precipitation':
-        return Colors.blue;
+        return [Colors.blue, Colors.blue];
       case 'humidity':
-        return Colors.purple;
+        return [Colors.blueAccent, Colors.greenAccent];
       case 'pressure':
-        return Colors.green;
+        return [Colors.purple, Colors.purple];
       default:
-        return Colors.grey;
+        return [Colors.grey, Colors.grey];
     }
   }
 
@@ -146,7 +148,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 Text(
                   displayValue,
                   style: context.theme.textTheme.titleSmall?.copyWith(
-                    color: getDataTypeColor(selectedDataType!),
+                    color: getDataTypeColor(selectedDataType!)[0],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -155,7 +157,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             if (selectedDataType == 'wind_speed' && touchedIndex != -1)
               Transform.rotate(
                 angle: (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
-                child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType!), size: 48),
+                child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType!)[0], size: 48),
               ),
           ],
         ),
@@ -191,14 +193,51 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildLineChart() {
-    Color lineColor = getDataTypeColor(selectedDataType!);
+    List<Color> lineColor = getDataTypeColor(selectedDataType!);
     List<FlSpot> spots = [];
+    double minY = double.infinity;
+    double maxY = double.negativeInfinity;
+
     for (int i = 0; i < weatherData[selectedDataType]!.length; i++) {
       if (weatherData[selectedDataType]![i] == -99) {
         spots.add(FlSpot.nullSpot);
       } else {
-        spots.add(FlSpot(i.toDouble(), weatherData[selectedDataType]![i]));
+        double value = weatherData[selectedDataType]![i];
+        spots.add(FlSpot(i.toDouble(), value));
+        minY = min(minY, value);
+        maxY = max(maxY, value);
       }
+    }
+
+    double interval;
+    double startY;
+    double endY;
+
+    switch (selectedDataType) {
+      case 'temperature':
+        interval = 3;
+        startY = (minY / interval).floor() * interval;
+        endY = (maxY / interval).ceil() * interval;
+        break;
+      case 'wind_speed':
+        interval = 1;
+        startY = minY.floor().toDouble();
+        endY = maxY.ceil().toDouble();
+        break;
+      case 'humidity':
+        interval = 20;
+        startY = 0;
+        endY = 100;
+        break;
+      case 'pressure':
+        interval = 15;
+        startY = (minY / interval).floor() * interval;
+        endY = (maxY / interval).ceil() * interval;
+        break;
+      default:
+        interval = 1;
+        startY = minY.floor().toDouble();
+        endY = maxY.ceil().toDouble();
     }
 
     return LineChart(
@@ -213,7 +252,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 int index = value.toInt();
                 if (index >= 0 && index < weatherData['time']!.length) {
                   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
-                  return Text(DateFormat('HH時').format(dateTime));
+                  return Text(DateFormat('HH時').format(dateTime), style: const TextStyle(fontSize: 10));
                 } else {
                   return const Text('');
                 }
@@ -224,26 +263,35 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 40,
-              getTitlesWidget: (value, meta) => Text(value.toInt().toString()),
+              interval: interval,
+              getTitlesWidget: (value, meta) {
+                if (value >= startY && value <= endY && (value % interval).abs() < 0.001) {
+                  return Text(value.toInt().toString(), style: const TextStyle(fontSize: 10));
+                } else {
+                  return const Text('');
+                }
+              },
             ),
           ),
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         borderData: FlBorderData(show: true),
+        minY: startY,
+        maxY: endY,
         lineBarsData: [
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            color: lineColor,
+            color: lineColor[0],
             barWidth: 3,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: lineColor.withOpacity(0.3),
+              color: lineColor[0].withOpacity(0.3),
               gradient: LinearGradient(
-                colors: [lineColor.withOpacity(0.3), lineColor.withOpacity(0.0)],
+                colors: [lineColor[0].withOpacity(0.8), lineColor[1].withOpacity(0.1)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -301,92 +349,129 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       ),
     );
   }
-
+  
   Widget _buildBarChart() {
-    Color barColor = getDataTypeColor(selectedDataType!);
-    return BarChart(
-      BarChartData(
-        gridData: const FlGridData(show: false),
-        titlesData: FlTitlesData(
-          bottomTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 30,
-              getTitlesWidget: (value, meta) {
-                int index = value.toInt();
-                if (index % 3 == 0 && index >= 0 && index < weatherData['time']!.length) {
-                  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: Text(
-                      DateFormat('HH時').format(dateTime),
-                      style: const TextStyle(fontSize: 10),
-                    ),
-                  );
-                } else {
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: const Text(''),
-                  );
-                }
-              },
-            ),
+    Color barColor = getDataTypeColor(selectedDataType!)[0];
+    Color abnormalColor = Colors.red.withOpacity(0.3);
+
+    double maxRainfall = weatherData[selectedDataType]!
+        .where((value) => value != -99)
+        .fold(0, (max, value) => value > max ? value : max);
+
+    double interval = _calculateDynamicInterval(maxRainfall);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return CustomPaint(
+          painter: BackgroundPainter(
+            data: weatherData[selectedDataType]!,
+            abnormalColor: abnormalColor,
+            chartAreaSize: Size(constraints.maxWidth, constraints.maxHeight),
           ),
-          leftTitles: AxisTitles(
-            sideTitles: SideTitles(
-              showTitles: true,
-              reservedSize: 40,
-              getTitlesWidget: (value, meta) => Text(
-                value.toInt().toString(),
-                style: const TextStyle(fontSize: 10),
+          child: BarChart(
+            BarChartData(
+              gridData: const FlGridData(show: false),
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 30,
+                    getTitlesWidget: (value, meta) {
+                      int index = value.toInt();
+                      if (index % 3 == 0 && index >= 0 && index < weatherData['time']!.length) {
+                        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
+                        return SideTitleWidget(
+                          axisSide: meta.axisSide,
+                          child: Text(
+                            DateFormat('HH時').format(dateTime),
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                        );
+                      } else {
+                        return SideTitleWidget(
+                          axisSide: meta.axisSide,
+                          child: const Text(''),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 40,
+                    interval: interval,
+                    getTitlesWidget: (value, meta) {
+                      if (value % interval < 0.001) {
+                        return Text(
+                          value.toInt().toString(),
+                          style: const TextStyle(fontSize: 10),
+                        );
+                      } else {
+                        return const Text('');
+                      }
+                    },
+                  ),
+                ),
+                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+              borderData: FlBorderData(show: true),
+              barGroups: weatherData[selectedDataType]!
+                  .asMap()
+                  .entries
+                  .map((entry) => BarChartGroupData(
+                        x: entry.key,
+                        barRods: [
+                          BarChartRodData(
+                            toY: entry.value == -99 ? 0 : entry.value,
+                            color: touchedIndex != -1 && touchedIndex != entry.key ? Colors.grey : barColor,
+                            width: 3,
+                          )
+                        ],
+                      ))
+                  .toList(),
+              barTouchData: BarTouchData(
+                enabled: true,
+                touchTooltipData: BarTouchTooltipData(
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) => null,
+                ),
+                touchCallback: (FlTouchEvent event, BarTouchResponse? touchResponse) {
+                  setState(() {
+                    if (event is FlPanEndEvent || event is FlTapUpEvent || event is FlLongPressEnd) {
+                      touchedIndex = -1;
+                    } else if (touchResponse?.spot != null) {
+                      touchedIndex = touchResponse!.spot!.touchedBarGroupIndex;
+                    }
+                  });
+                },
+              ),
+              maxY: (maxRainfall / interval).ceil() * interval,
+              minY: 0,
+              backgroundColor: Colors.transparent,
+              extraLinesData: ExtraLinesData(
+                horizontalLines: [
+                  HorizontalLine(
+                    y: double.parse(_calculate24HourAverage()),
+                    color: Colors.grey,
+                    strokeWidth: 1,
+                    dashArray: [5, 5],
+                  ),
+                ],
               ),
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        ),
-        borderData: FlBorderData(show: true),
-        barGroups: weatherData[selectedDataType]!
-            .asMap()
-            .entries
-            .map((entry) => BarChartGroupData(
-                  x: entry.key,
-                  barRods: [
-                    BarChartRodData(
-                      toY: entry.value == -99 ? 0 : entry.value,
-                      color: touchedIndex != -1 && touchedIndex != entry.key ? Colors.grey : barColor,
-                      width: 3,
-                    )
-                  ],
-                ))
-            .toList(),
-        barTouchData: BarTouchData(
-          enabled: true,
-          touchTooltipData: BarTouchTooltipData(
-            getTooltipItem: (group, groupIndex, rod, rodIndex) => null,
-          ),
-          touchCallback: (FlTouchEvent event, BarTouchResponse? touchResponse) {
-            setState(() {
-              if (event is FlPanEndEvent || event is FlTapUpEvent || event is FlLongPressEnd) {
-                touchedIndex = -1;
-              } else if (touchResponse?.spot != null) {
-                touchedIndex = touchResponse!.spot!.touchedBarGroupIndex;
-              }
-            });
-          },
-        ),
-        extraLinesData: ExtraLinesData(
-          horizontalLines: [
-            HorizontalLine(
-              y: double.parse(_calculate24HourAverage()),
-              color: Colors.grey,
-              strokeWidth: 1,
-              dashArray: [5, 5],
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
+  }
+
+  double _calculateDynamicInterval(double maxValue) {
+    if (maxValue <= 5) return 1;
+    if (maxValue <= 10) return 2;
+    if (maxValue <= 50) return 5;
+    if (maxValue <= 100) return 10;
+    return 20;
   }
 
   Widget _buildDataTypeSelector() {
@@ -449,7 +534,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             Container(
               width: 20,
               height: 3,
-              color: getDataTypeColor(selectedDataType!),
+              color: getDataTypeColor(selectedDataType!)[0],
             ),
             const SizedBox(width: 8),
             Text(dataTypeToChineseMap[selectedDataType]!),
@@ -478,4 +563,43 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       ],
     );
   }
+}
+
+class BackgroundPainter extends CustomPainter {
+  final List<double> data;
+  final Color abnormalColor;
+  final Size chartAreaSize;
+
+  BackgroundPainter({
+    required this.data,
+    required this.abnormalColor,
+    required this.chartAreaSize,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = abnormalColor
+      ..style = PaintingStyle.fill;
+
+    final double leftPadding = 55;
+    final double bottomPadding = 30;
+    final double topPadding = 0;
+    final double rightPadding = 10;
+
+    final double chartWidth = chartAreaSize.width - leftPadding - rightPadding;
+    final double chartHeight = chartAreaSize.height - bottomPadding - topPadding;
+
+    final barWidth = chartWidth / data.length;
+
+    for (int i = 0; i < data.length; i++) {
+      if (data[i] == -99) {
+        final rect = Rect.fromLTWH(leftPadding + i * barWidth, topPadding, barWidth, chartHeight);
+        canvas.drawRect(rect, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
