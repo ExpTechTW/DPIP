@@ -1,5 +1,6 @@
 import 'package:dpip/model/history.dart';
 import 'package:dpip/route/event_viewer/thunderstorm.dart';
+import 'package:dpip/route/report/report.dart';
 import 'package:flutter/material.dart';
 
 class TypeConfig {
@@ -14,6 +15,9 @@ final Map<String, TypeConfig> typeConfigs = {
   ),
   'rain': TypeConfig(
     buildPage: (History item) => ThunderstormPage(item: item),
+  ),
+  'earthquake': TypeConfig(
+    buildPage: (History item) => ReportRoute(id: item.addition?["id"]),
   ),
 };
 
