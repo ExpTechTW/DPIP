@@ -5,6 +5,10 @@
   "@datetime_format": {
     "description": "日期時間顯示格式"
   },
+  "full_date_format": "yyyy/MM/dd (EEEE)",
+  "@full_date_format": {
+    "description": "完整日期顯示格式"
+  },
   "date_format": "yyyy/MM/dd",
   "@date_format": {
     "description": "日期顯示格式"
@@ -1336,7 +1340,7 @@
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
   "sound_int_report_minor": "震度速報(一般)",
-  "@sound_report_minor": {
+  "@sound_int_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(一般)"
   },
   "sound_int_report_minor_h2": "所在地(鄉鎮)實測震度 3 以上",
@@ -1435,10 +1439,6 @@
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_thunder": "晴有雷聲",
-  "@sunny_with_thunder": {
-    "description": "天氣狀況：晴天伴有雷聲"
-  },
   "sunny_with_fog": "晴有霧",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
@@ -1515,10 +1515,6 @@
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_thunder": "多雲有雷聲",
-  "@partly_cloudy_with_thunder": {
-    "description": "天氣狀況：多雲伴有雷聲"
-  },
   "partly_cloudy_with_fog": "多雲有霧",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
@@ -1590,10 +1586,6 @@
   "overcast_with_lightning": "陰有閃電",
   "@overcast_with_lightning": {
     "description": "天氣狀況：陰天伴有閃電"
-  },
-  "overcast_with_thunder": "陰有雷聲",
-  "@overcast_with_thunder": {
-    "description": "天氣狀況：陰天伴有雷聲"
   },
   "overcast_with_fog": "陰有霧",
   "@overcast_with_fog": {

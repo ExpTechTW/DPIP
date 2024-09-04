@@ -4,19 +4,20 @@ import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/widget/home/event_list_route.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryTimelineItem extends StatelessWidget {
   final History history;
   final bool first;
   final bool last;
-  final bool isExpired;
+  final bool expired;
 
   const HistoryTimelineItem({
     super.key,
     required this.history,
     this.first = false,
     this.last = false,
-    required this.isExpired,
+    required this.expired,
   });
 
   @override
@@ -46,9 +47,13 @@ class HistoryTimelineItem extends StatelessWidget {
                       width: 42,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isExpired ? Colors.transparent : context.colors.primaryContainer,
+                        color: expired ? context.colors.surface : context.colors.primaryContainer,
+                        border: expired ? Border.all(color: context.colors.outlineVariant) : null,
                       ),
-                      child: Icon(ListIcons.getListIcon(history.icon)),
+                      child: Icon(
+                        ListIcons.getListIcon(history.icon),
+                        color: expired ? context.colors.outline : context.colors.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 ],
@@ -56,46 +61,45 @@ class HistoryTimelineItem extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(0, 12, 8, 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            DateFormat(context.i18n.time_format).format(history.time.send),
-                            style: context.theme.textTheme.labelMedium?.copyWith(color: context.colors.outline),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            history.text.content["all"]!.subtitle,
-                            style: context.theme.textTheme.titleMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          Flexible(
-                            child: Text(
-                              history.text.description["all"]!,
-                              style: context.theme.textTheme.bodyMedium,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      DateFormat(context.i18n.time_format).format(history.time.send),
+                      style: context.theme.textTheme.labelMedium?.copyWith(
+                        color: context.colors.outline.withOpacity(expired ? 0.6 : 1),
                       ),
                     ),
-                    if (shouldShowArrow(history))
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: Icon(Icons.arrow_forward_ios, color: context.colors.outline, size: 12),
+                    Text(
+                      history.text.content["all"]!.subtitle,
+                      style: context.theme.textTheme.titleMedium?.copyWith(
+                        color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      history.text.description["all"]!,
+                      style: context.theme.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
+                      ),
+                      textAlign: TextAlign.justify,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
             ),
+            if (shouldShowArrow(history))
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Icon(
+                  Symbols.chevron_right_rounded,
+                  color: context.colors.outline,
+                ),
+              ),
           ],
         ),
       ),

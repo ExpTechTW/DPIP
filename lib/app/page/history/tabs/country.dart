@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
-import 'package:dpip/app/page/history/widgets/timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/time_convert.dart';
@@ -17,6 +17,7 @@ class HistoryCountryTab extends StatefulWidget {
 }
 
 class _HistoryCountryTabState extends State<HistoryCountryTab> {
+  late final locale = Localizations.localeOf(context).toString();
   final list = GlobalKey<RefreshIndicatorState>();
   bool isLoading = true;
   List<History> historyList = [];
@@ -48,7 +49,7 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
+    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
 
     return RefreshIndicator(
       key: list,
@@ -70,17 +71,13 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
           final historyGroup = grouped[key]!;
 
           return Column(children: [
-            TimelineItem(
-                child: Text(
-              key,
-              style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.secondary),
-            )),
+            DateTimelineItem(key),
             ...historyGroup.map((history) {
               final int? expireTimestamp = history.time.expires['all'];
               final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
               final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
               return HistoryTimelineItem(
-                isExpired: isExpired,
+                expired: isExpired,
                 history: history,
                 last: index == historyList.length - 1,
               );

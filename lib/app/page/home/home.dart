@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
-import 'package:dpip/app/page/history/widgets/timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
@@ -42,6 +42,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  late final locale = Localizations.localeOf(context).toString();
   List<History> realtimeList = [];
   Map<String, dynamic> weatherData = {};
   bool country = false;
@@ -235,7 +236,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       return Center(child: Text(context.i18n.home_safety));
     }
 
-    final grouped = groupBy(realtimeList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
+    final grouped = groupBy(realtimeList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
 
     return Column(
       children: grouped.entries.map((entry) {
@@ -243,18 +244,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         final historyGroup = entry.value;
         return Column(
           children: [
-            TimelineItem(
-              child: Text(
-                date,
-                style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.secondary),
-              ),
-            ),
+            DateTimelineItem(date),
             ...historyGroup.map((history) {
               final int? expireTimestamp = history.time.expires['all'];
               final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
               final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
               return HistoryTimelineItem(
-                isExpired: isExpired,
+                expired: isExpired,
                 history: history,
                 last: history == realtimeList.last,
               );

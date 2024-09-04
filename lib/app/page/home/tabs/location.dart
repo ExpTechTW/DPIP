@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
-import 'package:dpip/app/page/history/widgets/timeline_item.dart';
+import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
@@ -65,10 +65,11 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
     if (region == null) {
       return const RegionOutOfService();
     }
+
+    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.date_format).format(e.time.send));
 
     return RefreshIndicator(
       key: list,
@@ -90,18 +91,13 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
           final historyGroup = grouped[key]!;
 
           return Column(children: [
-            TimelineItem(
-              child: Text(
-                key,
-                style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.secondary),
-              ),
-            ),
+            DateTimelineItem(key),
             ...historyGroup.map((history) {
               final int? expireTimestamp = history.time.expires['all'];
               final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
               final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
               return HistoryTimelineItem(
-                isExpired: isExpired,
+                expired: isExpired,
                 history: history,
                 last: index == historyList.length - 1,
               );
