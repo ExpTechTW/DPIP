@@ -1662,5 +1662,29 @@
   "map_average": "平均",
   "@map_average": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
+  },
+  "radar_synthetic_echo": "雷達合成回波",
+  "@radar_synthetic_echo": {
+    "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
+  },
+  "completed": "已結束",
+  "@completed": {
+    "description": "「天氣警特報」狀態 → 已結束"
+  },
+  "active": "生效中",
+  "@active": {
+    "description": "「天氣警特報」狀態 → 生效中"
+  },
+  "save_image_permission": "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。",
+  "@save_image_permission": {
+    "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。"
+  },
+  "save_image_error": "儲存圖片時發生錯誤:",
+  "@save_image_error": {
+    "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤:"
+  },
+  "error_occurred": "發生錯誤:",
+  "@error_occurred": {
+    "description": "Weather Status: An error occurred:"
   }
 }

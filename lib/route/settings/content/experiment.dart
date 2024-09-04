@@ -57,7 +57,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
           });
         } catch (e) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('發生錯誤: $e')),
+            SnackBar(content: Text('${context.i18n.error_occurred} $e')),
           );
           setState(() => _isLoading = false);
         }

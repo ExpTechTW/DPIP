@@ -51,7 +51,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
       Navigator.popUntil(context, ModalRoute.withName("/settings"));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('發生錯誤: $e')),
+        SnackBar(content: Text('${context.i18n.error_occurred} $e')),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);

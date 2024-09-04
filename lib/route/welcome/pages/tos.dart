@@ -58,7 +58,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('發生錯誤: $e')),
+        SnackBar(content: Text('${context.i18n.error_occurred} $e')),
       );
     } finally {
       setState(() => _isLoading = false);

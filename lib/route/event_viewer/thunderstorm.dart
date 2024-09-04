@@ -318,7 +318,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                     color: context.colors.surface.withOpacity(0.5),
                   ),
                   child: Text(
-                    "雷達合成回波",
+                    context.i18n.radar_synthetic_echo,
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -424,7 +424,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    "已結束",
+                    context.i18n.completed,
                     style: context.theme.textTheme.bodySmall?.copyWith(
                       color: context.colors.onError,
                       fontWeight: FontWeight.bold,
@@ -440,7 +440,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    "生效中",
+                    context.i18n.active,
                     style: context.theme.textTheme.bodySmall?.copyWith(
                       color: context.colors.onSecondaryContainer,
                       fontWeight: FontWeight.bold,
