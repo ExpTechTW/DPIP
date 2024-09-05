@@ -1683,6 +1683,26 @@
   "@history_final": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → (最終)"
   },
+  "level_1": "1級",
+  "@level_1": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 1級"
+  },
+  "level_2": "2級",
+  "@level_2": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 2級"
+  },
+  "level_3": "3級",
+  "@level_3": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 3級"
+  },
+  "level_4": "4級",
+  "@level_4": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 4級"
+  },
+  "level_7": "7級",
+  "@level_7": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 7級"
+  },
   "home_click_settings": "點擊設定所在地",
   "@home_click_settings": {
     "description": "「首頁」路徑 → 點擊設定所在地"
