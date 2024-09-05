@@ -129,17 +129,6 @@ class _ReportListPageState extends State<ReportListPage> {
 
   @override
   Widget build(context) {
-    final filter = ListTile(
-      trailing: const Icon(Icons.filter_list),
-      title: Text(context.i18n.report_filter),
-      subtitle: Text(
-        _getFilterSummary(),
-      ),
-      onTap: () {
-        _showFilterDialog();
-      },
-    );
-
     return NestedScrollView(
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
