@@ -122,6 +122,7 @@ class _ReportListPageState extends State<ReportListPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!mounted) return;
       scroll.currentState!.innerController.addListener(_loadMore);
     });
     _fetchNextPage();
