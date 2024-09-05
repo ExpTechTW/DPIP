@@ -133,6 +133,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: widget.onClose,
+            tooltip: 'Back',
           ),
           automaticallyImplyLeading: false,
           title: Column(
@@ -140,12 +141,14 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             children: [
               Text(
                 '${data?.station.county ?? ""}${data?.station.name ?? ""}',
-                style: context.theme.textTheme.titleLarge,
+                style: context.theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 stationId!,
                 style: context.theme.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.onSurface.withOpacity(0.7),
+                  color: context.colors.onSurface.withOpacity(0.6),
                 ),
               ),
             ],
@@ -154,22 +157,28 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             _buildDataTypeSelector(),
             const SizedBox(width: 16),
           ],
-          elevation: 0,
-          backgroundColor: context.colors.surface,
-          foregroundColor: context.colors.onSurface,
         ),
         if (isLoading)
-          const CircularProgressIndicator()
-        else
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 8),
-                _buildChart(),
-              ],
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(context.colors.primary),
+              ),
+            ),
+          )
+        else
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 16),
+                  _buildChart(),
+                ],
+              ),
             ),
           ),
       ],
