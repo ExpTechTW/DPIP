@@ -383,50 +383,56 @@ class _TemperatureMapState extends State<TemperatureMap> {
         if (_showLegend)
           Positioned(
             left: 6,
-            bottom: 50, // Adjusted to be above the legend button
+            bottom: 50,
             child: _buildLegend(),
           ),
         if (_selectedStationId != null)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.7,
-              ),
-              decoration: BoxDecoration(
-                color: context.theme.cardColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
-              ),
-              child: SafeArea(
-                top: false,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: SingleChildScrollView(
-                        child: AdvancedWeatherChart(
-                          type: "temperature",
-                          stationId: _selectedStationId!,
-                          onClose: () {
-                            setState(() {
-                              _selectedStationId = null;
-                            });
-                          },
-                        ),
-                      ),
+          DraggableScrollableSheet(
+            initialChildSize: 0.7,
+            minChildSize: 0.1,
+            maxChildSize: 1,
+            snap: true,
+            snapSizes: const [0.1, 0.7, 1],
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: context.theme.cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
                     ),
                   ],
                 ),
-              ),
-            ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 4,
+                        width: 40,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      AdvancedWeatherChart(
+                        type: "temperature",
+                        stationId: _selectedStationId!,
+                        onClose: () {
+                          setState(() {
+                            _selectedStationId = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
       ],
     );
