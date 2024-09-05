@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import "dart:ui" as ui;
 
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
@@ -230,10 +229,6 @@ class _IntensityPageState extends State<IntensityPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TZDateTime radarDateTime =
-        TZDateTime.fromMillisecondsSinceEpoch(UTC, radarList.isEmpty ? 0 : int.parse(radarList.last));
-    final TZDateTime radarTime = TZDateTime.from(radarDateTime, getLocation('Asia/Taipei'));
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.item.text.content['all']?.title ?? ""),
@@ -278,54 +273,6 @@ class _IntensityPageState extends State<IntensityPage> {
               top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
             ),
-          Positioned(
-            left: 4,
-            top: 4,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: context.colors.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 4,
-            top: 32,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    context.i18n.radar_synthetic_echo,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: context.colors.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
           _buildDraggableSheet(context),
         ],
       ),

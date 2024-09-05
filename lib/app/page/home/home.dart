@@ -11,6 +11,7 @@ import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/time_convert.dart';
 import 'package:dpip/util/weather_icon.dart';
+import 'package:dpip/widget/error/region_out_of_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -228,6 +229,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildHomeList({required bool isCountryView}) {
+    if (region == null && !country) {
+      return const RegionOutOfService();
+    }
+
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
