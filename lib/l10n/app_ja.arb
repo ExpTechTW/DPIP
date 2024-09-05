@@ -212,11 +212,11 @@
   "@report_replay": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 重播按鈕"
   },
-  "image_save": "セーブ",
+  "image_save": "保存",
   "@image_save": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片"
   },
-  "image_saved": "セーブしました",
+  "image_saved": "保存しました",
   "@image_saved": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
@@ -1091,7 +1091,7 @@
   "@me_about": {
     "description": "「我」路徑 → 關於"
   },
-  "alarm_area": "警報區域",
+  "alarm_area": "警報地域",
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
@@ -1255,7 +1255,7 @@
   "@history_nationwide": {
     "description": "「歷史」頁面 → 全國"
   },
-  "me_welcome": "歡迎頁面",
+  "me_welcome": "ようこそ",
   "@me_welcome": {
     "description": "「我」頁面 → 「歡迎頁面」按鈕"
   },
@@ -1267,11 +1267,11 @@
   "@max_earthquake_intensity": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
-  "report_all": "全部",
+  "report_all": "すべて",
   "@report_all": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
-  "report_filter": "篩選器",
+  "report_filter": "フィルター",
   "@report_filter": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
@@ -1287,7 +1287,7 @@
   "@report_end": {
     "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
-  "history_send_time": "發送時間",
+  "history_send_time": "発信時刻",
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
@@ -1371,7 +1371,7 @@
   "@sound_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
   },
-  "sound_weather_warning": "氣象警報",
+  "sound_weather_warning": "気象警報",
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
@@ -1395,11 +1395,11 @@
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
-  "sound_disaster": "災害資訊",
+  "sound_disaster": "防災情報",
   "@sound_disaster": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
   },
-  "sound_evacuation": "避難資訊",
+  "sound_evacuation": "避難情報",
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
@@ -1419,11 +1419,11 @@
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
-  "sound_other_notifications": "其他通知",
+  "sound_other_notifications": "その他の通知",
   "@sound_other_notifications": {
     "description": "「我」路徑 → 「通知測試」內容 → 「其他通知」標題 "
   },
-  "sound_major": "重大",
+  "sound_major": "重大な通知",
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
