@@ -1227,21 +1227,23 @@
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "為了獲得更好的自動定位體驗，您需要將位置權限提升至「",
+  "improve_auto_location_experience": "為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
   "@improve_auto_location_experience": {
-    "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「"
+    "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
+    "placeholders": {
+      "permissionType": {
+        "type": "String"
+      }
+    }
   },
-  "allow_background_location": "」以便讓 DPIP 在背景自動設定所在地資訊。",
-  "@allow_background_location": {
-    "description": "「通知權限」彈窗 → 」以便讓 DPIP 在背景自動設定所在地資訊。"
-  },
-  "auto_location_permission_upgrade_needed": "自動定位功能需要將位置權限提升至「",
+  "auto_location_permission_upgrade_needed": "自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
   "@auto_location_permission_upgrade_needed": {
-    "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「"
-  },
-  "background_use_suffix": "」以在背景使用。",
-  "@background_use_suffix": {
-    "description": "「通知權限」彈窗 → 」以在背景使用。"
+    "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
+    "placeholders": {
+      "permissionType": {
+        "type": "String"
+      }
+    }
   },
   "error_prefix": "錯誤:",
   "@error_prefix": {

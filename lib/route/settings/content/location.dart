@@ -184,7 +184,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 icon: const Icon(Symbols.my_location),
                 title: Text("$permissionType${context.i18n.location_permission}"),
                 content: Text(
-                    "${context.i18n.improve_auto_location_experience}$permissionType${context.i18n.allow_background_location}"),
+                    context.i18n.improve_auto_location_experience(permissionType.toString())),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
@@ -425,6 +425,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
   @override
   Widget build(BuildContext context) {
+    final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
     return Material(
       child: ListView(
         padding: EdgeInsets.only(bottom: context.padding.bottom),
@@ -468,7 +469,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "${context.i18n.auto_location_permission_upgrade_needed}${(Platform.isAndroid) ? context.i18n.always_allow : context.i18n.always}${context.i18n.background_use_suffix}",
+                        context.i18n.auto_location_permission_upgrade_needed(permissionType.toString()),
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),
