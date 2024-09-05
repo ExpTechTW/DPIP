@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               );
             },
             icon: const Icon(Symbols.pin_drop_rounded),
-            label: Text('$city$town', style: const TextStyle(fontSize: 20)),
+            label: Text(city != "" ? '$city$town' : "按此前往設定所在地", style: const TextStyle(fontSize: 20)),
           ),
         );
       },
