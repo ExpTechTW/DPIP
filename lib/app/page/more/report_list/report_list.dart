@@ -12,7 +12,7 @@ class ReportListPage extends StatefulWidget {
 }
 
 class _ReportListPageState extends State<ReportListPage> {
-  final _scrollController = ScrollController();
+  final scroll = GlobalKey<NestedScrollViewState>();
   List<PartialEarthquakeReport> reportList = [];
   DateTime? lastFetchTime;
   bool isLoading = false;
@@ -44,7 +44,10 @@ class _ReportListPageState extends State<ReportListPage> {
   void _loadMore() {
     if (isLoading) return;
     if (isLoadingEnd) return;
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+    if (scroll.currentState == null) return;
+
+    if (scroll.currentState!.innerController.position.pixels ==
+        scroll.currentState!.innerController.position.maxScrollExtent) {
       setState(() {
         _currentPage++;
         _fetchNextPage();
@@ -118,39 +121,45 @@ class _ReportListPageState extends State<ReportListPage> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_loadMore);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      scroll.currentState?.innerController.addListener(_loadMore);
+    });
     _fetchNextPage();
   }
 
   @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(context.i18n.report_filter),
-            Text(
-              _getFilterSummary(),
-              style: const TextStyle(fontSize: 14),
+  Widget build(context) {
+    return NestedScrollView(
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        return [
+          SliverAppBar(
+            pinned: true,
+            floating: true,
+            title: Text(context.i18n.report),
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: Container(
+                width: double.maxFinite,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                child: Wrap(
+                  children: [
+                    FilterChip(
+                      label: Text(
+                        _getFilterSummary() == context.i18n.report_all
+                            ? context.i18n.report_filter
+                            : _getFilterSummary(),
+                      ),
+                      selected: _getFilterSummary() != context.i18n.report_all,
+                      onSelected: (_) => _showFilterDialog(),
+                    )
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              _showFilterDialog(context);
-            },
+            shape: Border(bottom: BorderSide(color: context.colors.outlineVariant)),
           ),
-        ],
-      ),
+        ];
+      },
       body: Column(
         children: [
           Visibility(
@@ -172,7 +181,7 @@ class _ReportListPageState extends State<ReportListPage> {
                   }
 
                   return ListView.builder(
-                    controller: _scrollController,
+                    padding: EdgeInsets.only(bottom: context.padding.bottom),
                     itemCount: reportList.length + 1,
                     itemBuilder: (context, index) {
                       if (index == reportList.length) {
@@ -218,12 +227,12 @@ class _ReportListPageState extends State<ReportListPage> {
     );
   }
 
-  void _showFilterDialog(BuildContext context) {
+  void _showFilterDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
+          builder: (context, setState) {
             return AlertDialog(
               title: Text(context.i18n.report_filter),
               content: SingleChildScrollView(
