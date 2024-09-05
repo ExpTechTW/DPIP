@@ -205,7 +205,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 ),
               ],
             ),
-            if (selectedDataType == 'wind_speed' && touchedIndex != -1)
+            if (selectedDataType == 'wind_speed' &&
+                touchedIndex != -1 &&
+                weatherData[selectedDataType]![touchedIndex] != 0)
               Transform.rotate(
                 angle: (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
                 child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType!)[0], size: 48),
