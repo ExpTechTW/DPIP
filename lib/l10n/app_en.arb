@@ -5,7 +5,7 @@
   "@datetime_format": {
     "description": "日期時間顯示格式"
   },
-  "full_date_format": "yyyy/MM/dd (EEEE)",
+  "full_date_format": "EEEE, MM/dd/yyyy",
   "@full_date_format": {
     "description": "完整日期顯示格式"
   },
@@ -300,7 +300,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n組建 {buildNumber}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "me_version": "Version {version}\nBuild {buildNumber}\nMade by ExpTech Studio\nPartial Data Source: CWA",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -469,7 +469,7 @@
   "@out_of_service": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外"
   },
-  "out_of_service_only_taiwan": "Outside the service area, only available throughout Taiwan",
+  "out_of_service_only_taiwan": "Outside the service area, only available in Taiwan",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
@@ -505,7 +505,7 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_general": "一般",
+  "me_general": "General",
   "@me_general": {
     "description": "「我」路徑 → 一般、「設定」路徑 → 「通知測試」內容 → 通知測試列表"
   },
@@ -1123,7 +1123,7 @@
   "@lowest": {
     "description": "「首頁」路徑 → 「最低」描述"
   },
-  "not_enabled": " (未啟用)",
+  "not_enabled": " (Disabled)",
   "@not_enabled": {
     "description": "「設定」路徑 → 「通知測試」內容 →「 (未啟用)」副標題 "
   },
@@ -1195,15 +1195,15 @@
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
-  "invalid_operation": "無效操作",
+  "invalid_operation": "Slow down!",
   "@invalid_operation": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
   },
-  "operation_interval_too_short": "操作間隔過短，請稍後再嘗試。",
+  "operation_interval_too_short": "It seems like you're going a bit too fast. Please take a moment and try again later.",
   "@operation_interval_too_short": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 操作間隔過短，請稍後再嘗試。"
   },
-  "got_it": "知道了",
+  "got_it": "OK",
   "@got_it": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
   },
@@ -1267,19 +1267,19 @@
   "@max_earthquake_intensity": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
-  "report_all": "全部",
+  "report_all": "All",
   "@report_all": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
-  "report_filter": "篩選器",
+  "report_filter": "Filter",
   "@report_filter": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
-  "report_filter_reset": "重置",
+  "report_filter_reset": "Reset",
   "@report_filter_reset": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 重置"
   },
-  "report_filter_apply": "套用",
+  "report_filter_apply": "Apply",
   "@report_filter_apply": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 套用"
   },
@@ -1291,7 +1291,7 @@
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
-  "history_valid_until": "有效至",
+  "history_valid_until": "Expires at ",
   "@history_valid_until": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
   },
