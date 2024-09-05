@@ -487,11 +487,11 @@ class _RainMapState extends State<RainMap> {
           ),
         if (_selectedStationId != null)
           DraggableScrollableSheet(
-            initialChildSize: 0.7,
+            initialChildSize: 0.3,
             minChildSize: 0.1,
             maxChildSize: 1,
             snap: true,
-            snapSizes: const [0.1, 0.7, 1],
+            snapSizes: const [0.1, 0.3, 0.7, 1],
             builder: (BuildContext context, ScrollController scrollController) {
               return Container(
                 decoration: BoxDecoration(
