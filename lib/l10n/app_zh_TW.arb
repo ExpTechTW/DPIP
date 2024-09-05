@@ -1265,27 +1265,27 @@
   },
   "max_earthquake_intensity": "最大震度",
   "@max_earthquake_intensity": {
-    "description": "「更多」路徑 → 地震報告 → 「過濾器」圖例 → 最大震度"
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
   "report_all": "全部",
   "@report_all": {
-    "description": "「更多」路徑 → 地震報告 → 「過濾器」→ 全部"
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
-  "report_filter": "過濾器",
+  "report_filter": "篩選器",
   "@report_filter": {
-    "description": "「更多」路徑 → 地震報告 → 「過濾器」"
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
   "report_filter_reset": "重置",
   "@report_filter_reset": {
-    "description": "「更多」路徑 → 地震報告 → 「過濾器」圖例 → 彈出資訊 → 重置"
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 重置"
   },
   "report_filter_apply": "套用",
   "@report_filter_apply": {
-    "description": "「更多」路徑 → 地震報告 → 「過濾器」圖例 → 彈出資訊 → 套用"
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 套用"
   },
   "report_end": "到底了",
   "@report_end": {
-    "description": "「更多」路徑 → 地震報告 → 使用「過濾器」 → 到底了"
+    "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
   "history_send_time": "發送時間",
   "@history_send_time": {
