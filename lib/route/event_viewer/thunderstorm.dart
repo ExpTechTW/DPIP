@@ -253,7 +253,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           DpipMap(
             onMapCreated: _initMap,
             onStyleLoadedCallback: _loadMap,
-            rotateGesturesEnabled: true,
           ),
           Positioned(
             right: 4,

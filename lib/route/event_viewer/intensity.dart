@@ -260,7 +260,6 @@ class _IntensityPageState extends State<IntensityPage> {
           DpipMap(
             onMapCreated: _initMap,
             onStyleLoadedCallback: _loadMap,
-            rotateGesturesEnabled: true,
           ),
           Positioned(
             right: 4,
