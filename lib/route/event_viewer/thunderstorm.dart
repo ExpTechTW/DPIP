@@ -43,6 +43,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   bool _showLegend = false;
   Timer? _blinkTimer;
   int _blink = 0;
+  bool isExpired = true;
 
   @override
   void dispose() {
@@ -120,7 +121,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       "town-outline-highlighted",
       const LineLayerProperties(
         lineColor: "#9e10fd",
-        lineWidth: 6,
+        lineWidth: 2,
       ),
       sourceLayer: "town",
       filter: [
@@ -130,12 +131,14 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       ],
     );
 
-    await _mapController.addLayer(
-      "radarSource",
-      "radarLayer",
-      const RasterLayerProperties(),
-      belowLayerId: "county-outline",
-    );
+    if (!isExpired) {
+      await _mapController.addLayer(
+        "radarSource",
+        "radarLayer",
+        const RasterLayerProperties(),
+        belowLayerId: "county-outline",
+      );
+    }
 
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
@@ -286,54 +289,56 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               top: 50, // Adjusted to be above the legend button
               child: _buildLegend(),
             ),
-          Positioned(
-            left: 4,
-            top: 4,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: context.colors.onSurface,
+          if (!isExpired)
+            Positioned(
+              left: 4,
+              top: 4,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: context.colors.surface.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: context.colors.onSurface,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 4,
-            top: 32,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: context.colors.surface.withOpacity(0.5),
-                  ),
-                  child: Text(
-                    context.i18n.radar_synthetic_echo,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: context.colors.onSurface,
+          if (!isExpired)
+            Positioned(
+              left: 4,
+              top: 32,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: context.colors.surface.withOpacity(0.5),
+                    ),
+                    child: Text(
+                      context.i18n.radar_synthetic_echo,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: context.colors.onSurface,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
           _buildDraggableSheet(context),
         ],
       ),
@@ -374,7 +379,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
-    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+    isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
 
     return Padding(
       padding: const EdgeInsets.all(8),
