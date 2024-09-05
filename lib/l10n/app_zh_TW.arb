@@ -1687,5 +1687,29 @@
   "history_final": "(最終)",
   "@history_final": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → (最終)"
+  },
+  "home_click_settings": "點擊設定所在地",
+  "@home_click_settings": {
+    "description": "「首頁」路徑 → 點擊設定所在地"
+  },
+  "history_earthquake_intensity": "TREM 觀測網實測震度",
+  "@history_earthquake_intensity": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
+  },
+  "history_earthquake_intensity_h2": "使用 JMA 震度標準 (0.3秒三分量合成加速度)",
+  "@history_earthquake_intensity_h2": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
+  },
+  "history_seismic_intensity_reference": "本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。",
+  "@history_seismic_intensity_reference": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
+  },
+  "map_no_data": "沒有有效資料可顯示",
+  "@map_no_data": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 沒有有效資料可顯示"
+  },
+  "map_hh_time": "HH時",
+  "@map_hh_time": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → HH時"
   }
 }

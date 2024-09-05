@@ -263,7 +263,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (_invalid) {
-      return const Center(child: Text('沒有有效資料可顯示'));
+      return Center(
+        child: Text(context.i18n.map_no_data),
+      );
     }
 
     for (int i = 0; i < weatherData[selectedDataType]!.length; i++) {
@@ -320,7 +322,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 int index = value.toInt();
                 if (index >= 0 && index < weatherData['time']!.length) {
                   DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
-                  return Text(DateFormat('HH時').format(dateTime), style: const TextStyle(fontSize: 10));
+                  return Text(DateFormat(context.i18n.map_hh_time).format(dateTime),
+                      style: const TextStyle(fontSize: 10));
                 } else {
                   return const Text('');
                 }
@@ -425,7 +428,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (_invalid) {
-      return const Center(child: Text('沒有有效資料可顯示'));
+      return Center(
+        child: Text(context.i18n.map_no_data),
+      );
     }
 
     double maxRainfall = weatherData[selectedDataType]!
@@ -457,7 +462,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                         return SideTitleWidget(
                           axisSide: meta.axisSide,
                           child: Text(
-                            DateFormat('HH時').format(dateTime),
+                            DateFormat(context.i18n.map_hh_time).format(dateTime),
                             style: const TextStyle(fontSize: 10),
                           ),
                         );
