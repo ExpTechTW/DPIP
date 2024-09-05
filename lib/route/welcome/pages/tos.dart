@@ -15,6 +15,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
   final ScrollController controller = ScrollController();
   bool _isEnabled = false;
   double progress = 0;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -42,13 +43,26 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
     super.dispose();
   }
 
-  void complete(BuildContext context, bool status) async {
-    Global.preference.setBool("monitor", status);
-    String token = Global.preference.getString("fcm-token") ?? "";
-    if (token != "" && status) {
-      await ExpTech().sendMonitor(token, "1");
+  Future<void> complete(BuildContext context, bool status) async {
+    if (!status) {
+      Navigator.pop(context);
+      return;
     }
-    Navigator.pop(context);
+    setState(() => _isLoading = true);
+    try {
+      Global.preference.setBool("monitor", status);
+      String token = Global.preference.getString("fcm-token") ?? "";
+      if (token != "") {
+        await ExpTech().sendMonitor(token, "1");
+      }
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${context.i18n.error_occurred} $e')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -61,16 +75,18 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () => complete(context, false),
+                onPressed: _isLoading ? null : () => complete(context, false),
                 child: Text(
                   context.i18n.disagree,
                   style: TextStyle(fontSize: 16, color: context.colors.onSurface),
                 ),
               ),
-              FilledButton(
-                onPressed: _isEnabled ? () => complete(context, true) : null,
-                child: Text(context.i18n.agree),
-              ),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : FilledButton(
+                      onPressed: _isEnabled ? () => complete(context, true) : null,
+                      child: Text(context.i18n.agree),
+                    ),
             ],
           ),
         ),

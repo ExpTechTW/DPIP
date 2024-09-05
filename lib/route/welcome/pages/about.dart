@@ -22,6 +22,7 @@ class WelcomeAboutPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: context.padding,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(0, 32, 0, 16),

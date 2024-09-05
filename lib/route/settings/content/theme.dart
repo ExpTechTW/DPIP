@@ -16,13 +16,27 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
 
   final light = ThemeData(brightness: Brightness.light);
   final dark = ThemeData(brightness: Brightness.dark);
-  final system = ThemeData();
+  late ThemeData system;
 
-  setTheme(String theme) async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateSystemTheme();
+  }
+
+  void _updateSystemTheme() {
+    final brightness = MediaQuery.of(context).platformBrightness;
+    system = ThemeData(brightness: brightness);
+  }
+
+  Future<void> setTheme(String theme) async {
     DpipApp.of(context)!.changeTheme(theme);
     await Global.preference.setString("theme", theme);
     setState(() {
       themeMode = theme;
+      if (theme == "system") {
+        _updateSystemTheme();
+      }
     });
   }
 

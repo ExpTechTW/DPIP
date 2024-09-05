@@ -48,8 +48,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
 
-  String? city = Global.preference.getString("location-city");
-  String? town = Global.preference.getString("location-town");
+  String? city;
+  String? town;
+  int code = -1;
 
   Future<bool> requestLocationAlwaysPermission() async {
     var status = await Permission.locationWhenInUse.status;
@@ -79,7 +80,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             icon: const Icon(Symbols.error),
             title: Text(context.i18n.unable_notification),
             content: Text(
-              "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。${status.isPermanentlyDenied ? context.i18n.please_allow_notification_permission : ""}",
+              "${context.i18n.auto_location_permission_required}${status.isPermanentlyDenied ? context.i18n.please_allow_notification_permission : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
@@ -129,7 +130,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             icon: const Icon(Symbols.error),
             title: Text(context.i18n.unable_location),
             content: Text(
-              "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。${status.isPermanentlyDenied ? context.i18n.please_allow_location_permission : ""}",
+              "${context.i18n.location_permission_needed}${status.isPermanentlyDenied ? context.i18n.please_allow_location_permission : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
@@ -181,8 +182,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: Text("$permissionType位置權限"),
-                content: Text("為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以便讓 DPIP 在背景自動設定所在地資訊。"),
+                title: Text("$permissionType${context.i18n.location_permission}"),
+                content: Text(
+                    "${context.i18n.improve_auto_location_experience}$permissionType${context.i18n.allow_background_location}"),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
@@ -319,8 +321,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       androidstopBackgroundService(isAutoLocatingEnabled);
     }
 
-    Global.preference.remove("location-city");
-    Global.preference.remove("location-town");
+    Global.preference.remove("user-code");
     Global.preference.remove("user-lat");
     Global.preference.remove("user-lon");
 
@@ -366,6 +367,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     WidgetsBinding.instance.addObserver(this);
     permissionStatusUpdate();
     SettingsLocationView.setActiveCallback(sendpositionUpdate);
+
+    code = Global.preference.getInt("user-code") ?? -1;
+    if (code != -1) {
+      city = Global.location[code.toString()]?.city;
+      town = Global.location[code.toString()]?.town;
+    }
   }
 
   @override
@@ -406,8 +413,11 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
   void sendpositionUpdate() {
     if (mounted) {
-      city = Global.preference.getString("location-city");
-      town = Global.preference.getString("location-town");
+      code = Global.preference.getInt("user-code") ?? -1;
+      if (code != -1) {
+        city = Global.location[code.toString()]?.city;
+        town = Global.location[code.toString()]?.town;
+      }
       setState(() {});
       widget.onPositionUpdate?.call(city, town);
     }
@@ -458,7 +468,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        "自動定位功能需要將位置權限提升至「${(Platform.isAndroid) ? context.i18n.always_allow : context.i18n.always}」以在背景使用。",
+                        "${context.i18n.auto_location_permission_upgrade_needed}${(Platform.isAndroid) ? context.i18n.always_allow : context.i18n.always}${context.i18n.background_use_suffix}",
                         style: TextStyle(color: context.colors.error),
                       ),
                     ),
@@ -550,8 +560,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               );
 
               setState(() {
-                city = Global.preference.getString("location-city");
-                town = Global.preference.getString("location-town");
+                sendpositionUpdate();
               });
             },
           ),
@@ -583,8 +592,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               );
 
               setState(() {
-                city = Global.preference.getString("location-city");
-                town = Global.preference.getString("location-town");
+                sendpositionUpdate();
               });
             },
           )

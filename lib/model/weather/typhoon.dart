@@ -5,7 +5,6 @@ part "typhoon.g.dart";
 @JsonSerializable()
 class Typhoon {
   final String type = "typhoon";
-
   final TyphoonName name;
   final TyphoonNo no;
   final List<Analysis> analysis;
@@ -25,22 +24,24 @@ class Typhoon {
 
 @JsonSerializable()
 class TyphoonName {
+  @JsonKey(defaultValue: "")
   final String en;
+  @JsonKey(defaultValue: "")
   final String zh;
 
   const TyphoonName({
-    required this.en,
-    required this.zh,
+    this.en = "",
+    this.zh = "",
   });
 
   factory TyphoonName.fromJson(Map<String, dynamic> json) => _$TyphoonNameFromJson(json);
-
   Map<String, dynamic> toJson() => _$TyphoonNameToJson(this);
 }
 
 @JsonSerializable()
 class TyphoonNo {
   final int td;
+  @JsonKey(fromJson: _tyFromJson)
   final int ty;
 
   const TyphoonNo({
@@ -51,6 +52,8 @@ class TyphoonNo {
   factory TyphoonNo.fromJson(Map<String, dynamic> json) => _$TyphoonNoFromJson(json);
 
   Map<String, dynamic> toJson() => _$TyphoonNoToJson(this);
+
+  static int _tyFromJson(dynamic ty) => ty ?? -1;
 }
 
 @JsonSerializable()
