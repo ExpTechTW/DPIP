@@ -135,7 +135,7 @@ class _ReportListPageState extends State<ReportListPage> {
           SliverAppBar(
             pinned: true,
             floating: true,
-            title: Text(context.i18n.report_filter),
+            title: Text(context.i18n.report),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: Container(
