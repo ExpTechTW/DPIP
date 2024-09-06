@@ -324,19 +324,19 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上",
+  "eew_alert_description_sound": "Maximum intensity is greater than 5- and estimated intensity for the current location is 4 or greater.",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上",
+  "eew_description_sound": "Maximum intensity is greater than 5- and estimated intensity for the current location is 2 or greater.",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
-  "eq_description_sound": "偵測到晃動",
+  "eq_description_sound": "Shaking detected",
   "@eq_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 偵測到晃動"
   },
-  "report_description_sound": "所在地(縣市)實測震度 3 以上",
+  "report_description_sound": "Local measured intensity is greater than 3.",
   "@report_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 所在地(縣市)實測震度 3 以上"
   },
@@ -722,7 +722,7 @@
   "@agree": {
     "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
-  "trem_service_description": "在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。",
+  "trem_service_description": "On DPIP, you can access ExpTech Studio's TREM (Taiwan Real-time Earthquake Monitoring Network) Earthquake Monitor, so please carefully read through the conditions below and choose whether to enable this service or not.",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
@@ -730,7 +730,7 @@
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。",
+  "trem_station_warning": "The Earthquake Monitor is owned wholly by ExpTech Studio, and is not affiliated with the CWA. Please do not forward complaints or suggestions to the CWA, to avoid causing disturbances.",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
@@ -810,11 +810,11 @@
   "@no_changelog": {
     "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
-  "announcement_details": "公告詳情",
+  "announcement_details": "Announcement Details",
   "@announcement_details": {
     "description": "「我」路徑 → 「公告」標題 → 查看公告的具體內容"
   },
-  "version_details": "版本詳情",
+  "version_details": "Version Details",
   "@version_details": {
     "description": "「我」路徑 → 「更新日誌」標題 → 版本詳情"
   },
@@ -846,7 +846,7 @@
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "For better experience when using DPIP, you need to Enable the Permission for \"Auto Start\" to make sure DPIP is getting the info Normally.",
+  "auto_start_permission_experience": "For better experience when using DPIP, you need to Enable the Permission for \"Auto Start\" to make sure DPIP is getting the info normally.",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -1087,7 +1087,7 @@
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   },
-  "me_about": "關於",
+  "me_about": "About",
   "@me_about": {
     "description": "「我」路徑 → 關於"
   },
@@ -1095,7 +1095,7 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "預估最大震度",
+  "estimated_intensity": "Estimated maximum intensity",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
@@ -1115,11 +1115,11 @@
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   },
-  "highest": "最高",
+  "highest": "Highest",
   "@highest": {
     "description": "「首頁」路徑 → 「最高」描述"
   },
-  "lowest": "最低",
+  "lowest": "Lowest",
   "@lowest": {
     "description": "「首頁」路徑 → 「最低」描述"
   },
@@ -1127,7 +1127,7 @@
   "@not_enabled": {
     "description": "「設定」路徑 → 「通知測試」內容 →「 (未啟用)」副標題 "
   },
-  "introduction": "簡介",
+  "introduction": "Introduction",
   "@introduction": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 簡介"
   },
@@ -1135,19 +1135,19 @@
   "@first_gratitude": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
   },
-  "dpip_goal": "DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。",
+  "dpip_goal": "DPIP (Disaster Prevention Information Platform) is an application that aims to be a center for disaster prevention-related information, and we hope it can become an invaluable asset to everyone's daily lives. Although the application's development is not complete, we continue to work towards this goal.",
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
-  "development_investment": "在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。",
+  "development_investment": "In developing this application, we invested a lot of money, time and effort, with over $500,000NTD spent on staff costs, equipment costs, cloud services, network fees and other expenditures. Thus, we wish to be able to have the support of our users, by continuing to maintain operations without the use of third-party companies.",
   "@development_investment": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
   },
-  "profit_model": "營利模式",
+  "profit_model": "Profit Model",
   "@profit_model": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
   },
-  "profit_discussion": "為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。",
+  "profit_discussion": "",
   "@profit_discussion": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
   },
@@ -1159,7 +1159,7 @@
   "@user_payment_survey": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
   },
-  "why_no_ads": "為什麼不採用廣告？",
+  "why_no_ads": "Why do we not have advertisements?",
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
@@ -1179,7 +1179,7 @@
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
-  "how_to_profit": "如何營利？",
+  "how_to_profit": "How do we profit?",
   "@how_to_profit": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
   },
@@ -1187,11 +1187,11 @@
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
-  "developer_message": "DPIP 開發者的話",
+  "developer_message": "DPIP Founder's Message",
   "@developer_message": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
   },
-  "error_fetching_announcement": "獲取公告時發生錯誤:",
+  "error_fetching_announcement": "Announcement Retrieval Error",
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
@@ -1207,11 +1207,11 @@
   "@got_it": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
   },
-  "error_fcm_token": "錯誤: 無法取得 FCM Token",
+  "error_fcm_token": "Error: Unable to retrieve FCM Token",
   "@error_fcm_token": {
     "description": "錯誤：無法取得 FCM Token"
   },
-  "error_fetching_notifications": "獲取通知紀錄時發生錯誤",
+  "error_fetching_notifications": "Notification Record Retrieval Error",
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
@@ -1223,7 +1223,7 @@
   "@location_permission_needed": {
     "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
   },
-  "location_permission": "位置權限",
+  "location_permission": "Location Permissions",
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
@@ -1245,15 +1245,15 @@
       }
     }
   },
-  "error_prefix": "錯誤:",
+  "error_prefix": "Error:",
   "@error_prefix": {
     "description": "錯誤：前綴"
   },
-  "home_precipitation": "降水量",
+  "home_precipitation": "Precipitation",
   "@home_precipitation": {
     "description": "「首頁」頁面 → 降水量"
   },
-  "history_nationwide": "全國",
+  "history_nationwide": "Nationwide",
   "@history_nationwide": {
     "description": "「歷史」頁面 → 全國"
   },
@@ -1461,7 +1461,7 @@
   "@sunny_with_snow_pellets": {
     "description": "天氣狀況：晴天伴有雪珠"
   },
-  "sunny_with_ice_pellets": "晴有冰珠",
+  "sunny_with_ice_pellets": "",
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
