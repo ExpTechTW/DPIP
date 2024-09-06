@@ -220,7 +220,7 @@
   "@image_saved": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖片 → 提示描述"
   },
-  "settings_Personalization": "個人用設定",
+  "settings_Personalization": "個人用",
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
@@ -228,7 +228,7 @@
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
-  "settings_theme_description": "DPIPの外観とテーマ色を変更する",
+  "settings_theme_description": "DPIPの外観と色を変更する",
   "@settings_theme_description": {
     "description": "「設定」路徑 → 「主題色」副標題描述"
   },
@@ -300,7 +300,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n組建 {buildNumber}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "me_version": "バージョン {version}\nビルド番号 {buildNumber}\n製作：ExpTech Studio\n一部の情報源：CWA（中央気象署）",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -714,15 +714,15 @@
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
-  "disagree": "拒否",
+  "disagree": "同意しない",
   "@disagree": {
     "description": "「歡迎」頁面 → 強震監視器 → 不同意"
   },
-  "agree": "許可",
+  "agree": "同意する",
   "@agree": {
     "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
-  "trem_service_description": "ExpTech's TREMの強震モニターサービスはDPIPでご覧いただけますが、以下の条件をお読みいただき、この機能を有効にするかどうかをお選びください。",
+  "trem_service_description": "DPIPアプリ上では、ExpTech社のTREMによる強震監視サービスをご利用いただけます。このサービスをご利用になるには、以下の契約条項をよくお読みになり、同意していただく必要があります。",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
@@ -778,7 +778,7 @@
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
-  "remind_later": "後でリマインドする",
+  "remind_later": "後で",
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
