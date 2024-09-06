@@ -45,7 +45,7 @@ class ExtendedColors {
     onAmberContainer = amberScheme.onPrimaryContainer;
 
     final greyScheme = ColorScheme.fromSeed(
-      seedColor: Colors.grey,
+      seedColor: Colors.grey[400]!,
       brightness: brightness,
       dynamicSchemeVariant: DynamicSchemeVariant.fidelity,
     );

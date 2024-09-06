@@ -23,7 +23,7 @@ class RankingList<T> extends StatelessWidget {
         final color = index == 0
             ? context.theme.extendedColors.amberContainer
             : index == 1
-                ? context.theme.extendedColors.greyContainer
+                ? context.theme.extendedColors.greyContainer.withOpacity(0.46)
                 : index == 2
                     ? context.theme.extendedColors.brownContainer
                     : index < 10
@@ -33,7 +33,7 @@ class RankingList<T> extends StatelessWidget {
         final contentColor = index == 0
             ? context.theme.extendedColors.onAmberContainer
             : index == 1
-                ? context.theme.extendedColors.onGreyContainer
+                ? context.colors.onSurface
                 : index == 2
                     ? context.theme.extendedColors.onBrownContainer
                     : index < 10
