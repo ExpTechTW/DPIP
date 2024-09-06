@@ -1257,7 +1257,7 @@
   "@history_nationwide": {
     "description": "「歷史」頁面 → 全國"
   },
-  "me_welcome": "歡迎頁面",
+  "me_welcome": "Welcome screen",
   "@me_welcome": {
     "description": "「我」頁面 → 「歡迎頁面」按鈕"
   },
@@ -1265,7 +1265,7 @@
   "@donate_h2": {
     "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
   },
-  "max_earthquake_intensity": "最大震度",
+  "max_earthquake_intensity": "Max Intensity",
   "@max_earthquake_intensity": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
@@ -1297,7 +1297,7 @@
   "@history_valid_until": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
   },
-  "history_affected_area": "影響區域",
+  "history_affected_area": "Affected Area",
   "@history_affected_area": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 影響區域"
   },
@@ -1373,15 +1373,15 @@
   "@sound_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
   },
-  "sound_weather_warning": "氣象警報",
+  "sound_weather_warning": "Weather Warning",
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
-  "sound_rain_instant": "雷雨即時訊息",
+  "sound_rain_instant": "Heavy Rain Advisory",
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
-  "sound_weather_alert": "天氣警特報",
+  "sound_weather_alert": "Weather Advisory",
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
@@ -1413,7 +1413,7 @@
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海嘯消息(無聲通知)",
+  "sound_tsunami_silent": "Tsunami Report (Silent)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
@@ -1421,7 +1421,7 @@
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
-  "sound_other_notifications": "其他通知",
+  "sound_other_notifications": "Other Notifications",
   "@sound_other_notifications": {
     "description": "「我」路徑 → 「通知測試」內容 → 「其他通知」標題 "
   },
