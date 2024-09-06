@@ -78,6 +78,19 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
     }
   }
 
+  Future<void> _handleDevToggle(bool value) async {
+    if (!value) {
+      await Global.preference.setBool("dev", false);
+      setState(() => devEnabled = false);
+    } else {
+      await Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(builder: (context) => const WelcomeDevPage()),
+      );
+      setState(() => devEnabled = Global.preference.getBool("dev") ?? false);
+    }
+    SettingsRootView.updateDev();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -98,6 +111,20 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
                   title: Text(context.i18n.enable_monitor),
                   value: monitorEnabled,
                   onChanged: _handleMonitorToggle,
+                ),
+          _isLoading
+              ? ListTile(
+                  title: Text(context.i18n.enable_dev),
+                  trailing: const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : SwitchListTile(
+                  title: Text(context.i18n.enable_dev),
+                  value: monitorEnabled,
+                  onChanged: _handleDevToggle,
                 ),
         ],
       ),
