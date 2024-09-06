@@ -1195,7 +1195,7 @@
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
-  "invalid_operation": "無效操作",
+  "invalid_operation": "유효하지 않은 레슨입니다",
   "@invalid_operation": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
   },
@@ -1203,7 +1203,7 @@
   "@operation_interval_too_short": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 操作間隔過短，請稍後再嘗試。"
   },
-  "got_it": "知道了",
+  "got_it": "알겠습니다",
   "@got_it": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
   },
@@ -1245,7 +1245,7 @@
       }
     }
   },
-  "error_prefix": "錯誤:",
+  "error_prefix": "오류:",
   "@error_prefix": {
     "description": "錯誤：前綴"
   },
@@ -1269,7 +1269,7 @@
   "@max_earthquake_intensity": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
-  "report_all": "全部",
+  "report_all": "전부",
   "@report_all": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
@@ -1277,7 +1277,7 @@
   "@report_filter": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
-  "report_filter_reset": "重置",
+  "report_filter_reset": "리셋",
   "@report_filter_reset": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 重置"
   },
