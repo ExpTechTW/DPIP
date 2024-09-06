@@ -191,12 +191,12 @@ class _IntensityPageState extends State<IntensityPage> {
 
   Widget _buildLegend() {
     return MapLegend(
-      label: "TREM 觀測網實測震度",
+      label: context.i18n.history_earthquake_intensity,
       children: [
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
-        Text("使用 JMA 震度標準 (0.3秒三分量合成加速度)", style: context.theme.textTheme.labelMedium),
+        Text(context.i18n.history_earthquake_intensity_h2, style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -322,7 +322,7 @@ class _IntensityPageState extends State<IntensityPage> {
               _buildWarningDetails(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
-                child: Text("本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。", style: TextStyle(color: context.colors.error)),
+                child: Text(context.i18n.history_seismic_intensity_reference, style: TextStyle(color: context.colors.error)),
               ),
               const SizedBox(height: 20),
               _buildAffectedAreas(),
