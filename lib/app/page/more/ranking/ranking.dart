@@ -14,15 +14,6 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
   late final controller = TabController(length: 2, vsync: this);
 
   @override
-  void initState() {
-    super.initState();
-    controller.addListener(() {
-      if (!mounted || !controller.indexIsChanging) return;
-      setState(() {});
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return NestedScrollView(
       headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -31,7 +22,7 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             pinned: true,
             floating: true,
             snap: true,
-            title: Text(context.i18n.history),
+            title: Text("排行榜"),
             bottom: TabBar(
               controller: controller,
               tabs: [

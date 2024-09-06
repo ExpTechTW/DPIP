@@ -20,7 +20,7 @@ class _MorePageState extends State<MorePage> {
     NavigationDrawerDestination(
       icon: const Icon(Symbols.leaderboard_rounded),
       selectedIcon: const Icon(Symbols.leaderboard_rounded, fill: 1),
-      label: Text("排行"),
+      label: Text("排行榜"),
     ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.summarize),
