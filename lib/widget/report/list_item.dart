@@ -127,7 +127,7 @@ class ReportListItem extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) {
-                return ReportRoute(report: report);
+                return ReportRoute(id: report.id);
               },
             ),
           );

@@ -22,6 +22,27 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
+  void getNotify() async {
+    if (!_isNotificationPermission) {
+      await Permission.notification.request();
+      if (Platform.isIOS) {
+        NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          announcement: true,
+          badge: true,
+          carPlay: true,
+          criticalAlert: true,
+          provisional: true,
+          sound: true,
+        );
+        if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
+          _isNotificationPermission = true;
+        }
+      }
+    }
+    WelcomeRouteState.of(context)!.complete();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -177,9 +198,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   }
 
   Future<void> _handlePermissionChange(PermissionItem item, bool value) async {
-    if (_isRequestingPermission) {
-      return;
-    }
+    if (_isRequestingPermission) return;
 
     setState(() {
       _isRequestingPermission = true;
@@ -199,7 +218,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               await openAppSettings();
             }
           } else if (Platform.isIOS) {
-            await Firebase.initializeApp();
             NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
               alert: true,
               announcement: true,
@@ -220,7 +238,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           await openAppSettings();
         }
       }
-
       item.isGranted = status.isGranted;
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -263,7 +280,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            onPressed: _isNotificationPermission ? () => WelcomeRouteState.of(context)!.complete() : null,
+            onPressed: getNotify,
             child: Text(context.i18n.next_step),
           ),
         ),

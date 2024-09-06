@@ -14,6 +14,7 @@ class History {
   final InfoTime time;
   final InfoText text;
   final List<int> area;
+  final Map<String, dynamic>? addition;
 
   History({
     required this.id,
@@ -24,9 +25,11 @@ class History {
     required this.time,
     required this.text,
     required this.area,
+    this.addition,
   });
 
   factory History.fromJson(Map<String, dynamic> json) => _$HistoryFromJson(json);
+
   Map<String, dynamic> toJson() => _$HistoryToJson(this);
 }
 
@@ -34,7 +37,7 @@ class History {
 class InfoTime {
   @JsonKey(fromJson: parseDateTime, toJson: dateTimeToJson)
   final TZDateTime send;
-  final Map expires;
+  final Map<String, int> expires;
 
   InfoTime({
     required this.send,
@@ -42,6 +45,7 @@ class InfoTime {
   });
 
   factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
+
   Map<String, dynamic> toJson() => _$InfoTimeToJson(this);
 }
 
@@ -56,6 +60,7 @@ class InfoText {
   });
 
   factory InfoText.fromJson(Map<String, dynamic> json) => _$InfoTextFromJson(json);
+
   Map<String, dynamic> toJson() => _$InfoTextToJson(this);
 }
 
@@ -70,5 +75,6 @@ class InfoTextValue {
   });
 
   factory InfoTextValue.fromJson(Map<String, dynamic> json) => _$InfoTextValueFromJson(json);
+
   Map<String, dynamic> toJson() => _$InfoTextValueToJson(this);
 }

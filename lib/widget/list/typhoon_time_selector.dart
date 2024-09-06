@@ -3,20 +3,21 @@ import "package:flutter/material.dart";
 import "package:intl/intl.dart";
 
 class TyphoonTimeSelector extends StatefulWidget {
-  final Function(String, String) onSelectionChanged;
+  final Function(String, int) onSelectionChanged;
   final Function() onTimeExpanded;
   final List<String> timeList;
   final List<String> typhoonList;
-  final String selectedTyphoonId;
+  final List<int> typhoonIdList;
+  final int selectedTyphoonId;
 
-  const TyphoonTimeSelector({
-    super.key,
-    required this.onSelectionChanged,
-    required this.onTimeExpanded,
-    required this.timeList,
-    required this.typhoonList,
-    required this.selectedTyphoonId,
-  });
+  const TyphoonTimeSelector(
+      {super.key,
+      required this.onSelectionChanged,
+      required this.onTimeExpanded,
+      required this.timeList,
+      required this.typhoonList,
+      required this.selectedTyphoonId,
+      required this.typhoonIdList});
 
   @override
   State<TyphoonTimeSelector> createState() => _TyphoonTimeSelectorState();
@@ -24,7 +25,7 @@ class TyphoonTimeSelector extends StatefulWidget {
 
 class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTickerProviderStateMixin {
   late String _selectedTimestamp;
-  late String _selectedTyphoonId;
+  late int _selectedTyphoonId;
   late ScrollController _timeScrollController;
   late ScrollController _typhoonScrollController;
   final double _itemWidth = 80.0;
@@ -91,7 +92,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
 
   void _scrollToSelectedTyphoon() {
     if (!_typhoonScrollController.hasClients) return;
-    final index = widget.typhoonList.indexOf(_selectedTyphoonId);
+    final index = widget.typhoonIdList.indexOf(_selectedTyphoonId);
     if (index != -1) {
       final totalWidth = _itemWidth * widget.typhoonList.length;
       final viewportWidth = _typhoonScrollController.position.viewportDimension;
@@ -199,7 +200,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
           scrollDirection: Axis.horizontal,
           itemCount: widget.typhoonList.length,
           itemBuilder: (context, index) {
-            final typhoonId = widget.typhoonList[index];
+            final typhoonId = widget.typhoonIdList[index];
             final isSelected = typhoonId == _selectedTyphoonId;
             return SizedBox(
               width: _itemWidth,
@@ -220,7 +221,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    typhoonId,
+                    widget.typhoonList[index],
                     style: TextStyle(
                       color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                       fontWeight: FontWeight.bold,
@@ -234,6 +235,14 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
         ),
       ),
     );
+  }
+
+  String get _selectedTyphoonName {
+    int index = widget.typhoonIdList.indexOf(_selectedTyphoonId);
+    if (index != -1 && index < widget.typhoonList.length) {
+      return widget.typhoonList[index];
+    }
+    return "未知";
   }
 
   @override
@@ -261,7 +270,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonId)",
+                  "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonName)",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: context.colors.onSurface,

@@ -7,28 +7,31 @@ class RegionOutOfService extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          context.i18n.out_of_service_only_taiwan,
-          style: context.theme.textTheme.titleMedium,
-        ),
-        const SizedBox(height: 8),
-        FilledButton(
-          child: Text(context.i18n.settings),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                settings: const RouteSettings(name: "/settings"),
-                builder: (context) => const SettingsRoute(
-                  initialRoute: "/location",
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Text(
+            context.i18n.out_of_service_only_taiwan,
+            style: context.theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          FilledButton(
+            child: Text(context.i18n.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  settings: const RouteSettings(name: "/settings"),
+                  builder: (context) => const SettingsRoute(
+                    initialRoute: "/location",
+                  ),
                 ),
-              ),
-            );
-          },
-        )
-      ],
+              );
+            },
+          )
+        ],
+      ),
     );
   }
 }

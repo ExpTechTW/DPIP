@@ -5,9 +5,9 @@ import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/int.dart";
 import "package:dpip/util/intensity_color.dart";
 import "package:dpip/util/magnitude_color.dart";
+import "package:dpip/widget/list/detail_field_tile.dart";
 import "package:dpip/widget/report/enlargeable_image.dart";
 import "package:dpip/widget/report/intensity_box.dart";
-import "package:dpip/widget/report/report_detail_field.dart";
 import "package:dpip/widget/sheet/bottom_sheet_drag_handle.dart";
 import "package:flutter/material.dart";
 import "package:intl/intl.dart";
@@ -87,7 +87,7 @@ class ReportSheetContent extends StatelessWidget {
           ],
         ),
         const Divider(),
-        ReportDetailField(
+        DetailFieldTile(
           label: context.i18n.report_event_time,
           child: Text(
             DateFormat(context.i18n.datetime_format).format(report.time),
@@ -97,7 +97,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
           ),
         ),
-        ReportDetailField(
+        DetailFieldTile(
           label: context.i18n.report_location,
           child: Text(
             report.convertLatLon(),
@@ -110,7 +110,7 @@ class ReportSheetContent extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: ReportDetailField(
+              child: DetailFieldTile(
                 label: context.i18n.report_magnitude,
                 child: Row(
                   children: [
@@ -135,7 +135,7 @@ class ReportSheetContent extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ReportDetailField(
+              child: DetailFieldTile(
                 label: context.i18n.report_depth,
                 child: Row(
                   children: [
@@ -162,7 +162,7 @@ class ReportSheetContent extends StatelessWidget {
           ],
         ),
         const Divider(),
-        ReportDetailField(
+        DetailFieldTile(
           label: context.i18n.report_intensity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -229,7 +229,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         ),
         const Divider(),
-        ReportDetailField(
+        DetailFieldTile(
           label: context.i18n.report_image,
           child: EnlargeableImage(
             aspectRatio: 4 / 3,
@@ -239,7 +239,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         ),
         if (report.hasNumber)
-          ReportDetailField(
+          DetailFieldTile(
             label: context.i18n.report_intensity_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
@@ -249,7 +249,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
           ),
         if (report.hasNumber)
-          ReportDetailField(
+          DetailFieldTile(
             label: context.i18n.report_pga_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
@@ -259,7 +259,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
           ),
         if (report.hasNumber)
-          ReportDetailField(
+          DetailFieldTile(
             label: context.i18n.report_pgv_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
