@@ -22,10 +22,11 @@ class _TyphoonMapState extends State<TyphoonMap> {
   late MapLibreMapController _mapController;
   List<Typhoon>? typhoonData;
   List<String> typhoonList = [];
-  String selectedTyphoonId = "";
+  int selectedTyphoonId = -1;
   List<String> sourceList = [];
   List<String> layerList = [];
   List<String> typhoon_name_list = [];
+  List<int> typhoon_id_list = [];
   String selectedTimestamp = "";
   double userLat = 0;
   double userLon = 0;
@@ -113,6 +114,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
       typhoonData = await ExpTech().getTyphoon(time);
       if (typhoonData != null && typhoonData!.isNotEmpty) {
         typhoon_name_list = [];
+        typhoon_id_list = [];
         await _drawTyphoonPaths(typhoonData!);
       }
     } catch (e) {
@@ -120,7 +122,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
     }
   }
 
-  void _onSelectionChanged(String timestamp, String typhoonId) async {
+  void _onSelectionChanged(String timestamp, int typhoonId) async {
     selectedTimestamp = timestamp;
     await _loadTyphoonData(selectedTimestamp);
     if (selectedTyphoonId != typhoonId) {
@@ -131,9 +133,9 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   Future<void> _zoomToSelectedTyphoon() async {
-    if (typhoonData != null && selectedTyphoonId.isNotEmpty) {
-      Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.name.zh == selectedTyphoonId);
-      if (selectedTyphoon != null && selectedTyphoon.analysis.isNotEmpty) {
+    if (typhoonData != null && selectedTyphoonId != -1) {
+      Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.no.td == selectedTyphoonId);
+      if (selectedTyphoon.analysis.isNotEmpty) {
         LatLng center = LatLng(
           selectedTyphoon.analysis.last.lat,
           selectedTyphoon.analysis.last.lng,
@@ -159,11 +161,13 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
     for (int i = 0; i < typhoons.length; i++) {
       Typhoon typhoon = typhoons[i];
-      if (selectedTyphoonId == "") {
-        selectedTyphoonId = typhoon.name.zh;
+      String name = (typhoon.name.zh == "") ? "TD${typhoon.no.td}" : typhoon.name.zh;
+      if (selectedTyphoonId == -1) {
+        selectedTyphoonId = typhoon.no.td;
         _zoomToSelectedTyphoon();
       }
-      typhoon_name_list.add(typhoon.name.zh);
+      typhoon_name_list.add(name);
+      typhoon_id_list.add(typhoon.no.td);
       await _drawTyphoonPath(typhoon, i);
       await _draw15WindCircle(typhoon, i);
       await _drawForecastCircles(typhoon, i);
@@ -312,6 +316,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
               onTimeExpanded: () {},
               timeList: typhoonList,
               typhoonList: typhoon_name_list,
+              typhoonIdList: typhoon_id_list,
               selectedTyphoonId: selectedTyphoonId,
             ),
           ),

@@ -52,7 +52,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
               icon: const Icon(Symbols.error),
               title: Text(context.i18n.unable_to_obtain_permission),
               content: Text(
-                "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? context.i18n.photo_media_permission_request : ""}",
+                "${context.i18n.save_image_permission}${status.isPermanentlyDenied ? context.i18n.photo_media_permission_request : ""}",
               ),
               actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
@@ -121,7 +121,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
       } else {
         context.scaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text("儲存圖片時發生錯誤：${e.toString()}"),
+            content: Text("${context.i18n.save_image_error}${e.toString()}"),
           ),
         );
       }

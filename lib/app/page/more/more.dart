@@ -26,9 +26,6 @@ class _MorePageState extends State<MorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: destinations[currentIndex].label,
-      ),
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
         children: [

@@ -3,7 +3,6 @@ import "dart:async";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/core/eew.dart";
 import "package:dpip/model/report/earthquake_report.dart";
-import "package:dpip/model/report/partial_earthquake_report.dart";
 import "package:dpip/route/report/report_sheet_content.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/color_scheme.dart";
@@ -17,9 +16,9 @@ import "package:maplibre_gl/maplibre_gl.dart";
 import "package:material_symbols_icons/symbols.dart";
 
 class ReportRoute extends StatefulWidget {
-  final PartialEarthquakeReport report;
+  final String id;
 
-  const ReportRoute({super.key, required this.report});
+  const ReportRoute({super.key, required this.id});
 
   @override
   State<ReportRoute> createState() => _ReportRouteState();
@@ -68,7 +67,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
     try {
       final isDark = context.theme.brightness == Brightness.dark;
 
-      final data = await ExpTech().getReport(widget.report.id);
+      final data = await ExpTech().getReport(widget.id);
       final controller = await mapController.future;
 
       List markers = [];
@@ -312,6 +311,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   // 不要翻譯這
                   if (report!.magnitude >= 6 &&
                       report!.magnitude < 7 &&
+                      report!.depth <= 30 &&
                       (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
                       avatar: Icon(
@@ -330,6 +330,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                     ),
                   // 不要翻譯這
                   if (report!.magnitude >= 7 &&
+                      report!.depth <= 30 &&
                       (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),

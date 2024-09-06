@@ -27,7 +27,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       final records = await ExpTech().getNotificationHistory();
       notificationRecords = records.reversed.toList();
     } catch (e) {
-      errorMessage = '獲取通知紀錄時發生錯誤: $e';
+      errorMessage = '${context.i18n.error_fetching_notifications} $e';
     } finally {
       isLoading = false;
       setState(() {});
@@ -157,7 +157,7 @@ class NotificationCard extends StatelessWidget {
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
       label: Text(
-        record.critical ? context.i18n.emergency : context.i18n.me_generally,
+        record.critical ? context.i18n.emergency : context.i18n.me_general,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),

@@ -12,7 +12,11 @@ class LogViewerPage extends StatelessWidget {
       body: TalkerScreen(
         talker: TalkerManager.instance,
         appBarTitle: context.i18n.app_logs,
-        theme: const TalkerScreenTheme(),
+        theme: TalkerScreenTheme(
+          backgroundColor: context.colors.surface,
+          textColor: context.colors.onSurface,
+          cardColor: context.colors.surfaceContainer,
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import "package:dpip/route/notification/notification.dart";
 import "package:dpip/route/settings/settings.dart";
 import "package:dpip/route/sound/sound.dart";
 import "package:dpip/route/status/status.dart";
+import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
 import "package:flutter/material.dart";
@@ -28,7 +29,7 @@ class _MePageState extends State<MePage> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ListTileGroupHeader(title: context.i18n.me_generally),
+        ListTileGroupHeader(title: context.i18n.me_general),
         /**
          * 設定
          */
@@ -87,22 +88,12 @@ class _MePageState extends State<MePage> {
         ListTile(
           leading: const Icon(Symbols.favorite_rounded, fill: 1),
           title: Text(context.i18n.donate),
-          subtitle: const Text("幫助我們維護伺服器的穩定和長久發展"),
+          subtitle: Text(context.i18n.donate_h2),
           onTap: () {
             launchUrl(Uri.parse("https://exptech.com.tw/donate"));
           },
         ),
         ListTileGroupHeader(title: context.i18n.me_debug),
-        ListTile(
-          leading: const Icon(Symbols.forum_rounded),
-          title: Text(context.i18n.me_developer),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
-            );
-          },
-        ),
         ListTile(
           leading: const Icon(Symbols.bug_report),
           title: Text(context.i18n.app_logs),
@@ -135,6 +126,30 @@ class _MePageState extends State<MePage> {
                 ),
               );
             }
+          },
+        ),
+        ListTileGroupHeader(title: context.i18n.me_about),
+        ListTile(
+          leading: const Icon(Symbols.forum_rounded),
+          title: Text(context.i18n.me_developer),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
+            );
+          },
+        ),
+
+        /**
+         * 打開歡迎頁面
+         */
+        ListTile(
+          leading: const Icon(Icons.visibility),
+          title: Text(context.i18n.me_welcome),
+          onTap: () {
+            Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute(builder: (context) => const WelcomeRoute()),
+            );
           },
         ),
 
@@ -173,7 +188,8 @@ class _MePageState extends State<MePage> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
-                    context.i18n.me_version(Global.packageInfo.version.toString()),
+                    context.i18n
+                        .me_version(Global.packageInfo.version.toString(), Global.packageInfo.buildNumber.toString()),
                     textAlign: TextAlign.center,
                   ),
                 ),

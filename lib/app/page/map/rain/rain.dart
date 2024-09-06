@@ -1,6 +1,8 @@
 import "dart:io";
+import "dart:math";
 
 import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/weather/rain.dart";
@@ -19,6 +21,7 @@ class RainData {
   final String stationName;
   final String county;
   final String town;
+  final String id;
 
   RainData({
     required this.latitude,
@@ -27,6 +30,7 @@ class RainData {
     required this.stationName,
     required this.county,
     required this.town,
+    required this.id,
   });
 }
 
@@ -45,6 +49,7 @@ class _RainMapState extends State<RainMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  String? _selectedStationId;
 
   List<RainData> rainDataList = [];
   String selectedTimestamp = "";
@@ -152,6 +157,7 @@ class _RainMapState extends State<RainMap> {
           }
 
           return RainData(
+            id: station.id,
             latitude: station.station.lat,
             longitude: station.station.lng,
             rainfall: rainfall,
@@ -196,6 +202,7 @@ class _RainMapState extends State<RainMap> {
         .map((data) => {
               "type": "Feature",
               "properties": {
+                "id": data.id,
                 "rainfall": data.rainfall,
               },
               "geometry": {
@@ -307,6 +314,26 @@ class _RainMapState extends State<RainMap> {
         0
       ],
     );
+
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+      final features = await _mapController.queryRenderedFeatures(
+        point,
+        ['rain-circles', "rain-0-circles"],
+        null,
+      );
+
+      if (features.isNotEmpty) {
+        final stationId = features[0]['properties']['id'] as String;
+        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
+        setState(() {
+          _selectedStationId = stationId;
+        });
+      } else {
+        setState(() {
+          _selectedStationId = null;
+        });
+      }
+    });
 
     await _mapController.removeLayer("rain-labels");
     await _mapController.addSymbolLayer(
@@ -432,7 +459,7 @@ class _RainMapState extends State<RainMap> {
             ),
           ),
         ),
-        if (rainTimeList.isNotEmpty)
+        if (_selectedStationId == null && rainTimeList.isNotEmpty)
           Positioned(
             left: 0,
             right: 0,
@@ -455,8 +482,56 @@ class _RainMapState extends State<RainMap> {
         if (_showLegend)
           Positioned(
             left: 6,
-            bottom: 50, // Adjusted to be above the legend button
+            bottom: 50,
             child: _buildLegend(),
+          ),
+        if (_selectedStationId != null)
+          DraggableScrollableSheet(
+            initialChildSize: 0.3,
+            minChildSize: 0.1,
+            maxChildSize: 1,
+            snap: true,
+            snapSizes: const [0.1, 0.3, 0.7, 1],
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: context.theme.cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 4,
+                        width: 40,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      AdvancedWeatherChart(
+                        type: "precipitation",
+                        stationId: _selectedStationId!,
+                        onClose: () {
+                          setState(() {
+                            _selectedStationId = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
       ],
     );

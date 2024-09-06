@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import "package:dpip/app/page/history/history.dart";
 import "package:dpip/app/page/home/home.dart";
 import "package:dpip/app/page/map/monitor/monitor.dart";
 import "package:dpip/app/page/map/radar/radar.dart";
-import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/location/location.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/util/location_to_code.dart";
 import "package:dpip/util/log.dart";
 import "package:flutter/services.dart";
 
@@ -27,31 +25,14 @@ Future<void> getSavedLocation() async {
     await Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
     await Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
 
-    LocationResult positionData = await LocationService().getLatLngLocation(data?["lat"] ?? 0.0, data?["lon"] ?? 0.0);
-    var position = positionData.toJson();
-    String country = position["cityTown"];
-    List<String> parts = country.split(" ");
+    GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?["lat"], data?["lon"]);
 
-    if (parts.length == 3) {
-      String code = parts[2];
-
-      if (Global.location.containsKey(code)) {
-        Location locationInfo = Global.location[code]!;
-
-        await Global.preference.setString("location-city", locationInfo.city);
-        await Global.preference.setString("location-town", locationInfo.town);
-
-        _updateAllPositions();
-      }
+    if (location != null) {
+      await Global.preference.setInt("user-code", location.code);
     } else {
-      await Global.preference.remove("location-city");
-      await Global.preference.remove("location-town");
-      await Global.preference.setDouble("user-lat", 0.0);
-      await Global.preference.setDouble("user-lon", 0.0);
-      _updateAllPositions();
+      await Global.preference.remove("user-code");
     }
-  } on PlatformException catch (e) {
-    TalkerManager.instance.error("PlatformException in getSavedLocation: ${e.message}");
+    _updateAllPositions();
   } catch (e) {
     TalkerManager.instance.error("Error in getSavedLocation: $e");
   } finally {
@@ -64,7 +45,6 @@ void _updateAllPositions() {
   SettingsLocationView.updatePosition();
   RadarMap.updatePosition();
   HomePage.updatePosition();
-  HistoryPage.updatePosition();
   MonitorPage.updatePosition();
 }
 

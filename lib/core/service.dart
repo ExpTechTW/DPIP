@@ -3,14 +3,13 @@ import "dart:io";
 import "dart:ui";
 
 import "package:dpip/api/exptech.dart";
-import "package:dpip/app/page/history/history.dart";
 import "package:dpip/app/page/home/home.dart";
 import "package:dpip/app/page/map/monitor/monitor.dart";
 import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/location/location.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/util/location_to_code.dart";
 import "package:dpip/util/log.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter_background_service/flutter_background_service.dart";
@@ -63,43 +62,24 @@ void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
 void androidSendPositionlisten() {
   service.on("sendposition").listen((event) {
     if (event != null) {
-      var positionData = event.values.first;
-      var position = positionData["position"];
-      String country = position["country"];
-      List<String> parts = country.split(" ");
+      double lat = event.values.first["lat"] ?? 0;
+      double lng = event.values.first["lng"] ?? 0;
 
-      if (parts.length == 3) {
-        String code = parts[2];
+      GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(lat, lng);
 
-        if (Global.location.containsKey(code)) {
-          Location locationInfo = Global.location[code]!;
-
-          Global.preference.setString("location-city", locationInfo.city);
-          Global.preference.setString("location-town", locationInfo.town);
-
-          SettingsLocationView.updatePosition();
-          HomePage.updatePosition();
-          HistoryPage.updatePosition();
-          RadarMap.updatePosition();
-          MonitorPage.updatePosition();
-        }
+      if (location != null) {
+        Global.preference.setInt("user-code", location.code);
       } else {
-        Global.preference.remove("location-city");
-        Global.preference.remove("location-town");
-        Global.preference.setDouble("user-lat", 0.0);
-        Global.preference.setDouble("user-lon", 0.0);
-        SettingsLocationView.updatePosition();
-        HomePage.updatePosition();
-        HistoryPage.updatePosition();
-        RadarMap.updatePosition();
-        MonitorPage.updatePosition();
+        Global.preference.remove("user-code");
       }
 
-      var latitude = position["latitude"];
-      var longitude = position["longitude"];
-      Global.preference.setDouble("user-lat", (latitude as num?)?.toDouble() ?? 0.0);
-      Global.preference.setDouble("user-lon", (longitude as num?)?.toDouble() ?? 0.0);
+      Global.preference.setDouble("user-lat", lat);
+      Global.preference.setDouble("user-lon", lng);
       const MonitorPage(data: 0).createState();
+      SettingsLocationView.updatePosition();
+      HomePage.updatePosition();
+      RadarMap.updatePosition();
+      MonitorPage.updatePosition();
     }
   });
   service.on("senddebug").listen((event) {
@@ -206,16 +186,18 @@ void onStart(ServiceInstance service) async {
     service.on("removeposition").listen((event) {
       Global.preference.remove("user-lat");
       Global.preference.remove("user-lon");
-      Global.preference.remove("user-country");
+      Global.preference.remove("user-code");
     });
 
     void task() async {
       if (await service.isForegroundService()) {
         final position = await locationService.androidGetLocation();
         service.invoke("sendposition", {"position": position.toJson()});
-        String lat = position.position.latitude.toStringAsFixed(6);
-        String lon = position.position.longitude.toStringAsFixed(6);
-        String country = position.position.country;
+        String lat = position.lat.toString();
+        String lon = position.lng.toString();
+        String location = position.code == null
+            ? "服務區域外"
+            : "${Global.location[position.code.toString()]?.city}${Global.location[position.code.toString()]?.town}";
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
@@ -224,7 +206,7 @@ void onStart(ServiceInstance service) async {
 
         String notifyTitle = "自動定位中";
         String date = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
-        String notifyBody = "$date\n$lat,$lon $country";
+        String notifyBody = "$date\n$lat,$lon $location";
         service.invoke("senddebug", {"notifyBody": notifyBody});
 
         flutterLocalNotificationsPlugin.show(

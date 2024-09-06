@@ -140,23 +140,20 @@ class _DpipState extends State<Dpip> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            icon: const Icon(Symbols.signal_disconnected_rounded),
-            title: Text(context.i18n.abnormal),
-            content: Text(context.i18n.network_or_server_error),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: Text(context.i18n.retry),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _restartApp();
-                },
-              ),
-            ],
-          ),
+        return AlertDialog(
+          icon: const Icon(Symbols.signal_disconnected_rounded),
+          title: Text(context.i18n.abnormal),
+          content: Text(context.i18n.network_or_server_error),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            TextButton(
+              child: Text(context.i18n.retry),
+              onPressed: () {
+                Navigator.pop(context);
+                _restartApp();
+              },
+            ),
+          ],
         );
       },
     );
@@ -178,56 +175,53 @@ class _DpipState extends State<Dpip> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: currentActivePage,
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Symbols.home),
-              selectedIcon: const Icon(Symbols.home, fill: 1),
-              label: context.i18n.home,
-            ),
-            NavigationDestination(
-              icon: const Icon(Symbols.clock_loader_10_rounded),
-              selectedIcon: const Icon(Symbols.clock_loader_10_rounded, fill: 1),
-              label: context.i18n.history,
-            ),
-            NavigationDestination(
-              icon: const Icon(Symbols.map),
-              selectedIcon: const Icon(Symbols.map, fill: 1),
-              label: context.i18n.map,
-            ),
-            NavigationDestination(
-              icon: const Icon(Symbols.note_stack_add_rounded),
-              selectedIcon: const Icon(Symbols.note_stack_add_rounded, fill: 1),
-              label: context.i18n.more,
-            ),
-            NavigationDestination(
-              icon: const Icon(Symbols.person),
-              selectedIcon: const Icon(Symbols.person, fill: 1),
-              label: context.i18n.me,
-            ),
-          ],
-          onDestinationSelected: (value) {
-            setState(() {
-              currentActivePage = value;
-            });
-            controller.jumpToPage(currentActivePage);
-          },
-        ),
-        body: PageView(
-          controller: controller,
-          physics: const NeverScrollableScrollPhysics(),
-          children: const [
-            HomePage(),
-            HistoryPage(),
-            MapPage(),
-            MorePage(),
-            MePage(),
-          ],
-        ),
+    return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: currentActivePage,
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Symbols.home),
+            selectedIcon: const Icon(Symbols.home, fill: 1),
+            label: context.i18n.home,
+          ),
+          NavigationDestination(
+            icon: const Icon(Symbols.clock_loader_10_rounded),
+            selectedIcon: const Icon(Symbols.clock_loader_10_rounded, fill: 1),
+            label: context.i18n.history,
+          ),
+          NavigationDestination(
+            icon: const Icon(Symbols.map),
+            selectedIcon: const Icon(Symbols.map, fill: 1),
+            label: context.i18n.map,
+          ),
+          NavigationDestination(
+            icon: const Icon(Symbols.note_stack_add_rounded),
+            selectedIcon: const Icon(Symbols.note_stack_add_rounded, fill: 1),
+            label: context.i18n.more,
+          ),
+          NavigationDestination(
+            icon: const Icon(Symbols.person),
+            selectedIcon: const Icon(Symbols.person, fill: 1),
+            label: context.i18n.me,
+          ),
+        ],
+        onDestinationSelected: (value) {
+          setState(() {
+            currentActivePage = value;
+          });
+          controller.jumpToPage(currentActivePage);
+        },
+      ),
+      body: PageView(
+        controller: controller,
+        physics: const NeverScrollableScrollPhysics(),
+        children: const [
+          HomePage(),
+          HistoryPage(),
+          MapPage(),
+          MorePage(),
+          MePage(),
+        ],
       ),
     );
   }

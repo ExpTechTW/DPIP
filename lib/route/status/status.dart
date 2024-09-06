@@ -37,7 +37,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final isDarkMode = context.theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -64,8 +64,8 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text('錯誤: ${snapshot.error}',
-                        style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 16)),
+                    child: Text('${context.i18n.error_prefix} ${snapshot.error}',
+                        style: TextStyle(color: context.colors.error, fontSize: 16)),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(

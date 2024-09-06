@@ -22,7 +22,20 @@ class Route {
     return "https://lb-$i.exptech.dev/api";
   }
 
-  static Uri reportList({int? limit = 50, int? page = 1}) => Uri.parse("$api/v2/eq/report?limit=$limit&page=$page");
+  static Uri reportList({
+    int? limit,
+    int? page,
+    int? minIntensity,
+    int? maxIntensity,
+    int? minMagnitude,
+    int? maxMagnitude,
+    int? minDepth,
+    int? maxDepth,
+  }) {
+    String url =
+        "$onlyapi/v2/eq/report?limit=$limit&page=$page&minIntensity=$minIntensity&maxIntensity=$maxIntensity&minMagnitude=$minMagnitude&maxMagnitude=$maxMagnitude&minDepth=$minDepth&maxDepth=$maxDepth";
+    return Uri.parse(url);
+  }
 
   static Uri report(String reportId) => Uri.parse("$api/v2/eq/report/$reportId");
 
@@ -36,7 +49,7 @@ class Route {
 
   static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
 
-  static Uri weatherAll(String postalCode) => Uri.parse("$onlyapi/v1/weather/all/$postalCode");
+  static Uri weatherRealtime(String postalCode) => Uri.parse("$onlyapi/v2/weather/realtime/$postalCode");
 
   static Uri station() => Uri.parse("$api/v1/trem/station");
 
@@ -50,6 +63,10 @@ class Route {
   static Uri weatherList() => Uri.parse("$onlyapi/v1/meteor/weather/list");
 
   static Uri weather(String time) => Uri.parse("$onlyapi/v1/meteor/weather/$time");
+
+  static Uri meteorStation(String id) => Uri.parse("$onlyapi/v1/meteor/station/$id");
+
+  static Uri event(String id) => Uri.parse("$onlyapi/v1/dpip/event/$id");
 
   static Uri rainList() => Uri.parse("$onlyapi/v1/meteor/rain/list");
 

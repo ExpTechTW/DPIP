@@ -1,6 +1,8 @@
 import "dart:io";
+import "dart:math";
 
 import "package:dpip/api/exptech.dart";
+import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/model/weather/weather.dart";
@@ -17,12 +19,14 @@ class WindData {
   final double longitude;
   final int direction;
   final double speed;
+  final String id;
 
   WindData({
     required this.latitude,
     required this.longitude,
     required this.direction,
     required this.speed,
+    required this.id,
   });
 }
 
@@ -41,6 +45,7 @@ class _WindMapState extends State<WindMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
+  String? _selectedStationId;
 
   List<WindData> windDataList = [];
 
@@ -51,6 +56,22 @@ class _WindMapState extends State<WindMap> {
 
   void _initMap(MapLibreMapController controller) async {
     _mapController = controller;
+  }
+
+  Future<void> _updateWindData(List<WeatherStation> weatherData) async {
+    windDataList = weatherData
+        .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+        .map((station) => WindData(
+              id: station.id,
+              latitude: station.station.lat,
+              longitude: station.station.lng,
+              direction: (station.data.wind.direction + 180) % 360,
+              speed: station.data.wind.speed,
+            ))
+        .toList();
+
+    await addDynamicWindArrows(windDataList);
+    setState(() {});
   }
 
   void _loadMap() async {
@@ -73,16 +94,7 @@ class _WindMapState extends State<WindMap> {
 
     List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
-    windDataList = weatherData
-        .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-        .map((station) => WindData(
-            latitude: station.station.lat,
-            longitude: station.station.lng,
-            direction: (station.data.wind.direction + 180) % 360,
-            speed: station.data.wind.speed))
-        .toList();
-
-    await addDynamicWindArrows(windDataList);
+    _updateWindData(weatherData);
 
     if (isUserLocationValid) {
       await _mapController.addSource(
@@ -142,6 +154,7 @@ class _WindMapState extends State<WindMap> {
         .map((data) => {
               "type": "Feature",
               "properties": {
+                "id": data.id,
                 "direction": data.direction,
                 "speed": data.speed,
               },
@@ -245,6 +258,26 @@ class _WindMapState extends State<WindMap> {
       ],
     );
 
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+      final features = await _mapController.queryRenderedFeatures(
+        point,
+        ['wind-arrows', "wind-circles"],
+        null,
+      );
+
+      if (features.isNotEmpty) {
+        final stationId = features[0]['properties']['id'] as String;
+        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
+        setState(() {
+          _selectedStationId = stationId;
+        });
+      } else {
+        setState(() {
+          _selectedStationId = null;
+        });
+      }
+    });
+
     await _mapController.removeLayer("wind-speed-labels");
     await _mapController.addSymbolLayer(
       "wind-data",
@@ -345,7 +378,13 @@ class _WindMapState extends State<WindMap> {
             ),
           ),
         ),
-        if (weather_list.isNotEmpty)
+        if (_showLegend)
+          Positioned(
+            left: 6,
+            bottom: 50,
+            child: _buildLegend(),
+          ),
+        if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
             right: 0,
@@ -353,34 +392,63 @@ class _WindMapState extends State<WindMap> {
             child: TimeSelector(
               timeList: weather_list,
               onTimeExpanded: () {
-                _showLegend = false;
-                setState(() {});
+                setState(() {
+                  _showLegend = false;
+                });
               },
               onTimeSelected: (time) async {
                 List<WeatherStation> weatherData = await ExpTech().getWeather(time);
-
-                windDataList = [];
-
-                windDataList = weatherData
-                    .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-                    .map((station) => WindData(
-                        latitude: station.station.lat,
-                        longitude: station.station.lng,
-                        direction: (station.data.wind.direction + 180) % 360,
-                        speed: station.data.wind.speed))
-                    .toList();
-
-                await addDynamicWindArrows(windDataList);
-                await _addUserLocationMarker();
-                setState(() {});
+                await _updateWindData(weatherData);
               },
             ),
           ),
-        if (_showLegend)
-          Positioned(
-            left: 6,
-            bottom: 50, // Adjusted to be above the legend button
-            child: _buildLegend(),
+        if (_selectedStationId != null)
+          DraggableScrollableSheet(
+            initialChildSize: 0.3,
+            minChildSize: 0.1,
+            maxChildSize: 1,
+            snap: true,
+            snapSizes: const [0.1, 0.3, 0.7, 1],
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: context.theme.cardColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
+                  ],
+                ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 4,
+                        width: 40,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      AdvancedWeatherChart(
+                        type: "wind_speed",
+                        stationId: _selectedStationId!,
+                        onClose: () {
+                          setState(() {
+                            _selectedStationId = null;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
       ],
     );
