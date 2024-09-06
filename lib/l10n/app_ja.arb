@@ -465,11 +465,11 @@
   "@lightning": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電"
   },
-  "out_of_service": "圈外",
+  "out_of_service": "サービスエリア外",
   "@out_of_service": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外"
   },
-  "out_of_service_only_taiwan": "圈外、台湾でのみ利用可能",
+  "out_of_service_only_taiwan": "台湾以外ではご利用いただけません",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
@@ -710,7 +710,7 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "中央気象署（CWA）やExpTechが提供するデータを可視化した画像を保存する。",
+  "data_visualization_storage": "中央気象局またはExpTechが提供する画像を保存するため",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
@@ -722,7 +722,7 @@
   "@agree": {
     "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
-  "trem_service_description": "DPIPアプリ上では、ExpTech社のTREMによる強震監視サービスをご利用いただけます。このサービスをご利用になるには、以下の契約条項をよくお読みになり、同意していただく必要があります。",
+  "trem_service_description": "DPIPアプリ上では、ExpTech社のTREMによる強震監視サービスをご利用いただけます。サービスをご利用になるには、以下の契約条項をよくお読みになり、同意していただく必要があります。",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
@@ -790,11 +790,11 @@
   "@announcement": {
     "description": "「我」路徑 → 公告"
   },
-  "new_announcement_prompt": "新しいお知らせをチェックしますか？",
+  "new_announcement_prompt": "新しいお知らせを確認しますか？",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "現時点は、お知らせがありません",
+  "no_announcements": "現在、お知らせがありません",
   "@no_announcements": {
     "description": "「公告」標題 → 目前沒有公告"
   },
