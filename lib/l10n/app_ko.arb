@@ -288,11 +288,11 @@
   "@settings_copy_fcm": {
     "description": "「我」頁面標題 → 「FCM」標題 → 提示描述"
   },
-  "report_offing": "이번 지진으로 인해 약간의 해수면 변동이 있을 수 있습니다",
+  "report_offing": "지진으로 해수면 변동 가능성 있음.",
   "@report_offing": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "이번 지진으로 인해 쓰나미가 발생할 수 있으니, 후속 정보를 주의하세요",
+  "report_tsunami_attention": "지진으로 쓰나미 가능성, 정보 주의.",
   "@report_tsunami_attention": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
