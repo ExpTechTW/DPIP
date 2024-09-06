@@ -906,19 +906,19 @@
   "@only_used_during_earthquake_alerts": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
-  "weak_5": "5L",
+  "weak_5": "5-",
   "@weak_5": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5弱"
   },
-  "strong_5": "5H",
+  "strong_5": "5+",
   "@strong_5": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5強"
   },
-  "weak_6": "6L",
+  "weak_6": "6-",
   "@weak_6": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6弱"
   },
-  "strong_6": "6H",
+  "strong_6": "6+",
   "@strong_6": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6強"
   },
@@ -1195,7 +1195,7 @@
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
-  "invalid_operation": "Slow down!",
+  "invalid_operation": "Invalid operation.",
   "@invalid_operation": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
   },
@@ -1461,7 +1461,7 @@
   "@sunny_with_snow_pellets": {
     "description": "天氣狀況：晴天伴有雪珠"
   },
-  "sunny_with_ice_pellets": "",
+  "sunny_with_ice_pellets": "Sunny with ice pellets",
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
