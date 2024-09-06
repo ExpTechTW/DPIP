@@ -123,7 +123,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
                 )
               : SwitchListTile(
                   title: Text(context.i18n.enable_dev),
-                  value: monitorEnabled,
+                  value: devEnabled,
                   onChanged: _handleDevToggle,
                 ),
         ],
