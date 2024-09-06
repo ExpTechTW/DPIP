@@ -1413,11 +1413,11 @@
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海嘯消息(無聲通知)",
+  "sound_tsunami_silent": "PTWC津波情報(通知音なし)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
-  "sound_tsunami_silent_h2": "太平洋海嘯消息發布時",
+  "sound_tsunami_silent_h2": "PTWC津波情報発表された場合",
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
