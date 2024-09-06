@@ -1,3 +1,4 @@
+import "package:dpip/app/page/more/ranking/ranking.dart";
 import "package:dpip/app/page/more/report_list/report_list.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/list/tile_group_header.dart";
@@ -16,6 +17,11 @@ class _MorePageState extends State<MorePage> {
   int currentIndex = 0;
 
   late final destinations = [
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.leaderboard_rounded),
+      selectedIcon: const Icon(Symbols.leaderboard_rounded, fill: 1),
+      label: Text("排行"),
+    ),
     NavigationDrawerDestination(
       icon: const Icon(Symbols.summarize),
       selectedIcon: const Icon(Symbols.summarize, fill: 1),
@@ -41,7 +47,7 @@ class _MorePageState extends State<MorePage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [ReportListPage()],
+        children: const [RankingPage(), ReportListPage()],
       ),
     );
   }
