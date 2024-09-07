@@ -336,11 +336,11 @@
   "@eq_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 偵測到晃動"
   },
-  "report_description_sound": "Local (Special Municipality/County) measured intensity is greater than 3.",
+  "report_description_sound": "Local (Municipality/County) measured intensity is greater than 3.",
   "@report_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 所在地(縣市)實測震度 3 以上"
   },
-  "eew_sound_title": "Earthquake Early Warning notification",
+  "eew_sound_title": "Earthquake Prediction Warning notification",
   "@eew_sound_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 地震速報音效"
   },
@@ -1445,7 +1445,7 @@
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
-  "sunny_with_rain": "晴有雨",
+  "sunny_with_rain": "Sunny drizzle",
   "@sunny_with_rain": {
     "description": "天氣狀況：晴天伴有雨"
   },
