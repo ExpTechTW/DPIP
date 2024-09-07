@@ -8,6 +8,12 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/weather/weather.dart';
 
+enum MergeType {
+  none,
+  county,
+  town,
+}
+
 class RankingTemperatureTab extends StatefulWidget {
   const RankingTemperatureTab({super.key});
 
@@ -16,7 +22,8 @@ class RankingTemperatureTab extends StatefulWidget {
 }
 
 class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
-  bool showMerged = true;
+  MergeType merge = MergeType.county;
+  bool reversed = false;
   String time = "";
   List<WeatherStation> data = [];
   List<WeatherStation> ranked = [];
@@ -33,19 +40,33 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
   }
 
   rank() {
-    final temp = (showMerged)
-        ? groupBy(data, (e) => (e.station.county, e.station.town))
+    final temp = (merge != MergeType.none)
+        ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
             .entries
-            .map((entry) => entry.value.reduce((acc, e) => e.data.air.temperature > acc.data.air.temperature ? e : acc))
+            .map((entry) => entry.value.reduce((acc, e) =>
+                ((reversed && e.data.air.temperature < acc.data.air.temperature) ||
+                        e.data.air.temperature > acc.data.air.temperature)
+                    ? e
+                    : acc))
         : data;
 
+    final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
     setState(() {
-      ranked = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
+      ranked = reversed ? sorted.reversed.toList() : sorted;
     });
   }
 
-  setMerged(bool state) {
-    showMerged = state;
+  setMerge(MergeType state) {
+    if (state == merge) {
+      merge = MergeType.none;
+    } else {
+      merge = state;
+    }
+    rank();
+  }
+
+  setReversed(bool state) {
+    reversed = state;
     rank();
   }
 
@@ -63,7 +84,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
               "資料時間：$time",
               style: TextStyle(color: context.colors.onSurfaceVariant),
@@ -72,16 +93,44 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           SizedBox(
             height: kToolbarHeight,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               scrollDirection: Axis.horizontal,
               child: Wrap(
                 spacing: 8,
                 runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text("依"),
+                  ),
                   ChoiceChip(
-                    label: Text("合併觀測點"),
-                    selected: showMerged,
-                    onSelected: (value) => setMerged(!showMerged),
+                    label: Text("高溫"),
+                    selected: !reversed,
+                    onSelected: merge != MergeType.none ? (value) => setReversed(false) : null,
+                  ),
+                  ChoiceChip(
+                    label: Text("低溫"),
+                    selected: reversed,
+                    onSelected: merge != MergeType.none ? (value) => setReversed(true) : null,
+                  ),
+                  const SizedBox(
+                    height: kToolbarHeight - 16,
+                    child: VerticalDivider(),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text("合併至"),
+                  ),
+                  ChoiceChip(
+                    label: Text("鄉鎮"),
+                    selected: merge == MergeType.town,
+                    onSelected: (value) => setMerge(MergeType.town),
+                  ),
+                  ChoiceChip(
+                    label: Text("縣市"),
+                    selected: merge == MergeType.county,
+                    onSelected: (value) => setMerge(MergeType.county),
                   ),
                 ],
               ),
@@ -89,7 +138,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           ),
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.only(top: 4, bottom: context.padding.bottom),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               itemCount: ranked.isEmpty ? 1 : ranked.length,
               itemBuilder: (context, index) {
                 if (ranked.isEmpty) {
@@ -153,6 +202,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                       );
 
                 final percentage = item.data.air.temperature / ranked[0].data.air.temperature;
+                final stop = reversed ? 1 - percentage : percentage;
 
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -176,8 +226,8 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                               backgroundColor.withOpacity(0.4),
                             ], stops: [
                               0,
-                              percentage,
-                              percentage,
+                              stop,
+                              stop,
                               1
                             ]),
                           ),
@@ -185,10 +235,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                             children: [
                               Expanded(
                                 child: Row(
-                                  children: showMerged
+                                  children: merge != MergeType.none
                                       ? [
                                           Text(
-                                            "${item.station.county}${item.station.town}",
+                                            merge == MergeType.town
+                                                ? "${item.station.county}${item.station.town}"
+                                                : item.station.county,
                                             style: TextStyle(
                                               fontSize: fontSize,
                                               fontWeight: index == 0
@@ -230,7 +282,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                                 ),
                               ),
                               Text(
-                                "${item.data.air.temperature}°",
+                                "${item.data.air.temperature.toStringAsFixed(1)}℃",
                                 style: TextStyle(
                                   fontSize: fontSize,
                                   fontWeight: index == 0

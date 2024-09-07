@@ -90,7 +90,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
               "資料時間：$time",
               style: TextStyle(color: context.colors.onSurfaceVariant),
@@ -99,11 +99,12 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           SizedBox(
             height: kToolbarHeight,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               scrollDirection: Axis.horizontal,
               child: Wrap(
                 spacing: 8,
                 runAlignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   ChoiceChip(
                     label: Text("目前"),
@@ -156,7 +157,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           ),
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.only(top: 4, bottom: context.padding.bottom),
+              padding: const EdgeInsets.symmetric(vertical: 4),
               itemCount: ranked.isEmpty ? 1 : ranked.length,
               itemBuilder: (context, index) {
                 if (ranked.isEmpty) {
