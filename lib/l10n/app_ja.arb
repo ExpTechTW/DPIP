@@ -822,7 +822,7 @@
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
-  "error_saving_image": "画像の保存中にエラーが発生しました。",
+  "error_saving_image": "画像の保存中にエラーが発生しました",
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
@@ -1107,11 +1107,11 @@
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
-  "settings_earthquake_monitor": "請至設定進階功能中開啟強震監視器。",
+  "settings_earthquake_monitor": "セットアップの高度な機能で、強震モニタをオンにしてください。",
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
-  "view_prompt_information": "點擊查看提示資訊",
+  "view_prompt_information": "Tipsはこちら",
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   },
@@ -1211,7 +1211,7 @@
   "@error_fcm_token": {
     "description": "錯誤：無法取得 FCM Token"
   },
-  "error_fetching_notifications": "獲取通知紀錄時發生錯誤",
+  "error_fetching_notifications": "通知記録取得中にエラーが発生しました",
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
@@ -1389,11 +1389,11 @@
   "@sound_rain_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
   },
-  "sound_weather_major_h2": "所在地(鄉鎮)發布紅色燈號之\n天氣警特報",
+  "sound_weather_major_h2": "所在地（町村）は赤色\n気象警報を発令している",
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
-  "sound_weather_minor_h2": "所在地(鄉鎮)發布上述除外燈號之\n天氣警特報",
+  "sound_weather_minor_h2": "所在地（町村）は上記の除外された信号で\n気象警報を発令している",
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
@@ -1405,11 +1405,11 @@
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
-  "sound_evacuation_major_h2": "所在地(鄉鎮)發布避難警訊時",
+  "sound_evacuation_major_h2": "所在地（町村）が避難勧告を発表する場合",
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地(鄉鎮)發布避難資訊時",
+  "sound_evacuation_minor_h2": "所在地（町村）が避難情報を発表する場合",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
@@ -1429,39 +1429,39 @@
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
-  "sunny_with_haze": "晴有霾",
+  "sunny_with_haze": "晴れと煙霧",
   "@sunny_with_haze": {
     "description": "天氣狀況：晴天伴有霾"
   },
-  "sunny_with_mist": "晴有靄",
+  "sunny_with_mist": "晴れと靄",
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
-  "sunny_with_lightning": "晴有閃電",
+  "sunny_with_lightning": "晴れと落雷",
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_fog": "晴有霧",
+  "sunny_with_fog": "晴れと霧",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
-  "sunny_with_rain": "晴有雨",
+  "sunny_with_rain": "晴れと雨",
   "@sunny_with_rain": {
     "description": "天氣狀況：晴天伴有雨"
   },
-  "sunny_with_sleet": "晴有雨雪",
+  "sunny_with_sleet": "晴れと霙",
   "@sunny_with_sleet": {
     "description": "天氣狀況：晴天伴有雨夾雪"
   },
-  "sunny_with_heavy_snow": "晴有大雪",
+  "sunny_with_heavy_snow": "晴れと大雪",
   "@sunny_with_heavy_snow": {
     "description": "天氣狀況：晴天伴有大雪"
   },
-  "sunny_with_snow_pellets": "晴有雪珠",
+  "sunny_with_snow_pellets": "晴れと雪の玉",
   "@sunny_with_snow_pellets": {
     "description": "天氣狀況：晴天伴有雪珠"
   },
-  "sunny_with_ice_pellets": "晴有冰珠",
+  "sunny_with_ice_pellets": "晴れと氷の玉",
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
@@ -1473,67 +1473,67 @@
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
-  "sunny_with_hail": "晴有雹",
+  "sunny_with_hail": "晴れと雹",
   "@sunny_with_hail": {
     "description": "天氣狀況：晴天伴有冰雹"
   },
-  "sunny_with_thunderstorm": "晴有雷雨",
+  "sunny_with_thunderstorm": "晴れと雷雨",
   "@sunny_with_thunderstorm": {
     "description": "天氣狀況：晴天伴有雷雨"
   },
-  "sunny_with_thundersnow": "晴有雷雪",
+  "sunny_with_thundersnow": "晴れと雷雪",
   "@sunny_with_thundersnow": {
     "description": "天氣狀況：晴天伴有雷雪"
   },
-  "sunny_with_thunderhail": "晴有雷雹",
+  "sunny_with_thunderhail": "晴れと雷と雹",
   "@sunny_with_thunderhail": {
     "description": "天氣狀況：晴天伴有雷雹"
   },
-  "sunny_with_severe_thunderstorm": "晴大雷雨",
+  "sunny_with_severe_thunderstorm": "晴れと大きな雷雨",
   "@sunny_with_severe_thunderstorm": {
     "description": "天氣狀況：晴天伴有強雷雨"
   },
-  "sunny_with_severe_thunderhail": "晴大雷雹",
+  "sunny_with_severe_thunderhail": "晴れと大きな雷と雹",
   "@sunny_with_severe_thunderhail": {
     "description": "天氣狀況：晴天伴有強雷雹"
   },
-  "sunny_with_thunder": "晴天伴有雷",
+  "sunny_with_thunder": "晴れと雷",
   "@sunny_with_thunder": {
     "description": "天氣狀況：晴天伴有雷"
   },
-  "partly__cloudy": "多雲",
+  "partly__cloudy": "雲の多い",
   "@partly__cloudy": {
     "description": "天氣狀況：多雲"
   },
-  "partly_cloudy_with_haze": "多雲有霾",
+  "partly_cloudy_with_haze": "雲の多いと煙霧",
   "@partly_cloudy_with_haze": {
     "description": "天氣狀況：多雲伴有霾"
   },
-  "partly_cloudy_with_mist": "多雲有靄",
+  "partly_cloudy_with_mist": "雲の多いと靄",
   "@partly_cloudy_with_mist": {
     "description": "天氣狀況：多雲伴有靄"
   },
-  "partly_cloudy_with_lightning": "多雲有閃電",
+  "partly_cloudy_with_lightning": "雲の多いと落雷",
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_fog": "多雲有霧",
+  "partly_cloudy_with_fog": "雲の多いと霧",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
   },
-  "partly_cloudy_with_rain": "多雲有雨",
+  "partly_cloudy_with_rain": "雲の多いと雨",
   "@partly_cloudy_with_rain": {
     "description": "天氣狀況：多雲伴有雨"
   },
-  "partly_cloudy_with_sleet": "多雲有雨雪",
+  "partly_cloudy_with_sleet": "雲の多いと霙",
   "@partly_cloudy_with_sleet": {
     "description": "天氣狀況：多雲伴有雨夾雪"
   },
-  "partly_cloudy_with_heavy_snow": "多雲有大雪",
+  "partly_cloudy_with_heavy_snow": "雲の多いと大雪",
   "@partly_cloudy_with_heavy_snow": {
     "description": "天氣狀況：多雲伴有大雪"
   },
-  "partly_cloudy_with_snow_pellets": "多雲有雪珠",
+  "partly_cloudy_with_snow_pellets": "雲の多いと雪の玉",
   "@partly_cloudy_with_snow_pellets": {
     "description": "天氣狀況：多雲伴有雪珠"
   },
@@ -1549,27 +1549,27 @@
   "@partly_cloudy_with_sleet_showers": {
     "description": "天氣狀況：多雲伴有陣雨夾雪"
   },
-  "partly_cloudy_with_hail": "多雲有雹",
+  "partly_cloudy_with_hail": "雲の多いと雹",
   "@partly_cloudy_with_hail": {
     "description": "天氣狀況：多雲伴有冰雹"
   },
-  "partly_cloudy_with_thunderstorm": "多雲有雷雨",
+  "partly_cloudy_with_thunderstorm": "雲の多いと雷雨",
   "@partly_cloudy_with_thunderstorm": {
     "description": "天氣狀況：多雲伴有雷雨"
   },
-  "partly_cloudy_with_thundersnow": "多雲有雷雪",
+  "partly_cloudy_with_thundersnow": "雲の多いと雷雪",
   "@partly_cloudy_with_thundersnow": {
     "description": "天氣狀況：多雲伴有雷雪"
   },
-  "partly_cloudy_with_thunderhail": "多雲有雷雹",
+  "partly_cloudy_with_thunderhail": "雲の多いと雷と雹",
   "@partly_cloudy_with_thunderhail": {
     "description": "天氣狀況：多雲伴有雷雹"
   },
-  "partly_cloudy_with_severe_thunderstorm": "多雲大雷雨",
+  "partly_cloudy_with_severe_thunderstorm": "雲の多いと大きな雷雨",
   "@partly_cloudy_with_severe_thunderstorm": {
     "description": "天氣狀況：多雲伴有強雷雨"
   },
-  "partly_cloudy_with_severe_thunderhail": "多雲大雷雹",
+  "partly_cloudy_with_severe_thunderhail": "雲の多いと大きな雷と雹",
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
@@ -1577,39 +1577,39 @@
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
-  "overcast_with_haze": "陰有霾",
+  "overcast_with_haze": "曇り空と煙霧",
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "陰有靄",
+  "overcast_with_mist": "曇り空と靄",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
-  "overcast_with_lightning": "陰有閃電",
+  "overcast_with_lightning": "曇り空と落雷",
   "@overcast_with_lightning": {
     "description": "天氣狀況：陰天伴有閃電"
   },
-  "overcast_with_fog": "陰有霧",
+  "overcast_with_fog": "曇り空と霧",
   "@overcast_with_fog": {
     "description": "天氣狀況：陰天伴有霧"
   },
-  "overcast_with_rain": "陰有雨",
+  "overcast_with_rain": "曇り空と雨",
   "@overcast_with_rain": {
     "description": "天氣狀況：陰天伴有雨"
   },
-  "overcast_with_sleet": "陰有雨雪",
+  "overcast_with_sleet": "曇り空と霙",
   "@overcast_with_sleet": {
     "description": "天氣狀況：陰天伴有雨夾雪"
   },
-  "overcast_with_heavy_snow": "陰有大雪",
+  "overcast_with_heavy_snow": "曇り空と大雪",
   "@overcast_with_heavy_snow": {
     "description": "天氣狀況：陰天伴有大雪"
   },
-  "overcast_with_snow_pellets": "陰有雪珠",
+  "overcast_with_snow_pellets": "曇り空と雪の玉",
   "@overcast_with_snow_pellets": {
     "description": "天氣狀況：陰天伴有雪珠"
   },
-  "overcast_with_ice_pellets": "陰有冰珠",
+  "overcast_with_ice_pellets": "曇り空と氷の玉",
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
@@ -1621,31 +1621,31 @@
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
-  "overcast_with_hail": "陰有雹",
+  "overcast_with_hail": "曇り空と雹",
   "@overcast_with_hail": {
     "description": "天氣狀況：陰天伴有冰雹"
   },
-  "overcast_with_thunderstorm": "陰有雷雨",
+  "overcast_with_thunderstorm": "曇り空と雷雨",
   "@overcast_with_thunderstorm": {
     "description": "天氣狀況：陰天伴有雷雨"
   },
-  "overcast_with_thundersnow": "陰有雷雪",
+  "overcast_with_thundersnow": "曇り空と雷雪",
   "@overcast_with_thundersnow": {
     "description": "天氣狀況：陰天伴有雷雪"
   },
-  "overcast_with_thunderhail": "陰有雷雹",
+  "overcast_with_thunderhail": "曇り空と雷と雹",
   "@overcast_with_thunderhail": {
     "description": "天氣狀況：陰天伴有雷雹"
   },
-  "overcast_with_severe_thunderstorm": "陰大雷雨",
+  "overcast_with_severe_thunderstorm": "曇り空と大きな雷雨",
   "@overcast_with_severe_thunderstorm": {
     "description": "天氣狀況：陰天伴有強雷雨"
   },
-  "overcast_with_severe_thunderhail": "陰大雷雹",
+  "overcast_with_severe_thunderhail": "曇り空と大きな雷と雹",
   "@overcast_with_severe_thunderhail": {
     "description": "天氣狀況：陰天伴有強雷雹"
   },
-  "overcast_with_thunder": "陰天伴有雷",
+  "overcast_with_thunder": "曇り空と雷",
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
@@ -1657,7 +1657,7 @@
   "@map_average": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
   },
-  "radar_synthetic_echo": "雷達合成回波",
+  "radar_synthetic_echo": "合成レーダー",
   "@radar_synthetic_echo": {
     "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
   },
@@ -1669,11 +1669,11 @@
   "@active": {
     "description": "「天氣警特報」狀態 → 生效中"
   },
-  "save_image_permission": "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。",
+  "save_image_permission": "写真を保存するには、DPIPが正しく機能するために、写真とメディアの使用許可を許可する必要があります。",
   "@save_image_permission": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。"
   },
-  "save_image_error": "儲存圖片時發生錯誤:",
+  "save_image_error": "画像の保存中にエラーが発生しました:",
   "@save_image_error": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤:"
   },
@@ -1713,19 +1713,19 @@
   "@history_earthquake_intensity": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
   },
-  "history_earthquake_intensity_h2": "使用 JMA 震度標準 (0.3秒三分量合成加速度)",
+  "history_earthquake_intensity_h2": "JMA 気象庁振動標準（0.3秒3成分合成加速度）を使用",
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
-  "history_seismic_intensity_reference": "本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。",
+  "history_seismic_intensity_reference": "この情報はTREM-Netの自動観測結果から得られたものであり、人による検証は行っていない。実際の結果は、中央気象庁（CMA）から発表される情報に基づいてください。",
   "@history_seismic_intensity_reference": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
   },
-  "map_no_data": "沒有有效資料可顯示",
+  "map_no_data": "表示する有効なデータがない",
   "@map_no_data": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 沒有有效資料可顯示"
   },
-  "map_hh_time": "HH時",
+  "map_hh_time": "HH時間",
   "@map_hh_time": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → HH時"
   }
