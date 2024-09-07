@@ -356,7 +356,7 @@
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert_description_sound": "海嘯警報發布時\n沿海地區鄉鎮",
+  "tsunami_alert_description_sound": "Tsunami Warning Issued\nCoastal Areas",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
@@ -364,7 +364,7 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert2_description_sound": "海嘯警報發布時\n上述除外地區",
+  "tsunami_alert2_description_sound": "Tsunami Warning Issued\nExcluding Above Areas",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
