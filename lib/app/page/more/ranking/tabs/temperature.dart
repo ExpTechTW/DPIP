@@ -205,6 +205,61 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                     ? item.data.air.temperature / ranked.last.data.air.temperature
                     : item.data.air.temperature / ranked.first.data.air.temperature;
 
+                final location = merge != MergeType.none
+                    ? [
+                        Text(
+                          merge == MergeType.town ? "${item.station.county}${item.station.town}" : item.station.county,
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: index == 0
+                                ? FontWeight.bold
+                                : index < 3
+                                    ? FontWeight.w500
+                                    : null,
+                          ),
+                        ),
+                      ]
+                    : [
+                        Text(
+                          item.station.name,
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: index == 0
+                                ? FontWeight.bold
+                                : index < 3
+                                    ? FontWeight.w500
+                                    : null,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${item.station.county}${item.station.town}",
+                          style: TextStyle(
+                            fontSize: fontSize / 1.25,
+                            color: foregroundColor.withOpacity(0.8),
+                          ),
+                        ),
+                      ];
+
+                final content = [
+                  Expanded(
+                    child: index < 3
+                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                        : Row(children: location),
+                  ),
+                  Text(
+                    "${item.data.air.temperature.toStringAsFixed(1)}℃",
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: index == 0
+                          ? FontWeight.bold
+                          : index < 3
+                              ? FontWeight.w500
+                              : null,
+                    ),
+                  ),
+                ];
+
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
@@ -232,69 +287,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                               1
                             ]),
                           ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: merge != MergeType.none
-                                      ? [
-                                          Text(
-                                            merge == MergeType.town
-                                                ? "${item.station.county}${item.station.town}"
-                                                : item.station.county,
-                                            style: TextStyle(
-                                              fontSize: fontSize,
-                                              fontWeight: index == 0
-                                                  ? FontWeight.bold
-                                                  : index < 3
-                                                      ? FontWeight.w500
-                                                      : null,
-                                            ),
-                                          ),
-                                        ]
-                                      : [
-                                          Text(
-                                            item.station.name,
-                                            style: TextStyle(
-                                              fontSize: fontSize,
-                                              fontWeight: index == 0
-                                                  ? FontWeight.bold
-                                                  : index < 3
-                                                      ? FontWeight.w500
-                                                      : null,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            item.station.county,
-                                            style: TextStyle(
-                                              fontSize: fontSize / 1.25,
-                                              color: foregroundColor.withOpacity(0.8),
-                                            ),
-                                          ),
-                                          Text(
-                                            item.station.town,
-                                            style: TextStyle(
-                                              fontSize: fontSize / 1.25,
-                                              color: foregroundColor.withOpacity(0.8),
-                                            ),
-                                          ),
-                                        ],
-                                ),
-                              ),
-                              Text(
-                                "${item.data.air.temperature.toStringAsFixed(1)}℃",
-                                style: TextStyle(
-                                  fontSize: fontSize,
-                                  fontWeight: index == 0
-                                      ? FontWeight.bold
-                                      : index < 3
-                                          ? FontWeight.w500
-                                          : null,
-                                ),
-                              ),
-                            ],
-                          ),
+                          child: Row(children: content),
                         ),
                       )
                     ],

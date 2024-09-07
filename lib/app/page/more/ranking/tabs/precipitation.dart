@@ -222,6 +222,47 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
 
                 final percentage = item.$2 / ranked.first.$2;
 
+                final location = [
+                  Text(
+                    item.$1.name,
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: index == 0
+                          ? FontWeight.bold
+                          : index < 3
+                              ? FontWeight.w500
+                              : null,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    "${item.$1.county}${item.$1.town}",
+                    style: TextStyle(
+                      fontSize: fontSize / 1.25,
+                      color: foregroundColor.withOpacity(0.8),
+                    ),
+                  ),
+                ];
+
+                final content = [
+                  Expanded(
+                    child: index < 3
+                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                        : Row(children: location),
+                  ),
+                  Text(
+                    "${item.$2} mm",
+                    style: TextStyle(
+                      fontSize: fontSize,
+                      fontWeight: index == 0
+                          ? FontWeight.bold
+                          : index < 3
+                              ? FontWeight.w500
+                              : null,
+                    ),
+                  ),
+                ];
+
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
@@ -249,53 +290,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                               1
                             ]),
                           ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      item.$1.name,
-                                      style: TextStyle(
-                                        fontSize: fontSize,
-                                        fontWeight: index == 0
-                                            ? FontWeight.bold
-                                            : index < 3
-                                                ? FontWeight.w500
-                                                : null,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      item.$1.county,
-                                      style: TextStyle(
-                                        fontSize: fontSize / 1.25,
-                                        color: foregroundColor.withOpacity(0.8),
-                                      ),
-                                    ),
-                                    Text(
-                                      item.$1.town,
-                                      style: TextStyle(
-                                        fontSize: fontSize / 1.25,
-                                        color: foregroundColor.withOpacity(0.8),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Text(
-                                "${item.$2} mm",
-                                style: TextStyle(
-                                  fontSize: fontSize,
-                                  fontWeight: index == 0
-                                      ? FontWeight.bold
-                                      : index < 3
-                                          ? FontWeight.w500
-                                          : null,
-                                ),
-                              ),
-                            ],
-                          ),
+                          child: Row(children: content),
                         ),
                       )
                     ],
