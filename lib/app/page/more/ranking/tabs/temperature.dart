@@ -201,8 +201,9 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                         style: TextStyle(color: foregroundColor, fontSize: fontSize),
                       );
 
-                final percentage = item.data.air.temperature / ranked[0].data.air.temperature;
-                final stop = reversed ? 1 - percentage : percentage;
+                final percentage = reversed
+                    ? item.data.air.temperature / ranked.last.data.air.temperature
+                    : item.data.air.temperature / ranked.first.data.air.temperature;
 
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -226,8 +227,8 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                               backgroundColor.withOpacity(0.4),
                             ], stops: [
                               0,
-                              stop,
-                              stop,
+                              percentage,
+                              percentage,
                               1
                             ]),
                           ),

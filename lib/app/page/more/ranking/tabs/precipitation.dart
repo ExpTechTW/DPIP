@@ -220,7 +220,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                         style: TextStyle(color: foregroundColor, fontSize: fontSize),
                       );
 
-                final percentage = item.$2 / ranked[0].$2;
+                final percentage = item.$2 / ranked.first.$2;
 
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
