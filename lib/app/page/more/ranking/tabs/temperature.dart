@@ -123,12 +123,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                     child: Text("合併至"),
                   ),
                   ChoiceChip(
-                    label: Text("鄉鎮"),
+                    label: Text(context.i18n.location_town),
                     selected: merge == MergeType.town,
                     onSelected: (value) => setMerge(MergeType.town),
                   ),
                   ChoiceChip(
-                    label: Text("縣市"),
+                    label: Text(context.i18n.location_city),
                     selected: merge == MergeType.county,
                     onSelected: (value) => setMerge(MergeType.county),
                   ),
