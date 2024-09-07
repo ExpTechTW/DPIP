@@ -107,7 +107,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   ChoiceChip(
-                    label: Text("目前"),
+                    label: Text(context.i18n.interval_now),
                     selected: interval == Intervals.now,
                     onSelected: (value) => setInterval(Intervals.now),
                   ),

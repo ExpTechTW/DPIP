@@ -18,14 +18,14 @@ class _MorePageState extends State<MorePage> {
 
   late final destinations = [
     NavigationDrawerDestination(
-      icon: const Icon(Symbols.leaderboard_rounded),
-      selectedIcon: const Icon(Symbols.leaderboard_rounded, fill: 1),
-      label: Text("排行榜"),
-    ),
-    NavigationDrawerDestination(
       icon: const Icon(Symbols.summarize),
       selectedIcon: const Icon(Symbols.summarize, fill: 1),
       label: Text(context.i18n.report),
+    ),
+    NavigationDrawerDestination(
+      icon: const Icon(Symbols.leaderboard_rounded),
+      selectedIcon: const Icon(Symbols.leaderboard_rounded, fill: 1),
+      label: Text(context.i18n.ranking),
     ),
   ];
 
@@ -47,7 +47,10 @@ class _MorePageState extends State<MorePage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [RankingPage(), ReportListPage()],
+        children: const [
+          ReportListPage(),
+          RankingPage(),
+        ],
       ),
     );
   }

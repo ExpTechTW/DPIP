@@ -1728,5 +1728,9 @@
   "map_hh_time": "HH時",
   "@map_hh_time": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → HH時"
+  },
+  "ranking": "排行榜",
+  "@ranking": {
+    "description": "「排行榜」頁面 → 標題"
   }
 }
