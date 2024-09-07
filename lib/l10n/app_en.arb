@@ -324,11 +324,11 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "Maximum intensity is greater than 5- and estimated intensity for the current location is 4 or greater.",
+  "eew_alert_description_sound": "Maximum intensity is greater than 5- and local estimated intensity is 4 or greater.",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "Maximum intensity is greater than 5- and estimated intensity for the current location is 2 or greater.",
+  "eew_description_sound": "Maximum intensity is greater than 5- and local estimated intensity is 2 or greater.",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
@@ -352,7 +352,7 @@
   "@other_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "tsunami_alert_sound": "Tsunami Warning",
+  "tsunami_alert_sound": "Tsunami Warning (Alert)",
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
@@ -360,7 +360,7 @@
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
-  "tsunami_alert2_sound": "Tsunami Advisory",
+  "tsunami_alert2_sound": "Tsunami Warning (Notice)",
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
@@ -368,7 +368,7 @@
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "發送公告時",
+  "server_announcement_description_sound": "Tsunami Warning (Notice)",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
@@ -525,7 +525,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "Adjust the Advance Features of DPIP",
+  "advanced_features_title": "Adjust the Advanced Features of DPIP",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
@@ -710,7 +710,7 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "Use for saving visualize data form CWA and ExpTech.",
+  "data_visualization_storage": "Used for saving visualized data from CWA and ExpTech.",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
@@ -742,7 +742,7 @@
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
+  "trem_net_deployment": "In June 2022, TREM-Net (TREM Earthquake Observation Network) began to record earthquake data across Taiwan through two observation networks, namely SE-Net (Strong Shock Observation Network Accelerometer) and MS-Net (Weak Shock Observation Network Speedometer).",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
@@ -954,7 +954,7 @@
   "@lightning_0_60": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 60 分鐘內發生的雲間閃電"
   },
-  "abnormal": "abnormal",
+  "abnormal": "Abnormal",
   "@abnormal": {
     "description": "狀態：異常"
   },
@@ -1107,7 +1107,7 @@
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
-  "settings_earthquake_monitor": "請至設定進階功能中開啟強震監視器。",
+  "settings_earthquake_monitor": "Please enable the Earthquake Monitor in Advanced Features in Settings.",
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
@@ -1143,19 +1143,19 @@
   "@development_investment": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
   },
-  "profit_model": "Profit Model",
+  "profit_model": "Monetization Model",
   "@profit_model": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
   },
-  "profit_discussion": "",
+  "profit_discussion": "To sustain the development of our app, our team has had numerous in-depth discussions about how to monetize it. We've explored various options, searching for a suitable monetization model. We found that most similar software adopts in-app advertisements. This led us to initially consider this approach as our primary monetization method.",
   "@profit_discussion": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
   },
-  "profit_difficulty": "營利真的太難了",
+  "profit_difficulty": "Monetization is Tough",
   "@profit_difficulty": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利真的太難了"
   },
-  "user_payment_survey": "我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。",
+  "user_payment_survey": "We conducted a survey to gauge the public's willingness to pay for such an app. We discovered that most people generally lack a strong sense of disaster preparedness and are unlikely to spend money on it. Our backend data supports this finding. Statistics show that only about one in 100,000 users actively contribute financially. This made in-app advertisements seem like the most viable solution.",
   "@user_payment_survey": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
   },
@@ -1163,27 +1163,27 @@
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
-  "no_ads_reason": "當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。",
+  "no_ads_reason": "During a disaster, the last thing people want to see is an ad. This is the primary reason we've decided against in-app advertisements. For a disaster prevention app, delivering accurate and timely information is paramount. If ads hinder users from accessing critical disaster information, it would directly contradict our mission. Additionally, communication quality is often poor during disasters, and wasting precious data on ad loading is simply frustrating.",
   "@no_ads_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
   },
-  "charge_public": "對大眾收費？",
+  "charge_public": "Charging Users?",
   "@charge_public": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 對大眾收費？"
   },
-  "no_fee_reason": "如果植入廣告行不通，那對大眾收費呢？變成付費軟體？",
+  "no_fee_reason": "If in-app advertisements aren't feasible, what about charging users? Should we turn it into a paid app?",
   "@no_fee_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如果植入廣告行不通，那對大眾收費呢？變成付費軟體？"
   },
-  "public_charge_consideration": "首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。",
+  "public_charge_consideration": "First of all, as a disaster prevention app, our goal is to reach as many people as possible. Moreover, those who truly need this app may not have the extra funds to pay for it. We want to help as many people as possible. Secondly, as developers, we want our app to have a wide user base. Charging users would directly reduce the user base.",
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
-  "how_to_profit": "How do we profit?",
+  "how_to_profit": "How Do We Monetize?",
   "@how_to_profit": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
   },
-  "summary": "總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。",
+  "summary": "In conclusion, we hope to cultivate a community of individuals who are interested in disaster prevention and value this kind of app. We invite these users to support our development efforts and join us in making a difference.",
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
@@ -1195,7 +1195,7 @@
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
-  "invalid_operation": "Invalid operation.",
+  "invalid_operation": "Slow down!",
   "@invalid_operation": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
   },
@@ -1219,7 +1219,7 @@
   "@auto_location_permission_required": {
     "description": "「通知權限」彈窗 → 自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。"
   },
-  "location_permission_needed": "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。",
+  "location_permission_needed": "For the best experience, DPIP requires enabling auto-locating permissions.",
   "@location_permission_needed": {
     "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
   },
@@ -1227,7 +1227,7 @@
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "improve_auto_location_experience": "For a better automatic locating experience, please grant DPIP the \"{permissionType}\" on Location permission so it can continuously update your location in the background.",
   "@improve_auto_location_experience": {
     "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
     "placeholders": {
@@ -1236,7 +1236,7 @@
       }
     }
   },
-  "auto_location_permission_upgrade_needed": "自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
+  "auto_location_permission_upgrade_needed": "Auto-locating requires granting {permissionType} to operate in the background.",
   "@auto_location_permission_upgrade_needed": {
     "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
     "placeholders": {
@@ -1261,7 +1261,7 @@
   "@me_welcome": {
     "description": "「我」頁面 → 「歡迎頁面」按鈕"
   },
-  "donate_h2": "幫助我們維護伺服器的穩定和長久發展",
+  "donate_h2": "Help us maintain server stability and development.",
   "@donate_h2": {
     "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
   },
@@ -1285,11 +1285,11 @@
   "@report_filter_apply": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 套用"
   },
-  "report_end": "到底了",
+  "report_end": "End of list",
   "@report_end": {
     "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
-  "history_send_time": "發送時間",
+  "history_send_time": "Event Time",
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
@@ -1417,7 +1417,7 @@
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
-  "sound_tsunami_silent_h2": "According to the tsunami warning issued by the PTWC, which is\nassessed by CWA that it may cause public concern.\n",
+  "sound_tsunami_silent_h2": "According to the tsunami warning issued by the PTWC, which is\nassessed by CWA that it may cause public concern.",
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
@@ -1709,7 +1709,7 @@
   "@home_click_settings": {
     "description": "「首頁」路徑 → 點擊設定所在地"
   },
-  "history_earthquake_intensity": "TREM 觀測網實測震度",
+  "history_earthquake_intensity": "TREM Observation Network Measured Intensity",
   "@history_earthquake_intensity": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
   },
