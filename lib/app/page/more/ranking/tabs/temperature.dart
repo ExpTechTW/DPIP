@@ -107,12 +107,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                   ChoiceChip(
                     label: Text("高溫"),
                     selected: !reversed,
-                    onSelected: merge != MergeType.none ? (value) => setReversed(false) : null,
+                    onSelected: (value) => setReversed(false),
                   ),
                   ChoiceChip(
                     label: Text("低溫"),
                     selected: reversed,
-                    onSelected: merge != MergeType.none ? (value) => setReversed(true) : null,
+                    onSelected: (value) => setReversed(true),
                   ),
                   const SizedBox(
                     height: kToolbarHeight - 16,
