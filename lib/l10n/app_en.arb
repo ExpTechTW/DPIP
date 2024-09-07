@@ -324,11 +324,11 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is 4 or greater.",
+  "eew_alert_description_sound": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 4.",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is 2 or greater.",
+  "eew_description_sound": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 2.",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
@@ -1313,7 +1313,7 @@
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
-  "sound_eew_silent_h2": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is 1 or greater.",
+  "sound_eew_silent_h2": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 1.",
   "@sound_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上"
   },
@@ -1321,7 +1321,7 @@
   "@sound_earthquake_eew_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(重大)"
   },
-  "sound_earthquake_eew_major_h2": "Local (City/Town/District) estimated intensity is 4 or greater.",
+  "sound_earthquake_eew_major_h2": "Local (City/Town/District) estimated intensity is greater than 4.",
   "@sound_earthquake_eew_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(重大)」描述 → 所在地(鄉鎮)預估震度 4 以上"
   },
@@ -1329,7 +1329,7 @@
   "@sound_earthquake_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(一般)"
   },
-  "sound_earthquake_eew_minor_h2": "Local (City/Town/District) estimated intensity is 2 or greater.",
+  "sound_earthquake_eew_minor_h2": "Local (City/Town/District) estimated intensity is greater than 2.",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
@@ -1337,7 +1337,7 @@
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
-  "sound_earthquake_eew_silent_h2": "Local (City/Town/District) estimated intensity is 1 or greater.",
+  "sound_earthquake_eew_silent_h2": "Local (City/Town/District) estimated intensity is greater than 1.",
   "@sound_earthquake_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
@@ -1345,7 +1345,7 @@
   "@sound_int_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(一般)"
   },
-  "sound_int_report_minor_h2": "Local (City/Town/District) measured intensity is 3 or greater.",
+  "sound_int_report_minor_h2": "Local (City/Town/District) measured intensity is greater than 3.",
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
@@ -1353,7 +1353,7 @@
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
-  "sound_int_report_silent_h2": "Local (City/Town/District) measured intensity is 1 or greater.",
+  "sound_int_report_silent_h2": "Local (City/Town/District) measured intensity is greater than 1.",
   "@sound_int_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(無聲通知)」描述 → 所在地(鄉鎮)實測震度 1 以上。"
   },
@@ -1369,7 +1369,7 @@
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
-  "sound_report_silent_h2": "Local (Special Municipality/County) measured intensity is 1 or greater.",
+  "sound_report_silent_h2": "Local (Municipality/County) measured intensity is greater than 1.",
   "@sound_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
   },
