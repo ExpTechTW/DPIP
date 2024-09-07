@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/weather/weather.dart';
-import 'package:dpip/app/page/more/ranking/widgets/ranking_list.dart';
 
 class RankingTemperatureTab extends StatefulWidget {
   const RankingTemperatureTab({super.key});
@@ -19,9 +18,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     final latestWeatherData = await ExpTech().getWeather(weatherList.last);
 
     setState(() {
-      validWeatherStations = latestWeatherData
-          .where((station) => station.data.air.temperature != -99)
-          .toList();
+      validWeatherStations = latestWeatherData.where((station) => station.data.air.temperature != -99).toList();
       validWeatherStations.sort((a, b) => b.data.air.temperature.compareTo(a.data.air.temperature));
     });
   }
@@ -48,19 +45,14 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
   }
 
   Widget _buildRankIndicator(int rank) {
-    return rank == 1
-        ? const Icon(Symbols.trophy_rounded)
-        : Text("$rank");
+    return rank == 1 ? const Icon(Symbols.trophy_rounded) : Text("$rank");
   }
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: refresh,
-      child: RankingList(
-        data: validWeatherStations,
-        contentBuilder: (context, station, rank) => _buildListItem(station, rank),
-      ),
+      child: ListView(),
     );
   }
 }
