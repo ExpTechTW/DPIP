@@ -50,7 +50,7 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             pinned: true,
             floating: true,
             snap: true,
-            title: Text("排行榜"),
+            title: Text(context.i18n.ranking),
             bottom: TabBar(
               controller: controller,
               tabs: [
