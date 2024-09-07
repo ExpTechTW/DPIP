@@ -84,77 +84,77 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-          child: Text(
-            "資料時間：$time",
-            style: TextStyle(color: context.colors.onSurfaceVariant),
-          ),
-        ),
-        SizedBox(
-          height: kToolbarHeight,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            scrollDirection: Axis.horizontal,
-            child: Wrap(
-              spacing: 8,
-              runAlignment: WrapAlignment.center,
-              children: [
-                ChoiceChip(
-                  label: Text("目前"),
-                  selected: interval == Intervals.now,
-                  onSelected: (value) => setInterval(Intervals.now),
-                ),
-                ChoiceChip(
-                  label: Text("10 分鐘"),
-                  selected: interval == Intervals.tenMinutes,
-                  onSelected: (value) => setInterval(Intervals.tenMinutes),
-                ),
-                ChoiceChip(
-                  label: Text("1 小時"),
-                  selected: interval == Intervals.oneHour,
-                  onSelected: (value) => setInterval(Intervals.oneHour),
-                ),
-                ChoiceChip(
-                  label: Text("3 小時"),
-                  selected: interval == Intervals.threeHours,
-                  onSelected: (value) => setInterval(Intervals.threeHours),
-                ),
-                ChoiceChip(
-                  label: Text("6 小時"),
-                  selected: interval == Intervals.sixHours,
-                  onSelected: (value) => setInterval(Intervals.sixHours),
-                ),
-                ChoiceChip(
-                  label: Text("12 小時"),
-                  selected: interval == Intervals.twelveHours,
-                  onSelected: (value) => setInterval(Intervals.twelveHours),
-                ),
-                ChoiceChip(
-                  label: Text("24 小時"),
-                  selected: interval == Intervals.twentyFourHours,
-                  onSelected: (value) => setInterval(Intervals.twentyFourHours),
-                ),
-                ChoiceChip(
-                  label: Text("2 天"),
-                  selected: interval == Intervals.twoDays,
-                  onSelected: (value) => setInterval(Intervals.twoDays),
-                ),
-                ChoiceChip(
-                  label: Text("3 天"),
-                  selected: interval == Intervals.threeDays,
-                  onSelected: (value) => setInterval(Intervals.threeDays),
-                ),
-              ],
+    return RefreshIndicator(
+      onRefresh: refresh,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+            child: Text(
+              "資料時間：$time",
+              style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
-        ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: refresh,
+          SizedBox(
+            height: kToolbarHeight,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              scrollDirection: Axis.horizontal,
+              child: Wrap(
+                spacing: 8,
+                runAlignment: WrapAlignment.center,
+                children: [
+                  ChoiceChip(
+                    label: Text("目前"),
+                    selected: interval == Intervals.now,
+                    onSelected: (value) => setInterval(Intervals.now),
+                  ),
+                  ChoiceChip(
+                    label: Text("10 分鐘"),
+                    selected: interval == Intervals.tenMinutes,
+                    onSelected: (value) => setInterval(Intervals.tenMinutes),
+                  ),
+                  ChoiceChip(
+                    label: Text("1 小時"),
+                    selected: interval == Intervals.oneHour,
+                    onSelected: (value) => setInterval(Intervals.oneHour),
+                  ),
+                  ChoiceChip(
+                    label: Text("3 小時"),
+                    selected: interval == Intervals.threeHours,
+                    onSelected: (value) => setInterval(Intervals.threeHours),
+                  ),
+                  ChoiceChip(
+                    label: Text("6 小時"),
+                    selected: interval == Intervals.sixHours,
+                    onSelected: (value) => setInterval(Intervals.sixHours),
+                  ),
+                  ChoiceChip(
+                    label: Text("12 小時"),
+                    selected: interval == Intervals.twelveHours,
+                    onSelected: (value) => setInterval(Intervals.twelveHours),
+                  ),
+                  ChoiceChip(
+                    label: Text("24 小時"),
+                    selected: interval == Intervals.twentyFourHours,
+                    onSelected: (value) => setInterval(Intervals.twentyFourHours),
+                  ),
+                  ChoiceChip(
+                    label: Text("2 天"),
+                    selected: interval == Intervals.twoDays,
+                    onSelected: (value) => setInterval(Intervals.twoDays),
+                  ),
+                  ChoiceChip(
+                    label: Text("3 天"),
+                    selected: interval == Intervals.threeDays,
+                    onSelected: (value) => setInterval(Intervals.threeDays),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
             child: ListView.builder(
               padding: EdgeInsets.only(top: 4, bottom: context.padding.bottom),
               itemCount: ranked.isEmpty ? 1 : ranked.length,
@@ -303,8 +303,8 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
               },
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
