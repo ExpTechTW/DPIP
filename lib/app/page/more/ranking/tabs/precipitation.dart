@@ -181,8 +181,19 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                         ? 18
                         : 16;
 
-                final leading = index == 0
-                    ? Icon(Symbols.trophy_rounded, color: foregroundColor)
+                final double iconSize = index == 0
+                    ? 32
+                    : index == 1
+                        ? 28
+                        : 24;
+
+                final leading = index < 3
+                    ? Icon(
+                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                        color: foregroundColor,
+                        size: iconSize,
+                        fill: 1,
+                      )
                     : Text(
                         "$rank",
                         style: TextStyle(color: foregroundColor, fontSize: fontSize),
