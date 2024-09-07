@@ -2,7 +2,9 @@ import 'package:collection/collection.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/intervals.dart';
+import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/model/weather/rain.dart';
@@ -16,14 +18,18 @@ class RankingPrecipitationTab extends StatefulWidget {
 
 class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
   Intervals interval = Intervals.now;
+  String time = "";
   Map<StationInfo, RainData> data = {};
   List<(StationInfo, double)> ranked = [];
 
   Future refresh() async {
     final rainTimeList = await ExpTech().getRainList();
-
     final rainData = await ExpTech().getRain(rainTimeList.last);
+
+    if (!mounted) return;
+
     data = rainData.asMap().map((_, e) => MapEntry(e.station, e.data));
+    time = DateFormat(context.i18n.datetime_format).format(parseDateTime(rainTimeList.last));
     rank();
   }
 
@@ -79,7 +85,15 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+          child: Text(
+            "資料時間：$time",
+            style: TextStyle(color: context.colors.onSurfaceVariant),
+          ),
+        ),
         SizedBox(
           height: kToolbarHeight,
           child: SingleChildScrollView(
@@ -175,6 +189,12 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                                 ? context.colors.onSurface
                                 : context.colors.onSurfaceVariant;
 
+                final iconColor = index == 0
+                    ? context.theme.extendedColors.amber
+                    : index == 1
+                        ? context.theme.extendedColors.grey
+                        : context.theme.extendedColors.brown;
+
                 final double fontSize = index == 0
                     ? 20
                     : index < 3
@@ -190,7 +210,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                 final leading = index < 3
                     ? Icon(
                         index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
-                        color: foregroundColor,
+                        color: iconColor,
                         size: iconSize,
                         fill: 1,
                       )
