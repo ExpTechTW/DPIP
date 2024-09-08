@@ -99,10 +99,10 @@ Future<void> androidForegroundService() async {
       autoStart: true,
       isForegroundMode: true,
       foregroundServiceTypes: [AndroidForegroundType.location],
-      notificationChannelId: "foreground-general",
-      initialNotificationTitle: "",
-      initialNotificationContent: "",
-      foregroundServiceNotificationId: 0,
+      notificationChannelId: "my_foreground",
+      initialNotificationTitle: "DPIP",
+      initialNotificationContent: "前景服務啟動中...",
+      foregroundServiceNotificationId: 888,
     ),
     iosConfiguration: IosConfiguration(
       autoStart: true,
@@ -137,8 +137,6 @@ void onStart(ServiceInstance service) async {
 
   if (service is AndroidServiceInstance) {
     await service.setAsForegroundService();
-
-    AwesomeNotifications().cancel(0);
 
     AwesomeNotifications().createNotification(
       content: NotificationContent(
