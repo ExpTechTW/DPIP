@@ -184,6 +184,8 @@ void onStart(ServiceInstance service) async {
         String notifyBody = "$date\n$lat,$lon $location";
         service.invoke("senddebug", {"notifyBody": notifyBody});
 
+        AwesomeNotifications().cancel(0);
+
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: 1,
