@@ -58,12 +58,12 @@ class SoundListTileState extends State<SoundListTile> {
         print("test");
         AwesomeNotifications().createNotification(
           content: NotificationContent(
-            id: 10,
+            id: -1,
             channelKey: 'eew_alert-important',
             title: '重大通知',
             body: '這是一個包含重大通知的重要訊息。',
             notificationLayout: NotificationLayout.BigText,
-            criticalAlert: true,
+            // criticalAlert: true,
           ),
         );
 
