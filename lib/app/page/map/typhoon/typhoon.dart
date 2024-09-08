@@ -114,66 +114,52 @@ class _TyphoonMapState extends State<TyphoonMap> {
       GeojsonSourceProperties(data: typhoonData),
     );
 
-    // 添加颱風路徑線圖層
     await _mapController.addLayer(
       "typhoon-geojson",
       "typhoon-path",
-      LineLayerProperties(
+      const LineLayerProperties(
         lineColor: [
           'match',
-          ['get', 'color', ['properties']],
-          0, '#1565C0',  // 藍色
-          1, '#4CAF50',  // 綠色
-          2, '#FFC107',  // 黃色
-          3, '#FF5722',  // 橙色
-          '#757575'  // 默認灰色
+          [
+            'get',
+            'color',
+            ['properties']
+          ],
+          0, '#1565C0', // 藍色
+          1, '#4CAF50', // 綠色
+          2, '#FFC107', // 黃色
+          3, '#FF5722', // 橙色
+          '#757575' // 默認灰色
         ],
-        lineWidth: 3,
+        lineWidth: 2,
       ),
-      filter: ['==', ['geometry-type'], 'LineString'],
     );
 
-    // 添加颱風位置點圖層（只顯示 type.show 為 true 的點）
     await _mapController.addLayer(
       "typhoon-geojson",
       "typhoon-points",
-      CircleLayerProperties(
-        circleRadius: 6,
+      const CircleLayerProperties(
+        circleRadius: 3,
         circleColor: [
           'match',
-          ['get', 'color', ['properties']],
-          0, '#1565C0',
-          1, '#4CAF50',
-          2, '#FFC107',
-          3, '#FF5722',
+          [
+            'get',
+            'color',
+            ['properties']
+          ],
+          0,
+          '#1565C0',
+          1,
+          '#4CAF50',
+          2,
+          '#FFC107',
+          3,
+          '#FF5722',
           '#757575'
         ],
         circleStrokeWidth: 2,
         circleStrokeColor: '#FFFFFF',
       ),
-      filter: ['all',
-        ['==', ['geometry-type'], 'Point'],
-        ['==', ['get', 'show', ['get', 'type', ['properties']]], true]
-      ],
-    );
-
-    // 添加颱風名稱標籤圖層（只顯示 type.show 為 true 的點）
-    await _mapController.addLayer(
-      "typhoon-geojson",
-      "typhoon-labels",
-      SymbolLayerProperties(
-        textField: ['get', 'en', ['get', 'name', ['properties']]],
-        textSize: 12,
-        textOffset: [0, 1.5],
-        textAnchor: 'top',
-        textColor: '#000000',
-        textHaloColor: '#FFFFFF',
-        textHaloWidth: 1,
-      ),
-      filter: ['all',
-        ['==', ['geometry-type'], 'Point'],
-        ['==', ['get', 'show', ['get', 'type', ['properties']]], true]
-      ],
     );
 
     // 添加風圈圖層（只顯示第一個 type.forecast 為 true 的點）
@@ -181,16 +167,73 @@ class _TyphoonMapState extends State<TyphoonMap> {
       "typhoon-geojson",
       "typhoon-wind-circle",
       CircleLayerProperties(
-        circleRadius: ['get', '15ms', ['get', 'circle', ['get', 'info', ['properties']]]],
+        circleRadius: [
+          'get',
+          '15ms',
+          [
+            'get',
+            'circle',
+            [
+              'get',
+              'info',
+              ['properties']
+            ]
+          ]
+        ],
         circleColor: 'rgba(255, 0, 0, 0.1)',
         circleStrokeWidth: 1,
         circleStrokeColor: 'rgba(255, 0, 0, 0.6)',
       ),
-      filter: ['all',
-        ['==', ['geometry-type'], 'Point'],
-        ['==', ['get', 'forecast', ['get', 'type', ['properties']]], true],
-        ['==', ['get', 'tau', ['get', 'type', ['properties']]], 0],
-        ['!=', ['get', '15ms', ['get', 'circle', ['get', 'info', ['properties']]]], null]
+      filter: [
+        'all',
+        [
+          '==',
+          ['geometry-type'],
+          'Point'
+        ],
+        [
+          '==',
+          [
+            'get',
+            'forecast',
+            [
+              'get',
+              'type',
+              ['properties']
+            ]
+          ],
+          true
+        ],
+        [
+          '==',
+          [
+            'get',
+            'tau',
+            [
+              'get',
+              'type',
+              ['properties']
+            ]
+          ],
+          0
+        ],
+        [
+          '!=',
+          [
+            'get',
+            '15ms',
+            [
+              'get',
+              'circle',
+              [
+                'get',
+                'info',
+                ['properties']
+              ]
+            ]
+          ],
+          null
+        ]
       ],
     );
   }
