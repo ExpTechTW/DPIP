@@ -35,39 +35,42 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
 
   rank() {
     setState(() {
-      ranked = data.entries.map((e) {
-        double value;
-        switch (interval) {
-          case Intervals.now:
-            value = e.value.now;
-            break;
-          case Intervals.tenMinutes:
-            value = e.value.tenMinutes;
-            break;
-          case Intervals.oneHour:
-            value = e.value.oneHour;
-            break;
-          case Intervals.threeHours:
-            value = e.value.threeHours;
-            break;
-          case Intervals.sixHours:
-            value = e.value.sixHours;
-            break;
-          case Intervals.twelveHours:
-            value = e.value.twelveHours;
-            break;
-          case Intervals.twentyFourHours:
-            value = e.value.twentyFourHours;
-            break;
-          case Intervals.twoDays:
-            value = e.value.twoDays;
-            break;
-          case Intervals.threeDays:
-            value = e.value.threeDays;
-            break;
-        }
-        return (e.key, value);
-      }).sorted((a, b) => (b.$2 - a.$2).sign.toInt());
+      ranked = data.entries
+          .map((e) {
+            double value;
+            switch (interval) {
+              case Intervals.now:
+                value = e.value.now;
+                break;
+              case Intervals.tenMinutes:
+                value = e.value.tenMinutes;
+                break;
+              case Intervals.oneHour:
+                value = e.value.oneHour;
+                break;
+              case Intervals.threeHours:
+                value = e.value.threeHours;
+                break;
+              case Intervals.sixHours:
+                value = e.value.sixHours;
+                break;
+              case Intervals.twelveHours:
+                value = e.value.twelveHours;
+                break;
+              case Intervals.twentyFourHours:
+                value = e.value.twentyFourHours;
+                break;
+              case Intervals.twoDays:
+                value = e.value.twoDays;
+                break;
+              case Intervals.threeDays:
+                value = e.value.threeDays;
+                break;
+            }
+            return (e.key, value);
+          })
+          .where((e) => e.$2 > 0)
+          .sorted((a, b) => (b.$2 - a.$2).sign.toInt());
     });
   }
 
@@ -92,7 +95,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
             child: Text(
-              "資料時間：$time",
+              "資料時間：$time\n共 ${ranked.length} 觀測點",
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
