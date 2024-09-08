@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/weather/weather.dart';
 
 enum MergeType {
   none,
@@ -43,8 +43,9 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     final temp = (merge != MergeType.none)
         ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
             .values
-            .map((v) => v.reduce((acc, e) => ((reversed && e.data.air.temperature < acc.data.air.temperature) ||
-                    e.data.air.temperature > acc.data.air.temperature)
+            .map((v) => v.reduce((acc, e) => (reversed
+                    ? e.data.air.temperature < acc.data.air.temperature
+                    : e.data.air.temperature > acc.data.air.temperature)
                 ? e
                 : acc))
         : data;
@@ -82,13 +83,6 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Text(
-              "資料時間：$time\n共 ${ranked.length} 觀測點",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
-            ),
-          ),
           SizedBox(
             height: kToolbarHeight,
             child: SingleChildScrollView(
@@ -133,6 +127,13 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                   ),
                 ],
               ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "資料時間：$time\n共 ${ranked.length} 觀測點",
+              style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
           Expanded(
@@ -201,8 +202,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                       );
 
                 final percentage = reversed
-                    ? item.data.air.temperature / ranked.last.data.air.temperature
-                    : item.data.air.temperature / ranked.first.data.air.temperature;
+                    ? (ranked.first.data.air.temperature - item.data.air.temperature) /
+                        (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
+                    : (item.data.air.temperature - ranked.last.data.air.temperature) /
+                        (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
 
                 final location = merge != MergeType.none
                     ? [

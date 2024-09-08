@@ -23,6 +23,7 @@ class _ReportListPageState extends State<ReportListPage> {
   RangeValues _intensityRange = const RangeValues(0, 8);
   RangeValues _magnitudeRange = const RangeValues(0, 10);
   RangeValues _depthRange = const RangeValues(0, 700);
+
   List<String> get _intensityLevels => [
         context.i18n.level_1,
         context.i18n.level_2,
@@ -184,12 +185,6 @@ class _ReportListPageState extends State<ReportListPage> {
               onRefresh: refreshReportList,
               child: Builder(
                 builder: (context) {
-                  if (isLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
                   return ListView.builder(
                     padding: EdgeInsets.only(bottom: context.padding.bottom),
                     itemCount: reportList.length + 1,
@@ -203,7 +198,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Center(
-                            child: isLoading ? const CircularProgressIndicator() : Text(context.i18n.report_end),
+                            child: Text(context.i18n.report_end),
                           ),
                         );
                       }
