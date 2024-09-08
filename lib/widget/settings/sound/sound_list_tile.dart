@@ -73,8 +73,8 @@ class SoundListTileState extends State<SoundListTile> {
           content: NotificationContent(
             id: -1,
             channelKey: widget.type,
-            title: data[widget.type]["title"],
-            body: data[widget.type]["body"],
+            title: "[測試] ${data[widget.type]["title"]}",
+            body: "＊＊＊這是測試訊息＊＊＊${(Platform.isIOS) ? "\n" : "<br>"}${data[widget.type]["body"]}",
             notificationLayout: NotificationLayout.BigText,
           ),
         );
