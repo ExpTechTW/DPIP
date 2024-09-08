@@ -42,7 +42,7 @@ class SoundListTileState extends State<SoundListTile> {
   }
 
   void start() async {
-    final json = await rootBundle.loadString("assets/location.json");
+    final json = await rootBundle.loadString("assets/notify_test.json");
     data = jsonDecode(json) as Map<String, dynamic>;
   }
 
