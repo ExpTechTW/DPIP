@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/util/log.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/widget/list/typhoon_time_selector.dart';
@@ -20,7 +19,8 @@ class TyphoonMap extends StatefulWidget {
 
 class _TyphoonMapState extends State<TyphoonMap> {
   late MapLibreMapController _mapController;
-  List<Typhoon>? typhoonData;
+  List typhoonImagesList = [];
+  Map<String, dynamic> typhoonData = {};
   List<String> typhoonList = [];
   int selectedTyphoonId = -1;
   List<String> sourceList = [];
@@ -38,12 +38,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
   void _loadMap() async {
     try {
-      typhoonList = await ExpTech().getTyphoonList();
-      if (typhoonList.isNotEmpty) {
-        selectedTimestamp = typhoonList.last;
-        await _loadTyphoonData(selectedTimestamp);
-      }
-      selectedTimestamp = typhoonList.last;
+      typhoonImagesList = await ExpTech().getTyphoonImagesList();
+      typhoonData = await ExpTech().getTyphoonGeojson();
 
       if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
         await getSavedLocation();
@@ -109,188 +105,6 @@ class _TyphoonMapState extends State<TyphoonMap> {
     }
   }
 
-  Future<void> _loadTyphoonData(String time) async {
-    try {
-      typhoonData = await ExpTech().getTyphoon(time);
-      if (typhoonData != null && typhoonData!.isNotEmpty) {
-        typhoon_name_list = [];
-        typhoon_id_list = [];
-        await _drawTyphoonPaths(typhoonData!);
-      }
-    } catch (e) {
-      TalkerManager.instance.error("加載颱風數據時出錯: $e");
-    }
-  }
-
-  void _onSelectionChanged(String timestamp, int typhoonId) async {
-    selectedTimestamp = timestamp;
-    await _loadTyphoonData(selectedTimestamp);
-    if (selectedTyphoonId != typhoonId) {
-      selectedTyphoonId = typhoonId;
-      _zoomToSelectedTyphoon();
-    }
-    setState(() {});
-  }
-
-  Future<void> _zoomToSelectedTyphoon() async {
-    if (typhoonData != null && selectedTyphoonId != -1) {
-      Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.no.td == selectedTyphoonId);
-      if (selectedTyphoon.analysis.isNotEmpty) {
-        LatLng center = LatLng(
-          selectedTyphoon.analysis.last.lat,
-          selectedTyphoon.analysis.last.lng,
-        );
-        double zoomLevel = 5;
-        await _mapController.animateCamera(
-          CameraUpdate.newLatLngZoom(center, zoomLevel),
-          duration: const Duration(milliseconds: 1000),
-        );
-      }
-    }
-  }
-
-  Future<void> _drawTyphoonPaths(List<Typhoon> typhoons) async {
-    for (String layerId in layerList) {
-      await _mapController.removeLayer(layerId);
-    }
-    for (String sourceId in sourceList) {
-      await _mapController.removeSource(sourceId);
-    }
-    layerList.clear();
-    sourceList.clear();
-
-    for (int i = 0; i < typhoons.length; i++) {
-      Typhoon typhoon = typhoons[i];
-      String name = (typhoon.name.zh == "") ? "TD${typhoon.no.td}" : typhoon.name.zh;
-      if (selectedTyphoonId == -1) {
-        selectedTyphoonId = typhoon.no.td;
-        _zoomToSelectedTyphoon();
-      }
-      typhoon_name_list.add(name);
-      typhoon_id_list.add(typhoon.no.td);
-      await _drawTyphoonPath(typhoon, i);
-      await _draw15WindCircle(typhoon, i);
-      await _drawForecastCircles(typhoon, i);
-    }
-  }
-
-  Future<void> _drawTyphoonPath(Typhoon typhoon, int i) async {
-    String sourceId = "typhoon-path-$i";
-    String layerId = "typhoon-path-line-$i";
-    String sourceId_forecast = "typhoon-path-$i-forecast";
-    String layerId_forecast = "typhoon-path-line-$i-forecast";
-
-    List<List<double>> coordinates = typhoon.analysis.map((a) => [a.lng, a.lat]).toList();
-    List<List<double>> coordinates_forecast = typhoon.forecast.map((f) => [f.lng, f.lat]).toList();
-
-    coordinates_forecast.insert(0, coordinates.last);
-
-    await _mapController.addSource(
-      sourceId,
-      GeojsonSourceProperties(
-        data: {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "LineString",
-                "coordinates": coordinates,
-              }
-            }
-          ]
-        },
-      ),
-    );
-    await _mapController.addLineLayer(
-      sourceId,
-      layerId,
-      const LineLayerProperties(
-        lineColor: "#62abc7",
-        lineWidth: 3,
-      ),
-    );
-
-    await _mapController.addSource(
-      sourceId_forecast,
-      GeojsonSourceProperties(
-        data: {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "LineString",
-                "coordinates": coordinates_forecast,
-              }
-            }
-          ]
-        },
-      ),
-    );
-    await _mapController.addLineLayer(
-      sourceId_forecast,
-      layerId_forecast,
-      const LineLayerProperties(
-        lineColor: "#000000",
-        lineWidth: 3,
-      ),
-    );
-
-    layerList.addAll([layerId, layerId_forecast]);
-    sourceList.addAll([sourceId, sourceId_forecast]);
-  }
-
-  Future<void> _draw15WindCircle(Typhoon typhoon, int i) async {
-    String sourceId_15 = "typhoon-15-geojson-$i";
-    String layerId_15 = "typhoon-15-circle-$i";
-    String layerId_15_outline = "typhoon-15-circle-outline-$i";
-
-    await _mapController.addGeoJsonSource(sourceId_15, {
-      "type": "FeatureCollection",
-      "features": [
-        circle(LatLng(typhoon.analysis.last.lat, typhoon.analysis.last.lng),
-            typhoon.analysis.last.circle["15"]?.toDouble() ?? 0.0,
-            steps: 256)
-      ]
-    });
-
-    await _mapController.addLayer(
-        sourceId_15, layerId_15, const FillLayerProperties(fillColor: "#fbd745", fillOpacity: 0.6));
-
-    await _mapController.addLayer(
-        sourceId_15, layerId_15_outline, const LineLayerProperties(lineColor: "#d4af37", lineWidth: 2));
-
-    sourceList.add(sourceId_15);
-    layerList.addAll([layerId_15, layerId_15_outline]);
-  }
-
-  Future<void> _drawForecastCircles(Typhoon typhoon, int i) async {
-    int I = 0;
-    for (var forecast in typhoon.forecast) {
-      String sourceId_radius_forecast = "typhoon-15-geojson-$i-$I";
-      String layerId_radius_forecast = "typhoon-15-circle-$i-$I";
-      String layerId_radius_forecast_outline = "typhoon-15-circle-outline-$i-$I";
-
-      await _mapController.addGeoJsonSource(sourceId_radius_forecast, {
-        "type": "FeatureCollection",
-        "features": [circle(LatLng(forecast.lat, forecast.lng), forecast.radius.toDouble(), steps: 256)]
-      });
-
-      await _mapController.addLayer(sourceId_radius_forecast, layerId_radius_forecast,
-          const FillLayerProperties(fillColor: "#83bca0", fillOpacity: 0.6));
-
-      await _mapController.addLayer(sourceId_radius_forecast, layerId_radius_forecast_outline,
-          const LineLayerProperties(lineColor: "#2e8b57", lineWidth: 2));
-
-      sourceList.add(sourceId_radius_forecast);
-      layerList.addAll([layerId_radius_forecast, layerId_radius_forecast_outline]);
-      I++;
-    }
-  }
-
   @override
   void dispose() {
     _mapController.dispose();
@@ -306,20 +120,6 @@ class _TyphoonMapState extends State<TyphoonMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
-        if (typhoonList.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: TyphoonTimeSelector(
-              onSelectionChanged: _onSelectionChanged,
-              onTimeExpanded: () {},
-              timeList: typhoonList,
-              typhoonList: typhoon_name_list,
-              typhoonIdList: typhoon_id_list,
-              selectedTyphoonId: selectedTyphoonId,
-            ),
-          ),
       ],
     );
   }
