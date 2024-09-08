@@ -1,3 +1,4 @@
+import "dart:convert";
 import "dart:io";
 
 import "package:awesome_notifications/awesome_notifications.dart";
@@ -6,6 +7,7 @@ import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/need_location.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:material_symbols_icons/symbols.dart";
 
 class SoundListTile extends StatefulWidget {
@@ -31,6 +33,18 @@ class SoundListTileState extends State<SoundListTile> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  Map<String, dynamic> data = {};
+
+  @override
+  void initState() {
+    super.initState();
+    start();
+  }
+
+  void start() async {
+    final json = await rootBundle.loadString("assets/location.json");
+    data = jsonDecode(json) as Map<String, dynamic>;
+  }
 
   void _initUserLocation() async {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
@@ -55,19 +69,15 @@ class SoundListTileState extends State<SoundListTile> {
       int now = DateTime.now().millisecondsSinceEpoch;
       if (now - limit > 1000) {
         Global.preference.setInt("limit-sound-test", now);
-        print("test");
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: -1,
-            channelKey: 'eew_alert-important',
-            title: '重大通知',
-            body: '這是一個包含重大通知的重要訊息。',
+            channelKey: widget.type,
+            title: data[widget.type]["title"],
+            body: data[widget.type]["body"],
             notificationLayout: NotificationLayout.BigText,
-            // criticalAlert: true,
           ),
         );
-
-
       }
     }
   }

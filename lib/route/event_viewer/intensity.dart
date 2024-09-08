@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/page/map/radar/radar.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/model/history.dart';
@@ -13,7 +12,6 @@ import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/util/map_utils.dart';
 import 'package:dpip/util/need_location.dart';
 import 'package:dpip/util/parser.dart';
-import 'package:dpip/util/radar_color.dart';
 import 'package:dpip/widget/chip/label_chip.dart';
 import 'package:dpip/widget/list/detail_field_tile.dart';
 import 'package:dpip/widget/map/legend.dart';
@@ -322,7 +320,8 @@ class _IntensityPageState extends State<IntensityPage> {
               _buildWarningDetails(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
-                child: Text(context.i18n.history_seismic_intensity_reference, style: TextStyle(color: context.colors.error)),
+                child: Text(context.i18n.history_seismic_intensity_reference,
+                    style: TextStyle(color: context.colors.error)),
               ),
               const SizedBox(height: 20),
               _buildAffectedAreas(),
