@@ -183,8 +183,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
                 title: Text("$permissionType${context.i18n.location_permission}"),
-                content: Text(
-                    context.i18n.improve_auto_location_experience(permissionType.toString())),
+                content: Text(context.i18n.improve_auto_location_experience(permissionType.toString())),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
