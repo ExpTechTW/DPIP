@@ -104,7 +104,7 @@ Future<void> androidForegroundService() async {
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(
       iOS: DarwinInitializationSettings(),
-      android: AndroidInitializationSettings("resource://drawable/ic_stat_name"),
+      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
     ),
   );
 
