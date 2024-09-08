@@ -289,7 +289,7 @@ Future<void> notifyInit() async {
             soundSource: 'resource://raw/info',
             defaultColor: Colors.red,
             ledColor: Colors.red,
-            enableVibration: true,
+            enableVibration: false,
             vibrationPattern: lowVibrationPattern),
         NotificationChannel(
             channelGroupKey: 'group_other',
@@ -302,7 +302,7 @@ Future<void> notifyInit() async {
             soundSource: 'resource://raw/info',
             defaultColor: Colors.red,
             ledColor: Colors.red,
-            enableVibration: true,
+            enableVibration: false,
             vibrationPattern: lowVibrationPattern),
       ],
       channelGroups: [
