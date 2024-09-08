@@ -16,7 +16,6 @@ import "package:dpip/model/station.dart";
 import "package:dpip/model/tsunami/tsunami.dart";
 import "package:dpip/model/weather/lightning.dart";
 import "package:dpip/model/weather/rain.dart";
-import "package:dpip/model/weather/typhoon.dart";
 import "package:dpip/model/weather/weather.dart";
 import "package:http/http.dart";
 
@@ -279,8 +278,8 @@ class ExpTech {
     return jsonData.map((item) => RainStation.fromJson(item)).toList();
   }
 
-  Future<List<String>> getTyphoonList() async {
-    final requestUrl = Route.typhoonList();
+  Future<List> getTyphoonImagesList() async {
+    final requestUrl = Route.typhoonImagesList();
 
     var res = await get(requestUrl);
 
@@ -290,7 +289,7 @@ class ExpTech {
 
     final List<dynamic> jsonData = jsonDecode(res.body);
 
-    return jsonData.map((item) => item.toString()).toList();
+    return jsonData.map((item) => item).toList();
   }
 
   Future<List<String>> getLightningList() async {
@@ -307,8 +306,8 @@ class ExpTech {
     return jsonData.map((item) => item.toString()).toList();
   }
 
-  Future<List<Typhoon>> getTyphoon(String time) async {
-    final requestUrl = Route.typhoon(time);
+  Future<Map<String, dynamic>> getTyphoonGeojson() async {
+    final requestUrl = Route.typhoonGeojson();
 
     var res = await get(requestUrl);
 
@@ -316,9 +315,9 @@ class ExpTech {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final jsonData = jsonDecode(res.body);
 
-    return jsonData.map((item) => Typhoon.fromJson(item)).toList();
+    return jsonData;
   }
 
   Future<List<Lightning>> getLightning(String time) async {
