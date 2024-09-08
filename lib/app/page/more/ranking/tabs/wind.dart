@@ -14,14 +14,14 @@ enum MergeType {
   town,
 }
 
-class RankingTemperatureTab extends StatefulWidget {
-  const RankingTemperatureTab({super.key});
+class RankingWindTab extends StatefulWidget {
+  const RankingWindTab({super.key});
 
   @override
-  State<RankingTemperatureTab> createState() => _RankingTemperatureTabState();
+  State<RankingWindTab> createState() => _RankingWindTabState();
 }
 
-class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
+class _RankingWindTabState extends State<RankingWindTab> {
   MergeType merge = MergeType.none;
   bool reversed = false;
   String time = "";
@@ -34,7 +34,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
     if (!mounted) return;
 
-    data = latestWeatherData.where((station) => station.data.air.temperature != -99).toList();
+    data = latestWeatherData.where((station) => station.data.wind.speed != -99).toList();
     time = DateFormat(context.i18n.datetime_format).format(parseDateTime(weatherList.last));
     rank();
   }
@@ -43,13 +43,17 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     final temp = (merge != MergeType.none)
         ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
             .values
-            .map((v) => v.reduce((acc, e) => ((reversed && e.data.air.temperature < acc.data.air.temperature) ||
-                    e.data.air.temperature > acc.data.air.temperature)
-                ? e
-                : acc))
+            .map((v) => v.reduce((acc, e) =>
+                ((reversed && e.data.wind.speed < acc.data.wind.speed) || e.data.wind.speed > acc.data.wind.speed)
+                    ? e
+                    : acc))
         : data;
 
-    final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
+    final sorted = temp
+        .where((e) => e.data.wind.speed > 0)
+        .sorted((a, b) => (b.data.wind.speed - a.data.wind.speed).sign.toInt())
+        .toList();
+
     setState(() {
       ranked = reversed ? sorted.reversed.toList() : sorted;
     });
@@ -104,12 +108,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                     child: Text("依"),
                   ),
                   ChoiceChip(
-                    label: Text("高溫"),
+                    label: Text("降冪"),
                     selected: !reversed,
                     onSelected: (value) => setReversed(false),
                   ),
                   ChoiceChip(
-                    label: Text("低溫"),
+                    label: Text("升冪"),
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
@@ -201,8 +205,8 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                       );
 
                 final percentage = reversed
-                    ? item.data.air.temperature / ranked.last.data.air.temperature
-                    : item.data.air.temperature / ranked.first.data.air.temperature;
+                    ? item.data.wind.speed / ranked.last.data.wind.speed
+                    : item.data.wind.speed / ranked.first.data.wind.speed;
 
                 final location = merge != MergeType.none
                     ? [
@@ -247,7 +251,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                         : Row(children: location),
                   ),
                   Text(
-                    "${item.data.air.temperature.toStringAsFixed(1)}℃",
+                    "${item.data.wind.speed.toStringAsFixed(1)} m/s",
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight: index == 0

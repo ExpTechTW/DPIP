@@ -1,5 +1,6 @@
 import 'package:dpip/app/page/more/ranking/tabs/precipitation.dart';
 import 'package:dpip/app/page/more/ranking/tabs/temperature.dart';
+import 'package:dpip/app/page/more/ranking/tabs/wind.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -12,7 +13,7 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin {
-  late final controller = TabController(length: 2, vsync: this);
+  late final controller = TabController(length: 3, vsync: this);
   final scroll = GlobalKey<NestedScrollViewState>();
   bool showFAB = false;
 
@@ -53,9 +54,11 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             title: Text(context.i18n.ranking),
             bottom: TabBar(
               controller: controller,
+              isScrollable: true,
               tabs: [
                 Tab(text: context.i18n.precipitation_monitor),
                 Tab(text: context.i18n.temperature_monitor),
+                Tab(text: context.i18n.wind_direction_and_speed_monitor),
               ],
             ),
           ),
@@ -69,6 +72,7 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             children: const [
               RankingPrecipitationTab(),
               RankingTemperatureTab(),
+              RankingWindTab(),
             ],
           ),
           Positioned(
