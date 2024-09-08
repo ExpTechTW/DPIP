@@ -1,11 +1,10 @@
 import "dart:io";
 
-import "package:dpip/api/exptech.dart";
+import "package:awesome_notifications/awesome_notifications.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/need_location.dart";
-import "package:dpip/util/speed_limit.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
@@ -52,20 +51,19 @@ class SoundListTileState extends State<SoundListTile> {
     if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     } else {
-      String token = Global.preference.getString("fcm-token") ?? "";
-      if (token != "") {
-        int limit = Global.preference.getInt("limit-sound-test") ?? 0;
-        int now = DateTime.now().millisecondsSinceEpoch;
-        if (now - limit < 10000) {
-          showLimitDialog(context);
-        } else {
-          Global.preference.setInt("limit-sound-test", now);
-          await ExpTech().sendNotifyTest(token, widget.type, userLat.toString(), userLon.toString());
-        }
-      } else {
-        context.scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(context.i18n.error_fcm_token),
+      int limit = Global.preference.getInt("limit-sound-test") ?? 0;
+      int now = DateTime.now().millisecondsSinceEpoch;
+      if (now - limit > 1000) {
+        Global.preference.setInt("limit-sound-test", now);
+        print("test");
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: 10,
+            channelKey: 'eew_alert-important',
+            title: '重大通知',
+            body: '這是一個包含重大通知的重要訊息。',
+            notificationLayout: NotificationLayout.BigText,
+            criticalAlert: true,
           ),
         );
       }
