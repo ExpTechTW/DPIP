@@ -1393,7 +1393,7 @@
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
-  "sound_weather_minor_h2": "所在地(鄉鎮)發布上述除外燈號之\n天氣警特報",
+  "sound_weather_minor_h2": "Local (City/Town/District) Severe Weather Advisory Issued Excluding Above Areas",
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
