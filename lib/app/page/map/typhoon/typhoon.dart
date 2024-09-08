@@ -74,6 +74,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       await _addUserLocationMarker();
 
+      _addTransparentLayerFromDataset();
+
       setState(() {});
     } catch (e) {
       TalkerManager.instance.error("加載颱風列表時出錯: $e");
@@ -103,6 +105,33 @@ class _TyphoonMapState extends State<TyphoonMap> {
         ),
       );
     }
+  }
+
+  void _addTransparentLayerFromDataset() {
+    List<double> lonRange = [110, 150];
+    List<double> latRange = [10, 32];
+
+    final bounds =
+        LatLngBounds(southwest: LatLng(latRange[0], lonRange[0]), northeast: LatLng(latRange[1], lonRange[1]));
+
+    _mapController.addSource(
+      "radarOverlaySource",
+      ImageSourceProperties(
+        url: "https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}",
+        coordinates: [
+          [bounds.southwest.longitude, bounds.northeast.latitude],
+          [bounds.northeast.longitude, bounds.northeast.latitude],
+          [bounds.northeast.longitude, bounds.southwest.latitude],
+          [bounds.southwest.longitude, bounds.southwest.latitude],
+        ],
+      ),
+    );
+
+    _mapController.addLayer(
+      "radarOverlaySource",
+      "radarOverlayLayer",
+      const RasterLayerProperties(rasterOpacity: 1),
+    );
   }
 
   @override
