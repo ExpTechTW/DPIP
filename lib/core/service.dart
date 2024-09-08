@@ -2,7 +2,6 @@ import "dart:async";
 import "dart:io";
 import "dart:ui";
 
-import "package:awesome_notifications/awesome_notifications.dart";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/home/home.dart";
 import "package:dpip/app/page/map/monitor/monitor.dart";
@@ -14,6 +13,7 @@ import "package:dpip/util/location_to_code.dart";
 import "package:dpip/util/log.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter_background_service/flutter_background_service.dart";
+import "package:flutter_local_notifications/flutter_local_notifications.dart";
 import "package:intl/intl.dart";
 import "package:permission_handler/permission_handler.dart";
 
@@ -92,6 +92,25 @@ void androidSendPositionlisten() {
 
 Future<void> androidForegroundService() async {
   androidServiceInit = true;
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    "my_foreground",
+    "前景自動定位",
+    description: "前景自動定位",
+    importance: Importance.low,
+  );
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      iOS: DarwinInitializationSettings(),
+      android: AndroidInitializationSettings("resource://drawable/ic_stat_name"),
+    ),
+  );
+
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
 
   await service.configure(
     androidConfiguration: AndroidConfiguration(
@@ -126,6 +145,8 @@ void onStart(ServiceInstance service) async {
 
   LocationService locationService = LocationService();
 
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   service.on("stopService").listen((event) {
     timer?.cancel();
     if (service is AndroidServiceInstance) {
@@ -138,13 +159,17 @@ void onStart(ServiceInstance service) async {
   if (service is AndroidServiceInstance) {
     await service.setAsForegroundService();
 
-    AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 0,
-        channelKey: "foreground-general",
-        title: "DPIP",
-        body: "前景服務啟動中...",
-        notificationLayout: NotificationLayout.BigText,
+    await flutterLocalNotificationsPlugin.show(
+      888,
+      "DPIP",
+      "前景服務啟動中...",
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "my_foreground",
+          "前景自動定位",
+          icon: "@mipmap/ic_launcher",
+          ongoing: true,
+        ),
       ),
     );
 
@@ -184,16 +209,23 @@ void onStart(ServiceInstance service) async {
         String notifyBody = "$date\n$lat,$lon $location";
         service.invoke("senddebug", {"notifyBody": notifyBody});
 
-        AwesomeNotifications().cancel(0);
-
-        AwesomeNotifications().createNotification(
-          content: NotificationContent(
-            id: 1,
-            channelKey: "background-general",
-            title: notifyTitle,
-            body: notifyBody,
-            notificationLayout: NotificationLayout.BigText,
+        flutterLocalNotificationsPlugin.show(
+          888,
+          notifyTitle,
+          notifyBody,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              "my_foreground",
+              "前景自動定位",
+              icon: "@mipmap/ic_launcher",
+              ongoing: true,
+            ),
           ),
+        );
+
+        service.setForegroundNotificationInfo(
+          title: notifyTitle,
+          content: notifyBody,
         );
       }
     }
