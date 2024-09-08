@@ -42,11 +42,11 @@ class _RankingWindTabState extends State<RankingWindTab> {
   rank() {
     final temp = (merge != MergeType.none)
         ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
-        .values
-        .map((v) => v.reduce((acc, e) =>
-    (reversed ? e.data.wind.speed < acc.data.wind.speed : e.data.wind.speed > acc.data.wind.speed)
-        ? e
-        : acc))
+            .values
+            .map((v) => v.reduce((acc, e) =>
+                (reversed ? e.data.wind.speed < acc.data.wind.speed : e.data.wind.speed > acc.data.wind.speed)
+                    ? e
+                    : acc))
         : data;
 
     final sorted = temp
@@ -86,13 +86,6 @@ class _RankingWindTabState extends State<RankingWindTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Text(
-              "資料時間：$time\n共 ${ranked.length} 觀測點",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
-            ),
-          ),
           SizedBox(
             height: kToolbarHeight,
             child: SingleChildScrollView(
@@ -137,6 +130,13 @@ class _RankingWindTabState extends State<RankingWindTab> {
                   ),
                 ],
               ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "資料時間：$time\n共 ${ranked.length} 觀測點",
+              style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
           Expanded(

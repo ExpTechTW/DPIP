@@ -83,13 +83,6 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Text(
-              "資料時間：$time\n共 ${ranked.length} 觀測點",
-              style: TextStyle(color: context.colors.onSurfaceVariant),
-            ),
-          ),
           SizedBox(
             height: kToolbarHeight,
             child: SingleChildScrollView(
@@ -134,6 +127,13 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                   ),
                 ],
               ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "資料時間：$time\n共 ${ranked.length} 觀測點",
+              style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
           Expanded(
