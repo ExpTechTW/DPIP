@@ -594,35 +594,35 @@
   "@update_log": {
     "description": "「我」路徑 → 更新日誌"
   },
-  "interval_3_days": "3 天",
+  "interval_3_days": "3 Days",
   "@interval_3_days": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 天"
   },
-  "interval_2_days": "2 天",
+  "interval_2_days": "2 Days",
   "@interval_2_days": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2 天"
   },
-  "interval_24_hours": "24 小時",
+  "interval_24_hours": "24 Hours",
   "@interval_24_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24 小時"
   },
-  "interval_12_hours": "12 小時",
+  "interval_12_hours": "12 Hours",
   "@interval_12_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12 小時"
   },
-  "interval_6_hours": "6 小時",
+  "interval_6_hours": "6 Hours",
   "@interval_6_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6 小時"
   },
-  "interval_3_hours": "3 小時",
+  "interval_3_hours": "3 Hours",
   "@interval_3_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 小時"
   },
-  "interval_1_hour": "1 小時",
+  "interval_1_hour": "1 Hours",
   "@interval_1_hour": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1 小時"
   },
-  "interval_10_minutes": "10 分鐘",
+  "interval_10_minutes": "10 Minutes",
   "@interval_10_minutes": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10 分鐘"
   },
