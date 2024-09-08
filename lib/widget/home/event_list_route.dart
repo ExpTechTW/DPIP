@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 
 final Map<String, Widget Function(History item)> typeConfigs = {
   'thunderstorm': (History item) => ThunderstormPage(item: item),
-  'rain': (History item) => ThunderstormPage(item: item),
+  'heavy-rain': (History item) => ThunderstormPage(item: item),
+  'extremely-heavy-rain': (History item) => ThunderstormPage(item: item),
+  'torrential-rain': (History item) => ThunderstormPage(item: item),
+  'extremely-torrential-rain': (History item) => ThunderstormPage(item: item),
   'earthquake': (History item) => ReportRoute(id: item.addition?["id"]),
   'intensity': (History item) => IntensityPage(item: item),
 };
