@@ -160,80 +160,24 @@ class _TyphoonMapState extends State<TyphoonMap> {
         circleStrokeWidth: 2,
         circleStrokeColor: '#FFFFFF',
       ),
+      filter: ['all',
+        ['!=', ['get', 'forecast', ['get', 'type', ['properties']]], true]
+      ],
     );
 
     // 添加風圈圖層（只顯示第一個 type.forecast 為 true 的點）
     await _mapController.addLayer(
       "typhoon-geojson",
       "typhoon-wind-circle",
-      CircleLayerProperties(
-        circleRadius: [
-          'get',
-          '15ms',
-          [
-            'get',
-            'circle',
-            [
-              'get',
-              'info',
-              ['properties']
-            ]
-          ]
-        ],
-        circleColor: 'rgba(255, 0, 0, 0.1)',
-        circleStrokeWidth: 1,
-        circleStrokeColor: 'rgba(255, 0, 0, 0.6)',
+      FillLayerProperties(
+        fillColor: 'rgba(255, 0, 0, 0.1)',
+        fillOutlineColor: 'rgba(255, 0, 0, 0.6)',
       ),
-      filter: [
-        'all',
-        [
-          '==',
-          ['geometry-type'],
-          'Point'
-        ],
-        [
-          '==',
-          [
-            'get',
-            'forecast',
-            [
-              'get',
-              'type',
-              ['properties']
-            ]
-          ],
-          true
-        ],
-        [
-          '==',
-          [
-            'get',
-            'tau',
-            [
-              'get',
-              'type',
-              ['properties']
-            ]
-          ],
-          0
-        ],
-        [
-          '!=',
-          [
-            'get',
-            '15ms',
-            [
-              'get',
-              'circle',
-              [
-                'get',
-                'info',
-                ['properties']
-              ]
-            ]
-          ],
-          null
-        ]
+      filter: ['all',
+        ['==', ['geometry-type'], 'Polygon'],
+        ['==', ['get', 'type', ['properties']], 'wind-circle'],
+        ['==', ['get', 'forecast', ['get', 'type', ['properties']]], true],
+        ['==', ['get', 'tau', ['get', 'type', ['properties']]], 0]
       ],
     );
   }
