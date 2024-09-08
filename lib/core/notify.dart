@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 Future<void> notifyInit() async {
   await AwesomeNotifications().initialize(
-      'resource://drawable/res_app_icon',
+      'resource://drawable/ic_stat_name',
       [
         NotificationChannel(
             channelGroupKey: 'group_eew',
