@@ -202,8 +202,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                       );
 
                 final percentage = reversed
-                    ? item.data.air.temperature / ranked.last.data.air.temperature
-                    : item.data.air.temperature / ranked.first.data.air.temperature;
+                    ? (ranked.first.data.air.temperature - item.data.air.temperature) /
+                    (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
+                    : (item.data.air.temperature - ranked.last.data.air.temperature) /
+                    (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
 
                 final location = merge != MergeType.none
                     ? [
