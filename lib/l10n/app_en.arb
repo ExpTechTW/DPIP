@@ -1429,11 +1429,11 @@
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
-  "sunny_with_haze": "晴有霾",
+  "sunny_with_haze": "Sunny With Haze",
   "@sunny_with_haze": {
     "description": "天氣狀況：晴天伴有霾"
   },
-  "sunny_with_mist": "晴有靄",
+  "sunny_with_mist": "Sunny With Mist",
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
