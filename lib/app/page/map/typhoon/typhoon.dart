@@ -5,7 +5,6 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/log.dart';
 import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/typhoon_time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -76,6 +75,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       _addTransparentLayerFromDataset();
 
+      _loadTyphoonLayers();
+
       setState(() {});
     } catch (e) {
       TalkerManager.instance.error("加載颱風列表時出錯: $e");
@@ -105,6 +106,93 @@ class _TyphoonMapState extends State<TyphoonMap> {
         ),
       );
     }
+  }
+
+  Future<void> _loadTyphoonLayers() async {
+    await _mapController.addSource(
+      "typhoon-geojson",
+      GeojsonSourceProperties(data: typhoonData),
+    );
+
+    // 添加颱風路徑線圖層
+    await _mapController.addLayer(
+      "typhoon-geojson",
+      "typhoon-path",
+      LineLayerProperties(
+        lineColor: [
+          'match',
+          ['get', 'color', ['properties']],
+          0, '#1565C0',  // 藍色
+          1, '#4CAF50',  // 綠色
+          2, '#FFC107',  // 黃色
+          3, '#FF5722',  // 橙色
+          '#757575'  // 默認灰色
+        ],
+        lineWidth: 3,
+      ),
+      filter: ['==', ['geometry-type'], 'LineString'],
+    );
+
+    // 添加颱風位置點圖層（只顯示 type.show 為 true 的點）
+    await _mapController.addLayer(
+      "typhoon-geojson",
+      "typhoon-points",
+      CircleLayerProperties(
+        circleRadius: 6,
+        circleColor: [
+          'match',
+          ['get', 'color', ['properties']],
+          0, '#1565C0',
+          1, '#4CAF50',
+          2, '#FFC107',
+          3, '#FF5722',
+          '#757575'
+        ],
+        circleStrokeWidth: 2,
+        circleStrokeColor: '#FFFFFF',
+      ),
+      filter: ['all',
+        ['==', ['geometry-type'], 'Point'],
+        ['==', ['get', 'show', ['get', 'type', ['properties']]], true]
+      ],
+    );
+
+    // 添加颱風名稱標籤圖層（只顯示 type.show 為 true 的點）
+    await _mapController.addLayer(
+      "typhoon-geojson",
+      "typhoon-labels",
+      SymbolLayerProperties(
+        textField: ['get', 'en', ['get', 'name', ['properties']]],
+        textSize: 12,
+        textOffset: [0, 1.5],
+        textAnchor: 'top',
+        textColor: '#000000',
+        textHaloColor: '#FFFFFF',
+        textHaloWidth: 1,
+      ),
+      filter: ['all',
+        ['==', ['geometry-type'], 'Point'],
+        ['==', ['get', 'show', ['get', 'type', ['properties']]], true]
+      ],
+    );
+
+    // 添加風圈圖層（只顯示第一個 type.forecast 為 true 的點）
+    await _mapController.addLayer(
+      "typhoon-geojson",
+      "typhoon-wind-circle",
+      CircleLayerProperties(
+        circleRadius: ['get', '15ms', ['get', 'circle', ['get', 'info', ['properties']]]],
+        circleColor: 'rgba(255, 0, 0, 0.1)',
+        circleStrokeWidth: 1,
+        circleStrokeColor: 'rgba(255, 0, 0, 0.6)',
+      ),
+      filter: ['all',
+        ['==', ['geometry-type'], 'Point'],
+        ['==', ['get', 'forecast', ['get', 'type', ['properties']]], true],
+        ['==', ['get', 'tau', ['get', 'type', ['properties']]], 0],
+        ['!=', ['get', '15ms', ['get', 'circle', ['get', 'info', ['properties']]]], null]
+      ],
+    );
   }
 
   void _addTransparentLayerFromDataset() {
