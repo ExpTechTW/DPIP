@@ -12,6 +12,18 @@
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		632125292C2EA17900A088F8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 632125282C2EA17900A088F8 /* GoogleService-Info.plist */; };
+		63E05C452C8D4FB800909123 /* warn.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C432C8D4FB800909123 /* warn.wav */; };
+		63E05C462C8D4FB800909123 /* update.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C422C8D4FB800909123 /* update.wav */; };
+		63E05C472C8D4FB800909123 /* info.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C3C2C8D4FB800909123 /* info.wav */; };
+		63E05C482C8D4FB800909123 /* int_report.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C3D2C8D4FB800909123 /* int_report.wav */; };
+		63E05C492C8D4FB800909123 /* eq.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C3B2C8D4FB800909123 /* eq.wav */; };
+		63E05C4A2C8D4FB800909123 /* rain.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C3F2C8D4FB800909123 /* rain.wav */; };
+		63E05C4B2C8D4FB800909123 /* eew.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C392C8D4FB800909123 /* eew.wav */; };
+		63E05C4C2C8D4FB800909123 /* eew_alert.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C3A2C8D4FB800909123 /* eew_alert.wav */; };
+		63E05C4D2C8D4FB800909123 /* normal.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C3E2C8D4FB800909123 /* normal.wav */; };
+		63E05C4E2C8D4FB800909123 /* report.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C402C8D4FB800909123 /* report.wav */; };
+		63E05C4F2C8D4FB800909123 /* tsunami.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C412C8D4FB800909123 /* tsunami.wav */; };
+		63E05C502C8D4FB800909123 /* weather.wav in Resources */ = {isa = PBXBuildFile; fileRef = 63E05C442C8D4FB800909123 /* weather.wav */; };
 		63F1FCBE2C8D48D300693F0C /* update.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 63F1FCBB2C8D48D300693F0C /* update.aiff */; };
 		63F1FCBF2C8D48D300693F0C /* rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 63F1FCB82C8D48D300693F0C /* rain.aiff */; };
 		63F1FCC02C8D48D300693F0C /* eew.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 63F1FCB22C8D48D300693F0C /* eew.aiff */; };
@@ -77,6 +89,18 @@
 		52E010A42C7C5DDC00C87792 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		632125282C2EA17900A088F8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6321252A2C2EA20700A088F8 /* RunnerProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerProfile.entitlements; sourceTree = "<group>"; };
+		63E05C392C8D4FB800909123 /* eew.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eew.wav; sourceTree = "<group>"; };
+		63E05C3A2C8D4FB800909123 /* eew_alert.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eew_alert.wav; sourceTree = "<group>"; };
+		63E05C3B2C8D4FB800909123 /* eq.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = eq.wav; sourceTree = "<group>"; };
+		63E05C3C2C8D4FB800909123 /* info.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = info.wav; sourceTree = "<group>"; };
+		63E05C3D2C8D4FB800909123 /* int_report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = int_report.wav; sourceTree = "<group>"; };
+		63E05C3E2C8D4FB800909123 /* normal.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = normal.wav; sourceTree = "<group>"; };
+		63E05C3F2C8D4FB800909123 /* rain.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = rain.wav; sourceTree = "<group>"; };
+		63E05C402C8D4FB800909123 /* report.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = report.wav; sourceTree = "<group>"; };
+		63E05C412C8D4FB800909123 /* tsunami.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tsunami.wav; sourceTree = "<group>"; };
+		63E05C422C8D4FB800909123 /* update.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = update.wav; sourceTree = "<group>"; };
+		63E05C432C8D4FB800909123 /* warn.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = warn.wav; sourceTree = "<group>"; };
+		63E05C442C8D4FB800909123 /* weather.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = weather.wav; sourceTree = "<group>"; };
 		63F1FCB22C8D48D300693F0C /* eew.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = eew.aiff; sourceTree = "<group>"; };
 		63F1FCB32C8D48D300693F0C /* eew_alert.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = eew_alert.aiff; sourceTree = "<group>"; };
 		63F1FCB42C8D48D300693F0C /* eq.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = eq.aiff; sourceTree = "<group>"; };
@@ -190,6 +214,18 @@
 				63F1FCB52C8D48D300693F0C /* info.aiff */,
 				63F1FCB62C8D48D300693F0C /* int_report.aiff */,
 				63F1FCB72C8D48D300693F0C /* normal.aiff */,
+				63E05C392C8D4FB800909123 /* eew.wav */,
+				63E05C3A2C8D4FB800909123 /* eew_alert.wav */,
+				63E05C3B2C8D4FB800909123 /* eq.wav */,
+				63E05C3C2C8D4FB800909123 /* info.wav */,
+				63E05C3D2C8D4FB800909123 /* int_report.wav */,
+				63E05C3E2C8D4FB800909123 /* normal.wav */,
+				63E05C3F2C8D4FB800909123 /* rain.wav */,
+				63E05C402C8D4FB800909123 /* report.wav */,
+				63E05C412C8D4FB800909123 /* tsunami.wav */,
+				63E05C422C8D4FB800909123 /* update.wav */,
+				63E05C432C8D4FB800909123 /* warn.wav */,
+				63E05C442C8D4FB800909123 /* weather.wav */,
 				63F1FCB82C8D48D300693F0C /* rain.aiff */,
 				63F1FCB92C8D48D300693F0C /* report.aiff */,
 				63F1FCBA2C8D48D300693F0C /* tsunami.aiff */,
@@ -324,6 +360,18 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				63F1FCBE2C8D48D300693F0C /* update.aiff in Resources */,
 				63F1FCBF2C8D48D300693F0C /* rain.aiff in Resources */,
+				63E05C452C8D4FB800909123 /* warn.wav in Resources */,
+				63E05C462C8D4FB800909123 /* update.wav in Resources */,
+				63E05C472C8D4FB800909123 /* info.wav in Resources */,
+				63E05C482C8D4FB800909123 /* int_report.wav in Resources */,
+				63E05C492C8D4FB800909123 /* eq.wav in Resources */,
+				63E05C4A2C8D4FB800909123 /* rain.wav in Resources */,
+				63E05C4B2C8D4FB800909123 /* eew.wav in Resources */,
+				63E05C4C2C8D4FB800909123 /* eew_alert.wav in Resources */,
+				63E05C4D2C8D4FB800909123 /* normal.wav in Resources */,
+				63E05C4E2C8D4FB800909123 /* report.wav in Resources */,
+				63E05C4F2C8D4FB800909123 /* tsunami.wav in Resources */,
+				63E05C502C8D4FB800909123 /* weather.wav in Resources */,
 				63F1FCC02C8D48D300693F0C /* eew.aiff in Resources */,
 				63F1FCC12C8D48D300693F0C /* int_report.aiff in Resources */,
 				63F1FCC22C8D48D300693F0C /* info.aiff in Resources */,
