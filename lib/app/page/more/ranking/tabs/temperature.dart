@@ -42,11 +42,12 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
   rank() {
     final temp = (merge != MergeType.none)
         ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
-            .values
-            .map((v) => v.reduce((acc, e) => ((reversed && e.data.air.temperature < acc.data.air.temperature) ||
-                    e.data.air.temperature > acc.data.air.temperature)
-                ? e
-                : acc))
+        .values
+        .map((v) => v.reduce((acc, e) =>
+    (reversed ? e.data.air.temperature < acc.data.air.temperature
+        : e.data.air.temperature > acc.data.air.temperature)
+        ? e
+        : acc))
         : data;
 
     final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
