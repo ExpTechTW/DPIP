@@ -1,4 +1,6 @@
 import 'package:collection/collection.dart';
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/model/weather/rain.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/intervals.dart';
@@ -6,8 +8,6 @@ import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/weather/rain.dart';
 
 class RankingPrecipitationTab extends StatefulWidget {
   const RankingPrecipitationTab({super.key});

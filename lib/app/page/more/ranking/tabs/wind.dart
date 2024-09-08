@@ -1,12 +1,12 @@
 import 'package:collection/collection.dart';
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/model/weather/weather.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/weather/weather.dart';
 
 enum MergeType {
   none,
@@ -42,11 +42,11 @@ class _RankingWindTabState extends State<RankingWindTab> {
   rank() {
     final temp = (merge != MergeType.none)
         ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
-            .values
-            .map((v) => v.reduce((acc, e) =>
-                ((reversed && e.data.wind.speed < acc.data.wind.speed) || e.data.wind.speed > acc.data.wind.speed)
-                    ? e
-                    : acc))
+        .values
+        .map((v) => v.reduce((acc, e) =>
+    (reversed ? e.data.wind.speed < acc.data.wind.speed : e.data.wind.speed > acc.data.wind.speed)
+        ? e
+        : acc))
         : data;
 
     final sorted = temp
@@ -204,9 +204,9 @@ class _RankingWindTabState extends State<RankingWindTab> {
                         style: TextStyle(color: foregroundColor, fontSize: fontSize),
                       );
 
-                final percentage = reversed
-                    ? item.data.wind.speed / ranked.last.data.wind.speed
-                    : item.data.wind.speed / ranked.first.data.wind.speed;
+                final minWind = reversed ? ranked.first.data.wind.speed : ranked.last.data.wind.speed;
+                final maxWind = reversed ? ranked.last.data.wind.speed : ranked.first.data.wind.speed;
+                final percentage = (item.data.wind.speed - minWind) / (maxWind - minWind);
 
                 final location = merge != MergeType.none
                     ? [
