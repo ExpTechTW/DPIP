@@ -112,10 +112,7 @@ class DpipMapState extends State<DpipMap> {
           "type": "line",
           "source": "map",
           "source-layer": "tsunami",
-          "paint": {
-            "line-opacity": 0,
-            "line-width": 10,
-          },
+          "paint": {"line-opacity": 0, "line-width": 3, "line-join": "round"},
         },
       ],
     },

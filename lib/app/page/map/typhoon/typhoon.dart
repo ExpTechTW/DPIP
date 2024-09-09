@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/model/weather/typhoon.dart';
 import 'package:dpip/util/log.dart';
 import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/widget/list/typhoon_time_selector.dart';
 import 'package:dpip/widget/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -20,7 +18,8 @@ class TyphoonMap extends StatefulWidget {
 
 class _TyphoonMapState extends State<TyphoonMap> {
   late MapLibreMapController _mapController;
-  List<Typhoon>? typhoonData;
+  List typhoonImagesList = [];
+  Map<String, dynamic> typhoonData = {};
   List<String> typhoonList = [];
   int selectedTyphoonId = -1;
   List<String> sourceList = [];
@@ -38,12 +37,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
   void _loadMap() async {
     try {
-      typhoonList = await ExpTech().getTyphoonList();
-      if (typhoonList.isNotEmpty) {
-        selectedTimestamp = typhoonList.last;
-        await _loadTyphoonData(selectedTimestamp);
-      }
-      selectedTimestamp = typhoonList.last;
+      typhoonImagesList = await ExpTech().getTyphoonImagesList();
+      typhoonData = await ExpTech().getTyphoonGeojson();
 
       if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
         await getSavedLocation();
@@ -78,6 +73,10 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       await _addUserLocationMarker();
 
+      _addTransparentLayerFromDataset();
+
+      _loadTyphoonLayers();
+
       setState(() {});
     } catch (e) {
       TalkerManager.instance.error("加載颱風列表時出錯: $e");
@@ -109,186 +108,105 @@ class _TyphoonMapState extends State<TyphoonMap> {
     }
   }
 
-  Future<void> _loadTyphoonData(String time) async {
-    try {
-      typhoonData = await ExpTech().getTyphoon(time);
-      if (typhoonData != null && typhoonData!.isNotEmpty) {
-        typhoon_name_list = [];
-        typhoon_id_list = [];
-        await _drawTyphoonPaths(typhoonData!);
-      }
-    } catch (e) {
-      TalkerManager.instance.error("加載颱風數據時出錯: $e");
-    }
-  }
-
-  void _onSelectionChanged(String timestamp, int typhoonId) async {
-    selectedTimestamp = timestamp;
-    await _loadTyphoonData(selectedTimestamp);
-    if (selectedTyphoonId != typhoonId) {
-      selectedTyphoonId = typhoonId;
-      _zoomToSelectedTyphoon();
-    }
-    setState(() {});
-  }
-
-  Future<void> _zoomToSelectedTyphoon() async {
-    if (typhoonData != null && selectedTyphoonId != -1) {
-      Typhoon? selectedTyphoon = typhoonData!.firstWhere((t) => t.no.td == selectedTyphoonId);
-      if (selectedTyphoon.analysis.isNotEmpty) {
-        LatLng center = LatLng(
-          selectedTyphoon.analysis.last.lat,
-          selectedTyphoon.analysis.last.lng,
-        );
-        double zoomLevel = 5;
-        await _mapController.animateCamera(
-          CameraUpdate.newLatLngZoom(center, zoomLevel),
-          duration: const Duration(milliseconds: 1000),
-        );
-      }
-    }
-  }
-
-  Future<void> _drawTyphoonPaths(List<Typhoon> typhoons) async {
-    for (String layerId in layerList) {
-      await _mapController.removeLayer(layerId);
-    }
-    for (String sourceId in sourceList) {
-      await _mapController.removeSource(sourceId);
-    }
-    layerList.clear();
-    sourceList.clear();
-
-    for (int i = 0; i < typhoons.length; i++) {
-      Typhoon typhoon = typhoons[i];
-      String name = (typhoon.name.zh == "") ? "TD${typhoon.no.td}" : typhoon.name.zh;
-      if (selectedTyphoonId == -1) {
-        selectedTyphoonId = typhoon.no.td;
-        _zoomToSelectedTyphoon();
-      }
-      typhoon_name_list.add(name);
-      typhoon_id_list.add(typhoon.no.td);
-      await _drawTyphoonPath(typhoon, i);
-      await _draw15WindCircle(typhoon, i);
-      await _drawForecastCircles(typhoon, i);
-    }
-  }
-
-  Future<void> _drawTyphoonPath(Typhoon typhoon, int i) async {
-    String sourceId = "typhoon-path-$i";
-    String layerId = "typhoon-path-line-$i";
-    String sourceId_forecast = "typhoon-path-$i-forecast";
-    String layerId_forecast = "typhoon-path-line-$i-forecast";
-
-    List<List<double>> coordinates = typhoon.analysis.map((a) => [a.lng, a.lat]).toList();
-    List<List<double>> coordinates_forecast = typhoon.forecast.map((f) => [f.lng, f.lat]).toList();
-
-    coordinates_forecast.insert(0, coordinates.last);
-
+  Future<void> _loadTyphoonLayers() async {
     await _mapController.addSource(
-      sourceId,
-      GeojsonSourceProperties(
-        data: {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "LineString",
-                "coordinates": coordinates,
-              }
-            }
-          ]
-        },
-      ),
+      "typhoon-geojson",
+      GeojsonSourceProperties(data: typhoonData),
     );
-    await _mapController.addLineLayer(
-      sourceId,
-      layerId,
-      const LineLayerProperties(
-        lineColor: "#62abc7",
-        lineWidth: 3,
-      ),
-    );
-
-    await _mapController.addSource(
-      sourceId_forecast,
-      GeojsonSourceProperties(
-        data: {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "LineString",
-                "coordinates": coordinates_forecast,
-              }
-            }
-          ]
-        },
-      ),
-    );
-    await _mapController.addLineLayer(
-      sourceId_forecast,
-      layerId_forecast,
-      const LineLayerProperties(
-        lineColor: "#000000",
-        lineWidth: 3,
-      ),
-    );
-
-    layerList.addAll([layerId, layerId_forecast]);
-    sourceList.addAll([sourceId, sourceId_forecast]);
-  }
-
-  Future<void> _draw15WindCircle(Typhoon typhoon, int i) async {
-    String sourceId_15 = "typhoon-15-geojson-$i";
-    String layerId_15 = "typhoon-15-circle-$i";
-    String layerId_15_outline = "typhoon-15-circle-outline-$i";
-
-    await _mapController.addGeoJsonSource(sourceId_15, {
-      "type": "FeatureCollection",
-      "features": [
-        circle(LatLng(typhoon.analysis.last.lat, typhoon.analysis.last.lng),
-            typhoon.analysis.last.circle["15"]?.toDouble() ?? 0.0,
-            steps: 256)
-      ]
-    });
 
     await _mapController.addLayer(
-        sourceId_15, layerId_15, const FillLayerProperties(fillColor: "#fbd745", fillOpacity: 0.6));
+      "typhoon-geojson",
+      "typhoon-path",
+      const LineLayerProperties(
+        lineColor: [
+          'match',
+          [
+            'get',
+            'color',
+            ['properties']
+          ],
+          0, '#1565C0', // 藍色
+          1, '#4CAF50', // 綠色
+          2, '#FFC107', // 黃色
+          3, '#FF5722', // 橙色
+          '#757575' // 默認灰色
+        ],
+        lineWidth: 2,
+      ),
+    );
 
     await _mapController.addLayer(
-        sourceId_15, layerId_15_outline, const LineLayerProperties(lineColor: "#d4af37", lineWidth: 2));
+      "typhoon-geojson",
+      "typhoon-points",
+      const CircleLayerProperties(
+        circleRadius: 3,
+        circleColor: [
+          'match',
+          [
+            'get',
+            'color',
+            ['properties']
+          ],
+          0,
+          '#1565C0',
+          1,
+          '#4CAF50',
+          2,
+          '#FFC107',
+          3,
+          '#FF5722',
+          '#757575'
+        ],
+        circleStrokeWidth: 2,
+        circleStrokeColor: '#FFFFFF',
+      ),
+      filter: ['all',
+        ['!=', ['get', 'forecast', ['get', 'type', ['properties']]], true]
+      ],
+    );
 
-    sourceList.add(sourceId_15);
-    layerList.addAll([layerId_15, layerId_15_outline]);
+    // 添加風圈圖層（只顯示第一個 type.forecast 為 true 的點）
+    await _mapController.addLayer(
+      "typhoon-geojson",
+      "typhoon-wind-circle",
+      FillLayerProperties(
+        fillColor: 'rgba(255, 0, 0, 0.1)',
+        fillOutlineColor: 'rgba(255, 0, 0, 0.6)',
+      ),
+      filter: ['all',
+        ['==', ['geometry-type'], 'Polygon'],
+        ['==', ['get', 'type', ['properties']], 'wind-circle'],
+        ['==', ['get', 'forecast', ['get', 'type', ['properties']]], true],
+        ['==', ['get', 'tau', ['get', 'type', ['properties']]], 0]
+      ],
+    );
   }
 
-  Future<void> _drawForecastCircles(Typhoon typhoon, int i) async {
-    int I = 0;
-    for (var forecast in typhoon.forecast) {
-      String sourceId_radius_forecast = "typhoon-15-geojson-$i-$I";
-      String layerId_radius_forecast = "typhoon-15-circle-$i-$I";
-      String layerId_radius_forecast_outline = "typhoon-15-circle-outline-$i-$I";
+  void _addTransparentLayerFromDataset() {
+    List<double> lonRange = [110, 150];
+    List<double> latRange = [10, 32];
 
-      await _mapController.addGeoJsonSource(sourceId_radius_forecast, {
-        "type": "FeatureCollection",
-        "features": [circle(LatLng(forecast.lat, forecast.lng), forecast.radius.toDouble(), steps: 256)]
-      });
+    final bounds =
+        LatLngBounds(southwest: LatLng(latRange[0], lonRange[0]), northeast: LatLng(latRange[1], lonRange[1]));
 
-      await _mapController.addLayer(sourceId_radius_forecast, layerId_radius_forecast,
-          const FillLayerProperties(fillColor: "#83bca0", fillOpacity: 0.6));
+    _mapController.addSource(
+      "radarOverlaySource",
+      ImageSourceProperties(
+        url: "https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}",
+        coordinates: [
+          [bounds.southwest.longitude, bounds.northeast.latitude],
+          [bounds.northeast.longitude, bounds.northeast.latitude],
+          [bounds.northeast.longitude, bounds.southwest.latitude],
+          [bounds.southwest.longitude, bounds.southwest.latitude],
+        ],
+      ),
+    );
 
-      await _mapController.addLayer(sourceId_radius_forecast, layerId_radius_forecast_outline,
-          const LineLayerProperties(lineColor: "#2e8b57", lineWidth: 2));
-
-      sourceList.add(sourceId_radius_forecast);
-      layerList.addAll([layerId_radius_forecast, layerId_radius_forecast_outline]);
-      I++;
-    }
+    _mapController.addLayer(
+      "radarOverlaySource",
+      "radarOverlayLayer",
+      const RasterLayerProperties(rasterOpacity: 1),
+    );
   }
 
   @override
@@ -306,20 +224,6 @@ class _TyphoonMapState extends State<TyphoonMap> {
           onStyleLoadedCallback: _loadMap,
           minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
         ),
-        if (typhoonList.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: TyphoonTimeSelector(
-              onSelectionChanged: _onSelectionChanged,
-              onTimeExpanded: () {},
-              timeList: typhoonList,
-              typhoonList: typhoon_name_list,
-              typhoonIdList: typhoon_id_list,
-              selectedTyphoonId: selectedTyphoonId,
-            ),
-          ),
       ],
     );
   }

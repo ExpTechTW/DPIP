@@ -5,6 +5,10 @@
   "@datetime_format": {
     "description": "日期時間顯示格式"
   },
+  "full_date_format": "EEEE, MM/dd/yyyy",
+  "@full_date_format": {
+    "description": "完整日期顯示格式"
+  },
   "date_format": "MM/dd/yyyy",
   "@date_format": {
     "description": "日期顯示格式"
@@ -19,11 +23,11 @@
   },
   "monitor": "Monitor",
   "@monitor": {
-    "description": "「地圖」路徑 → 強震監視器、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 強震監視器"
+    "description": "「地圖」路徑 → 強震監視器、「設定」路徑 → 「通知測試」內容 →「地震資訊」標題 → 強震監視器"
   },
   "report": "Reports",
   "@report": {
-    "description": "「更多」路徑 → 地震報告、「設定」路徑 → 「音效測試」內容 →「地震資訊」標題 → 地震報告"
+    "description": "「更多」路徑 → 地震報告、「設定」路徑 → 「通知測試」內容 →「地震資訊」標題 → 地震報告"
   },
   "map": "Map",
   "@map": {
@@ -43,7 +47,7 @@
   },
   "donate": "Donate",
   "@donate": {
-    "description": "「我」頁面 → 應用程式資訊 → 「贊助我們」按鈕"
+    "description": "「我」頁面 → 「贊助我們」按鈕"
   },
   "threads": "Follow us on Threads",
   "@threads": {
@@ -246,7 +250,7 @@
   },
   "settings_location": "Location",
   "@settings_location": {
-    "description": "「設定」路徑 → 「所在地」副標題"
+    "description": "「設定」路徑 → 「所在地」副標題、「歷史」標題頁面 → 降水量"
   },
   "settings_location_description": "Adjust your location to receive real-time weather information, estimated earthquake intensity, and estimated arrival time of seismic waves.",
   "@settings_location_description": {
@@ -296,11 +300,14 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "Version {version}\nMade by ExpTech\nPartial data source CWA",
+  "me_version": "Version {version}\nBuild {buildNumber}\nMade by ExpTech Studio\nPartial Data Source: CWA",
   "@me_version": {
-    "description": "「我」頁面標題 → 版本 {version}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+    "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
       "version": {
+        "type": "String"
+      },
+      "buildNumber": {
         "type": "String"
       }
     }
@@ -309,149 +316,61 @@
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "sound_test": "Sound test",
-  "@sound_test": {
-    "description": "「我」路徑 → 「音效」標題 → 音效測試"
+  "notify_test": "Notification Test",
+  "@notify_test": {
+    "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
-  "sound_test_description": "Testing notification sound for real-time weather information, Earthquake Early Warnings, etc.",
-  "@sound_test_description": {
-    "description": "「我」路徑 → 「音效測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效"
+  "notify_test_description": "Test the notification and sound of weather and earthquake alerts",
+  "@notify_test_description": {
+    "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_sound": "Earthquake Early Warning (Alert)",
-  "@eew_alert_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 緊急地震速報"
-  },
-  "eew_alert_description_sound": "Maximum intensity greater than 5 upper and local intensity greater than 4",
+  "eew_alert_description_sound": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 4.",
   "@eew_alert_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 最大震度 5弱 以上\n且所在地預估震度 4 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_sound": "Earthquake Early Warning",
-  "@eew_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」標題 → 地震速報"
-  },
-  "eew_description_sound": "Maximum intensity greater than 2",
+  "eew_description_sound": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 2.",
   "@eew_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震速報音效」副標題敘述 → 地震速報 所在地預估震度 2 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
-  "int_report_sound": "Intensity report",
-  "@int_report_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」標題 → 震度速報"
-  },
-  "int_report_description_sound": "TREM seismic network detected shaking greater than 3 at your location.",
-  "@int_report_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 所在地實測震度 3 以上"
-  },
-  "eq_description_sound": "TREM seismic network detected shaking.",
+  "eq_description_sound": "Shaking detected",
   "@eq_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → TREM 觀測網 偵測到晃動"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 偵測到晃動"
   },
-  "report_description_sound": "Earthquake report: intensity at your location greater than 3",
+  "report_description_sound": "Local (Municipality/County) measured intensity is greater than 3.",
   "@report_description_sound": {
-    "description": "「我」路徑 → 「音效測試」內容 →「地震資訊」副標題敘述 → 地震報告 所在地震度 3 以上"
+    "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 所在地(縣市)實測震度 3 以上"
   },
-  "eew_sound_title": "Earthquake Early Warning notification",
+  "eew_sound_title": "Earthquake Prediction Warning notification",
   "@eew_sound_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 地震速報音效"
+    "description": "「我」路徑 → 「通知測試」內容 → 地震速報音效"
   },
   "eew_info_sound_title": "Earthquake Information",
   "@eew_info_sound_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 地震資訊"
-  },
-  "dp_info_sound_title": "Disaster Prevention Information",
-  "@dp_info_sound_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 災防資訊"
+    "description": "「我」路徑 → 「通知測試」內容 → 地震資訊"
   },
   "other_title": "Other",
   "@other_title": {
-    "description": "「我」路徑 → 「音效測試」內容 → 其他、「設定」路徑 → 其他"
+    "description": "「我」路徑 → 「通知測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "thunderstorm_instant_messaging_sound": "Immediate Thunderstorm Alerts",
-  "@thunderstorm_instant_messaging_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雷雨即時訊息"
-  },
-  "thunderstorm_instant_messaging_description_sound": "Immediate Thunderstorm Alerts issued at your location",
-  "@thunderstorm_instant_messaging_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雷雨即時訊息"
-  },
-  "heavy_rain_alert_sound": "Heavy Rain Advisory",
-  "@heavy_rain_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 大雨特報"
-  },
-  "heavy_rain_alert_description_sound": "Heavy Rain Advisory issued at your location",
-  "@heavy_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 大雨特報"
-  },
-  "torrential_rain_alert_sound": "Extremely Heavy Rain Advisory",
-  "@torrential_rain_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 豪雨特報"
-  },
-  "torrential_rain_alert_description_sound": "Extremely Heavy Rain Advisory issued at your location",
-  "@torrential_rain_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 豪雨特報"
-  },
-  "flooding_alert_sound": "Flood Alert",
-  "@flooding_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 淹水警戒"
-  },
-  "flooding_alert_description_sound": "Flood Alert issued at your location",
-  "@flooding_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 淹水警戒"
-  },
-  "tsunami_alert_sound": "Tsunami Warning (Notice)",
+  "tsunami_alert_sound": "Tsunami Warning (Alert)",
   "@tsunami_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（注意）"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert_description_sound": "Tsunami Warning (Notice): estimated height below 1 meter.",
+  "tsunami_alert_description_sound": "Tsunami Warning Issued\nCoastal Areas",
   "@tsunami_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（注意）\n預估浪高 1 公尺以下"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
-  "tsunami_alert2_sound": "Tsunami Warning (Alert)",
+  "tsunami_alert2_sound": "Tsunami Warning (Notice)",
   "@tsunami_alert2_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 海嘯警報（警報）"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert2_description_sound": "Tsunami warning (warning) issued in the location\nThe wave height is estimated to be over 1 meter",
+  "tsunami_alert2_description_sound": "Tsunami Warning Issued\nExcluding Above Areas",
   "@tsunami_alert2_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 海嘯警報（警報）\n預估浪高 1 公尺以上"
+    "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "volcano_info_sound": "Volcano Information",
-  "@volcano_info_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 火山資訊"
-  },
-  "volcano_info_description_sound": "Volcano Information issued at your location",
-  "@volcano_info_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 火山資訊"
-  },
-  "high_temperature_info_sound": "Heat Information",
-  "@high_temperature_info_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 高溫資訊"
-  },
-  "high_temperature_info_description_sound": "Heat Information issued at your location",
-  "@high_temperature_info_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 高溫資訊"
-  },
-  "strong_wind_warning_sound": "Land Strong Wind Advisory",
-  "@strong_wind_warning_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 陸上強風特報"
-  },
-  "strong_wind_warning_description_sound": "Land Strong Wind Advisory issued at your location",
-  "@strong_wind_warning_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 陸上強風特報"
-  },
-  "other_alert_sound": "Other Advisory",
-  "@other_alert_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 其他類型警報"
-  },
-  "other_alert_description_sound": "Other Advisory issued at your location",
-  "@other_alert_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 所在地發布 其他類型警報"
-  },
-  "server_announcement_sound": "Server Announcement",
-  "@server_announcement_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → 伺服器公告"
-  },
-  "server_announcement_description_sound": "Announcement by ExpTech",
+  "server_announcement_description_sound": "Tsunami Warning (Notice)",
   "@server_announcement_description_sound": {
-    "description": "「設定」路徑 → 「音效測試」內容 →「災防資訊」標題 → ExpTech 發布之公告"
+    "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
   "monitor_list": "Maps",
   "@monitor_list": {
@@ -525,10 +444,6 @@
   "@no_historical_events": {
     "description": "「歷史」路徑 → 沒有歷史事件資訊"
   },
-  "hourly_forecast": "Hourly forecast",
-  "@hourly_forecast": {
-    "description": "「首頁」路徑 → 「每小時預報」標題"
-  },
   "current_events": "Current event information",
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
@@ -554,7 +469,7 @@
   "@out_of_service": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外"
   },
-  "out_of_service_only_taiwan": "Outside the service area, only available throughout Taiwan",
+  "out_of_service_only_taiwan": "Outside the service area, only available in Taiwan",
   "@out_of_service_only_taiwan": {
     "description": "「設定」路徑 → 「所在地」設定 → 服務區域外，僅在臺灣各地可用"
   },
@@ -578,205 +493,21 @@
   "@sunny": {
     "description": "天氣狀況：晴"
   },
-  "partly_cloudy": "Partly Cloudy",
-  "@partly_cloudy": {
-    "description": "天氣狀況：局部多雲"
-  },
-  "cloudy": "Cloudy",
-  "@cloudy": {
-    "description": "天氣狀況：多雲"
-  },
-  "overcast": "Negative",
+  "overcast": "Overcast",
   "@overcast": {
     "description": "天氣狀況：陰"
-  },
-  "foggy": "mist",
-  "@foggy": {
-    "description": "天氣狀況：薄霧"
-  },
-  "patchy_rain_possible": "There may be local light rain",
-  "@patchy_rain_possible": {
-    "description": "天氣狀況：可能有局部小雨"
-  },
-  "patchy_snow_possible": "Possible local light snow",
-  "@patchy_snow_possible": {
-    "description": "天氣狀況：可能有局部小雪"
-  },
-  "patchy_sleet_possible": "Possible localized light rain and sleet",
-  "@patchy_sleet_possible": {
-    "description": "天氣狀況：可能有局部小雨夾雪"
-  },
-  "patchy_freezing_drizzle_possible": "There may be local light freezing fog and rain",
-  "@patchy_freezing_drizzle_possible": {
-    "description": "天氣狀況：可能有局部小凍霧雨"
-  },
-  "thundery_outbreaks_possible": "There may be a thunderstorm",
-  "@thundery_outbreaks_possible": {
-    "description": "天氣狀況：可能有雷雨"
-  },
-  "blowing_snow": "blizzard",
-  "@blowing_snow": {
-    "description": "天氣狀況：飛雪"
-  },
-  "blizzard": "Blizzard",
-  "@blizzard": {
-    "description": "天氣狀況：暴風雪"
-  },
-  "fog": "Fog",
-  "@fog": {
-    "description": "天氣狀況：霧"
-  },
-  "freezing_fog": "Freezing Fog",
-  "@freezing_fog": {
-    "description": "天氣狀況：凍霧"
-  },
-  "patchy_light_drizzle": "Partly drizzle",
-  "@patchy_light_drizzle": {
-    "description": "天氣狀況：局部細雨"
-  },
-  "light_drizzle": "Light Drizzle",
-  "@light_drizzle": {
-    "description": "天氣狀況：細雨"
-  },
-  "freezing_drizzle": "凍霧雨",
-  "@freezing_drizzle": {
-    "description": "天氣狀況：凍霧雨"
-  },
-  "heavy_freezing_drizzle": "大凍霧雨",
-  "@heavy_freezing_drizzle": {
-    "description": "天氣狀況：大凍霧雨"
-  },
-  "patchy_light_rain": "局部小雨",
-  "@patchy_light_rain": {
-    "description": "天氣狀況：局部小雨"
-  },
-  "light_rain": "Light Rain",
-  "@light_rain": {
-    "description": "天氣狀況：小雨"
-  },
-  "moderate_rain_at_times": "偶爾有雨",
-  "@moderate_rain_at_times": {
-    "description": "天氣狀況：偶爾有雨"
-  },
-  "moderate_rain": "Moderate Rain",
-  "@moderate_rain": {
-    "description": "天氣狀況：雨"
-  },
-  "heavy_rain_at_times": "偶爾有大雨",
-  "@heavy_rain_at_times": {
-    "description": "天氣狀況：偶爾有大雨"
-  },
-  "heavy_rain": "Heavy Rain",
-  "@heavy_rain": {
-    "description": "天氣狀況：大雨"
-  },
-  "light_freezing_rain": "微凍雨",
-  "@light_freezing_rain": {
-    "description": "天氣狀況：微凍雨"
-  },
-  "moderate_or_heavy_freezing_rain": "中度或大凍雨",
-  "@moderate_or_heavy_freezing_rain": {
-    "description": "天氣狀況：中度或大凍雨"
-  },
-  "light_sleet": "微雨夾雪",
-  "@light_sleet": {
-    "description": "天氣狀況：微雨夾雪"
-  },
-  "moderate_or_heavy_sleet": "中度或大雨夾雪",
-  "@moderate_or_heavy_sleet": {
-    "description": "天氣狀況：中度或大雨夾雪"
-  },
-  "patchy_light_snow": "局部小雪",
-  "@patchy_light_snow": {
-    "description": "天氣狀況：零星小雪"
-  },
-  "light_snow": "小雪",
-  "@light_snow": {
-    "description": "天氣狀況：小雪"
-  },
-  "patchy_moderate_snow": "局部降雪",
-  "@patchy_moderate_snow": {
-    "description": "天氣狀況：局部降雪"
-  },
-  "moderate_snow": "Moderate Snow",
-  "@moderate_snow": {
-    "description": "天氣狀況：雪"
-  },
-  "patchy_heavy_snow": "Patchy Heavy Snow",
-  "@patchy_heavy_snow": {
-    "description": "天氣狀況：局部大雪"
-  },
-  "heavy_snow": "Heavy Snow",
-  "@heavy_snow": {
-    "description": "天氣狀況：大雪"
-  },
-  "ice_pellets": "冰丸",
-  "@ice_pellets": {
-    "description": "天氣狀況：冰丸"
-  },
-  "light_rain_shower": "小陣雨",
-  "@light_rain_shower": {
-    "description": "天氣狀況：小陣雨"
-  },
-  "moderate_or_heavy_rain_shower": "中度或大陣雨",
-  "@moderate_or_heavy_rain_shower": {
-    "description": "天氣狀況：中度或大陣雨"
-  },
-  "torrential_rain_shower": "暴雨",
-  "@torrential_rain_shower": {
-    "description": "天氣狀況：暴雨"
-  },
-  "light_sleet_showers": "小冰雹雨",
-  "@light_sleet_showers": {
-    "description": "天氣狀況：小冰雹雨"
-  },
-  "moderate_or_heavy_sleet_showers": "中度或大冰雹雨",
-  "@moderate_or_heavy_sleet_showers": {
-    "description": "天氣狀況：中度或大冰雹雨"
-  },
-  "light_snow_showers": "小陣雪",
-  "@light_snow_showers": {
-    "description": "天氣狀況：小陣雪"
-  },
-  "moderate_or_heavy_snow_showers": "中度或大陣雪",
-  "@moderate_or_heavy_snow_showers": {
-    "description": "天氣狀況：中度或大陣雪"
-  },
-  "light_showers_of_ice_pellets": "冰丸小雨",
-  "@light_showers_of_ice_pellets": {
-    "description": "天氣狀況：冰丸小雨"
-  },
-  "moderate_or_heavy_showers_of_ice_pellets": "中度或大冰丸",
-  "@moderate_or_heavy_showers_of_ice_pellets": {
-    "description": "天氣狀況：中度或大冰丸"
-  },
-  "patchy_light_rain_with_thunder": "局部小雷雨",
-  "@patchy_light_rain_with_thunder": {
-    "description": "天氣狀況：局部小雷雨"
-  },
-  "moderate_or_heavy_rain_with_thunder": "中度或大雷雨",
-  "@moderate_or_heavy_rain_with_thunder": {
-    "description": "天氣狀況：中度或大雷雨"
-  },
-  "patchy_light_snow_with_thunder": "局部小雪伴雷",
-  "@patchy_light_snow_with_thunder": {
-    "description": "天氣狀況：局部小雪伴雷"
-  },
-  "moderate_or_heavy_snow_with_thunder": "中度或大雪伴雷",
-  "@moderate_or_heavy_snow_with_thunder": {
-    "description": "天氣狀況：中度或大雪伴雷"
   },
   "more": "More",
   "@more": {
     "description": "「更多」頁面標題"
   },
-  "more_features": "更多功能列表",
+  "more_features": "More features",
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_generally": "General",
-  "@me_generally": {
-    "description": "「我」路徑 → 一般"
+  "me_general": "General",
+  "@me_general": {
+    "description": "「我」路徑 → 一般、「設定」路徑 → 「通知測試」內容 → 通知測試列表"
   },
   "me_debug": "Debug",
   "@me_debug": {
@@ -794,7 +525,7 @@
   "@advanced_features": {
     "description": "「設定」路徑 → 「進階功能」標題"
   },
-  "advanced_features_title": "調整 DPIP 的進階功能",
+  "advanced_features_title": "Adjust the Advanced Features of DPIP",
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
@@ -802,11 +533,11 @@
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
-  "no_tsunami_information": "近期無海嘯資訊",
+  "no_tsunami_information": "No Tsunami Information",
   "@no_tsunami_information": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_warning": "海嘯警報",
+  "tsunami_warning": "Tsunami Warning",
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
@@ -827,35 +558,35 @@
   "@tsunami_publish": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發布"
   },
-  "tsunami_renew": "更新",
+  "tsunami_renew": "Update",
   "@tsunami_renew": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 更新"
   },
-  "tsunami_relieve": "解除",
+  "tsunami_relieve": "Cancelled",
   "@tsunami_relieve": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 解除"
   },
-  "estimated_time_wave": "預估海嘯到達時間及波高",
+  "estimated_time_wave": "Estimated tsunami arrival time and wave height",
   "@estimated_time_wave": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 預估海嘯到達時間及波高"
   },
-  "observing_tsunamis": "各地觀測到的海嘯",
+  "observing_tsunamis": "Tsunami observed in different areas",
   "@observing_tsunamis": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 各地觀測到的海嘯"
   },
-  "occurrence_time": "發生時間",
+  "occurrence_time": "Time of occurrence",
   "@occurrence_time": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 發生時間"
   },
-  "scale": "規模",
+  "scale": "Magnitude",
   "@scale": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 規模"
   },
-  "depth": "深度",
+  "depth": "Depth",
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "一切平安，無事件發生。",
+  "home_safety": "There are currently no events.",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -865,37 +596,37 @@
   },
   "interval_3_days": "3 Days",
   "@interval_3_days": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3天"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 天"
   },
   "interval_2_days": "2 Days",
   "@interval_2_days": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2天"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2 天"
   },
   "interval_24_hours": "24 Hours",
   "@interval_24_hours": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24 小時"
   },
   "interval_12_hours": "12 Hours",
   "@interval_12_hours": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12 小時"
   },
   "interval_6_hours": "6 Hours",
   "@interval_6_hours": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6 小時"
   },
   "interval_3_hours": "3 Hours",
   "@interval_3_hours": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 小時"
   },
-  "interval_1_hour": "1 Hour",
+  "interval_1_hour": "1 Hours",
   "@interval_1_hour": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1小時"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1 小時"
   },
   "interval_10_minutes": "10 Minutes",
   "@interval_10_minutes": {
-    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10分鐘"
+    "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10 分鐘"
   },
-  "interval_now": "今日",
+  "interval_now": "Today",
   "@interval_now": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 今日"
   },
@@ -903,11 +634,11 @@
   "@welcome_message": {
     "description": "「歡迎」頁面 → 歡迎使用 DPIP"
   },
-  "disaster_info_platform": "Disaster Info Platform",
+  "disaster_info_platform": "Disaster Prevention Information Platform",
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。",
+  "dpip_description": "DPIP is an app designed by a local team in Taiwan. It integrates information from TREM-Net (Taiwan Real-time Earthquake Monitoring Network) and data from the Central Weather Administration, providing a comprehensive, unified, and convenient disaster prevention information application.",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
@@ -915,19 +646,19 @@
   "@next_step": {
     "description": "「歡迎」頁面 → 下一步"
   },
-  "who_we_are": "我們是誰？",
+  "who_we_are": "Who are we?",
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。",
+  "exptech_studio_description": "ExpTech Studio is a group primarily composed of students, with an average age of under 20 and more than 15 members. The members are students from northern, central, and southern Taiwan, as well as Japan, South Korea, and China.",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
-  "our_mission": "我們的初衷",
+  "our_mission": "Our Original Intention",
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。",
+  "founding_mission": "The original intention was to recruit a group of students interested and skilled in computers and technology. It later expanded beyond the school and gradually developed into its current form.",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
@@ -935,7 +666,7 @@
   "@notice": {
     "description": "「歡迎」頁面 → 注意事項"
   },
-  "notice_details": "DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。",
+  "notice_details": "DPIP will relay various information from ExpTech and the Central Weather Administration, Taiwan. Please note the following points when using it.",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
@@ -963,27 +694,23 @@
   "@permission": {
     "description": "「歡迎」頁面 → 權限"
   },
-  "privacy_commitment": "我們一直和使用者站在一起，為使用者的隱私而不斷努力。",
+  "privacy_commitment": "We advocate for the privacy of all users.",
   "@privacy_commitment": {
     "description": "「歡迎」頁面 → 我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-  },
-  "required_info_permissions": "所需的資訊和權限列表：",
-  "@required_info_permissions": {
-    "description": "「歡迎」頁面 → 所需的資訊和權限列表："
   },
   "notification": "Notifications",
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供通知服務",
+  "notification_service_description": "To provide notification service",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 用於提供通知服務"
   },
-  "location_based_service": "用於提供基於位置的服務",
+  "location_based_service": "To provide services base on location",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 用於提供基於位置的服務"
   },
-  "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
+  "data_visualization_storage": "Used for saving visualized data from CWA and ExpTech.",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
@@ -995,7 +722,7 @@
   "@agree": {
     "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
-  "trem_service_description": "在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。",
+  "trem_service_description": "DPIP offers a strong earthquake monitoring service powered by TREM from ExpTech Studio. Please carefully review the following terms and conditions and select whether to enable this service.",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
@@ -1003,11 +730,11 @@
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。",
+  "trem_station_warning": "The Earthquake Monitor is owned wholly by ExpTech Studio, and is not affiliated with the CWA. Please do not forward complaints or suggestions to the CWA, to avoid causing disturbances.",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
-  "trem_monitor_description": "強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。",
+  "trem_monitor_description": "The Earthquake Monitor uses TREM (Taiwan Real-time Earthquake Monitoring) to monitor nationwide seismic activity, as a real-time seismic intensity display service. When an earthquake occurs, changes in color of monitor stations can be used to monitor the propagation of seismic waves.",
   "@trem_monitor_description": {
     "description": "「歡迎」頁面 → 強震監視器是由 TREM（臺灣即時地震監測）觀測到全臺現在的震動，做為即時震度顯示的功能，地震發生當下可以透過站點顏色變化，觀察地震波傳播情形。"
   },
@@ -1015,7 +742,7 @@
   "@station_noise_warning": {
     "description": "「歡迎」頁面 → 由於日常雜訊（汽車、工廠、施工等）影響，平時站點可能也會有顏色變化。另外，由於是即時資料，當下無法判斷是否是故障，所以也有可能因為站點故障而改變顏色。"
   },
-  "trem_net_deployment": "2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。",
+  "trem_net_deployment": "In June 2022, TREM-Net (TREM Earthquake Observation Network) began to record earthquake data across Taiwan through two observation networks, namely SE-Net (Strong Shock Observation Network Accelerometer) and MS-Net (Weak Shock Observation Network Speedometer).",
   "@trem_net_deployment": {
     "description": "「歡迎」頁面 → 2022 年 6 月初開始於全臺各地部署站點，TREM-Net（TREM 地震觀測網）由兩個觀測網組成，分別為 SE-Net（強震觀測網「加速度儀」）及 MS-Net（微震觀測網「速度儀」），共同紀錄地震時的各項數據。"
   },
@@ -1023,7 +750,7 @@
   "@discover_new_version": {
     "description": "「發現新版本」頁面 → 發現新版本"
   },
-  "update_to_latest_version": "更新至最新版本以獲得最佳體驗",
+  "update_to_latest_version": "Please update to the latest version for the best experience",
   "@update_to_latest_version": {
     "description": "「發現新版本」頁面 → 更新至最新版本以獲得最佳體驗"
   },
@@ -1043,11 +770,11 @@
   "@skip_for_now": {
     "description": "「發現新版本」頁面 → 暫時略過"
   },
-  "update_complete": "更新完成",
+  "update_complete": "Update Complete",
   "@update_complete": {
     "description": "「發現新版本」頁面 → 更新完成"
   },
-  "update_complete_prompt": "DPIP 更新完成，要前往查看更新日誌嗎？",
+  "update_complete_prompt": "DPIP just Finished Updating, Want to look at the Update Log now?",
   "@update_complete_prompt": {
     "description": "「發現新版本」頁面 → DPIP 更新完成，要前往查看更新日誌嗎？"
   },
@@ -1055,7 +782,7 @@
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
-  "go_to_view": "前往查看",
+  "go_to_view": "Go!",
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
@@ -1063,11 +790,11 @@
   "@announcement": {
     "description": "「我」路徑 → 公告"
   },
-  "new_announcement_prompt": "有新的公告，要前往查看嗎？",
+  "new_announcement_prompt": "Do you want to check out the New Announcement?",
   "@new_announcement_prompt": {
     "description": "「新公告」頁面 → 有新的公告，要前往查看嗎？"
   },
-  "no_announcements": "目前沒有公告",
+  "no_announcements": "No Announcements",
   "@no_announcements": {
     "description": "「公告」標題 → 目前沒有公告"
   },
@@ -1075,23 +802,23 @@
   "@contributor": {
     "description": "「我」路徑 → 貢獻者"
   },
-  "unable_to_load_changelog": "無法載入更新日誌，請稍後再試。",
+  "unable_to_load_changelog": "Unable to load the Change Log, Please Retry Later.",
   "@unable_to_load_changelog": {
     "description": "「我」路徑 →「更新日誌」標題 → 無法載入更新日誌，請稍後再試。"
   },
-  "no_changelog": "目前沒有更新日誌",
+  "no_changelog": "No update logs",
   "@no_changelog": {
     "description": "「我」路徑 → 「更新日誌」標題 → 當前沒有任何更新日誌"
   },
-  "announcement_details": "公告詳情",
+  "announcement_details": "Announcement Details",
   "@announcement_details": {
     "description": "「我」路徑 → 「公告」標題 → 查看公告的具體內容"
   },
-  "version_details": "版本詳情",
+  "version_details": "Version Details",
   "@version_details": {
     "description": "「我」路徑 → 「更新日誌」標題 → 版本詳情"
   },
-  "unable_to_obtain_permission": "無法取得權限",
+  "unable_to_obtain_permission": "Unable to get Permission",
   "@unable_to_obtain_permission": {
     "description": "當無法獲取應用程式所需的權限時顯示的消息 → 無法取得權限"
   },
@@ -1099,7 +826,7 @@
   "@error_saving_image": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤"
   },
-  "confirm": "確定",
+  "confirm": "Confirm",
   "@confirm": {
     "description": "用於確認操作的按鈕文字 → 儲存圖片時發生錯誤"
   },
@@ -1111,27 +838,27 @@
   "@always_allow": {
     "description": "「存取權限彈窗」 → 一律允許"
   },
-  "always": "永遠",
+  "always": "Always",
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_start_permission_info": "For better experience with DPIP, please give the \"Auto Start\" Permission to let us set your Local Information.",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "auto_start_permission_experience": "For better experience when using DPIP, you need to Enable the Permission for \"Auto Start\" to make sure DPIP is getting the info normally.",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
-  "auto_start_permission": "自啟動權限",
+  "auto_start_permission": "Auto Start Permission",
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "auto_location_experience_info": "For a better experience, please give permission for location access to allow for DPIP to automatically set background location information.",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。",
+  "unlimited_permission_experience_info": "For better experience when using DPIP, you need to Enable the Permission for \"Auto Start\" to make sure DPIP is getting the info Normally.",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -1179,19 +906,19 @@
   "@only_used_during_earthquake_alerts": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
-  "weak_5": "5L",
+  "weak_5": "5-",
   "@weak_5": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5弱"
   },
-  "strong_5": "5H",
+  "strong_5": "5+",
   "@strong_5": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5強"
   },
-  "weak_6": "6L",
+  "weak_6": "6-",
   "@weak_6": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6弱"
   },
-  "strong_6": "6H",
+  "strong_6": "6+",
   "@strong_6": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6強"
   },
@@ -1227,7 +954,7 @@
   "@lightning_0_60": {
     "description": "「地圖」路徑 → 地圖列表 → 閃電 → 「！」圖例 → 60 分鐘內發生的雲間閃電"
   },
-  "abnormal": "abnormal",
+  "abnormal": "Abnormal",
   "@abnormal": {
     "description": "狀態：異常"
   },
@@ -1307,7 +1034,7 @@
   "@no_data": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：無資料"
   },
-  "automatic_foreground_positioning": "Foreground Auto Locating",
+  "automatic_foreground_positioning": "Foreground Auto-locating",
   "@automatic_foreground_positioning": {
     "description": "前景自動定位"
   },
@@ -1355,5 +1082,655 @@
         "type": "String"
       }
     }
+  },
+  "me_developer": "What the devs want to say",
+  "@me_developer": {
+    "description": "「我」路徑 → 「開發者想說的話」標題"
+  },
+  "me_about": "About",
+  "@me_about": {
+    "description": "「我」路徑 → 關於"
+  },
+  "alarm_area": "Alerted Area",
+  "@alarm_area": {
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
+  },
+  "estimated_intensity": "Estimated maximum intensity",
+  "@estimated_intensity": {
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
+  },
+  "time_earthquake": "Time of Occurrence",
+  "@time_earthquake": {
+    "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 發震"
+  },
+  "no_earthquake_monitor": "Unable to access Earthquake Monitor",
+  "@no_earthquake_monitor": {
+    "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
+  },
+  "settings_earthquake_monitor": "Please enable the Earthquake Monitor in Advanced Features in Settings.",
+  "@settings_earthquake_monitor": {
+    "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
+  },
+  "view_prompt_information": "Click to view information",
+  "@view_prompt_information": {
+    "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
+  },
+  "highest": "Highest",
+  "@highest": {
+    "description": "「首頁」路徑 → 「最高」描述"
+  },
+  "lowest": "Lowest",
+  "@lowest": {
+    "description": "「首頁」路徑 → 「最低」描述"
+  },
+  "not_enabled": " (Disabled)",
+  "@not_enabled": {
+    "description": "「設定」路徑 → 「通知測試」內容 →「 (未啟用)」副標題 "
+  },
+  "introduction": "Introduction",
+  "@introduction": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 簡介"
+  },
+  "first_gratitude": "Firstly, I'd like to thank all the users, and to everyone in the development team, I'd like to express my most sincere gratitude.",
+  "@first_gratitude": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
+  },
+  "dpip_goal": "DPIP (Disaster Prevention Information Platform) is an application that aims to be a center for disaster prevention-related information, and we hope it can become an invaluable asset to everyone's daily lives. Although the application's development is not complete, we continue to work towards this goal.",
+  "@dpip_goal": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
+  },
+  "development_investment": "In developing this application, we invested a lot of money, time and effort, with over $500,000NTD spent on staff costs, equipment costs, cloud services, network fees and other expenditures. Thus, we wish to be able to have the support of our users, by continuing to maintain operations without the use of third-party companies.",
+  "@development_investment": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
+  },
+  "profit_model": "Monetization Model",
+  "@profit_model": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
+  },
+  "profit_discussion": "To sustain the development of our app, our team has had numerous in-depth discussions about how to monetize it. We've explored various options, searching for a suitable monetization model. We found that most similar software adopts in-app advertisements. This led us to initially consider this approach as our primary monetization method.",
+  "@profit_discussion": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
+  },
+  "profit_difficulty": "Monetization is Tough",
+  "@profit_difficulty": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 營利真的太難了"
+  },
+  "user_payment_survey": "We conducted a survey to gauge the public's willingness to pay for such an app. We discovered that most people generally lack a strong sense of disaster preparedness and are unlikely to spend money on it. Our backend data supports this finding. Statistics show that only about one in 100,000 users actively contribute financially. This made in-app advertisements seem like the most viable solution.",
+  "@user_payment_survey": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
+  },
+  "why_no_ads": "Why do we not have advertisements?",
+  "@why_no_ads": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
+  },
+  "no_ads_reason": "During a disaster, the last thing people want to see is an ad. This is the primary reason we've decided against in-app advertisements. For a disaster prevention app, delivering accurate and timely information is paramount. If ads hinder users from accessing critical disaster information, it would directly contradict our mission. Additionally, communication quality is often poor during disasters, and wasting precious data on ad loading is simply frustrating.",
+  "@no_ads_reason": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
+  },
+  "charge_public": "Charging Users?",
+  "@charge_public": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 對大眾收費？"
+  },
+  "no_fee_reason": "If in-app advertisements aren't feasible, what about charging users? Should we turn it into a paid app?",
+  "@no_fee_reason": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 如果植入廣告行不通，那對大眾收費呢？變成付費軟體？"
+  },
+  "public_charge_consideration": "First of all, as a disaster prevention app, our goal is to reach as many people as possible. Moreover, those who truly need this app may not have the extra funds to pay for it. We want to help as many people as possible. Secondly, as developers, we want our app to have a wide user base. Charging users would directly reduce the user base.",
+  "@public_charge_consideration": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
+  },
+  "how_to_profit": "How Do We Monetize?",
+  "@how_to_profit": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
+  },
+  "summary": "In conclusion, we hope to cultivate a community of individuals who are interested in disaster prevention and value this kind of app. We invite these users to support our development efforts and join us in making a difference.",
+  "@summary": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
+  },
+  "developer_message": "DPIP Founder's Message",
+  "@developer_message": {
+    "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
+  },
+  "error_fetching_announcement": "Announcement Retrieval Error",
+  "@error_fetching_announcement": {
+    "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
+  },
+  "invalid_operation": "Slow down!",
+  "@invalid_operation": {
+    "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
+  },
+  "operation_interval_too_short": "It seems like you're going a bit too fast. Please take a moment and try again later.",
+  "@operation_interval_too_short": {
+    "description": "「通知測試」 → 「操作時間過短」彈窗 → 操作間隔過短，請稍後再嘗試。"
+  },
+  "got_it": "OK",
+  "@got_it": {
+    "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
+  },
+  "error_fcm_token": "Error: Unable to retrieve FCM Token",
+  "@error_fcm_token": {
+    "description": "錯誤：無法取得 FCM Token"
+  },
+  "error_fetching_notifications": "Notification Record Retrieval Error",
+  "@error_fetching_notifications": {
+    "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
+  },
+  "auto_location_permission_required": "For optimal auto-location service performance, DPIP requires enabling notification permissions.",
+  "@auto_location_permission_required": {
+    "description": "「通知權限」彈窗 → 自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。"
+  },
+  "location_permission_needed": "For optimal auto-location service performance, DPIP requires enabling location service permissions.",
+  "@location_permission_needed": {
+    "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
+  },
+  "location_permission": "Location Permissions",
+  "@location_permission": {
+    "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
+  },
+  "improve_auto_location_experience": "For a better automatic locating experience, please grant DPIP the \"{permissionType}\" on Location permission so it can continuously update your location in the background.",
+  "@improve_auto_location_experience": {
+    "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
+    "placeholders": {
+      "permissionType": {
+        "type": "String"
+      }
+    }
+  },
+  "auto_location_permission_upgrade_needed": "Auto-locating requires granting {permissionType} to operate in the background.",
+  "@auto_location_permission_upgrade_needed": {
+    "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
+    "placeholders": {
+      "permissionType": {
+        "type": "String"
+      }
+    }
+  },
+  "error_prefix": "Error:",
+  "@error_prefix": {
+    "description": "錯誤：前綴"
+  },
+  "home_precipitation": "Precipitation",
+  "@home_precipitation": {
+    "description": "「首頁」頁面 → 降水量"
+  },
+  "history_nationwide": "Nationwide",
+  "@history_nationwide": {
+    "description": "「歷史」頁面 → 全國"
+  },
+  "me_welcome": "Welcome screen",
+  "@me_welcome": {
+    "description": "「我」頁面 → 「歡迎頁面」按鈕"
+  },
+  "donate_h2": "Help us maintain server stability and development.",
+  "@donate_h2": {
+    "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
+  },
+  "max_earthquake_intensity": "Max Intensity",
+  "@max_earthquake_intensity": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
+  },
+  "report_all": "All",
+  "@report_all": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
+  },
+  "report_filter": "Filter",
+  "@report_filter": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」"
+  },
+  "report_filter_reset": "Reset",
+  "@report_filter_reset": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 重置"
+  },
+  "report_filter_apply": "Apply",
+  "@report_filter_apply": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 套用"
+  },
+  "report_end": "End of list",
+  "@report_end": {
+    "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
+  },
+  "history_send_time": "Event Time",
+  "@history_send_time": {
+    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
+  },
+  "history_valid_until": "Valid until",
+  "@history_valid_until": {
+    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
+  },
+  "history_affected_area": "Affected Area",
+  "@history_affected_area": {
+    "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 影響區域"
+  },
+  "sound_eew_alert_major": "Emergency Earthquake Early Warning (Critical)",
+  "@sound_eew_alert_major": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(重大)"
+  },
+  "sound_eew_minor": "Emergency Earthquake Early Warning",
+  "@sound_eew_minor": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
+  },
+  "sound_eew_silent": "Emergency Earthquake Early Warning (Silent)",
+  "@sound_eew_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
+  },
+  "sound_eew_silent_h2": "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 1.",
+  "@sound_eew_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上"
+  },
+  "sound_earthquake_eew_major": "Earthquake Early Warning (Critical)",
+  "@sound_earthquake_eew_major": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(重大)"
+  },
+  "sound_earthquake_eew_major_h2": "Local (City/Town/District) estimated intensity is greater than 4.",
+  "@sound_earthquake_eew_major_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(重大)」描述 → 所在地(鄉鎮)預估震度 4 以上"
+  },
+  "sound_earthquake_eew_minor": "Earthquake Early Warning",
+  "@sound_earthquake_eew_minor": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(一般)"
+  },
+  "sound_earthquake_eew_minor_h2": "Local (City/Town/District) estimated intensity is greater than 2.",
+  "@sound_earthquake_eew_minor_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
+  },
+  "sound_earthquake_eew_silent": "Earthquake Early Warning (Silent)",
+  "@sound_earthquake_eew_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
+  },
+  "sound_earthquake_eew_silent_h2": "Local (City/Town/District) estimated intensity is greater than 1.",
+  "@sound_earthquake_eew_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
+  },
+  "sound_int_report_minor": "Intensity Report",
+  "@sound_int_report_minor": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(一般)"
+  },
+  "sound_int_report_minor_h2": "Local (City/Town/District) measured intensity is greater than 3.",
+  "@sound_report_minor_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
+  },
+  "sound_int_report_silent": "Intensity Report (Silent)",
+  "@sound_int_report_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
+  },
+  "sound_int_report_silent_h2": "Local (City/Town/District) measured intensity is greater than 1.",
+  "@sound_int_report_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(無聲通知)」描述 → 所在地(鄉鎮)實測震度 1 以上。"
+  },
+  "sound_monitor_minor": "Earthquake Monitor",
+  "@sound_monitor_minor": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 強震監視器(一般)"
+  },
+  "sound_report_minor": "Earthquake Report",
+  "@sound_report_minor": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
+  },
+  "sound_report_silent": "Earthquake Report (Silent)",
+  "@sound_report_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
+  },
+  "sound_report_silent_h2": "Local (Municipality/County) measured intensity is greater than 1.",
+  "@sound_report_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
+  },
+  "sound_weather_warning": "Weather Warning",
+  "@sound_weather_warning": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
+  },
+  "sound_rain_instant": "Heavy Rain Advisory",
+  "@sound_rain_instant": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
+  },
+  "sound_weather_alert": "Weather Advisory",
+  "@sound_weather_alert": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
+  },
+  "sound_rain_minor_h2": "Local (City/Town/District) Thunderstorm Advisory or Mountain Area Heavy Rain Advisory Issued",
+  "@sound_rain_minor_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
+  },
+  "sound_weather_major_h2": "Local (City/Town/District) Red Severe Weather Advisory Issued",
+  "@sound_weather_warning_major_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
+  },
+  "sound_weather_minor_h2": "Local (City/Town/District) Severe Weather Advisory Issued Excluding Above Areas",
+  "@sound_weather_warning_minor_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
+  },
+  "sound_disaster": "Disaster Information",
+  "@sound_disaster": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
+  },
+  "sound_evacuation": "Evacuation Advisory",
+  "@sound_evacuation": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
+  },
+  "sound_evacuation_major_h2": "When a critical evacuation notice is issued for the current location (City/Town/District)",
+  "@sound_evacuation_major_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
+  },
+  "sound_evacuation_minor_h2": "When a minor evacuation notice is issued for the current location (City/Town/District)",
+  "@sound_evacuation_minor_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
+  },
+  "sound_tsunami_silent": "Tsunami Report (Silent)",
+  "@sound_tsunami_silent": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
+  },
+  "sound_tsunami_silent_h2": "According to the tsunami warning issued by the PTWC, which is\nassessed by CWA that it may cause public concern.",
+  "@sound_tsunami_silent_h2": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
+  },
+  "sound_other_notifications": "Other Notifications",
+  "@sound_other_notifications": {
+    "description": "「我」路徑 → 「通知測試」內容 → 「其他通知」標題 "
+  },
+  "sound_major": "Critical",
+  "@sound_major": {
+    "description": "「我」路徑 → 「通知測試」內容 → 重大"
+  },
+  "sunny_with_haze": "Sunny With Haze",
+  "@sunny_with_haze": {
+    "description": "天氣狀況：晴天伴有霾"
+  },
+  "sunny_with_mist": "Sunny With Mist",
+  "@sunny_with_mist": {
+    "description": "天氣狀況：晴天伴有靄"
+  },
+  "sunny_with_lightning": "晴有閃電",
+  "@sunny_with_lightning": {
+    "description": "天氣狀況：晴天伴有閃電"
+  },
+  "sunny_with_fog": "晴有霧",
+  "@sunny_with_fog": {
+    "description": "天氣狀況：晴天伴有霧"
+  },
+  "sunny_with_rain": "Sunny drizzle",
+  "@sunny_with_rain": {
+    "description": "天氣狀況：晴天伴有雨"
+  },
+  "sunny_with_sleet": "晴有雨雪",
+  "@sunny_with_sleet": {
+    "description": "天氣狀況：晴天伴有雨夾雪"
+  },
+  "sunny_with_heavy_snow": "晴有大雪",
+  "@sunny_with_heavy_snow": {
+    "description": "天氣狀況：晴天伴有大雪"
+  },
+  "sunny_with_snow_pellets": "晴有雪珠",
+  "@sunny_with_snow_pellets": {
+    "description": "天氣狀況：晴天伴有雪珠"
+  },
+  "sunny_with_ice_pellets": "Sunny with ice pellets",
+  "@sunny_with_ice_pellets": {
+    "description": "天氣狀況：晴天伴有冰珠"
+  },
+  "sunny_with_snow_showers": "晴有陣雪",
+  "@sunny_with_snow_showers": {
+    "description": "天氣狀況：晴天伴有陣雪"
+  },
+  "sunny_with_sleet_showers": "晴陣雨雪",
+  "@sunny_with_sleet_showers": {
+    "description": "天氣狀況：晴天伴有陣雨夾雪"
+  },
+  "sunny_with_hail": "晴有雹",
+  "@sunny_with_hail": {
+    "description": "天氣狀況：晴天伴有冰雹"
+  },
+  "sunny_with_thunderstorm": "晴有雷雨",
+  "@sunny_with_thunderstorm": {
+    "description": "天氣狀況：晴天伴有雷雨"
+  },
+  "sunny_with_thundersnow": "晴有雷雪",
+  "@sunny_with_thundersnow": {
+    "description": "天氣狀況：晴天伴有雷雪"
+  },
+  "sunny_with_thunderhail": "晴有雷雹",
+  "@sunny_with_thunderhail": {
+    "description": "天氣狀況：晴天伴有雷雹"
+  },
+  "sunny_with_severe_thunderstorm": "晴大雷雨",
+  "@sunny_with_severe_thunderstorm": {
+    "description": "天氣狀況：晴天伴有強雷雨"
+  },
+  "sunny_with_severe_thunderhail": "晴大雷雹",
+  "@sunny_with_severe_thunderhail": {
+    "description": "天氣狀況：晴天伴有強雷雹"
+  },
+  "sunny_with_thunder": "晴天伴有雷",
+  "@sunny_with_thunder": {
+    "description": "天氣狀況：晴天伴有雷"
+  },
+  "partly__cloudy": "多雲",
+  "@partly__cloudy": {
+    "description": "天氣狀況：多雲"
+  },
+  "partly_cloudy_with_haze": "多雲有霾",
+  "@partly_cloudy_with_haze": {
+    "description": "天氣狀況：多雲伴有霾"
+  },
+  "partly_cloudy_with_mist": "多雲有靄",
+  "@partly_cloudy_with_mist": {
+    "description": "天氣狀況：多雲伴有靄"
+  },
+  "partly_cloudy_with_lightning": "多雲有閃電",
+  "@partly_cloudy_with_lightning": {
+    "description": "天氣狀況：多雲伴有閃電"
+  },
+  "partly_cloudy_with_fog": "多雲有霧",
+  "@partly_cloudy_with_fog": {
+    "description": "天氣狀況：多雲伴有霧"
+  },
+  "partly_cloudy_with_rain": "多雲有雨",
+  "@partly_cloudy_with_rain": {
+    "description": "天氣狀況：多雲伴有雨"
+  },
+  "partly_cloudy_with_sleet": "多雲有雨雪",
+  "@partly_cloudy_with_sleet": {
+    "description": "天氣狀況：多雲伴有雨夾雪"
+  },
+  "partly_cloudy_with_heavy_snow": "多雲有大雪",
+  "@partly_cloudy_with_heavy_snow": {
+    "description": "天氣狀況：多雲伴有大雪"
+  },
+  "partly_cloudy_with_snow_pellets": "多雲有雪珠",
+  "@partly_cloudy_with_snow_pellets": {
+    "description": "天氣狀況：多雲伴有雪珠"
+  },
+  "partly_cloudy_with_ice_pellets": "多雲有冰珠",
+  "@partly_cloudy_with_ice_pellets": {
+    "description": "天氣狀況：多雲伴有冰珠"
+  },
+  "partly_cloudy_with_snow_showers": "多雲有陣雪",
+  "@partly_cloudy_with_snow_showers": {
+    "description": "天氣狀況：多雲伴有陣雪"
+  },
+  "partly_cloudy_with_sleet_showers": "多雲陣雨雪",
+  "@partly_cloudy_with_sleet_showers": {
+    "description": "天氣狀況：多雲伴有陣雨夾雪"
+  },
+  "partly_cloudy_with_hail": "多雲有雹",
+  "@partly_cloudy_with_hail": {
+    "description": "天氣狀況：多雲伴有冰雹"
+  },
+  "partly_cloudy_with_thunderstorm": "多雲有雷雨",
+  "@partly_cloudy_with_thunderstorm": {
+    "description": "天氣狀況：多雲伴有雷雨"
+  },
+  "partly_cloudy_with_thundersnow": "多雲有雷雪",
+  "@partly_cloudy_with_thundersnow": {
+    "description": "天氣狀況：多雲伴有雷雪"
+  },
+  "partly_cloudy_with_thunderhail": "多雲有雷雹",
+  "@partly_cloudy_with_thunderhail": {
+    "description": "天氣狀況：多雲伴有雷雹"
+  },
+  "partly_cloudy_with_severe_thunderstorm": "多雲大雷雨",
+  "@partly_cloudy_with_severe_thunderstorm": {
+    "description": "天氣狀況：多雲伴有強雷雨"
+  },
+  "partly_cloudy_with_severe_thunderhail": "多雲大雷雹",
+  "@partly_cloudy_with_severe_thunderhail": {
+    "description": "天氣狀況：多雲伴有強雷雹"
+  },
+  "partly_cloudy_with_thunder": "多雲伴有雷",
+  "@partly_cloudy_with_thunder": {
+    "description": "天氣狀況：多雲伴有雷"
+  },
+  "overcast_with_haze": "陰有霾",
+  "@overcast_with_haze": {
+    "description": "天氣狀況：陰天伴有霾"
+  },
+  "overcast_with_mist": "陰有靄",
+  "@overcast_with_mist": {
+    "description": "天氣狀況：陰天伴有靄"
+  },
+  "overcast_with_lightning": "陰有閃電",
+  "@overcast_with_lightning": {
+    "description": "天氣狀況：陰天伴有閃電"
+  },
+  "overcast_with_fog": "陰有霧",
+  "@overcast_with_fog": {
+    "description": "天氣狀況：陰天伴有霧"
+  },
+  "overcast_with_rain": "陰有雨",
+  "@overcast_with_rain": {
+    "description": "天氣狀況：陰天伴有雨"
+  },
+  "overcast_with_sleet": "陰有雨雪",
+  "@overcast_with_sleet": {
+    "description": "天氣狀況：陰天伴有雨夾雪"
+  },
+  "overcast_with_heavy_snow": "陰有大雪",
+  "@overcast_with_heavy_snow": {
+    "description": "天氣狀況：陰天伴有大雪"
+  },
+  "overcast_with_snow_pellets": "陰有雪珠",
+  "@overcast_with_snow_pellets": {
+    "description": "天氣狀況：陰天伴有雪珠"
+  },
+  "overcast_with_ice_pellets": "陰有冰珠",
+  "@overcast_with_ice_pellets": {
+    "description": "天氣狀況：陰天伴有冰珠"
+  },
+  "overcast_with_snow_showers": "陰有陣雪",
+  "@overcast_with_snow_showers": {
+    "description": "天氣狀況：陰天伴有陣雪"
+  },
+  "overcast_with_sleet_showers": "陰陣雨雪",
+  "@overcast_with_sleet_showers": {
+    "description": "天氣狀況：陰天伴有陣雨夾雪"
+  },
+  "overcast_with_hail": "陰有雹",
+  "@overcast_with_hail": {
+    "description": "天氣狀況：陰天伴有冰雹"
+  },
+  "overcast_with_thunderstorm": "陰有雷雨",
+  "@overcast_with_thunderstorm": {
+    "description": "天氣狀況：陰天伴有雷雨"
+  },
+  "overcast_with_thundersnow": "陰有雷雪",
+  "@overcast_with_thundersnow": {
+    "description": "天氣狀況：陰天伴有雷雪"
+  },
+  "overcast_with_thunderhail": "陰有雷雹",
+  "@overcast_with_thunderhail": {
+    "description": "天氣狀況：陰天伴有雷雹"
+  },
+  "overcast_with_severe_thunderstorm": "陰大雷雨",
+  "@overcast_with_severe_thunderstorm": {
+    "description": "天氣狀況：陰天伴有強雷雨"
+  },
+  "overcast_with_severe_thunderhail": "陰大雷雹",
+  "@overcast_with_severe_thunderhail": {
+    "description": "天氣狀況：陰天伴有強雷雹"
+  },
+  "overcast_with_thunder": "陰天伴有雷",
+  "@overcast_with_thunder": {
+    "description": "天氣狀況：陰天伴有雷"
+  },
+  "get_weather_abnormal": "Error in retrieving weather data",
+  "@get_weather_abnormal": {
+    "description": "取得天氣異常"
+  },
+  "map_average": "Average",
+  "@map_average": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
+  },
+  "radar_synthetic_echo": "雷達合成回波",
+  "@radar_synthetic_echo": {
+    "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
+  },
+  "completed": "Dismissed",
+  "@completed": {
+    "description": "「天氣警特報」狀態 → 已結束"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "「天氣警特報」狀態 → 生效中"
+  },
+  "save_image_permission": "To save images, DPIP requires \"Photos and Media\" permissions.",
+  "@save_image_permission": {
+    "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。"
+  },
+  "save_image_error": "Error in saving images.",
+  "@save_image_error": {
+    "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤:"
+  },
+  "error_occurred": "An error has occurred.",
+  "@error_occurred": {
+    "description": "Weather Status: An error occurred:"
+  },
+  "history_final": "(Final Report)",
+  "@history_final": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → (最終)"
+  },
+  "level_1": "1",
+  "@level_1": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 1級"
+  },
+  "level_2": "2",
+  "@level_2": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 2級"
+  },
+  "level_3": "3",
+  "@level_3": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 3級"
+  },
+  "level_4": "4",
+  "@level_4": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 4級"
+  },
+  "level_7": "7",
+  "@level_7": {
+    "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 7級"
+  },
+  "home_click_settings": "Set location",
+  "@home_click_settings": {
+    "description": "「首頁」路徑 → 點擊設定所在地"
+  },
+  "history_earthquake_intensity": "TREM Observation Network Measured Intensity",
+  "@history_earthquake_intensity": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
+  },
+  "history_earthquake_intensity_h2": "JMASIS Standard (0.3-sec 3D accel)",
+  "@history_earthquake_intensity_h2": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
+  },
+  "history_seismic_intensity_reference": "The data presented is automatically generated by TREM-Net and has not undergone human review or verification. It is intended for preliminary emergency response reference only. Please refer to CWA for official information.",
+  "@history_seismic_intensity_reference": {
+    "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
+  },
+  "map_no_data": "No available data to display.",
+  "@map_no_data": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 沒有有效資料可顯示"
+  },
+  "map_hh_time": "HH:00",
+  "@map_hh_time": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → HH時"
+  },
+  "ranking": "Leaderboard",
+  "@ranking": {
+    "description": "「排行榜」頁面 → 標題"
   }
 }

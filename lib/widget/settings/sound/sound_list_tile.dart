@@ -1,12 +1,13 @@
+import "dart:convert";
 import "dart:io";
 
-import "package:dpip/api/exptech.dart";
+import "package:awesome_notifications/awesome_notifications.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/need_location.dart";
-import "package:dpip/util/speed_limit.dart";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:material_symbols_icons/symbols.dart";
 
 class SoundListTile extends StatefulWidget {
@@ -32,6 +33,18 @@ class SoundListTileState extends State<SoundListTile> {
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
+  Map<String, dynamic> data = {};
+
+  @override
+  void initState() {
+    super.initState();
+    start();
+  }
+
+  void start() async {
+    final json = await rootBundle.loadString("assets/notify_test.json");
+    data = jsonDecode(json) as Map<String, dynamic>;
+  }
 
   void _initUserLocation() async {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
@@ -52,20 +65,17 @@ class SoundListTileState extends State<SoundListTile> {
     if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     } else {
-      String token = Global.preference.getString("fcm-token") ?? "";
-      if (token != "") {
-        int limit = Global.preference.getInt("limit-sound-test") ?? 0;
-        int now = DateTime.now().millisecondsSinceEpoch;
-        if (now - limit < 10000) {
-          showLimitDialog(context);
-        } else {
-          Global.preference.setInt("limit-sound-test", now);
-          await ExpTech().sendNotifyTest(token, widget.type, userLat.toString(), userLon.toString());
-        }
-      } else {
-        context.scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(context.i18n.error_fcm_token),
+      int limit = Global.preference.getInt("limit-sound-test") ?? 0;
+      int now = DateTime.now().millisecondsSinceEpoch;
+      if (now - limit > 1000) {
+        Global.preference.setInt("limit-sound-test", now);
+        AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: -1,
+            channelKey: widget.type,
+            title: "[測試] ${data[widget.type]["title"]}",
+            body: "＊＊＊這是測試訊息＊＊＊${(Platform.isIOS) ? "\n" : "<br>"}${data[widget.type]["body"]}",
+            notificationLayout: NotificationLayout.BigText,
           ),
         );
       }

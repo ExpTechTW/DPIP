@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 2.3.0
+version: 2.4.0
 
 environment:
   sdk: '>=3.3.1 <4.0.0'
@@ -71,5 +71,6 @@ flutter:
   - assets/DPIP.png
   - assets/ExpTech.png
   - assets/location.json
+  - assets/notify_test.json
   - assets/time.json
   - assets/box.json
