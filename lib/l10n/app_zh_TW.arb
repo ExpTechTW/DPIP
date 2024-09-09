@@ -1117,11 +1117,11 @@
   },
   "highest": "最高",
   "@highest": {
-    "description": "「首頁」路徑 → 「最高」描述"
+    "description": "「首頁」路徑 → 「最高」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最高"
   },
   "lowest": "最低",
   "@lowest": {
-    "description": "「首頁」路徑 → 「最低」描述"
+    "description": "「首頁」路徑 → 「最低」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最低"
   },
   "not_enabled": " (未啟用)",
   "@not_enabled": {
@@ -1732,5 +1732,33 @@
   "ranking": "排行榜",
   "@ranking": {
     "description": "「排行榜」頁面 → 標題"
+  },
+  "ranking_time": "資料時間：{time}\n共 {ranked_length} 觀測點",
+  "@ranking_time": {
+    "description": "「排行榜」頁面 → 資料時間：{time}\n共 {ranked_length} 觀測點",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "ranked_length": {
+        "type": "String"
+      }
+    }
+  },
+  "according": "依",
+  "@according": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
+  },
+  "ranking_lowering_power": "降冪",
+  "@ranking_lowering_power": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
+  },
+  "ranking_raising_power": "升冪",
+  "@ranking_raising_power": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
+  },
+  "ranking_merge_into": "合併至",
+  "@ranking_merge_into": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
   }
 }

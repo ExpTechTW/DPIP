@@ -93,17 +93,17 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text("依"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(context.i18n.according),
                   ),
                   ChoiceChip(
-                    label: Text("高溫"),
+                    label: Text(context.i18n.highest),
                     selected: !reversed,
                     onSelected: (value) => setReversed(false),
                   ),
                   ChoiceChip(
-                    label: Text("低溫"),
+                    label: Text(context.i18n.lowest),
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
@@ -111,9 +111,9 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                     height: kToolbarHeight - 16,
                     child: VerticalDivider(),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text("合併至"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(context.i18n.ranking_merge_into),
                   ),
                   ChoiceChip(
                     label: Text(context.i18n.location_town),
@@ -132,7 +132,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "資料時間：$time\n共 ${ranked.length} 觀測點",
+              context.i18n.ranking_time(time.toString(), ranked.length.toString()),
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
