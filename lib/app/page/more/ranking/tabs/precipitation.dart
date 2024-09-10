@@ -154,7 +154,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "資料時間：$time\n共 ${ranked.length} 觀測點",
+              context.i18n.ranking_time(time.toString(), ranked.length.toString()),
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
