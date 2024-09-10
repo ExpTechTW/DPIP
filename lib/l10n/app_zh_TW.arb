@@ -1761,8 +1761,8 @@
   "@ranking_merge_into": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
   },
-  "permission_save": "儲存",
-  "@permission_save": {
+  "permission_storage": "儲存",
+  "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
   }
 }

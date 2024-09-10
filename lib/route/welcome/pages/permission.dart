@@ -134,7 +134,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         case Permission.storage:
         case Permission.photos:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
-          text = context.i18n.permission_save;
+          text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;
           color = Colors.green;
           break;
