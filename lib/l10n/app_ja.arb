@@ -702,13 +702,13 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "通知サービスの提供に使用",
+  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
   "@notification_service_description": {
-    "description": "「歡迎」頁面 → 用於提供通知服務"
+    "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "位置情報の提供に使用",
+  "location_based_service": "使用定位來自動更新所在地設定，提供當地的即時防災資訊",
   "@location_based_service": {
-    "description": "「歡迎」頁面 → 用於提供基於位置的服務"
+    "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
   "data_visualization_storage": "中央気象局またはExpTechが提供する画像を保存するため",
   "@data_visualization_storage": {
@@ -1117,11 +1117,11 @@
   },
   "highest": "最高",
   "@highest": {
-    "description": "「首頁」路徑 → 「最高」描述"
+    "description": "「首頁」路徑 → 「最高」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最高"
   },
   "lowest": "最低",
   "@lowest": {
-    "description": "「首頁」路徑 → 「最低」描述"
+    "description": "「首頁」路徑 → 「最低」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最低"
   },
   "not_enabled": "(未使用)",
   "@not_enabled": {
@@ -1732,5 +1732,37 @@
   "ranking": "ランキング",
   "@ranking": {
     "description": "「排行榜」頁面 → 標題"
+  },
+  "ranking_time": "資料時間：{time}\n共 {ranked_length} 觀測點",
+  "@ranking_time": {
+    "description": "「排行榜」頁面 → 資料時間：{time}\n共 {ranked_length} 觀測點",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "ranked_length": {
+        "type": "String"
+      }
+    }
+  },
+  "according": "依",
+  "@according": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
+  },
+  "ranking_descending": "降冪",
+  "@ranking_descending": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
+  },
+  "ranking_ascending": "升冪",
+  "@ranking_ascending": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
+  },
+  "ranking_merge_into": "合併至",
+  "@ranking_merge_into": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
+  },
+  "permission_storage": "保存",
+  "@permission_storage": {
+    "description": "「歡迎」頁面 → 儲存"
   }
 }
