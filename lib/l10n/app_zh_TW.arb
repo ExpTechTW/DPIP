@@ -1749,12 +1749,12 @@
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_lowering_power": "降冪",
-  "@ranking_lowering_power": {
+  "ranking_descending": "降冪",
+  "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_raising_power": "升冪",
-  "@ranking_raising_power": {
+  "ranking_ascending": "升冪",
+  "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
   "ranking_merge_into": "合併至",

@@ -101,12 +101,12 @@ class _RankingWindTabState extends State<RankingWindTab> {
                     child: Text(context.i18n.according),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.ranking_lowering_power),
+                    label: Text(context.i18n.ranking_descending),
                     selected: !reversed,
                     onSelected: (value) => setReversed(false),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.ranking_raising_power),
+                    label: Text(context.i18n.ranking_ascending),
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
