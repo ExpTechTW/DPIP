@@ -702,13 +702,13 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "用於提供通知服務",
+  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
   "@notification_service_description": {
-    "description": "「歡迎」頁面 → 用於提供通知服務"
+    "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "用於提供基於位置的服務",
+  "location_based_service": "使用定位來自動更新所在地設定，提供當地的即時防災資訊",
   "@location_based_service": {
-    "description": "「歡迎」頁面 → 用於提供基於位置的服務"
+    "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
   "data_visualization_storage": "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片",
   "@data_visualization_storage": {
@@ -1760,5 +1760,9 @@
   "ranking_merge_into": "合併至",
   "@ranking_merge_into": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
+  },
+  "permission_save": "儲存",
+  "@permission_save": {
+    "description": "「歡迎」頁面 → 儲存"
   }
 }
