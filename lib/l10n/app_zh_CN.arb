@@ -702,11 +702,11 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
+  "notification_service_description": "在重大灾害发生时以通知来传递即时防灾信息",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "使用定位來自動更新所在地設定，提供當地的即時防災資訊",
+  "location_based_service": "使用定位来自动更新所在地设置，提供当地的即时防灾信息",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
@@ -1095,7 +1095,7 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "預估最大震度",
+  "estimated_intensity": "预估最大震度",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
@@ -1127,71 +1127,71 @@
   "@not_enabled": {
     "description": "「設定」路徑 → 「通知測試」內容 →「 (未啟用)」副標題 "
   },
-  "introduction": "簡介",
+  "introduction": "简介",
   "@introduction": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 簡介"
   },
-  "first_gratitude": "首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。",
+  "first_gratitude": "首先感谢所有下载这个软件的用户，整个开发团队在此献上最诚挚的谢意。",
   "@first_gratitude": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
   },
-  "dpip_goal": "DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。",
+  "dpip_goal": "DPIP 是一个以集成所有防灾信息为目标的软件，希望能成为民众生活中不可或缺的一部分。尽管目前完成度不高且困难重重，但我们仍会持续朝这个目标前进。",
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
-  "development_investment": "在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。",
+  "development_investment": "在开发软件时，我们投入了大量的金钱、时间与精力，在人事成本、设备费用、云端服务、网络费用等项目上，花费超过50万新台币。为此，我们希望获得用户的支持，在不依赖其他第三方公司的前提下，继续维持营运。",
   "@development_investment": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
   },
-  "profit_model": "營利模式",
+  "profit_model": "营利模式",
   "@profit_model": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
   },
-  "profit_discussion": "為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。",
+  "profit_discussion": "为了维持 App 的开发，团队内部进行了多次激烈讨论，思考如何才能营利？我们试图在众多方案中，找出一个适合的营利模式。我们发现，大多数同类型软件采用植入广告的方式来达到营利目的，这使得我们一度考虑采用该方式作为营利的方法。",
   "@profit_discussion": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
   },
-  "profit_difficulty": "營利真的太難了",
+  "profit_difficulty": "营利真的太难了",
   "@profit_difficulty": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利真的太難了"
   },
-  "user_payment_survey": "我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。",
+  "user_payment_survey": "我们调查了一般民众的付费意愿，发现大部分人普遍防灾意识不足，更不会花钱在这件事情上。后台的数据能侧面证实这个说法，据统计，热心赞助的民众大约是整体用户的10万分之1，这使得植入广告似乎成为了最好的解决方法。",
   "@user_payment_survey": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
   },
-  "why_no_ads": "為什麼不採用廣告？",
+  "why_no_ads": "为什么不采用广告？",
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
-  "no_ads_reason": "當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。",
+  "no_ads_reason": "当灾害发生时，大家一定不会想要看广告吧？这是我们不植入广告的第一个理由。防灾导向的软件，快速正确地传递防灾信息是首要任务。如果因为广告而导致无法正确掌握防灾信息，这反而和我们的理念相违背。况且，灾害发生时通常通信品质不佳，还要额外浪费网络流量在加载广告，这件事太令人沮丧了。",
   "@no_ads_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
   },
-  "charge_public": "對大眾收費？",
+  "charge_public": "对大众收费？",
   "@charge_public": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 對大眾收費？"
   },
-  "no_fee_reason": "如果植入廣告行不通，那對大眾收費呢？變成付費軟體？",
+  "no_fee_reason": "如果植入广告行不通，那对大众收费呢？变成付费软件？",
   "@no_fee_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如果植入廣告行不通，那對大眾收費呢？變成付費軟體？"
   },
-  "public_charge_consideration": "首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。",
+  "public_charge_consideration": "首先，作为防灾软件，我们希望尽可能地将防灾信息传递给越多人越好。而且，或许真正需要的人没办法再多出额外的经费承担这项支出，我们希望帮助更多的人。其次，作为开发人员，我们希望软件可以有很多人使用，收费会直接导致大家使用意愿降低。",
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
-  "how_to_profit": "如何營利？",
+  "how_to_profit": "如何营利？",
   "@how_to_profit": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
   },
-  "summary": "總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。",
+  "summary": "总结上述，我们希望培养出对防灾有兴趣的人、重视防灾的人，支持我们的软件开发，一起往前发展。",
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
-  "developer_message": "DPIP 開發者的話",
+  "developer_message": "DPIP 开发者的话",
   "@developer_message": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
   },
-  "error_fetching_announcement": "獲取公告時發生錯誤:",
+  "error_fetching_announcement": "获取公告时发生错误:",
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
@@ -1207,7 +1207,7 @@
   "@got_it": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
   },
-  "error_fcm_token": "錯誤: 無法取得 FCM Token",
+  "error_fcm_token": "错误: 无法取得 FCM Token",
   "@error_fcm_token": {
     "description": "錯誤：無法取得 FCM Token"
   },
@@ -1253,7 +1253,7 @@
   "@home_precipitation": {
     "description": "「首頁」頁面 → 降水量"
   },
-  "history_nationwide": "全國",
+  "history_nationwide": "全国",
   "@history_nationwide": {
     "description": "「歷史」頁面 → 全國"
   },
@@ -1261,7 +1261,7 @@
   "@me_welcome": {
     "description": "「我」頁面 → 「歡迎頁面」按鈕"
   },
-  "donate_h2": "幫助我們維護伺服器的穩定和長久發展",
+  "donate_h2": "帮助我们维护服务器的稳定和长久发展",
   "@donate_h2": {
     "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
   },
@@ -1273,7 +1273,7 @@
   "@report_all": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
-  "report_filter": "篩選器",
+  "report_filter": "筛选器",
   "@report_filter": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
@@ -1661,7 +1661,7 @@
   "@radar_synthetic_echo": {
     "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
   },
-  "completed": "已結束",
+  "completed": "已结束",
   "@completed": {
     "description": "「天氣警特報」狀態 → 已結束"
   },
@@ -1685,23 +1685,23 @@
   "@history_final": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → (最終)"
   },
-  "level_1": "1級",
+  "level_1": "1级",
   "@level_1": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 1級"
   },
-  "level_2": "2級",
+  "level_2": "2级",
   "@level_2": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 2級"
   },
-  "level_3": "3級",
+  "level_3": "3级",
   "@level_3": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 3級"
   },
-  "level_4": "4級",
+  "level_4": "4级",
   "@level_4": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 4級"
   },
-  "level_7": "7級",
+  "level_7": "7级",
   "@level_7": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 7級"
   },
@@ -1709,11 +1709,11 @@
   "@home_click_settings": {
     "description": "「首頁」路徑 → 點擊設定所在地"
   },
-  "history_earthquake_intensity": "TREM 觀測網實測震度",
+  "history_earthquake_intensity": "TREM 观测网实测震度",
   "@history_earthquake_intensity": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
   },
-  "history_earthquake_intensity_h2": "使用 JMA 震度標準 (0.3秒三分量合成加速度)",
+  "history_earthquake_intensity_h2": "使用 JMA 震度标准 (0.3秒三分量合成加速度)",
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
@@ -1749,11 +1749,11 @@
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_descending": "降冪",
+  "ranking_descending": "降幂",
   "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_ascending": "升冪",
+  "ranking_ascending": "升幂",
   "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
