@@ -352,7 +352,7 @@
   "@other_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "tsunami_alert_sound": "海嘯警報（警報）",
+  "tsunami_alert_sound": "Cảnh báo sóng thần (Cảnh báo)",
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
@@ -360,7 +360,7 @@
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
-  "tsunami_alert2_sound": "海嘯警報（注意）",
+  "tsunami_alert2_sound": "Cảnh báo sóng thần (Cẩn thận)",
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
@@ -505,7 +505,7 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_general": "一般",
+  "me_general": "Nói chung",
   "@me_general": {
     "description": "「我」路徑 → 一般、「設定」路徑 → 「通知測試」內容 → 通知測試列表"
   },
@@ -594,35 +594,35 @@
   "@update_log": {
     "description": "「我」路徑 → 更新日誌"
   },
-  "interval_3_days": "3 天",
+  "interval_3_days": "3 ngày",
   "@interval_3_days": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 天"
   },
-  "interval_2_days": "2 天",
+  "interval_2_days": "2 ngày",
   "@interval_2_days": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2 天"
   },
-  "interval_24_hours": "24 小時",
+  "interval_24_hours": "24 giờ",
   "@interval_24_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24 小時"
   },
-  "interval_12_hours": "12 小時",
+  "interval_12_hours": "12 giờ",
   "@interval_12_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12 小時"
   },
-  "interval_6_hours": "6 小時",
+  "interval_6_hours": "6 giờ",
   "@interval_6_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6 小時"
   },
-  "interval_3_hours": "3 小時",
+  "interval_3_hours": "3 giờ",
   "@interval_3_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 小時"
   },
-  "interval_1_hour": "1 小時",
+  "interval_1_hour": "1 giờ",
   "@interval_1_hour": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1 小時"
   },
-  "interval_10_minutes": "10 分鐘",
+  "interval_10_minutes": "10 phút",
   "@interval_10_minutes": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10 分鐘"
   },
