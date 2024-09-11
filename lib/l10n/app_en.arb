@@ -702,7 +702,7 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
+  "notification_service_description": "When a natural disaster occurs, notifications are used to transmit disaster prevention information.",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
