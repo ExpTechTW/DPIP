@@ -1219,9 +1219,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               child: _buildLegend(),
             ),
           if (_showMonitorInfo)
-            Positioned(
-              right: 6,
-              top: 75,
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 75,
+                left: 6,
+                right: 6,
+              ),
               child: Card(
                 elevation: 4,
                 child: Padding(
