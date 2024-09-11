@@ -352,7 +352,7 @@
   "@other_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 其他、「設定」路徑 → 其他"
   },
-  "tsunami_alert_sound": "海嘯警報（警報）",
+  "tsunami_alert_sound": "海啸警报（警报）",
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
@@ -360,7 +360,7 @@
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
-  "tsunami_alert2_sound": "海嘯警報（注意）",
+  "tsunami_alert2_sound": "海啸警报（注意）",
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
@@ -505,7 +505,7 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_general": "一般",
+  "me_general": "常规​​​​​",
   "@me_general": {
     "description": "「我」路徑 → 一般、「設定」路徑 → 「通知測試」內容 → 通知測試列表"
   },
@@ -1087,7 +1087,7 @@
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   },
-  "me_about": "關於",
+  "me_about": "关于",
   "@me_about": {
     "description": "「我」路徑 → 關於"
   },
@@ -1289,7 +1289,7 @@
   "@report_end": {
     "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
-  "history_send_time": "發送時間",
+  "history_send_time": "发送时间",
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
