@@ -1074,6 +1074,36 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         }).show(context: context);
   }
 
+  Widget _showMonitorInfoCard(BuildContext context) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Icon(
+              Symbols.warning_amber_rounded,
+              size: 50,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              context.i18n.no_earthquake_monitor,
+              style: context.theme.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 10),
+            Text(
+              context.i18n.settings_earthquake_monitor,
+              style: context.theme.textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1219,40 +1249,21 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               child: _buildLegend(),
             ),
           if (_showMonitorInfo)
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 75,
-                left: 6,
-                right: 6,
-              ),
-              child: Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Symbols.warning_amber_rounded,
-                        size: 50,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        context.i18n.no_earthquake_monitor,
-                        style: context.theme.textTheme.bodyLarge,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        context.i18n.settings_earthquake_monitor,
-                        style: context.theme.textTheme.bodyMedium,
-                      ),
-                    ],
-                  ),
+            if (Platform.localeName.substring(0,2) == "ja")
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 75,
+                  left: 6,
+                  right: 6,
                 ),
+                child: _showMonitorInfoCard(context),
+              )
+            else
+              Positioned(
+                right: 6,
+                top: 75,
+                child: _showMonitorInfoCard(context),
               ),
-            ),
           Positioned.fill(
             child: EewDraggableSheet(child: _eewUI),
           ),
