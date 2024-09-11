@@ -1249,7 +1249,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               child: _buildLegend(),
             ),
           if (_showMonitorInfo)
-            if (Platform.localeName.substring(0,2) == "ja")
+            if (Platform.localeName.substring(0,2) == "ja" || Global.preference.getString("locale")?.substring(0,2) == "ja")
               Padding(
                 padding: const EdgeInsets.only(
                   top: 75,
