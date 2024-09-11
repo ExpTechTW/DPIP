@@ -505,7 +505,7 @@
   "@more_features": {
     "description": "「更多」路徑 → 「更多功能列表」標題"
   },
-  "me_general": "一般",
+  "me_general": "일반",
   "@me_general": {
     "description": "「我」路徑 → 一般、「設定」路徑 → 「通知測試」內容 → 通知測試列表"
   },
@@ -594,35 +594,35 @@
   "@update_log": {
     "description": "「我」路徑 → 更新日誌"
   },
-  "interval_3_days": "3 天",
+  "interval_3_days": "3일",
   "@interval_3_days": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 天"
   },
-  "interval_2_days": "2 天",
+  "interval_2_days": "2일",
   "@interval_2_days": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 2 天"
   },
-  "interval_24_hours": "24 小時",
+  "interval_24_hours": "24시간",
   "@interval_24_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 24 小時"
   },
-  "interval_12_hours": "12 小時",
+  "interval_12_hours": "12시간",
   "@interval_12_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 12 小時"
   },
-  "interval_6_hours": "6 小時",
+  "interval_6_hours": "6시간",
   "@interval_6_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 6 小時"
   },
-  "interval_3_hours": "3 小時",
+  "interval_3_hours": "3시간",
   "@interval_3_hours": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 3 小時"
   },
-  "interval_1_hour": "1 小時",
+  "interval_1_hour": "1시간",
   "@interval_1_hour": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 1 小時"
   },
-  "interval_10_minutes": "10 分鐘",
+  "interval_10_minutes": "10분",
   "@interval_10_minutes": {
     "description": "「地圖」路徑 → 「降水」標題 → 托盤 → 10 分鐘"
   },
