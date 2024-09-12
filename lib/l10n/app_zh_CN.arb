@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh_CN",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
