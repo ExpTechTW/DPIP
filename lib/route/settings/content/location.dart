@@ -412,14 +412,12 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         });
       },
     );
-    setState(() async {
-      autoStartPermission = await Autostarter.checkAutoStartState() ?? false;
-      try {
+    if (Platform.isAndroid) {
+      setState(() async {
+        autoStartPermission = await Autostarter.checkAutoStartState() ?? false;
         batteryOptimizationPermission = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
-      } catch (err) {
-        batteryOptimizationPermission = false;
-      }
-    });
+      });
+    }
   }
 
   void sendpositionUpdate() {
@@ -594,8 +592,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     ),
                     TextButton(
                       child: Text(context.i18n.settings),
-                      onPressed: () {
+                      onPressed: () async {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                        Navigator.pop(context);
                       },
                     ),
                   ]),
