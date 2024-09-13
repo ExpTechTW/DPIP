@@ -269,7 +269,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
               "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} (${_intervalTranslations[_select_index]})",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            icon: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
+            icon: Icon(_isExpanded ? Icons.expand_more : Icons.expand_less),
             iconAlignment: IconAlignment.end,
             style: ButtonStyle(
               backgroundColor: WidgetStatePropertyAll(context.colors.surface),
