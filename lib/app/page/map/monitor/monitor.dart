@@ -1117,7 +1117,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           if (!monitor)
             Positioned(
               key: monitorButtonKey,
-              right: 4,
+              left: 4,
               top: 40,
               child: Material(
                 color: context.colors.error,
