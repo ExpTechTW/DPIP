@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:autostarter/autostarter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
@@ -19,6 +20,8 @@ class WelcomePermissionPage extends StatefulWidget {
 
 class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
+  late Future<List<PermissionItemOnly>> _permissionsFutureAndroid;
+  bool _autoStartStatus = false;
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
@@ -44,10 +47,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   }
 
   @override
-  void initState() {
+  Future<void> initState() async {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _permissionsFuture = _initializePermissions();
+    _permissionsFutureAndroid = Future.value(_createPermissionItem(context));
+    _autoStartStatus = (await Autostarter.checkAutoStartState())!;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _checkNotificationPermission();
       setState(() {});
@@ -90,7 +95,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         permissions = [
           Permission.notification,
           Permission.location,
+          Permission.locationAlways,
           androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+          Permission.ignoreBatteryOptimizations,
         ];
       } else if (Platform.isIOS) {
         permissions = [
@@ -131,12 +138,24 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           description = context.i18n.location_based_service;
           color = Colors.blue;
           break;
+        case Permission.locationAlways:
+          icon = Icons.location_on;
+          text = "位置(一律允許)";
+          description = context.i18n.location_based_service;
+          color = Colors.blue;
+          break;
         case Permission.storage:
         case Permission.photos:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
           text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;
           color = Colors.green;
+          break;
+        case Permission.ignoreBatteryOptimizations:
+          icon = Icons.battery_full;
+          text = "省電策略";
+          description = "省電策略";
+          color = Colors.greenAccent;
           break;
         default:
           continue;
@@ -152,6 +171,100 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       ));
     }
     return items;
+  }
+
+  List<PermissionItemOnly> _createPermissionItem(BuildContext context) {
+    if (Platform.isIOS) {
+        return [];
+      }
+    final items = <PermissionItemOnly>[];
+    final permission = ["autoStart"];
+    for (final permission in permission) {
+      IconData icon;
+      String text;
+      String description;
+      Color color;
+      bool isHighlighted = false;
+
+      switch (permission) {
+        case "autoStart":
+          icon = Icons.start;
+          text = "自啟動";
+          description = "自啟動";
+          color = Colors.orange;
+          break;
+        default:
+          continue;
+      }
+
+      items.add(PermissionItemOnly(
+        icon: icon,
+        text: text,
+        description: description,
+        color: color,
+        permission: Future.value(false),
+        isHighlighted: isHighlighted,
+      ));
+    }
+    return items;
+  }
+
+  Widget _buildPermissionCardOnly(PermissionItemOnly item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: context.colors.surfaceContainer,
+          borderRadius: BorderRadius.circular(16),
+          border: item.isHighlighted ? Border.all(color: Colors.red, width: 2) : null,
+        ),
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: item.color.withOpacity(0.1),
+            child: Icon(item.icon, color: item.color),
+          ),
+          title: Text(item.text),
+          subtitle: Text(item.description),
+          trailing: _buildPermissionSwitchOnly(item),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPermissionSwitchOnly(PermissionItemOnly item) {
+    return FutureBuilder<bool>(
+      future: item.permission,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          );
+        }
+        _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data!;
+        print(_autoStartStatus);
+        return Switch(
+          value: _autoStartStatus,
+          onChanged: (value) async {
+            if (value) {
+              final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
+              if (isAvailable!) {
+                await Autostarter.getAutoStartPermission(newTask: true);
+              }
+            } else {
+              await Autostarter.getAutoStartPermission(newTask: true);
+            }
+
+            final newStatus = await Autostarter.checkAutoStartState();
+            _autoStartStatus = newStatus!;
+            item.permission = Future.value(_autoStartStatus);
+
+            setState(() {});
+          },
+        );
+      },
+    );
   }
 
   Widget _buildPermissionCard(PermissionItem item) {
@@ -352,6 +465,22 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 return Column(children: permissionItems.map(_buildPermissionCard).toList());
               },
             ),
+            if (Platform.isAndroid)
+              FutureBuilder(
+                future: _permissionsFutureAndroid,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text('No permissions to display'));
+                  }
+
+                  final permissionItems = _createPermissionItem(context);
+                  return Column(children: permissionItems.map(_buildPermissionCardOnly).toList());
+                },
+              ),
           ],
         ),
       ),
@@ -375,6 +504,24 @@ class PermissionItem {
     required this.color,
     required this.permission,
     this.isGranted = false,
+    required this.isHighlighted,
+  });
+}
+
+class PermissionItemOnly {
+  final IconData icon;
+  final String text;
+  final String description;
+  final Color color;
+  Future<bool> permission;
+  bool isHighlighted;
+
+  PermissionItemOnly({
+    required this.icon,
+    required this.text,
+    required this.description,
+    required this.color,
+    required this.permission,
     required this.isHighlighted,
   });
 }

@@ -592,7 +592,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                     ),
                     TextButton(
                       child: Text(context.i18n.settings),
-                      onPressed: () async {
+                      onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                         Navigator.pop(context);
                       },
