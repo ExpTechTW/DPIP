@@ -702,11 +702,11 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
+  "notification_service_description": "大規模災害発生時に通知を通じてリアルタイムの防災情報を伝達します",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "使用定位來自動更新所在地設定，提供當地的即時防災資訊",
+  "location_based_service": "位置情報を使用して所在地設定を自動更新し、現地のリアルタイム防災情報を提供します",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
@@ -1381,7 +1381,7 @@
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
-  "sound_weather_alert": "天氣警特報",
+  "sound_weather_alert": "天気警報・特報",
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
@@ -1465,11 +1465,11 @@
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
-  "sunny_with_snow_showers": "晴有陣雪",
+  "sunny_with_snow_showers": "晴れ時々雪",
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
-  "sunny_with_sleet_showers": "晴陣雨雪",
+  "sunny_with_sleet_showers": "晴れ時々雨か雪",
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
@@ -1537,15 +1537,15 @@
   "@partly_cloudy_with_snow_pellets": {
     "description": "天氣狀況：多雲伴有雪珠"
   },
-  "partly_cloudy_with_ice_pellets": "多雲有冰珠",
+  "partly_cloudy_with_ice_pellets": "曇り時々みぞれ",
   "@partly_cloudy_with_ice_pellets": {
     "description": "天氣狀況：多雲伴有冰珠"
   },
-  "partly_cloudy_with_snow_showers": "多雲有陣雪",
+  "partly_cloudy_with_snow_showers": "曇り時々雪",
   "@partly_cloudy_with_snow_showers": {
     "description": "天氣狀況：多雲伴有陣雪"
   },
-  "partly_cloudy_with_sleet_showers": "多雲陣雨雪",
+  "partly_cloudy_with_sleet_showers": "曇り時々雨か雪",
   "@partly_cloudy_with_sleet_showers": {
     "description": "天氣狀況：多雲伴有陣雨夾雪"
   },
@@ -1573,7 +1573,7 @@
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
-  "partly_cloudy_with_thunder": "多雲伴有雷",
+  "partly_cloudy_with_thunder": "曇り時々雷雨",
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
@@ -1613,11 +1613,11 @@
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
-  "overcast_with_snow_showers": "陰有陣雪",
+  "overcast_with_snow_showers": "曇り時々雪",
   "@overcast_with_snow_showers": {
     "description": "天氣狀況：陰天伴有陣雪"
   },
-  "overcast_with_sleet_showers": "陰陣雨雪",
+  "overcast_with_sleet_showers": "曇り時々雨か雪",
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
@@ -1649,7 +1649,7 @@
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
-  "get_weather_abnormal": "取得天氣異常",
+  "get_weather_abnormal": "天気の取得に失敗しました",
   "@get_weather_abnormal": {
     "description": "取得天氣異常"
   },
@@ -1733,7 +1733,7 @@
   "@ranking": {
     "description": "「排行榜」頁面 → 標題"
   },
-  "ranking_time": "資料時間：{time}\n共 {ranked_length} 觀測點",
+  "ranking_time": "資料時間：{time}\n合計 {ranked_length} 観測点",
   "@ranking_time": {
     "description": "「排行榜」頁面 → 資料時間：{time}\n共 {ranked_length} 觀測點",
     "placeholders": {
@@ -1749,15 +1749,15 @@
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_descending": "降冪",
+  "ranking_descending": "降順",
   "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_ascending": "升冪",
+  "ranking_ascending": "昇順",
   "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
-  "ranking_merge_into": "合併至",
+  "ranking_merge_into": "統合する",
   "@ranking_merge_into": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
   },
