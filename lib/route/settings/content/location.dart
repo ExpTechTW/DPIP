@@ -678,7 +678,80 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 sendpositionUpdate();
               });
             },
-          )
+          ),
+          if (autoStartPermission != null)
+            Visibility(
+              visible: !isAutoLocatingEnabled && city != null && town != null && !autoStartPermission!,
+              maintainAnimation: true,
+              maintainState: true,
+              child: AnimatedOpacity(
+                opacity: !isAutoLocatingEnabled && city != null && town != null && !autoStartPermission! ? 1 : 0,
+                curve: const Interval(0.2, 1, curve: Easing.standard),
+                duration: Durations.medium2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Symbols.warning,
+                        color: context.colors.error,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        context.i18n.autoStart_permission_denied,
+                        style: TextStyle(color: context.colors.error),
+                      ),
+                    ),
+                    TextButton(
+                      child: Text(context.i18n.settings),
+                      onPressed: () async {
+                        await Autostarter.getAutoStartPermission(newTask: true);
+                      },
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+          if (batteryOptimizationPermission != null)
+            Visibility(
+              visible: !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission!,
+              maintainAnimation: true,
+              maintainState: true,
+              child: AnimatedOpacity(
+                opacity: !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission! ? 1 : 0,
+                curve: const Interval(0.2, 1, curve: Easing.standard),
+                duration: Durations.medium2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Icon(
+                        Symbols.warning,
+                        color: context.colors.error,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        context.i18n.batteryOptimization_permission_denied,
+                        style: TextStyle(color: context.colors.error),
+                      ),
+                    ),
+                    TextButton(
+                      child: Text(context.i18n.settings),
+                      onPressed: () {
+                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ]),
+                ),
+              ),
+            ),
         ],
       ),
     );

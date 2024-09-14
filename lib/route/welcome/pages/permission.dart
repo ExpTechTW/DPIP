@@ -79,8 +79,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      setState(() {
+      setState(() async {
         _permissionsFuture = _initializePermissions();
+        _permissionsFutureAndroid = Future.value(_createPermissionItem(context));
+        _autoStartStatus = (await Autostarter.checkAutoStartState())!;
       });
     }
   }
@@ -242,22 +244,20 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             child: CircularProgressIndicator(strokeWidth: 2),
           );
         }
-        _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data!;
-        print(_autoStartStatus);
+        _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data ?? false;
         return Switch(
           value: _autoStartStatus,
           onChanged: (value) async {
-            if (value) {
-              final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
-              if (isAvailable!) {
-                await Autostarter.getAutoStartPermission(newTask: true);
-              }
-            } else {
+            setState(() {
+              _autoStartStatus = value;
+            });
+            final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
+            if (isAvailable!) {
               await Autostarter.getAutoStartPermission(newTask: true);
+              final newStatus = await Autostarter.checkAutoStartState();
+              _autoStartStatus = newStatus!;
             }
 
-            final newStatus = await Autostarter.checkAutoStartState();
-            _autoStartStatus = newStatus!;
             item.permission = Future.value(_autoStartStatus);
 
             setState(() {});
@@ -352,6 +352,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         }
       }
       item.isGranted = status.isGranted;
+
+      setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to change permission: ${item.text}')),
