@@ -528,7 +528,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 ),
               ),
             ),
-          if (autoStartPermission != null)
+          if (autoStartPermission != null && Platform.isAndroid)
             Visibility(
               visible: isAutoLocatingEnabled && !autoStartPermission!,
               maintainAnimation: true,
@@ -564,7 +564,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 ),
               ),
             ),
-          if (batteryOptimizationPermission != null)
+          if (batteryOptimizationPermission != null && Platform.isAndroid)
             Visibility(
               visible: isAutoLocatingEnabled && !batteryOptimizationPermission!,
               maintainAnimation: true,
@@ -679,7 +679,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               });
             },
           ),
-          if (autoStartPermission != null)
+          if (autoStartPermission != null && Platform.isAndroid)
             Visibility(
               visible: !isAutoLocatingEnabled && city != null && town != null && !autoStartPermission!,
               maintainAnimation: true,
@@ -715,7 +715,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 ),
               ),
             ),
-          if (batteryOptimizationPermission != null)
+          if (batteryOptimizationPermission != null && Platform.isAndroid)
             Visibility(
               visible: !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission!,
               maintainAnimation: true,
