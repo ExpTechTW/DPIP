@@ -28,7 +28,7 @@
 	<key>CFBundleName</key>
 	<string>dpip</string>
 	<key>CFBundleDisplayName</key>
-	<string>DPIP 防災</string>
+	<string>DPIP</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
