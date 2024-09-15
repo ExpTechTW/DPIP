@@ -47,16 +47,22 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   }
 
   @override
-  Future<void> initState() async {
+  void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _permissionsFuture = _initializePermissions();
-    _permissionsFutureAndroid = Future.value(_createPermissionItem(context));
-    _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+    if (Platform.isAndroid) {
+      _permissionsFutureAndroid = Future.value(_createPermissionItem());
+      _autoStartStatusCheck();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _checkNotificationPermission();
       setState(() {});
     });
+  }
+
+  void _autoStartStatusCheck() async {
+    _autoStartStatus = (await Autostarter.checkAutoStartState())!;
   }
 
   Future<void> _checkNotificationPermission() async {
@@ -81,8 +87,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     if (state == AppLifecycleState.resumed) {
       setState(() async {
         _permissionsFuture = _initializePermissions();
-        _permissionsFutureAndroid = Future.value(_createPermissionItem(context));
-        _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+        if (Platform.isAndroid) {
+          _permissionsFutureAndroid = Future.value(_createPermissionItem());
+          _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+        }
       });
     }
   }
@@ -146,18 +154,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           description = context.i18n.location_based_service;
           color = Colors.blue;
           break;
+        case Permission.ignoreBatteryOptimizations:
+          icon = Icons.battery_full;
+          text = "省電策略";
+          description = "省電策略";
+          color = Colors.greenAccent;
+          break;
         case Permission.storage:
         case Permission.photos:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
           text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;
           color = Colors.green;
-          break;
-        case Permission.ignoreBatteryOptimizations:
-          icon = Icons.battery_full;
-          text = "省電策略";
-          description = "省電策略";
-          color = Colors.greenAccent;
           break;
         default:
           continue;
@@ -175,10 +183,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     return items;
   }
 
-  List<PermissionItemOnly> _createPermissionItem(BuildContext context) {
-    if (Platform.isIOS) {
-        return [];
-      }
+  List<PermissionItemOnly> _createPermissionItem() {
     final items = <PermissionItemOnly>[];
     final permission = ["autoStart"];
     for (final permission in permission) {
@@ -479,7 +484,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                     return const Center(child: Text('No permissions to display'));
                   }
 
-                  final permissionItems = _createPermissionItem(context);
+                  final permissionItems = _createPermissionItem();
                   return Column(children: permissionItems.map(_buildPermissionCardOnly).toList());
                 },
               ),
