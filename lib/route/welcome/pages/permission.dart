@@ -100,21 +100,39 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     List<Permission> permissions = [];
 
     try {
-      if (Platform.isAndroid) {
-        final androidInfo = await deviceInfo.androidInfo;
-        permissions = [
-          Permission.notification,
-          Permission.location,
-          Permission.locationAlways,
-          androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
-          Permission.ignoreBatteryOptimizations,
-        ];
-      } else if (Platform.isIOS) {
-        permissions = [
-          Permission.notification,
-          Permission.location,
-          Permission.photos,
-        ];
+      PermissionStatus status = await Permission.location.status;
+      if (status.isGranted) {
+        if (Platform.isAndroid) {
+          final androidInfo = await deviceInfo.androidInfo;
+          permissions = [
+            Permission.notification,
+            Permission.locationAlways,
+            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            Permission.ignoreBatteryOptimizations,
+          ];
+        } else if (Platform.isIOS) {
+          permissions = [
+            Permission.notification,
+            Permission.locationAlways,
+            Permission.photos,
+          ];
+        }
+      } else {
+        if (Platform.isAndroid) {
+          final androidInfo = await deviceInfo.androidInfo;
+            permissions = [
+              Permission.notification,
+              Permission.location,
+              androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+              Permission.ignoreBatteryOptimizations,
+            ];
+        } else if (Platform.isIOS) {
+          permissions = [
+            Permission.notification,
+            Permission.location,
+            Permission.photos,
+          ];
+        }
       }
 
       await _checkNotificationPermission();
@@ -127,7 +145,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
   List<PermissionItem> _createPermissionItems(List<Permission> permissions, BuildContext context) {
     final items = <PermissionItem>[];
-    for (final permission in permissions) {
+    for (Permission permission in permissions) {
       IconData icon;
       String text;
       String description;
@@ -142,15 +160,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           color = Colors.orange;
           isHighlighted = true;
           break;
+        case Permission.locationAlways:
         case Permission.location:
           icon = Icons.location_on;
           text = context.i18n.settings_position;
-          description = context.i18n.location_based_service;
-          color = Colors.blue;
-          break;
-        case Permission.locationAlways:
-          icon = Icons.location_on;
-          text = "位置(一律允許)";
           description = context.i18n.location_based_service;
           color = Colors.blue;
           break;
@@ -349,6 +362,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               _isNotificationPermission = true;
             }
           }
+        } else if (item.permission == Permission.location){
+          item.permission = Permission.locationAlways;
+          status = await item.permission.request();
+          if (status.isPermanentlyDenied) {
+            _showPermanentlyDeniedDialog(item);
+          }
         }
       } else {
         status = await item.permission.status;
@@ -473,7 +492,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               },
             ),
             if (Platform.isAndroid)
-              FutureBuilder(
+              FutureBuilder<List<PermissionItemOnly>>(
                 future: _permissionsFutureAndroid,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -500,7 +519,7 @@ class PermissionItem {
   final String text;
   final String description;
   final Color color;
-  final Permission permission;
+  Permission permission;
   bool isGranted;
   bool isHighlighted;
 
