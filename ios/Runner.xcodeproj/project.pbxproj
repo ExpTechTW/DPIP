@@ -76,8 +76,9 @@
 		529BD5D22C48C28B00EFE088 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		529C27C92C93F7B900AAFAB6 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		529C27CC2C93F7BC00AAFAB6 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		529C27CE2C947EE800AAFAB6 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		529C27CF2C947EFB00AAFAB6 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		529C27D92C96EBD100AAFAB6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		529C27DA2C96EBD900AAFAB6 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		52E010A32C7C5DDC00C87792 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Main.strings; sourceTree = "<group>"; };
 		52E010A42C7C5DDC00C87792 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		632125282C2EA17900A088F8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -495,8 +496,9 @@
 			children = (
 				529C27C92C93F7B900AAFAB6 /* zh */,
 				529C27CC2C93F7BC00AAFAB6 /* ko */,
-				529C27CE2C947EE800AAFAB6 /* zh-Hant */,
 				529C27CF2C947EFB00AAFAB6 /* ja */,
+				529C27D92C96EBD100AAFAB6 /* en */,
+				529C27DA2C96EBD900AAFAB6 /* vi */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
