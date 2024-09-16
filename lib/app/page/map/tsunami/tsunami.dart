@@ -548,6 +548,11 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 color: context.colors.onSurface,
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Text(
                                               convertTimestamp(tsunami!.eq.time),
                                               style: TextStyle(
@@ -573,8 +578,13 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 color: context.colors.onSurface,
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   tsunami!.eq.loc,
