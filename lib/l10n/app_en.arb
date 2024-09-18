@@ -898,7 +898,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "Estimated earthquake intensity legend",
+  "estimated_intensity_legend": "Estimated intensity legend",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
@@ -1095,7 +1095,7 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "Estimated maximum intensity",
+  "estimated_intensity": "Estimated",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
