@@ -1083,7 +1083,7 @@
       }
     }
   },
-  "me_developer": "開発者が言いたいこと",
+  "me_developer": "開発者からのメッセージ",
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   },
@@ -1469,7 +1469,7 @@
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
-  "sunny_with_sleet_showers": "晴れ時々雨か雪",
+  "sunny_with_sleet_showers": "晴れ時々みぞれ",
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
