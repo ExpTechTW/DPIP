@@ -428,7 +428,7 @@
   "@unit_relative_humidity": {
     "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 單位：相對濕度 (%)"
   },
-  "unit_hpa": "单位：百帕（hPa）",
+  "unit_hpa": "单位：百帕 (hPa)",
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
   },
@@ -730,7 +730,7 @@
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "强震监视器使用之测站为 ExpTech 所有，不归中央气象署管理，请不要向中央气象署交付故障或意见，会造成他们的困扰。",
+  "trem_station_warning": "强震监视器使用的测站为 ExpTech 所有，不归中央气象署管理，请不要向中央气象署交付故障或意见，会造成他们的困扰。",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
@@ -1517,7 +1517,7 @@
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_fog": "多雲有霧",
+  "partly_cloudy_with_fog": "",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
   },
@@ -1641,7 +1641,7 @@
   "@overcast_with_severe_thunderstorm": {
     "description": "天氣狀況：陰天伴有強雷雨"
   },
-  "overcast_with_severe_thunderhail": "陰大雷雹",
+  "overcast_with_severe_thunderhail": "阴天有强雷冰雹",
   "@overcast_with_severe_thunderhail": {
     "description": "天氣狀況：陰天伴有強雷雹"
   },
