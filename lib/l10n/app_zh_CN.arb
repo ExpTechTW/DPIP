@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh_CN",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -1433,15 +1433,15 @@
   "@sunny_with_haze": {
     "description": "天氣狀況：晴天伴有霾"
   },
-  "sunny_with_mist": "晴有靄",
+  "sunny_with_mist": "晴有薄雾",
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
-  "sunny_with_lightning": "晴有閃電",
+  "sunny_with_lightning": "晴有闪电",
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_fog": "晴有霧",
+  "sunny_with_fog": "晴有雾",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
