@@ -1517,7 +1517,7 @@
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_fog": "",
+  "partly_cloudy_with_fog": "多云有雾",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
   },
