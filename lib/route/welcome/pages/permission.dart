@@ -273,27 +273,60 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               _isNotificationPermission = true;
             }
           }
-        } else if (item.permission == Permission.location){
+        } else if (item.permission == Permission.location) {
           status = await item.permission.status;
           if (status.isPermanentlyDenied) {
             _showPermanentlyDeniedDialog(item);
-          } else if (status.isDenied) {
-            _showPermanentlyDeniedDialog(item);
           }
-
-          item.permission = Permission.locationAlways;
-          status = await item.permission.request();
-          if (status.isPermanentlyDenied) {
-            _showPermanentlyDeniedDialog(item);
-          } else if (status.isDenied) {
-            _showPermanentlyDeniedDialog(item);
+          if (Platform.isAndroid) {
+            _permissionsFuture = _initializePermissions();
+            item.permission = Permission.locationAlways;
+            if (status.isDenied) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            } else if (status.isGranted) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            }
           }
-        } else if (item.permission == Permission.locationAlways){
+        } else if (item.permission == Permission.locationAlways) {
           status = await item.permission.status;
           if (status.isPermanentlyDenied) {
             _showPermanentlyDeniedDialog(item);
-          } else if (status.isDenied) {
-            _showPermanentlyDeniedDialog(item);
+          }
+          if (Platform.isAndroid) {
+            _permissionsFuture = _initializePermissions();
+            if (status.isDenied) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            } else if (status.isGranted) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            }
           }
         }
       } else {
