@@ -1745,7 +1745,7 @@
       }
     }
   },
-  "according": "順序",
+  "according": "並び替え",
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
