@@ -3,6 +3,8 @@ import "dart:io";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
+import "package:dpip/route/settings/content/root.dart";
+import "package:dpip/route/welcome/pages/dev.dart";
 import "package:dpip/route/welcome/pages/tos.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/need_location.dart";
@@ -18,6 +20,7 @@ class SettingsExperimentView extends StatefulWidget {
 
 class _SettingsExperimentViewState extends State<SettingsExperimentView> with WidgetsBindingObserver {
   bool monitorEnabled = Global.preference.getBool("monitor") ?? false;
+  bool devEnabled = Global.preference.getBool("dev") ?? false;
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
@@ -75,6 +78,19 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
     }
   }
 
+  Future<void> _handleDevToggle(bool value) async {
+    if (!value) {
+      await Global.preference.setBool("dev", false);
+      setState(() => devEnabled = false);
+    } else {
+      await Navigator.of(context, rootNavigator: true).push(
+        MaterialPageRoute(builder: (context) => const WelcomeDevPage()),
+      );
+      setState(() => devEnabled = Global.preference.getBool("dev") ?? false);
+    }
+    SettingsRootView.updateDev();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -95,6 +111,20 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
                   title: Text(context.i18n.enable_monitor),
                   value: monitorEnabled,
                   onChanged: _handleMonitorToggle,
+                ),
+          _isLoading
+              ? ListTile(
+                  title: Text(context.i18n.enable_dev),
+                  trailing: const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : SwitchListTile(
+                  title: Text(context.i18n.enable_dev),
+                  value: devEnabled,
+                  onChanged: _handleDevToggle,
                 ),
         ],
       ),

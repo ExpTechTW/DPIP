@@ -2,6 +2,7 @@ import "dart:convert";
 import "dart:io";
 
 import "package:dpip/api/route.dart";
+import "package:dpip/global.dart";
 import "package:dpip/model/announcement.dart";
 import "package:dpip/model/crowdin/localization_progress.dart";
 import "package:dpip/model/eew.dart";
@@ -454,6 +455,41 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
+  }
+
+  Future<String> login(String? name, String email, String password) async {
+    final url = Uri.parse('https://api-1.exptech.dev/api/v3/et/login');
+    final response = await post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+        'pass': password,
+        'name': '${name ?? "me"}/dpip/${Global.packageInfo.version.toString()}/${Platform.isAndroid ? "Android" : "IOS"}',
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to login: ${response.statusCode}');
+    }
+  }
+
+  Future<String> logout(String token) async {
+    final url = Uri.parse('https://api-1.exptech.dev/api/v3/et/logout');
+    final response = await delete(
+      url,
+      headers: {'Authorization': 'Basic $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to login: ${response.statusCode}');
+    }
   }
 
   Future<String> sendMonitor(String token, String status) async {
