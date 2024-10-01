@@ -870,6 +870,14 @@
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
+  "autoStart_permission_denied": "自啟動權限已被拒絕，請移至設定允許權限。",
+  "@autoStart_permission_denied": {
+    "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
+  },
+  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "@batteryOptimization_permission_denied": {
+    "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
+  },
   "permission_request": "權限請求",
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
