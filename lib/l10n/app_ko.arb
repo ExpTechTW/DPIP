@@ -1309,371 +1309,371 @@
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
   },
-  "sound_eew_silent": "緊急地震速報(無聲)",
+  "sound_eew_silent": "긴급지진속보(무음)",
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
-  "sound_eew_silent_h2": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上",
+  "sound_eew_silent_h2": "최대진도 5약 이상,\n소재지(향ㆍ진) 예상 진도 1 이상",
   "@sound_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上"
   },
-  "sound_earthquake_eew_major": "地震速報(重大)",
+  "sound_earthquake_eew_major": "지진속보(거대)",
   "@sound_earthquake_eew_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(重大)"
   },
-  "sound_earthquake_eew_major_h2": "所在地(鄉鎮)預估震度 4 以上",
+  "sound_earthquake_eew_major_h2": "소재지(향ㆍ진) 예상 진도 4 이상",
   "@sound_earthquake_eew_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(重大)」描述 → 所在地(鄉鎮)預估震度 4 以上"
   },
-  "sound_earthquake_eew_minor": "地震速報(一般)",
+  "sound_earthquake_eew_minor": "지진속보(일반)",
   "@sound_earthquake_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(一般)"
   },
-  "sound_earthquake_eew_minor_h2": "所在地(鄉鎮)預估震度 2 以上",
+  "sound_earthquake_eew_minor_h2": "소재지(향ㆍ진) 예상 진도 2 이상",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
-  "sound_earthquake_eew_silent": "地震速報(無聲)",
+  "sound_earthquake_eew_silent": "지진속보(무음)",
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
-  "sound_earthquake_eew_silent_h2": "所在地(鄉鎮)預估震度 1 以上",
+  "sound_earthquake_eew_silent_h2": "소재지(향ㆍ진) 예상 진도 1 이상",
   "@sound_earthquake_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
-  "sound_int_report_minor": "震度速報(一般)",
+  "sound_int_report_minor": "진도속보(일반)",
   "@sound_int_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(一般)"
   },
-  "sound_int_report_minor_h2": "所在地(鄉鎮)實測震度 3 以上",
+  "sound_int_report_minor_h2": "소재지(향ㆍ진) 실측 진도 3 이상",
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
-  "sound_int_report_silent": "震度速報(無聲通知)",
+  "sound_int_report_silent": "진도속보(무음)",
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
-  "sound_int_report_silent_h2": "所在地(鄉鎮)實測震度 1 以上",
+  "sound_int_report_silent_h2": "소재지(향ㆍ진) 실측 진도 1 이상",
   "@sound_int_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(無聲通知)」描述 → 所在地(鄉鎮)實測震度 1 以上。"
   },
-  "sound_monitor_minor": "強震監視器(一般)",
+  "sound_monitor_minor": "강진모니터(일반)",
   "@sound_monitor_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 強震監視器(一般)"
   },
-  "sound_report_minor": "地震報告(一般)",
+  "sound_report_minor": "지진보고(일반)",
   "@sound_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
   },
-  "sound_report_silent": "地震報告(無聲通知)",
+  "sound_report_silent": "지진보고(무음)",
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
-  "sound_report_silent_h2": "所在地(縣市)實測震度 1 以上",
+  "sound_report_silent_h2": "소재지(현ㆍ시) 실측 진도 1 이상",
   "@sound_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
   },
-  "sound_weather_warning": "氣象警報",
+  "sound_weather_warning": "기상경보",
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
-  "sound_rain_instant": "雷雨即時訊息",
+  "sound_rain_instant": "뇌우 재난 문자",
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
-  "sound_weather_alert": "天氣警特報",
+  "sound_weather_alert": "기상 경보",
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
-  "sound_rain_minor_h2": "所在地(鄉鎮)發布雷雨即時訊息或\n山區暴雨時",
+  "sound_rain_minor_h2": "소재지(현ㆍ시)으로 뇌우 실시간 정보 또는 산간지역 호우 시 전송합니다.",
   "@sound_rain_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
   },
-  "sound_weather_major_h2": "所在地(鄉鎮)發布紅色燈號之\n天氣警特報",
+  "sound_weather_major_h2": "소재지(향진)에서 적색 기상 경보 특보를 발령",
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
-  "sound_weather_minor_h2": "所在地(鄉鎮)發布上述除外燈號之\n天氣警特報",
+  "sound_weather_minor_h2": "소재지(향진)에서 기상 경보를 발령",
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
-  "sound_disaster": "災害資訊",
+  "sound_disaster": "재난 정보",
   "@sound_disaster": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
   },
-  "sound_evacuation": "避難資訊",
+  "sound_evacuation": "피난 정보",
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
-  "sound_evacuation_major_h2": "所在地(鄉鎮)發布避難警訊時",
+  "sound_evacuation_major_h2": "소재지(향진)에 피난 경보가 발령된 경우",
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地(鄉鎮)發布避難資訊時",
+  "sound_evacuation_minor_h2": "소재지(향진)에 피난정보가 발령된 경우",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海嘯消息(無聲通知)",
+  "sound_tsunami_silent": "태평양 쓰나미 소식(무음)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
-  "sound_tsunami_silent_h2": "太平洋海嘯消息發布時",
+  "sound_tsunami_silent_h2": "태평향 쓰나미 소식 발표 시",
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
-  "sound_other_notifications": "其他通知",
+  "sound_other_notifications": "기타 정보",
   "@sound_other_notifications": {
     "description": "「我」路徑 → 「通知測試」內容 → 「其他通知」標題 "
   },
-  "sound_major": "重大",
+  "sound_major": "거대",
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
-  "sunny_with_haze": "晴有霾",
+  "sunny_with_haze": "맑고 연무",
   "@sunny_with_haze": {
     "description": "天氣狀況：晴天伴有霾"
   },
-  "sunny_with_mist": "晴有靄",
+  "sunny_with_mist": "맑고 이슬비",
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
-  "sunny_with_lightning": "晴有閃電",
+  "sunny_with_lightning": "맑고 번개",
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_fog": "晴有霧",
+  "sunny_with_fog": "맑고 안개",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
-  "sunny_with_rain": "晴有雨",
+  "sunny_with_rain": "맑고 비",
   "@sunny_with_rain": {
     "description": "天氣狀況：晴天伴有雨"
   },
-  "sunny_with_sleet": "晴有雨雪",
+  "sunny_with_sleet": "맑고 진눈깨비",
   "@sunny_with_sleet": {
     "description": "天氣狀況：晴天伴有雨夾雪"
   },
-  "sunny_with_heavy_snow": "晴有大雪",
+  "sunny_with_heavy_snow": "맑고 폭설",
   "@sunny_with_heavy_snow": {
     "description": "天氣狀況：晴天伴有大雪"
   },
-  "sunny_with_snow_pellets": "晴有雪珠",
+  "sunny_with_snow_pellets": "맑고 싸락눈",
   "@sunny_with_snow_pellets": {
     "description": "天氣狀況：晴天伴有雪珠"
   },
-  "sunny_with_ice_pellets": "晴有冰珠",
+  "sunny_with_ice_pellets": "맑고 작은 우박",
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
-  "sunny_with_snow_showers": "晴有陣雪",
+  "sunny_with_snow_showers": "맑고 눈보라",
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
-  "sunny_with_sleet_showers": "晴陣雨雪",
+  "sunny_with_sleet_showers": "맑고 진눈깨비 소나기",
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
-  "sunny_with_hail": "晴有雹",
+  "sunny_with_hail": "맑고 우박",
   "@sunny_with_hail": {
     "description": "天氣狀況：晴天伴有冰雹"
   },
-  "sunny_with_thunderstorm": "晴有雷雨",
+  "sunny_with_thunderstorm": "맑고 뇌우",
   "@sunny_with_thunderstorm": {
     "description": "天氣狀況：晴天伴有雷雨"
   },
-  "sunny_with_thundersnow": "晴有雷雪",
+  "sunny_with_thundersnow": "맑고 천둥을 동반한 눈",
   "@sunny_with_thundersnow": {
     "description": "天氣狀況：晴天伴有雷雪"
   },
-  "sunny_with_thunderhail": "晴有雷雹",
+  "sunny_with_thunderhail": "맑고 천둥번개",
   "@sunny_with_thunderhail": {
     "description": "天氣狀況：晴天伴有雷雹"
   },
-  "sunny_with_severe_thunderstorm": "晴大雷雨",
+  "sunny_with_severe_thunderstorm": "맑고 강한 뇌우",
   "@sunny_with_severe_thunderstorm": {
     "description": "天氣狀況：晴天伴有強雷雨"
   },
-  "sunny_with_severe_thunderhail": "晴大雷雹",
+  "sunny_with_severe_thunderhail": "맑고 강한 천둥번개",
   "@sunny_with_severe_thunderhail": {
     "description": "天氣狀況：晴天伴有強雷雹"
   },
-  "sunny_with_thunder": "晴天伴有雷",
+  "sunny_with_thunder": "맑고 천둥",
   "@sunny_with_thunder": {
     "description": "天氣狀況：晴天伴有雷"
   },
-  "partly__cloudy": "多雲",
+  "partly__cloudy": "부분적으로 흐림",
   "@partly__cloudy": {
     "description": "天氣狀況：多雲"
   },
-  "partly_cloudy_with_haze": "多雲有霾",
+  "partly_cloudy_with_haze": "연무를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_haze": {
     "description": "天氣狀況：多雲伴有霾"
   },
-  "partly_cloudy_with_mist": "多雲有靄",
+  "partly_cloudy_with_mist": "이슬비를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_mist": {
     "description": "天氣狀況：多雲伴有靄"
   },
-  "partly_cloudy_with_lightning": "多雲有閃電",
+  "partly_cloudy_with_lightning": "천둥을 동반한 부분적으로 흐림",
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_fog": "多雲有霧",
+  "partly_cloudy_with_fog": "안개를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
   },
-  "partly_cloudy_with_rain": "多雲有雨",
+  "partly_cloudy_with_rain": "비를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_rain": {
     "description": "天氣狀況：多雲伴有雨"
   },
-  "partly_cloudy_with_sleet": "多雲有雨雪",
+  "partly_cloudy_with_sleet": "진눈깨비를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_sleet": {
     "description": "天氣狀況：多雲伴有雨夾雪"
   },
-  "partly_cloudy_with_heavy_snow": "多雲有大雪",
+  "partly_cloudy_with_heavy_snow": "폭설을 동반한 부분적으로 흐림",
   "@partly_cloudy_with_heavy_snow": {
     "description": "天氣狀況：多雲伴有大雪"
   },
-  "partly_cloudy_with_snow_pellets": "多雲有雪珠",
+  "partly_cloudy_with_snow_pellets": "싸락눈을 동반한 부분적으로 흐림",
   "@partly_cloudy_with_snow_pellets": {
     "description": "天氣狀況：多雲伴有雪珠"
   },
-  "partly_cloudy_with_ice_pellets": "多雲有冰珠",
+  "partly_cloudy_with_ice_pellets": "작은 우박을 동반한 부분적으로 흐림",
   "@partly_cloudy_with_ice_pellets": {
     "description": "天氣狀況：多雲伴有冰珠"
   },
-  "partly_cloudy_with_snow_showers": "多雲有陣雪",
+  "partly_cloudy_with_snow_showers": "눈보라를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_snow_showers": {
     "description": "天氣狀況：多雲伴有陣雪"
   },
-  "partly_cloudy_with_sleet_showers": "多雲陣雨雪",
+  "partly_cloudy_with_sleet_showers": "진눈깨비 소나기를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_sleet_showers": {
     "description": "天氣狀況：多雲伴有陣雨夾雪"
   },
-  "partly_cloudy_with_hail": "多雲有雹",
+  "partly_cloudy_with_hail": "우박을 동반한 부분적으로 흐림",
   "@partly_cloudy_with_hail": {
     "description": "天氣狀況：多雲伴有冰雹"
   },
-  "partly_cloudy_with_thunderstorm": "多雲有雷雨",
+  "partly_cloudy_with_thunderstorm": "뇌우를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_thunderstorm": {
     "description": "天氣狀況：多雲伴有雷雨"
   },
-  "partly_cloudy_with_thundersnow": "多雲有雷雪",
+  "partly_cloudy_with_thundersnow": "눈과 번개를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_thundersnow": {
     "description": "天氣狀況：多雲伴有雷雪"
   },
-  "partly_cloudy_with_thunderhail": "多雲有雷雹",
+  "partly_cloudy_with_thunderhail": "천둥번개를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_thunderhail": {
     "description": "天氣狀況：多雲伴有雷雹"
   },
-  "partly_cloudy_with_severe_thunderstorm": "多雲大雷雨",
+  "partly_cloudy_with_severe_thunderstorm": "강한 뇌우를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_severe_thunderstorm": {
     "description": "天氣狀況：多雲伴有強雷雨"
   },
-  "partly_cloudy_with_severe_thunderhail": "多雲大雷雹",
+  "partly_cloudy_with_severe_thunderhail": "강한 천둥번개를 동반한 부분적으로 흐림",
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
-  "partly_cloudy_with_thunder": "多雲伴有雷",
+  "partly_cloudy_with_thunder": "천둥을 동반한 부분적으로 흐림",
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
-  "overcast_with_haze": "陰有霾",
+  "overcast_with_haze": "연무로 뒤덮인",
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "陰有靄",
+  "overcast_with_mist": "이슬비로 뒤덮인",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
-  "overcast_with_lightning": "陰有閃電",
+  "overcast_with_lightning": "번개로 뒤덮인",
   "@overcast_with_lightning": {
     "description": "天氣狀況：陰天伴有閃電"
   },
-  "overcast_with_fog": "陰有霧",
+  "overcast_with_fog": "안개로 뒤덮인",
   "@overcast_with_fog": {
     "description": "天氣狀況：陰天伴有霧"
   },
-  "overcast_with_rain": "陰有雨",
+  "overcast_with_rain": "비로 뒤덮인",
   "@overcast_with_rain": {
     "description": "天氣狀況：陰天伴有雨"
   },
-  "overcast_with_sleet": "陰有雨雪",
+  "overcast_with_sleet": "진눈깨비로 뒤덮인",
   "@overcast_with_sleet": {
     "description": "天氣狀況：陰天伴有雨夾雪"
   },
-  "overcast_with_heavy_snow": "陰有大雪",
+  "overcast_with_heavy_snow": "폭설로 뒤덮인",
   "@overcast_with_heavy_snow": {
     "description": "天氣狀況：陰天伴有大雪"
   },
-  "overcast_with_snow_pellets": "陰有雪珠",
+  "overcast_with_snow_pellets": "싸락눈으로 뒤덮인",
   "@overcast_with_snow_pellets": {
     "description": "天氣狀況：陰天伴有雪珠"
   },
-  "overcast_with_ice_pellets": "陰有冰珠",
+  "overcast_with_ice_pellets": "작은 우박으로 뒤덮인",
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
-  "overcast_with_snow_showers": "陰有陣雪",
+  "overcast_with_snow_showers": "눈보라로 뒤덮인",
   "@overcast_with_snow_showers": {
     "description": "天氣狀況：陰天伴有陣雪"
   },
-  "overcast_with_sleet_showers": "陰陣雨雪",
+  "overcast_with_sleet_showers": "진눈깨비 소나기로 뒤덮인",
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
-  "overcast_with_hail": "陰有雹",
+  "overcast_with_hail": "우박으로 뒤덮인",
   "@overcast_with_hail": {
     "description": "天氣狀況：陰天伴有冰雹"
   },
-  "overcast_with_thunderstorm": "陰有雷雨",
+  "overcast_with_thunderstorm": "뇌우로 뒤덮인",
   "@overcast_with_thunderstorm": {
     "description": "天氣狀況：陰天伴有雷雨"
   },
-  "overcast_with_thundersnow": "陰有雷雪",
+  "overcast_with_thundersnow": "눈보라로 뒤덮인",
   "@overcast_with_thundersnow": {
     "description": "天氣狀況：陰天伴有雷雪"
   },
-  "overcast_with_thunderhail": "陰有雷雹",
+  "overcast_with_thunderhail": "천둥번개로 뒤덮인",
   "@overcast_with_thunderhail": {
     "description": "天氣狀況：陰天伴有雷雹"
   },
-  "overcast_with_severe_thunderstorm": "陰大雷雨",
+  "overcast_with_severe_thunderstorm": "맑고 강한 천둥번개",
   "@overcast_with_severe_thunderstorm": {
     "description": "天氣狀況：陰天伴有強雷雨"
   },
-  "overcast_with_severe_thunderhail": "陰大雷雹",
+  "overcast_with_severe_thunderhail": "흐리고 강한 천둥번개",
   "@overcast_with_severe_thunderhail": {
     "description": "天氣狀況：陰天伴有強雷雹"
   },
-  "overcast_with_thunder": "陰天伴有雷",
+  "overcast_with_thunder": "흐리고 천둥",
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
-  "get_weather_abnormal": "取得天氣異常",
+  "get_weather_abnormal": "날씨 이상징후 확인",
   "@get_weather_abnormal": {
     "description": "取得天氣異常"
   },
-  "map_average": "平均",
+  "map_average": "평균",
   "@map_average": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
   },
-  "radar_synthetic_echo": "雷達合成回波",
+  "radar_synthetic_echo": "기상 레이더",
   "@radar_synthetic_echo": {
     "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
   },
-  "completed": "已結束",
+  "completed": "종료",
   "@completed": {
     "description": "「天氣警特報」狀態 → 已結束"
   },
-  "active": "生效中",
+  "active": "시행 중",
   "@active": {
     "description": "「天氣警特報」狀態 → 生效中"
   },
-  "save_image_permission": "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。",
+  "save_image_permission": "사진을 저장하려면 DPIP에 사진 및 미디어 사용 권한을 허용해야 정상적으로 작동합니다.",
   "@save_image_permission": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。"
   },
-  "save_image_error": "儲存圖片時發生錯誤:",
+  "save_image_error": "사진 저장 후 오류가 발생했습니다:",
   "@save_image_error": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤:"
   },
