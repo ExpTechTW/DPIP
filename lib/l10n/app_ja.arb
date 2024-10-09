@@ -41,7 +41,7 @@
   "@settings": {
     "description": "「設定」頁面標題"
   },
-  "settingsDescription": "DPIPの作動方法を調整",
+  "settingsDescription": "DPIPの動作を調整",
   "@settingsDescription": {
     "description": "「設定」頁面敘述"
   },
@@ -79,7 +79,7 @@
       }
     }
   },
-  "report_with_number": "番号 {reportNumber} の顕著な地震",
+  "report_with_number": "ID #{reportNumber} の顕著な地震",
   "@report_with_number": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 副標題",
     "placeholders": {
@@ -100,7 +100,7 @@
   "@report_event_time": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 發震時間"
   },
-  "report_location": "緯度/経度",
+  "report_location": "震央",
   "@report_location": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 位於、「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 位於"
   },
@@ -172,11 +172,11 @@
   "@settings_locale_crowdin_description": {
     "description": "「設定」路徑 → 「協助翻譯」副標題敘述"
   },
-  "earthquake_warning_error": "最新の地震速報は取得できません",
+  "earthquake_warning_error": "最新の緊急地震速報が取得できません",
   "@earthquake_warning_error": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 暫時無法取得地震速報資料"
   },
-  "no_earthquake_warning": "地震速報が発表されていません",
+  "no_earthquake_warning": "緊急地震速報が発表されていません",
   "@no_earthquake_warning": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 目前無生效中的地震速報"
   },
@@ -292,7 +292,7 @@
   "@report_offing": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起若干海面變動"
   },
-  "report_tsunami_attention": "この地震により津波発生のおそれがあります 今後の情報にご注意ください",
+  "report_tsunami_attention": "この地震により津波発生のおそれがあります。今後の情報にご注意ください。",
   "@report_tsunami_attention": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊 → 此地震可能引起海嘯 注意後續資訊"
   },
@@ -324,11 +324,11 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "最大震度が５弱以上かつ\nその所在地（町村）の推定震度が４以上である",
+  "eew_alert_description_sound": "予想最大震度が５弱以上かつ\n現在地（町村）の予想震度が４以上",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "最大震度が５弱以上かつ\nその所在地（町村）の推定震度が２以上である",
+  "eew_description_sound": "予想最大震度が５弱以上かつ\n現在地（町村）の予想震度が２以上",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
@@ -336,7 +336,7 @@
   "@eq_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 偵測到晃動"
   },
-  "report_description_sound": "所在地（都道府県）の実測震度が３以上である",
+  "report_description_sound": "現在地（都道府県）の実測震度が３以上",
   "@report_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 所在地(縣市)實測震度 3 以上"
   },
@@ -356,7 +356,7 @@
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert_description_sound": "津波警報が発表された場合\n沿岸地域（町村）",
+  "tsunami_alert_description_sound": "沿岸地域（町村）に居るときに\n津波警報が発表された場合",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
@@ -364,11 +364,11 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert2_description_sound": "津波警報が発表された場合\n上記除外地域",
+  "tsunami_alert2_description_sound": "沿岸地域以外に居るときに\n津波警報が発表された場合",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "お知らせ送信時",
+  "server_announcement_description_sound": "お知らせが送信された場合",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
@@ -444,7 +444,7 @@
   "@no_historical_events": {
     "description": "「歷史」路徑 → 沒有歷史事件資訊"
   },
-  "current_events": "現在のイベント情報",
+  "current_events": "現在の地震イベント",
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
@@ -529,7 +529,7 @@
   "@advanced_features_title": {
     "description": "「設定」路徑 → 「進階功能」副描述"
   },
-  "enable_monitor": "強震モニタの有効化",
+  "enable_monitor": "リアルタイム震度モニタ（台湾）の有効化",
   "@enable_monitor": {
     "description": "「設定」路徑 → 「進階功能」標題 → 啟用強震監視器"
   },
@@ -541,7 +541,7 @@
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "番号 {id} 第{serial}報",
+  "tsunami_number": "ID #{id} 第{serial}報",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -586,7 +586,7 @@
   "@depth": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 深度"
   },
-  "home_safety": "すべて安全で、事件もない。",
+  "home_safety": "何も起こらず順調です。",
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
@@ -638,7 +638,7 @@
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
-  "dpip_description": "DPIPは台湾の現地チームによって設計されたアプリで、TREM-Net（台湾リアルタイム地震観測網）の情報と中央気象局（CWA）のデータを統合し、統合された単一の便利な防災情報アプリを提供します。",
+  "dpip_description": "DPIPは台湾の現地チームによって設計されたアプリです。TREM-Net（台湾リアルタイム地震観測網）の情報と台湾中央氣象署（CWA）のデータを統合し、便利な防災情報アプリを提供します。",
   "@dpip_description": {
     "description": "「歡迎」頁面 → DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
   },
@@ -650,7 +650,7 @@
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studioは、平均年齢20歳以下の15人以上の学生で構成されるグループです。メンバーは台湾（北部、中部、南部）、日本、韓国、中国から来ています。",
+  "exptech_studio_description": "ExpTech Studioは、15人以上の学生で構成される、平均年齢20歳以下のグループです。台湾（北部、中部、南部）、日本、韓国、中国出身のメンバーで構成されます。",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
@@ -658,7 +658,7 @@
   "@our_mission": {
     "description": "「歡迎」頁面 → 我們的初衷"
   },
-  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために設立されたが、その後校外に発展し、徐々に現在の形になりました。",
+  "founding_mission": "コンピューターやテクノロジーに興味と能力のある学生を集めるために学校内で設立されましたが、その後校外に発展し、徐々に現在の形になりました。",
   "@founding_mission": {
     "description": "「歡迎」頁面 → 成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
   },
@@ -666,11 +666,11 @@
   "@notice": {
     "description": "「歡迎」頁面 → 注意事項"
   },
-  "notice_details": "DPIPでは、ExpTechや中央気象署（CWA）からの様々な情報をお届けしますので、ご利用の際には以下の点にご留意ください。",
+  "notice_details": "DPIPでは、ExpTechや台湾中央氣象署（CWA）からの様々な情報をお届けします。ご利用の際には以下の点にご留意ください。",
   "@notice_details": {
     "description": "「歡迎」頁面 → DPIP 將傳遞來自 ExpTech 及中央氣象署的各種資訊，使用時請注意以下幾點。"
   },
-  "official_info": "いかなる情報も、中央気象署（CWA）が発表した内容に基づいていること。",
+  "official_info": "いかなる情報も、台湾中央氣象署（CWA）が発表した内容に基づいています。",
   "@official_info": {
     "description": "「歡迎」頁面 → 任何資訊應以中央氣象署發布之內容為準。"
   },
@@ -678,11 +678,11 @@
   "@information_reliability": {
     "description": "「歡迎」頁面 → 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
   },
-  "strong_shake_warning": "強い揺れは、通知よりも早くユーザーに到達する可能性があります。",
+  "strong_shake_warning": "通知よりも先に強い揺れが到達する可能性があります。",
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震情報は迅速な計算の結果であり、大きな誤差が生じる可能性があるため、注意深く理解して利用する必要があります。",
+  "earthquake_alert_warning": "地震情報は速報的な計算の結果であり、大きな誤差が生じる可能性があるため、注意深く理解して利用する必要があります。",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
@@ -706,11 +706,11 @@
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "位置情報を使用して所在地設定を自動更新し、現地のリアルタイム防災情報を提供します",
+  "location_based_service": "位置情報を使用して現在地設定を自動更新し、現地のリアルタイム防災情報を提供します",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
-  "data_visualization_storage": "中央気象局またはExpTechが提供する画像を保存するため",
+  "data_visualization_storage": "台湾中央氣象署またはExpTechが提供する画像を保存する",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
@@ -842,11 +842,11 @@
   "@always": {
     "description": "「存取權限彈窗」 → 永遠"
   },
-  "auto_start_permission_info": "より良いオートロケーションを体験するには、「自動起動許可」を指定し、DPIPがバックグラウンドで自動的に所在地を設定するように、オートアクティベーションの許可を与える必要があります。",
+  "auto_start_permission_info": "より良いオートロケーションを体験するには、「自動起動許可」を指定し、DPIPがバックグラウンドで自動的に現在地を設定するように、オートアクティベーションの許可を与える必要があります。",
   "@auto_start_permission_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "auto_start_permission_experience": "より良いDPIPを体験するには、「自動起動許可」を指定し、DPIPがバックグラウンドでアラーム通知を適切に受信できるようにする必要があります。",
+  "auto_start_permission_experience": "DPIPをより良く使用するには、バックグラウンドでの実行を許可し、いつでもDPIPからの通知を適切に受信できるようにしてください。",
   "@auto_start_permission_experience": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -854,11 +854,11 @@
   "@auto_start_permission": {
     "description": "「存取權限彈窗」 → 自啟動權限"
   },
-  "auto_location_experience_info": "より良いオートロケーションを体験するためには、「制限のない」を指定し、DPIPがバックグラウンドで自動的に所在地を設定することを許可する必要があります。",
+  "auto_location_experience_info": "より良いオートロケーションを体験するためには、「制限のない」を指定し、DPIPがバックグラウンドで自動的に現在地を設定することを許可する必要があります。",
   "@auto_location_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
   },
-  "unlimited_permission_experience_info": "より良いDPIPを体験するためには、「制限のない」を指定し、DPIPがバックグラウンドでアラーム通知を適切に受信できるようにする必要があります。",
+  "unlimited_permission_experience_info": "DPIPをより良く使用するには、「制限のない」を指定し、バックグラウンドでDPIPからの通知を適切に受信できるようにしてください。",
   "@unlimited_permission_experience_info": {
     "description": "「存取權限彈窗」 → 為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。"
   },
@@ -878,11 +878,11 @@
   "@manual_permission_enablement": {
     "description": "「存取權限彈窗」 → 需要使用者手動到設定開啟相關權限。"
   },
-  "location_not_set": "所在地を設定していません",
+  "location_not_set": "現在地が設定されていません",
   "@location_not_set": {
     "description": "「尚未設定所在地彈窗」 → 尚未設定所在地"
   },
-  "location_setting_required": "DPIPを正しく動作させるには、所在地を設定する必要があります「設定ページに移動」をクリックして、お住まいの所在地を設定し、再度お試しください。",
+  "location_setting_required": "DPIPを正しく動作させるには、現在地を設定する必要があります。「設定ページに移動」をタップして、現在地を設定し、再度お試しください。",
   "@location_setting_required": {
     "description": "提示用戶需要設定所在地才能正常運作的訊息"
   },
@@ -898,7 +898,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "推定震度の凡例",
+  "estimated_intensity_legend": "予想震度の凡例",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
@@ -966,7 +966,7 @@
   "@retry": {
     "description": "重試"
   },
-  "photo_media_permission_request": "アプリケーションの設定で 「写真とメディア」の許可を探して許可し、もう一度試してください。",
+  "photo_media_permission_request": "アプリケーションの設定で 「写真と動画」の権限を探して許可したうえで、もう一度試してください。",
   "@photo_media_permission_request": {
     "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
@@ -1095,19 +1095,19 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "推定最大震度",
+  "estimated_intensity": "予想最大震度",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
-  "time_earthquake": "地震発生",
+  "time_earthquake": "発生",
   "@time_earthquake": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 發震"
   },
-  "no_earthquake_monitor": "強震モニタの無効化",
+  "no_earthquake_monitor": "リアルタイム震度モニタが無効です",
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
-  "settings_earthquake_monitor": "セットアップの高度な機能で、強震モニタをオンにしてください。",
+  "settings_earthquake_monitor": "設定の「高度な機能」で、リアルタイム震度モニタを有効にしてください。",
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
@@ -1135,11 +1135,11 @@
   "@first_gratitude": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
   },
-  "dpip_goal": "DPIPは、あらゆる防災情報を統合し、人々の生活に溶け込むことを目指したソフトウェアです。まだまだ未完成で難しいが、この目標に向かって努力を続けていく。",
+  "dpip_goal": "DPIPは、あらゆる防災情報を統合して発信し、人々の生活に溶け込むことを目指したソフトウェアです。まだまだ未完成であり、開発に当たっては困難もありますが、目標に向かって努力を続けていく所存です。",
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
-  "development_investment": "ソフトウェアの開発には、人件費、設備費、クラウドサービス、ネットワーク費用など、50万ニュー台湾ドル以上の費用と時間、労力を費やしてきました。そのためにも、ユーザーの皆様のご支持をいただき、他社に依存することなく運営を継続していきたいと考えております。",
+  "development_investment": "当ソフトウェアの開発には、人件費、設備費、クラウドサービス・ネットワーク費用など、合計50万ニュー台湾ドル以上の費用に加え、膨大な時間、労力を費やしてきました。そのためにも、ユーザーの皆様のご支持をいただき、他社に依存することなく運営を継続していきたいと考えております。",
   "@development_investment": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
   },
@@ -1147,15 +1147,15 @@
   "@profit_model": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
   },
-  "profit_discussion": "アプリの開発を維持するため、チームは利益を上げる方法について社内で何度も激論を交わした。多くの選択肢の中から適切な収益モデルを見つけようとした。その結果、同種のソフトの多くが広告の挿入で採算をとっていることがわかり、一時はこの方式を採算方式として採用することも検討した。",
+  "profit_discussion": "アプリの開発を続けるため、私たちのチームは、採算をとる方法について何度も激論を交わしました。多くの選択肢の中から適切な収益モデルを模索しました。その結果、同種のソフトの多くが広告によって採算をとっていることがわかり、一時はこの方式を採算方式として採用することも検討しました。",
   "@profit_discussion": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
   },
-  "profit_difficulty": "利益を上げるのは本当に難しい",
+  "profit_difficulty": "利益を上げる困難",
   "@profit_difficulty": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利真的太難了"
   },
-  "user_payment_survey": "一般の人々の支払い意欲を調査したところ、一般的に防災に対する意識が低く、そのためにお金を使う可能性はさらに低いことがわかった。バックエンドのデータがこの主張を裏付けている。統計的に、熱心なスポンサーの数はユーザー全体の10万人に1人程度であり、広告を埋め込むことが最良の解決策であるように思える。",
+  "user_payment_survey": "人々の意識を調査したところ、一般的に防災に対する意識は低く、防災のためにお金を使う可能性はさらに低いことがわかりました。バックエンドのデータがこの主張を裏付けています。統計的に、熱心なスポンサーの数はユーザー全体の10万人に1人程度であり、ますます、広告を埋め込むことが最良の解決策であるように思えました。",
   "@user_payment_survey": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
   },
@@ -1163,7 +1163,7 @@
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
-  "no_ads_reason": "災害が起きたら、人は絶対に広告を見たくなくなりますよね。これが広告を出さない第一の理由です。防災に特化したソフトは、防災情報を早く正確に届けることが第一です。広告によって防災に関する正しい情報が得られなくなるとしたら、それは私たちの理念に反します。さらに、災害時には通信品質が低下することが多いのに、広告を読み込むためにネットワーク・トラフィックを浪費するのは悔しいことです。",
+  "no_ads_reason": "災害が起きた時、広告を見たい人は絶対にいません。これが広告を出さない第一の理由です。防災に特化したソフトは、防災情報を早く正確に届けることが第一です。広告によって正しい防災情報が得られなくなるとしたら、それは私たちの理念に反します。さらに、通信品質が低下することが多い災害時に、広告を読み込むために通信量を浪費するのは悔しいことです。",
   "@no_ads_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
   },
@@ -1175,7 +1175,7 @@
   "@no_fee_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如果植入廣告行不通，那對大眾收費呢？變成付費軟體？"
   },
-  "public_charge_consideration": "まず、防災ソフトとして、できるだけ多くの人に防災情報を届けたい。また、本当に必要な人は余計な出費ができないかもしれないので、できるだけ多くの人を助けたい。第二に、開発者としては、できるだけ多くの人に使ってもらいたいと考えており、有料化は利用意欲の低下に直結します。",
+  "public_charge_consideration": "まず、防災情報ソフトとして、できるだけ多くの人に防災情報を届けたい。また、余計な出費ができない人も含め、できるだけ多くの人を助けたい。そして、開発者としては、できるだけ多くの人に使ってもらいたい。\n一方で、有料化は利用意欲の低下に直結し、これらの目標に反します。",
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
@@ -1183,7 +1183,7 @@
   "@how_to_profit": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
   },
-  "summary": "まとめると、防災に興味を持ち、大切にしてくれる人を育て、ソフト開発をサポートし、ともに前進していきたいということだ。",
+  "summary": "まとめると、防災に興味を持ち、大切にしてくれる人を育て、ソフト開発をサポートし、ともに前進していきたいという考えです。",
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
@@ -1215,11 +1215,11 @@
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
-  "auto_location_permission_required": "自動的に所在地を設定する機能を使用するには、DPIPに通知権限が取得を許可する必要があります。",
+  "auto_location_permission_required": "自動的に現在地を設定する機能を使用するには、DPIPに通知権限を許可する必要があります。",
   "@auto_location_permission_required": {
     "description": "「通知權限」彈窗 → 自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。"
   },
-  "location_permission_needed": "自動的に所在地を設定する機能を使用するには、DPIPに位置情報が取得を許可する必要があります。",
+  "location_permission_needed": "自動的に現在地を設定する機能を使用するには、DPIPに位置情報の取得を許可する必要があります。",
   "@location_permission_needed": {
     "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
   },
@@ -1227,7 +1227,7 @@
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "より良いオートロケーションを体験するには、「{permissionType}」を指定し、DPIPがバックグラウンドで自動的に所在地を設定するように、オートアクティベーションの許可を与える必要があります。",
+  "improve_auto_location_experience": "より良いオートロケーションを体験するには、「{permissionType}」を指定し、DPIPがバックグラウンドで自動的に現在地を設定するように、オートアクティベーションの許可を与える必要があります。",
   "@improve_auto_location_experience": {
     "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
     "placeholders": {
@@ -1236,7 +1236,7 @@
       }
     }
   },
-  "auto_location_permission_upgrade_needed": "自動的に所在地を設定する機能を使用するには、「{permissionType}」を指定し、許可を付与する必要があります。",
+  "auto_location_permission_upgrade_needed": "自動的に現在地を設定する機能を使用するには、「{permissionType}」を指定し、許可を付与する必要があります。",
   "@auto_location_permission_upgrade_needed": {
     "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
     "placeholders": {
@@ -1261,7 +1261,7 @@
   "@me_welcome": {
     "description": "「我」頁面 → 「歡迎頁面」按鈕"
   },
-  "donate_h2": "サーバーの安定性と長期的な発展の維持にご協力ください",
+  "donate_h2": "安定したサーバーの維持と長期的な発展にご協力ください",
   "@donate_h2": {
     "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
   },
@@ -1289,11 +1289,11 @@
   "@report_end": {
     "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
-  "history_send_time": "発信時刻",
+  "history_send_time": "発表時刻",
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
-  "history_valid_until": "有効期間",
+  "history_valid_until": "有効期限",
   "@history_valid_until": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
   },
@@ -1313,31 +1313,31 @@
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
-  "sound_eew_silent_h2": "最大震度が５弱以上かつ\nその所在地（町村）の推定震度が１以上である",
+  "sound_eew_silent_h2": "予想最大震度が５弱以上かつ\n現在地（町村）の予想震度が１以上",
   "@sound_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上"
   },
-  "sound_earthquake_eew_major": "地震速報(重大な通知)",
+  "sound_earthquake_eew_major": "緊急地震速報 (重大な通知)",
   "@sound_earthquake_eew_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(重大)"
   },
-  "sound_earthquake_eew_major_h2": "所在地（町村）の推定震度が４以上である",
+  "sound_earthquake_eew_major_h2": "現在地(町村)の予想震度が４以上",
   "@sound_earthquake_eew_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(重大)」描述 → 所在地(鄉鎮)預估震度 4 以上"
   },
-  "sound_earthquake_eew_minor": "地震速報(一般な通知)",
+  "sound_earthquake_eew_minor": "緊急地震速報 (一般な通知)",
   "@sound_earthquake_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(一般)"
   },
-  "sound_earthquake_eew_minor_h2": "所在地（町村）の推定震度が２以上である",
+  "sound_earthquake_eew_minor_h2": "現在地（町村）の予想震度が２以上",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
-  "sound_earthquake_eew_silent": "地震速報(ミュートな通知)",
+  "sound_earthquake_eew_silent": "緊急地震速報 (ミュートな通知)",
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
-  "sound_earthquake_eew_silent_h2": "所在地（町村）の推定震度が１以上である",
+  "sound_earthquake_eew_silent_h2": "現在地（町村）の予想震度が１以上",
   "@sound_earthquake_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
@@ -1345,7 +1345,7 @@
   "@sound_int_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(一般)"
   },
-  "sound_int_report_minor_h2": "所在地（町村）の実測震度が３以上である",
+  "sound_int_report_minor_h2": "現在地（町村）の実測震度が３以上",
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
@@ -1353,7 +1353,7 @@
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
-  "sound_int_report_silent_h2": "所在地（町村）の実測震度が１以上である",
+  "sound_int_report_silent_h2": "現在地（町村）の実測震度が１以上",
   "@sound_int_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(無聲通知)」描述 → 所在地(鄉鎮)實測震度 1 以上。"
   },
@@ -1369,7 +1369,7 @@
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
-  "sound_report_silent_h2": "所在地（都道府県）の実測震度が１以上である",
+  "sound_report_silent_h2": "現在地（都道府県）の実測震度が１以上",
   "@sound_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
   },
@@ -1377,7 +1377,7 @@
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
-  "sound_rain_instant": "リアルタイムな雷雨の情報",
+  "sound_rain_instant": "リアルタイムの雷雨情報",
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
@@ -1385,15 +1385,15 @@
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
-  "sound_rain_minor_h2": "所在地（町村）はリアルタイムな雷雨の情報と山間部の暴雨を発表する場合",
+  "sound_rain_minor_h2": "現在地（町村）にリアルタイム雷雨情報や山間部の暴雨が発表された場合",
   "@sound_rain_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
   },
-  "sound_weather_major_h2": "所在地（町村）は赤色\n気象警報を発令している",
+  "sound_weather_major_h2": "現在地（町村）に赤信号の気象警報が発令された場合",
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
-  "sound_weather_minor_h2": "所在地（町村）は上記の除外された信号で\n気象警報を発令している",
+  "sound_weather_minor_h2": "現在地（町村）に上記以外の気象警報は発令されている",
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
@@ -1405,19 +1405,19 @@
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
-  "sound_evacuation_major_h2": "所在地（町村）が避難勧告を発表する場合",
+  "sound_evacuation_major_h2": "現在地（町村）に避難勧告が発表された場合",
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地（町村）が避難情報を発表する場合",
+  "sound_evacuation_minor_h2": "現在地（町村）に避難情報が発表された場合",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "PTWC津波情報(通知音なし)",
+  "sound_tsunami_silent": "PTWC津波情報 (通知音なし)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
-  "sound_tsunami_silent_h2": "PTWC津波情報が発表された場合",
+  "sound_tsunami_silent_h2": "PTWCによって津波情報が発表された場合",
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
@@ -1705,7 +1705,7 @@
   "@level_7": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 7級"
   },
-  "home_click_settings": "クリックして所在地を設定する",
+  "home_click_settings": "タップして現在地を設定する",
   "@home_click_settings": {
     "description": "「首頁」路徑 → 點擊設定所在地"
   },
@@ -1713,11 +1713,11 @@
   "@history_earthquake_intensity": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
   },
-  "history_earthquake_intensity_h2": "JMA 気象庁振動標準（0.3秒3成分合成加速度）を使用",
+  "history_earthquake_intensity_h2": "日本気象庁(JMA)震度階級（0.3秒3成分合成加速度）",
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
-  "history_seismic_intensity_reference": "この情報はTREM-Netの自動観測結果から得られたものであり、人による検証は行っていない。実際の結果は、中央気象庁（CMA）から発表される情報に基づいてください。",
+  "history_seismic_intensity_reference": "この情報はTREM-Netの自動観測結果から得られたものであり、目視による検証は行っていません。実際の結果は、台湾中央氣象署（CWA）から発表される情報を参照してください。",
   "@history_seismic_intensity_reference": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
   },
