@@ -201,7 +201,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
+                  context.i18n.hours_24_trend(dataTypeToChineseMap[selectedDataType].toString()),
                   style: context.theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
