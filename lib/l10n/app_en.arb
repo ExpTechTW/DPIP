@@ -368,7 +368,7 @@
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "Tsunami Warning (Notice)",
+  "server_announcement_description_sound": "When announcements are published",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
@@ -541,7 +541,7 @@
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "{id} No. {serial} report",
+  "tsunami_number": "No. {id}, Update #{serial}",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -590,7 +590,7 @@
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
-  "update_log": "Update Log",
+  "update_log": "Change log",
   "@update_log": {
     "description": "「我」路徑 → 更新日誌"
   },
@@ -898,7 +898,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "Estimated earthquake intensity legend",
+  "estimated_intensity_legend": "Estimated intensity legend",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
@@ -1095,7 +1095,7 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "Estimated maximum intensity",
+  "estimated_intensity": "Estimated",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
@@ -1764,5 +1764,14 @@
   "permission_storage": "Save",
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
+  },
+  "hours_24_trend": "24小時{type}趨勢",
+  "@hours_24_trend": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
   }
 }
