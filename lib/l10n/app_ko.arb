@@ -1764,5 +1764,14 @@
   "permission_storage": "이미지 저장",
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
+  },
+  "hours_24_trend": "24小時{type}趨勢",
+  "@hours_24_trend": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
   }
 }
