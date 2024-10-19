@@ -428,7 +428,7 @@
   "@unit_relative_humidity": {
     "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 單位：相對濕度 (%)"
   },
-  "unit_hpa": "单位：百帕（hPa）",
+  "unit_hpa": "单位：百帕 (hPa)",
   "@unit_hpa": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣壓」圖例 → 單位：百帕 (hPa)"
   },
@@ -730,7 +730,7 @@
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
-  "trem_station_warning": "强震监视器使用之测站为 ExpTech 所有，不归中央气象署管理，请不要向中央气象署交付故障或意见，会造成他们的困扰。",
+  "trem_station_warning": "强震监视器使用的测站为 ExpTech 所有，不归中央气象署管理，请不要向中央气象署交付故障或意见，会造成他们的困扰。",
   "@trem_station_warning": {
     "description": "「歡迎」頁面 → 強震監視器使用之測站為 ExpTech 所有，不歸中央氣象署管理，請不要向中央氣象署傳遞故障或意見，會造成他們的困擾。"
   },
@@ -1433,15 +1433,15 @@
   "@sunny_with_haze": {
     "description": "天氣狀況：晴天伴有霾"
   },
-  "sunny_with_mist": "晴有靄",
+  "sunny_with_mist": "晴有薄雾",
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
-  "sunny_with_lightning": "晴有閃電",
+  "sunny_with_lightning": "晴有闪电",
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_fog": "晴有霧",
+  "sunny_with_fog": "晴有雾",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
@@ -1465,15 +1465,15 @@
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
-  "sunny_with_snow_showers": "晴有陣雪",
+  "sunny_with_snow_showers": "晴有阵雪",
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
-  "sunny_with_sleet_showers": "晴陣雨雪",
+  "sunny_with_sleet_showers": "晴阵雨雪",
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
-  "sunny_with_hail": "晴有雹",
+  "sunny_with_hail": "晴有冰雹",
   "@sunny_with_hail": {
     "description": "天氣狀況：晴天伴有冰雹"
   },
@@ -1485,7 +1485,7 @@
   "@sunny_with_thundersnow": {
     "description": "天氣狀況：晴天伴有雷雪"
   },
-  "sunny_with_thunderhail": "晴有雷雹",
+  "sunny_with_thunderhail": "晴有雷冰雹",
   "@sunny_with_thunderhail": {
     "description": "天氣狀況：晴天伴有雷雹"
   },
@@ -1493,7 +1493,7 @@
   "@sunny_with_severe_thunderstorm": {
     "description": "天氣狀況：晴天伴有強雷雨"
   },
-  "sunny_with_severe_thunderhail": "晴大雷雹",
+  "sunny_with_severe_thunderhail": "晴大雷冰雹",
   "@sunny_with_severe_thunderhail": {
     "description": "天氣狀況：晴天伴有強雷雹"
   },
@@ -1501,151 +1501,151 @@
   "@sunny_with_thunder": {
     "description": "天氣狀況：晴天伴有雷"
   },
-  "partly__cloudy": "多雲",
+  "partly__cloudy": "多云",
   "@partly__cloudy": {
     "description": "天氣狀況：多雲"
   },
-  "partly_cloudy_with_haze": "多雲有霾",
+  "partly_cloudy_with_haze": "多云有霾",
   "@partly_cloudy_with_haze": {
     "description": "天氣狀況：多雲伴有霾"
   },
-  "partly_cloudy_with_mist": "多雲有靄",
+  "partly_cloudy_with_mist": "多云有霭",
   "@partly_cloudy_with_mist": {
     "description": "天氣狀況：多雲伴有靄"
   },
-  "partly_cloudy_with_lightning": "多雲有閃電",
+  "partly_cloudy_with_lightning": "多云有雷电",
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_fog": "多雲有霧",
+  "partly_cloudy_with_fog": "多云有雾",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
   },
-  "partly_cloudy_with_rain": "多雲有雨",
+  "partly_cloudy_with_rain": "多云有雨",
   "@partly_cloudy_with_rain": {
     "description": "天氣狀況：多雲伴有雨"
   },
-  "partly_cloudy_with_sleet": "多雲有雨雪",
+  "partly_cloudy_with_sleet": "多云有雨雪",
   "@partly_cloudy_with_sleet": {
     "description": "天氣狀況：多雲伴有雨夾雪"
   },
-  "partly_cloudy_with_heavy_snow": "多雲有大雪",
+  "partly_cloudy_with_heavy_snow": "多云有大雪",
   "@partly_cloudy_with_heavy_snow": {
     "description": "天氣狀況：多雲伴有大雪"
   },
-  "partly_cloudy_with_snow_pellets": "多雲有雪珠",
+  "partly_cloudy_with_snow_pellets": "多云有雪珠",
   "@partly_cloudy_with_snow_pellets": {
     "description": "天氣狀況：多雲伴有雪珠"
   },
-  "partly_cloudy_with_ice_pellets": "多雲有冰珠",
+  "partly_cloudy_with_ice_pellets": "多云有冰珠",
   "@partly_cloudy_with_ice_pellets": {
     "description": "天氣狀況：多雲伴有冰珠"
   },
-  "partly_cloudy_with_snow_showers": "多雲有陣雪",
+  "partly_cloudy_with_snow_showers": "多云有阵雪",
   "@partly_cloudy_with_snow_showers": {
     "description": "天氣狀況：多雲伴有陣雪"
   },
-  "partly_cloudy_with_sleet_showers": "多雲陣雨雪",
+  "partly_cloudy_with_sleet_showers": "多云阵雨雪",
   "@partly_cloudy_with_sleet_showers": {
     "description": "天氣狀況：多雲伴有陣雨夾雪"
   },
-  "partly_cloudy_with_hail": "多雲有雹",
+  "partly_cloudy_with_hail": "多云有冰雹",
   "@partly_cloudy_with_hail": {
     "description": "天氣狀況：多雲伴有冰雹"
   },
-  "partly_cloudy_with_thunderstorm": "多雲有雷雨",
+  "partly_cloudy_with_thunderstorm": "多云有雷雨",
   "@partly_cloudy_with_thunderstorm": {
     "description": "天氣狀況：多雲伴有雷雨"
   },
-  "partly_cloudy_with_thundersnow": "多雲有雷雪",
+  "partly_cloudy_with_thundersnow": "多云有雷雪",
   "@partly_cloudy_with_thundersnow": {
     "description": "天氣狀況：多雲伴有雷雪"
   },
-  "partly_cloudy_with_thunderhail": "多雲有雷雹",
+  "partly_cloudy_with_thunderhail": "多云有雷冰雹",
   "@partly_cloudy_with_thunderhail": {
     "description": "天氣狀況：多雲伴有雷雹"
   },
-  "partly_cloudy_with_severe_thunderstorm": "多雲大雷雨",
+  "partly_cloudy_with_severe_thunderstorm": "多云大雷雨",
   "@partly_cloudy_with_severe_thunderstorm": {
     "description": "天氣狀況：多雲伴有強雷雨"
   },
-  "partly_cloudy_with_severe_thunderhail": "多雲大雷雹",
+  "partly_cloudy_with_severe_thunderhail": "多云大雷冰雹",
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
-  "partly_cloudy_with_thunder": "多雲伴有雷",
+  "partly_cloudy_with_thunder": "多云伴有雷",
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
-  "overcast_with_haze": "陰有霾",
+  "overcast_with_haze": "阴有霾",
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "陰有靄",
+  "overcast_with_mist": "阴有霭",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
-  "overcast_with_lightning": "陰有閃電",
+  "overcast_with_lightning": "阴有雷电",
   "@overcast_with_lightning": {
     "description": "天氣狀況：陰天伴有閃電"
   },
-  "overcast_with_fog": "陰有霧",
+  "overcast_with_fog": "阴有雾",
   "@overcast_with_fog": {
     "description": "天氣狀況：陰天伴有霧"
   },
-  "overcast_with_rain": "陰有雨",
+  "overcast_with_rain": "阴有雨",
   "@overcast_with_rain": {
     "description": "天氣狀況：陰天伴有雨"
   },
-  "overcast_with_sleet": "陰有雨雪",
+  "overcast_with_sleet": "阴有雨雪",
   "@overcast_with_sleet": {
     "description": "天氣狀況：陰天伴有雨夾雪"
   },
-  "overcast_with_heavy_snow": "陰有大雪",
+  "overcast_with_heavy_snow": "阴有大雪",
   "@overcast_with_heavy_snow": {
     "description": "天氣狀況：陰天伴有大雪"
   },
-  "overcast_with_snow_pellets": "陰有雪珠",
+  "overcast_with_snow_pellets": "阴有雪珠",
   "@overcast_with_snow_pellets": {
     "description": "天氣狀況：陰天伴有雪珠"
   },
-  "overcast_with_ice_pellets": "陰有冰珠",
+  "overcast_with_ice_pellets": "阴有冰珠",
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
-  "overcast_with_snow_showers": "陰有陣雪",
+  "overcast_with_snow_showers": "阴有阵雪",
   "@overcast_with_snow_showers": {
     "description": "天氣狀況：陰天伴有陣雪"
   },
-  "overcast_with_sleet_showers": "陰陣雨雪",
+  "overcast_with_sleet_showers": "阴阵雨雪",
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
-  "overcast_with_hail": "陰有雹",
+  "overcast_with_hail": "阴有冰雹",
   "@overcast_with_hail": {
     "description": "天氣狀況：陰天伴有冰雹"
   },
-  "overcast_with_thunderstorm": "陰有雷雨",
+  "overcast_with_thunderstorm": "阴有雷雨",
   "@overcast_with_thunderstorm": {
     "description": "天氣狀況：陰天伴有雷雨"
   },
-  "overcast_with_thundersnow": "陰有雷雪",
+  "overcast_with_thundersnow": "阴有雷雪",
   "@overcast_with_thundersnow": {
     "description": "天氣狀況：陰天伴有雷雪"
   },
-  "overcast_with_thunderhail": "陰有雷雹",
+  "overcast_with_thunderhail": "阴有雷冰雹",
   "@overcast_with_thunderhail": {
     "description": "天氣狀況：陰天伴有雷雹"
   },
-  "overcast_with_severe_thunderstorm": "陰大雷雨",
+  "overcast_with_severe_thunderstorm": "阴大雷雨",
   "@overcast_with_severe_thunderstorm": {
     "description": "天氣狀況：陰天伴有強雷雨"
   },
-  "overcast_with_severe_thunderhail": "陰大雷雹",
+  "overcast_with_severe_thunderhail": "阴天有强雷冰雹",
   "@overcast_with_severe_thunderhail": {
     "description": "天氣狀況：陰天伴有強雷雹"
   },
-  "overcast_with_thunder": "陰天伴有雷",
+  "overcast_with_thunder": "阴天伴有雷",
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
@@ -1764,5 +1764,14 @@
   "permission_storage": "储存",
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
+  },
+  "hours_24_trend": "24小时{type}趋势",
+  "@hours_24_trend": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
   }
 }
