@@ -169,8 +169,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           break;
         case Permission.ignoreBatteryOptimizations:
           icon = Icons.battery_full;
-          text = "省電策略";
-          description = "省電策略";
+          text = context.i18n.power_saving_position;
+          description = context.i18n.power_saving_position_text;
           color = Colors.greenAccent;
           break;
         case Permission.storage:
@@ -466,8 +466,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                         backgroundColor: Colors.orange.withOpacity(0.1),
                         child: const Icon(Icons.start, color: Colors.orange),
                       ),
-                      title: const Text("自啟動"),
-                      subtitle: const Text("自啟動"),
+                      title: Text(context.i18n.automatic_start_position),
+                      subtitle: Text(context.i18n.automatic_start_position_text),
                       trailing: FutureBuilder<bool>(
                         future: _autoStartPermission,
                         builder: (context, snapshot) {
