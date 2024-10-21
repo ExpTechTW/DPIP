@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh_CN",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -869,6 +869,14 @@
   "notification_permission_denied": "通知功能已被拒绝，请移至设置允许权限。",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
+  },
+  "autoStart_permission_denied": "自啟動權限已被拒絕，請移至設定允許權限。",
+  "@autoStart_permission_denied": {
+    "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
+  },
+  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "@batteryOptimization_permission_denied": {
+    "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
   },
   "permission_request": "权限请求",
   "@permission_request": {
@@ -1773,5 +1781,21 @@
         "type": "String"
       }
     }
+  },
+  "power_saving_position": "省电策略",
+  "@power_saving_position": {
+    "description": "「歡迎」頁面 → 省電策略"
+  },
+  "power_saving_position_text": "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。",
+  "@power_saving_position_text": {
+    "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
+  },
+  "automatic_start_position": "自動化啟動",
+  "@automatic_start_position": {
+    "description": "「歡迎」頁面 → 自動化啟動"
+  },
+  "automatic_start_position_text": "允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。",
+  "@automatic_start_position_text": {
+    "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
 }
