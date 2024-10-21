@@ -386,7 +386,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           style: TextStyle(
                                             fontSize: 28,
                                             fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
                                             color: context.colors.onSurface,
                                           ),
                                         ),
@@ -400,7 +399,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
-                                              letterSpacing: 1,
                                               color: context.colors.onSurface.withOpacity(0.8),
                                             ),
                                           ),
@@ -411,7 +409,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                               : "${getTime()} 更新",
                                           style: TextStyle(
                                             fontSize: 14,
-                                            letterSpacing: 1,
                                             color: context.colors.onSurfaceVariant,
                                           ),
                                         ),
@@ -478,7 +475,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           "${tsunami?.content}",
                                           style: TextStyle(
                                             fontSize: 18,
-                                            letterSpacing: 2,
                                             color: context.colors.onSurface,
                                           ),
                                         ),
@@ -494,7 +490,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     style: TextStyle(
                                                       fontSize: 22,
                                                       fontWeight: FontWeight.bold,
-                                                      letterSpacing: 2,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
@@ -512,7 +507,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     style: TextStyle(
                                                       fontSize: 22,
                                                       fontWeight: FontWeight.bold,
-                                                      letterSpacing: 2,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
@@ -530,7 +524,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                           style: TextStyle(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
-                                            letterSpacing: 2,
                                             color: context.colors.onSurface,
                                           ),
                                         ),
@@ -544,16 +537,19 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                               context.i18n.occurrence_time,
                                               style: TextStyle(
                                                 fontSize: 18,
-                                                letterSpacing: 2,
                                                 color: context.colors.onSurface,
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Text(
                                               convertTimestamp(tsunami!.eq.time),
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
-                                                letterSpacing: 2,
                                                 color: context.colors.onSurface,
                                               ),
                                             ),
@@ -569,19 +565,22 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                               context.i18n.report_location,
                                               style: TextStyle(
                                                 fontSize: 18,
-                                                letterSpacing: 2,
                                                 color: context.colors.onSurface,
                                               ),
                                             ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
                                             Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   tsunami!.eq.loc,
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
-                                                    letterSpacing: 2,
                                                     color: context.colors.onSurface,
                                                   ),
                                                 ),
@@ -590,7 +589,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                   style: TextStyle(
                                                     fontSize: 14,
                                                     fontWeight: FontWeight.bold,
-                                                    letterSpacing: 2,
                                                     color: context.colors.onSurface,
                                                   ),
                                                 ),
@@ -611,7 +609,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     context.i18n.scale,
                                                     style: TextStyle(
                                                       fontSize: 18,
-                                                      letterSpacing: 2,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
@@ -620,7 +617,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,
-                                                      letterSpacing: 2,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
@@ -638,7 +634,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     context.i18n.depth,
                                                     style: TextStyle(
                                                       fontSize: 18,
-                                                      letterSpacing: 2,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
@@ -647,7 +642,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,
-                                                      letterSpacing: 2,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),

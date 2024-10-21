@@ -278,7 +278,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                 ),
                 const SizedBox(width: 4),
                 Icon(
-                  _isExpanded ? Icons.expand_less : Icons.expand_more,
+                  _isExpanded ? Icons.expand_more : Icons.expand_less,
                   color: context.colors.onSurface,
                 ),
               ],

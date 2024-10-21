@@ -368,7 +368,7 @@
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "Tsunami Warning (Notice)",
+  "server_announcement_description_sound": "When announcements are published",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
@@ -541,7 +541,7 @@
   "@tsunami_warning": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 近期無海嘯資訊"
   },
-  "tsunami_number": "{id} No. {serial} report",
+  "tsunami_number": "No. {id}, Update #{serial}",
   "@tsunami_number": {
     "description": "「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → {id}號 第{serial}報",
     "placeholders": {
@@ -590,7 +590,7 @@
   "@home_safety": {
     "description": "「首頁」路徑 → 「一切平安，無事件發生。」描述"
   },
-  "update_log": "Update Log",
+  "update_log": "Change log",
   "@update_log": {
     "description": "「我」路徑 → 更新日誌"
   },
@@ -634,7 +634,7 @@
   "@welcome_message": {
     "description": "「歡迎」頁面 → 歡迎使用 DPIP"
   },
-  "disaster_info_platform": "Disaster Prevention Information Platform",
+  "disaster_info_platform": "",
   "@disaster_info_platform": {
     "description": "「歡迎」頁面 → 防災資訊平台"
   },
@@ -702,13 +702,13 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "To provide notification service",
+  "notification_service_description": "When a natural disaster occurs, notifications are used to transmit disaster prevention information.",
   "@notification_service_description": {
-    "description": "「歡迎」頁面 → 用於提供通知服務"
+    "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "To provide services base on location",
+  "location_based_service": "Automatically updates your location settings to provide real-time disaster alerts for your current area.",
   "@location_based_service": {
-    "description": "「歡迎」頁面 → 用於提供基於位置的服務"
+    "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
   "data_visualization_storage": "Used for saving visualized data from CWA and ExpTech.",
   "@data_visualization_storage": {
@@ -782,7 +782,7 @@
   "@remind_later": {
     "description": "「發現新版本」頁面 → 稍後再說"
   },
-  "go_to_view": "Go!",
+  "go_to_view": "Take me there",
   "@go_to_view": {
     "description": "「發現新版本」頁面 → 前往查看"
   },
@@ -898,7 +898,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "Estimated earthquake intensity legend",
+  "estimated_intensity_legend": "Estimated intensity legend",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
@@ -970,7 +970,7 @@
   "@photo_media_permission_request": {
     "description": "「更多」路徑 → 地震報告 → 詳細地震報告 → 地震報告請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
   },
-  "no_notification_history": "No notification record",
+  "no_notification_history": "There is currently no notification history",
   "@no_notification_history": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 沒有通知紀錄"
   },
@@ -986,15 +986,15 @@
   "@notification_area": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 通知發送區域"
   },
-  "emergency_notification": "Emergency notification",
+  "emergency_notification": "Emergency notifications",
   "@emergency_notification": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 緊急通知"
   },
-  "general_notification": "General notice",
+  "general_notification": "General Notifications",
   "@general_notification": {
     "description": "「我」路徑 →「行動通知推播紀錄」標題 → 一般通知"
   },
-  "please_allow_notification_permission": "Please go to the application settings to find and allow the \"Notifications\" permission and try again.",
+  "please_allow_notification_permission": "Please enable notifications for DPIP in your system settings and try again.",
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
@@ -1095,7 +1095,7 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "Estimated maximum intensity",
+  "estimated_intensity": "Estimated",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
@@ -1117,11 +1117,11 @@
   },
   "highest": "Highest",
   "@highest": {
-    "description": "「首頁」路徑 → 「最高」描述"
+    "description": "「首頁」路徑 → 「最高」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最高"
   },
   "lowest": "Lowest",
   "@lowest": {
-    "description": "「首頁」路徑 → 「最低」描述"
+    "description": "「首頁」路徑 → 「最低」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最低"
   },
   "not_enabled": " (Disabled)",
   "@not_enabled": {
@@ -1211,7 +1211,7 @@
   "@error_fcm_token": {
     "description": "錯誤：無法取得 FCM Token"
   },
-  "error_fetching_notifications": "Notification Record Retrieval Error",
+  "error_fetching_notifications": "There's an error occurred while retrieving notification history.\nPlease try again later.",
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
@@ -1732,5 +1732,46 @@
   "ranking": "Leaderboard",
   "@ranking": {
     "description": "「排行榜」頁面 → 標題"
+  },
+  "ranking_time": "Data time: {time}\n{ranked_length} weather stations",
+  "@ranking_time": {
+    "description": "「排行榜」頁面 → 資料時間：{time}\n共 {ranked_length} 觀測點",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "ranked_length": {
+        "type": "String"
+      }
+    }
+  },
+  "according": "According to",
+  "@according": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
+  },
+  "ranking_descending": "Descending",
+  "@ranking_descending": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
+  },
+  "ranking_ascending": "Ascending",
+  "@ranking_ascending": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
+  },
+  "ranking_merge_into": "Scope",
+  "@ranking_merge_into": {
+    "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
+  },
+  "permission_storage": "Save",
+  "@permission_storage": {
+    "description": "「歡迎」頁面 → 儲存"
+  },
+  "hours_24_trend": "24小時{type}趨勢",
+  "@hours_24_trend": {
+    "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
   }
 }

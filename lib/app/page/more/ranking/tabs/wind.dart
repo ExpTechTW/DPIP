@@ -96,17 +96,17 @@ class _RankingWindTabState extends State<RankingWindTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text("依"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(context.i18n.according),
                   ),
                   ChoiceChip(
-                    label: Text("降冪"),
+                    label: Text(context.i18n.ranking_descending),
                     selected: !reversed,
                     onSelected: (value) => setReversed(false),
                   ),
                   ChoiceChip(
-                    label: Text("升冪"),
+                    label: Text(context.i18n.ranking_ascending),
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
@@ -114,9 +114,9 @@ class _RankingWindTabState extends State<RankingWindTab> {
                     height: kToolbarHeight - 16,
                     child: VerticalDivider(),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text("合併至"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(context.i18n.ranking_merge_into),
                   ),
                   ChoiceChip(
                     label: Text(context.i18n.location_town),
@@ -135,7 +135,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              "資料時間：$time\n共 ${ranked.length} 觀測點",
+              context.i18n.ranking_time(time.toString(), ranked.length.toString()),
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),

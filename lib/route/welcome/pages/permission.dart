@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:autostarter/autostarter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import "package:dpip/route/welcome/welcome.dart";
 import 'package:dpip/util/extension/build_context.dart';
@@ -19,6 +20,8 @@ class WelcomePermissionPage extends StatefulWidget {
 
 class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
+  late Future<bool> _autoStartPermission;
+  bool _autoStartStatus = false;
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
@@ -48,10 +51,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _permissionsFuture = _initializePermissions();
+    if (Platform.isAndroid) {
+      _autoStartStatusCheck();
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _checkNotificationPermission();
       setState(() {});
     });
+  }
+
+  void _autoStartStatusCheck() async {
+    _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+    _autoStartPermission = Future.value(_autoStartStatus);
   }
 
   Future<void> _checkNotificationPermission() async {
@@ -74,8 +85,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      setState(() {
+      setState(() async {
         _permissionsFuture = _initializePermissions();
+        if (Platform.isAndroid) {
+          _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+          _autoStartPermission = Future.value(_autoStartStatus);
+        }
       });
     }
   }
@@ -85,19 +100,39 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     List<Permission> permissions = [];
 
     try {
-      if (Platform.isAndroid) {
-        final androidInfo = await deviceInfo.androidInfo;
-        permissions = [
-          Permission.notification,
-          Permission.location,
-          androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
-        ];
-      } else if (Platform.isIOS) {
-        permissions = [
-          Permission.notification,
-          Permission.location,
-          Permission.photos,
-        ];
+      PermissionStatus status = await Permission.location.status;
+      if (status.isGranted) {
+        if (Platform.isAndroid) {
+          final androidInfo = await deviceInfo.androidInfo;
+          permissions = [
+            Permission.notification,
+            Permission.locationAlways,
+            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            Permission.ignoreBatteryOptimizations,
+          ];
+        } else if (Platform.isIOS) {
+          permissions = [
+            Permission.notification,
+            Permission.locationAlways,
+            Permission.photos,
+          ];
+        }
+      } else {
+        if (Platform.isAndroid) {
+          final androidInfo = await deviceInfo.androidInfo;
+            permissions = [
+              Permission.notification,
+              Permission.location,
+              androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+              Permission.ignoreBatteryOptimizations,
+            ];
+        } else if (Platform.isIOS) {
+          permissions = [
+            Permission.notification,
+            Permission.location,
+            Permission.photos,
+          ];
+        }
       }
 
       await _checkNotificationPermission();
@@ -110,7 +145,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
   List<PermissionItem> _createPermissionItems(List<Permission> permissions, BuildContext context) {
     final items = <PermissionItem>[];
-    for (final permission in permissions) {
+    for (Permission permission in permissions) {
       IconData icon;
       String text;
       String description;
@@ -125,16 +160,23 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           color = Colors.orange;
           isHighlighted = true;
           break;
+        case Permission.locationAlways:
         case Permission.location:
           icon = Icons.location_on;
           text = context.i18n.settings_position;
           description = context.i18n.location_based_service;
           color = Colors.blue;
           break;
+        case Permission.ignoreBatteryOptimizations:
+          icon = Icons.battery_full;
+          text = context.i18n.power_saving_position;
+          description = context.i18n.power_saving_position_text;
+          color = Colors.greenAccent;
+          break;
         case Permission.storage:
         case Permission.photos:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
-          text = context.i18n.image_save;
+          text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;
           color = Colors.green;
           break;
@@ -231,6 +273,61 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               _isNotificationPermission = true;
             }
           }
+        } else if (item.permission == Permission.location) {
+          status = await item.permission.status;
+          if (status.isPermanentlyDenied) {
+            _showPermanentlyDeniedDialog(item);
+          }
+          if (Platform.isAndroid) {
+            _permissionsFuture = _initializePermissions();
+            item.permission = Permission.locationAlways;
+            if (status.isDenied) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            } else if (status.isGranted) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            }
+          }
+        } else if (item.permission == Permission.locationAlways) {
+          status = await item.permission.status;
+          if (status.isPermanentlyDenied) {
+            _showPermanentlyDeniedDialog(item);
+          }
+          if (Platform.isAndroid) {
+            _permissionsFuture = _initializePermissions();
+            if (status.isDenied) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            } else if (status.isGranted) {
+              status = await item.permission.request();
+              if (status.isPermanentlyDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isDenied) {
+                _showPermanentlyDeniedDialog(item);
+              } else if (status.isGranted) {
+                _showPermanentlyDeniedDialog(item);
+              }
+            }
+          }
         }
       } else {
         status = await item.permission.status;
@@ -239,6 +336,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         }
       }
       item.isGranted = status.isGranted;
+
+      setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to change permission: ${item.text}')),
@@ -352,6 +451,58 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 return Column(children: permissionItems.map(_buildPermissionCard).toList());
               },
             ),
+            if (Platform.isAndroid)
+              Column(children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: context.colors.surfaceContainer,
+                      borderRadius: BorderRadius.circular(16),
+                      border: null,
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.orange.withOpacity(0.1),
+                        child: const Icon(Icons.start, color: Colors.orange),
+                      ),
+                      title: Text(context.i18n.automatic_start_position),
+                      subtitle: Text(context.i18n.automatic_start_position_text),
+                      trailing: FutureBuilder<bool>(
+                        future: _autoStartPermission,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          }
+                          _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data ?? false;
+                          return Switch(
+                            value: _autoStartStatus,
+                            onChanged: (value) async {
+                              setState(() {
+                                _autoStartStatus = value;
+                              });
+                              final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
+                              if (isAvailable!) {
+                                await Autostarter.getAutoStartPermission(newTask: true);
+                                final newStatus = await Autostarter.checkAutoStartState();
+                                _autoStartStatus = newStatus!;
+                              }
+
+                              _autoStartPermission = Future.value(_autoStartStatus);
+
+                              setState(() {});
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                )
+              ]),
           ],
         ),
       ),
@@ -364,7 +515,7 @@ class PermissionItem {
   final String text;
   final String description;
   final Color color;
-  final Permission permission;
+  Permission permission;
   bool isGranted;
   bool isHighlighted;
 
