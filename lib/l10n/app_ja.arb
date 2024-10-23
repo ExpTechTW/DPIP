@@ -448,7 +448,7 @@
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
-  "no_events": "現在の無いイベント情報",
+  "no_events": "現在イベント情報はありません",
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
@@ -869,6 +869,14 @@
   "notification_permission_denied": "通知機能が拒否されている場合は、設定ページに移動し、通知許可を設定してください。",
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
+  },
+  "autoStart_permission_denied": "自啟動權限已被拒絕，請移至設定允許權限。",
+  "@autoStart_permission_denied": {
+    "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
+  },
+  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "@batteryOptimization_permission_denied": {
+    "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
   },
   "permission_request": "権限管理請求",
   "@permission_request": {
@@ -1309,7 +1317,7 @@
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
   },
-  "sound_eew_silent": "緊急地震速報(ミュートな通知)",
+  "sound_eew_silent": "緊急地震速報(サイレント通知)",
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
@@ -1333,7 +1341,7 @@
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
-  "sound_earthquake_eew_silent": "緊急地震速報 (ミュートな通知)",
+  "sound_earthquake_eew_silent": "緊急地震速報 (サイレント通知)",
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
@@ -1349,7 +1357,7 @@
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
-  "sound_int_report_silent": "震度速報(ミュートな通知)",
+  "sound_int_report_silent": "震度速報(サイレント通知)",
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
@@ -1365,7 +1373,7 @@
   "@sound_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
   },
-  "sound_report_silent": "地震情報(ミュートな通知)",
+  "sound_report_silent": "地震情報(サイレント通知)",
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
@@ -1773,5 +1781,21 @@
         "type": "String"
       }
     }
+  },
+  "power_saving_position": "低電力モード",
+  "@power_saving_position": {
+    "description": "「歡迎」頁面 → 省電策略"
+  },
+  "power_saving_position_text": "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。",
+  "@power_saving_position_text": {
+    "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
+  },
+  "automatic_start_position": "自動化啟動",
+  "@automatic_start_position": {
+    "description": "「歡迎」頁面 → 自動化啟動"
+  },
+  "automatic_start_position_text": "允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。",
+  "@automatic_start_position_text": {
+    "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
 }
