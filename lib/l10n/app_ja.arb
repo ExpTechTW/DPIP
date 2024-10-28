@@ -100,7 +100,7 @@
   "@report_event_time": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 發震時間"
   },
-  "report_location": "震央",
+  "report_location": "震源地",
   "@report_location": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 位於、「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 位於"
   },
