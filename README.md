@@ -136,3 +136,7 @@ DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果
 ## 開放原始碼授權
 
 開放原始碼授權資訊請詳見 [LICENSE](LICENSE) 檔案
+
+## Stars
+
+<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://star-history.com/embed?secret=Z2hwX1FaR2pDTE9TdDRoaFF1NTFNWlk0Q1dQbjZjOTcxUzIzZnlSUQ==#ExpTechTW/DPIP&Date" frameBorder="0"></iframe>
