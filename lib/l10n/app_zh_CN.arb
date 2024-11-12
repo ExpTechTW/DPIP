@@ -1042,7 +1042,7 @@
   "@no_data": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：無資料"
   },
-  "automatic_foreground_positioning": "前景自动定位",
+  "automatic_foreground_positioning": "前台自动定位",
   "@automatic_foreground_positioning": {
     "description": "前景自動定位"
   },
@@ -1405,11 +1405,11 @@
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
-  "sound_disaster": "灾害资讯",
+  "sound_disaster": "灾害信息",
   "@sound_disaster": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
   },
-  "sound_evacuation": "避难资讯",
+  "sound_evacuation": "避难信息",
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
@@ -1417,7 +1417,7 @@
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地(乡镇)发布避难资讯时",
+  "sound_evacuation_minor_h2": "所在地(乡镇)发布避难信息时",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
@@ -1725,7 +1725,7 @@
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
-  "history_seismic_intensity_reference": "本资料系由 TREM-Net 观测网自动观测结果所得，尚未经人为检视确认，仅供应变之初步参考。实际应以中央气象署发布之资讯为准。",
+  "history_seismic_intensity_reference": "本资料由 TREM-Net 观测网自动观测结果所得，尚未经人为检视确认，仅供应变之初步参考。实际应以中央气象署发布的信息为准。",
   "@history_seismic_intensity_reference": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
   },
@@ -1757,11 +1757,11 @@
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_descending": "降幂",
+  "ranking_descending": "降序",
   "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_ascending": "升幂",
+  "ranking_ascending": "升序",
   "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
@@ -1794,7 +1794,7 @@
   "@automatic_start_position": {
     "description": "「歡迎」頁面 → 自動化啟動"
   },
-  "automatic_start_position_text": "允许DPIP在设备重启或关闭后自动启动，以便实时防灾通知。",
+  "automatic_start_position_text": "允许DPIP在设备重启或关闭后自动启动，以持续提供防灾通知服务。",
   "@automatic_start_position_text": {
     "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
