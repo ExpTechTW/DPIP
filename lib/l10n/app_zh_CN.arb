@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh_CN",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -300,7 +300,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n组建 {buildNumber}\n由 ExpTech 探索科技制作\n部分资料来源 CWA(中央气象署)",
+  "me_version": "版本 {version}\n构建 {buildNumber}\n由 ExpTech 探索科技制作\n部分资料来源 CWA(中央气象署)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -420,7 +420,7 @@
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
   },
-  "unit_degrees_c": "单位：摄氏温度（°C）",
+  "unit_degrees_c": "单位：摄氏度（°C）",
   "@unit_degrees_c": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 單位：攝氏度 (°C)"
   },
@@ -436,7 +436,7 @@
   "@history": {
     "description": "「歷史」頁面標題"
   },
-  "historical_events": "3天內的历史事件信息",
+  "historical_events": "3天内的历史事件信息",
   "@historical_events": {
     "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
   },
@@ -906,7 +906,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "预估震级图例",
+  "estimated_intensity_legend": "预估震度图例",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
@@ -966,7 +966,7 @@
   "@abnormal": {
     "description": "狀態：異常"
   },
-  "network_or_server_error": "网路连线或服务器异常",
+  "network_or_server_error": "网络连接或服务器异常。",
   "@network_or_server_error": {
     "description": "網路連線或伺服器異常。"
   },
@@ -1014,7 +1014,7 @@
   "@no_data_available": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 沒有可用的資料"
   },
-  "server_status_overview": "此页面呈现服务器各时段状态概览。原始数据每5秒更新一次，此处显示精简版本以最佳化网路用量。请注意，此信息仅供参考，实际状况应以公告为准。",
+  "server_status_overview": "此页面呈现服务器各时段状态概览。原始数据每5秒更新一次，此处显示精简版本以优化网络用量。请注意，此信息仅供参考，实际状况应以公告为准。",
   "@server_status_overview": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
   },
@@ -1119,7 +1119,7 @@
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
-  "view_prompt_information": "点击查看提示资讯",
+  "view_prompt_information": "点击查看提示信息",
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   },
@@ -1235,7 +1235,7 @@
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "为了获得更好的自动定位体验，您需要将位置权限提升至「{permissionType}」以便让 DPIP 在背景自动设置所在地资讯。",
+  "improve_auto_location_experience": "为了获得更好的自动定位体验，您需要将位置权限提升至「{permissionType}」以便让 DPIP 在后台自动设置所在地信息。",
   "@improve_auto_location_experience": {
     "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
     "placeholders": {
@@ -1244,7 +1244,7 @@
       }
     }
   },
-  "auto_location_permission_upgrade_needed": "自动定位功能需要将位置权限提升至「{permissionType}」以在背景使用。",
+  "auto_location_permission_upgrade_needed": "自动定位功能需要将位置权限提升至「{permissionType}」以在后台使用。",
   "@auto_location_permission_upgrade_needed": {
     "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
     "placeholders": {
