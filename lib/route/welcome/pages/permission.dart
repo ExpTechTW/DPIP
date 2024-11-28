@@ -451,58 +451,58 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 return Column(children: permissionItems.map(_buildPermissionCard).toList());
               },
             ),
-            if (Platform.isAndroid)
-              Column(children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceContainer,
-                      borderRadius: BorderRadius.circular(16),
-                      border: null,
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.orange.withOpacity(0.1),
-                        child: const Icon(Icons.start, color: Colors.orange),
-                      ),
-                      title: Text(context.i18n.automatic_start_position),
-                      subtitle: Text(context.i18n.automatic_start_position_text),
-                      trailing: FutureBuilder<bool>(
-                        future: _autoStartPermission,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            );
-                          }
-                          _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data ?? false;
-                          return Switch(
-                            value: _autoStartStatus,
-                            onChanged: (value) async {
-                              setState(() {
-                                _autoStartStatus = value;
-                              });
-                              final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
-                              if (isAvailable!) {
-                                await Autostarter.getAutoStartPermission(newTask: true);
-                                final newStatus = await Autostarter.checkAutoStartState();
-                                _autoStartStatus = newStatus!;
-                              }
+            // if (Platform.isAndroid)
+            //   Column(children: [
+            //     Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //       child: Container(
+            //         decoration: BoxDecoration(
+            //           color: context.colors.surfaceContainer,
+            //           borderRadius: BorderRadius.circular(16),
+            //           border: null,
+            //         ),
+            //         child: ListTile(
+            //           leading: CircleAvatar(
+            //             backgroundColor: Colors.orange.withOpacity(0.1),
+            //             child: const Icon(Icons.start, color: Colors.orange),
+            //           ),
+            //           title: Text(context.i18n.automatic_start_position),
+            //           subtitle: Text(context.i18n.automatic_start_position_text),
+            //           trailing: FutureBuilder<bool>(
+            //             future: _autoStartPermission,
+            //             builder: (context, snapshot) {
+            //               if (snapshot.connectionState == ConnectionState.waiting) {
+            //                 return const SizedBox(
+            //                   width: 24,
+            //                   height: 24,
+            //                   child: CircularProgressIndicator(strokeWidth: 2),
+            //                 );
+            //               }
+            //               _autoStartStatus = _autoStartStatus == true ? _autoStartStatus : snapshot.data ?? false;
+            //               return Switch(
+            //                 value: _autoStartStatus,
+            //                 onChanged: (value) async {
+            //                   setState(() {
+            //                     _autoStartStatus = value;
+            //                   });
+            //                   final isAvailable = await Autostarter.isAutoStartPermissionAvailable();
+            //                   if (isAvailable!) {
+            //                     await Autostarter.getAutoStartPermission(newTask: true);
+            //                     final newStatus = await Autostarter.checkAutoStartState();
+            //                     _autoStartStatus = newStatus!;
+            //                   }
 
-                              _autoStartPermission = Future.value(_autoStartStatus);
+            //                   _autoStartPermission = Future.value(_autoStartStatus);
 
-                              setState(() {});
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                )
-              ]),
+            //                   setState(() {});
+            //                 },
+            //               );
+            //             },
+            //           ),
+            //         ),
+            //       ),
+            //     )
+            //   ]),
           ],
         ),
       ),
