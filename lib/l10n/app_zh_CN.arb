@@ -420,11 +420,11 @@
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
   },
-  "unit_degrees_c": "单位：毫米(mm)",
+  "unit_degrees_c": "单位：摄氏度(°C)",
   "@unit_degrees_c": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 單位：攝氏度 (°C)"
   },
-  "unit_relative_humidity": "：单位：相对湿度（%）",
+  "unit_relative_humidity": "单位：相对湿度 (%)",
   "@unit_relative_humidity": {
     "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 單位：相對濕度 (%)"
   },
