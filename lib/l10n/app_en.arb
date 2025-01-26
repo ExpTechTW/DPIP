@@ -1786,15 +1786,15 @@
   "@power_saving_position": {
     "description": "「歡迎」頁面 → 省電策略"
   },
-  "power_saving_position_text": "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。",
+  "power_saving_position_text": "Allow DPIP to run continuously in the background for instant disaster notification information.",
   "@power_saving_position_text": {
     "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
   },
-  "automatic_start_position": "自動化啟動",
+  "automatic_start_position": "Automatic start-up",
   "@automatic_start_position": {
     "description": "「歡迎」頁面 → 自動化啟動"
   },
-  "automatic_start_position_text": "允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。",
+  "automatic_start_position_text": "Allow DPIP to run continuously in the background for instant disaster notification information.",
   "@automatic_start_position_text": {
     "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
