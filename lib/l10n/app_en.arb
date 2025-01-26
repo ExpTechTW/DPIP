@@ -1143,7 +1143,7 @@
   "@first_gratitude": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
   },
-  "dpip_goal": "DPIP (Disaster Prevention Information Platform) is an application that aims to be a center for disaster prevention-related information, and we hope it can become an invaluable asset to everyone's daily lives. Although the application's development is not complete, we continue to work towards this goal.",
+  "dpip_goal": "DPIP is an application that aims to be a center for disaster prevention-related information, and we hope it can become an invaluable asset to everyone's daily lives. Although the application's development is not complete, we continue to work towards this goal.",
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
@@ -1445,11 +1445,11 @@
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
-  "sunny_with_lightning": "晴有閃電",
+  "sunny_with_lightning": "Sunny with lightning",
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_fog": "晴有霧",
+  "sunny_with_fog": "Sunny with fog",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
@@ -1457,7 +1457,7 @@
   "@sunny_with_rain": {
     "description": "天氣狀況：晴天伴有雨"
   },
-  "sunny_with_sleet": "晴有雨雪",
+  "sunny_with_sleet": "Sunny with sleet",
   "@sunny_with_sleet": {
     "description": "天氣狀況：晴天伴有雨夾雪"
   },
@@ -1653,7 +1653,7 @@
   "@overcast_with_severe_thunderhail": {
     "description": "天氣狀況：陰天伴有強雷雹"
   },
-  "overcast_with_thunder": "陰天伴有雷",
+  "overcast_with_thunder": "Cloudy with thunder.",
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
@@ -1665,7 +1665,7 @@
   "@map_average": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
   },
-  "radar_synthetic_echo": "雷達合成回波",
+  "radar_synthetic_echo": "Radar synthetic echo",
   "@radar_synthetic_echo": {
     "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
   },
@@ -1773,7 +1773,7 @@
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
   },
-  "hours_24_trend": "24小時{type}趨勢",
+  "hours_24_trend": "24 Hour {type} Trend",
   "@hours_24_trend": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
     "placeholders": {
