@@ -874,7 +874,7 @@
   "@autoStart_permission_denied": {
     "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
   },
-  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "batteryOptimization_permission_denied": "Power Saving Policy has been denied, please move to Setting Allowed Permissions.",
   "@batteryOptimization_permission_denied": {
     "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
   },
@@ -1461,11 +1461,11 @@
   "@sunny_with_sleet": {
     "description": "天氣狀況：晴天伴有雨夾雪"
   },
-  "sunny_with_heavy_snow": "晴有大雪",
+  "sunny_with_heavy_snow": "Sunny with heavy snow",
   "@sunny_with_heavy_snow": {
     "description": "天氣狀況：晴天伴有大雪"
   },
-  "sunny_with_snow_pellets": "晴有雪珠",
+  "sunny_with_snow_pellets": "Sunny with snowdrops",
   "@sunny_with_snow_pellets": {
     "description": "天氣狀況：晴天伴有雪珠"
   },
@@ -1473,7 +1473,7 @@
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
-  "sunny_with_snow_showers": "晴有陣雪",
+  "sunny_with_snow_showers": "Sunny with snow showers",
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
@@ -1481,11 +1481,11 @@
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
-  "sunny_with_hail": "晴有雹",
+  "sunny_with_hail": "Sunny with hail",
   "@sunny_with_hail": {
     "description": "天氣狀況：晴天伴有冰雹"
   },
-  "sunny_with_thunderstorm": "晴有雷雨",
+  "sunny_with_thunderstorm": "Sunny with thunderstorm",
   "@sunny_with_thunderstorm": {
     "description": "天氣狀況：晴天伴有雷雨"
   },
@@ -1497,7 +1497,7 @@
   "@sunny_with_thunderhail": {
     "description": "天氣狀況：晴天伴有雷雹"
   },
-  "sunny_with_severe_thunderstorm": "晴大雷雨",
+  "sunny_with_severe_thunderstorm": "Sunny with severe thunderstorm",
   "@sunny_with_severe_thunderstorm": {
     "description": "天氣狀況：晴天伴有強雷雨"
   },
