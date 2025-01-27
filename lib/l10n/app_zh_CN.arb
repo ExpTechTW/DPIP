@@ -1,5 +1,5 @@
 {
-  "@@locale": "zh_CN",
+  "@@locale": "zh-CN",
   "@@context": "App level localization strings.",
   "datetime_format": "yyyy/MM/dd HH:mm:ss",
   "@datetime_format": {
@@ -448,7 +448,7 @@
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
-  "no_events": "当前无事件信息",
+  "no_events": "当前没有事件信息",
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
@@ -1006,7 +1006,7 @@
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
-  "please_allow_location_permission": "请您到軟件设定中找到并允许「位置」权限后再试一次。",
+  "please_allow_location_permission": "请您到应用程序设定中找到并允许「位置」权限后再试一次。",
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
@@ -1357,7 +1357,7 @@
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
-  "sound_int_report_silent": "震度速報(无声)",
+  "sound_int_report_silent": "震度速報(无声通知)",
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
@@ -1373,7 +1373,7 @@
   "@sound_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
   },
-  "sound_report_silent": "地震报告(无声)",
+  "sound_report_silent": "地震报告(无声通知)",
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
@@ -1385,7 +1385,7 @@
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
-  "sound_rain_instant": "雷雨即时讯息",
+  "sound_rain_instant": "雷雨即时信息",
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
@@ -1421,7 +1421,7 @@
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海啸消息(无声)",
+  "sound_tsunami_silent": "太平洋海啸消息(无声通知)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
@@ -1517,7 +1517,7 @@
   "@partly_cloudy_with_haze": {
     "description": "天氣狀況：多雲伴有霾"
   },
-  "partly_cloudy_with_mist": "多云有霭",
+  "partly_cloudy_with_mist": "多云有薄雾",
   "@partly_cloudy_with_mist": {
     "description": "天氣狀況：多雲伴有靄"
   },
@@ -1589,7 +1589,7 @@
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "阴有霭",
+  "overcast_with_mist": "阴有薄雾",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
