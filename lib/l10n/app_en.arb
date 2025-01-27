@@ -1537,83 +1537,83 @@
   "@partly_cloudy_with_sleet": {
     "description": "天氣狀況：多雲伴有雨夾雪"
   },
-  "partly_cloudy_with_heavy_snow": "多雲有大雪",
+  "partly_cloudy_with_heavy_snow": "Cloudy with heavy snow",
   "@partly_cloudy_with_heavy_snow": {
     "description": "天氣狀況：多雲伴有大雪"
   },
-  "partly_cloudy_with_snow_pellets": "多雲有雪珠",
+  "partly_cloudy_with_snow_pellets": "Cloudy with snowdrops",
   "@partly_cloudy_with_snow_pellets": {
     "description": "天氣狀況：多雲伴有雪珠"
   },
-  "partly_cloudy_with_ice_pellets": "多雲有冰珠",
+  "partly_cloudy_with_ice_pellets": "Cloudy with ice beads",
   "@partly_cloudy_with_ice_pellets": {
     "description": "天氣狀況：多雲伴有冰珠"
   },
-  "partly_cloudy_with_snow_showers": "多雲有陣雪",
+  "partly_cloudy_with_snow_showers": "Cloudy with snow showers",
   "@partly_cloudy_with_snow_showers": {
     "description": "天氣狀況：多雲伴有陣雪"
   },
-  "partly_cloudy_with_sleet_showers": "多雲陣雨雪",
+  "partly_cloudy_with_sleet_showers": "Cloudy with rain and snow showers",
   "@partly_cloudy_with_sleet_showers": {
     "description": "天氣狀況：多雲伴有陣雨夾雪"
   },
-  "partly_cloudy_with_hail": "多雲有雹",
+  "partly_cloudy_with_hail": "Cloudy with hail",
   "@partly_cloudy_with_hail": {
     "description": "天氣狀況：多雲伴有冰雹"
   },
-  "partly_cloudy_with_thunderstorm": "多雲有雷雨",
+  "partly_cloudy_with_thunderstorm": "Cloudy with thunderstorm",
   "@partly_cloudy_with_thunderstorm": {
     "description": "天氣狀況：多雲伴有雷雨"
   },
-  "partly_cloudy_with_thundersnow": "多雲有雷雪",
+  "partly_cloudy_with_thundersnow": "Cloudy with thunder and snow",
   "@partly_cloudy_with_thundersnow": {
     "description": "天氣狀況：多雲伴有雷雪"
   },
-  "partly_cloudy_with_thunderhail": "多雲有雷雹",
+  "partly_cloudy_with_thunderhail": "Cloudy with thunder and hail",
   "@partly_cloudy_with_thunderhail": {
     "description": "天氣狀況：多雲伴有雷雹"
   },
-  "partly_cloudy_with_severe_thunderstorm": "多雲大雷雨",
+  "partly_cloudy_with_severe_thunderstorm": "Cloudy with thunderstorm",
   "@partly_cloudy_with_severe_thunderstorm": {
     "description": "天氣狀況：多雲伴有強雷雨"
   },
-  "partly_cloudy_with_severe_thunderhail": "多雲大雷雹",
+  "partly_cloudy_with_severe_thunderhail": "Cloudy with heavy thunder and hail",
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
-  "partly_cloudy_with_thunder": "多雲伴有雷",
+  "partly_cloudy_with_thunder": "Cloudy with thunder",
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
-  "overcast_with_haze": "陰有霾",
+  "overcast_with_haze": "Overcast with haze",
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "陰有靄",
+  "overcast_with_mist": "Overcast with mist",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
-  "overcast_with_lightning": "陰有閃電",
+  "overcast_with_lightning": "Overcast with lighting",
   "@overcast_with_lightning": {
     "description": "天氣狀況：陰天伴有閃電"
   },
-  "overcast_with_fog": "陰有霧",
+  "overcast_with_fog": "Overcast with fog",
   "@overcast_with_fog": {
     "description": "天氣狀況：陰天伴有霧"
   },
-  "overcast_with_rain": "陰有雨",
+  "overcast_with_rain": "Overcast with rain",
   "@overcast_with_rain": {
     "description": "天氣狀況：陰天伴有雨"
   },
-  "overcast_with_sleet": "陰有雨雪",
+  "overcast_with_sleet": "Overcast with rain and snow",
   "@overcast_with_sleet": {
     "description": "天氣狀況：陰天伴有雨夾雪"
   },
-  "overcast_with_heavy_snow": "陰有大雪",
+  "overcast_with_heavy_snow": "Overcast with heavy snow",
   "@overcast_with_heavy_snow": {
     "description": "天氣狀況：陰天伴有大雪"
   },
-  "overcast_with_snow_pellets": "陰有雪珠",
+  "overcast_with_snow_pellets": "Overcast with snow beads",
   "@overcast_with_snow_pellets": {
     "description": "天氣狀況：陰天伴有雪珠"
   },
