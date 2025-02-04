@@ -43,11 +43,11 @@ class Route {
 
   static Uri tsunami(String tsuId) => Uri.parse("$onlyapi/v1/tsunami/$tsuId");
 
-  static Uri rts() => Uri.parse("$lb/v1/trem/rts");
+  static Uri rts() => Uri.parse("$lb/v2/trem/rts");
 
   static Uri ntp() => Uri.parse("${lb.replaceAll("api", "")}ntp");
 
-  static Uri eew() => Uri.parse("$lb/v1/eq/eew?type=cwa");
+  static Uri eew() => Uri.parse("$lb/v2/eq/eew?type=cwa");
 
   static Uri weatherRealtime(String postalCode) => Uri.parse("$onlyapi/v2/weather/realtime/$postalCode");
 
