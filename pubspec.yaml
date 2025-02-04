@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  autostarter: ^0.0.1
+  autostarter: ^0.0.2
   awesome_notifications_core: ^0.9.3
   awesome_notifications: ^0.9.3+1
   awesome_notifications_fcm: ^0.9.3+1

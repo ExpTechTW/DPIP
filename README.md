@@ -23,6 +23,17 @@ DPIP（Disaster prevention information platform）是一款由臺灣本土團隊
 
 TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案，由兩個觀測網組成，分別為 **SE-Net**（強震觀測網「加速度儀」）及 **MS-Net**（微震觀測網「速度儀」），共同紀錄地震時的各項數據。
 
+## 合作夥伴
+### 台灣數位串流有限公司 (Taiwan Digital Streaming Co.)
+<img height="100" width="250" alt="Logo" src="https://github.com/user-attachments/assets/e4b793c8-58b3-4058-a246-24f646b4b3d7">
+
+提供服務：
+- 雲端運算資源
+- 網路頻寬
+- 技術諮詢支援
+
+特別感謝台灣數位串流有限公司對開源社群的支持！
+
 ## 資料來源
 
 所有資料皆來自於以下單位：
@@ -136,3 +147,13 @@ DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果
 ## 開放原始碼授權
 
 開放原始碼授權資訊請詳見 [LICENSE](LICENSE) 檔案
+
+## Star History
+
+<a href="https://star-history.com/#ExpTechTW/DPIP&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ExpTechTW/DPIP&type=Date" />
+ </picture>
+</a>
