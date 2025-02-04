@@ -300,7 +300,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n组建 {buildNumber}\n由 ExpTech 探索科技制作\n部分资料来源 CWA(中央气象署)",
+  "me_version": "版本 {version}\n构建 {buildNumber}\n由 ExpTech 探索科技制作\n部分资料来源 CWA(中央气象署)",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -416,15 +416,15 @@
   "@unit_dbz": {
     "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 單位：dBZ"
   },
-  "unit_mm": "单位：毫米（mm）",
+  "unit_mm": "单位：毫米(mm)",
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
   },
-  "unit_degrees_c": "单位：摄氏温度（°C）",
+  "unit_degrees_c": "单位：摄氏度(°C)",
   "@unit_degrees_c": {
     "description": "「地圖」路徑 → 地圖列表 → 「氣溫」圖例 → 單位：攝氏度 (°C)"
   },
-  "unit_relative_humidity": "单位：相对湿度（%）",
+  "unit_relative_humidity": "单位：相对湿度 (%)",
   "@unit_relative_humidity": {
     "description": "「地圖」路徑 → 地圖列表 → 「濕度」圖例 → 單位：相對濕度 (%)"
   },
@@ -436,7 +436,7 @@
   "@history": {
     "description": "「歷史」頁面標題"
   },
-  "historical_events": "3天內的历史事件信息",
+  "historical_events": "3天内的历史事件信息",
   "@historical_events": {
     "description": "「歷史」路徑 → 「3天內的歷史事件資訊」標題"
   },
@@ -448,7 +448,7 @@
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
-  "no_events": "当前无事件信息",
+  "no_events": "当前没有事件信息",
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
@@ -870,6 +870,14 @@
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
+  "autoStart_permission_denied": "自启动权限被拒绝，请前往设置允许权限。",
+  "@autoStart_permission_denied": {
+    "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
+  },
+  "batteryOptimization_permission_denied": "省电策略被拒绝，请前往设置允许权限。",
+  "@batteryOptimization_permission_denied": {
+    "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
+  },
   "permission_request": "权限请求",
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
@@ -898,7 +906,7 @@
   "@copy_fcm_token_error": {
     "description": "「我」路徑 → 複製 FCM Token 時發生錯誤"
   },
-  "estimated_intensity_legend": "预估震级图例",
+  "estimated_intensity_legend": "预估震度图例",
   "@estimated_intensity_legend": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 描述預估震度的圖例"
   },
@@ -958,7 +966,7 @@
   "@abnormal": {
     "description": "狀態：異常"
   },
-  "network_or_server_error": "网路连线或服务器异常",
+  "network_or_server_error": "网络连接或服务器异常。",
   "@network_or_server_error": {
     "description": "網路連線或伺服器異常。"
   },
@@ -998,7 +1006,7 @@
   "@please_allow_notification_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「通知」權限後再試一次。"
   },
-  "please_allow_location_permission": "请您到軟件设定中找到并允许「位置」权限后再试一次。",
+  "please_allow_location_permission": "请您到应用程序设定中找到并允许「位置」权限后再试一次。",
   "@please_allow_location_permission": {
     "description": "「設定」路徑 → 請您到應用程式設定中找到並允許「位置」權限後再試一次。"
   },
@@ -1006,7 +1014,7 @@
   "@no_data_available": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 沒有可用的資料"
   },
-  "server_status_overview": "此页面呈现服务器各时段状态概览。原始数据每5秒更新一次，此处显示精简版本以最佳化网路用量。请注意，此信息仅供参考，实际状况应以公告为准。",
+  "server_status_overview": "此页面呈现服务器各时段状态概览。原始数据每5秒更新一次，此处显示精简版本以优化网络用量。请注意，此信息仅供参考，实际状况应以公告为准。",
   "@server_status_overview": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。"
   },
@@ -1034,7 +1042,7 @@
   "@no_data": {
     "description": "「我」路徑 → 「伺服器狀態」標題 → 資訊內容 → 狀態：無資料"
   },
-  "automatic_foreground_positioning": "前景自动定位",
+  "automatic_foreground_positioning": "前台自动定位",
   "@automatic_foreground_positioning": {
     "description": "前景自動定位"
   },
@@ -1111,7 +1119,7 @@
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
-  "view_prompt_information": "点击查看提示资讯",
+  "view_prompt_information": "点击查看提示信息",
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   },
@@ -1227,7 +1235,7 @@
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "为了获得更好的自动定位体验，您需要将位置权限提升至「{permissionType}」以便让 DPIP 在背景自动设置所在地资讯。",
+  "improve_auto_location_experience": "为了获得更好的自动定位体验，您需要将位置权限提升至「{permissionType}」以便让 DPIP 在后台自动设置所在地信息。",
   "@improve_auto_location_experience": {
     "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
     "placeholders": {
@@ -1236,7 +1244,7 @@
       }
     }
   },
-  "auto_location_permission_upgrade_needed": "自动定位功能需要将位置权限提升至「{permissionType}」以在背景使用。",
+  "auto_location_permission_upgrade_needed": "自动定位功能需要将位置权限提升至「{permissionType}」以在后台使用。",
   "@auto_location_permission_upgrade_needed": {
     "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
     "placeholders": {
@@ -1349,7 +1357,7 @@
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
-  "sound_int_report_silent": "震度速報(无声)",
+  "sound_int_report_silent": "震度速報(无声通知)",
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
@@ -1365,7 +1373,7 @@
   "@sound_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
   },
-  "sound_report_silent": "地震报告(无声)",
+  "sound_report_silent": "地震报告(无声通知)",
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
@@ -1377,7 +1385,7 @@
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
-  "sound_rain_instant": "雷雨即时讯息",
+  "sound_rain_instant": "雷雨即时信息",
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
@@ -1397,11 +1405,11 @@
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
-  "sound_disaster": "灾害资讯",
+  "sound_disaster": "灾害信息",
   "@sound_disaster": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
   },
-  "sound_evacuation": "避难资讯",
+  "sound_evacuation": "避难信息",
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
@@ -1409,11 +1417,11 @@
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地(乡镇)发布避难资讯时",
+  "sound_evacuation_minor_h2": "所在地(乡镇)发布避难信息时",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海啸消息(无声)",
+  "sound_tsunami_silent": "太平洋海啸消息(无声通知)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
@@ -1509,7 +1517,7 @@
   "@partly_cloudy_with_haze": {
     "description": "天氣狀況：多雲伴有霾"
   },
-  "partly_cloudy_with_mist": "多云有霭",
+  "partly_cloudy_with_mist": "多云有薄雾",
   "@partly_cloudy_with_mist": {
     "description": "天氣狀況：多雲伴有靄"
   },
@@ -1581,7 +1589,7 @@
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "阴有霭",
+  "overcast_with_mist": "阴有薄雾",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
@@ -1717,7 +1725,7 @@
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
-  "history_seismic_intensity_reference": "本资料系由 TREM-Net 观测网自动观测结果所得，尚未经人为检视确认，仅供应变之初步参考。实际应以中央气象署发布之资讯为准。",
+  "history_seismic_intensity_reference": "本资料由 TREM-Net 观测网自动观测结果所得，尚未经人为检视确认，仅供应变之初步参考。实际应以中央气象署发布的信息为准。",
   "@history_seismic_intensity_reference": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
   },
@@ -1749,11 +1757,11 @@
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_descending": "降幂",
+  "ranking_descending": "降序",
   "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_ascending": "升幂",
+  "ranking_ascending": "升序",
   "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
@@ -1773,5 +1781,21 @@
         "type": "String"
       }
     }
+  },
+  "power_saving_position": "省电策略",
+  "@power_saving_position": {
+    "description": "「歡迎」頁面 → 省電策略"
+  },
+  "power_saving_position_text": "允许DPIP在后台持续运行，以便实时防灾通知。",
+  "@power_saving_position_text": {
+    "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
+  },
+  "automatic_start_position": "自启动",
+  "@automatic_start_position": {
+    "description": "「歡迎」頁面 → 自動化啟動"
+  },
+  "automatic_start_position_text": "允许DPIP在设备重启或关闭后自动启动，以持续提供防灾通知服务。",
+  "@automatic_start_position_text": {
+    "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
 }

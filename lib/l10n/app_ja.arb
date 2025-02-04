@@ -100,7 +100,7 @@
   "@report_event_time": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 發震時間"
   },
-  "report_location": "震央",
+  "report_location": "震源地",
   "@report_location": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 位於、「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 位於"
   },
@@ -448,7 +448,7 @@
   "@current_events": {
     "description": "「首頁」路徑 → 「目前的事件資訊」標題"
   },
-  "no_events": "現在の無いイベント情報",
+  "no_events": "現在イベント情報はありません",
   "@no_events": {
     "description": "「首頁」路徑 → 「目前沒有事件資訊」描述"
   },
@@ -870,6 +870,14 @@
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
+  "autoStart_permission_denied": "自動起動の権限がありません。",
+  "@autoStart_permission_denied": {
+    "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
+  },
+  "batteryOptimization_permission_denied": "省電力ポリシーが拒否されました。",
+  "@batteryOptimization_permission_denied": {
+    "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
+  },
   "permission_request": "権限管理請求",
   "@permission_request": {
     "description": "「存取權限彈窗」 → 權限請求"
@@ -1135,7 +1143,7 @@
   "@first_gratitude": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
   },
-  "dpip_goal": "DPIPは、あらゆる防災情報を統合して発信し、人々の生活に溶け込むことを目指したソフトウェアです。まだまだ未完成であり、開発に当たっては困難もありますが、目標に向かって努力を続けていく所存です。",
+  "dpip_goal": "DPIPは、あらゆる防災情報を統合して発信し、人々の生活に溶け込むことを目指したソフトウェアです。このソフトウェアはまだまだ未完成であり、開発に当たっては困難もありますが、目標に向かって努力を続けていく所存です。",
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
@@ -1187,7 +1195,7 @@
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
-  "developer_message": "DPIPの開発者はこう言いたいのだ",
+  "developer_message": "DPIPの開発者が言いたいこと",
   "@developer_message": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
   },
@@ -1309,7 +1317,7 @@
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
   },
-  "sound_eew_silent": "緊急地震速報(ミュートな通知)",
+  "sound_eew_silent": "緊急地震速報(サイレント通知)",
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
@@ -1333,7 +1341,7 @@
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
-  "sound_earthquake_eew_silent": "緊急地震速報 (ミュートな通知)",
+  "sound_earthquake_eew_silent": "緊急地震速報 (サイレント通知)",
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
@@ -1349,7 +1357,7 @@
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
-  "sound_int_report_silent": "震度速報(ミュートな通知)",
+  "sound_int_report_silent": "震度速報(サイレント通知)",
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
@@ -1365,7 +1373,7 @@
   "@sound_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
   },
-  "sound_report_silent": "地震情報(ミュートな通知)",
+  "sound_report_silent": "地震情報(サイレント通知)",
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
@@ -1745,7 +1753,7 @@
       }
     }
   },
-  "according": "並び替え",
+  "according": "並び順",
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
@@ -1765,7 +1773,7 @@
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
   },
-  "hours_24_trend": "24小時{type}趨勢",
+  "hours_24_trend": "24時間{type}のトレンド",
   "@hours_24_trend": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
     "placeholders": {
@@ -1773,5 +1781,21 @@
         "type": "String"
       }
     }
+  },
+  "power_saving_position": "低電力モード",
+  "@power_saving_position": {
+    "description": "「歡迎」頁面 → 省電策略"
+  },
+  "power_saving_position_text": "DPIPをバックグラウンドで実行し、災害情報通知を即座に入手できるようにする。",
+  "@power_saving_position_text": {
+    "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
+  },
+  "automatic_start_position": "自動起動",
+  "@automatic_start_position": {
+    "description": "「歡迎」頁面 → 自動化啟動"
+  },
+  "automatic_start_position_text": "デバイスの再起動やシャットダウン後でもDPIPが自動的に起動し、継続的に防災通知情報を入手することができるようにする。",
+  "@automatic_start_position_text": {
+    "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
 }
