@@ -76,7 +76,7 @@ class ExpTech {
     if (time != 0) {
       requestUrl = Uri.parse(requestUrl
           .toString()
-          .replaceAll("rts", "rts/$time")
+          .replaceAll("rts", "rts/${time ~/ 1000}")
           .replaceAll("lb-", "api-")
           .replaceAll("-3", "-1")
           .replaceAll("-4", "-2"));
@@ -97,7 +97,7 @@ class ExpTech {
     if (time != 0) {
       requestUrl = Uri.parse(requestUrl
           .toString()
-          .replaceAll("eew", "eew/$time")
+          .replaceAll("eew", "eew/${time ~/ 1000}")
           .replaceAll("lb-", "api-")
           .replaceAll("-3", "-1")
           .replaceAll("-4", "-2"));
