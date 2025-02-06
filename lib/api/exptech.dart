@@ -79,7 +79,8 @@ class ExpTech {
           .replaceAll("rts", "rts/${time ~/ 1000}")
           .replaceAll("lb-", "api-")
           .replaceAll("-3", "-1")
-          .replaceAll("-4", "-2"));
+          .replaceAll("-4", "-2")
+          .replaceAll(RegExp(r'api-\d+'), 'api-1'));
     }
 
     var res = await get(requestUrl);
@@ -100,7 +101,8 @@ class ExpTech {
           .replaceAll("eew", "eew/${time ~/ 1000}")
           .replaceAll("lb-", "api-")
           .replaceAll("-3", "-1")
-          .replaceAll("-4", "-2"));
+          .replaceAll("-4", "-2")
+          .replaceAll(RegExp(r'api-\d+'), 'api-1'));
     }
 
     var res = await get(requestUrl);
