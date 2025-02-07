@@ -21,13 +21,13 @@ class TsunamiEstimateList extends StatelessWidget {
 
   heightToString(height) {
     if (height == 3) {
-      return ">6m";
+      return ">3m";
     } else if (height == 2) {
-      return "3~6m";
-    } else if (height == 1) {
       return "1~3m";
+    } else if (height == 1) {
+      return "0.3~1m";
     } else {
-      return "<1m";
+      return "<0.3m";
     }
   }
 
