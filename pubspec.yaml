@@ -15,7 +15,7 @@ dependencies:
   awesome_notifications_fcm: ^0.10.0
   cached_network_image: 3.4.0
   clipboard: ^0.1.3
-  collection: 1.19.0
+  collection: 1.19.1
   device_info_plus: 10.1.2
   disable_battery_optimization: ^1.1.1
   dynamic_color: ^1.7.0
