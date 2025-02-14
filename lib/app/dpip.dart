@@ -143,8 +143,11 @@ class _DpipState extends State<Dpip> {
         return AlertDialog(
           icon: const Icon(Symbols.signal_disconnected_rounded),
           title: Text(context.i18n.abnormal),
-          content: Text(context.i18n.network_or_server_error),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
+          content: Text(
+            context.i18n.network_or_server_error,
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             TextButton(
               child: Text(context.i18n.retry),
