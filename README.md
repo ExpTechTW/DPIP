@@ -24,16 +24,27 @@ DPIP（Disaster prevention information platform）是一款由臺灣本土團隊
 TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案，由兩個觀測網組成，分別為 **SE-Net**（強震觀測網「加速度儀」）及 **MS-Net**（微震觀測網「速度儀」），共同紀錄地震時的各項數據。
 
 ## 合作夥伴
-### 台灣數位串流有限公司 (Taiwan Digital Streaming Co.)
+## 巨科資訊有限公司
+<img src="https://github.com/user-attachments/assets/34875ff1-ace2-4e92-ac32-d98e5717b62e" 
+     alt="Logo" width="450" height="auto">
+
+- [官網](https://www.geoscience.com.tw/home)
+
+### 提供的支持：
+- 開發設備
+
+## 台灣數位串流有限公司 (Taiwan Digital Streaming Co.)
 <img src="https://github.com/user-attachments/assets/e4b793c8-58b3-4058-a246-24f646b4b3d7" 
      alt="Logo" width="450" height="auto">
 
-提供服務：
+- [官網](https://www.twds.com.tw/)
+
+### 提供的支持：
 - 雲端運算資源
 - 網路頻寬
 - 技術諮詢支援
 
-特別感謝台灣數位串流有限公司對開源社群的支持！
+### 特別感謝上述公司對開源社群的支持！(按照先後順序排序)
 
 ## 資料來源
 
@@ -47,7 +58,6 @@ TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案�
 ### 非官方來源
 
 - TREM-Net by [ExpTech Studio](https://exptech.dev/)
-- [The Weather Channel](https://weather.com/?Goto=Redirected)
 
 ## 下載
 
