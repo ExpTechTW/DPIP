@@ -58,7 +58,6 @@ TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案�
 ### 非官方來源
 
 - TREM-Net by [ExpTech Studio](https://exptech.dev/)
-- [The Weather Channel](https://weather.com/?Goto=Redirected)
 
 ## 下載
 
