@@ -25,7 +25,8 @@ TREM-Net 是一個 2022 年 6 月初開始於全臺各地部署站點的專案�
 
 ## 合作夥伴
 ### 台灣數位串流有限公司 (Taiwan Digital Streaming Co.)
-<img height="100" width="250" alt="Logo" src="https://github.com/user-attachments/assets/e4b793c8-58b3-4058-a246-24f646b4b3d7">
+<img src="https://github.com/user-attachments/assets/e4b793c8-58b3-4058-a246-24f646b4b3d7" 
+     alt="Logo" width="450" height="auto">
 
 提供服務：
 - 雲端運算資源
