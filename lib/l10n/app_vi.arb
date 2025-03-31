@@ -300,7 +300,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n組建 {buildNumber}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "me_version": "Phiên bản {version}\nXây dựng {buildNumber}\nĐược sản xuất bởi ExpTech Exploration Technology. Một số nguồn dữ liệu: CWA (Cục Quản lý Thời tiết Trung Ương Quốc Gia.",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -368,7 +368,7 @@
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "發送公告時",
+  "server_announcement_description_sound": "Khi gửi thông báo",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
@@ -1103,15 +1103,15 @@
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "預估最大震度",
+  "estimated_intensity": "Cường độ động đất tối đa ước tính",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
-  "time_earthquake": "發震",
+  "time_earthquake": "Động đất",
   "@time_earthquake": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 發震"
   },
-  "no_earthquake_monitor": "未啟用強震監視器",
+  "no_earthquake_monitor": "Không bật chức năng giám sát động đất mạnh",
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
@@ -1155,27 +1155,27 @@
   "@profit_model": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
   },
-  "profit_discussion": "為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。",
+  "profit_discussion": "Để duy trì sự phát triển của Ứng dụng, nhóm đã có nhiều cuộc thảo luận sôi nổi về cách kiếm lợi nhuận. Chúng tôi đã cố gắng tìm ra một mô hình lợi nhuận phù hợp trong số nhiều lựa chọn. Chúng tôi thấy rằng hầu hết các phần mềm tương tự đều sử dụng quảng cáo nhúng để đạt được mục đích lợi nhuận, điều này khiến chúng tôi cân nhắc áp dụng phương pháp này như một phương pháp kiếm lợi nhuận.",
   "@profit_discussion": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
   },
-  "profit_difficulty": "營利真的太難了",
+  "profit_difficulty": "Thật ra rất khó để kiếm được lợi nhuận ",
   "@profit_difficulty": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利真的太難了"
   },
-  "user_payment_survey": "我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。",
+  "user_payment_survey": "Chúng tôi đã điều tra mức độ sẵn sàng chi trả của công chúng và thấy rằng hầu hết mọi người thường thiếu nhận thức về phòng chống thiên tai và không sẵn sàng chi tiền cho việc này. Dữ liệu cơ bản có thể gián tiếp xác nhận tuyên bố này. Theo thống kê, số lượng người nhiệt tình tài trợ chỉ chiếm khoảng 1/100.000 tổng số người dùng, điều này khiến quảng cáo nhúng có vẻ là giải pháp tốt nhất.",
   "@user_payment_survey": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
   },
-  "why_no_ads": "為什麼不採用廣告？",
+  "why_no_ads": "Tại sao lại không có quảng cáo?",
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
-  "no_ads_reason": "當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。",
+  "no_ads_reason": "Khi thảm họa xảy ra, không ai muốn xem quảng cáo phải không? Đây là lý do đầu tiên tại sao chúng tôi không chèn quảng cáo. Phần mềm hướng đến phòng ngừa thiên tai có nhiệm vụ chính là cung cấp thông tin phòng ngừa thiên tai một cách nhanh chóng và chính xác. Nếu quảng cáo ngăn cản mọi người hiểu đúng thông tin phòng chống thiên tai thì điều này sẽ đi ngược lại triết lý của chúng tôi. Hơn nữa, khi thảm họa xảy ra, chất lượng truyền thông thường kém và việc lãng phí lưu lượng mạng bổ sung để tải quảng cáo rất gây khó chịu",
   "@no_ads_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
   },
-  "charge_public": "對大眾收費？",
+  "charge_public": "Thu phí của người sử dụng ",
   "@charge_public": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 對大眾收費？"
   },
@@ -1187,15 +1187,15 @@
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
-  "how_to_profit": "如何營利？",
+  "how_to_profit": "Làm thế nào để kiếm được lợi nhuận?",
   "@how_to_profit": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
   },
-  "summary": "總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。",
+  "summary": "Tóm lại, chúng tôi hy vọng sẽ đào tạo được những người quan tâm đến phòng chống thiên tai và coi trọng công tác phòng chống thiên tai, hỗ trợ quá trình phát triển phần mềm của chúng tôi và cùng nhau tiến lên.",
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
-  "developer_message": "DPIP 開發者的話",
+  "developer_message": "Lời từ các nhà phát triển DPIP",
   "@developer_message": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
   },
@@ -1203,23 +1203,23 @@
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
-  "invalid_operation": "無效操作",
+  "invalid_operation": "Hoạt động không hợp lệ",
   "@invalid_operation": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
   },
-  "operation_interval_too_short": "操作間隔過短，請稍後再嘗試。",
+  "operation_interval_too_short": "Khoảng thời gian thao tác quá ngắn, vui lòng thử lại sau.",
   "@operation_interval_too_short": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 操作間隔過短，請稍後再嘗試。"
   },
-  "got_it": "知道了",
+  "got_it": "Đã hiểu",
   "@got_it": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
   },
-  "error_fcm_token": "錯誤: 無法取得 FCM Token",
+  "error_fcm_token": "Lỗi: Không thể lấy được FCM Token",
   "@error_fcm_token": {
     "description": "錯誤：無法取得 FCM Token"
   },
-  "error_fetching_notifications": "獲取通知紀錄時發生錯誤",
+  "error_fetching_notifications": "Đã xảy ra lỗi khi truy xuất hồ sơ thông báo",
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
@@ -1235,7 +1235,7 @@
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "improve_auto_location_experience": "Để có trải nghiệm định vị tự động tốt hơn, bạn cần tăng quyền vị trí thành \"luôn cho phép\" để DPIP có thể tự động thiết lập thông tin vị trí ở chế độ nền.",
   "@improve_auto_location_experience": {
     "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
     "placeholders": {
@@ -1244,7 +1244,7 @@
       }
     }
   },
-  "auto_location_permission_upgrade_needed": "自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
+  "auto_location_permission_upgrade_needed": "Tính năng định vị tự động yêu cầu quyền vị trí phải được nâng lên \"(luôn cho phép)\" để sử dụng ở chế độ nền.",
   "@auto_location_permission_upgrade_needed": {
     "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
     "placeholders": {
@@ -1393,11 +1393,11 @@
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
-  "sound_rain_minor_h2": "所在地(鄉鎮)發布雷雨即時訊息或\n山區暴雨時",
+  "sound_rain_minor_h2": "Khi tin tức về sóng thần Thái Bình Dương được công bố",
   "@sound_rain_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
   },
-  "sound_weather_major_h2": "所在地(鄉鎮)發布紅色燈號之\n天氣警特報",
+  "sound_weather_major_h2": "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu đỏ",
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
@@ -1405,35 +1405,35 @@
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
-  "sound_disaster": "災害資訊",
+  "sound_disaster": "Thông tin thiên tai",
   "@sound_disaster": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
   },
-  "sound_evacuation": "避難資訊",
+  "sound_evacuation": "Thông tin di tản",
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
-  "sound_evacuation_major_h2": "所在地(鄉鎮)發布避難警訊時",
+  "sound_evacuation_major_h2": "Khi khu vực địa phương (thị trấn) ban hành cảnh báo sơ tán",
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地(鄉鎮)發布避難資訊時",
+  "sound_evacuation_minor_h2": "Khi khu vực địa phương (thị trấn) thông báo thông tin sơ tán",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海嘯消息(無聲通知)",
+  "sound_tsunami_silent": "Tin tức về sóng thần Thái Bình Dương (Thông báo im lặng)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
-  "sound_tsunami_silent_h2": "太平洋海嘯消息發布時",
+  "sound_tsunami_silent_h2": "Khi tin tức về sóng thần Thái Bình Dương được công bố",
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
-  "sound_other_notifications": "其他通知",
+  "sound_other_notifications": "Thông báo khác",
   "@sound_other_notifications": {
     "description": "「我」路徑 → 「通知測試」內容 → 「其他通知」標題 "
   },
-  "sound_major": "重大",
+  "sound_major": "Chuyên ngành",
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
@@ -1621,15 +1621,15 @@
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
-  "overcast_with_snow_showers": "陰有陣雪",
+  "overcast_with_snow_showers": "Có mây, mưa và tuyết",
   "@overcast_with_snow_showers": {
     "description": "天氣狀況：陰天伴有陣雪"
   },
-  "overcast_with_sleet_showers": "陰陣雨雪",
+  "overcast_with_sleet_showers": "Trời u ám có mưa đá",
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
-  "overcast_with_hail": "陰有雹",
+  "overcast_with_hail": "Có mây và mưa đá",
   "@overcast_with_hail": {
     "description": "天氣狀況：陰天伴有冰雹"
   },
