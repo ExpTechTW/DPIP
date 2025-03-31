@@ -5,7 +5,7 @@
   "@datetime_format": {
     "description": "日期時間顯示格式"
   },
-  "full_date_format": "yyyy/MM/dd (EEEE)",
+  "full_date_format": "Năm/Tháng/Ngày (EEEE)",
   "@full_date_format": {
     "description": "完整日期顯示格式"
   },
@@ -324,11 +324,11 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上",
+  "eew_alert_description_sound": "Cường độ động đất tối đa là 5 yếu hoặc cao hơn và\nCường độ động đất ước tính tại địa điểm (thị trấn) là 4 hoặc cao hơn",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上",
+  "eew_description_sound": "Cường độ mạnh nhất là 5 yếu trở lên và cường độ ước tính tại địa điểm (thị trấn) là 2 trở lên",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
@@ -364,7 +364,7 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert2_description_sound": "海嘯警報發布時\n上述除外地區",
+  "tsunami_alert2_description_sound": "Khi cảnh báo sóng thần được ban hành.\nCác khu vực bị loại trừ khỏi các mục trên.",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
@@ -702,11 +702,11 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
+  "notification_service_description": "Cung cấp thông tin phòng ngừa thiên tai theo thời gian thực thông qua các thông báo khi xảy ra thiên tai lớn.",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "使用定位來自動更新所在地設定，提供當地的即時防災資訊",
+  "location_based_service": "Sử dụng định vị để tự động cập nhật cài đặt vị trí và cung cấp thông tin phòng ngừa thảm họa tại địa phương theo thời gian thực.",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
@@ -870,11 +870,11 @@
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
-  "autoStart_permission_denied": "自啟動權限已被拒絕，請移至設定允許權限。",
+  "autoStart_permission_denied": "Quyền tự động khởi động đã bị từ chối. Vui lòng vào Cài đặt để cấp quyền",
   "@autoStart_permission_denied": {
     "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
   },
-  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "batteryOptimization_permission_denied": "Chính sách tiết kiệm điện đã bị từ chối. Vui lòng vào Cài đặt để cấp quyền.",
   "@batteryOptimization_permission_denied": {
     "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
   },
@@ -1095,11 +1095,11 @@
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   },
-  "me_about": "關於",
+  "me_about": "Về tôi.",
   "@me_about": {
     "description": "「我」路徑 → 關於"
   },
-  "alarm_area": "警報區域",
+  "alarm_area": "Khu vực nhận cảnh báo.",
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
@@ -1123,7 +1123,7 @@
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   },
-  "highest": "最高",
+  "highest": "Cao nhất",
   "@highest": {
     "description": "「首頁」路徑 → 「最高」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最高"
   },
@@ -1223,11 +1223,11 @@
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
-  "auto_location_permission_required": "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。",
+  "auto_location_permission_required": "Tính năng định vị tự động yêu cầu bạn phải cho phép DPIP sử dụng quyền thông báo để hoạt động bình thường.",
   "@auto_location_permission_required": {
     "description": "「通知權限」彈窗 → 自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。"
   },
-  "location_permission_needed": "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。",
+  "location_permission_needed": "Chức năng định vị tự động yêu cầu bạn phải cho phép DPIP sử dụng quyền vị trí để hoạt động bình thường.",
   "@location_permission_needed": {
     "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
   },
@@ -1273,27 +1273,27 @@
   "@donate_h2": {
     "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
   },
-  "max_earthquake_intensity": "最大震度",
+  "max_earthquake_intensity": "Cường độ động đất tối đa",
   "@max_earthquake_intensity": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
-  "report_all": "全部",
+  "report_all": "Báo cáo tất cả ",
   "@report_all": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
-  "report_filter": "篩選器",
+  "report_filter": "Bộ lọc",
   "@report_filter": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
-  "report_filter_reset": "重置",
+  "report_filter_reset": "Cài lại",
   "@report_filter_reset": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 重置"
   },
-  "report_filter_apply": "套用",
+  "report_filter_apply": "Áp dụng ",
   "@report_filter_apply": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 套用"
   },
-  "report_end": "到底了",
+  "report_end": "Cuối cùng ",
   "@report_end": {
     "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
@@ -1309,15 +1309,15 @@
   "@history_affected_area": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 影響區域"
   },
-  "sound_eew_alert_major": "緊急地震速報(重大)",
+  "sound_eew_alert_major": "Cảnh báo động đất khẩn cấp (Lớn)",
   "@sound_eew_alert_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(重大)"
   },
-  "sound_eew_minor": "緊急地震速報(一般)",
+  "sound_eew_minor": "Cảnh báo động đất (Nhỏ)",
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
   },
-  "sound_eew_silent": "緊急地震速報(無聲)",
+  "sound_eew_silent": "Cảnn báo động đất (Im Lặng)",
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
@@ -1333,15 +1333,15 @@
   "@sound_earthquake_eew_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(重大)」描述 → 所在地(鄉鎮)預估震度 4 以上"
   },
-  "sound_earthquake_eew_minor": "地震速報(一般)",
+  "sound_earthquake_eew_minor": "Cảnh báo sớm về động đất (Chung)",
   "@sound_earthquake_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(一般)"
   },
-  "sound_earthquake_eew_minor_h2": "所在地(鄉鎮)預估震度 2 以上",
+  "sound_earthquake_eew_minor_h2": "Cường độ động đất ước tính tại địa điểm (thị trấn) là 2 hoặc cao hơn",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
-  "sound_earthquake_eew_silent": "地震速報(無聲)",
+  "sound_earthquake_eew_silent": "Báo cáo nhanh về động đất (im lặng)",
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
