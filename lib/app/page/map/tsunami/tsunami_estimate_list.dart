@@ -21,23 +21,25 @@ class TsunamiEstimateList extends StatelessWidget {
 
   heightToString(height) {
     if (height == 3) {
-      return ">6m";
+      return ">3m";
     } else if (height == 2) {
-      return "3~6m";
-    } else if (height == 1) {
       return "1~3m";
+    } else if (height == 1) {
+      return "0.3~1m";
     } else {
-      return "<1m";
+      return "<0.3m";
     }
   }
 
   heightToColor(height) {
-    if (height >= 2) {
+    if (height == 3) {
       return const Color(0xFFE543FF);
-    } else if (height == 1) {
+    } else if (height == 2) {
       return const Color(0xFFC90000);
-    } else {
+    } else if (height == 1) {
       return const Color(0xFFFFC900);
+    } else {
+      return const Color(0xFF00AAFF);
     }
   }
 
