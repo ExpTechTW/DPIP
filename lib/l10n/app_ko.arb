@@ -870,11 +870,11 @@
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
-  "autoStart_permission_denied": "自啟動權限已被拒絕，請移至設定允許權限。",
+  "autoStart_permission_denied": "자동 시작 권한이 거부되었습니다. 설정으로 이동하여 권한을 허용해 주세요.",
   "@autoStart_permission_denied": {
     "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
   },
-  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "batteryOptimization_permission_denied": "배터리 최적화가 거부되었습니다. 설정으로 이동하여 권한을 허용해 주세요.",
   "@batteryOptimization_permission_denied": {
     "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
   },
@@ -1773,7 +1773,7 @@
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
   },
-  "hours_24_trend": "24小時{type}趨勢",
+  "hours_24_trend": "24 시간 {type} 추세",
   "@hours_24_trend": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
     "placeholders": {
@@ -1786,11 +1786,11 @@
   "@power_saving_position": {
     "description": "「歡迎」頁面 → 省電策略"
   },
-  "power_saving_position_text": "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。",
+  "power_saving_position_text": "실시간 재난 알림 정보를 위해 DPIP가 백그라운드에서 계속 실행되도록 허용합니다.",
   "@power_saving_position_text": {
     "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
   },
-  "automatic_start_position": "自動化啟動",
+  "automatic_start_position": "자동 시작 위치",
   "@automatic_start_position": {
     "description": "「歡迎」頁面 → 自動化啟動"
   },
