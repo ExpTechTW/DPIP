@@ -79,7 +79,7 @@ android {
             multiDexEnabled true
         }
         debug {
-            signingConfig null
+            signingConfig signingConfigs.debug
             minifyEnabled false
         }
     }
