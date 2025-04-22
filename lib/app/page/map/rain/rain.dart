@@ -315,7 +315,7 @@ class _RainMapState extends State<RainMap> {
       ],
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng,String layerId) async {
       final features = await _mapController.queryRenderedFeatures(
         point,
         ['rain-circles', "rain-0-circles"],

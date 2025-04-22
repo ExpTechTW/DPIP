@@ -200,7 +200,7 @@ class _PressureMapState extends State<PressureMap> {
       ),
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
       final features = await _mapController.queryRenderedFeatures(
         point,
         ['pressure-circles'],
