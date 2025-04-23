@@ -6,7 +6,7 @@ import "package:dpip/util/log.dart";
 import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
-import "package:flutter_gen/gen_l10n/app_localizations.dart";
+import 'package:dpip/l10n/app_localizations.dart';
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:flutter_localized_locales/flutter_localized_locales.dart";
 import "package:talker_flutter/talker_flutter.dart";

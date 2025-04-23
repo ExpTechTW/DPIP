@@ -48,6 +48,9 @@ post_install do |installer|
         'PERMISSION_LOCATION=1',
         'PERMISSION_NOTIFICATIONS=1',
       ]
+      unless target.name == 'Runner'
+      config.build_settings['SKIP_INSTALL'] = "YES"
+      end
     end
   end
 

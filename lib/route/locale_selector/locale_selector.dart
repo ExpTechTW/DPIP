@@ -6,7 +6,7 @@ import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/color_scheme.dart";
 import "package:dpip/util/extension/locale.dart";
 import "package:flutter/material.dart";
-import "package:flutter_gen/gen_l10n/app_localizations.dart";
+import "package:dpip/l10n/app_localizations.dart";
 import "package:intl/intl.dart";
 
 class LocaleSelectorRoute extends StatefulWidget {
