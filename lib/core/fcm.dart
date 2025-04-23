@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/util/log.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
@@ -16,6 +19,10 @@ Future<void> fcmInit() async {
     debug: true,
   );
   await AwesomeNotificationsFcm().requestFirebaseAppToken();
+
+  if(Platform.isIOS){
+    print(await FirebaseMessaging.instance.getAPNSToken());
+  }
 }
 
 Future<void> onFcmTokenHandle(String token) async {
