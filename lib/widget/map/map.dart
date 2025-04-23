@@ -44,79 +44,64 @@ class DpipMap extends StatefulWidget {
 }
 
 class DpipMapState extends State<DpipMap> {
-  late String style = jsonEncode(
-    {
-      "version": 8,
-      "name": "ExpTech Studio",
-      "center": [120.85, 23.10],
-      "zoom": 6.2,
-      "sources": {
-        "map": {
-          "type": "vector",
-          "url": "https://lb.exptech.dev/api/v1/map/tiles/tiles.json",
-          "tileSize": 512,
-          "buffer": 64
-        },
+  late String style = jsonEncode({
+    "version": 8,
+    "name": "ExpTech Studio",
+    "center": [120.85, 23.10],
+    "zoom": 6.2,
+    "sources": {
+      "map": {
+        "type": "vector",
+        "url": "https://lb.exptech.dev/api/v1/map/tiles/tiles.json",
+        "tileSize": 512,
+        "buffer": 64,
       },
-      "sprite": "",
-      "glyphs": "https://glyphs.geolonia.com/{fontstack}/{range}.pbf",
-      "layers": [
-        {
-          "id": "background",
-          "type": "background",
-          "paint": {
-            "background-color": context.colors.surface.toHexStringRGB(),
-          },
-        },
-        {
-          "id": "county",
-          "type": "fill",
-          "source": "map",
-          "source-layer": "city",
-          "paint": {
-            "fill-color": context.colors.surfaceContainerHigh.toHexStringRGB(),
-            "fill-opacity": 1,
-          },
-        },
-        {
-          "id": "town",
-          "type": "fill",
-          "source": "map",
-          "source-layer": "town",
-          "paint": {
-            "fill-color": context.colors.surfaceContainerHigh.toHexStringRGB(),
-            "fill-opacity": 1,
-          },
-        },
-        {
-          "id": "county-outline",
-          "source": "map",
-          "source-layer": "city",
-          "type": "line",
-          "paint": {
-            "line-color": context.colors.outline.toHexStringRGB(),
-          },
-        },
-        {
-          "id": "global",
-          "type": "fill",
-          "source": "map",
-          "source-layer": "global",
-          "paint": {
-            "fill-color": context.colors.surfaceContainer.toHexStringRGB(),
-            "fill-opacity": 1,
-          },
-        },
-        {
-          "id": "tsunami",
-          "type": "line",
-          "source": "map",
-          "source-layer": "tsunami",
-          "paint": {"line-opacity": 0, "line-width": 3, "line-join": "round"},
-        },
-      ],
     },
-  );
+    "sprite": "",
+    "glyphs": "https://glyphs.geolonia.com/{fontstack}/{range}.pbf",
+    "layers": [
+      {
+        "id": "background",
+        "type": "background",
+        "paint": {"background-color": context.colors.surface.toHexStringRGB()},
+      },
+      {
+        "id": "county",
+        "type": "fill",
+        "source": "map",
+        "source-layer": "city",
+        "paint": {"fill-color": context.colors.surfaceContainerHigh.toHexStringRGB(), "fill-opacity": 1},
+      },
+      {
+        "id": "town",
+        "type": "fill",
+        "source": "map",
+        "source-layer": "town",
+        "paint": {"fill-color": context.colors.surfaceContainerHigh.toHexStringRGB(), "fill-opacity": 1},
+      },
+      {
+        "id": "county-outline",
+        "source": "map",
+        "source-layer": "city",
+        "type": "line",
+        "paint": {"line-color": context.colors.outline.toHexStringRGB()},
+      },
+      {
+        "id": "global",
+        "type": "fill",
+        "source": "map",
+        "source-layer": "global",
+        "paint": {"fill-color": context.colors.surfaceContainer.toHexStringRGB(), "fill-opacity": 1},
+      },
+      {
+        "id": "tsunami",
+        "type": "line",
+        "source": "map",
+        "source-layer": "tsunami",
+        "paint": {"line-opacity": 0, "line-width": 3, "line-join": "round"},
+      },
+    ],
+  });
 
   String? styleAbsoluteFilePath;
 
@@ -159,9 +144,7 @@ class DpipMapState extends State<DpipMap> {
   @override
   Widget build(BuildContext context) {
     if (styleAbsoluteFilePath == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
@@ -169,10 +152,7 @@ class DpipMapState extends State<DpipMap> {
     return MapLibreMap(
       minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(3, 9),
       trackCameraPosition: true,
-      initialCameraPosition: CameraPosition(
-        target: widget.initialCameraPosition.target,
-        zoom: adjustedZoomValue,
-      ),
+      initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
       styleString: styleAbsoluteFilePath!,
       onMapCreated: widget.onMapCreated,
       onMapClick: widget.onMapClick,

@@ -83,11 +83,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
       final res = await get(Uri.parse(widget.imageUrl));
 
-      final result = await ImageGallerySaver.saveImage(
-        res.bodyBytes,
-        quality: 100,
-        name: widget.imageName,
-      );
+      final result = await ImageGallerySaver.saveImage(res.bodyBytes, quality: 100, name: widget.imageName);
 
       if (!mounted) return;
 
@@ -113,16 +109,14 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                )
+                ),
               ],
             );
           },
         );
       } else {
         context.scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text("${context.i18n.save_image_error}${e.toString()}"),
-          ),
+          SnackBar(content: Text("${context.i18n.save_image_error}${e.toString()}")),
         );
       }
     }
@@ -166,9 +160,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                     child: CachedNetworkImage(
                       imageUrl: widget.imageUrl,
                       progressIndicatorBuilder: (context, url, progress) {
-                        return Center(
-                          child: CircularProgressIndicator(value: progress.progress),
-                        );
+                        return Center(child: CircularProgressIndicator(value: progress.progress));
                       },
                     ),
                   ),
@@ -180,54 +172,58 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
             opacity: isUiHidden ? 0 : 1,
             duration: const Duration(milliseconds: 200),
             child: SafeArea(
-              child: Stack(children: [
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: IconButton.filled(
-                    icon: const Icon(Symbols.close_rounded),
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
-                      backgroundColor: WidgetStateProperty.all(context.colors.surfaceContainerHighest.withOpacity(0.8)),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: IconButton.filled(
+                      icon: const Icon(Symbols.close_rounded),
+                      style: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
+                        backgroundColor: WidgetStateProperty.all(
+                          context.colors.surfaceContainerHighest.withOpacity(0.8),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.maybePop(context);
+                      },
                     ),
-                    onPressed: () {
-                      Navigator.maybePop(context);
-                    },
                   ),
-                ),
-                Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: TextButton.icon(
-                    icon: isDownloading
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: Padding(
-                              padding: EdgeInsets.all(4.0),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          )
-                        : const Icon(Symbols.save_rounded),
-                    label: Text(context.i18n.image_save),
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
-                      backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: TextButton.icon(
+                      icon:
+                          isDownloading
+                              ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: Padding(
+                                  padding: EdgeInsets.all(4.0),
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              )
+                              : const Icon(Symbols.save_rounded),
+                      label: Text(context.i18n.image_save),
+                      style: ButtonStyle(
+                        foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
+                        backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),
+                      ),
+                      onPressed:
+                          isDownloading
+                              ? null
+                              : () async {
+                                setState(() => isDownloading = true);
+                                await saveImageToDownloads();
+                                setState(() => isDownloading = false);
+                              },
                     ),
-                    onPressed: isDownloading
-                        ? null
-                        : () async {
-                            setState(() => isDownloading = true);
-                            await saveImageToDownloads();
-                            setState(() => isDownloading = false);
-                          },
                   ),
-                )
-              ]),
+                ],
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

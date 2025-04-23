@@ -11,9 +11,7 @@ Future<void> showLocationDialog(BuildContext context) async {
       return AlertDialog(
         icon: const Icon(Symbols.error),
         title: Text(context.i18n.location_not_set),
-        content: Text(
-          context.i18n.location_setting_required,
-        ),
+        content: Text(context.i18n.location_setting_required),
         actionsAlignment: MainAxisAlignment.end,
         actions: [
           TextButton(
@@ -24,9 +22,7 @@ Future<void> showLocationDialog(BuildContext context) async {
                 context,
                 MaterialPageRoute(
                   settings: const RouteSettings(name: "/settings"),
-                  builder: (context) => const SettingsRoute(
-                    initialRoute: "/location",
-                  ),
+                  builder: (context) => const SettingsRoute(initialRoute: "/location"),
                 ),
               );
             },

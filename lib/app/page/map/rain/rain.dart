@@ -77,7 +77,9 @@ class _RainMapState extends State<RainMap> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-        "rain-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      "rain-data",
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+    );
 
     rainTimeList = await ExpTech().getRainList();
 
@@ -88,23 +90,22 @@ class _RainMapState extends State<RainMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-      await _mapController.setGeoJsonSource(
         "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
+        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
       );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -117,57 +118,58 @@ class _RainMapState extends State<RainMap> {
   Future<void> updateRainData(String timestamp, String interval) async {
     List<RainStation> rainData = await ExpTech().getRain(timestamp);
 
-    rainDataList = rainData
-        .map((station) {
-          double rainfall;
-          switch (interval) {
-            case "now":
-              rainfall = station.data.now;
-              break;
-            case "10m":
-              rainfall = station.data.tenMinutes;
-              break;
-            case "1h":
-              rainfall = station.data.oneHour;
-              break;
-            case "3h":
-              rainfall = station.data.threeHours;
-              break;
-            case "6h":
-              rainfall = station.data.sixHours;
-              break;
-            case "12h":
-              rainfall = station.data.twelveHours;
-              break;
-            case "24h":
-              rainfall = station.data.twentyFourHours;
-              break;
-            case "2d":
-              rainfall = station.data.twoDays;
-              break;
-            case "3d":
-              rainfall = station.data.threeDays;
-              break;
-            default:
-              rainfall = station.data.now;
-          }
+    rainDataList =
+        rainData
+            .map((station) {
+              double rainfall;
+              switch (interval) {
+                case "now":
+                  rainfall = station.data.now;
+                  break;
+                case "10m":
+                  rainfall = station.data.tenMinutes;
+                  break;
+                case "1h":
+                  rainfall = station.data.oneHour;
+                  break;
+                case "3h":
+                  rainfall = station.data.threeHours;
+                  break;
+                case "6h":
+                  rainfall = station.data.sixHours;
+                  break;
+                case "12h":
+                  rainfall = station.data.twelveHours;
+                  break;
+                case "24h":
+                  rainfall = station.data.twentyFourHours;
+                  break;
+                case "2d":
+                  rainfall = station.data.twoDays;
+                  break;
+                case "3d":
+                  rainfall = station.data.threeDays;
+                  break;
+                default:
+                  rainfall = station.data.now;
+              }
 
-          if (rainfall == -99) {
-            return null;
-          }
+              if (rainfall == -99) {
+                return null;
+              }
 
-          return RainData(
-            id: station.id,
-            latitude: station.station.lat,
-            longitude: station.station.lng,
-            rainfall: rainfall,
-            stationName: station.station.name,
-            county: station.station.county,
-            town: station.station.town,
-          );
-        })
-        .whereType<RainData>()
-        .toList();
+              return RainData(
+                id: station.id,
+                latitude: station.station.lat,
+                longitude: station.station.lng,
+                rainfall: rainfall,
+                stationName: station.station.name,
+                county: station.station.county,
+                town: station.station.town,
+              );
+            })
+            .whereType<RainData>()
+            .toList();
 
     await addRainCircles(rainDataList);
   }
@@ -198,19 +200,19 @@ class _RainMapState extends State<RainMap> {
   }
 
   Future<void> addRainCircles(List<RainData> rainDataList) async {
-    final features = rainDataList
-        .map((data) => {
-              "type": "Feature",
-              "properties": {
-                "id": data.id,
-                "rainfall": data.rainfall,
+    final features =
+        rainDataList
+            .map(
+              (data) => {
+                "type": "Feature",
+                "properties": {"id": data.id, "rainfall": data.rainfall},
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [data.longitude, data.latitude],
+                },
               },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [data.longitude, data.latitude]
-              }
-            })
-        .toList();
+            )
+            .toList();
 
     await _mapController.setGeoJsonSource("rain-data", {"type": "FeatureCollection", "features": features});
 
@@ -235,7 +237,7 @@ class _RainMapState extends State<RainMap> {
       filter: [
         "==",
         ["get", "rainfall"],
-        0
+        0,
       ],
       minzoom: 10,
     );
@@ -253,13 +255,13 @@ class _RainMapState extends State<RainMap> {
         textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
-          [0, 2]
+          [0, 2],
         ],
       ),
       filter: [
         "==",
         ["get", "rainfall"],
-        0
+        0,
       ],
       minzoom: 10,
     );
@@ -301,7 +303,7 @@ class _RainMapState extends State<RainMap> {
           1000,
           "#960099",
           2000,
-          "#000000"
+          "#000000",
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
@@ -311,16 +313,12 @@ class _RainMapState extends State<RainMap> {
       filter: [
         "!=",
         ["get", "rainfall"],
-        0
+        0,
       ],
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng,String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(
-        point,
-        ['rain-circles', "rain-0-circles"],
-        null,
-      );
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
+      final features = await _mapController.queryRenderedFeatures(point, ['rain-circles', "rain-0-circles"], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
@@ -348,13 +346,13 @@ class _RainMapState extends State<RainMap> {
         textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
-          [0, 2]
+          [0, 2],
         ],
       ),
       filter: [
         "!=",
         ["get", "rainfall"],
-        0
+        0,
       ],
       minzoom: 9,
     );
@@ -408,12 +406,7 @@ class _RainMapState extends State<RainMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels
-            .map((label) => Text(
-                  label,
-                  style: const TextStyle(fontSize: 10),
-                ))
-            .toList(),
+        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 10))).toList(),
       ),
     );
   }
@@ -479,12 +472,7 @@ class _RainMapState extends State<RainMap> {
               },
             ),
           ),
-        if (_showLegend)
-          Positioned(
-            left: 6,
-            bottom: 50,
-            child: _buildLegend(),
-          ),
+        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
         if (_selectedStationId != null)
           DraggableScrollableSheet(
             initialChildSize: 0.3,
@@ -498,11 +486,7 @@ class _RainMapState extends State<RainMap> {
                   color: context.theme.cardColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -5),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -513,10 +497,7 @@ class _RainMapState extends State<RainMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
                         type: "precipitation",

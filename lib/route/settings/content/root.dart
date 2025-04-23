@@ -13,9 +13,7 @@ class SettingsRootView extends StatefulWidget {
 class _SettingsRootViewState extends State<SettingsRootView> {
   @override
   Widget build(BuildContext context) {
-    const tileTitleTextStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-    );
+    const tileTitleTextStyle = TextStyle(fontWeight: FontWeight.bold);
 
     return Material(
       child: ListView(
@@ -24,73 +22,37 @@ class _SettingsRootViewState extends State<SettingsRootView> {
         children: [
           ListTileGroupHeader(title: context.i18n.settings_position),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.pin_drop),
-            ),
-            title: Text(
-              context.i18n.settings_location,
-              style: tileTitleTextStyle,
-            ),
+            leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.pin_drop)),
+            title: Text(context.i18n.settings_location, style: tileTitleTextStyle),
             subtitle: Text(context.i18n.settings_location_description),
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                "/location",
-              );
+              Navigator.pushNamed(context, "/location");
             },
           ),
           ListTileGroupHeader(title: context.i18n.settings_Personalization),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.format_paint),
-            ),
-            title: Text(
-              context.i18n.settings_theme,
-              style: tileTitleTextStyle,
-            ),
+            leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.format_paint)),
+            title: Text(context.i18n.settings_theme, style: tileTitleTextStyle),
             subtitle: Text(context.i18n.settings_theme_description),
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                "/theme",
-              );
+              Navigator.pushNamed(context, "/theme");
             },
           ),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.translate),
-            ),
-            title: Text(
-              context.i18n.settings_locale,
-              style: tileTitleTextStyle,
-            ),
+            leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.translate)),
+            title: Text(context.i18n.settings_locale, style: tileTitleTextStyle),
             subtitle: Text(context.i18n.settings_locale_description),
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                "/locale",
-              );
+              Navigator.pushNamed(context, "/locale");
             },
           ),
           ListTileGroupHeader(title: context.i18n.other_title),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.experiment),
-            ),
-            title: Text(
-              context.i18n.advanced_features,
-              style: tileTitleTextStyle,
-            ),
+            leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.experiment)),
+            title: Text(context.i18n.advanced_features, style: tileTitleTextStyle),
             subtitle: Text(context.i18n.advanced_features_title),
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                "/experiment",
-              );
+              Navigator.pushNamed(context, "/experiment");
             },
           ),
         ],

@@ -61,28 +61,24 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
           if (grouped.isEmpty) {
             return Padding(
               padding: const EdgeInsets.only(top: 24),
-              child: Center(
-                child: Text(context.i18n.home_safety),
-              ),
+              child: Center(child: Text(context.i18n.home_safety)),
             );
           }
 
           final key = grouped.keys.elementAt(index);
           final historyGroup = grouped[key]!;
 
-          return Column(children: [
-            DateTimelineItem(key),
-            ...historyGroup.map((history) {
-              final int? expireTimestamp = history.time.expires['all'];
-              final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-              final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-              return HistoryTimelineItem(
-                expired: isExpired,
-                history: history,
-                last: index == historyList.length - 1,
-              );
-            })
-          ]);
+          return Column(
+            children: [
+              DateTimelineItem(key),
+              ...historyGroup.map((history) {
+                final int? expireTimestamp = history.time.expires['all'];
+                final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+                final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+                return HistoryTimelineItem(expired: isExpired, history: history, last: index == historyList.length - 1);
+              }),
+            ],
+          );
         },
       ),
     );

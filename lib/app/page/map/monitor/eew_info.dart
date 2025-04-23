@@ -21,13 +21,7 @@ class EewDraggableSheet extends StatelessWidget {
             boxShadow: kElevationToShadow[4],
             borderRadius: BorderRadius.circular(12),
           ),
-          child: ListView(
-            controller: scrollController,
-            children: [
-              const BottomSheetDragHandle(),
-              ...child,
-            ],
-          ),
+          child: ListView(controller: scrollController, children: [const BottomSheetDragHandle(), ...child]),
         );
       },
     );

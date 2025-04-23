@@ -56,9 +56,7 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
             _isLoading = false;
           });
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${context.i18n.error_occurred} $e')),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.i18n.error_occurred} $e')));
           setState(() => _isLoading = false);
         }
       } else {
@@ -66,9 +64,10 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
         if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
           await showLocationDialog(context);
         } else {
-          await Navigator.of(context, rootNavigator: true).push(
-            MaterialPageRoute(builder: (context) => const WelcomeTosPage()),
-          );
+          await Navigator.of(
+            context,
+            rootNavigator: true,
+          ).push(MaterialPageRoute(builder: (context) => const WelcomeTosPage()));
           setState(() => monitorEnabled = Global.preference.getBool("monitor") ?? false);
         }
       }
@@ -84,18 +83,14 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
         children: [
           _isLoading
               ? ListTile(
-                  title: Text(context.i18n.enable_monitor),
-                  trailing: const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(),
-                  ),
-                )
+                title: Text(context.i18n.enable_monitor),
+                trailing: const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+              )
               : SwitchListTile(
-                  title: Text(context.i18n.enable_monitor),
-                  value: monitorEnabled,
-                  onChanged: _handleMonitorToggle,
-                ),
+                title: Text(context.i18n.enable_monitor),
+                value: monitorEnabled,
+                onChanged: _handleMonitorToggle,
+              ),
         ],
       ),
     );

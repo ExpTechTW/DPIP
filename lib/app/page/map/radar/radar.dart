@@ -113,12 +113,7 @@ class _RadarMapState extends State<RadarMap> {
 
     String newTileUrl = getTileUrl(radar_list.last);
 
-    _mapController.addSource(
-        "radarSource",
-        RasterSourceProperties(
-          tiles: [newTileUrl],
-          tileSize: 256,
-        ));
+    _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
     _mapController.removeLayer("county-outline");
     _mapController.removeLayer("county");
@@ -126,10 +121,7 @@ class _RadarMapState extends State<RadarMap> {
     _mapController.addLayer(
       "map",
       "county",
-      FillLayerProperties(
-        fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(),
-        fillOpacity: 1,
-      ),
+      FillLayerProperties(fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(), fillOpacity: 1),
       sourceLayer: "city",
       belowLayerId: "radarLayer",
     );
@@ -137,9 +129,7 @@ class _RadarMapState extends State<RadarMap> {
     _mapController.addLayer(
       "map",
       "county-outline",
-      LineLayerProperties(
-        lineColor: context.colors.outline.toHexStringRGB(),
-      ),
+      LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB()),
       sourceLayer: "city",
     );
 
@@ -150,7 +140,9 @@ class _RadarMapState extends State<RadarMap> {
     }
 
     await _mapController.addSource(
-        "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      "markers-geojson",
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+    );
 
     start();
   }
@@ -162,22 +154,19 @@ class _RadarMapState extends State<RadarMap> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource(
-        "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
-      );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -210,13 +199,7 @@ class _RadarMapState extends State<RadarMap> {
   }
 
   Widget _buildColorBar() {
-    return SizedBox(
-      height: 20,
-      width: 300,
-      child: CustomPaint(
-        painter: ColorBarPainter(dBZColors),
-      ),
-    );
+    return SizedBox(height: 20, width: 300, child: CustomPaint(painter: ColorBarPainter(dBZColors)));
   }
 
   Widget _buildColorBarLabels() {
@@ -225,12 +208,7 @@ class _RadarMapState extends State<RadarMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels
-            .map((label) => Text(
-                  label,
-                  style: const TextStyle(fontSize: 9),
-                ))
-            .toList(),
+        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 9))).toList(),
       ),
     );
   }
@@ -239,11 +217,7 @@ class _RadarMapState extends State<RadarMap> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        DpipMap(
-          onMapCreated: _initMap,
-          onStyleLoadedCallback: _loadMap,
-          rotateGesturesEnabled: true,
-        ),
+        DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap, rotateGesturesEnabled: true),
         Positioned(
           left: 4,
           bottom: 4,
@@ -287,15 +261,14 @@ class _RadarMapState extends State<RadarMap> {
                 _mapController.removeLayer("radarLayer");
                 _mapController.removeSource("radarSource");
 
-                _mapController.addSource(
-                    "radarSource",
-                    RasterSourceProperties(
-                      tiles: [newTileUrl],
-                      tileSize: 256,
-                    ));
+                _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
-                _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(),
-                    belowLayerId: "county-outline");
+                _mapController.addLayer(
+                  "radarSource",
+                  "radarLayer",
+                  const RasterLayerProperties(),
+                  belowLayerId: "county-outline",
+                );
 
                 _addUserLocationMarker();
               },
@@ -324,10 +297,7 @@ class ColorBarPainter extends CustomPainter {
 
     for (int i = 0; i < colors.length; i++) {
       paint.color = Color(int.parse("0xFF${colors[i]}"));
-      canvas.drawRect(
-        Rect.fromLTWH(i * width, 0, width, size.height),
-        paint,
-      );
+      canvas.drawRect(Rect.fromLTWH(i * width, 0, width, size.height), paint);
     }
   }
 

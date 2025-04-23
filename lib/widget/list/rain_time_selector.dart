@@ -31,16 +31,16 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
 
   final List<String> _intervals = ['3d', '2d', '24h', '12h', '6h', '3h', '1h', '10m', 'now'];
   List<String> get _intervalTranslations => [
-        context.i18n.interval_3_days,
-        context.i18n.interval_2_days,
-        context.i18n.interval_24_hours,
-        context.i18n.interval_12_hours,
-        context.i18n.interval_6_hours,
-        context.i18n.interval_3_hours,
-        context.i18n.interval_1_hour,
-        context.i18n.interval_10_minutes,
-        context.i18n.interval_now,
-      ];
+    context.i18n.interval_3_days,
+    context.i18n.interval_2_days,
+    context.i18n.interval_24_hours,
+    context.i18n.interval_12_hours,
+    context.i18n.interval_6_hours,
+    context.i18n.interval_3_hours,
+    context.i18n.interval_1_hour,
+    context.i18n.interval_10_minutes,
+    context.i18n.interval_now,
+  ];
 
   @override
   void initState() {
@@ -49,14 +49,8 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
     _selectedInterval = "now"; // Default to now
     _timeScrollController = ScrollController();
     _intervalScrollController = ScrollController();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _expandAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _expandAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelected();
       _scrollToSelectedInterval();
@@ -286,13 +280,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
               sizeFactor: _expandAnimation,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: Column(
-                  children: [
-                    _buildTimeSelector(),
-                    const SizedBox(height: 8),
-                    _buildIntervalSelector(),
-                  ],
-                ),
+                child: Column(children: [_buildTimeSelector(), const SizedBox(height: 8), _buildIntervalSelector()]),
               ),
             ),
           ),

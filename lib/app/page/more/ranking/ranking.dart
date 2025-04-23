@@ -69,11 +69,7 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
           TabBarView(
             controller: controller,
             physics: const NeverScrollableScrollPhysics(),
-            children: const [
-              RankingPrecipitationTab(),
-              RankingTemperatureTab(),
-              RankingWindTab(),
-            ],
+            children: const [RankingPrecipitationTab(), RankingTemperatureTab(), RankingWindTab()],
           ),
           Positioned(
             bottom: 8,
@@ -85,8 +81,11 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
               child: FloatingActionButton.small(
                 child: const Icon(Symbols.vertical_align_top_rounded),
                 onPressed: () {
-                  scroll.currentState?.innerController
-                      .animateTo(0, duration: Durations.medium1, curve: Easing.standard);
+                  scroll.currentState?.innerController.animateTo(
+                    0,
+                    duration: Durations.medium1,
+                    curve: Easing.standard,
+                  );
                   scroll.currentState?.outerController.animateTo(0, duration: Durations.long2, curve: Easing.standard);
                 },
               ),

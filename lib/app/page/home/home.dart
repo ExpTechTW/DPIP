@@ -152,8 +152,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               );
             },
             icon: const Icon(Symbols.pin_drop_rounded),
-            label: Text(region != null ? '$city$town' : context.i18n.home_click_settings,
-                style: const TextStyle(fontSize: 20)),
+            label: Text(
+              region != null ? '$city$town' : context.i18n.home_click_settings,
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
         );
       },
@@ -162,14 +164,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildMainContent(),
-          _buildAppBar(),
-        ],
-      ),
-    );
+    return Scaffold(body: Stack(children: [_buildMainContent(), _buildAppBar()]));
   }
 
   Widget _buildMainContent() {
@@ -214,17 +209,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             tooltip: context.i18n.history_nationwide,
             value: true,
           ),
-          ButtonSegment(
-            icon: const Icon(Symbols.home_rounded),
-            tooltip: context.i18n.settings_location,
-            value: false,
-          ),
+          ButtonSegment(icon: const Icon(Symbols.home_rounded), tooltip: context.i18n.settings_location, value: false),
         ],
         selected: {country},
-        onSelectionChanged: (p0) => setState(() {
-          country = p0.first;
-          refreshRealtimeList();
-        }),
+        onSelectionChanged:
+            (p0) => setState(() {
+              country = p0.first;
+              refreshRealtimeList();
+            }),
       ),
     );
   }
@@ -245,25 +237,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     final grouped = groupBy(realtimeList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
 
     return Column(
-      children: grouped.entries.map((entry) {
-        final date = entry.key;
-        final historyGroup = entry.value;
-        return Column(
-          children: [
-            DateTimelineItem(date),
-            ...historyGroup.map((history) {
-              final int? expireTimestamp = history.time.expires['all'];
-              final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-              final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-              return HistoryTimelineItem(
-                expired: isExpired,
-                history: history,
-                last: history == realtimeList.last,
-              );
-            }),
-          ],
-        );
-      }).toList(),
+      children:
+          grouped.entries.map((entry) {
+            final date = entry.key;
+            final historyGroup = entry.value;
+            return Column(
+              children: [
+                DateTimelineItem(date),
+                ...historyGroup.map((history) {
+                  final int? expireTimestamp = history.time.expires['all'];
+                  final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+                  final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+                  return HistoryTimelineItem(expired: isExpired, history: history, last: history == realtimeList.last);
+                }),
+              ],
+            );
+          }).toList(),
     );
   }
 
@@ -276,7 +265,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           colors: [
             context.colors.primary.withOpacity(0.12),
             context.colors.primaryContainer.withOpacity(0.08),
-            Colors.transparent
+            Colors.transparent,
           ],
           stops: const [0.16, 0.6, 1],
           begin: Alignment.topCenter,
@@ -285,11 +274,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildLocationButton(),
-          _buildTemperatureDisplay(),
-          _buildWeatherDetails(),
-        ],
+        children: [_buildLocationButton(), _buildTemperatureDisplay(), _buildWeatherDetails()],
       ),
     );
   }
@@ -320,9 +305,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ),
                       ),
                       TextSpan(
-                        text: tempParts[0] == '--'
-                            ? ".-°C"
-                            : tempParts.length > 1
+                        text:
+                            tempParts[0] == '--'
+                                ? ".-°C"
+                                : tempParts.length > 1
                                 ? '.${tempParts[1]}°C'
                                 : '.0°C',
                         style: TextStyle(
@@ -337,19 +323,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 const SizedBox(height: 8),
                 Text(
                   WeatherIcons.getWeatherContent(context, weatherCode.toString()),
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: context.colors.onSurfaceVariant,
-                  ),
+                  style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-          Icon(
-            WeatherIcons.getWeatherIcon(weatherCode, isDay),
-            size: 80,
-            color: context.colors.primary,
-          ),
+          Icon(WeatherIcons.getWeatherIcon(weatherCode, isDay), size: 80, color: context.colors.primary),
         ],
       ),
     );
@@ -377,10 +356,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildWeatherDetailItem(String label, String value) {
     return Text(
       '$label   $value',
-      style: TextStyle(
-        fontSize: 18,
-        color: context.colors.onSurfaceVariant.withOpacity(0.75),
-      ),
+      style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant.withOpacity(0.75)),
     );
   }
 
@@ -393,10 +369,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         visible: isAppBarVisible,
         child: FadeTransition(
           opacity: animController.drive(Tween(begin: 0.0, end: 1.0)),
-          child: AppBar(
-            elevation: 4,
-            title: Text(context.i18n.home),
-          ),
+          child: AppBar(elevation: 4, title: Text(context.i18n.home)),
         ),
       ),
     );

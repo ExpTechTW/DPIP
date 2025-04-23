@@ -54,10 +54,7 @@ class ReportListItem extends StatelessWidget {
                     Text(
                       DateFormat(context.i18n.time_format).format(report.time),
                       textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: context.colors.onSurfaceVariant,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 12),
                     ),
                   ],
                 ),
@@ -82,12 +79,7 @@ class ReportListItem extends StatelessWidget {
                         height: first ? height / 2 : height,
                         color: context.colors.outlineVariant, // Color of the vertical line
                       ),
-                    IntensityBox(
-                      intensity: report.intensity,
-                      size: 36,
-                      borderRadius: 36,
-                      border: !report.hasNumber,
-                    ),
+                    IntensityBox(intensity: report.intensity, size: 36, borderRadius: 36, border: !report.hasNumber),
                   ],
                 ),
               ),
@@ -112,8 +104,10 @@ class ReportListItem extends StatelessWidget {
                      * 規模、深度
                      */
                     Text(
-                      context.i18n
-                          .report_list_item_subtitle(report.magnitude.toStringAsFixed(1), report.depth.toString()),
+                      context.i18n.report_list_item_subtitle(
+                        report.magnitude.toStringAsFixed(1),
+                        report.depth.toString(),
+                      ),
                       style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
                   ],

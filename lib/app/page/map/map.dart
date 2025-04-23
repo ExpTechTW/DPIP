@@ -80,15 +80,10 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: destinations[currentIndex].label,
-      ),
+      appBar: AppBar(title: destinations[currentIndex].label),
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
-        children: [
-          ListTileGroupHeader(title: context.i18n.monitor_list),
-          ...destinations,
-        ],
+        children: [ListTileGroupHeader(title: context.i18n.monitor_list), ...destinations],
         onDestinationSelected: (value) {
           setState(() => currentIndex = value);
           controller.jumpToPage(value);

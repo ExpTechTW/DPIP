@@ -52,23 +52,22 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       if (isUserLocationValid) {
         await _mapController.addSource(
-            "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-        await _mapController.setGeoJsonSource(
           "markers-geojson",
-          {
-            "type": "FeatureCollection",
-            "features": [
-              {
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                  "coordinates": [userLon, userLat],
-                  "type": "Point"
-                }
-              }
-            ],
-          },
+          const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
         );
+        await _mapController.setGeoJsonSource("markers-geojson", {
+          "type": "FeatureCollection",
+          "features": [
+            {
+              "type": "Feature",
+              "properties": {},
+              "geometry": {
+                "coordinates": [userLon, userLat],
+                "type": "Point",
+              },
+            },
+          ],
+        });
       }
 
       await _addUserLocationMarker();
@@ -109,10 +108,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   Future<void> _loadTyphoonLayers() async {
-    await _mapController.addSource(
-      "typhoon-geojson",
-      GeojsonSourceProperties(data: typhoonData),
-    );
+    await _mapController.addSource("typhoon-geojson", GeojsonSourceProperties(data: typhoonData));
 
     await _mapController.addLayer(
       "typhoon-geojson",
@@ -123,13 +119,13 @@ class _TyphoonMapState extends State<TyphoonMap> {
           [
             'get',
             'color',
-            ['properties']
+            ['properties'],
           ],
           0, '#1565C0', // 藍色
           1, '#4CAF50', // 綠色
           2, '#FFC107', // 黃色
           3, '#FF5722', // 橙色
-          '#757575' // 默認灰色
+          '#757575', // 默認灰色
         ],
         lineWidth: 2,
       ),
@@ -145,7 +141,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
           [
             'get',
             'color',
-            ['properties']
+            ['properties'],
           ],
           0,
           '#1565C0',
@@ -155,13 +151,26 @@ class _TyphoonMapState extends State<TyphoonMap> {
           '#FFC107',
           3,
           '#FF5722',
-          '#757575'
+          '#757575',
         ],
         circleStrokeWidth: 2,
         circleStrokeColor: '#FFFFFF',
       ),
-      filter: ['all',
-        ['!=', ['get', 'forecast', ['get', 'type', ['properties']]], true]
+      filter: [
+        'all',
+        [
+          '!=',
+          [
+            'get',
+            'forecast',
+            [
+              'get',
+              'type',
+              ['properties'],
+            ],
+          ],
+          true,
+        ],
       ],
     );
 
@@ -169,15 +178,49 @@ class _TyphoonMapState extends State<TyphoonMap> {
     await _mapController.addLayer(
       "typhoon-geojson",
       "typhoon-wind-circle",
-      FillLayerProperties(
-        fillColor: 'rgba(255, 0, 0, 0.1)',
-        fillOutlineColor: 'rgba(255, 0, 0, 0.6)',
-      ),
-      filter: ['all',
-        ['==', ['geometry-type'], 'Polygon'],
-        ['==', ['get', 'type', ['properties']], 'wind-circle'],
-        ['==', ['get', 'forecast', ['get', 'type', ['properties']]], true],
-        ['==', ['get', 'tau', ['get', 'type', ['properties']]], 0]
+      FillLayerProperties(fillColor: 'rgba(255, 0, 0, 0.1)', fillOutlineColor: 'rgba(255, 0, 0, 0.6)'),
+      filter: [
+        'all',
+        [
+          '==',
+          ['geometry-type'],
+          'Polygon',
+        ],
+        [
+          '==',
+          [
+            'get',
+            'type',
+            ['properties'],
+          ],
+          'wind-circle',
+        ],
+        [
+          '==',
+          [
+            'get',
+            'forecast',
+            [
+              'get',
+              'type',
+              ['properties'],
+            ],
+          ],
+          true,
+        ],
+        [
+          '==',
+          [
+            'get',
+            'tau',
+            [
+              'get',
+              'type',
+              ['properties'],
+            ],
+          ],
+          0,
+        ],
       ],
     );
   }
@@ -186,8 +229,10 @@ class _TyphoonMapState extends State<TyphoonMap> {
     List<double> lonRange = [110, 150];
     List<double> latRange = [10, 32];
 
-    final bounds =
-        LatLngBounds(southwest: LatLng(latRange[0], lonRange[0]), northeast: LatLng(latRange[1], lonRange[1]));
+    final bounds = LatLngBounds(
+      southwest: LatLng(latRange[0], lonRange[0]),
+      northeast: LatLng(latRange[1], lonRange[1]),
+    );
 
     _mapController.addSource(
       "radarOverlaySource",
@@ -202,11 +247,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
       ),
     );
 
-    _mapController.addLayer(
-      "radarOverlaySource",
-      "radarOverlayLayer",
-      const RasterLayerProperties(rasterOpacity: 1),
-    );
+    _mapController.addLayer("radarOverlaySource", "radarOverlayLayer", const RasterLayerProperties(rasterOpacity: 1));
   }
 
   @override

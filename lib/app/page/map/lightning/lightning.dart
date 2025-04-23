@@ -20,12 +20,7 @@ class LightningData {
   final int type;
   final int time;
 
-  LightningData({
-    required this.latitude,
-    required this.longitude,
-    required this.type,
-    required this.time,
-  });
+  LightningData({required this.latitude, required this.longitude, required this.type, required this.time});
 }
 
 class LightningMap extends StatefulWidget {
@@ -75,23 +70,22 @@ class _LightningMapState extends State<LightningMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-      await _mapController.setGeoJsonSource(
         "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
+        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
       );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -133,43 +127,45 @@ class _LightningMapState extends State<LightningMap> {
 
   Future<void> _loadLightningData(String time) async {
     List<Lightning> lightningData = await ExpTech().getLightning(time);
-    lightningDataList = lightningData
-        .map((lightning) => LightningData(
-              latitude: lightning.loc.lat,
-              longitude: lightning.loc.lng,
-              type: lightning.type,
-              time: lightning.time,
-            ))
-        .toList();
+    lightningDataList =
+        lightningData
+            .map(
+              (lightning) => LightningData(
+                latitude: lightning.loc.lat,
+                longitude: lightning.loc.lng,
+                type: lightning.type,
+                time: lightning.time,
+              ),
+            )
+            .toList();
 
     await _addLightningMarkers();
   }
 
   Future<void> _addLightningMarkers() async {
-    final features = lightningDataList.map((data) {
-      final timeDiff = selectTime - data.time;
-      int level;
-      if (timeDiff < 5 * 60 * 1000) {
-        level = 5;
-      } else if (timeDiff < 10 * 60 * 1000) {
-        level = 10;
-      } else if (timeDiff < 30 * 60 * 1000) {
-        level = 30;
-      } else {
-        level = 60;
-      }
+    final features =
+        lightningDataList.map((data) {
+          final timeDiff = selectTime - data.time;
+          int level;
+          if (timeDiff < 5 * 60 * 1000) {
+            level = 5;
+          } else if (timeDiff < 10 * 60 * 1000) {
+            level = 10;
+          } else if (timeDiff < 30 * 60 * 1000) {
+            level = 30;
+          } else {
+            level = 60;
+          }
 
-      return {
-        "type": "Feature",
-        "properties": {
-          "type": "${data.type}-$level",
-        },
-        "geometry": {
-          "type": "Point",
-          "coordinates": [data.longitude, data.latitude]
-        }
-      };
-    }).toList();
+          return {
+            "type": "Feature",
+            "properties": {"type": "${data.type}-$level"},
+            "geometry": {
+              "type": "Point",
+              "coordinates": [data.longitude, data.latitude],
+            },
+          };
+        }).toList();
 
     await _mapController.setGeoJsonSource("lightning-data", {"type": "FeatureCollection", "features": features});
 
@@ -308,12 +304,7 @@ class _LightningMapState extends State<LightningMap> {
               },
             ),
           ),
-        if (_showLegend)
-          Positioned(
-            left: 6,
-            bottom: 50,
-            child: _buildLegend(),
-          ),
+        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
       ],
     );
   }

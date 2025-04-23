@@ -26,12 +26,7 @@ class EnlargeableImage extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: Stack(
             children: [
-              Hero(
-                tag: heroTag,
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                ),
-              ),
+              Hero(tag: heroTag, child: CachedNetworkImage(imageUrl: imageUrl)),
               Positioned.fill(
                 child: Material(
                   color: Colors.transparent,
@@ -41,11 +36,7 @@ class EnlargeableImage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return ImageViewerRoute(
-                              heroTag: heroTag,
-                              imageUrl: imageUrl,
-                              imageName: imageName,
-                            );
+                            return ImageViewerRoute(heroTag: heroTag, imageUrl: imageUrl, imageName: imageName);
                           },
                         ),
                       );

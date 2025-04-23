@@ -13,11 +13,7 @@ class ChangelogEntry {
   ChangelogEntry({required this.version, required this.type, required this.content});
 
   factory ChangelogEntry.fromJson(Map<String, dynamic> json) {
-    return ChangelogEntry(
-      version: json['ver'],
-      type: json['type'],
-      content: json['content'],
-    );
+    return ChangelogEntry(version: json['ver'], type: json['type'], content: json['content']);
   }
 }
 
@@ -59,13 +55,7 @@ Widget _buildTypeChip(BuildContext context, ChangelogEntry entry) {
     side: BorderSide(color: _getTypeColor(entry.type)),
     backgroundColor: _getTypeColor(entry.type).withOpacity(0.16),
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    label: Text(
-      _getLocalizedType(entry.type),
-      style: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
+    label: Text(_getLocalizedType(entry.type), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
   );
 }
 
@@ -106,21 +96,13 @@ class _ChangelogPageState extends State<ChangelogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.i18n.update_log),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(context.i18n.update_log), elevation: 0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Expanded(
-                child: _buildChangelogList(),
-              ),
-            ],
+            children: [const SizedBox(height: 16), Expanded(child: _buildChangelogList())],
           ),
         ),
       ),
@@ -147,9 +129,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => ChangelogDetailPage(entry: _changelogEntries[index]),
-                ),
+                MaterialPageRoute(builder: (context) => ChangelogDetailPage(entry: _changelogEntries[index])),
               );
             },
           );
@@ -163,11 +143,7 @@ class ChangelogCard extends StatelessWidget {
   final ChangelogEntry entry;
   final VoidCallback onTap;
 
-  const ChangelogCard({
-    super.key,
-    required this.entry,
-    required this.onTap,
-  });
+  const ChangelogCard({super.key, required this.entry, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -176,9 +152,7 @@ class ChangelogCard extends StatelessWidget {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -194,10 +168,7 @@ class ChangelogCard extends StatelessWidget {
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 label: Text(
                   _getSupportLocalizedType(isSupport),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 8),
@@ -206,9 +177,7 @@ class ChangelogCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   'v${entry.version}',
-                  style: context.theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 8),
@@ -228,20 +197,14 @@ class ChangelogCard extends StatelessWidget {
 class ChangelogDetailPage extends StatelessWidget {
   final ChangelogEntry entry;
 
-  const ChangelogDetailPage({
-    super.key,
-    required this.entry,
-  });
+  const ChangelogDetailPage({super.key, required this.entry});
 
   @override
   Widget build(BuildContext context) {
     bool isSupport =
         supportList["support-version"] == null ? false : supportList["support-version"].contains(entry.version);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.i18n.version_details),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(context.i18n.version_details), elevation: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -250,9 +213,7 @@ class ChangelogDetailPage extends StatelessWidget {
             children: [
               Text(
                 'v${entry.version} ${_getLocalizedType(entry.type)}',
-                style: context.theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               Row(
@@ -264,10 +225,7 @@ class ChangelogDetailPage extends StatelessWidget {
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     label: Text(
                       _getSupportLocalizedType(isSupport),
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(width: 8),

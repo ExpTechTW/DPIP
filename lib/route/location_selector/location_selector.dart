@@ -27,9 +27,10 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
   Future<void> setLocation(Location location) async {
     setState(() => _isLoading = true);
     try {
-      String? code = Global.location.entries
-          .firstWhereOrNull((l) => l.value.city == location.city && l.value.town == location.town)
-          ?.key;
+      String? code =
+          Global.location.entries
+              .firstWhereOrNull((l) => l.value.city == location.city && l.value.town == location.town)
+              ?.key;
 
       if (code == null) {
         Global.preference.remove("user-code");
@@ -50,9 +51,7 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
       MonitorPage.updatePosition();
       Navigator.popUntil(context, ModalRoute.withName("/settings"));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${context.i18n.error_occurred} $e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.i18n.error_occurred} $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -76,19 +75,20 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
         actions: [
           IconButton(
             icon: const Icon(Symbols.search),
-            onPressed: _isLoading
-                ? null
-                : () async {
-                    final result = await showSearch<Location>(
-                      context: context,
-                      delegate: LocationSelectorSearchDelegate(),
-                    );
+            onPressed:
+                _isLoading
+                    ? null
+                    : () async {
+                      final result = await showSearch<Location>(
+                        context: context,
+                        delegate: LocationSelectorSearchDelegate(),
+                      );
 
-                    if (result == null) return;
+                      if (result == null) return;
 
-                    await setLocation(result);
-                  },
-          )
+                      await setLocation(result);
+                    },
+          ),
         ],
       ),
       body: Stack(
@@ -100,17 +100,18 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
                 return ListTile(
                   title: Text(data[index]),
                   trailing: const Icon(Symbols.arrow_right),
-                  onTap: _isLoading
-                      ? null
-                      : () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              settings: RouteSettings(name: "/location_selector/${data[index]}"),
-                              builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
-                            ),
-                          );
-                        },
+                  onTap:
+                      _isLoading
+                          ? null
+                          : () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                settings: RouteSettings(name: "/location_selector/${data[index]}"),
+                                builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
+                              ),
+                            );
+                          },
                 );
               } else {
                 return RadioListTile(
@@ -118,28 +119,25 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
                   value: data[index],
                   groupValue: widget.town,
                   controlAffinity: ListTileControlAffinity.trailing,
-                  onChanged: _isLoading
-                      ? null
-                      : (value) async {
-                          if (value == null) return;
+                  onChanged:
+                      _isLoading
+                          ? null
+                          : (value) async {
+                            if (value == null) return;
 
-                          final location = Global.location.entries.firstWhere((e) {
-                            return (e.value.city == widget.city) && (e.value.town == value);
-                          }).value;
+                            final location =
+                                Global.location.entries.firstWhere((e) {
+                                  return (e.value.city == widget.city) && (e.value.town == value);
+                                }).value;
 
-                          await setLocation(location);
-                        },
+                            await setLocation(location);
+                          },
                 );
               }
             },
           ),
           if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
+            Container(color: Colors.black.withOpacity(0.3), child: const Center(child: CircularProgressIndicator())),
         ],
       ),
     );

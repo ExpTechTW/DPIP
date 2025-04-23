@@ -25,16 +25,16 @@ class _ReportListPageState extends State<ReportListPage> {
   RangeValues _depthRange = const RangeValues(0, 700);
 
   List<String> get _intensityLevels => [
-        context.i18n.level_1,
-        context.i18n.level_2,
-        context.i18n.level_3,
-        context.i18n.level_4,
-        context.i18n.weak_5,
-        context.i18n.strong_5,
-        context.i18n.weak_6,
-        context.i18n.strong_6,
-        context.i18n.level_7
-      ];
+    context.i18n.level_1,
+    context.i18n.level_2,
+    context.i18n.level_3,
+    context.i18n.level_4,
+    context.i18n.weak_5,
+    context.i18n.strong_5,
+    context.i18n.weak_6,
+    context.i18n.strong_6,
+    context.i18n.level_7,
+  ];
 
   Future<void> refreshReportList() async {
     if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
@@ -98,9 +98,7 @@ class _ReportListPageState extends State<ReportListPage> {
   void addToList(List<PartialEarthquakeReport> list) {
     final oldIdList = reportList.map((v) => v.id);
 
-    list.removeWhere(
-      (r) => oldIdList.contains(r.id),
-    );
+    list.removeWhere((r) => oldIdList.contains(r.id));
 
     list = reportList + list;
 
@@ -117,7 +115,8 @@ class _ReportListPageState extends State<ReportListPage> {
 
     if (_intensityRange.start > 0 || _intensityRange.end < 8) {
       summaries.add(
-          '${context.i18n.max_earthquake_intensity}: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}');
+        '${context.i18n.max_earthquake_intensity}: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}',
+      );
     }
     if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
       summaries.add('${context.i18n.scale}: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
@@ -162,7 +161,7 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       selected: _getFilterSummary() != context.i18n.report_all,
                       onSelected: (_) => _showFilterDialog(),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -197,9 +196,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         }
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: Text(context.i18n.report_end),
-                          ),
+                          child: Center(child: Text(context.i18n.report_end)),
                         );
                       }
 
@@ -256,10 +253,7 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _intensityRange = RangeValues(
-                            values.start.roundToDouble(),
-                            values.end.roundToDouble(),
-                          );
+                          _intensityRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
                         });
                       },
                     ),
@@ -275,10 +269,7 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _magnitudeRange = RangeValues(
-                            values.start.roundToDouble(),
-                            values.end.roundToDouble(),
-                          );
+                          _magnitudeRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
                         });
                       },
                     ),
@@ -288,16 +279,10 @@ class _ReportListPageState extends State<ReportListPage> {
                       min: 0,
                       max: 700,
                       divisions: 70,
-                      labels: RangeLabels(
-                        "${_depthRange.start.round()}km",
-                        "${_depthRange.end.round()}km",
-                      ),
+                      labels: RangeLabels("${_depthRange.start.round()}km", "${_depthRange.end.round()}km"),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _depthRange = RangeValues(
-                            values.start.roundToDouble(),
-                            values.end.roundToDouble(),
-                          );
+                          _depthRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
                         });
                       },
                     ),

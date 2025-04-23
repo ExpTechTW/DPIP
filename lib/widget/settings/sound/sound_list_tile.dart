@@ -16,13 +16,7 @@ class SoundListTile extends StatefulWidget {
   final String type;
   final bool? enable;
 
-  const SoundListTile({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.type,
-    this.enable = true,
-  });
+  const SoundListTile({super.key, required this.title, required this.subtitle, required this.type, this.enable = true});
 
   @override
   SoundListTileState createState() => SoundListTileState();

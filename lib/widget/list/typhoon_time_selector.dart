@@ -10,14 +10,15 @@ class TyphoonTimeSelector extends StatefulWidget {
   final List<int> typhoonIdList;
   final int selectedTyphoonId;
 
-  const TyphoonTimeSelector(
-      {super.key,
-      required this.onSelectionChanged,
-      required this.onTimeExpanded,
-      required this.timeList,
-      required this.typhoonList,
-      required this.selectedTyphoonId,
-      required this.typhoonIdList});
+  const TyphoonTimeSelector({
+    super.key,
+    required this.onSelectionChanged,
+    required this.onTimeExpanded,
+    required this.timeList,
+    required this.typhoonList,
+    required this.selectedTyphoonId,
+    required this.typhoonIdList,
+  });
 
   @override
   State<TyphoonTimeSelector> createState() => _TyphoonTimeSelectorState();
@@ -40,14 +41,8 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
     _selectedTyphoonId = widget.selectedTyphoonId;
     _timeScrollController = ScrollController();
     _typhoonScrollController = ScrollController();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _expandAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _expandAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToSelected();
       _scrollToSelectedTyphoon();
@@ -258,41 +253,24 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
             decoration: BoxDecoration(
               color: context.colors.surface,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} ($_selectedTyphoonName)",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: context.colors.onSurface,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: context.colors.onSurface),
                 ),
                 const SizedBox(width: 4),
-                Icon(
-                  _isExpanded ? Icons.expand_more : Icons.expand_less,
-                  color: context.colors.onSurface,
-                ),
+                Icon(_isExpanded ? Icons.expand_more : Icons.expand_less, color: context.colors.onSurface),
               ],
             ),
           ),
         ),
         SizeTransition(
           sizeFactor: _expandAnimation,
-          child: Column(
-            children: [
-              _buildTimeSelector(),
-              _buildTyphoonSelector(),
-            ],
-          ),
+          child: Column(children: [_buildTimeSelector(), _buildTyphoonSelector()]),
         ),
       ],
     );

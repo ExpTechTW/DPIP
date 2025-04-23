@@ -10,13 +10,7 @@ class Announcement {
   final String content;
   final bool show;
 
-  Announcement({
-    required this.time,
-    required this.tags,
-    required this.title,
-    required this.content,
-    this.show = false,
-  });
+  Announcement({required this.time, required this.tags, required this.title, required this.content, this.show = false});
 
   factory Announcement.fromJson(Map<String, dynamic> json) => _$AnnouncementFromJson(json);
 

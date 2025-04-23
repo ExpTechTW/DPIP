@@ -7,12 +7,7 @@ class TimeSelector extends StatefulWidget {
   final Function() onTimeExpanded;
   final List<String> timeList;
 
-  const TimeSelector({
-    super.key,
-    required this.onTimeSelected,
-    required this.onTimeExpanded,
-    required this.timeList,
-  });
+  const TimeSelector({super.key, required this.onTimeSelected, required this.onTimeExpanded, required this.timeList});
 
   @override
   State<TimeSelector> createState() => _TimeSelectorState();
@@ -31,14 +26,8 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
     super.initState();
     _selectedTimestamp = widget.timeList.last;
     _scrollController = ScrollController();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _expandAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _expandAnimation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToSelected());
   }
 
@@ -155,9 +144,10 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                 AnimatedDefaultTextStyle(
                                   duration: const Duration(milliseconds: 200),
                                   style: TextStyle(
-                                    color: isSelected
-                                        ? context.colors.onSecondary
-                                        : context.colors.onSurface.withOpacity(0.7),
+                                    color:
+                                        isSelected
+                                            ? context.colors.onSecondary
+                                            : context.colors.onSurface.withOpacity(0.7),
                                     fontSize: 12,
                                   ),
                                   child: Text(DateFormat("MM/dd").format(time)),

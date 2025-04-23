@@ -28,47 +28,22 @@ class ForecastWeatherCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              time,
-              style: TextStyle(
-                fontSize: 16,
-                color: context.colors.primary,
-              ),
-            ),
+            Text(time, style: TextStyle(fontSize: 16, color: context.colors.primary)),
             Row(
               children: [
                 Text(
                   "$maxTemperature°",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: context.colors.onSurface,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: context.colors.onSurface),
                 ),
                 Text(
                   "/$minTemperature°",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: context.colors.onSurfaceVariant,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: context.colors.onSurfaceVariant),
                 ),
               ],
             ),
-            Text(
-              "$rain%",
-              style: TextStyle(
-                fontSize: 16,
-                color: context.theme.extendedColors.blue,
-              ),
-            ),
+            Text("$rain%", style: TextStyle(fontSize: 16, color: context.theme.extendedColors.blue)),
             const SizedBox(height: 8),
-            Icon(
-              icon,
-              fill: 1,
-              size: 36,
-              color: context.colors.onPrimaryContainer.withOpacity(0.75),
-            ),
+            Icon(icon, fill: 1, size: 36, color: context.colors.onPrimaryContainer.withOpacity(0.75)),
           ],
         ),
       ),

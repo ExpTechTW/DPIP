@@ -1,11 +1,1 @@
-enum Intervals {
-  now,
-  tenMinutes,
-  oneHour,
-  threeHours,
-  sixHours,
-  twelveHours,
-  twentyFourHours,
-  twoDays,
-  threeDays,
-}
+enum Intervals { now, tenMinutes, oneHour, threeHours, sixHours, twelveHours, twentyFourHours, twoDays, threeDays }

@@ -8,11 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-enum MergeType {
-  none,
-  county,
-  town,
-}
+enum MergeType { none, county, town }
 
 class RankingTemperatureTab extends StatefulWidget {
   const RankingTemperatureTab({super.key});
@@ -40,15 +36,22 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
   }
 
   rank() {
-    final temp = (merge != MergeType.none)
-        ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
-            .values
-            .map((v) => v.reduce((acc, e) => (reversed
-                    ? e.data.air.temperature < acc.data.air.temperature
-                    : e.data.air.temperature > acc.data.air.temperature)
-                ? e
-                : acc))
-        : data;
+    final temp =
+        (merge != MergeType.none)
+            ? groupBy(
+              data,
+              (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
+            ).values.map(
+              (v) => v.reduce(
+                (acc, e) =>
+                    (reversed
+                            ? e.data.air.temperature < acc.data.air.temperature
+                            : e.data.air.temperature > acc.data.air.temperature)
+                        ? e
+                        : acc,
+              ),
+            )
+            : data;
 
     final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
     setState(() {
@@ -93,10 +96,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(context.i18n.according),
-                  ),
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Text(context.i18n.according)),
                   ChoiceChip(
                     label: Text(context.i18n.highest),
                     selected: !reversed,
@@ -107,10 +107,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
-                  const SizedBox(
-                    height: kToolbarHeight - 16,
-                    child: VerticalDivider(),
-                  ),
+                  const SizedBox(height: kToolbarHeight - 16, child: VerticalDivider()),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(context.i18n.ranking_merge_into),
@@ -151,111 +148,119 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 final item = ranked[index];
                 final rank = index + 1;
 
-                final backgroundColor = index == 0
-                    ? context.theme.extendedColors.amberContainer
-                    : index == 1
+                final backgroundColor =
+                    index == 0
+                        ? context.theme.extendedColors.amberContainer
+                        : index == 1
                         ? context.theme.extendedColors.greyContainer
                         : index == 2
-                            ? context.theme.extendedColors.brownContainer
-                            : index < 10
-                                ? context.colors.surfaceContainerHigh
-                                : context.colors.surfaceContainer;
+                        ? context.theme.extendedColors.brownContainer
+                        : index < 10
+                        ? context.colors.surfaceContainerHigh
+                        : context.colors.surfaceContainer;
 
-                final foregroundColor = index == 0
-                    ? context.theme.extendedColors.onAmberContainer
-                    : index == 1
+                final foregroundColor =
+                    index == 0
+                        ? context.theme.extendedColors.onAmberContainer
+                        : index == 1
                         ? context.colors.onSurface
                         : index == 2
-                            ? context.theme.extendedColors.onBrownContainer
-                            : index < 10
-                                ? context.colors.onSurface
-                                : context.colors.onSurfaceVariant;
+                        ? context.theme.extendedColors.onBrownContainer
+                        : index < 10
+                        ? context.colors.onSurface
+                        : context.colors.onSurfaceVariant;
 
-                final iconColor = index == 0
-                    ? context.theme.extendedColors.amber
-                    : index == 1
+                final iconColor =
+                    index == 0
+                        ? context.theme.extendedColors.amber
+                        : index == 1
                         ? context.theme.extendedColors.grey
                         : context.theme.extendedColors.brown;
 
-                final double fontSize = index == 0
-                    ? 20
-                    : index < 3
+                final double fontSize =
+                    index == 0
+                        ? 20
+                        : index < 3
                         ? 18
                         : 16;
 
-                final double iconSize = index == 0
-                    ? 32
-                    : index == 1
+                final double iconSize =
+                    index == 0
+                        ? 32
+                        : index == 1
                         ? 28
                         : 24;
 
-                final leading = index < 3
-                    ? Icon(
-                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
-                        color: iconColor,
-                        size: iconSize,
-                        fill: 1,
-                      )
-                    : Text(
-                        "$rank",
-                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
-                      );
+                final leading =
+                    index < 3
+                        ? Icon(
+                          index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                          color: iconColor,
+                          size: iconSize,
+                          fill: 1,
+                        )
+                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
 
-                final percentage = reversed
-                    ? (ranked.first.data.air.temperature - item.data.air.temperature) /
-                        (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
-                    : (item.data.air.temperature - ranked.last.data.air.temperature) /
-                        (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
+                final percentage =
+                    reversed
+                        ? (ranked.first.data.air.temperature - item.data.air.temperature) /
+                            (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
+                        : (item.data.air.temperature - ranked.last.data.air.temperature) /
+                            (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
 
-                final location = merge != MergeType.none
-                    ? [
-                        Text(
-                          merge == MergeType.town ? "${item.station.county}${item.station.town}" : item.station.county,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: index == 0
-                                ? FontWeight.bold
-                                : index < 3
-                                    ? FontWeight.w500
-                                    : null,
+                final location =
+                    merge != MergeType.none
+                        ? [
+                          Text(
+                            merge == MergeType.town
+                                ? "${item.station.county}${item.station.town}"
+                                : item.station.county,
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              fontWeight:
+                                  index == 0
+                                      ? FontWeight.bold
+                                      : index < 3
+                                      ? FontWeight.w500
+                                      : null,
+                            ),
                           ),
-                        ),
-                      ]
-                    : [
-                        Text(
-                          item.station.name,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: index == 0
-                                ? FontWeight.bold
-                                : index < 3
-                                    ? FontWeight.w500
-                                    : null,
+                        ]
+                        : [
+                          Text(
+                            item.station.name,
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              fontWeight:
+                                  index == 0
+                                      ? FontWeight.bold
+                                      : index < 3
+                                      ? FontWeight.w500
+                                      : null,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "${item.station.county}${item.station.town}",
-                          style: TextStyle(
-                            fontSize: fontSize / 1.25,
-                            color: foregroundColor.withOpacity(0.8),
+                          const SizedBox(width: 8),
+                          Text(
+                            "${item.station.county}${item.station.town}",
+                            style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
                           ),
-                        ),
-                      ];
+                        ];
 
                 final content = [
                   Expanded(
-                    child: index < 3
-                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
-                        : Row(children: location),
+                    child:
+                        index < 3
+                            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                            : Row(children: location),
                   ),
                   Text(
                     "${item.data.air.temperature.toStringAsFixed(1)}℃",
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight: index == 0
-                          ? FontWeight.bold
-                          : index < 3
+                      fontWeight:
+                          index == 0
+                              ? FontWeight.bold
+                              : index < 3
                               ? FontWeight.w500
                               : null,
                     ),
@@ -266,10 +271,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
                     children: [
-                      SizedBox(
-                        width: 48,
-                        child: Center(child: leading),
-                      ),
+                      SizedBox(width: 48, child: Center(child: leading)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Container(
@@ -277,21 +279,19 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: backgroundColor,
-                            gradient: LinearGradient(colors: [
-                              backgroundColor,
-                              backgroundColor,
-                              backgroundColor.withOpacity(0.4),
-                              backgroundColor.withOpacity(0.4),
-                            ], stops: [
-                              0,
-                              percentage,
-                              percentage,
-                              1
-                            ]),
+                            gradient: LinearGradient(
+                              colors: [
+                                backgroundColor,
+                                backgroundColor,
+                                backgroundColor.withOpacity(0.4),
+                                backgroundColor.withOpacity(0.4),
+                              ],
+                              stops: [0, percentage, percentage, 1],
+                            ),
                           ),
                           child: Row(children: content),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 );

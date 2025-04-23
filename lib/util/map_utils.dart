@@ -57,21 +57,37 @@ Future<void> loadWindImage(MapLibreMapController controller) async {
 @Deprecated("Migrate symbol image loading to sprite")
 Future<void> loadLightningImage(MapLibreMapController controller) async {
   await controller.addImage(
-      "lightning-1-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-5.png")));
+    "lightning-1-5",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-5.png")),
+  );
   await controller.addImage(
-      "lightning-1-10", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-10.png")));
+    "lightning-1-10",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-10.png")),
+  );
   await controller.addImage(
-      "lightning-1-30", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-30.png")));
+    "lightning-1-30",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-30.png")),
+  );
   await controller.addImage(
-      "lightning-1-60", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-60.png")));
+    "lightning-1-60",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-1-60.png")),
+  );
   await controller.addImage(
-      "lightning-0-5", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-5.png")));
+    "lightning-0-5",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-5.png")),
+  );
   await controller.addImage(
-      "lightning-0-10", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-10.png")));
+    "lightning-0-10",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-10.png")),
+  );
   await controller.addImage(
-      "lightning-0-30", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-30.png")));
+    "lightning-0-30",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-30.png")),
+  );
   await controller.addImage(
-      "lightning-0-60", Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-60.png")));
+    "lightning-0-60",
+    Uint8List.sublistView(await rootBundle.load("assets/map/icons/lightning-0-60.png")),
+  );
 }
 
 enum Units {
@@ -155,7 +171,8 @@ LatLng destination(LatLng origin, double distance, double bearing, {Units units 
 
   // Main
   final latitude2 = asin(sin(latitude1) * cos(radians) + cos(latitude1) * sin(radians) * cos(bearingRad));
-  final longitude2 = longitude1 +
+  final longitude2 =
+      longitude1 +
       atan2(sin(bearingRad) * sin(radians) * cos(latitude1), cos(radians) - sin(latitude1) * sin(latitude2));
   final lng = radiansToDegrees(longitude2);
   final lat = radiansToDegrees(latitude2);
@@ -183,7 +200,7 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
     "geometry": {
       "coordinates": [coordinates],
       "type": "Polygon",
-    }
+    },
   };
 }
 
