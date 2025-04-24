@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/meteor_station.dart';
+import 'package:dpip/api/model/meteor_station.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,12 @@ class AdvancedWeatherChart extends StatefulWidget {
   final VoidCallback onClose;
   final String? type;
 
-  const AdvancedWeatherChart({super.key, required this.stationId, required this.onClose, this.type = 'temperature'});
+  const AdvancedWeatherChart({
+    super.key,
+    required this.stationId,
+    required this.onClose,
+    this.type = 'temperature',
+  });
 
   @override
   State<AdvancedWeatherChart> createState() => _AdvancedWeatherChartState();
@@ -78,7 +83,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         'precipitation': data!.precipitation.reversed.toList(),
         'humidity': data!.humidity.reversed.toList(),
         'pressure': data!.pressure.reversed.toList(),
-        'time': data!.time.reversed.toList().map((item) => double.tryParse(item.toString()) ?? 0).toList(),
+        'time':
+            data!.time.reversed
+                .toList()
+                .map((item) => double.tryParse(item.toString()) ?? 0)
+                .toList(),
       };
       isLoading = false;
     });
@@ -125,18 +134,26 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       mainAxisSize: MainAxisSize.min,
       children: [
         AppBar(
-          leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: widget.onClose, tooltip: 'Back'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: widget.onClose,
+            tooltip: 'Back',
+          ),
           automaticallyImplyLeading: false,
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 '${data?.station.county ?? ""}${data?.station.name ?? ""}',
-                style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: context.theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Text(
                 stationId!,
-                style: context.theme.textTheme.bodyMedium?.copyWith(color: context.colors.onSurface.withOpacity(0.6)),
+                style: context.theme.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.onSurface.withOpacity(0.6),
+                ),
               ),
             ],
           ),
@@ -146,7 +163,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Center(
-              child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(context.colors.primary)),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  context.colors.primary,
+                ),
+              ),
             ),
           )
         else
@@ -155,7 +176,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [_buildHeader(), const SizedBox(height: 16), _buildChart()],
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 16),
+                  _buildChart(),
+                ],
               ),
             ),
           ),
@@ -180,7 +205,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  context.i18n.hours_24_trend(dataTypeToChineseMap[selectedDataType].toString()),
+                  context.i18n.hours_24_trend(
+                    dataTypeToChineseMap[selectedDataType].toString(),
+                  ),
                   style: context.theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
@@ -197,8 +224,13 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 touchedIndex != -1 &&
                 weatherData[selectedDataType]![touchedIndex] != 0)
               Transform.rotate(
-                angle: (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
-                child: Icon(Icons.arrow_upward, color: getDataTypeColor(selectedDataType!)[0], size: 48),
+                angle:
+                    (windDirection[touchedIndex] + 180) % 360 * 3.14159 / 180,
+                child: Icon(
+                  Icons.arrow_upward,
+                  color: getDataTypeColor(selectedDataType!)[0],
+                  size: 48,
+                ),
               ),
           ],
         ),
@@ -207,7 +239,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   String _calculate24HourAverage() {
-    List<double> validData = weatherData[selectedDataType]!.where((value) => value != -99).toList();
+    List<double> validData =
+        weatherData[selectedDataType]!.where((value) => value != -99).toList();
     if (validData.isEmpty) return 'N/A';
     double sum = validData.reduce((a, b) => a + b);
     return (sum / validData.length).toStringAsFixed(1);
@@ -223,7 +256,10 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             const SizedBox(height: 8),
             AspectRatio(
               aspectRatio: 16 / 9,
-              child: selectedDataType == 'precipitation' ? _buildBarChart() : _buildLineChart(),
+              child:
+                  selectedDataType == 'precipitation'
+                      ? _buildBarChart()
+                      : _buildLineChart(),
             ),
             const SizedBox(height: 8),
             _buildLegend(),
@@ -239,7 +275,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     double minY = double.infinity;
     double maxY = double.negativeInfinity;
 
-    bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    bool _invalid =
+        weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (_invalid) {
       return Center(child: Text(context.i18n.map_no_data));
@@ -298,7 +335,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               getTitlesWidget: (value, meta) {
                 int index = value.toInt();
                 if (index >= 0 && index < weatherData['time']!.length) {
-                  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
+                  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                    weatherData['time']![index].toInt(),
+                  );
                   return Text(
                     DateFormat(context.i18n.map_hh_time).format(dateTime),
                     style: const TextStyle(fontSize: 10),
@@ -315,16 +354,25 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               reservedSize: 40,
               interval: interval,
               getTitlesWidget: (value, meta) {
-                if (value >= startY && value <= endY && (value % interval).abs() < 0.001) {
-                  return Text(value.toInt().toString(), style: const TextStyle(fontSize: 10));
+                if (value >= startY &&
+                    value <= endY &&
+                    (value % interval).abs() < 0.001) {
+                  return Text(
+                    value.toInt().toString(),
+                    style: const TextStyle(fontSize: 10),
+                  );
                 } else {
                   return const Text('');
                 }
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         borderData: FlBorderData(show: true),
         minY: startY,
@@ -341,7 +389,10 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               show: true,
               color: lineColor[0].withOpacity(0.3),
               gradient: LinearGradient(
-                colors: [lineColor[0].withOpacity(0.8), lineColor[1].withOpacity(0.1)],
+                colors: [
+                  lineColor[0].withOpacity(0.8),
+                  lineColor[1].withOpacity(0.1),
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -349,11 +400,17 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           ),
         ],
         lineTouchData: LineTouchData(
-          touchCallback: (FlTouchEvent event, LineTouchResponse? touchResponse) {
+          touchCallback: (
+            FlTouchEvent event,
+            LineTouchResponse? touchResponse,
+          ) {
             setState(() {
-              if (event is FlPanEndEvent || event is FlTapUpEvent || event is FlLongPressEnd) {
+              if (event is FlPanEndEvent ||
+                  event is FlTapUpEvent ||
+                  event is FlLongPressEnd) {
                 touchedIndex = -1;
-              } else if (touchResponse?.lineBarSpots != null && touchResponse!.lineBarSpots!.isNotEmpty) {
+              } else if (touchResponse?.lineBarSpots != null &&
+                  touchResponse!.lineBarSpots!.isNotEmpty) {
                 touchedIndex = touchResponse.lineBarSpots![0].x.toInt();
               }
             });
@@ -363,14 +420,26 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               return List.filled(touchedBarSpots.length, null);
             },
           ),
-          getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
+          getTouchedSpotIndicator: (
+            LineChartBarData barData,
+            List<int> spotIndexes,
+          ) {
             return spotIndexes.map((spotIndex) {
               return TouchedSpotIndicatorData(
-                const FlLine(color: Colors.white, strokeWidth: 2, dashArray: [5, 5]),
+                const FlLine(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                  dashArray: [5, 5],
+                ),
                 FlDotData(
                   show: true,
                   getDotPainter: (spot, percent, barData, index) {
-                    return FlDotCirclePainter(radius: 3, color: Colors.white, strokeWidth: 2, strokeColor: Colors.grey);
+                    return FlDotCirclePainter(
+                      radius: 3,
+                      color: Colors.white,
+                      strokeWidth: 2,
+                      strokeColor: Colors.grey,
+                    );
                   },
                 ),
               );
@@ -395,7 +464,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     Color barColor = getDataTypeColor(selectedDataType!)[0];
     Color abnormalColor = Colors.red.withOpacity(0.3);
 
-    bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    bool _invalid =
+        weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (_invalid) {
       return Center(child: Text(context.i18n.map_no_data));
@@ -425,17 +495,26 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                     reservedSize: 30,
                     getTitlesWidget: (value, meta) {
                       int index = value.toInt();
-                      if (index % 3 == 0 && index >= 0 && index < weatherData['time']!.length) {
-                        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
+                      if (index % 3 == 0 &&
+                          index >= 0 &&
+                          index < weatherData['time']!.length) {
+                        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                          weatherData['time']![index].toInt(),
+                        );
                         return SideTitleWidget(
                           axisSide: meta.axisSide,
                           child: Text(
-                            DateFormat(context.i18n.map_hh_time).format(dateTime),
+                            DateFormat(
+                              context.i18n.map_hh_time,
+                            ).format(dateTime),
                             style: const TextStyle(fontSize: 10),
                           ),
                         );
                       } else {
-                        return SideTitleWidget(axisSide: meta.axisSide, child: const Text(''));
+                        return SideTitleWidget(
+                          axisSide: meta.axisSide,
+                          child: const Text(''),
+                        );
                       }
                     },
                   ),
@@ -447,15 +526,22 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                     interval: interval,
                     getTitlesWidget: (value, meta) {
                       if (value % interval < 0.001) {
-                        return Text(value.toInt().toString(), style: const TextStyle(fontSize: 10));
+                        return Text(
+                          value.toInt().toString(),
+                          style: const TextStyle(fontSize: 10),
+                        );
                       } else {
                         return const Text('');
                       }
                     },
                   ),
                 ),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
               ),
               borderData: FlBorderData(show: true),
               barGroups:
@@ -468,7 +554,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                           barRods: [
                             BarChartRodData(
                               toY: entry.value == -99 ? 0 : entry.value,
-                              color: touchedIndex != -1 && touchedIndex != entry.key ? Colors.grey : barColor,
+                              color:
+                                  touchedIndex != -1 &&
+                                          touchedIndex != entry.key
+                                      ? Colors.grey
+                                      : barColor,
                               width: 3,
                             ),
                           ],
@@ -477,10 +567,17 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                       .toList(),
               barTouchData: BarTouchData(
                 enabled: true,
-                touchTooltipData: BarTouchTooltipData(getTooltipItem: (group, groupIndex, rod, rodIndex) => null),
-                touchCallback: (FlTouchEvent event, BarTouchResponse? touchResponse) {
+                touchTooltipData: BarTouchTooltipData(
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) => null,
+                ),
+                touchCallback: (
+                  FlTouchEvent event,
+                  BarTouchResponse? touchResponse,
+                ) {
                   setState(() {
-                    if (event is FlPanEndEvent || event is FlTapUpEvent || event is FlLongPressEnd) {
+                    if (event is FlPanEndEvent ||
+                        event is FlTapUpEvent ||
+                        event is FlLongPressEnd) {
                       touchedIndex = -1;
                     } else if (touchResponse?.spot != null) {
                       touchedIndex = touchResponse!.spot!.touchedBarGroupIndex;
@@ -525,13 +622,22 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         tempItems.add(
           DropdownMenuItem<String>(
             value: value,
-            child: Text(label, style: TextStyle(color: context.colors.onSecondaryContainer, fontSize: 14)),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: context.colors.onSecondaryContainer,
+                fontSize: 14,
+              ),
+            ),
           ),
         );
       }
     }
     return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: context.colors.secondaryContainer),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: context.colors.secondaryContainer,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -545,7 +651,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             }
           },
           items: tempItems,
-          icon: Icon(Icons.arrow_drop_down, color: context.colors.onSecondaryContainer, size: 20),
+          icon: Icon(
+            Icons.arrow_drop_down,
+            color: context.colors.onSecondaryContainer,
+            size: 20,
+          ),
           dropdownColor: context.colors.secondaryContainer,
           borderRadius: BorderRadius.circular(16),
           elevation: 2,
@@ -560,7 +670,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       children: [
         Row(
           children: [
-            Container(width: 20, height: 3, color: getDataTypeColor(selectedDataType!)[0]),
+            Container(
+              width: 20,
+              height: 3,
+              color: getDataTypeColor(selectedDataType!)[0],
+            ),
             const SizedBox(width: 8),
             Text(dataTypeToChineseMap[selectedDataType]!),
           ],
@@ -572,7 +686,13 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               width: 20,
               height: 1,
               decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid)),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 1,
+                    style: BorderStyle.solid,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -589,7 +709,11 @@ class BackgroundPainter extends CustomPainter {
   final Color abnormalColor;
   final Size chartAreaSize;
 
-  BackgroundPainter({required this.data, required this.abnormalColor, required this.chartAreaSize});
+  BackgroundPainter({
+    required this.data,
+    required this.abnormalColor,
+    required this.chartAreaSize,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -604,13 +728,19 @@ class BackgroundPainter extends CustomPainter {
     final double rightPadding = 10;
 
     final double chartWidth = chartAreaSize.width - leftPadding - rightPadding;
-    final double chartHeight = chartAreaSize.height - bottomPadding - topPadding;
+    final double chartHeight =
+        chartAreaSize.height - bottomPadding - topPadding;
 
     final barWidth = chartWidth / data.length;
 
     for (int i = 0; i < data.length; i++) {
       if (data[i] == -99) {
-        final rect = Rect.fromLTWH(leftPadding + i * barWidth, topPadding, barWidth, chartHeight);
+        final rect = Rect.fromLTWH(
+          leftPadding + i * barWidth,
+          topPadding,
+          barWidth,
+          chartHeight,
+        );
         canvas.drawRect(rect, paint);
       }
     }

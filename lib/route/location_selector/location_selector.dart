@@ -4,7 +4,7 @@ import "package:dpip/app/page/home/home.dart";
 import "package:dpip/app/page/map/monitor/monitor.dart";
 import "package:dpip/app/page/map/radar/radar.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/location/location.dart";
+import "package:dpip/api/model/location/location.dart";
 import "package:dpip/route/location_selector/search.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:flutter/material.dart";
@@ -29,7 +29,11 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
     try {
       String? code =
           Global.location.entries
-              .firstWhereOrNull((l) => l.value.city == location.city && l.value.town == location.town)
+              .firstWhereOrNull(
+                (l) =>
+                    l.value.city == location.city &&
+                    l.value.town == location.town,
+              )
               ?.key;
 
       if (code == null) {
@@ -39,7 +43,11 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
       }
 
       String fcmToken = Global.preference.getString("fcm-token") ?? "";
-      await ExpTech().getNotifyLocation(fcmToken, "${location.lat}", "${location.lng}");
+      await ExpTech().getNotifyLocation(
+        fcmToken,
+        "${location.lat}",
+        "${location.lng}",
+      );
       Global.preference.setDouble("user-lat", location.lat);
       Global.preference.setDouble("user-lon", location.lng);
 
@@ -51,7 +59,9 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
       MonitorPage.updatePosition();
       Navigator.popUntil(context, ModalRoute.withName("/settings"));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.i18n.error_occurred} $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${context.i18n.error_occurred} $e')),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -63,7 +73,11 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
     if (widget.city == null) {
       data = Global.location.entries.map((e) => e.value.city).toSet().toList();
     } else {
-      data = Global.location.entries.where((e) => e.value.city == widget.city).map((e) => e.value.town).toList();
+      data =
+          Global.location.entries
+              .where((e) => e.value.city == widget.city)
+              .map((e) => e.value.town)
+              .toList();
     }
   }
 
@@ -107,8 +121,14 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                settings: RouteSettings(name: "/location_selector/${data[index]}"),
-                                builder: (context) => LocationSelectorRoute(city: data[index], town: widget.town),
+                                settings: RouteSettings(
+                                  name: "/location_selector/${data[index]}",
+                                ),
+                                builder:
+                                    (context) => LocationSelectorRoute(
+                                      city: data[index],
+                                      town: widget.town,
+                                    ),
                               ),
                             );
                           },
@@ -127,7 +147,8 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
 
                             final location =
                                 Global.location.entries.firstWhere((e) {
-                                  return (e.value.city == widget.city) && (e.value.town == value);
+                                  return (e.value.city == widget.city) &&
+                                      (e.value.town == value);
                                 }).value;
 
                             await setLocation(location);
@@ -137,7 +158,10 @@ class _LocationSelectorRouteState extends State<LocationSelectorRoute> {
             },
           ),
           if (_isLoading)
-            Container(color: Colors.black.withOpacity(0.3), child: const Center(child: CircularProgressIndicator())),
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
         ],
       ),
     );

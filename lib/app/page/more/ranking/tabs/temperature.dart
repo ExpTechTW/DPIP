@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/weather/weather.dart';
+import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/extension/color_scheme.dart';
 import 'package:dpip/util/parser.dart';
@@ -30,8 +30,13 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
 
     if (!mounted) return;
 
-    data = latestWeatherData.where((station) => station.data.air.temperature != -99).toList();
-    time = DateFormat(context.i18n.datetime_format).format(parseDateTime(weatherList.last));
+    data =
+        latestWeatherData
+            .where((station) => station.data.air.temperature != -99)
+            .toList();
+    time = DateFormat(
+      context.i18n.datetime_format,
+    ).format(parseDateTime(weatherList.last));
     rank();
   }
 
@@ -40,7 +45,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
         (merge != MergeType.none)
             ? groupBy(
               data,
-              (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
+              (e) =>
+                  merge == MergeType.town
+                      ? (e.station.county, e.station.town)
+                      : e.station.county,
             ).values.map(
               (v) => v.reduce(
                 (acc, e) =>
@@ -53,7 +61,14 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
             )
             : data;
 
-    final sorted = temp.sorted((a, b) => (b.data.air.temperature - a.data.air.temperature).sign.toInt()).toList();
+    final sorted =
+        temp
+            .sorted(
+              (a, b) =>
+                  (b.data.air.temperature - a.data.air.temperature).sign
+                      .toInt(),
+            )
+            .toList();
     setState(() {
       ranked = reversed ? sorted.reversed.toList() : sorted;
     });
@@ -96,7 +111,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Text(context.i18n.according)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(context.i18n.according),
+                  ),
                   ChoiceChip(
                     label: Text(context.i18n.highest),
                     selected: !reversed,
@@ -107,7 +125,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
-                  const SizedBox(height: kToolbarHeight - 16, child: VerticalDivider()),
+                  const SizedBox(
+                    height: kToolbarHeight - 16,
+                    child: VerticalDivider(),
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(context.i18n.ranking_merge_into),
@@ -129,7 +150,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              context.i18n.ranking_time(time.toString(), ranked.length.toString()),
+              context.i18n.ranking_time(
+                time.toString(),
+                ranked.length.toString(),
+              ),
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
@@ -194,19 +218,31 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 final leading =
                     index < 3
                         ? Icon(
-                          index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                          index == 0
+                              ? Symbols.trophy_rounded
+                              : Symbols.workspace_premium_rounded,
                           color: iconColor,
                           size: iconSize,
                           fill: 1,
                         )
-                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
+                        : Text(
+                          "$rank",
+                          style: TextStyle(
+                            color: foregroundColor,
+                            fontSize: fontSize,
+                          ),
+                        );
 
                 final percentage =
                     reversed
-                        ? (ranked.first.data.air.temperature - item.data.air.temperature) /
-                            (ranked.first.data.air.temperature - ranked.last.data.air.temperature)
-                        : (item.data.air.temperature - ranked.last.data.air.temperature) /
-                            (ranked.first.data.air.temperature - ranked.last.data.air.temperature);
+                        ? (ranked.first.data.air.temperature -
+                                item.data.air.temperature) /
+                            (ranked.first.data.air.temperature -
+                                ranked.last.data.air.temperature)
+                        : (item.data.air.temperature -
+                                ranked.last.data.air.temperature) /
+                            (ranked.first.data.air.temperature -
+                                ranked.last.data.air.temperature);
 
                 final location =
                     merge != MergeType.none
@@ -242,7 +278,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                           const SizedBox(width: 8),
                           Text(
                             "${item.station.county}${item.station.town}",
-                            style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
+                            style: TextStyle(
+                              fontSize: fontSize / 1.25,
+                              color: foregroundColor.withOpacity(0.8),
+                            ),
                           ),
                         ];
 
@@ -250,7 +289,10 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                   Expanded(
                     child:
                         index < 3
-                            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                            ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: location,
+                            )
                             : Row(children: location),
                   ),
                   Text(
@@ -268,14 +310,20 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 ];
 
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     children: [
                       SizedBox(width: 48, child: Center(child: leading)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: backgroundColor,

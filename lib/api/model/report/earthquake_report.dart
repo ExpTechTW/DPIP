@@ -1,4 +1,4 @@
-import "package:dpip/model/report/area_intensity.dart";
+import "package:dpip/api/model/report/area_intensity.dart";
 import "package:dpip/util/parser.dart";
 import "package:json_annotation/json_annotation.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
@@ -43,7 +43,8 @@ class EarthquakeReport {
     required this.trem,
   });
 
-  factory EarthquakeReport.fromJson(Map<String, dynamic> json) => _$EarthquakeReportFromJson(json);
+  factory EarthquakeReport.fromJson(Map<String, dynamic> json) =>
+      _$EarthquakeReportFromJson(json);
 
   Map<String, dynamic> toJson() => _$EarthquakeReportToJson(this);
 
@@ -68,10 +69,14 @@ class EarthquakeReport {
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag$id");
+      return Uri.parse(
+        "https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag$id",
+      );
     }
 
-    return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag");
+    return Uri.parse(
+      "https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag",
+    );
   }
 
   String get reportImageName {
@@ -117,7 +122,10 @@ class EarthquakeReport {
     return "${mapImageBaseName}i.png";
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null ? null : "$traceBaseUrl/$intensityMapImageName";
+  String? get intensityMapImageUrl =>
+      intensityMapImageName == null
+          ? null
+          : "$traceBaseUrl/$intensityMapImageName";
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
@@ -125,7 +133,8 @@ class EarthquakeReport {
     return "${mapImageBaseName}a.png";
   }
 
-  String? get pgaMapImageUrl => pgaMapImageName == null ? null : "$traceBaseUrl/$pgaMapImageName";
+  String? get pgaMapImageUrl =>
+      pgaMapImageName == null ? null : "$traceBaseUrl/$pgaMapImageName";
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
@@ -133,7 +142,8 @@ class EarthquakeReport {
     return "${mapImageBaseName}v.png";
   }
 
-  String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$traceBaseUrl/$pgvMapImageName";
+  String? get pgvMapImageUrl =>
+      pgvMapImageName == null ? null : "$traceBaseUrl/$pgvMapImageName";
 
   int getMaxIntensity() {
     int max = 0;
@@ -149,7 +159,10 @@ class EarthquakeReport {
 
   String getLocation() {
     if (location.contains("(")) {
-      return location.substring(location.indexOf("(") + 3, location.indexOf(")"));
+      return location.substring(
+        location.indexOf("(") + 3,
+        location.indexOf(")"),
+      );
     } else {
       return location.substring(0, location.indexOf("方") + 1);
     }

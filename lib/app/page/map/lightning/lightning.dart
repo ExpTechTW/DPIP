@@ -2,7 +2,7 @@ import "dart:async";
 import "dart:io";
 
 import "package:dpip/api/exptech.dart";
-import "package:dpip/model/weather/lightning.dart";
+import "package:dpip/api/model/weather/lightning.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/map_utils.dart";
 import "package:dpip/widget/list/time_selector.dart";
@@ -20,7 +20,12 @@ class LightningData {
   final int type;
   final int time;
 
-  LightningData({required this.latitude, required this.longitude, required this.type, required this.time});
+  LightningData({
+    required this.latitude,
+    required this.longitude,
+    required this.type,
+    required this.time,
+  });
 }
 
 class LightningMap extends StatefulWidget {
@@ -51,7 +56,8 @@ class _LightningMapState extends State<LightningMap> {
 
   Future<void> _loadMap() async {
     await _loadMapImages();
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
@@ -60,7 +66,9 @@ class _LightningMapState extends State<LightningMap> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
     await _mapController.addSource(
       "lightning-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
     lightningTimeList = await ExpTech().getLightningList();
     if (lightningTimeList.isNotEmpty) {
@@ -71,7 +79,9 @@ class _LightningMapState extends State<LightningMap> {
     if (isUserLocationValid) {
       await _mapController.addSource(
         "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        const GeojsonSourceProperties(
+          data: {"type": "FeatureCollection", "features": []},
+        ),
       );
       await _mapController.setGeoJsonSource("markers-geojson", {
         "type": "FeatureCollection",
@@ -86,8 +96,14 @@ class _LightningMapState extends State<LightningMap> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+      final cameraUpdate = CameraUpdate.newLatLngZoom(
+        LatLng(userLat, userLon),
+        8,
+      );
+      await _mapController.animateCamera(
+        cameraUpdate,
+        duration: const Duration(milliseconds: 1000),
+      );
     }
 
     await _addUserLocationMarker();
@@ -167,7 +183,10 @@ class _LightningMapState extends State<LightningMap> {
           };
         }).toList();
 
-    await _mapController.setGeoJsonSource("lightning-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource("lightning-data", {
+      "type": "FeatureCollection",
+      "features": features,
+    });
 
     await _mapController.removeLayer("lightning-markers");
     await _mapController.addLayer(

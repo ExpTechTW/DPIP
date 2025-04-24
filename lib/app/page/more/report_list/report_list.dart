@@ -1,5 +1,5 @@
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/report/partial_earthquake_report.dart';
+import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/widget/report/list_item.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +37,8 @@ class _ReportListPageState extends State<ReportListPage> {
   ];
 
   Future<void> refreshReportList() async {
-    if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
+    if (lastFetchTime != null &&
+        DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
       return;
     }
     if (isLoadingEnd) return;
@@ -118,11 +119,17 @@ class _ReportListPageState extends State<ReportListPage> {
         '${context.i18n.max_earthquake_intensity}: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}',
       );
     }
-    if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
-      summaries.add('${context.i18n.scale}: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
+    if (_magnitudeRange.start > 0 ||
+        (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
+      summaries.add(
+        '${context.i18n.scale}: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}',
+      );
     }
-    if (_depthRange.start > 0 || (_depthRange.end > 0 && _depthRange.end < 700)) {
-      summaries.add('${context.i18n.depth}: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
+    if (_depthRange.start > 0 ||
+        (_depthRange.end > 0 && _depthRange.end < 700)) {
+      summaries.add(
+        '${context.i18n.depth}: ${_depthRange.start.round()}-${_depthRange.end.round()}km',
+      );
     }
 
     return summaries.isEmpty ? context.i18n.report_all : summaries.join(', ');
@@ -150,7 +157,10 @@ class _ReportListPageState extends State<ReportListPage> {
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: Container(
                 width: double.maxFinite,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 child: Wrap(
                   children: [
                     FilterChip(
@@ -166,7 +176,9 @@ class _ReportListPageState extends State<ReportListPage> {
                 ),
               ),
             ),
-            shape: Border(bottom: BorderSide(color: context.colors.outlineVariant)),
+            shape: Border(
+              bottom: BorderSide(color: context.colors.outlineVariant),
+            ),
           ),
         ];
       },
@@ -253,7 +265,10 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _intensityRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
+                          _intensityRange = RangeValues(
+                            values.start.roundToDouble(),
+                            values.end.roundToDouble(),
+                          );
                         });
                       },
                     ),
@@ -269,7 +284,10 @@ class _ReportListPageState extends State<ReportListPage> {
                       ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _magnitudeRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
+                          _magnitudeRange = RangeValues(
+                            values.start.roundToDouble(),
+                            values.end.roundToDouble(),
+                          );
                         });
                       },
                     ),
@@ -279,10 +297,16 @@ class _ReportListPageState extends State<ReportListPage> {
                       min: 0,
                       max: 700,
                       divisions: 70,
-                      labels: RangeLabels("${_depthRange.start.round()}km", "${_depthRange.end.round()}km"),
+                      labels: RangeLabels(
+                        "${_depthRange.start.round()}km",
+                        "${_depthRange.end.round()}km",
+                      ),
                       onChanged: (RangeValues values) {
                         setState(() {
-                          _depthRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());
+                          _depthRange = RangeValues(
+                            values.start.roundToDouble(),
+                            values.end.roundToDouble(),
+                          );
                         });
                       },
                     ),

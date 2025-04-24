@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/history.dart';
 import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/model/history.dart';
 import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/time_convert.dart';
@@ -52,7 +52,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool isLoading = true;
   String? region;
   final scrollController = ScrollController();
-  late final animController = AnimationController(vsync: this, duration: Duration.zero);
+  late final animController = AnimationController(
+    vsync: this,
+    duration: Duration.zero,
+  );
   bool isAppBarVisible = false;
   late TabController _tabController;
 
@@ -82,7 +85,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _initData() async {
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
     int code = Global.preference.getInt("user-code") ?? -1;
@@ -103,7 +107,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (region == null && !country) return;
     setState(() => isLoading = true);
     try {
-      final data = country ? await ExpTech().getRealtime() : await ExpTech().getRealtimeRegion(region!);
+      final data =
+          country
+              ? await ExpTech().getRealtime()
+              : await ExpTech().getRealtimeRegion(region!);
       if (mounted) {
         setState(() {
           realtimeList = data.reversed.toList();
@@ -147,7 +154,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 context,
                 MaterialPageRoute(
                   settings: const RouteSettings(name: '/settings'),
-                  builder: (context) => const SettingsRoute(initialRoute: '/location'),
+                  builder:
+                      (context) =>
+                          const SettingsRoute(initialRoute: '/location'),
                 ),
               );
             },
@@ -164,7 +173,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Stack(children: [_buildMainContent(), _buildAppBar()]));
+    return Scaffold(
+      body: Stack(children: [_buildMainContent(), _buildAppBar()]),
+    );
   }
 
   Widget _buildMainContent() {
@@ -185,7 +196,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Expanded(
                   child: Text(
                     context.i18n.current_events,
-                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: context.colors.onSurfaceVariant,
+                    ),
                   ),
                 ),
                 _buildLocationToggle(),
@@ -209,7 +223,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             tooltip: context.i18n.history_nationwide,
             value: true,
           ),
-          ButtonSegment(icon: const Icon(Symbols.home_rounded), tooltip: context.i18n.settings_location, value: false),
+          ButtonSegment(
+            icon: const Icon(Symbols.home_rounded),
+            tooltip: context.i18n.settings_location,
+            value: false,
+          ),
         ],
         selected: {country},
         onSelectionChanged:
@@ -234,7 +252,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       return Center(child: Text(context.i18n.home_safety));
     }
 
-    final grouped = groupBy(realtimeList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
+    final grouped = groupBy(
+      realtimeList,
+      (e) =>
+          DateFormat(context.i18n.full_date_format, locale).format(e.time.send),
+    );
 
     return Column(
       children:
@@ -246,9 +268,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 DateTimelineItem(date),
                 ...historyGroup.map((history) {
                   final int? expireTimestamp = history.time.expires['all'];
-                  final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-                  final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-                  return HistoryTimelineItem(expired: isExpired, history: history, last: history == realtimeList.last);
+                  final TZDateTime expireTimeUTC = convertToTZDateTime(
+                    expireTimestamp ?? 0,
+                  );
+                  final bool isExpired = TZDateTime.now(
+                    UTC,
+                  ).isAfter(expireTimeUTC.toUtc());
+                  return HistoryTimelineItem(
+                    expired: isExpired,
+                    history: history,
+                    last: history == realtimeList.last,
+                  );
                 }),
               ],
             );
@@ -274,13 +304,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildLocationButton(), _buildTemperatureDisplay(), _buildWeatherDetails()],
+        children: [
+          _buildLocationButton(),
+          _buildTemperatureDisplay(),
+          _buildWeatherDetails(),
+        ],
       ),
     );
   }
 
   Widget _buildTemperatureDisplay() {
-    final tempParts = (weatherData['weather']?['data']?['air']?['temperature'] ?? '--').toString().split('.');
+    final tempParts =
+        (weatherData['weather']?['data']?['air']?['temperature'] ?? '--')
+            .toString()
+            .split('.');
     final weatherCode = weatherData['weather']?['data']?['weatherCode'] ?? 0;
     const isDay = 1;
 
@@ -301,7 +338,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         style: TextStyle(
                           fontSize: 68,
                           fontWeight: FontWeight.w500,
-                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                          color: context.colors.onPrimaryContainer.withOpacity(
+                            0.85,
+                          ),
                         ),
                       ),
                       TextSpan(
@@ -314,7 +353,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w500,
-                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                          color: context.colors.onPrimaryContainer.withOpacity(
+                            0.85,
+                          ),
                         ),
                       ),
                     ],
@@ -322,13 +363,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  WeatherIcons.getWeatherContent(context, weatherCode.toString()),
-                  style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant),
+                  WeatherIcons.getWeatherContent(
+                    context,
+                    weatherCode.toString(),
+                  ),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: context.colors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
           ),
-          Icon(WeatherIcons.getWeatherIcon(weatherCode, isDay), size: 80, color: context.colors.primary),
+          Icon(
+            WeatherIcons.getWeatherIcon(weatherCode, isDay),
+            size: 80,
+            color: context.colors.primary,
+          ),
         ],
       ),
     );
@@ -356,7 +407,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildWeatherDetailItem(String label, String value) {
     return Text(
       '$label   $value',
-      style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant.withOpacity(0.75)),
+      style: TextStyle(
+        fontSize: 18,
+        color: context.colors.onSurfaceVariant.withOpacity(0.75),
+      ),
     );
   }
 

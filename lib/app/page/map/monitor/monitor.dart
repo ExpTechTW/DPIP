@@ -7,10 +7,10 @@ import "package:dpip/core/eew.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/core/rts.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/eew.dart";
-import "package:dpip/model/rts/rts.dart";
-import "package:dpip/model/station.dart";
-import "package:dpip/model/station_info.dart";
+import "package:dpip/api/model/eew.dart";
+import "package:dpip/api/model/rts/rts.dart";
+import "package:dpip/api/model/station.dart";
+import "package:dpip/api/model/station_info.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/int.dart";
 import "package:dpip/util/extension/latlng.dart";
@@ -57,7 +57,8 @@ class MonitorPage extends StatefulWidget {
   }
 }
 
-class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
+class _MonitorPageState extends State<MonitorPage>
+    with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
   final monitor = Global.preference.getBool("monitor") ?? false;
@@ -84,9 +85,13 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   bool _isEewBoxVisible = true;
   bool isUserLocationValid = false;
   final Map<String, dynamic> _eewIntensityArea = {};
-  final DraggableScrollableController sheetController = DraggableScrollableController();
+  final DraggableScrollableController sheetController =
+      DraggableScrollableController();
   final sheetInitialSize = 0.2;
-  late final animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+  late final animController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
   late ScrollController scrollController;
   List<Widget> _eewUI = [];
   List<Widget> _rtsUI = [];
@@ -103,14 +108,17 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
-      final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      final scrollPosition = ((newSize - sheetInitialSize) /
+              (1 - sheetInitialSize))
+          .clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
     MonitorPage.setActiveCallback(sendpositionUpdate);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (monitor) return;
-      bool disable_monitor_tip = Global.preference.getBool("disable_monitor_tip") ?? false;
+      bool disable_monitor_tip =
+          Global.preference.getBool("disable_monitor_tip") ?? false;
       if (!disable_monitor_tip) {
         Global.preference.setBool("disable_monitor_tip", true);
         initTargets();
@@ -136,7 +144,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   void userLocation() async {
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
 
@@ -147,7 +156,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
-    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+    if (!isUserLocationValid &&
+        !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
   }
@@ -180,7 +190,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _setupStationSource(data);
     _startDataUpdates();
 
-    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (
+      timer,
+    ) async {
       if (!mounted) return;
       _isMarkerVisible = !_isMarkerVisible;
       _isBoxVisible = !_isBoxVisible;
@@ -200,15 +212,21 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _stations = data;
     await _mapController.addSource(
       "station-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
     await _mapController.addSource(
       "station-geojson-intensity-0",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
     await _mapController.addSource(
       "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
     _addStationLayer();
   }
@@ -217,12 +235,18 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     await _mapController.addCircleLayer(
       "station-geojson",
       "station",
-      CircleLayerProperties(circleColor: _getStationColorExpression(), circleRadius: _getStationRadiusExpression()),
+      CircleLayerProperties(
+        circleColor: _getStationColorExpression(),
+        circleRadius: _getStationRadiusExpression(),
+      ),
     );
     await _mapController.addCircleLayer(
       "station-geojson-intensity-0",
       "station-intensity-0",
-      CircleLayerProperties(circleColor: "#7B7B7B", circleRadius: _getStationRadiusExpression()),
+      CircleLayerProperties(
+        circleColor: "#7B7B7B",
+        circleRadius: _getStationRadiusExpression(),
+      ),
     );
 
     await _mapController.addLayer(
@@ -310,7 +334,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       if (monitor) {
         _updateRtsData();
       } else {
-        _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
+        _lsatGetRtsDataTime =
+            (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
       }
       _updateEewData();
       setState(() {});
@@ -319,18 +344,30 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       if (!mounted) return;
       _updateEewCircles();
       if (_timeReplay != 0) {
-        _timeReplay += (_replayTimeStamp == 0) ? 0 : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
+        _timeReplay +=
+            (_replayTimeStamp == 0)
+                ? 0
+                : DateTime.now().millisecondsSinceEpoch - _replayTimeStamp;
         _replayTimeStamp = DateTime.now().millisecondsSinceEpoch;
       }
     });
   }
 
   bool _dataStatus() {
-    bool status = (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) - _lsatGetRtsDataTime) < 3000;
+    bool status =
+        (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) -
+            _lsatGetRtsDataTime) <
+        3000;
     if (!status && _rtsData != null) {
       _rtsData = null;
-      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(null));
-      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(null));
+      _mapController.setGeoJsonSource(
+        "station-geojson",
+        _generateStationGeoJson(null),
+      );
+      _mapController.setGeoJsonSource(
+        "station-geojson-intensity-0",
+        _generateStationGeoJsonIntensity0(null),
+      );
     }
     return status;
   }
@@ -344,7 +381,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       String formattedPing = _ping.toStringAsFixed(2);
       _formattedPing = formattedPing;
       _rtsData = data;
-      _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
+      _lsatGetRtsDataTime =
+          (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
     } catch (err) {
       TalkerManager.instance.error(err);
     } finally {
@@ -353,8 +391,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   }
 
   Future<void> _updateMarkers() async {
-    await _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
-    await _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
+    await _mapController.setGeoJsonSource(
+      "station-geojson",
+      _generateStationGeoJson(_rtsData),
+    );
+    await _mapController.setGeoJsonSource(
+      "station-geojson-intensity-0",
+      _generateStationGeoJsonIntensity0(_rtsData),
+    );
   }
 
   void _updateEewData() async {
@@ -373,9 +417,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (_isMarkerVisible) {
       for (var id in _eewLastInfo.keys) {
         markers.add(
-          GeoJsonFeatureBuilder(
-            GeoJsonFeatureType.Point,
-          ).setProperty("intensity", 10).setGeometry(_eewLastInfo[id]!.eq.latlng.toGeoJsonCoordinates()),
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+              .setProperty("intensity", 10)
+              .setGeometry(_eewLastInfo[id]!.eq.latlng.toGeoJsonCoordinates()),
         );
       }
     }
@@ -383,23 +427,31 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _rtsData?.station.forEach((key, value) {
       int intensity = intensityFloatToInt(value.I);
       if (value.alert == true && intensity > 0) {
-        StationInfo info = findAppropriateItem(_stations[key]!.info, _timeReplay);
+        StationInfo info = findAppropriateItem(
+          _stations[key]!.info,
+          _timeReplay,
+        );
         markers.add(
-          GeoJsonFeatureBuilder(
-            GeoJsonFeatureType.Point,
-          ).setProperty("intensity", intensity).setGeometry(info.latlng.toGeoJsonCoordinates()),
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+              .setProperty("intensity", intensity)
+              .setGeometry(info.latlng.toGeoJsonCoordinates()),
         );
       }
     });
 
     if (isUserLocationValid) {
       markers.add(
-        GeoJsonFeatureBuilder(GeoJsonFeatureType.Point).setGeometry([userLon, userLat]).setProperty("intensity", 11),
+        GeoJsonFeatureBuilder(
+          GeoJsonFeatureType.Point,
+        ).setGeometry([userLon, userLat]).setProperty("intensity", 11),
       );
     }
 
     if (markers.isNotEmpty) {
-      await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers).build());
+      await _mapController.setGeoJsonSource(
+        "markers-geojson",
+        GeoJsonBuilder().setFeatures(markers).build(),
+      );
     }
   }
 
@@ -426,12 +478,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         for (var area in Global.box["features"]) {
           int id = area["properties"]["ID"];
           if (_rtsData!.box[id.toString()] == null) continue;
-          bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
+          bool skip = checkBoxSkip(
+            _eewLastInfo,
+            _eewDist,
+            area["geometry"]["coordinates"][0],
+          );
           if (!skip) {
             features.add(
-              GeoJsonFeatureBuilder(
-                GeoJsonFeatureType.Polygon,
-              ).setGeometry(area["geometry"]["coordinates"][0]).setProperty("i", _rtsData!.box[id.toString()]),
+              GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon)
+                  .setGeometry(area["geometry"]["coordinates"][0])
+                  .setProperty("i", _rtsData!.box[id.toString()]),
             );
           }
         }
@@ -465,7 +521,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 ),
               ),
             ),
-            label: Text(Global.location[area.code.toString()]!.city + Global.location[area.code.toString()]!.town),
+            label: Text(
+              Global.location[area.code.toString()]!.city +
+                  Global.location[area.code.toString()]!.town,
+            ),
           ),
         );
         rtsUI.add(const SizedBox(height: 5));
@@ -474,7 +533,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       }
     }
 
-    await _mapController.setGeoJsonSource("box-geojson", GeoJsonBuilder().setFeatures(features).build());
+    await _mapController.setGeoJsonSource(
+      "box-geojson",
+      GeoJsonBuilder().setFeatures(features).build(),
+    );
     _rtsUI = rtsUI;
   }
 
@@ -502,8 +564,12 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         );
         _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
         _userEewArriveTime[eew.id] = {
-          "s": (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
-          "p": (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+          "s":
+              (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info["dist"]))
+                  .floor(),
+          "p":
+              (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info["dist"]))
+                  .floor(),
         };
       }
 
@@ -535,7 +601,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
-                    color: _eewLastInfo[eew.id]?.status == 1 ? const Color(0xFFC80000) : const Color(0xFFFFC800),
+                    color:
+                        _eewLastInfo[eew.id]?.status == 1
+                            ? const Color(0xFFC80000)
+                            : const Color(0xFFFFC800),
                     width: 2,
                   ),
                 ),
@@ -551,17 +620,28 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                             _eewLastInfo[eew.id]?.status == 1
                                 ? context.i18n.emergency_earthquake_warning
                                 : context.i18n.earthquake_warning,
-                            style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: context.colors.onSurface,
+                            ),
                           ),
                           Text(
-                            context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ""),
-                            style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant),
+                            context.i18n.eew_no_x(
+                              _eewLastInfo[eew.id]?.serial.toString() ?? "",
+                            ),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: context.colors.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 5),
                       _TopInfoBox(
-                        intensity: isUserLocationValid ? _userEewIntensity[eew.id] ?? 0 : null,
+                        intensity:
+                            isUserLocationValid
+                                ? _userEewIntensity[eew.id] ?? 0
+                                : null,
                         isValid: isUserLocationValid,
                         arrivalTime: _userEewArriveTime[eew.id]!["s"],
                         currentTime: _getCurrentTime(),
@@ -569,7 +649,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                       const SizedBox(height: 10),
                       Card(
                         elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(8),
                           child: Column(
@@ -579,27 +661,41 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         context.i18n.estimated_intensity,
-                                        style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color:
+                                              context.colors.onSurfaceVariant,
+                                        ),
                                       ),
                                       const SizedBox(height: 4),
                                       Container(
                                         width: 50,
                                         height: 50,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(10),
-                                          color: IntensityColor.intensity(_eewLastInfo[eew.id]!.eq.max),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          color: IntensityColor.intensity(
+                                            _eewLastInfo[eew.id]!.eq.max,
+                                          ),
                                         ),
                                         child: Center(
                                           child: Text(
-                                            _eewLastInfo[eew.id]!.eq.max.asIntensityDisplayLabel,
+                                            _eewLastInfo[eew.id]!
+                                                .eq
+                                                .max
+                                                .asIntensityDisplayLabel,
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 28,
-                                              color: IntensityColor.onIntensity(_eewLastInfo[eew.id]!.eq.max),
+                                              color: IntensityColor.onIntensity(
+                                                _eewLastInfo[eew.id]!.eq.max,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -607,11 +703,16 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                     ],
                                   ),
                                   const SizedBox(width: 12),
-                                  Container(width: 1, height: 80, color: context.colors.outline),
+                                  Container(
+                                    width: 1,
+                                    height: 80,
+                                    color: context.colors.outline,
+                                  ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           _eewLastInfo[eew.id]!.eq.location,
@@ -624,7 +725,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                         const SizedBox(height: 4),
                                         Text(
                                           "${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} ${context.i18n.time_earthquake}",
-                                          style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color:
+                                                context.colors.onSurfaceVariant,
+                                          ),
                                         ),
                                         const SizedBox(height: 8),
                                         Row(
@@ -634,7 +739,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                                 "M${_eewLastInfo[eew.id]?.eq.magnitude}",
                                                 style: TextStyle(
                                                   fontSize: 20,
-                                                  color: context.colors.onSurface,
+                                                  color:
+                                                      context.colors.onSurface,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
@@ -659,7 +765,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const SizedBox(height: 8),
-                                    Divider(color: context.colors.outline, thickness: 1),
+                                    Divider(
+                                      color: context.colors.outline,
+                                      thickness: 1,
+                                    ),
                                     const SizedBox(height: 8),
                                     Text(
                                       context.i18n.alarm_area,
@@ -679,9 +788,17 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                                                 (county) => Chip(
                                                   label: Text(
                                                     county,
-                                                    style: TextStyle(color: context.colors.onPrimaryContainer),
+                                                    style: TextStyle(
+                                                      color:
+                                                          context
+                                                              .colors
+                                                              .onPrimaryContainer,
+                                                    ),
                                                   ),
-                                                  backgroundColor: context.colors.primaryContainer,
+                                                  backgroundColor:
+                                                      context
+                                                          .colors
+                                                          .primaryContainer,
                                                 ),
                                               )
                                               .toList(),
@@ -723,11 +840,23 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _addEewCircle(Eew eew) async {
     final geojson =
         GeoJsonBuilder()
-            .addFeature(circleFeature(center: LatLng(eew.eq.latitude, eew.eq.longitude), radius: 0, steps: 256))
+            .addFeature(
+              circleFeature(
+                center: LatLng(eew.eq.latitude, eew.eq.longitude),
+                radius: 0,
+                steps: 256,
+              ),
+            )
             .build();
 
-    await _mapController.addSource("${eew.id}-circle", GeojsonSourceProperties(data: geojson, tolerance: 1));
-    await _mapController.addSource("${eew.id}-circle-p", GeojsonSourceProperties(data: geojson, tolerance: 1));
+    await _mapController.addSource(
+      "${eew.id}-circle",
+      GeojsonSourceProperties(data: geojson, tolerance: 1),
+    );
+    await _mapController.addSource(
+      "${eew.id}-circle-p",
+      GeojsonSourceProperties(data: geojson, tolerance: 1),
+    );
     _addEewLayers(eew);
   }
 
@@ -764,29 +893,49 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   void _updateEewCircles() async {
     if (_eewLastInfo.keys.isEmpty) return;
     for (var id in _eewLastInfo.keys) {
-      final dist = psWaveDist(_eewLastInfo[id]!.eq.depth, _eewLastInfo[id]!.eq.time, _getCurrentTime());
+      final dist = psWaveDist(
+        _eewLastInfo[id]!.eq.depth,
+        _eewLastInfo[id]!.eq.time,
+        _getCurrentTime(),
+      );
       _eewDist[id] = dist["s_dist"]!;
 
       await _mapController.setGeoJsonSource(
         "$id-circle",
         GeoJsonBuilder()
-            .addFeature(circleFeature(center: _eewLastInfo[id]!.eq.latlng, radius: dist["s_dist"]!, steps: 256))
+            .addFeature(
+              circleFeature(
+                center: _eewLastInfo[id]!.eq.latlng,
+                radius: dist["s_dist"]!,
+                steps: 256,
+              ),
+            )
             .build(),
       );
       await _mapController.setGeoJsonSource(
         "$id-circle-p",
         GeoJsonBuilder()
-            .addFeature(circleFeature(center: _eewLastInfo[id]!.eq.latlng, radius: dist["p_dist"]!, steps: 256))
+            .addFeature(
+              circleFeature(
+                center: _eewLastInfo[id]!.eq.latlng,
+                radius: dist["p_dist"]!,
+                steps: 256,
+              ),
+            )
             .build(),
       );
     }
   }
 
-  int _getCurrentTime() => (_timeReplay != 0) ? _timeReplay : DateTime.now().millisecondsSinceEpoch + _timeOffset;
+  int _getCurrentTime() =>
+      (_timeReplay != 0)
+          ? _timeReplay
+          : DateTime.now().millisecondsSinceEpoch + _timeOffset;
 
   void _removeOldEews(List<Eew> data) async {
     final currentEewIds = data.map((e) => e.id).toSet();
-    final idsToRemove = _eewLastInfo.keys.where((id) => !currentEewIds.contains(id)).toList();
+    final idsToRemove =
+        _eewLastInfo.keys.where((id) => !currentEewIds.contains(id)).toList();
 
     for (var id in idsToRemove) {
       _eewLastInfo.remove(id);
@@ -825,7 +974,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     if (eewArea.keys.isEmpty) {
       await _mapController.setLayerProperties(
         "town",
-        FillLayerProperties(fillColor: context.colors.surfaceContainerHighest.toHexStringRGB(), fillOpacity: 1),
+        FillLayerProperties(
+          fillColor: context.colors.surfaceContainerHighest.toHexStringRGB(),
+          fillOpacity: 1,
+        ),
       );
       return;
     }
@@ -837,7 +989,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
           "match",
           ["get", "CODE"],
           ...eewArea.entries.expand(
-            (entry) => [int.parse(entry.key), IntensityColor.intensity(entry.value).toHexStringRGB()],
+            (entry) => [
+              int.parse(entry.key),
+              IntensityColor.intensity(entry.value).toHexStringRGB(),
+            ],
           ),
           context.colors.surfaceContainerHighest.toHexStringRGB(),
         ],
@@ -858,7 +1013,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             })
             .where((e) {
               if (_rtsData!.box.keys.isNotEmpty) {
-                return rtsData.station[e.key]?.alert == true && intensityFloatToInt(rtsData.station[e.key]!.I) < 1;
+                return rtsData.station[e.key]?.alert == true &&
+                    intensityFloatToInt(rtsData.station[e.key]!.I) < 1;
               }
               return false;
             })
@@ -883,7 +1039,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             })
             .where((e) {
               if (_eewLastInfo.keys.isNotEmpty ||
-                  (_rtsData!.box.keys.isNotEmpty && rtsData.station[e.key]?.alert == true)) {
+                  (_rtsData!.box.keys.isNotEmpty &&
+                      rtsData.station[e.key]?.alert == true)) {
                 return false;
               }
 
@@ -891,7 +1048,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             })
             .map((e) {
               StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
-              return info.latlng.toFeatureBuilder().setProperty("i", rtsData.station[e.key]?.i).setId(int.parse(e.key));
+              return info.latlng
+                  .toFeatureBuilder()
+                  .setProperty("i", rtsData.station[e.key]?.i)
+                  .setId(int.parse(e.key));
             })
             .toList();
 
@@ -971,7 +1131,10 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
-        Text(context.i18n.only_used_during_earthquake_alerts, style: context.theme.textTheme.labelMedium),
+        Text(
+          context.i18n.only_used_during_earthquake_alerts,
+          style: context.theme.textTheme.labelMedium,
+        ),
       ],
     );
   }
@@ -984,7 +1147,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       child: Row(
         children:
             intensities.map((intensity) {
-              return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
+              return Expanded(
+                child: Container(color: IntensityColor.intensity(intensity)),
+              );
             }).toList(),
       ),
     );
@@ -1010,7 +1175,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
             labels.map((label) {
               return SizedBox(
                 width: 300 / 9,
-                child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
+                child: Text(
+                  label,
+                  style: const TextStyle(fontSize: 10),
+                  textAlign: TextAlign.center,
+                ),
               );
             }).toList(),
       ),
@@ -1055,7 +1224,8 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _timeReplay != 0 ? AppBar(title: Text(context.i18n.monitor)) : null,
+      appBar:
+          _timeReplay != 0 ? AppBar(title: Text(context.i18n.monitor)) : null,
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
@@ -1103,7 +1273,11 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                       width: 30,
                       height: 30,
                       alignment: Alignment.center,
-                      child: Icon(Icons.warning_amber_rounded, size: 20, color: context.colors.onError),
+                      child: Icon(
+                        Icons.warning_amber_rounded,
+                        size: 20,
+                        color: context.colors.onError,
+                      ),
                     ),
                   ),
                 ),
@@ -1118,7 +1292,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                 filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                  decoration: BoxDecoration(
+                    color: context.colors.surface.withOpacity(0.5),
+                  ),
                   child: Text(
                     DateFormat(context.i18n.datetime_format).format(
                       (!_dataStatus())
@@ -1152,7 +1328,9 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                   filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                    decoration: BoxDecoration(
+                      color: context.colors.surface.withOpacity(0.5),
+                    ),
                     child: Text(
                       (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
                       style: TextStyle(
@@ -1171,7 +1349,14 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
               ),
             ),
           if (_rtsUI.isNotEmpty)
-            Positioned(left: 4, top: 58, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: _rtsUI)),
+            Positioned(
+              left: 4,
+              top: 58,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: _rtsUI,
+              ),
+            ),
           if (_showLegend)
             Positioned(
               right: 6,
@@ -1189,11 +1374,21 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Icon(Symbols.warning_amber_rounded, size: 50, color: Colors.red),
+                      const Icon(
+                        Symbols.warning_amber_rounded,
+                        size: 50,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 10),
-                      Text(context.i18n.no_earthquake_monitor, style: context.theme.textTheme.bodyLarge),
+                      Text(
+                        context.i18n.no_earthquake_monitor,
+                        style: context.theme.textTheme.bodyLarge,
+                      ),
                       const SizedBox(height: 10),
-                      Text(context.i18n.settings_earthquake_monitor, style: context.theme.textTheme.bodyMedium),
+                      Text(
+                        context.i18n.settings_earthquake_monitor,
+                        style: context.theme.textTheme.bodyMedium,
+                      ),
                     ],
                   ),
                 ),
@@ -1212,16 +1407,30 @@ class _TopInfoBox extends StatelessWidget {
   final int? arrivalTime;
   final int currentTime;
 
-  const _TopInfoBox({required this.intensity, required this.isValid, this.arrivalTime, required this.currentTime});
+  const _TopInfoBox({
+    required this.intensity,
+    required this.isValid,
+    this.arrivalTime,
+    required this.currentTime,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 80,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: IntensityColor.intensity(intensity!)),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: IntensityColor.intensity(intensity!),
+      ),
       child: Row(
         children: [
-          Expanded(flex: 1, child: _IntensityBox(title: context.i18n.location_estimate, intensity: intensity ?? 0)),
+          Expanded(
+            flex: 1,
+            child: _IntensityBox(
+              title: context.i18n.location_estimate,
+              intensity: intensity ?? 0,
+            ),
+          ),
           Container(
             width: 1,
             color: IntensityColor.onIntensity(intensity!),
@@ -1255,12 +1464,20 @@ class _IntensityBox extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: IntensityColor.onIntensity(intensity)),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: IntensityColor.onIntensity(intensity),
+          ),
         ),
         Center(
           child: Text(
             intensity.asIntensityDisplayLabel,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32, color: IntensityColor.onIntensity(intensity)),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              color: IntensityColor.onIntensity(intensity),
+            ),
           ),
         ),
       ],
@@ -1274,23 +1491,41 @@ class _ArrivalTimeBox extends StatelessWidget {
   final int currentTime;
   final int intensity;
 
-  const _ArrivalTimeBox({required this.isValid, this.arrivalTime, required this.currentTime, required this.intensity});
+  const _ArrivalTimeBox({
+    required this.isValid,
+    this.arrivalTime,
+    required this.currentTime,
+    required this.intensity,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final remainingSeconds = isValid && arrivalTime != null ? ((arrivalTime! - currentTime) / 1000).floor() : null;
+    final remainingSeconds =
+        isValid && arrivalTime != null
+            ? ((arrivalTime! - currentTime) / 1000).floor()
+            : null;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           context.i18n.seismic_waves,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: IntensityColor.onIntensity(intensity)),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: IntensityColor.onIntensity(intensity),
+          ),
         ),
         if (!isValid || remainingSeconds == null || remainingSeconds <= 0)
           Text(
-            !isValid ? context.i18n.monitor_unknown : context.i18n.monitor_arrival,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: IntensityColor.onIntensity(intensity)),
+            !isValid
+                ? context.i18n.monitor_unknown
+                : context.i18n.monitor_arrival,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+              color: IntensityColor.onIntensity(intensity),
+            ),
           )
         else
           Row(

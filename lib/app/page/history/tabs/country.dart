@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
-import 'package:dpip/model/history.dart';
+import 'package:dpip/api/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/time_convert.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +49,11 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
+    final grouped = groupBy(
+      historyList,
+      (e) =>
+          DateFormat(context.i18n.full_date_format, locale).format(e.time.send),
+    );
 
     return RefreshIndicator(
       key: list,
@@ -73,9 +77,17 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
               DateTimelineItem(key),
               ...historyGroup.map((history) {
                 final int? expireTimestamp = history.time.expires['all'];
-                final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-                final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-                return HistoryTimelineItem(expired: isExpired, history: history, last: index == historyList.length - 1);
+                final TZDateTime expireTimeUTC = convertToTZDateTime(
+                  expireTimestamp ?? 0,
+                );
+                final bool isExpired = TZDateTime.now(
+                  UTC,
+                ).isAfter(expireTimeUTC.toUtc());
+                return HistoryTimelineItem(
+                  expired: isExpired,
+                  history: history,
+                  last: index == historyList.length - 1,
+                );
               }),
             ],
           );

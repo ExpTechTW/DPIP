@@ -1,4 +1,4 @@
-import "package:dpip/model/station_intensity.dart";
+import "package:dpip/api/model/station_intensity.dart";
 import "package:json_annotation/json_annotation.dart";
 
 part "area_intensity.g.dart";

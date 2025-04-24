@@ -1,4 +1,4 @@
-import 'package:dpip/model/history.dart';
+import 'package:dpip/api/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/list_icon.dart';
 import 'package:dpip/widget/home/event_list_route.dart';
@@ -49,12 +49,23 @@ class HistoryTimelineItem extends StatelessWidget {
                       width: 42,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: expired ? context.colors.surface : context.colors.primaryContainer,
-                        border: expired ? Border.all(color: context.colors.outlineVariant) : null,
+                        color:
+                            expired
+                                ? context.colors.surface
+                                : context.colors.primaryContainer,
+                        border:
+                            expired
+                                ? Border.all(
+                                  color: context.colors.outlineVariant,
+                                )
+                                : null,
                       ),
                       child: Icon(
                         ListIcons.getListIcon(history.icon),
-                        color: expired ? context.colors.outline : context.colors.onPrimaryContainer,
+                        color:
+                            expired
+                                ? context.colors.outline
+                                : context.colors.onPrimaryContainer,
                       ),
                     ),
                   ),
@@ -68,15 +79,21 @@ class HistoryTimelineItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      DateFormat(context.i18n.time_format).format(history.time.send),
+                      DateFormat(
+                        context.i18n.time_format,
+                      ).format(history.time.send),
                       style: context.theme.textTheme.labelMedium?.copyWith(
-                        color: context.colors.outline.withOpacity(expired ? 0.6 : 1),
+                        color: context.colors.outline.withOpacity(
+                          expired ? 0.6 : 1,
+                        ),
                       ),
                     ),
                     Text(
                       history.text.content["all"]!.subtitle,
                       style: context.theme.textTheme.titleMedium?.copyWith(
-                        color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
+                        color: context.colors.onSurface.withOpacity(
+                          expired ? 0.6 : 1,
+                        ),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -84,7 +101,9 @@ class HistoryTimelineItem extends StatelessWidget {
                     Text(
                       history.text.description["all"]!,
                       style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
+                        color: context.colors.onSurface.withOpacity(
+                          expired ? 0.6 : 1,
+                        ),
                       ),
                       textAlign: TextAlign.justify,
                       maxLines: 3,
@@ -97,7 +116,10 @@ class HistoryTimelineItem extends StatelessWidget {
             if (hasDetail)
               Padding(
                 padding: const EdgeInsets.only(left: 4),
-                child: Icon(Symbols.chevron_right_rounded, color: context.colors.outline),
+                child: Icon(
+                  Symbols.chevron_right_rounded,
+                  color: context.colors.outline,
+                ),
               ),
           ],
         ),

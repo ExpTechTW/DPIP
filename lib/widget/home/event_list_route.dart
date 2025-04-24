@@ -1,4 +1,4 @@
-import 'package:dpip/model/history.dart';
+import 'package:dpip/api/model/history.dart';
 import 'package:dpip/route/event_viewer/intensity.dart';
 import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:dpip/route/report/report.dart';
@@ -21,7 +21,10 @@ bool shouldShowArrow(History item) {
 void handleEventList(BuildContext context, History current) {
   final build = typeConfigs[current.type];
   if (build != null) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => build(current)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => build(current)),
+    );
   } else {
     print('Unknown type: ${current.type}');
   }

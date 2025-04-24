@@ -5,7 +5,7 @@ import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/weather/weather.dart";
+import "package:dpip/api/model/weather/weather.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/map_utils.dart";
 import "package:dpip/widget/list/time_selector.dart";
@@ -61,7 +61,11 @@ class _WindMapState extends State<WindMap> {
   Future<void> _updateWindData(List<WeatherStation> weatherData) async {
     windDataList =
         weatherData
-            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+            .where(
+              (station) =>
+                  station.data.wind.direction != -99 &&
+                  station.data.wind.speed != -99,
+            )
             .map(
               (station) => WindData(
                 id: station.id,
@@ -82,7 +86,8 @@ class _WindMapState extends State<WindMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
@@ -92,19 +97,25 @@ class _WindMapState extends State<WindMap> {
 
     await _mapController.addSource(
       "wind-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
 
     weather_list = await ExpTech().getWeatherList();
 
-    List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    List<WeatherStation> weatherData = await ExpTech().getWeather(
+      weather_list.last,
+    );
 
     _updateWindData(weatherData);
 
     if (isUserLocationValid) {
       await _mapController.addSource(
         "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        const GeojsonSourceProperties(
+          data: {"type": "FeatureCollection", "features": []},
+        ),
       );
       await _mapController.setGeoJsonSource("markers-geojson", {
         "type": "FeatureCollection",
@@ -119,8 +130,14 @@ class _WindMapState extends State<WindMap> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+      final cameraUpdate = CameraUpdate.newLatLngZoom(
+        LatLng(userLat, userLon),
+        8,
+      );
+      await _mapController.animateCamera(
+        cameraUpdate,
+        duration: const Duration(milliseconds: 1000),
+      );
     }
 
     await _addUserLocationMarker();
@@ -159,7 +176,11 @@ class _WindMapState extends State<WindMap> {
             .map(
               (data) => {
                 "type": "Feature",
-                "properties": {"id": data.id, "direction": data.direction, "speed": data.speed},
+                "properties": {
+                  "id": data.id,
+                  "direction": data.direction,
+                  "speed": data.speed,
+                },
                 "geometry": {
                   "type": "Point",
                   "coordinates": [data.longitude, data.latitude],
@@ -168,7 +189,10 @@ class _WindMapState extends State<WindMap> {
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("wind-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource("wind-data", {
+      "type": "FeatureCollection",
+      "features": features,
+    });
 
     await _mapController.removeLayer("wind-circles");
     await _mapController.addLayer(
@@ -261,12 +285,21 @@ class _WindMapState extends State<WindMap> {
       ],
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['wind-arrows', "wind-circles"], null);
+    _mapController.onFeatureTapped.add((
+      dynamic feature,
+      Point<double> point,
+      LatLng latLng,
+      String layerId,
+    ) async {
+      final features = await _mapController.queryRenderedFeatures(point, [
+        'wind-arrows',
+        "wind-circles",
+      ], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
+        if (_selectedStationId != null)
+          AdvancedWeatherChart.updateStationId(stationId);
         setState(() {
           _selectedStationId = stationId;
         });
@@ -391,7 +424,9 @@ class _WindMapState extends State<WindMap> {
                 });
               },
               onTimeSelected: (time) async {
-                List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                List<WeatherStation> weatherData = await ExpTech().getWeather(
+                  time,
+                );
                 await _updateWindData(weatherData);
               },
             ),
@@ -407,9 +442,15 @@ class _WindMapState extends State<WindMap> {
               return Container(
                 decoration: BoxDecoration(
                   color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -420,7 +461,10 @@ class _WindMapState extends State<WindMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                       AdvancedWeatherChart(
                         type: "wind_speed",

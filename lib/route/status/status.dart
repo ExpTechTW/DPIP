@@ -1,5 +1,5 @@
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/server_status.dart';
+import 'package:dpip/api/model/server_status.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -41,7 +41,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.i18n.server_status, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          context.i18n.server_status,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -66,14 +69,20 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   return Center(
                     child: Text(
                       '${context.i18n.error_prefix} ${snapshot.error}',
-                      style: TextStyle(color: context.colors.error, fontSize: 16),
+                      style: TextStyle(
+                        color: context.colors.error,
+                        fontSize: 16,
+                      ),
                     ),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
                     child: Text(
                       context.i18n.no_data_available,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   );
                 }
@@ -111,12 +120,18 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: isDarkMode ? Colors.blue[300] : Colors.blue[700]),
+          Icon(
+            Icons.info_outline,
+            color: isDarkMode ? Colors.blue[300] : Colors.blue[700],
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               context.i18n.server_status_overview,
-              style: TextStyle(fontSize: 14, color: isDarkMode ? Colors.white70 : Colors.black87),
+              style: TextStyle(
+                fontSize: 14,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
             ),
           ),
         ],
@@ -162,7 +177,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? statusColor.withOpacity(0.2) : statusColor.withOpacity(0.1),
+                color:
+                    isDarkMode
+                        ? statusColor.withOpacity(0.2)
+                        : statusColor.withOpacity(0.1),
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
               ),
               child: Row(
@@ -179,9 +197,15 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.2),
+                          color:
+                              isDarkMode
+                                  ? statusColor.withOpacity(0.3)
+                                  : statusColor.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -189,13 +213,21 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                           children: [
                             Icon(statusIcon, color: statusColor, size: 18),
                             const SizedBox(width: 6),
-                            Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
+                            Text(
+                              statusText,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       const SizedBox(width: 8),
                       Icon(
-                        isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
                         color: isDarkMode ? Colors.white70 : Colors.grey,
                       ),
                     ],
@@ -210,7 +242,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: status.services.length,
               separatorBuilder:
-                  (context, index) => Divider(height: 1, color: isDarkMode ? Colors.grey[700] : Colors.grey[300]),
+                  (context, index) => Divider(
+                    height: 1,
+                    color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+                  ),
               itemBuilder: (context, index) {
                 final entry = status.services.entries.elementAt(index);
                 return _buildServiceTile(entry.key, entry.value, isDarkMode);
@@ -221,7 +256,11 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     );
   }
 
-  Widget _buildServiceTile(String serviceName, ServiceStatus serviceStatus, bool isDarkMode) {
+  Widget _buildServiceTile(
+    String serviceName,
+    ServiceStatus serviceStatus,
+    bool isDarkMode,
+  ) {
     Color getStatusColor(int status) {
       switch (status) {
         case 1:
@@ -254,7 +293,10 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     return ListTile(
       title: Text(
         serviceName,
-        style: TextStyle(fontWeight: FontWeight.w500, color: isDarkMode ? Colors.white : Colors.black87),
+        style: TextStyle(
+          fontWeight: FontWeight.w500,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
       ),
       subtitle: Text(
         context.i18n.delay(serviceStatus.count.toString()),
@@ -263,10 +305,16 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.1),
+          color:
+              isDarkMode
+                  ? statusColor.withOpacity(0.3)
+                  : statusColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
+        child: Text(
+          statusText,
+          style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

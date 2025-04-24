@@ -1,4 +1,4 @@
-import "package:dpip/model/eew_info.dart";
+import "package:dpip/api/model/eew_info.dart";
 import "package:dpip/util/parser.dart";
 import "package:json_annotation/json_annotation.dart";
 

@@ -5,7 +5,7 @@ import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/weather/weather.dart";
+import "package:dpip/api/model/weather/weather.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/map_utils.dart";
 import "package:dpip/widget/list/time_selector.dart";
@@ -66,7 +66,8 @@ class _HumidityMapState extends State<HumidityMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
@@ -76,12 +77,16 @@ class _HumidityMapState extends State<HumidityMap> {
 
     await _mapController.addSource(
       "humidity-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
 
     weather_list = await ExpTech().getWeatherList();
 
-    List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    List<WeatherStation> weatherData = await ExpTech().getWeather(
+      weather_list.last,
+    );
 
     humidityDataList =
         weatherData
@@ -104,7 +109,9 @@ class _HumidityMapState extends State<HumidityMap> {
     if (isUserLocationValid) {
       await _mapController.addSource(
         "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        const GeojsonSourceProperties(
+          data: {"type": "FeatureCollection", "features": []},
+        ),
       );
       await _mapController.setGeoJsonSource("markers-geojson", {
         "type": "FeatureCollection",
@@ -119,8 +126,14 @@ class _HumidityMapState extends State<HumidityMap> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+      final cameraUpdate = CameraUpdate.newLatLngZoom(
+        LatLng(userLat, userLon),
+        8,
+      );
+      await _mapController.animateCamera(
+        cameraUpdate,
+        duration: const Duration(milliseconds: 1000),
+      );
     }
 
     await _addUserLocationMarker();
@@ -168,7 +181,10 @@ class _HumidityMapState extends State<HumidityMap> {
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("humidity-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource("humidity-data", {
+      "type": "FeatureCollection",
+      "features": features,
+    });
 
     await _mapController.removeLayer("humidity-circles");
     await _mapController.addLayer(
@@ -202,12 +218,20 @@ class _HumidityMapState extends State<HumidityMap> {
       ),
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['humidity-circles'], null);
+    _mapController.onFeatureTapped.add((
+      dynamic feature,
+      Point<double> point,
+      LatLng latLng,
+      String layerId,
+    ) async {
+      final features = await _mapController.queryRenderedFeatures(point, [
+        'humidity-circles',
+      ], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
+        if (_selectedStationId != null)
+          AdvancedWeatherChart.updateStationId(stationId);
         setState(() {
           _selectedStationId = stationId;
         });
@@ -251,7 +275,10 @@ class _HumidityMapState extends State<HumidityMap> {
         const SizedBox(height: 8),
         _buildColorBarLabels(),
         const SizedBox(height: 12),
-        Text(context.i18n.unit_relative_humidity, style: context.theme.textTheme.labelMedium),
+        Text(
+          context.i18n.unit_relative_humidity,
+          style: context.theme.textTheme.labelMedium,
+        ),
       ],
     );
   }
@@ -279,7 +306,12 @@ class _HumidityMapState extends State<HumidityMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 12))).toList(),
+        children:
+            labels
+                .map(
+                  (label) => Text(label, style: const TextStyle(fontSize: 12)),
+                )
+                .toList(),
       ),
     );
   }
@@ -337,13 +369,18 @@ class _HumidityMapState extends State<HumidityMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
-                List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                List<WeatherStation> weatherData = await ExpTech().getWeather(
+                  time,
+                );
 
                 humidityDataList = [];
 
                 humidityDataList =
                     weatherData
-                        .where((station) => station.data.air.relative_humidity != -99)
+                        .where(
+                          (station) =>
+                              station.data.air.relative_humidity != -99,
+                        )
                         .map(
                           (station) => HumidityData(
                             id: station.id,
@@ -375,9 +412,15 @@ class _HumidityMapState extends State<HumidityMap> {
               return Container(
                 decoration: BoxDecoration(
                   color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -388,7 +431,10 @@ class _HumidityMapState extends State<HumidityMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                       AdvancedWeatherChart(
                         type: "humidity",

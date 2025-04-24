@@ -6,7 +6,7 @@ import 'package:dpip/app/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/model/history.dart';
+import 'package:dpip/api/model/history.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:dpip/util/time_convert.dart';
 import 'package:dpip/widget/error/region_out_of_service.dart';
@@ -50,7 +50,8 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       getSavedLocation();
     }
     final code = Global.preference.getInt("user-code");
@@ -66,7 +67,11 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
+    final grouped = groupBy(
+      historyList,
+      (e) =>
+          DateFormat(context.i18n.full_date_format, locale).format(e.time.send),
+    );
     if (region == null) {
       return const RegionOutOfService();
     }
@@ -93,9 +98,17 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
               DateTimelineItem(key),
               ...historyGroup.map((history) {
                 final int? expireTimestamp = history.time.expires['all'];
-                final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-                final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-                return HistoryTimelineItem(expired: isExpired, history: history, last: index == historyList.length - 1);
+                final TZDateTime expireTimeUTC = convertToTZDateTime(
+                  expireTimestamp ?? 0,
+                );
+                final bool isExpired = TZDateTime.now(
+                  UTC,
+                ).isAfter(expireTimeUTC.toUtc());
+                return HistoryTimelineItem(
+                  expired: isExpired,
+                  history: history,
+                  last: index == historyList.length - 1,
+                );
               }),
             ],
           );

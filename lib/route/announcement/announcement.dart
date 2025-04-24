@@ -1,5 +1,5 @@
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/model/announcement.dart';
+import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/util/extension/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -60,7 +60,8 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
 
   Future<void> _fetchAnnouncements() async {
     try {
-      final fetchedAnnouncements = (await ExpTech().getAnnouncement()).reversed.toList();
+      final fetchedAnnouncements =
+          (await ExpTech().getAnnouncement()).reversed.toList();
       setState(() {
         announcements = fetchedAnnouncements;
         isLoading = false;
@@ -82,7 +83,10 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [const SizedBox(height: 16), Expanded(child: _buildAnnouncementList())],
+            children: [
+              const SizedBox(height: 16),
+              Expanded(child: _buildAnnouncementList()),
+            ],
           ),
         ),
       ),
@@ -111,7 +115,11 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AnnouncementDetailPage(announcement: announcements[index], tagTypes: tagTypes),
+                  builder:
+                      (context) => AnnouncementDetailPage(
+                        announcement: announcements[index],
+                        tagTypes: tagTypes,
+                      ),
                 ),
               );
             },
@@ -127,7 +135,12 @@ class AnnouncementCard extends StatelessWidget {
   final List<TagType> tagTypes;
   final VoidCallback onTap;
 
-  const AnnouncementCard({super.key, required this.announcement, required this.tagTypes, required this.onTap});
+  const AnnouncementCard({
+    super.key,
+    required this.announcement,
+    required this.tagTypes,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +162,9 @@ class AnnouncementCard extends StatelessWidget {
                   children: [
                     Text(
                       announcement.title,
-                      style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: context.theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -164,7 +179,9 @@ class AnnouncementCard extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: context.theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                color: context.theme.textTheme.bodySmall?.color?.withOpacity(
+                  0.5,
+                ),
               ),
             ],
           ),
@@ -194,7 +211,10 @@ class AnnouncementCard extends StatelessWidget {
     return Wrap(
       spacing: 4,
       runSpacing: 4,
-      children: announcement.tags.map((tagId) => _buildGlassyTag(context, _getTagTypeById(tagId))).toList(),
+      children:
+          announcement.tags
+              .map((tagId) => _buildGlassyTag(context, _getTagTypeById(tagId)))
+              .toList(),
     );
   }
 
@@ -204,7 +224,10 @@ class AnnouncementCard extends StatelessWidget {
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withOpacity(0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      label: Text(
+        tagType.text,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }
@@ -213,12 +236,19 @@ class AnnouncementDetailPage extends StatelessWidget {
   final Announcement announcement;
   final List<TagType> tagTypes;
 
-  const AnnouncementDetailPage({super.key, required this.announcement, required this.tagTypes});
+  const AnnouncementDetailPage({
+    super.key,
+    required this.announcement,
+    required this.tagTypes,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.i18n.announcement_details), elevation: 0),
+      appBar: AppBar(
+        title: Text(context.i18n.announcement_details),
+        elevation: 0,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -227,7 +257,9 @@ class AnnouncementDetailPage extends StatelessWidget {
             children: [
               Text(
                 announcement.title,
-                style: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: context.theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               _buildDateChip(context),
@@ -235,14 +267,26 @@ class AnnouncementDetailPage extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: announcement.tags.map((tagId) => _buildGlassyTag(context, _getTagTypeById(tagId))).toList(),
+                children:
+                    announcement.tags
+                        .map(
+                          (tagId) =>
+                              _buildGlassyTag(context, _getTagTypeById(tagId)),
+                        )
+                        .toList(),
               ),
               const SizedBox(height: 24),
               MarkdownBody(
                 data: announcement.content,
-                styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-                  h1: context.theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-                  h2: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                styleSheet: MarkdownStyleSheet.fromTheme(
+                  Theme.of(context),
+                ).copyWith(
+                  h1: context.theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  h2: context.theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                   p: context.theme.textTheme.bodyLarge,
                 ),
               ),
@@ -284,7 +328,10 @@ class AnnouncementDetailPage extends StatelessWidget {
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withOpacity(0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+      label: Text(
+        tagType.text,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

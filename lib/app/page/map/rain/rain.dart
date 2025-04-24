@@ -5,7 +5,7 @@ import "package:dpip/api/exptech.dart";
 import "package:dpip/app/page/map/meteor.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/model/weather/rain.dart";
+import "package:dpip/api/model/weather/rain.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/map_utils.dart";
 import "package:dpip/widget/list/rain_time_selector.dart";
@@ -68,7 +68,8 @@ class _RainMapState extends State<RainMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS &&
+        (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
@@ -78,7 +79,9 @@ class _RainMapState extends State<RainMap> {
 
     await _mapController.addSource(
       "rain-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      const GeojsonSourceProperties(
+        data: {"type": "FeatureCollection", "features": []},
+      ),
     );
 
     rainTimeList = await ExpTech().getRainList();
@@ -91,7 +94,9 @@ class _RainMapState extends State<RainMap> {
     if (isUserLocationValid) {
       await _mapController.addSource(
         "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        const GeojsonSourceProperties(
+          data: {"type": "FeatureCollection", "features": []},
+        ),
       );
       await _mapController.setGeoJsonSource("markers-geojson", {
         "type": "FeatureCollection",
@@ -106,8 +111,14 @@ class _RainMapState extends State<RainMap> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+      final cameraUpdate = CameraUpdate.newLatLngZoom(
+        LatLng(userLat, userLon),
+        8,
+      );
+      await _mapController.animateCamera(
+        cameraUpdate,
+        duration: const Duration(milliseconds: 1000),
+      );
     }
 
     await _addUserLocationMarker();
@@ -214,7 +225,10 @@ class _RainMapState extends State<RainMap> {
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("rain-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource("rain-data", {
+      "type": "FeatureCollection",
+      "features": features,
+    });
 
     await _mapController.removeLayer("rain-0-circles");
     await _mapController.addLayer(
@@ -317,12 +331,21 @@ class _RainMapState extends State<RainMap> {
       ],
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['rain-circles', "rain-0-circles"], null);
+    _mapController.onFeatureTapped.add((
+      dynamic feature,
+      Point<double> point,
+      LatLng latLng,
+      String layerId,
+    ) async {
+      final features = await _mapController.queryRenderedFeatures(point, [
+        'rain-circles',
+        "rain-0-circles",
+      ], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
+        if (_selectedStationId != null)
+          AdvancedWeatherChart.updateStationId(stationId);
         setState(() {
           _selectedStationId = stationId;
         });
@@ -401,12 +424,28 @@ class _RainMapState extends State<RainMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["0", "10", "30", "50", "100", "200", "300", "500", "1000", "2000+"];
+    final labels = [
+      "0",
+      "10",
+      "30",
+      "50",
+      "100",
+      "200",
+      "300",
+      "500",
+      "1000",
+      "2000+",
+    ];
     return SizedBox(
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 10))).toList(),
+        children:
+            labels
+                .map(
+                  (label) => Text(label, style: const TextStyle(fontSize: 10)),
+                )
+                .toList(),
       ),
     );
   }
@@ -484,9 +523,15 @@ class _RainMapState extends State<RainMap> {
               return Container(
                 decoration: BoxDecoration(
                   color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    ),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -497,7 +542,10 @@ class _RainMapState extends State<RainMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
                       ),
                       AdvancedWeatherChart(
                         type: "precipitation",
