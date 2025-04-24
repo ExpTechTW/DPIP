@@ -408,10 +408,26 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       });
     });
     if (Platform.isAndroid) {
-      setState(() async {
-        autoStartPermission = await Autostarter.checkAutoStartState() ?? false;
-        batteryOptimizationPermission = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
-      });
+      Future<void> checkAutoStart() async {
+        final autoStart = await Autostarter.checkAutoStartState();
+        if (mounted) {
+          setState(() {
+            autoStartPermission = autoStart ?? false;
+          });
+        }
+      }
+      
+      Future<void> checkBatteryOptimization() async {
+        final batteryOptimization = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+        if (mounted) {
+          setState(() {
+            batteryOptimizationPermission = batteryOptimization ?? false;
+          });
+        }
+      }
+      
+      checkAutoStart();
+      checkBatteryOptimization();
     }
   }
 
