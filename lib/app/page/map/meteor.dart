@@ -502,7 +502,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                           weatherData['time']![index].toInt(),
                         );
                         return SideTitleWidget(
-                          axisSide: meta.axisSide,
+                          meta: meta,
                           child: Text(
                             DateFormat(
                               context.i18n.map_hh_time,
@@ -512,7 +512,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                         );
                       } else {
                         return SideTitleWidget(
-                          axisSide: meta.axisSide,
+                          meta: meta,
                           child: const Text(''),
                         );
                       }

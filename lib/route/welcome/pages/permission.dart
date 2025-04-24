@@ -18,7 +18,8 @@ class WelcomePermissionPage extends StatefulWidget {
   State<WelcomePermissionPage> createState() => _WelcomePermissionPageState();
 }
 
-class _WelcomePermissionPageState extends State<WelcomePermissionPage> with WidgetsBindingObserver {
+class _WelcomePermissionPageState extends State<WelcomePermissionPage>
+    with WidgetsBindingObserver {
   late Future<List<Permission>> _permissionsFuture;
   late Future<bool> _autoStartPermission;
   bool _autoStartStatus = false;
@@ -29,15 +30,16 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     if (!_isNotificationPermission) {
       await Permission.notification.request();
       if (Platform.isIOS) {
-        NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-          alert: true,
-          announcement: true,
-          badge: true,
-          carPlay: true,
-          criticalAlert: true,
-          provisional: true,
-          sound: true,
-        );
+        NotificationSettings iosrp = await FirebaseMessaging.instance
+            .requestPermission(
+              alert: true,
+              announcement: true,
+              badge: true,
+              carPlay: true,
+              criticalAlert: true,
+              provisional: true,
+              sound: true,
+            );
         if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
           _isNotificationPermission = true;
         }
@@ -61,7 +63,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   }
 
   void _autoStartStatusCheck() async {
-    _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+    _autoStartStatus = await Autostarter.checkAutoStartState() ?? true;
     _autoStartPermission = Future.value(_autoStartStatus);
   }
 
@@ -71,8 +73,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       _isNotificationPermission = status.isGranted;
     } else if (Platform.isIOS) {
       await Firebase.initializeApp();
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      _isNotificationPermission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      final settings =
+          await FirebaseMessaging.instance.getNotificationSettings();
+      _isNotificationPermission =
+          settings.authorizationStatus == AuthorizationStatus.authorized;
     }
   }
 
@@ -107,11 +111,17 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           permissions = [
             Permission.notification,
             Permission.locationAlways,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            androidInfo.version.sdkInt <= 32
+                ? Permission.storage
+                : Permission.photos,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [Permission.notification, Permission.locationAlways, Permission.photos];
+          permissions = [
+            Permission.notification,
+            Permission.locationAlways,
+            Permission.photos,
+          ];
         }
       } else {
         if (Platform.isAndroid) {
@@ -119,11 +129,17 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           permissions = [
             Permission.notification,
             Permission.location,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            androidInfo.version.sdkInt <= 32
+                ? Permission.storage
+                : Permission.photos,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [Permission.notification, Permission.location, Permission.photos];
+          permissions = [
+            Permission.notification,
+            Permission.location,
+            Permission.photos,
+          ];
         }
       }
 
@@ -135,7 +151,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     return permissions;
   }
 
-  List<PermissionItem> _createPermissionItems(List<Permission> permissions, BuildContext context) {
+  List<PermissionItem> _createPermissionItems(
+    List<Permission> permissions,
+    BuildContext context,
+  ) {
     final items = <PermissionItem>[];
     for (Permission permission in permissions) {
       IconData icon;
@@ -197,7 +216,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         decoration: BoxDecoration(
           color: context.colors.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
-          border: item.isHighlighted ? Border.all(color: Colors.red, width: 2) : null,
+          border:
+              item.isHighlighted
+                  ? Border.all(color: Colors.red, width: 2)
+                  : null,
         ),
         child: ListTile(
           leading: CircleAvatar(
@@ -217,11 +239,18 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       future: item.permission.status,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2));
+          return const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          );
         }
         final status = snapshot.data ?? PermissionStatus.denied;
 
-        return Switch(value: status.isGranted, onChanged: (value) => _handlePermissionChange(item, value));
+        return Switch(
+          value: status.isGranted,
+          onChanged: (value) => _handlePermissionChange(item, value),
+        );
       },
     );
   }
@@ -247,15 +276,16 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               await openAppSettings();
             }
           } else if (Platform.isIOS) {
-            NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-              alert: true,
-              announcement: true,
-              badge: true,
-              carPlay: true,
-              criticalAlert: true,
-              provisional: true,
-              sound: true,
-            );
+            NotificationSettings iosrp = await FirebaseMessaging.instance
+                .requestPermission(
+                  alert: true,
+                  announcement: true,
+                  badge: true,
+                  carPlay: true,
+                  criticalAlert: true,
+                  provisional: true,
+                  sound: true,
+                );
             if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
               _isNotificationPermission = true;
             }
@@ -326,7 +356,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change permission: ${item.text}')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to change permission: ${item.text}')),
+      );
     } finally {
       setState(() {
         _isRequestingPermission = false;
@@ -342,7 +374,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             title: Text(context.i18n.permission_request),
             content: Text(context.i18n.manual_permission_enablement),
             actions: [
-              TextButton(child: Text(context.i18n.cancel), onPressed: () => Navigator.of(context).pop()),
+              TextButton(
+                child: Text(context.i18n.cancel),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
               TextButton(
                 child: Text(context.i18n.confirm),
                 onPressed: () {
@@ -361,7 +396,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(onPressed: getNotify, child: Text(context.i18n.next_step)),
+          child: FilledButton(
+            onPressed: getNotify,
+            child: Text(context.i18n.next_step),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -375,7 +413,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Icon(Symbols.security_rounded, size: 80, color: context.colors.primary),
+                    child: Icon(
+                      Symbols.security_rounded,
+                      size: 80,
+                      color: context.colors.primary,
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -423,8 +465,13 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                   return const Center(child: Text('No permissions to display'));
                 }
 
-                final permissionItems = _createPermissionItems(snapshot.data!, context);
-                return Column(children: permissionItems.map(_buildPermissionCard).toList());
+                final permissionItems = _createPermissionItems(
+                  snapshot.data!,
+                  context,
+                );
+                return Column(
+                  children: permissionItems.map(_buildPermissionCard).toList(),
+                );
               },
             ),
             // if (Platform.isAndroid)

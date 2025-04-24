@@ -6,3 +6,4 @@
 /ios/build
 *.g.dart
 /lib/l10n
+macos/Flutter/ephemeral
