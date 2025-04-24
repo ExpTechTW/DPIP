@@ -1,8 +1,9 @@
 import "package:dpip/global.dart";
-import "package:dpip/main.dart";
+import "package:dpip/models/settings.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/settings/theme/theme_radio_tile.dart";
 import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 
 class SettingsThemeView extends StatefulWidget {
   const SettingsThemeView({super.key});
@@ -29,17 +30,6 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
     system = ThemeData(brightness: brightness);
   }
 
-  Future<void> setTheme(String theme) async {
-    DpipApp.of(context)!.changeTheme(theme);
-    await Global.preference.setString("theme", theme);
-    setState(() {
-      themeMode = theme;
-      if (theme == "system") {
-        _updateSystemTheme();
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -49,32 +39,36 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                ThemeRadioTile(
-                  value: "light",
-                  groupValue: themeMode,
-                  onTap: () => setTheme("light"),
-                  title: context.i18n.theme_light,
-                  theme: light,
-                ),
-                const SizedBox(height: 16),
-                ThemeRadioTile(
-                  value: "dark",
-                  groupValue: themeMode,
-                  onTap: () => setTheme("dark"),
-                  title: context.i18n.theme_dark,
-                  theme: dark,
-                ),
-                const SizedBox(height: 16),
-                ThemeRadioTile(
-                  value: "system",
-                  groupValue: themeMode,
-                  onTap: () => setTheme("system"),
-                  title: context.i18n.theme_system,
-                  theme: system,
-                ),
-              ],
+            child: Consumer<SettingsModel>(
+              builder: (context, model, child) {
+                return Column(
+                  children: [
+                    ThemeRadioTile(
+                      value: ThemeMode.light,
+                      groupValue: model.themeMode,
+                      onTap: () => model.setThemeMode(ThemeMode.light),
+                      title: context.i18n.theme_light,
+                      theme: light,
+                    ),
+                    const SizedBox(height: 16),
+                    ThemeRadioTile(
+                      value: ThemeMode.dark,
+                      groupValue: model.themeMode,
+                      onTap: () => model.setThemeMode(ThemeMode.dark),
+                      title: context.i18n.theme_dark,
+                      theme: dark,
+                    ),
+                    const SizedBox(height: 16),
+                    ThemeRadioTile(
+                      value: ThemeMode.system,
+                      groupValue: model.themeMode,
+                      onTap: () => model.setThemeMode(ThemeMode.system),
+                      title: context.i18n.theme_system,
+                      theme: system,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ],

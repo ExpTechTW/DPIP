@@ -3,10 +3,10 @@ import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
 class ThemeRadioTile extends StatelessWidget {
-  final String value;
-  final String groupValue;
+  final ThemeMode value;
+  final ThemeMode groupValue;
   final void Function()? onTap;
-  final void Function(String?)? onChanged;
+  final void Function(ThemeMode?)? onChanged;
   final String title;
   final ThemeData theme;
 
@@ -36,11 +36,11 @@ class ThemeRadioTile extends StatelessWidget {
               decoration: BoxDecoration(color: theme.colorScheme.surfaceContainer),
               child: Center(
                 child: Icon(
-                  value == "light"
-                      ? Symbols.light_mode
-                      : value == "dark"
-                      ? Symbols.dark_mode
-                      : Symbols.smartphone,
+                  switch (value) {
+                    ThemeMode.light => Symbols.light_mode,
+                    ThemeMode.dark => Symbols.dark_mode,
+                    ThemeMode.system => Symbols.smartphone,
+                  },
                   color: theme.colorScheme.onSurface,
                   size: 32,
                 ),

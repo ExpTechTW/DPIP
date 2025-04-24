@@ -32,7 +32,7 @@ class _SettingsLocaleViewState extends State<SettingsLocaleView> {
               await Navigator.of(
                 context,
                 rootNavigator: true,
-              ).push(MaterialPageRoute(builder: (context) => LocaleSelectorRoute(locale)));
+              ).push(MaterialPageRoute(builder: (context) => const LocaleSelectorRoute()));
 
               setState(() {
                 locale = Global.preference.getString("locale")?.asLocale ?? Localizations.localeOf(context);
