@@ -75,46 +75,50 @@ class _TemperatureMapState extends State<TemperatureMap> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-        "temperature-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      "temperature-data",
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+    );
 
     weather_list = await ExpTech().getWeatherList();
 
     List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
-    temperatureDataList = weatherData
-        .where((station) => station.data.air.temperature != -99)
-        .map((station) => TemperatureData(
-              id: station.id,
-              latitude: station.station.lat,
-              longitude: station.station.lng,
-              temperature: station.data.air.temperature,
-              stationName: station.station.name,
-              county: station.station.county,
-              town: station.station.town,
-            ))
-        .toList();
+    temperatureDataList =
+        weatherData
+            .where((station) => station.data.air.temperature != -99)
+            .map(
+              (station) => TemperatureData(
+                id: station.id,
+                latitude: station.station.lat,
+                longitude: station.station.lng,
+                temperature: station.data.air.temperature,
+                stationName: station.station.name,
+                county: station.station.county,
+                town: station.station.town,
+              ),
+            )
+            .toList();
 
     await addTemperatureCircles(temperatureDataList);
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-      await _mapController.setGeoJsonSource(
         "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
+        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
       );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -150,19 +154,19 @@ class _TemperatureMapState extends State<TemperatureMap> {
   }
 
   Future<void> addTemperatureCircles(List<TemperatureData> temperatureDataList) async {
-    final features = temperatureDataList
-        .map((data) => {
-              "type": "Feature",
-              "properties": {
-                "id": data.id,
-                "temperature": data.temperature,
+    final features =
+        temperatureDataList
+            .map(
+              (data) => {
+                "type": "Feature",
+                "properties": {"id": data.id, "temperature": data.temperature},
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [data.longitude, data.latitude],
+                },
               },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [data.longitude, data.latitude]
-              }
-            })
-        .toList();
+            )
+            .toList();
 
     await _mapController.setGeoJsonSource("temperature-data", {"type": "FeatureCollection", "features": features});
 
@@ -206,12 +210,8 @@ class _TemperatureMapState extends State<TemperatureMap> {
       ),
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
-      final features = await _mapController.queryRenderedFeatures(
-        point,
-        ['temperature-circles'],
-        null,
-      );
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
+      final features = await _mapController.queryRenderedFeatures(point, ['temperature-circles'], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
@@ -239,7 +239,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
         textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
-          [0, 2]
+          [0, 2],
         ],
       ),
       minzoom: 9,
@@ -292,12 +292,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels
-            .map((label) => Text(
-                  label,
-                  style: const TextStyle(fontSize: 12),
-                ))
-            .toList(),
+        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 12))).toList(),
       ),
     );
   }
@@ -359,18 +354,21 @@ class _TemperatureMapState extends State<TemperatureMap> {
 
                 temperatureDataList = [];
 
-                temperatureDataList = weatherData
-                    .where((station) => station.data.air.temperature != -99)
-                    .map((station) => TemperatureData(
-                          id: station.id,
-                          latitude: station.station.lat,
-                          longitude: station.station.lng,
-                          temperature: station.data.air.temperature,
-                          stationName: station.station.name,
-                          county: station.station.county,
-                          town: station.station.town,
-                        ))
-                    .toList();
+                temperatureDataList =
+                    weatherData
+                        .where((station) => station.data.air.temperature != -99)
+                        .map(
+                          (station) => TemperatureData(
+                            id: station.id,
+                            latitude: station.station.lat,
+                            longitude: station.station.lng,
+                            temperature: station.data.air.temperature,
+                            stationName: station.station.name,
+                            county: station.station.county,
+                            town: station.station.town,
+                          ),
+                        )
+                        .toList();
 
                 await addTemperatureCircles(temperatureDataList);
 
@@ -380,12 +378,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
               },
             ),
           ),
-        if (_showLegend)
-          Positioned(
-            left: 6,
-            bottom: 50,
-            child: _buildLegend(),
-          ),
+        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
         if (_selectedStationId != null)
           DraggableScrollableSheet(
             initialChildSize: 0.3,
@@ -399,11 +392,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
                   color: context.theme.cardColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -5),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -414,10 +403,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
                         type: "temperature",

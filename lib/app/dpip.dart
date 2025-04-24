@@ -84,29 +84,29 @@ class _DpipState extends State<Dpip> {
 
       if ((update && !skip) || criticalUpdate) {
         if (!criticalUpdate && Platform.isAndroid) {
-          InAppUpdate.checkForUpdate().then((info) {
-            setState(() {
-              if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-                if (info.immediateUpdateAllowed) {
-                  InAppUpdate.performImmediateUpdate();
-                } else if (info.flexibleUpdateAllowed) {
-                  InAppUpdate.startFlexibleUpdate().then((updateResult) {
-                    if (updateResult == AppUpdateResult.success) {
-                      InAppUpdate.completeFlexibleUpdate();
+          InAppUpdate.checkForUpdate()
+              .then((info) {
+                setState(() {
+                  if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+                    if (info.immediateUpdateAllowed) {
+                      InAppUpdate.performImmediateUpdate();
+                    } else if (info.flexibleUpdateAllowed) {
+                      InAppUpdate.startFlexibleUpdate().then((updateResult) {
+                        if (updateResult == AppUpdateResult.success) {
+                          InAppUpdate.completeFlexibleUpdate();
+                        }
+                      });
                     }
-                  });
-                }
-              }
-            });
-          }).catchError((e) {});
+                  }
+                });
+              })
+              .catchError((e) {});
         } else {
           if (mounted) {
             Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
               MaterialPageRoute(
-                  builder: (context) => UpdateRequiredPage(
-                        showSkipButton: !criticalUpdate,
-                        lastVersion: lastVersion,
-                      )),
+                builder: (context) => UpdateRequiredPage(showSkipButton: !criticalUpdate, lastVersion: lastVersion),
+              ),
               (Route<dynamic> route) => false,
             );
           }
@@ -143,10 +143,7 @@ class _DpipState extends State<Dpip> {
         return AlertDialog(
           icon: const Icon(Symbols.signal_disconnected_rounded),
           title: Text(context.i18n.abnormal),
-          content: Text(
-            context.i18n.network_or_server_error,
-            textAlign: TextAlign.center,
-          ),
+          content: Text(context.i18n.network_or_server_error, textAlign: TextAlign.center),
           actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             TextButton(
@@ -218,13 +215,7 @@ class _DpipState extends State<Dpip> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          HomePage(),
-          HistoryPage(),
-          MapPage(),
-          MorePage(),
-          MePage(),
-        ],
+        children: const [HomePage(), HistoryPage(), MapPage(), MorePage(), MePage()],
       ),
     );
   }

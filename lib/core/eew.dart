@@ -79,8 +79,10 @@ double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, do
   double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   double x = max(hypocenterDistance, 3);
   double gpv600 =
-      pow(10, 0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x)
-          .toDouble();
+      pow(
+        10,
+        0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x,
+      ).toDouble();
   double pgv400 = gpv600 * 1.31;
   double pgv = pgv400 * 1.0;
   return 2.68 + 1.72 * log(pgv) / ln10;
@@ -182,14 +184,14 @@ String intensityToNumberString(int level) {
   return (level == 5)
       ? "5⁻"
       : (level == 6)
-          ? "5⁺"
-          : (level == 7)
-              ? "6⁻"
-              : (level == 8)
-                  ? "6⁺"
-                  : (level == 9)
-                      ? "7"
-                      : level.toString();
+      ? "5⁺"
+      : (level == 7)
+      ? "6⁻"
+      : (level == 8)
+      ? "6⁺"
+      : (level == 9)
+      ? "7"
+      : level.toString();
 }
 
 WaveTime calculateWaveTime(double depth, double distance) {
@@ -233,7 +235,13 @@ WaveTime calculateWaveTime(double depth, double distance) {
 }
 
 Map<String, dynamic> eewLocationInfo(
-    double mag, double depth, double eqLat, double eqLng, double userLat, double userLon) {
+  double mag,
+  double depth,
+  double eqLat,
+  double eqLng,
+  double userLat,
+  double userLon,
+) {
   final distSurface = distance(eqLat, eqLng, userLat, userLon);
   final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
   final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
@@ -241,8 +249,5 @@ Map<String, dynamic> eewLocationInfo(
   if (intensity > 4.5) {
     intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
   }
-  return {
-    "dist": dist,
-    "i": intensity,
-  };
+  return {"dist": dist, "i": intensity};
 }

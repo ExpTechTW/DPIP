@@ -10,14 +10,7 @@ class ListTileGroupHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Text(
-        title,
-        style: TextStyle(
-          color: context.colors.primary,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: Text(title, style: TextStyle(color: context.colors.primary, fontSize: 14, fontWeight: FontWeight.bold)),
     );
   }
 }

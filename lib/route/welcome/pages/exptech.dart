@@ -63,7 +63,7 @@ class WelcomeExpTechPage extends StatelessWidget {
                             color: context.colors.primary.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -82,27 +82,17 @@ class WelcomeExpTechPage extends StatelessWidget {
                   children: [
                     Text(
                       context.i18n.who_we_are,
-                      style: context.theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      context.i18n.exptech_studio_description,
-                      style: context.theme.textTheme.bodyMedium,
-                    ),
+                    Text(context.i18n.exptech_studio_description, style: context.theme.textTheme.bodyMedium),
                     const SizedBox(height: 16),
                     Text(
                       context.i18n.our_mission,
-                      style: context.theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      context.i18n.founding_mission,
-                      style: context.theme.textTheme.bodyMedium,
-                    )
+                    Text(context.i18n.founding_mission, style: context.theme.textTheme.bodyMedium),
                   ],
                 ),
               ),

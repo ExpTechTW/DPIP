@@ -36,17 +36,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       boxShadow: kElevationToShadow[4],
       color: backgroundColor,
     ),
-    end: BoxDecoration(
-      borderRadius: BorderRadius.zero,
-      boxShadow: kElevationToShadow[4],
-      color: backgroundColor,
-    ),
+    end: BoxDecoration(borderRadius: BorderRadius.zero, boxShadow: kElevationToShadow[4], color: backgroundColor),
   ).chain(CurveTween(curve: Curves.linear));
 
-  final opacityTween = Tween(
-    begin: 0.0,
-    end: 1.0,
-  ).chain(CurveTween(curve: Curves.linear));
+  final opacityTween = Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.linear));
 
   late final sheetInitialSize = context.padding.bottom / context.dimension.height + 0.2;
   final sheetController = DraggableScrollableController();
@@ -83,13 +76,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
           markers.add({
             "type": "Feature",
-            "properties": {
-              "intensity": town.intensity,
-            },
+            "properties": {"intensity": town.intensity},
             "geometry": {
               "coordinates": [town.lon, town.lat],
-              "type": "Point"
-            }
+              "type": "Point",
+            },
           });
 
           if (bounds.isEmpty) {
@@ -105,20 +96,14 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         "properties": {
           "intensity": 10, // 10 is for classifying epicenter cross
         },
-        "geometry": {
-          "coordinates": data.latlng.toGeoJsonCoordinates(),
-          "type": "Point",
-        }
+        "geometry": {"coordinates": data.latlng.toGeoJsonCoordinates(), "type": "Point"},
       });
 
       expandBounds(bounds, data.latlng);
 
       await controller.moveCamera(
         CameraUpdate.newLatLngBounds(
-          LatLngBounds(
-            southwest: LatLng(bounds[0], bounds[1]),
-            northeast: LatLng(bounds[2], bounds[3]),
-          ),
+          LatLngBounds(southwest: LatLng(bounds[0], bounds[1]), northeast: LatLng(bounds[2], bounds[3])),
           left: 32,
           right: 32,
           top: 32,
@@ -130,13 +115,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         await controller.moveCamera(CameraUpdate.zoomTo(9));
       }
 
-      await controller.addGeoJsonSource(
-        "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": markers,
-        },
-      );
+      await controller.addGeoJsonSource("markers-geojson", {"type": "FeatureCollection", "features": markers});
 
       final waves = GeoJsonBuilder();
 
@@ -149,18 +128,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
         if (distance["s_dist"] == null || distance["s_dist"]! < 0) continue;
 
-        waves.addFeature(
-          circleFeature(
-            center: LatLng(data.latitude, data.longitude),
-            radius: distance["s_dist"]!,
-          ),
-        );
+        waves.addFeature(circleFeature(center: LatLng(data.latitude, data.longitude), radius: distance["s_dist"]!));
       }
 
-      await controller.addGeoJsonSource(
-        "waves-geojson",
-        waves.build(),
-      );
+      await controller.addGeoJsonSource("waves-geojson", waves.build());
 
       if (!mounted) return;
 
@@ -226,20 +197,16 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           fillColor: [
             "match",
             ["get", "NAME"],
-            ...cityMaxIntensity.entries.expand((entry) => [
-                  entry.key,
-                  IntensityColor.intensity(entry.value).toHexStringRGB(),
-                ]),
+            ...cityMaxIntensity.entries.expand(
+              (entry) => [entry.key, IntensityColor.intensity(entry.value).toHexStringRGB()],
+            ),
             context.colors.surfaceContainerHighest.toHexStringRGB(),
           ],
           fillOpacity: 1,
         ),
       );
 
-      await controller.setLayerProperties(
-        "town",
-        const FillLayerProperties(fillOpacity: 0),
-      );
+      await controller.setLayerProperties("town", const FillLayerProperties(fillOpacity: 0));
 
       setState(() {
         report = data;
@@ -285,10 +252,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    final appBar = AppBar(
-      elevation: 4,
-      title: Text(context.i18n.report),
-    );
+    final appBar = AppBar(elevation: 4, title: Text(context.i18n.report));
 
     return Scaffold(
       body: Stack(
@@ -314,15 +278,10 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       report!.depth <= 35 &&
                       (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
                     Chip(
-                      avatar: Icon(
-                        Symbols.tsunami_rounded,
-                        color: context.theme.extendedColors.blue,
-                      ),
+                      avatar: Icon(Symbols.tsunami_rounded, color: context.theme.extendedColors.blue),
                       label: Text(
                         context.i18n.report_offing,
-                        style: TextStyle(
-                          color: context.theme.extendedColors.blue,
-                        ),
+                        style: TextStyle(color: context.theme.extendedColors.blue),
                       ),
                       backgroundColor: Colors.blue.withOpacity(0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
@@ -367,36 +326,32 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
                 return DecoratedBoxTransition(
                   decoration: animController.drive(decorationTween),
-                  child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : report == null
+                  child:
+                      isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : report == null
                           ? Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Row(
-                                children: [
-                                  Flexible(
-                                    flex: 8,
-                                    child: Text(
-                                      context.i18n.report_error,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  flex: 8,
+                                  child: Text(context.i18n.report_error, style: const TextStyle(fontSize: 16)),
+                                ),
+                                const SizedBox(width: 10),
+                                Flexible(
+                                  flex: 2,
+                                  child: IconButton(
+                                    icon: const Icon(Symbols.refresh),
+                                    style: ElevatedButton.styleFrom(foregroundColor: context.colors.onSurface),
+                                    onPressed: () {
+                                      refreshReport();
+                                    },
                                   ),
-                                  const SizedBox(width: 10),
-                                  Flexible(
-                                    flex: 2,
-                                    child: IconButton(
-                                      icon: const Icon(Symbols.refresh),
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: context.colors.onSurface,
-                                      ),
-                                      onPressed: () {
-                                        refreshReport();
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
+                                ),
+                              ],
+                            ),
+                          )
                           : ReportSheetContent(report: report!, controller: controller, focus: focus),
                 );
               },
@@ -408,10 +363,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
             right: 0,
             child: Visibility(
               visible: isAppBarVisible,
-              child: FadeTransition(
-                opacity: animController.drive(opacityTween),
-                child: appBar,
-              ),
+              child: FadeTransition(opacity: animController.drive(opacityTween), child: appBar),
             ),
           ),
         ],

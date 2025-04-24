@@ -6,30 +6,20 @@ class UpdateCard extends StatelessWidget {
   final String description;
   final VoidCallback? onViewDetails;
 
-  const UpdateCard({
-    super.key,
-    required this.title,
-    required this.description,
-    this.onViewDetails,
-  });
+  const UpdateCard({super.key, required this.title, required this.description, this.onViewDetails});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              context.theme.primaryColor.withOpacity(0.1),
-              context.theme.primaryColor.withOpacity(0.3),
-            ],
+            colors: [context.theme.primaryColor.withOpacity(0.1), context.theme.primaryColor.withOpacity(0.3)],
           ),
         ),
         child: Padding(
@@ -68,15 +58,8 @@ class UpdateCard extends StatelessWidget {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.update,
-                  size: 48,
-                  color: Colors.amber,
-                ),
+                decoration: BoxDecoration(color: Colors.amber.withOpacity(0.2), shape: BoxShape.circle),
+                child: const Icon(Icons.update, size: 48, color: Colors.amber),
               ),
             ],
           ),

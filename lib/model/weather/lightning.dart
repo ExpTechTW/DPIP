@@ -8,11 +8,7 @@ class Lightning {
   final int type;
   final Location loc;
 
-  const Lightning({
-    required this.time,
-    required this.type,
-    required this.loc,
-  });
+  const Lightning({required this.time, required this.type, required this.loc});
 
   factory Lightning.fromJson(Map<String, dynamic> json) => _$LightningFromJson(json);
 
@@ -24,10 +20,7 @@ class Location {
   final double lat;
   final double lng;
 
-  const Location({
-    required this.lat,
-    required this.lng,
-  });
+  const Location({required this.lat, required this.lng});
 
   factory Location.fromJson(Map<String, dynamic> json) => _$LocationFromJson(json);
 

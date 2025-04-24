@@ -24,10 +24,7 @@ class WelcomeChangelogDialog extends StatelessWidget {
           child: Text(context.i18n.go_to_view),
           onPressed: () {
             Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ChangelogPage()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangelogPage()));
           },
         ),
       ],

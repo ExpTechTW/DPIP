@@ -98,36 +98,24 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
     String newTileUrl = getTileUrl(radarList.last);
 
-    await _mapController.addSource(
-      "radarSource",
-      RasterSourceProperties(
-        tiles: [newTileUrl],
-        tileSize: 256,
-      ),
-    );
+    await _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
     await _mapController.addLayer(
       "map",
       "town-outline-default",
-      LineLayerProperties(
-        lineColor: context.colors.outline.toHexStringRGB(),
-        lineWidth: 1,
-      ),
+      LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB(), lineWidth: 1),
       sourceLayer: "town",
     );
 
     await _mapController.addLayer(
       "map",
       "town-outline-highlighted",
-      const LineLayerProperties(
-        lineColor: "#9e10fd",
-        lineWidth: 2,
-      ),
+      const LineLayerProperties(lineColor: "#9e10fd", lineWidth: 2),
       sourceLayer: "town",
       filter: [
         'in',
         ['get', 'CODE'],
-        ['literal', widget.item.area]
+        ['literal', widget.item.area],
       ],
     );
 
@@ -154,7 +142,9 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
       if (!mounted) return;
       await _mapController.setLayerProperties(
-          "town-outline-highlighted", LineLayerProperties(lineOpacity: (_blink < 6) ? 1 : 0));
+        "town-outline-highlighted",
+        LineLayerProperties(lineOpacity: (_blink < 6) ? 1 : 0),
+      );
       _blink++;
       if (_blink >= 8) _blink = 0;
     });
@@ -167,22 +157,19 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     isUserLocationValid = (userLon != 0 && userLat != 0);
 
     if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource(
-        "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
-      );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -215,13 +202,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Widget _buildColorBar() {
-    return SizedBox(
-      height: 20,
-      width: 300,
-      child: CustomPaint(
-        painter: ColorBarPainter(dBZColors),
-      ),
-    );
+    return SizedBox(height: 20, width: 300, child: CustomPaint(painter: ColorBarPainter(dBZColors)));
   }
 
   Widget _buildColorBarLabels() {
@@ -230,33 +211,24 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels
-            .map((label) => Text(
-                  label,
-                  style: const TextStyle(fontSize: 9),
-                ))
-            .toList(),
+        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 9))).toList(),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final TZDateTime radarDateTime =
-        TZDateTime.fromMillisecondsSinceEpoch(UTC, radarList.isEmpty ? 0 : int.parse(radarList.last));
+    final TZDateTime radarDateTime = TZDateTime.fromMillisecondsSinceEpoch(
+      UTC,
+      radarList.isEmpty ? 0 : int.parse(radarList.last),
+    );
     final TZDateTime radarTime = TZDateTime.from(radarDateTime, getLocation('Asia/Taipei'));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.item.text.content['all']?.title ?? ""),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ""), elevation: 0),
       body: Stack(
         children: [
-          DpipMap(
-            onMapCreated: _initMap,
-            onStyleLoadedCallback: _loadMap,
-          ),
+          DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
           Positioned(
             right: 4,
             top: 4,
@@ -299,16 +271,10 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                   filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: context.colors.surface.withOpacity(0.5),
-                    ),
+                    decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
                     child: Text(
                       DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.onSurface,
-                      ),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.colors.onSurface),
                     ),
                   ),
                 ),
@@ -324,16 +290,10 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                   filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: context.colors.surface.withOpacity(0.5),
-                    ),
+                    decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
                     child: Text(
                       context.i18n.radar_synthetic_echo,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: context.colors.onSurface,
-                      ),
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.colors.onSurface),
                     ),
                   ),
                 ),
@@ -396,12 +356,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           const SizedBox(width: 12),
           Row(
             children: [
-              Text(
-                subtitle,
-                style: context.theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(subtitle, style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               if (isExpired)
                 LabelChip(
@@ -437,10 +392,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         Container(
           margin: const EdgeInsets.symmetric(vertical: 8),
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            description,
-            style: context.theme.textTheme.bodyLarge,
-          ),
+          child: Text(description, style: context.theme.textTheme.bodyLarge),
         ),
         _buildTimeBar(context, sendTime, localExpireTime, isExpired),
       ],
@@ -455,10 +407,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: context.colors.surfaceContainerHigh, borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -497,16 +446,8 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: context.theme.textTheme.labelLarge?.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
-            ),
-            Text(
-              DateFormat('yyyy/MM/dd HH:mm').format(time),
-              style: context.theme.textTheme.bodyLarge,
-            ),
+            Text(label, style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.onSurfaceVariant)),
+            Text(DateFormat('yyyy/MM/dd HH:mm').format(time), style: context.theme.textTheme.bodyLarge),
           ],
         ),
       ],
@@ -528,25 +469,23 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      city,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: Text(city, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: locations.map((e) {
-                        return Chip(
-                          padding: const EdgeInsets.all(4),
-                          side: BorderSide(color: context.colors.outline),
-                          backgroundColor: context.colors.surfaceContainerHigh,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          label: Text(e.town),
-                        );
-                      }).toList(),
+                      children:
+                          locations.map((e) {
+                            return Chip(
+                              padding: const EdgeInsets.all(4),
+                              side: BorderSide(color: context.colors.outline),
+                              backgroundColor: context.colors.surfaceContainerHigh,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              label: Text(e.town),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ],
@@ -557,9 +496,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       );
     }
 
-    return DetailFieldTile(
-      label: context.i18n.history_affected_area,
-      child: Column(children: areas),
-    );
+    return DetailFieldTile(label: context.i18n.history_affected_area, child: Column(children: areas));
   }
 }

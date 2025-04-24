@@ -34,10 +34,7 @@ class _MorePageState extends State<MorePage> {
     return Scaffold(
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
-        children: [
-          ListTileGroupHeader(title: context.i18n.more_features),
-          ...destinations,
-        ],
+        children: [ListTileGroupHeader(title: context.i18n.more_features), ...destinations],
         onDestinationSelected: (value) {
           setState(() => currentIndex = value);
           controller.jumpToPage(value);
@@ -47,10 +44,7 @@ class _MorePageState extends State<MorePage> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          ReportListPage(),
-          RankingPage(),
-        ],
+        children: const [ReportListPage(), RankingPage()],
       ),
     );
   }

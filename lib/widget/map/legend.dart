@@ -17,10 +17,7 @@ class MapLegend extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label ?? context.i18n.map_legend,
-              style: context.theme.textTheme.titleMedium,
-            ),
+            Text(label ?? context.i18n.map_legend, style: context.theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             ...children,
           ],

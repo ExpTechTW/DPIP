@@ -21,8 +21,10 @@ final List<TagType> tagTypes = [
 ];
 
 TagType _getTagTypeById(int id) {
-  return tagTypes.firstWhere((tagType) => tagType.id == id,
-      orElse: () => TagType(id: -1, text: "未知", color: Colors.grey));
+  return tagTypes.firstWhere(
+    (tagType) => tagType.id == id,
+    orElse: () => TagType(id: -1, text: "未知", color: Colors.grey),
+  );
 }
 
 String _formatDate(int timestamp) {
@@ -74,21 +76,13 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.i18n.announcement),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(context.i18n.announcement), elevation: 0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Expanded(
-                child: _buildAnnouncementList(),
-              ),
-            ],
+            children: [const SizedBox(height: 16), Expanded(child: _buildAnnouncementList())],
           ),
         ),
       ),
@@ -117,10 +111,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AnnouncementDetailPage(
-                    announcement: announcements[index],
-                    tagTypes: tagTypes,
-                  ),
+                  builder: (context) => AnnouncementDetailPage(announcement: announcements[index], tagTypes: tagTypes),
                 ),
               );
             },
@@ -136,21 +127,14 @@ class AnnouncementCard extends StatelessWidget {
   final List<TagType> tagTypes;
   final VoidCallback onTap;
 
-  const AnnouncementCard({
-    super.key,
-    required this.announcement,
-    required this.tagTypes,
-    required this.onTap,
-  });
+  const AnnouncementCard({super.key, required this.announcement, required this.tagTypes, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -165,9 +149,7 @@ class AnnouncementCard extends StatelessWidget {
                   children: [
                     Text(
                       announcement.title,
-                      style: context.theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: context.theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -222,13 +204,7 @@ class AnnouncementCard extends StatelessWidget {
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withOpacity(0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(
-        tagType.text,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
     );
   }
 }
@@ -237,19 +213,12 @@ class AnnouncementDetailPage extends StatelessWidget {
   final Announcement announcement;
   final List<TagType> tagTypes;
 
-  const AnnouncementDetailPage({
-    super.key,
-    required this.announcement,
-    required this.tagTypes,
-  });
+  const AnnouncementDetailPage({super.key, required this.announcement, required this.tagTypes});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.i18n.announcement_details),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(context.i18n.announcement_details), elevation: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -258,9 +227,7 @@ class AnnouncementDetailPage extends StatelessWidget {
             children: [
               Text(
                 announcement.title,
-                style: context.theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: context.theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               _buildDateChip(context),
@@ -317,13 +284,7 @@ class AnnouncementDetailPage extends StatelessWidget {
       side: BorderSide(color: tagType.color),
       backgroundColor: tagType.color.withOpacity(0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      label: Text(
-        tagType.text,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
     );
   }
 }

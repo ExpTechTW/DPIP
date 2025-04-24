@@ -59,16 +59,19 @@ class _WindMapState extends State<WindMap> {
   }
 
   Future<void> _updateWindData(List<WeatherStation> weatherData) async {
-    windDataList = weatherData
-        .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-        .map((station) => WindData(
-              id: station.id,
-              latitude: station.station.lat,
-              longitude: station.station.lng,
-              direction: (station.data.wind.direction + 180) % 360,
-              speed: station.data.wind.speed,
-            ))
-        .toList();
+    windDataList =
+        weatherData
+            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+            .map(
+              (station) => WindData(
+                id: station.id,
+                latitude: station.station.lat,
+                longitude: station.station.lng,
+                direction: (station.data.wind.direction + 180) % 360,
+                speed: station.data.wind.speed,
+              ),
+            )
+            .toList();
 
     await addDynamicWindArrows(windDataList);
     setState(() {});
@@ -88,7 +91,9 @@ class _WindMapState extends State<WindMap> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-        "wind-data", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
+      "wind-data",
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+    );
 
     weather_list = await ExpTech().getWeatherList();
 
@@ -98,23 +103,22 @@ class _WindMapState extends State<WindMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-          "markers-geojson", const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}));
-      await _mapController.setGeoJsonSource(
         "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
+        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
       );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -150,20 +154,19 @@ class _WindMapState extends State<WindMap> {
   }
 
   Future<void> addDynamicWindArrows(List<WindData> windDataList) async {
-    final features = windDataList
-        .map((data) => {
-              "type": "Feature",
-              "properties": {
-                "id": data.id,
-                "direction": data.direction,
-                "speed": data.speed,
+    final features =
+        windDataList
+            .map(
+              (data) => {
+                "type": "Feature",
+                "properties": {"id": data.id, "direction": data.direction, "speed": data.speed},
+                "geometry": {
+                  "type": "Point",
+                  "coordinates": [data.longitude, data.latitude],
+                },
               },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [data.longitude, data.latitude]
-              }
-            })
-        .toList();
+            )
+            .toList();
 
     await _mapController.setGeoJsonSource("wind-data", {"type": "FeatureCollection", "features": features});
 
@@ -188,7 +191,7 @@ class _WindMapState extends State<WindMap> {
       filter: [
         "==",
         ["get", "speed"],
-        0
+        0,
       ],
       minzoom: 10,
     );
@@ -200,7 +203,7 @@ class _WindMapState extends State<WindMap> {
       const SymbolLayerProperties(
         textField: [
           Expressions.format,
-          ["get", "speed"]
+          ["get", "speed"],
         ],
         textSize: 12,
         textColor: "#ffffff",
@@ -209,13 +212,13 @@ class _WindMapState extends State<WindMap> {
         textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
-          [0, 2]
+          [0, 2],
         ],
       ),
       filter: [
         "==",
         ["get", "speed"],
-        0
+        0,
       ],
       minzoom: 10,
     );
@@ -245,7 +248,7 @@ class _WindMapState extends State<WindMap> {
           13.9,
           "wind-4",
           32.7,
-          "wind-5"
+          "wind-5",
         ],
         iconRotate: [Expressions.get, "direction"],
         textAllowOverlap: true,
@@ -254,16 +257,12 @@ class _WindMapState extends State<WindMap> {
       filter: [
         "!=",
         ["get", "speed"],
-        0
+        0,
       ],
     );
 
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng) async {
-      final features = await _mapController.queryRenderedFeatures(
-        point,
-        ['wind-arrows', "wind-circles"],
-        null,
-      );
+    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
+      final features = await _mapController.queryRenderedFeatures(point, ['wind-arrows', "wind-circles"], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
@@ -285,7 +284,7 @@ class _WindMapState extends State<WindMap> {
       const SymbolLayerProperties(
         textField: [
           Expressions.format,
-          ["get", "speed"]
+          ["get", "speed"],
         ],
         textSize: 12,
         textColor: "#ffffff",
@@ -294,13 +293,13 @@ class _WindMapState extends State<WindMap> {
         textFont: ["Noto Sans Regular"],
         textOffset: [
           Expressions.literal,
-          [0, 2]
+          [0, 2],
         ],
       ),
       filter: [
         "!=",
         ["get", "speed"],
-        0
+        0,
       ],
       minzoom: 9,
     );
@@ -378,12 +377,7 @@ class _WindMapState extends State<WindMap> {
             ),
           ),
         ),
-        if (_showLegend)
-          Positioned(
-            left: 6,
-            bottom: 50,
-            child: _buildLegend(),
-          ),
+        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
         if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -415,11 +409,7 @@ class _WindMapState extends State<WindMap> {
                   color: context.theme.cardColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -5),
-                    ),
+                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
                   ],
                 ),
                 child: SingleChildScrollView(
@@ -430,10 +420,7 @@ class _WindMapState extends State<WindMap> {
                         height: 4,
                         width: 40,
                         margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
                         type: "wind_speed",

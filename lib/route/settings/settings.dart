@@ -77,7 +77,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
                     return Text(routeTitle[history.last] ?? context.i18n.settings);
                   },
                 ),
-              )
+              ),
             ];
           },
           body: Navigator(
@@ -97,17 +97,14 @@ class _SettingsRouteState extends State<SettingsRoute> {
                       end: const Offset(-0.2, 0.0),
                     ).chain(CurveTween(curve: backTransition));
 
-                    var fade = Tween(
-                      begin: 1.0,
-                      end: 0.0,
-                    ).chain(CurveTween(curve: backTransition));
+                    var fade = Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: backTransition));
 
                     return SlideTransition(
                       position: secondaryAnimation.drive(slide),
                       child: FadeTransition(opacity: secondaryAnimation.drive(fade), child: child),
                     );
                   },
-                )
+                ),
               ];
             },
             onGenerateRoute: (settings) {

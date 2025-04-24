@@ -52,10 +52,7 @@ class TimeLineTile extends StatelessWidget {
                   Text(
                     DateFormat(context.i18n.time_format).format(time),
                     textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: context.colors.onSurfaceVariant,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 12),
                   ),
                 ],
               ),
@@ -84,23 +81,13 @@ class TimeLineTile extends StatelessWidget {
                 Container(
                   height: 42,
                   width: 42,
-                  decoration: BoxDecoration(
-                    color: color,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: icon,
-                  ),
+                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                  child: Center(child: icon),
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: child,
-            ),
-          ),
+          Expanded(child: Padding(padding: const EdgeInsets.all(8), child: child)),
         ],
       ),
     );

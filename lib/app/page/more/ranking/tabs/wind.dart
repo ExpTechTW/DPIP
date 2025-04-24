@@ -8,11 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-enum MergeType {
-  none,
-  county,
-  town,
-}
+enum MergeType { none, county, town }
 
 class RankingWindTab extends StatefulWidget {
   const RankingWindTab({super.key});
@@ -40,19 +36,26 @@ class _RankingWindTabState extends State<RankingWindTab> {
   }
 
   rank() {
-    final temp = (merge != MergeType.none)
-        ? groupBy(data, (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county)
-            .values
-            .map((v) => v.reduce((acc, e) =>
-                (reversed ? e.data.wind.speed < acc.data.wind.speed : e.data.wind.speed > acc.data.wind.speed)
-                    ? e
-                    : acc))
-        : data;
+    final temp =
+        (merge != MergeType.none)
+            ? groupBy(
+              data,
+              (e) => merge == MergeType.town ? (e.station.county, e.station.town) : e.station.county,
+            ).values.map(
+              (v) => v.reduce(
+                (acc, e) =>
+                    (reversed ? e.data.wind.speed < acc.data.wind.speed : e.data.wind.speed > acc.data.wind.speed)
+                        ? e
+                        : acc,
+              ),
+            )
+            : data;
 
-    final sorted = temp
-        .where((e) => e.data.wind.speed > 0)
-        .sorted((a, b) => (b.data.wind.speed - a.data.wind.speed).sign.toInt())
-        .toList();
+    final sorted =
+        temp
+            .where((e) => e.data.wind.speed > 0)
+            .sorted((a, b) => (b.data.wind.speed - a.data.wind.speed).sign.toInt())
+            .toList();
 
     setState(() {
       ranked = reversed ? sorted.reversed.toList() : sorted;
@@ -96,10 +99,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(context.i18n.according),
-                  ),
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Text(context.i18n.according)),
                   ChoiceChip(
                     label: Text(context.i18n.ranking_descending),
                     selected: !reversed,
@@ -110,10 +110,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
-                  const SizedBox(
-                    height: kToolbarHeight - 16,
-                    child: VerticalDivider(),
-                  ),
+                  const SizedBox(height: kToolbarHeight - 16, child: VerticalDivider()),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Text(context.i18n.ranking_merge_into),
@@ -154,109 +151,116 @@ class _RankingWindTabState extends State<RankingWindTab> {
                 final item = ranked[index];
                 final rank = index + 1;
 
-                final backgroundColor = index == 0
-                    ? context.theme.extendedColors.amberContainer
-                    : index == 1
+                final backgroundColor =
+                    index == 0
+                        ? context.theme.extendedColors.amberContainer
+                        : index == 1
                         ? context.theme.extendedColors.greyContainer
                         : index == 2
-                            ? context.theme.extendedColors.brownContainer
-                            : index < 10
-                                ? context.colors.surfaceContainerHigh
-                                : context.colors.surfaceContainer;
+                        ? context.theme.extendedColors.brownContainer
+                        : index < 10
+                        ? context.colors.surfaceContainerHigh
+                        : context.colors.surfaceContainer;
 
-                final foregroundColor = index == 0
-                    ? context.theme.extendedColors.onAmberContainer
-                    : index == 1
+                final foregroundColor =
+                    index == 0
+                        ? context.theme.extendedColors.onAmberContainer
+                        : index == 1
                         ? context.colors.onSurface
                         : index == 2
-                            ? context.theme.extendedColors.onBrownContainer
-                            : index < 10
-                                ? context.colors.onSurface
-                                : context.colors.onSurfaceVariant;
+                        ? context.theme.extendedColors.onBrownContainer
+                        : index < 10
+                        ? context.colors.onSurface
+                        : context.colors.onSurfaceVariant;
 
-                final iconColor = index == 0
-                    ? context.theme.extendedColors.amber
-                    : index == 1
+                final iconColor =
+                    index == 0
+                        ? context.theme.extendedColors.amber
+                        : index == 1
                         ? context.theme.extendedColors.grey
                         : context.theme.extendedColors.brown;
 
-                final double fontSize = index == 0
-                    ? 20
-                    : index < 3
+                final double fontSize =
+                    index == 0
+                        ? 20
+                        : index < 3
                         ? 18
                         : 16;
 
-                final double iconSize = index == 0
-                    ? 32
-                    : index == 1
+                final double iconSize =
+                    index == 0
+                        ? 32
+                        : index == 1
                         ? 28
                         : 24;
 
-                final leading = index < 3
-                    ? Icon(
-                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
-                        color: iconColor,
-                        size: iconSize,
-                        fill: 1,
-                      )
-                    : Text(
-                        "$rank",
-                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
-                      );
+                final leading =
+                    index < 3
+                        ? Icon(
+                          index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                          color: iconColor,
+                          size: iconSize,
+                          fill: 1,
+                        )
+                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
 
                 final minWind = reversed ? ranked.first.data.wind.speed : ranked.last.data.wind.speed;
                 final maxWind = reversed ? ranked.last.data.wind.speed : ranked.first.data.wind.speed;
                 final percentage = (item.data.wind.speed - minWind) / (maxWind - minWind);
 
-                final location = merge != MergeType.none
-                    ? [
-                        Text(
-                          merge == MergeType.town ? "${item.station.county}${item.station.town}" : item.station.county,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: index == 0
-                                ? FontWeight.bold
-                                : index < 3
-                                    ? FontWeight.w500
-                                    : null,
+                final location =
+                    merge != MergeType.none
+                        ? [
+                          Text(
+                            merge == MergeType.town
+                                ? "${item.station.county}${item.station.town}"
+                                : item.station.county,
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              fontWeight:
+                                  index == 0
+                                      ? FontWeight.bold
+                                      : index < 3
+                                      ? FontWeight.w500
+                                      : null,
+                            ),
                           ),
-                        ),
-                      ]
-                    : [
-                        Text(
-                          item.station.name,
-                          style: TextStyle(
-                            fontSize: fontSize,
-                            fontWeight: index == 0
-                                ? FontWeight.bold
-                                : index < 3
-                                    ? FontWeight.w500
-                                    : null,
+                        ]
+                        : [
+                          Text(
+                            item.station.name,
+                            style: TextStyle(
+                              fontSize: fontSize,
+                              fontWeight:
+                                  index == 0
+                                      ? FontWeight.bold
+                                      : index < 3
+                                      ? FontWeight.w500
+                                      : null,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "${item.station.county}${item.station.town}",
-                          style: TextStyle(
-                            fontSize: fontSize / 1.25,
-                            color: foregroundColor.withOpacity(0.8),
+                          const SizedBox(width: 8),
+                          Text(
+                            "${item.station.county}${item.station.town}",
+                            style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
                           ),
-                        ),
-                      ];
+                        ];
 
                 final content = [
                   Expanded(
-                    child: index < 3
-                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
-                        : Row(children: location),
+                    child:
+                        index < 3
+                            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                            : Row(children: location),
                   ),
                   Text(
                     "${item.data.wind.speed.toStringAsFixed(1)} m/s",
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight: index == 0
-                          ? FontWeight.bold
-                          : index < 3
+                      fontWeight:
+                          index == 0
+                              ? FontWeight.bold
+                              : index < 3
                               ? FontWeight.w500
                               : null,
                     ),
@@ -267,10 +271,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
                     children: [
-                      SizedBox(
-                        width: 48,
-                        child: Center(child: leading),
-                      ),
+                      SizedBox(width: 48, child: Center(child: leading)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Container(
@@ -278,21 +279,19 @@ class _RankingWindTabState extends State<RankingWindTab> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: backgroundColor,
-                            gradient: LinearGradient(colors: [
-                              backgroundColor,
-                              backgroundColor,
-                              backgroundColor.withOpacity(0.4),
-                              backgroundColor.withOpacity(0.4),
-                            ], stops: [
-                              0,
-                              percentage,
-                              percentage,
-                              1
-                            ]),
+                            gradient: LinearGradient(
+                              colors: [
+                                backgroundColor,
+                                backgroundColor,
+                                backgroundColor.withOpacity(0.4),
+                                backgroundColor.withOpacity(0.4),
+                              ],
+                              stops: [0, percentage, percentage, 1],
+                            ),
                           ),
                           child: Row(children: content),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 );

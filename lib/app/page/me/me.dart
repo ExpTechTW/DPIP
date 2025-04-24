@@ -1,3 +1,5 @@
+import "dart:io";
+
 import "package:clipboard/clipboard.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/announcement/announcement.dart";
@@ -37,13 +39,14 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.tune),
           title: Text(context.i18n.settings),
           subtitle: Text(context.i18n.settingsDescription),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              settings: const RouteSettings(name: "/settings"),
-              builder: (context) => const SettingsRoute(),
-            ),
-          ),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  settings: const RouteSettings(name: "/settings"),
+                  builder: (context) => const SettingsRoute(),
+                ),
+              ),
         ),
 
         /**
@@ -53,13 +56,14 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.audiotrack_sharp),
           title: Text(context.i18n.notify_test),
           subtitle: Text(context.i18n.notify_test_description),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              settings: const RouteSettings(name: "/sound"),
-              builder: (context) => const SoundRoute(),
-            ),
-          ),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  settings: const RouteSettings(name: "/sound"),
+                  builder: (context) => const SoundRoute(),
+                ),
+              ),
         ),
 
         /**
@@ -69,20 +73,14 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.campaign_rounded, fill: 1),
           title: Text(context.i18n.announcement),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AnnouncementPage()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const AnnouncementPage()));
           },
         ),
         ListTile(
           leading: const Icon(Symbols.update_rounded),
           title: Text(context.i18n.update_log),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ChangelogPage()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangelogPage()));
           },
         ),
         ListTile(
@@ -98,10 +96,7 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.bug_report),
           title: Text(context.i18n.app_logs),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LogViewerPage()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => LogViewerPage()));
           },
         ),
         /**
@@ -111,20 +106,16 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Icons.fingerprint),
           title: Text(context.i18n.settings_fcm),
           onTap: () {
-            String token = Global.preference.getString("fcm-token") ?? "";
+            String token =
+                ((Platform.isIOS)
+                    ? Global.preference.getString("apns-token")
+                    : Global.preference.getString("fcm-token")) ??
+                "";
             if (token != "") {
               FlutterClipboard.copy(token);
-              context.scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text(context.i18n.settings_copy_fcm),
-                ),
-              );
+              context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.settings_copy_fcm)));
             } else {
-              context.scaffoldMessenger.showSnackBar(
-                SnackBar(
-                  content: Text(context.i18n.copy_fcm_token_error),
-                ),
-              );
+              context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.copy_fcm_token_error)));
             }
           },
         ),
@@ -133,10 +124,7 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.forum_rounded),
           title: Text(context.i18n.me_developer),
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DPIPInfoPage()),
-            );
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const DPIPInfoPage()));
           },
         ),
 
@@ -147,9 +135,10 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Icons.visibility),
           title: Text(context.i18n.me_welcome),
           onTap: () {
-            Navigator.of(context, rootNavigator: true).push(
-              MaterialPageRoute(builder: (context) => const WelcomeRoute()),
-            );
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).push(MaterialPageRoute(builder: (context) => const WelcomeRoute()));
           },
         ),
 
@@ -161,35 +150,24 @@ class _MePageState extends State<MePage> {
           child: Container(
             margin: const EdgeInsets.all(8),
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: context.colors.surfaceContainer,
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: BoxDecoration(color: context.colors.surfaceContainer, borderRadius: BorderRadius.circular(16)),
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      "assets/DPIP.png",
-                      height: 64,
-                      width: 64,
-                    ),
+                    child: Image.asset("assets/DPIP.png", height: 64, width: 64),
                   ),
                 ),
-                const Text(
-                  "DPIP",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
+                const Text("DPIP", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Text(
-                    context.i18n
-                        .me_version(Global.packageInfo.version.toString(), Global.packageInfo.buildNumber.toString()),
+                    context.i18n.me_version(
+                      Global.packageInfo.version.toString(),
+                      Global.packageInfo.buildNumber.toString(),
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -236,10 +214,7 @@ class _MePageState extends State<MePage> {
                       avatar: const Icon(Symbols.dns_rounded),
                       label: Text(context.i18n.server_status),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const ServerStatusPage()),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ServerStatusPage()));
                       },
                     ),
                     ActionChip(
@@ -260,19 +235,22 @@ class _MePageState extends State<MePage> {
                       avatar: const Icon(Symbols.book_rounded, fill: 1),
                       label: Text(context.i18n.third_party_libraries),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return const LicensePage();
-                          },
-                        ));
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const LicensePage();
+                            },
+                          ),
+                        );
                       },
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }

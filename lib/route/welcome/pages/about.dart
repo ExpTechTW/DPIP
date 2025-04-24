@@ -63,7 +63,7 @@ class WelcomeAboutPage extends StatelessWidget {
                             color: context.colors.primary.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
-                        )
+                        ),
                       ],
                     ),
                   ),

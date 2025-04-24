@@ -22,247 +22,247 @@ class WeatherIcons {
     // Sunny (晴)
     100: {
       "icon": {"day": "sunny", "night": "nightlight"},
-      "key": "sunny"
+      "key": "sunny",
     },
     101: {
       "icon": {"day": "sunny", "night": "nightlight"},
-      "key": "sunny_haze"
+      "key": "sunny_haze",
     },
     102: {
       "icon": {"day": "sunny", "night": "nightlight"},
-      "key": "sunny_mist"
+      "key": "sunny_mist",
     },
     103: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_lightning"
+      "key": "sunny_lightning",
     },
     104: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder"
+      "key": "sunny_thunder",
     },
     105: {
       "icon": {"day": "foggy", "night": "foggy"},
-      "key": "sunny_fog"
+      "key": "sunny_fog",
     },
     106: {
       "icon": {"day": "rainy", "night": "rainy"},
-      "key": "sunny_rain"
+      "key": "sunny_rain",
     },
     107: {
       "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "sunny_rain_snow"
+      "key": "sunny_rain_snow",
     },
     108: {
       "icon": {"day": "snowy", "night": "snowy"},
-      "key": "sunny_heavy_snow"
+      "key": "sunny_heavy_snow",
     },
     109: {
       "icon": {"day": "snowy", "night": "snowy"},
-      "key": "sunny_snow_pellets"
+      "key": "sunny_snow_pellets",
     },
     110: {
       "icon": {"day": "hail", "night": "hail"},
-      "key": "sunny_ice_pellets"
+      "key": "sunny_ice_pellets",
     },
     111: {
       "icon": {"day": "rainy", "night": "rainy"},
-      "key": "sunny_showers"
+      "key": "sunny_showers",
     },
     112: {
       "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "sunny_rain_snow_showers"
+      "key": "sunny_rain_snow_showers",
     },
     113: {
       "icon": {"day": "hail", "night": "hail"},
-      "key": "sunny_hail"
+      "key": "sunny_hail",
     },
     114: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunderstorm"
+      "key": "sunny_thunderstorm",
     },
     115: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder_snow"
+      "key": "sunny_thunder_snow",
     },
     116: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder_hail"
+      "key": "sunny_thunder_hail",
     },
     117: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_heavy_thunderstorm"
+      "key": "sunny_heavy_thunderstorm",
     },
     118: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_heavy_thunder_hail"
+      "key": "sunny_heavy_thunder_hail",
     },
     119: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder"
+      "key": "sunny_thunder",
     },
 
     // Cloudy (多雲)
     200: {
       "icon": {"day": "partly_cloudy_day", "night": "partly_cloudy_night"},
-      "key": "cloudy"
+      "key": "cloudy",
     },
     201: {
       "icon": {"day": "partly_cloudy_day", "night": "partly_cloudy_night"},
-      "key": "cloudy_haze"
+      "key": "cloudy_haze",
     },
     202: {
       "icon": {"day": "partly_cloudy_day", "night": "partly_cloudy_night"},
-      "key": "cloudy_mist"
+      "key": "cloudy_mist",
     },
     203: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_lightning"
+      "key": "cloudy_lightning",
     },
     204: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder"
+      "key": "cloudy_thunder",
     },
     205: {
       "icon": {"day": "foggy", "night": "foggy"},
-      "key": "cloudy_fog"
+      "key": "cloudy_fog",
     },
     206: {
       "icon": {"day": "rainy", "night": "rainy"},
-      "key": "cloudy_rain"
+      "key": "cloudy_rain",
     },
     207: {
       "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "cloudy_rain_snow"
+      "key": "cloudy_rain_snow",
     },
     208: {
       "icon": {"day": "snowy", "night": "snowy"},
-      "key": "cloudy_heavy_snow"
+      "key": "cloudy_heavy_snow",
     },
     209: {
       "icon": {"day": "snowy", "night": "snowy"},
-      "key": "cloudy_snow_pellets"
+      "key": "cloudy_snow_pellets",
     },
     210: {
       "icon": {"day": "hail", "night": "hail"},
-      "key": "cloudy_ice_pellets"
+      "key": "cloudy_ice_pellets",
     },
     211: {
       "icon": {"day": "rainy", "night": "rainy"},
-      "key": "cloudy_showers"
+      "key": "cloudy_showers",
     },
     212: {
       "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "cloudy_rain_snow_showers"
+      "key": "cloudy_rain_snow_showers",
     },
     213: {
       "icon": {"day": "hail", "night": "hail"},
-      "key": "cloudy_hail"
+      "key": "cloudy_hail",
     },
     214: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunderstorm"
+      "key": "cloudy_thunderstorm",
     },
     215: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder_snow"
+      "key": "cloudy_thunder_snow",
     },
     216: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder_hail"
+      "key": "cloudy_thunder_hail",
     },
     217: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_heavy_thunderstorm"
+      "key": "cloudy_heavy_thunderstorm",
     },
     218: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_heavy_thunder_hail"
+      "key": "cloudy_heavy_thunder_hail",
     },
     219: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder"
+      "key": "cloudy_thunder",
     },
 
     // Overcast (陰)
     300: {
       "icon": {"day": "cloudy", "night": "cloudy"},
-      "key": "overcast"
+      "key": "overcast",
     },
     301: {
       "icon": {"day": "cloudy", "night": "cloudy"},
-      "key": "overcast_haze"
+      "key": "overcast_haze",
     },
     302: {
       "icon": {"day": "cloudy", "night": "cloudy"},
-      "key": "overcast_mist"
+      "key": "overcast_mist",
     },
     303: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_lightning"
+      "key": "overcast_lightning",
     },
     304: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder"
+      "key": "overcast_thunder",
     },
     305: {
       "icon": {"day": "foggy", "night": "foggy"},
-      "key": "overcast_fog"
+      "key": "overcast_fog",
     },
     306: {
       "icon": {"day": "rainy", "night": "rainy"},
-      "key": "overcast_rain"
+      "key": "overcast_rain",
     },
     307: {
       "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "overcast_rain_snow"
+      "key": "overcast_rain_snow",
     },
     308: {
       "icon": {"day": "snowy", "night": "snowy"},
-      "key": "overcast_heavy_snow"
+      "key": "overcast_heavy_snow",
     },
     309: {
       "icon": {"day": "snowy", "night": "snowy"},
-      "key": "overcast_snow_pellets"
+      "key": "overcast_snow_pellets",
     },
     310: {
       "icon": {"day": "hail", "night": "hail"},
-      "key": "overcast_ice_pellets"
+      "key": "overcast_ice_pellets",
     },
     311: {
       "icon": {"day": "rainy", "night": "rainy"},
-      "key": "overcast_showers"
+      "key": "overcast_showers",
     },
     312: {
       "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "overcast_rain_snow_showers"
+      "key": "overcast_rain_snow_showers",
     },
     313: {
       "icon": {"day": "hail", "night": "hail"},
-      "key": "overcast_hail"
+      "key": "overcast_hail",
     },
     314: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunderstorm"
+      "key": "overcast_thunderstorm",
     },
     315: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder_snow"
+      "key": "overcast_thunder_snow",
     },
     316: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder_hail"
+      "key": "overcast_thunder_hail",
     },
     317: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_heavy_thunderstorm"
+      "key": "overcast_heavy_thunderstorm",
     },
     318: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_heavy_thunder_hail"
+      "key": "overcast_heavy_thunder_hail",
     },
     319: {
       "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder"
+      "key": "overcast_thunder",
     },
   };
 

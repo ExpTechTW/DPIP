@@ -31,12 +31,7 @@ class WelcomeNoticePage extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Icon(
-                      Symbols.warning_rounded,
-                      size: 80,
-                      color: context.colors.primary,
-                      fill: 1,
-                    ),
+                    child: Icon(Symbols.warning_rounded, size: 80, color: context.colors.primary, fill: 1),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -77,10 +72,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  context.i18n.information_reliability,
-                  style: context.theme.textTheme.bodyLarge,
-                ),
+                child: Text(context.i18n.information_reliability, style: context.theme.textTheme.bodyLarge),
               ),
             ),
             Padding(
@@ -91,10 +83,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  context.i18n.strong_shake_warning,
-                  style: context.theme.textTheme.bodyLarge,
-                ),
+                child: Text(context.i18n.strong_shake_warning, style: context.theme.textTheme.bodyLarge),
               ),
             ),
             Padding(
@@ -105,10 +94,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  context.i18n.earthquake_alert_warning,
-                  style: context.theme.textTheme.bodyLarge,
-                ),
+                child: Text(context.i18n.earthquake_alert_warning, style: context.theme.textTheme.bodyLarge),
               ),
             ),
             Padding(
@@ -119,10 +105,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(
-                  context.i18n.legal_risks,
-                  style: context.theme.textTheme.bodyLarge,
-                ),
+                child: Text(context.i18n.legal_risks, style: context.theme.textTheme.bodyLarge),
               ),
             ),
           ],

@@ -14,7 +14,7 @@ class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
           onPressed: () {
             query = "";
           },
-        )
+        ),
       ];
     }
 
@@ -48,9 +48,7 @@ class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
     final data = Global.location.entries.where((e) => "${e.value.city} ${e.value.town}".contains(query)).toList();
 
     if (data.isEmpty || query.isEmpty) {
-      return Center(
-        child: Text(context.i18n.no_search_results),
-      );
+      return Center(child: Text(context.i18n.no_search_results));
     }
 
     return ListView.builder(

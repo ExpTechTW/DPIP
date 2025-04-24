@@ -7,13 +7,7 @@ class LabelChip extends StatelessWidget {
   final Color? outlineColor;
   final String label;
 
-  const LabelChip({
-    super.key,
-    required this.label,
-    this.backgroundColor,
-    this.foregroundColor,
-    this.outlineColor,
-  });
+  const LabelChip({super.key, required this.label, this.backgroundColor, this.foregroundColor, this.outlineColor});
 
   @override
   Widget build(BuildContext context) {
