@@ -2,7 +2,7 @@ import "package:collection/collection.dart";
 import "package:dpip/api/model/crowdin/localization_progress.dart";
 import "package:dpip/global.dart";
 import "package:dpip/l10n/app_localizations.dart";
-import "package:dpip/models/settings.dart";
+import "package:dpip/models/settings/ui.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/util/extension/color_scheme.dart";
 import "package:dpip/util/extension/locale.dart";
@@ -34,7 +34,7 @@ class _LocaleSelectorRouteState extends State<LocaleSelectorRoute> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(context.i18n.settings_locale)),
-      body: Consumer<SettingsModel>(
+      body: Consumer<SettingsUserInterfaceModel>(
         builder: (context, model, child) {
           return ListView.builder(
             itemCount: localeList.length,

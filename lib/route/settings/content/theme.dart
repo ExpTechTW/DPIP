@@ -1,5 +1,5 @@
 import "package:dpip/global.dart";
-import "package:dpip/models/settings.dart";
+import "package:dpip/models/settings/ui.dart";
 import "package:dpip/util/extension/build_context.dart";
 import "package:dpip/widget/settings/theme/theme_radio_tile.dart";
 import "package:flutter/material.dart";
@@ -39,7 +39,7 @@ class _SettingsThemeViewState extends State<SettingsThemeView> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Consumer<SettingsModel>(
+            child: Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
                 return Column(
                   children: [

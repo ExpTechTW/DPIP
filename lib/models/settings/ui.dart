@@ -4,8 +4,8 @@ import 'package:dpip/util/extension/string.dart';
 import 'package:flutter/material.dart';
 import 'package:dpip/core/preference.dart';
 
-class SettingsModel extends ChangeNotifier {
-  void _log(String message) => log(message, name: 'SettingsModel');
+class SettingsUserInterfaceModel extends ChangeNotifier {
+  void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
 
   String _themeMode = Preference.themeMode ?? 'system';
   ThemeMode get themeMode => switch (_themeMode) {

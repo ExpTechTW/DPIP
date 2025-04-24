@@ -2,7 +2,7 @@ import "package:dpip/app/dpip.dart";
 import "package:dpip/core/preference.dart";
 import "package:dpip/global.dart";
 import 'package:dpip/l10n/app_localizations.dart';
-import "package:dpip/models/settings.dart";
+import "package:dpip/models/settings/ui.dart";
 import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/log.dart";
 import "package:dynamic_color/dynamic_color.dart";
@@ -30,7 +30,10 @@ void main() async {
   TalkerManager.instance.info('global init');
   initializeTimeZones();
   runApp(
-    MultiProvider(providers: [ChangeNotifierProvider(create: (context) => SettingsModel())], child: const DpipApp()),
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (context) => SettingsUserInterfaceModel())],
+      child: const DpipApp(),
+    ),
   );
 }
 
@@ -61,7 +64,7 @@ class DpipAppState extends State<DpipApp> {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
-        return Consumer<SettingsModel>(
+        return Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
             final lightTheme = ThemeData(
               colorSchemeSeed: model.themeColor,
