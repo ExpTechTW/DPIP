@@ -1,6 +1,6 @@
 import "package:dpip/api/model/location/location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
@@ -28,10 +28,7 @@ class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
 
   @override
   Widget buildResults(BuildContext context) {
-    final data =
-        Global.location.entries
-            .where((e) => "${e.value.city} ${e.value.town}".contains(query))
-            .toList();
+    final data = Global.location.entries.where((e) => "${e.value.city} ${e.value.town}".contains(query)).toList();
 
     return ListView.builder(
       itemCount: data.length,
@@ -48,10 +45,7 @@ class LocationSelectorSearchDelegate extends SearchDelegate<Location> {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final data =
-        Global.location.entries
-            .where((e) => "${e.value.city} ${e.value.town}".contains(query))
-            .toList();
+    final data = Global.location.entries.where((e) => "${e.value.city} ${e.value.town}".contains(query)).toList();
 
     if (data.isEmpty || query.isEmpty) {
       return Center(child: Text(context.i18n.no_search_results));

@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:dpip/util/extension/string.dart';
+import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
 import 'package:dpip/core/preference.dart';
 

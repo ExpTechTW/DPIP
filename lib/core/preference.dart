@@ -1,4 +1,4 @@
-import 'package:dpip/util/extension/preference.dart';
+import 'package:dpip/utils/extensions/preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceKeys {
@@ -27,6 +27,8 @@ class Preference {
   static Future<void> init() async {
     instance = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
   }
+
+  static bool get isFirstLaunch => instance.getString('welcome') != 'done';
 
   static String? get themeMode => instance.getString(PreferenceKeys.themeMode);
   static set themeMode(String? value) => instance.set(PreferenceKeys.themeMode, value);

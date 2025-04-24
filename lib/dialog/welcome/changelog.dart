@@ -1,5 +1,5 @@
 import 'package:dpip/route/changelog/changelog.dart';
-import 'package:dpip/util/extension/build_context.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 

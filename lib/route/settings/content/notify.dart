@@ -1,6 +1,6 @@
 import "package:dpip/models/settings/notify.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/widget/list/tile_group_header.dart";
+import "package:dpip/utils/extensions/build_context.dart";
+import "package:dpip/widgets/list/tile_group_header.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 

@@ -4,8 +4,8 @@ import "package:dpip/route/settings/content/location.dart";
 import "package:dpip/route/settings/content/notify.dart";
 import "package:dpip/route/settings/content/root.dart";
 import "package:dpip/route/settings/content/theme.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/util/page_route_builder/forward_back.dart";
+import "package:dpip/utils/extensions/build_context.dart";
+import "package:dpip/utils/page_route_builder/forward_back.dart";
 import "package:flutter/material.dart";
 
 class SettingsRoute extends StatefulWidget {

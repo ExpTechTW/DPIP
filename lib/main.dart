@@ -1,18 +1,16 @@
-import "package:dpip/app/dpip.dart";
 import "package:dpip/core/preference.dart";
 import "package:dpip/global.dart";
 import 'package:dpip/l10n/app_localizations.dart';
 import "package:dpip/models/settings/notify.dart";
 import "package:dpip/models/settings/ui.dart";
-import "package:dpip/route/welcome/welcome.dart";
-import "package:dpip/util/log.dart";
+import "package:dpip/router.dart";
+import "package:dpip/utils/log.dart";
 import "package:dynamic_color/dynamic_color.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:flutter_localized_locales/flutter_localized_locales.dart";
 import "package:provider/provider.dart";
-import "package:talker_flutter/talker_flutter.dart";
 import "package:timezone/data/latest.dart";
 
 void main() async {
@@ -48,8 +46,6 @@ class DpipApp extends StatefulWidget {
 
   @override
   State<DpipApp> createState() => DpipAppState();
-
-  static DpipAppState? of(BuildContext context) => context.findAncestorStateOfType<DpipAppState>();
 }
 
 class DpipAppState extends State<DpipApp> {
@@ -81,9 +77,7 @@ class DpipAppState extends State<DpipApp> {
               brightness: Brightness.dark,
             );
 
-            return MaterialApp(
-              navigatorKey: DpipApp.navigatorKey,
-              navigatorObservers: [TalkerRouteObserver(TalkerManager.instance)],
+            return MaterialApp.router(
               builder: (context, child) {
                 final mediaQueryData = MediaQuery.of(context);
                 final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.2);
@@ -102,7 +96,7 @@ class DpipAppState extends State<DpipApp> {
               ],
               supportedLocales: AppLocalizations.supportedLocales,
               locale: model.locale,
-              home: showWelcomeScreen ? const WelcomeRoute() : const Dpip(),
+              routerConfig: router,
             );
           },
         );

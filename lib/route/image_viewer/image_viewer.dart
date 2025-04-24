@@ -2,7 +2,7 @@ import "dart:io";
 
 import "package:cached_network_image/cached_network_image.dart";
 import "package:device_info_plus/device_info_plus.dart";
-import "package:dpip/util/extension/build_context.dart";
+import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
 import "package:fluttertoast/fluttertoast.dart";
 import "package:http/http.dart";

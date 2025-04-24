@@ -3,10 +3,9 @@ import "dart:io";
 import "package:dpip/api/exptech.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/route/welcome/pages/tos.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/util/need_location.dart";
-import "package:dpip/util/speed_limit.dart";
+import "package:dpip/utils/extensions/build_context.dart";
+import "package:dpip/utils/need_location.dart";
+import "package:dpip/utils/speed_limit.dart";
 import "package:flutter/material.dart";
 
 class SettingsExperimentView extends StatefulWidget {
@@ -64,10 +63,6 @@ class _SettingsExperimentViewState extends State<SettingsExperimentView> with Wi
         if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
           await showLocationDialog(context);
         } else {
-          await Navigator.of(
-            context,
-            rootNavigator: true,
-          ).push(MaterialPageRoute(builder: (context) => const WelcomeTosPage()));
           setState(() => monitorEnabled = Global.preference.getBool("monitor") ?? false);
         }
       }

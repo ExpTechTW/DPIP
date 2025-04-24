@@ -1,8 +1,8 @@
 import "package:dpip/global.dart";
 import "package:dpip/route/locale_selector/locale_selector.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/util/extension/locale.dart";
-import "package:dpip/util/extension/string.dart";
+import "package:dpip/utils/extensions/build_context.dart";
+import "package:dpip/utils/extensions/locale.dart";
+import "package:dpip/utils/extensions/string.dart";
 import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 import "package:url_launcher/url_launcher.dart";

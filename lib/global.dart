@@ -2,7 +2,7 @@ import "dart:convert";
 
 import "package:dpip/api/exptech.dart";
 import "package:dpip/api/model/location/location.dart";
-import "package:dpip/util/location_to_code.dart";
+import "package:dpip/utils/location_to_code.dart";
 import "package:flutter/services.dart";
 import "package:package_info_plus/package_info_plus.dart";
 import "package:shared_preferences/shared_preferences.dart";
@@ -20,9 +20,7 @@ class Global {
     final json = await rootBundle.loadString("assets/location.json");
     final data = jsonDecode(json) as Map<String, dynamic>;
 
-    location = data.map(
-      (key, value) => MapEntry(key, Location.fromJson(value)),
-    );
+    location = data.map((key, value) => MapEntry(key, Location.fromJson(value)));
   }
 
   static Future init() async {

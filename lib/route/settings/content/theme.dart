@@ -1,7 +1,7 @@
 import "package:dpip/global.dart";
 import "package:dpip/models/settings/ui.dart";
-import "package:dpip/util/extension/build_context.dart";
-import "package:dpip/widget/settings/theme/theme_radio_tile.dart";
+import "package:dpip/utils/extensions/build_context.dart";
+import "package:dpip/widgets/settings/theme/theme_radio_tile.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 

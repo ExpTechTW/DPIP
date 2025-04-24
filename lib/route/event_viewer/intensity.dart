@@ -6,17 +6,17 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/api/model/history.dart';
-import 'package:dpip/util/extension/build_context.dart';
-import 'package:dpip/util/intensity_color.dart';
-import 'package:dpip/util/list_icon.dart';
-import 'package:dpip/util/map_utils.dart';
-import 'package:dpip/util/need_location.dart';
-import 'package:dpip/util/parser.dart';
-import 'package:dpip/widget/chip/label_chip.dart';
-import 'package:dpip/widget/list/detail_field_tile.dart';
-import 'package:dpip/widget/map/legend.dart';
-import 'package:dpip/widget/map/map.dart';
-import 'package:dpip/widget/sheet/bottom_sheet_drag_handle.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/intensity_color.dart';
+import 'package:dpip/utils/list_icon.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/utils/need_location.dart';
+import 'package:dpip/utils/parser.dart';
+import 'package:dpip/widgets/chip/label_chip.dart';
+import 'package:dpip/widgets/list/detail_field_tile.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -95,16 +95,13 @@ class _IntensityPageState extends State<IntensityPage> {
 
     radarList = await ExpTech().getRadarList();
 
-    if (Platform.isIOS &&
-        (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
 
     await _mapController.addSource(
       "markers-geojson",
-      const GeojsonSourceProperties(
-        data: {"type": "FeatureCollection", "features": []},
-      ),
+      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
     );
 
     start();
@@ -130,18 +127,11 @@ class _IntensityPageState extends State<IntensityPage> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(
-        LatLng(userLat, userLon),
-        8,
-      );
-      await _mapController.animateCamera(
-        cameraUpdate,
-        duration: const Duration(milliseconds: 1000),
-      );
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
 
-    if (!isUserLocationValid &&
-        !(Global.preference.getBool("auto-location") ?? false)) {
+    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
       await showLocationDialog(context);
     }
 
@@ -178,10 +168,7 @@ class _IntensityPageState extends State<IntensityPage> {
           "match",
           ["get", "CODE"],
           ...invertedArea.entries.expand(
-            (entry) => [
-              int.parse(entry.key),
-              IntensityColor.intensity(entry.value).toHexStringRGB(),
-            ],
+            (entry) => [int.parse(entry.key), IntensityColor.intensity(entry.value).toHexStringRGB()],
           ),
           context.colors.surfaceContainerHighest.toHexStringRGB(),
         ],
@@ -203,10 +190,7 @@ class _IntensityPageState extends State<IntensityPage> {
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
-        Text(
-          context.i18n.history_earthquake_intensity_h2,
-          style: context.theme.textTheme.labelMedium,
-        ),
+        Text(context.i18n.history_earthquake_intensity_h2, style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -219,9 +203,7 @@ class _IntensityPageState extends State<IntensityPage> {
       child: Row(
         children:
             intensities.map((intensity) {
-              return Expanded(
-                child: Container(color: IntensityColor.intensity(intensity)),
-              );
+              return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
             }).toList(),
       ),
     );
@@ -247,11 +229,7 @@ class _IntensityPageState extends State<IntensityPage> {
             labels.map((label) {
               return SizedBox(
                 width: 300 / 9,
-                child: Text(
-                  label,
-                  style: const TextStyle(fontSize: 10),
-                  textAlign: TextAlign.center,
-                ),
+                child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
               );
             }).toList(),
       ),
@@ -261,10 +239,7 @@ class _IntensityPageState extends State<IntensityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.item.text.content['all']?.title ?? ""),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ""), elevation: 0),
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
@@ -361,12 +336,7 @@ class _IntensityPageState extends State<IntensityPage> {
           const SizedBox(width: 12),
           Row(
             children: [
-              Text(
-                subtitle,
-                style: context.theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(subtitle, style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               LabelChip(
                 label:
@@ -403,39 +373,19 @@ class _IntensityPageState extends State<IntensityPage> {
     );
   }
 
-  Widget _buildTimeBar(
-    BuildContext context,
-    DateTime sendTime,
-    DateTime expireTime,
-    bool isExpired,
-  ) {
+  Widget _buildTimeBar(BuildContext context, DateTime sendTime, DateTime expireTime, bool isExpired) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: context.colors.surfaceContainerHigh, borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTimeInfo(
-            context,
-            Symbols.schedule_rounded,
-            context.i18n.history_send_time,
-            sendTime,
-          ),
-        ],
+        children: [_buildTimeInfo(context, Symbols.schedule_rounded, context.i18n.history_send_time, sendTime)],
       ),
     );
   }
 
-  Widget _buildTimeInfo(
-    BuildContext context,
-    IconData icon,
-    String label,
-    DateTime time,
-  ) {
+  Widget _buildTimeInfo(BuildContext context, IconData icon, String label, DateTime time) {
     return Row(
       children: [
         Icon(icon, color: context.colors.secondary),
@@ -443,16 +393,8 @@ class _IntensityPageState extends State<IntensityPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: context.theme.textTheme.labelLarge?.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
-            ),
-            Text(
-              DateFormat('yyyy/MM/dd HH:mm').format(time),
-              style: context.theme.textTheme.bodyLarge,
-            ),
+            Text(label, style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.onSurfaceVariant)),
+            Text(DateFormat('yyyy/MM/dd HH:mm').format(time), style: context.theme.textTheme.bodyLarge),
           ],
         ),
       ],
@@ -460,10 +402,7 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final grouped = groupBy(
-      data!.area.map((e) => Global.location[e.toString()]!),
-      (e) => e.city,
-    );
+    final grouped = groupBy(data!.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
     List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {
@@ -477,10 +416,7 @@ class _IntensityPageState extends State<IntensityPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      city,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: Text(city, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
@@ -492,10 +428,8 @@ class _IntensityPageState extends State<IntensityPage> {
                             return Chip(
                               padding: const EdgeInsets.all(4),
                               side: BorderSide(color: context.colors.outline),
-                              backgroundColor:
-                                  context.colors.surfaceContainerHigh,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
+                              backgroundColor: context.colors.surfaceContainerHigh,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               label: Text(e.town),
                             );
                           }).toList(),
@@ -509,9 +443,6 @@ class _IntensityPageState extends State<IntensityPage> {
       );
     }
 
-    return DetailFieldTile(
-      label: context.i18n.history_affected_area,
-      child: Column(children: areas),
-    );
+    return DetailFieldTile(label: context.i18n.history_affected_area, child: Column(children: areas));
   }
 }

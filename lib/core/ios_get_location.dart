@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import "package:dpip/app/page/home/home.dart";
-import "package:dpip/app/page/map/monitor/monitor.dart";
-import "package:dpip/app/page/map/radar/radar.dart";
+import "package:dpip/app_old/page/home/home.dart";
+import "package:dpip/app_old/page/map/monitor/monitor.dart";
+import "package:dpip/app_old/page/map/radar/radar.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/settings/content/location.dart";
-import "package:dpip/util/location_to_code.dart";
-import "package:dpip/util/log.dart";
+import "package:dpip/utils/location_to_code.dart";
+import "package:dpip/utils/log.dart";
 import "package:flutter/services.dart";
 
 const _channel = MethodChannel("com.exptech.dpip/data");
