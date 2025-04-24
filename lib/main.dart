@@ -2,6 +2,7 @@ import "package:dpip/app/dpip.dart";
 import "package:dpip/core/preference.dart";
 import "package:dpip/global.dart";
 import 'package:dpip/l10n/app_localizations.dart';
+import "package:dpip/models/settings/notify.dart";
 import "package:dpip/models/settings/ui.dart";
 import "package:dpip/route/welcome/welcome.dart";
 import "package:dpip/util/log.dart";
@@ -31,7 +32,10 @@ void main() async {
   initializeTimeZones();
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => SettingsUserInterfaceModel())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => SettingsUserInterfaceModel()),
+        ChangeNotifierProvider(create: (context) => SettingsNotificationModel()),
+      ],
       child: const DpipApp(),
     ),
   );

@@ -1,6 +1,7 @@
 import "package:dpip/route/settings/content/experiment.dart";
 import "package:dpip/route/settings/content/locale.dart";
 import "package:dpip/route/settings/content/location.dart";
+import "package:dpip/route/settings/content/notify.dart";
 import "package:dpip/route/settings/content/root.dart";
 import "package:dpip/route/settings/content/theme.dart";
 import "package:dpip/util/extension/build_context.dart";
@@ -42,6 +43,7 @@ class _SettingsRouteState extends State<SettingsRoute> {
       "/locale": context.i18n.settings_locale,
       "/location": context.i18n.settings_location,
       "/theme": context.i18n.settings_theme,
+      "/notify": '通知',
       "/experiment": context.i18n.advanced_features,
     };
 
@@ -122,6 +124,8 @@ class _SettingsRouteState extends State<SettingsRoute> {
                   return ForwardBackPageRouteBuilder(page: const SettingsLocationView());
                 case "/theme":
                   return ForwardBackPageRouteBuilder(page: const SettingsThemeView());
+                case "/notify":
+                  return ForwardBackPageRouteBuilder(page: const SettingsNotifyView());
                 case "/experiment":
                   return ForwardBackPageRouteBuilder(page: const SettingsExperimentView());
               }

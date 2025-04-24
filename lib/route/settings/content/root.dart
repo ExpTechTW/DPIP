@@ -46,6 +46,14 @@ class _SettingsRootViewState extends State<SettingsRootView> {
               Navigator.pushNamed(context, "/locale");
             },
           ),
+          ListTile(
+            leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.notifications)),
+            title: Text('通知', style: tileTitleTextStyle),
+            subtitle: Text('通知設定'),
+            onTap: () {
+              Navigator.pushNamed(context, "/notify");
+            },
+          ),
           ListTileGroupHeader(title: context.i18n.other_title),
           ListTile(
             leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.experiment)),
