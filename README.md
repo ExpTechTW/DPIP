@@ -81,6 +81,14 @@ DPIP 支援多語言，並且我們正在 Crowdin 上進行翻譯工作。如果
 
 - **Flutter SDK**: [安裝指引](https://docs.flutter.dev/get-started/install)
 - **Dart SDK**: 已包含在 Flutter SDK 中
+
+```
+Flutter 3.32.0-0.2.pre • channel beta • https://github.com/flutter/flutter.git
+Framework • revision d3abd00e69 (5 days ago) • 2025-04-18 10:08:55 -0700
+Engine • revision 382be0028d (6 days ago) • 2025-04-17 11:11:00 -0700
+Tools • Dart 3.8.0 (build 3.8.0-278.1.beta) • DevTools 2.45.0
+```
+
 - [**Android Studio**](https://developer.android.com/studio?hl=ja) 或 [**Xcode**](https://developer.apple.com/jp/xcode/) (適用於 iOS 開發)
   - 也可以使用 [VSCode](https://code.visualstudio.com/) 或其他你喜歡的 IDE
 - _\*可選\*_ [**Git**](https://git-scm.com/): 用於複製存儲庫

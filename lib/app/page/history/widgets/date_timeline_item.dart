@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 class DateTimelineItem extends StatelessWidget {
   final String date;
 
-  const DateTimelineItem(
-    this.date, {
-    super.key,
-  });
+  const DateTimelineItem(this.date, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,21 +24,13 @@ class DateTimelineItem extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Positioned(
-                        top: 0,
-                        bottom: 0,
-                        width: 1,
-                        child: Container(color: context.colors.outlineVariant),
-                      ),
+                      Positioned(top: 0, bottom: 0, width: 1, child: Container(color: context.colors.outlineVariant)),
                       SizedBox(
                         width: 42,
                         child: Container(
                           height: 8,
                           width: 8,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: context.colors.outlineVariant,
-                          ),
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: context.colors.outlineVariant),
                         ),
                       ),
                     ],

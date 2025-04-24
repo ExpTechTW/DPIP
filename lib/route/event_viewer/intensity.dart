@@ -114,22 +114,19 @@ class _IntensityPageState extends State<IntensityPage> {
     isUserLocationValid = (userLon != 0 && userLat != 0);
 
     if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource(
-        "markers-geojson",
-        {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point"
-              }
-            }
-          ],
-        },
-      );
+      await _mapController.setGeoJsonSource("markers-geojson", {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "coordinates": [userLon, userLat],
+              "type": "Point",
+            },
+          },
+        ],
+      });
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
@@ -170,10 +167,9 @@ class _IntensityPageState extends State<IntensityPage> {
         fillColor: [
           "match",
           ["get", "CODE"],
-          ...invertedArea.entries.expand((entry) => [
-                int.parse(entry.key),
-                IntensityColor.intensity(entry.value).toHexStringRGB(),
-              ]),
+          ...invertedArea.entries.expand(
+            (entry) => [int.parse(entry.key), IntensityColor.intensity(entry.value).toHexStringRGB()],
+          ),
           context.colors.surfaceContainerHighest.toHexStringRGB(),
         ],
         fillOpacity: 1,
@@ -205,13 +201,10 @@ class _IntensityPageState extends State<IntensityPage> {
       height: 20,
       width: 300,
       child: Row(
-        children: intensities.map((intensity) {
-          return Expanded(
-            child: Container(
-              color: IntensityColor.intensity(intensity),
-            ),
-          );
-        }).toList(),
+        children:
+            intensities.map((intensity) {
+              return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
+            }).toList(),
       ),
     );
   }
@@ -226,22 +219,19 @@ class _IntensityPageState extends State<IntensityPage> {
       context.i18n.strong_5,
       context.i18n.weak_6,
       context.i18n.strong_6,
-      "7"
+      "7",
     ];
     return SizedBox(
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) {
-          return SizedBox(
-            width: 300 / 9,
-            child: Text(
-              label,
-              style: const TextStyle(fontSize: 10),
-              textAlign: TextAlign.center,
-            ),
-          );
-        }).toList(),
+        children:
+            labels.map((label) {
+              return SizedBox(
+                width: 300 / 9,
+                child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
+              );
+            }).toList(),
       ),
     );
   }
@@ -249,16 +239,10 @@ class _IntensityPageState extends State<IntensityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.item.text.content['all']?.title ?? ""),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ""), elevation: 0),
       body: Stack(
         children: [
-          DpipMap(
-            onMapCreated: _initMap,
-            onStyleLoadedCallback: _loadMap,
-          ),
+          DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
           Positioned(
             right: 4,
             top: 4,
@@ -320,8 +304,10 @@ class _IntensityPageState extends State<IntensityPage> {
               _buildWarningDetails(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
-                child: Text(context.i18n.history_seismic_intensity_reference,
-                    style: TextStyle(color: context.colors.error)),
+                child: Text(
+                  context.i18n.history_seismic_intensity_reference,
+                  style: TextStyle(color: context.colors.error),
+                ),
               ),
               const SizedBox(height: 20),
               _buildAffectedAreas(),
@@ -350,12 +336,7 @@ class _IntensityPageState extends State<IntensityPage> {
           const SizedBox(width: 12),
           Row(
             children: [
-              Text(
-                subtitle,
-                style: context.theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(subtitle, style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               LabelChip(
                 label:
@@ -385,10 +366,7 @@ class _IntensityPageState extends State<IntensityPage> {
         Container(
           margin: const EdgeInsets.symmetric(vertical: 8),
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(
-            description,
-            style: context.theme.textTheme.bodyLarge,
-          ),
+          child: Text(description, style: context.theme.textTheme.bodyLarge),
         ),
         _buildTimeBar(context, sendTime, localExpireTime, isExpired),
       ],
@@ -399,15 +377,10 @@ class _IntensityPageState extends State<IntensityPage> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      decoration: BoxDecoration(color: context.colors.surfaceContainerHigh, borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildTimeInfo(context, Symbols.schedule_rounded, context.i18n.history_send_time, sendTime),
-        ],
+        children: [_buildTimeInfo(context, Symbols.schedule_rounded, context.i18n.history_send_time, sendTime)],
       ),
     );
   }
@@ -420,16 +393,8 @@ class _IntensityPageState extends State<IntensityPage> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: context.theme.textTheme.labelLarge?.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
-            ),
-            Text(
-              DateFormat('yyyy/MM/dd HH:mm').format(time),
-              style: context.theme.textTheme.bodyLarge,
-            ),
+            Text(label, style: context.theme.textTheme.labelLarge?.copyWith(color: context.colors.onSurfaceVariant)),
+            Text(DateFormat('yyyy/MM/dd HH:mm').format(time), style: context.theme.textTheme.bodyLarge),
           ],
         ),
       ],
@@ -451,25 +416,23 @@ class _IntensityPageState extends State<IntensityPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      city,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    child: Text(city, style: const TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(width: 20),
                   Expanded(
                     child: Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: locations.map((e) {
-                        return Chip(
-                          padding: const EdgeInsets.all(4),
-                          side: BorderSide(color: context.colors.outline),
-                          backgroundColor: context.colors.surfaceContainerHigh,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          label: Text(e.town),
-                        );
-                      }).toList(),
+                      children:
+                          locations.map((e) {
+                            return Chip(
+                              padding: const EdgeInsets.all(4),
+                              side: BorderSide(color: context.colors.outline),
+                              backgroundColor: context.colors.surfaceContainerHigh,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              label: Text(e.town),
+                            );
+                          }).toList(),
                     ),
                   ),
                 ],
@@ -480,9 +443,6 @@ class _IntensityPageState extends State<IntensityPage> {
       );
     }
 
-    return DetailFieldTile(
-      label: context.i18n.history_affected_area,
-      child: Column(children: areas),
-    );
+    return DetailFieldTile(label: context.i18n.history_affected_area, child: Column(children: areas));
   }
 }

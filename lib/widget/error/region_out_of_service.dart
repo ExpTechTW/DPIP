@@ -11,10 +11,7 @@ class RegionOutOfService extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text(
-            context.i18n.out_of_service_only_taiwan,
-            style: context.theme.textTheme.titleMedium,
-          ),
+          Text(context.i18n.out_of_service_only_taiwan, style: context.theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           FilledButton(
             child: Text(context.i18n.settings),
@@ -23,13 +20,11 @@ class RegionOutOfService extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   settings: const RouteSettings(name: "/settings"),
-                  builder: (context) => const SettingsRoute(
-                    initialRoute: "/location",
-                  ),
+                  builder: (context) => const SettingsRoute(initialRoute: "/location"),
                 ),
               );
             },
-          )
+          ),
         ],
       ),
     );

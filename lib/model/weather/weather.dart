@@ -14,12 +14,7 @@ class WeatherStation {
 
   final DailyTemperature daily;
 
-  const WeatherStation({
-    required this.id,
-    required this.station,
-    required this.data,
-    required this.daily,
-  });
+  const WeatherStation({required this.id, required this.station, required this.data, required this.daily});
 
   factory WeatherStation.fromJson(Map<String, dynamic> json) => _$WeatherStationFromJson(json);
 
@@ -55,11 +50,7 @@ class WeatherData {
   final Wind wind;
   final AirCondition air;
 
-  const WeatherData({
-    required this.weather,
-    required this.wind,
-    required this.air,
-  });
+  const WeatherData({required this.weather, required this.wind, required this.air});
 
   factory WeatherData.fromJson(Map<String, dynamic> json) => _$WeatherDataFromJson(json);
 
@@ -71,10 +62,7 @@ class Wind {
   final int direction;
   final double speed;
 
-  const Wind({
-    required this.direction,
-    required this.speed,
-  });
+  const Wind({required this.direction, required this.speed});
 
   factory Wind.fromJson(Map<String, dynamic> json) => _$WindFromJson(json);
 
@@ -87,11 +75,7 @@ class AirCondition {
   final double pressure;
   final int relative_humidity;
 
-  const AirCondition({
-    required this.temperature,
-    required this.pressure,
-    required this.relative_humidity,
-  });
+  const AirCondition({required this.temperature, required this.pressure, required this.relative_humidity});
 
   factory AirCondition.fromJson(Map<String, dynamic> json) => _$AirConditionFromJson(json);
 
@@ -103,10 +87,7 @@ class DailyTemperature {
   final TemperatureRecord high;
   final TemperatureRecord low;
 
-  const DailyTemperature({
-    required this.high,
-    required this.low,
-  });
+  const DailyTemperature({required this.high, required this.low});
 
   factory DailyTemperature.fromJson(Map<String, dynamic> json) => _$DailyTemperatureFromJson(json);
 
@@ -118,10 +99,7 @@ class TemperatureRecord {
   final double temperature;
   final int time;
 
-  const TemperatureRecord({
-    required this.temperature,
-    required this.time,
-  });
+  const TemperatureRecord({required this.temperature, required this.time});
 
   factory TemperatureRecord.fromJson(Map<String, dynamic> json) => _$TemperatureRecordFromJson(json);
 

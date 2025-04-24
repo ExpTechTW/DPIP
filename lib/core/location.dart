@@ -40,8 +40,12 @@ class LocationService {
 
     final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
     GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(position.latitude, position.longitude);
-    double distance =
-        Geolocator.distanceBetween(positionlattemp, positionlontemp, position.latitude, position.longitude);
+    double distance = Geolocator.distanceBetween(
+      positionlattemp,
+      positionlontemp,
+      position.latitude,
+      position.longitude,
+    );
     if (distance >= 250) {
       Global.preference.setDouble("user-lat", position.latitude);
       Global.preference.setDouble("user-lon", position.longitude);

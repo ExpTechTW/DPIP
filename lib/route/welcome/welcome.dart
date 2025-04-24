@@ -30,12 +30,7 @@ class WelcomeRouteState extends State<WelcomeRoute> {
 
   void complete() {
     Global.preference.setBool("welcome-1.0.0", true);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Dpip(),
-      ),
-    );
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dpip()));
   }
 
   @override
@@ -44,12 +39,7 @@ class WelcomeRouteState extends State<WelcomeRoute> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          WelcomeAboutPage(),
-          WelcomeExpTechPage(),
-          WelcomeNoticePage(),
-          WelcomePermissionPage(),
-        ],
+        children: const [WelcomeAboutPage(), WelcomeExpTechPage(), WelcomeNoticePage(), WelcomePermissionPage()],
       ),
     );
   }

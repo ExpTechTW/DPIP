@@ -173,55 +173,58 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                 final item = ranked[index];
                 final rank = index + 1;
 
-                final backgroundColor = index == 0
-                    ? context.theme.extendedColors.amberContainer
-                    : index == 1
+                final backgroundColor =
+                    index == 0
+                        ? context.theme.extendedColors.amberContainer
+                        : index == 1
                         ? context.theme.extendedColors.greyContainer
                         : index == 2
-                            ? context.theme.extendedColors.brownContainer
-                            : index < 10
-                                ? context.colors.surfaceContainerHigh
-                                : context.colors.surfaceContainer;
+                        ? context.theme.extendedColors.brownContainer
+                        : index < 10
+                        ? context.colors.surfaceContainerHigh
+                        : context.colors.surfaceContainer;
 
-                final foregroundColor = index == 0
-                    ? context.theme.extendedColors.onAmberContainer
-                    : index == 1
+                final foregroundColor =
+                    index == 0
+                        ? context.theme.extendedColors.onAmberContainer
+                        : index == 1
                         ? context.colors.onSurface
                         : index == 2
-                            ? context.theme.extendedColors.onBrownContainer
-                            : index < 10
-                                ? context.colors.onSurface
-                                : context.colors.onSurfaceVariant;
+                        ? context.theme.extendedColors.onBrownContainer
+                        : index < 10
+                        ? context.colors.onSurface
+                        : context.colors.onSurfaceVariant;
 
-                final iconColor = index == 0
-                    ? context.theme.extendedColors.amber
-                    : index == 1
+                final iconColor =
+                    index == 0
+                        ? context.theme.extendedColors.amber
+                        : index == 1
                         ? context.theme.extendedColors.grey
                         : context.theme.extendedColors.brown;
 
-                final double fontSize = index == 0
-                    ? 20
-                    : index < 3
+                final double fontSize =
+                    index == 0
+                        ? 20
+                        : index < 3
                         ? 18
                         : 16;
 
-                final double iconSize = index == 0
-                    ? 32
-                    : index == 1
+                final double iconSize =
+                    index == 0
+                        ? 32
+                        : index == 1
                         ? 28
                         : 24;
 
-                final leading = index < 3
-                    ? Icon(
-                        index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
-                        color: iconColor,
-                        size: iconSize,
-                        fill: 1,
-                      )
-                    : Text(
-                        "$rank",
-                        style: TextStyle(color: foregroundColor, fontSize: fontSize),
-                      );
+                final leading =
+                    index < 3
+                        ? Icon(
+                          index == 0 ? Symbols.trophy_rounded : Symbols.workspace_premium_rounded,
+                          color: iconColor,
+                          size: iconSize,
+                          fill: 1,
+                        )
+                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
 
                 final percentage = item.$2 / ranked.first.$2;
 
@@ -230,9 +233,10 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                     item.$1.name,
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight: index == 0
-                          ? FontWeight.bold
-                          : index < 3
+                      fontWeight:
+                          index == 0
+                              ? FontWeight.bold
+                              : index < 3
                               ? FontWeight.w500
                               : null,
                     ),
@@ -240,26 +244,25 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   const SizedBox(width: 8),
                   Text(
                     "${item.$1.county}${item.$1.town}",
-                    style: TextStyle(
-                      fontSize: fontSize / 1.25,
-                      color: foregroundColor.withOpacity(0.8),
-                    ),
+                    style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
                   ),
                 ];
 
                 final content = [
                   Expanded(
-                    child: index < 3
-                        ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
-                        : Row(children: location),
+                    child:
+                        index < 3
+                            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: location)
+                            : Row(children: location),
                   ),
                   Text(
                     "${item.$2} mm",
                     style: TextStyle(
                       fontSize: fontSize,
-                      fontWeight: index == 0
-                          ? FontWeight.bold
-                          : index < 3
+                      fontWeight:
+                          index == 0
+                              ? FontWeight.bold
+                              : index < 3
                               ? FontWeight.w500
                               : null,
                     ),
@@ -270,10 +273,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   child: Row(
                     children: [
-                      SizedBox(
-                        width: 48,
-                        child: Center(child: leading),
-                      ),
+                      SizedBox(width: 48, child: Center(child: leading)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Container(
@@ -281,21 +281,19 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: backgroundColor,
-                            gradient: LinearGradient(colors: [
-                              backgroundColor,
-                              backgroundColor,
-                              backgroundColor.withOpacity(0.4),
-                              backgroundColor.withOpacity(0.4),
-                            ], stops: [
-                              0,
-                              percentage,
-                              percentage,
-                              1
-                            ]),
+                            gradient: LinearGradient(
+                              colors: [
+                                backgroundColor,
+                                backgroundColor,
+                                backgroundColor.withOpacity(0.4),
+                                backgroundColor.withOpacity(0.4),
+                              ],
+                              stops: [0, percentage, percentage, 1],
+                            ),
                           ),
                           child: Row(children: content),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 );

@@ -30,10 +30,7 @@ class GeoJsonBuilder {
   }
 
   Map<String, dynamic> build() {
-    return {
-      "type": "FeatureCollection",
-      "features": features.map((f) => f.build()).toList(),
-    };
+    return {"type": "FeatureCollection", "features": features.map((f) => f.build()).toList()};
   }
 }
 
@@ -68,10 +65,7 @@ class GeoJsonFeatureBuilder<T extends GeoJsonFeatureType> {
     return {
       "type": "Feature",
       "properties": properties,
-      "geometry": {
-        "type": type.name,
-        "coordinates": coordinates,
-      }
+      "geometry": {"type": type.name, "coordinates": coordinates},
     };
   }
 }

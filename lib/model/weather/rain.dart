@@ -12,11 +12,7 @@ class RainStation {
 
   final RainData data;
 
-  const RainStation({
-    required this.id,
-    required this.station,
-    required this.data,
-  });
+  const RainStation({required this.id, required this.station, required this.data});
 
   factory RainStation.fromJson(Map<String, dynamic> json) => _$RainStationFromJson(json);
 

@@ -97,10 +97,7 @@ class HistoryTimelineItem extends StatelessWidget {
             if (hasDetail)
               Padding(
                 padding: const EdgeInsets.only(left: 4),
-                child: Icon(
-                  Symbols.chevron_right_rounded,
-                  color: context.colors.outline,
-                ),
+                child: Icon(Symbols.chevron_right_rounded, color: context.colors.outline),
               ),
           ],
         ),

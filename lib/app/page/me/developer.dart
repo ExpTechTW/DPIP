@@ -10,20 +10,14 @@ class DPIPInfoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(context.i18n.me_developer),
-        leading: IconButton(
-          icon: const Icon(Symbols.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: IconButton(icon: const Icon(Symbols.arrow_back), onPressed: () => Navigator.pop(context)),
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              context.colors.primary.withOpacity(0.05),
-              context.colors.surface,
-            ],
+            colors: [context.colors.primary.withOpacity(0.05), context.colors.surface],
           ),
         ),
         child: ListView(
@@ -31,23 +25,27 @@ class DPIPInfoPage extends StatelessWidget {
           children: [
             _buildHeroCard(context),
             const SizedBox(height: 24),
-            _buildInfoCard(
-                context,
-                context.i18n.introduction,
-                [context.i18n.first_gratitude, context.i18n.dpip_goal, context.i18n.development_investment],
-                Symbols.info_rounded),
-            _buildInfoCard(
-                context, context.i18n.profit_model, [context.i18n.profit_discussion], Symbols.monetization_on_rounded),
-            _buildInfoCard(context, context.i18n.profit_difficulty, [context.i18n.user_payment_survey],
-                Symbols.trending_down_rounded),
+            _buildInfoCard(context, context.i18n.introduction, [
+              context.i18n.first_gratitude,
+              context.i18n.dpip_goal,
+              context.i18n.development_investment,
+            ], Symbols.info_rounded),
+            _buildInfoCard(context, context.i18n.profit_model, [
+              context.i18n.profit_discussion,
+            ], Symbols.monetization_on_rounded),
+            _buildInfoCard(context, context.i18n.profit_difficulty, [
+              context.i18n.user_payment_survey,
+            ], Symbols.trending_down_rounded),
             _buildInfoCard(context, context.i18n.why_no_ads, [context.i18n.no_ads_reason], Symbols.block_rounded),
-            _buildInfoCard(context, context.i18n.charge_public,
-                [context.i18n.no_fee_reason, context.i18n.public_charge_consideration], Symbols.attach_money_rounded),
-            _buildInfoCard(
-                context,
-                context.i18n.how_to_profit,
-                [context.i18n.summary, '2024/08/28   YuYu1015', '©2024 ExpTech Studio Ltd.'],
-                Symbols.lightbulb_rounded),
+            _buildInfoCard(context, context.i18n.charge_public, [
+              context.i18n.no_fee_reason,
+              context.i18n.public_charge_consideration,
+            ], Symbols.attach_money_rounded),
+            _buildInfoCard(context, context.i18n.how_to_profit, [
+              context.i18n.summary,
+              '2024/08/28   YuYu1015',
+              '©2024 ExpTech Studio Ltd.',
+            ], Symbols.lightbulb_rounded),
           ],
         ),
       ),
@@ -106,13 +104,12 @@ class DPIPInfoPage extends StatelessWidget {
             ),
             const Divider(height: 24),
             ...paragraphs
-                .map((paragraph) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        paragraph,
-                        style: context.theme.textTheme.bodyLarge,
-                      ),
-                    ))
+                .map(
+                  (paragraph) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(paragraph, style: context.theme.textTheme.bodyLarge),
+                  ),
+                )
                 .toList(),
           ],
         ),

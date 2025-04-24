@@ -33,16 +33,14 @@ class ThemeRadioTile extends StatelessWidget {
           children: [
             Container(
               height: 96,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainer,
-              ),
+              decoration: BoxDecoration(color: theme.colorScheme.surfaceContainer),
               child: Center(
                 child: Icon(
                   value == "light"
                       ? Symbols.light_mode
                       : value == "dark"
-                          ? Symbols.dark_mode
-                          : Symbols.smartphone,
+                      ? Symbols.dark_mode
+                      : Symbols.smartphone,
                   color: theme.colorScheme.onSurface,
                   size: 32,
                 ),
@@ -63,7 +61,7 @@ class ThemeRadioTile extends StatelessWidget {
                 ),
                 Text(title),
               ],
-            )
+            ),
           ],
         ),
       ),

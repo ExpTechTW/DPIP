@@ -39,10 +39,7 @@ class InfoTime {
   final TZDateTime send;
   final Map<String, int> expires;
 
-  InfoTime({
-    required this.send,
-    required this.expires,
-  });
+  InfoTime({required this.send, required this.expires});
 
   factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
 
@@ -54,10 +51,7 @@ class InfoText {
   final Map<String, InfoTextValue> content;
   final Map<String, String> description;
 
-  InfoText({
-    required this.content,
-    required this.description,
-  });
+  InfoText({required this.content, required this.description});
 
   factory InfoText.fromJson(Map<String, dynamic> json) => _$InfoTextFromJson(json);
 
@@ -69,10 +63,7 @@ class InfoTextValue {
   final String title;
   final String subtitle;
 
-  InfoTextValue({
-    required this.title,
-    required this.subtitle,
-  });
+  InfoTextValue({required this.title, required this.subtitle});
 
   factory InfoTextValue.fromJson(Map<String, dynamic> json) => _$InfoTextValueFromJson(json);
 

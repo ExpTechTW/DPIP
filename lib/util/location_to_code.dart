@@ -8,12 +8,7 @@ class GeoJsonProperties {
   final String name;
   final int code;
 
-  GeoJsonProperties({
-    required this.town,
-    required this.county,
-    required this.name,
-    required this.code,
-  });
+  GeoJsonProperties({required this.town, required this.county, required this.name, required this.code});
 
   factory GeoJsonProperties.fromJson(Map<String, dynamic> json) {
     return GeoJsonProperties(

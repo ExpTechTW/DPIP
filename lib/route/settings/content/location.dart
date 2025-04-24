@@ -94,19 +94,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        openAppSettings();
-                        Navigator.pop(context);
-                      },
-                    )
+                    child: Text(context.i18n.settings),
+                    onPressed: () {
+                      openAppSettings();
+                      Navigator.pop(context);
+                    },
+                  )
                   : FilledButton(
-                      child: Text(context.i18n.again),
-                      onPressed: () {
-                        checkNotificationPermission();
-                        Navigator.pop(context);
-                      },
-                    ),
+                    child: Text(context.i18n.again),
+                    onPressed: () {
+                      checkNotificationPermission();
+                      Navigator.pop(context);
+                    },
+                  ),
             ],
           );
         },
@@ -144,19 +144,19 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               ),
               status.isPermanentlyDenied
                   ? FilledButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        openAppSettings();
-                        Navigator.pop(context);
-                      },
-                    )
+                    child: Text(context.i18n.settings),
+                    onPressed: () {
+                      openAppSettings();
+                      Navigator.pop(context);
+                    },
+                  )
                   : FilledButton(
-                      child: Text(context.i18n.again),
-                      onPressed: () {
-                        checkLocationPermission();
-                        Navigator.pop(context);
-                      },
-                    ),
+                    child: Text(context.i18n.again),
+                    onPressed: () {
+                      checkLocationPermission();
+                      Navigator.pop(context);
+                    },
+                  ),
             ],
           );
         },
@@ -179,7 +179,8 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
       if (!mounted) return false;
       final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
 
-      final status = await showDialog<bool>(
+      final status =
+          await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
@@ -391,27 +392,21 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
   }
 
   void permissionStatusUpdate() {
-    Permission.notification.status.then(
-      (value) {
-        setState(() {
-          notificationPermission = value;
-        });
-      },
-    );
-    Permission.location.status.then(
-      (value) {
-        setState(() {
-          locationPermission = value;
-        });
-      },
-    );
-    Permission.locationAlways.status.then(
-      (value) {
-        setState(() {
-          locationAlwaysPermission = value;
-        });
-      },
-    );
+    Permission.notification.status.then((value) {
+      setState(() {
+        notificationPermission = value;
+      });
+    });
+    Permission.location.status.then((value) {
+      setState(() {
+        locationPermission = value;
+      });
+    });
+    Permission.locationAlways.status.then((value) {
+      setState(() {
+        locationAlwaysPermission = value;
+      });
+    });
     if (Platform.isAndroid) {
       setState(() async {
         autoStartPermission = await Autostarter.checkAutoStartState() ?? false;
@@ -467,28 +462,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 duration: Durations.medium2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.warning, color: context.colors.error),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.auto_location_permission_upgrade_needed(permissionType.toString()),
-                        style: TextStyle(color: context.colors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.i18n.auto_location_permission_upgrade_needed(permissionType.toString()),
+                          style: TextStyle(color: context.colors.error),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        openAppSettings();
-                      },
-                    ),
-                  ]),
+                      TextButton(
+                        child: Text(context.i18n.settings),
+                        onPressed: () {
+                          openAppSettings();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -503,28 +497,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 duration: Durations.medium2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.warning, color: context.colors.error),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.notification_permission_denied,
-                        style: TextStyle(color: context.colors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.i18n.notification_permission_denied,
+                          style: TextStyle(color: context.colors.error),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        openAppSettings();
-                      },
-                    ),
-                  ]),
+                      TextButton(
+                        child: Text(context.i18n.settings),
+                        onPressed: () {
+                          openAppSettings();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -539,28 +532,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 duration: Durations.medium2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.warning, color: context.colors.error),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.autoStart_permission_denied,
-                        style: TextStyle(color: context.colors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.i18n.autoStart_permission_denied,
+                          style: TextStyle(color: context.colors.error),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () async {
-                        await Autostarter.getAutoStartPermission(newTask: true);
-                      },
-                    ),
-                  ]),
+                      TextButton(
+                        child: Text(context.i18n.settings),
+                        onPressed: () async {
+                          await Autostarter.getAutoStartPermission(newTask: true);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -575,51 +567,44 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 duration: Durations.medium2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.warning, color: context.colors.error),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.batteryOptimization_permission_denied,
-                        style: TextStyle(color: context.colors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.i18n.batteryOptimization_permission_denied,
+                          style: TextStyle(color: context.colors.error),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ]),
+                      TextButton(
+                        child: Text(context.i18n.settings),
+                        onPressed: () {
+                          DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Row(children: [
-              const Padding(
-                padding: EdgeInsets.all(8),
-                child: Icon(Symbols.info),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(context.i18n.settings_location_auto_description),
-              )
-            ]),
+            child: Row(
+              children: [
+                const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.info)),
+                const SizedBox(width: 8),
+                Expanded(child: Text(context.i18n.settings_location_auto_description)),
+              ],
+            ),
           ),
           ListTileGroupHeader(title: context.i18n.settings_location),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Symbols.location_city),
-            ),
+            leading: const Padding(padding: EdgeInsets.all(8), child: Icon(Symbols.location_city)),
             title: Text(context.i18n.location_city),
             subtitle: Text(city ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled,
@@ -636,11 +621,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               await Navigator.of(
                 context,
                 rootNavigator: true,
-              ).push(
-                MaterialPageRoute(
-                  builder: (context) => LocationSelectorRoute(city: null, town: town),
-                ),
-              );
+              ).push(MaterialPageRoute(builder: (context) => LocationSelectorRoute(city: null, town: town)));
 
               setState(() {
                 sendpositionUpdate();
@@ -648,10 +629,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             },
           ),
           ListTile(
-            leading: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(Symbols.forest),
-            ),
+            leading: const Padding(padding: EdgeInsets.all(8.0), child: Icon(Symbols.forest)),
             title: Text(context.i18n.location_town),
             subtitle: Text(town ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled && city != null,
@@ -668,11 +646,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               await Navigator.of(
                 context,
                 rootNavigator: true,
-              ).push(
-                MaterialPageRoute(
-                  builder: (context) => LocationSelectorRoute(city: city, town: town),
-                ),
-              );
+              ).push(MaterialPageRoute(builder: (context) => LocationSelectorRoute(city: city, town: town)));
 
               setState(() {
                 sendpositionUpdate();
@@ -690,28 +664,27 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 duration: Durations.medium2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.warning, color: context.colors.error),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.autoStart_permission_denied,
-                        style: TextStyle(color: context.colors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.i18n.autoStart_permission_denied,
+                          style: TextStyle(color: context.colors.error),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () async {
-                        await Autostarter.getAutoStartPermission(newTask: true);
-                      },
-                    ),
-                  ]),
+                      TextButton(
+                        child: Text(context.i18n.settings),
+                        onPressed: () async {
+                          await Autostarter.getAutoStartPermission(newTask: true);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -721,34 +694,34 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               maintainAnimation: true,
               maintainState: true,
               child: AnimatedOpacity(
-                opacity: !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission! ? 1 : 0,
+                opacity:
+                    !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission! ? 1 : 0,
                 curve: const Interval(0.2, 1, curve: Easing.standard),
                 duration: Durations.medium2,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(
-                        Symbols.warning,
-                        color: context.colors.error,
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(Symbols.warning, color: context.colors.error),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.batteryOptimization_permission_denied,
-                        style: TextStyle(color: context.colors.error),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          context.i18n.batteryOptimization_permission_denied,
+                          style: TextStyle(color: context.colors.error),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ]),
+                      TextButton(
+                        child: Text(context.i18n.settings),
+                        onPressed: () {
+                          DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

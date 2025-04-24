@@ -111,27 +111,19 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [
-            Permission.notification,
-            Permission.locationAlways,
-            Permission.photos,
-          ];
+          permissions = [Permission.notification, Permission.locationAlways, Permission.photos];
         }
       } else {
         if (Platform.isAndroid) {
           final androidInfo = await deviceInfo.androidInfo;
-            permissions = [
-              Permission.notification,
-              Permission.location,
-              androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
-              Permission.ignoreBatteryOptimizations,
-            ];
-        } else if (Platform.isIOS) {
           permissions = [
             Permission.notification,
             Permission.location,
-            Permission.photos,
+            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            Permission.ignoreBatteryOptimizations,
           ];
+        } else if (Platform.isIOS) {
+          permissions = [Permission.notification, Permission.location, Permission.photos];
         }
       }
 
@@ -184,14 +176,16 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           continue;
       }
 
-      items.add(PermissionItem(
-        icon: icon,
-        text: text,
-        description: description,
-        color: color,
-        permission: permission,
-        isHighlighted: isHighlighted,
-      ));
+      items.add(
+        PermissionItem(
+          icon: icon,
+          text: text,
+          description: description,
+          color: color,
+          permission: permission,
+          isHighlighted: isHighlighted,
+        ),
+      );
     }
     return items;
   }
@@ -223,18 +217,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       future: item.permission.status,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          );
+          return const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2));
         }
         final status = snapshot.data ?? PermissionStatus.denied;
 
-        return Switch(
-          value: status.isGranted,
-          onChanged: (value) => _handlePermissionChange(item, value),
-        );
+        return Switch(value: status.isGranted, onChanged: (value) => _handlePermissionChange(item, value));
       },
     );
   }
@@ -339,9 +326,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
       setState(() {});
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to change permission: ${item.text}')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to change permission: ${item.text}')));
     } finally {
       setState(() {
         _isRequestingPermission = false;
@@ -352,23 +337,21 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   void _showPermanentlyDeniedDialog(PermissionItem item) {
     showDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: Text(context.i18n.permission_request),
-        content: Text(context.i18n.manual_permission_enablement),
-        actions: [
-          TextButton(
-            child: Text(context.i18n.cancel),
-            onPressed: () => Navigator.of(context).pop(),
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: Text(context.i18n.permission_request),
+            content: Text(context.i18n.manual_permission_enablement),
+            actions: [
+              TextButton(child: Text(context.i18n.cancel), onPressed: () => Navigator.of(context).pop()),
+              TextButton(
+                child: Text(context.i18n.confirm),
+                onPressed: () {
+                  openAppSettings();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
-          TextButton(
-            child: Text(context.i18n.confirm),
-            onPressed: () {
-              openAppSettings();
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -378,10 +361,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(
-            onPressed: getNotify,
-            child: Text(context.i18n.next_step),
-          ),
+          child: FilledButton(onPressed: getNotify, child: Text(context.i18n.next_step)),
         ),
       ),
       body: SingleChildScrollView(
@@ -395,11 +375,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Icon(
-                      Symbols.security_rounded,
-                      size: 80,
-                      color: context.colors.primary,
-                    ),
+                    child: Icon(Symbols.security_rounded, size: 80, color: context.colors.primary),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -429,10 +405,10 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                             color: context.colors.primary.withOpacity(0.7),
                           ),
                           textAlign: TextAlign.center,
-                        )
+                        ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

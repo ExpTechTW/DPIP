@@ -37,17 +37,11 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
               controller: controller,
               tabs: [
                 Tab(
-                  icon: Icon(
-                    Symbols.globe_asia_rounded,
-                    fill: controller.index == 0 ? 1 : 0,
-                  ),
+                  icon: Icon(Symbols.globe_asia_rounded, fill: controller.index == 0 ? 1 : 0),
                   text: context.i18n.history_nationwide,
                 ),
                 Tab(
-                  icon: Icon(
-                    Symbols.home_rounded,
-                    fill: controller.index == 1 ? 1 : 0,
-                  ),
+                  icon: Icon(Symbols.home_rounded, fill: controller.index == 1 ? 1 : 0),
                   text: context.i18n.settings_location,
                 ),
               ],
@@ -58,10 +52,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
       body: TabBarView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          HistoryCountryTab(),
-          HistoryLocationTab(),
-        ],
+        children: const [HistoryCountryTab(), HistoryLocationTab()],
       ),
     );
   }

@@ -20,12 +20,7 @@ class ReportSheetContent extends StatelessWidget {
   final EarthquakeReport report;
   final void Function(LatLng target) focus;
 
-  const ReportSheetContent({
-    super.key,
-    required this.report,
-    required this.controller,
-    required this.focus,
-  });
+  const ReportSheetContent({super.key, required this.report, required this.controller, required this.focus});
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +45,7 @@ class ReportSheetContent extends StatelessWidget {
                           : context.i18n.report_without_number,
                       style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                     ),
-                    Text(
-                      report.getLocation(),
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
+                    Text(report.getLocation(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -91,21 +83,12 @@ class ReportSheetContent extends StatelessWidget {
           label: context.i18n.report_event_time,
           child: Text(
             DateFormat(context.i18n.datetime_format).format(report.time),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
         DetailFieldTile(
           label: context.i18n.report_location,
-          child: Text(
-            report.convertLatLon(),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          child: Text(report.convertLatLon(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
         Row(
           children: [
@@ -123,13 +106,7 @@ class ReportSheetContent extends StatelessWidget {
                         color: MagnitudeColor.magnitude(report.magnitude),
                       ),
                     ),
-                    Text(
-                      "M ${report.magnitude}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text("M ${report.magnitude}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -148,13 +125,7 @@ class ReportSheetContent extends StatelessWidget {
                         color: DepthColor.depth(report.depth),
                       ),
                     ),
-                    Text(
-                      "${report.depth} km",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text("${report.depth} km", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -177,10 +148,7 @@ class ReportSheetContent extends StatelessWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text(
-                              areaName,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
+                            child: Text(areaName, style: const TextStyle(fontWeight: FontWeight.bold)),
                           ),
                           const SizedBox(width: 20),
                           Expanded(
@@ -216,7 +184,7 @@ class ReportSheetContent extends StatelessWidget {
                                     ),
                                     label: Text(townName),
                                     onPressed: () => focus(LatLng(town.lat, town.lon)),
-                                  )
+                                  ),
                               ],
                             ),
                           ),
@@ -267,7 +235,7 @@ class ReportSheetContent extends StatelessWidget {
               imageUrl: report.pgvMapImageUrl!,
               imageName: report.pgvMapImageName!,
             ),
-          )
+          ),
       ],
     );
   }

@@ -64,13 +64,17 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text('${context.i18n.error_prefix} ${snapshot.error}',
-                        style: TextStyle(color: context.colors.error, fontSize: 16)),
+                    child: Text(
+                      '${context.i18n.error_prefix} ${snapshot.error}',
+                      style: TextStyle(color: context.colors.error, fontSize: 16),
+                    ),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
-                    child: Text(context.i18n.no_data_available,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                    child: Text(
+                      context.i18n.no_data_available,
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    ),
                   );
                 }
 
@@ -112,10 +116,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
           Expanded(
             child: Text(
               context.i18n.server_status_overview,
-              style: TextStyle(
-                fontSize: 14,
-                color: isDarkMode ? Colors.white70 : Colors.black87,
-              ),
+              style: TextStyle(fontSize: 14, color: isDarkMode ? Colors.white70 : Colors.black87),
             ),
           ),
         ],
@@ -188,10 +189,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                           children: [
                             Icon(statusIcon, color: statusColor, size: 18),
                             const SizedBox(width: 6),
-                            Text(
-                              statusText,
-                              style: TextStyle(color: statusColor, fontWeight: FontWeight.bold),
-                            ),
+                            Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -211,10 +209,8 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: status.services.length,
-              separatorBuilder: (context, index) => Divider(
-                height: 1,
-                color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
-              ),
+              separatorBuilder:
+                  (context, index) => Divider(height: 1, color: isDarkMode ? Colors.grey[700] : Colors.grey[300]),
               itemBuilder: (context, index) {
                 final entry = status.services.entries.elementAt(index);
                 return _buildServiceTile(entry.key, entry.value, isDarkMode);
@@ -258,16 +254,11 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     return ListTile(
       title: Text(
         serviceName,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          color: isDarkMode ? Colors.white : Colors.black87,
-        ),
+        style: TextStyle(fontWeight: FontWeight.w500, color: isDarkMode ? Colors.white : Colors.black87),
       ),
       subtitle: Text(
         context.i18n.delay(serviceStatus.count.toString()),
-        style: TextStyle(
-          color: isDarkMode ? Colors.white70 : Colors.black54,
-        ),
+        style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -275,13 +266,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
           color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Text(
-          statusText,
-          style: TextStyle(
-            color: statusColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),
       ),
     );
   }

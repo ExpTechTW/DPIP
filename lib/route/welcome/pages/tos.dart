@@ -57,9 +57,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
       }
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${context.i18n.error_occurred} $e')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.i18n.error_occurred} $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -76,17 +74,14 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             children: [
               TextButton(
                 onPressed: _isLoading ? null : () => complete(context, false),
-                child: Text(
-                  context.i18n.disagree,
-                  style: TextStyle(fontSize: 16, color: context.colors.onSurface),
-                ),
+                child: Text(context.i18n.disagree, style: TextStyle(fontSize: 16, color: context.colors.onSurface)),
               ),
               _isLoading
                   ? const CircularProgressIndicator()
                   : FilledButton(
-                      onPressed: _isEnabled ? () => complete(context, true) : null,
-                      child: Text(context.i18n.agree),
-                    ),
+                    onPressed: _isEnabled ? () => complete(context, true) : null,
+                    child: Text(context.i18n.agree),
+                  ),
             ],
           ),
         ),
@@ -101,11 +96,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 children: [
-                  Icon(
-                    Symbols.monitor_heart,
-                    size: 36,
-                    color: context.colors.secondary,
-                  ),
+                  Icon(Symbols.monitor_heart, size: 36, color: context.colors.secondary),
                   const SizedBox(height: 16),
                   Text(
                     context.i18n.monitor,
@@ -117,37 +108,24 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
             ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(
-                context.i18n.trem_service_description,
-                style: context.theme.textTheme.bodyLarge,
-              ),
+              child: Text(context.i18n.trem_service_description, style: context.theme.textTheme.bodyLarge),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.colors.errorContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: BoxDecoration(color: context.colors.errorContainer, borderRadius: BorderRadius.circular(16)),
               child: Text(
                 context.i18n.real_time_magnitude_warning,
-                style: context.theme.textTheme.bodyLarge!.copyWith(
-                  color: context.colors.onErrorContainer,
-                ),
+                style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
               ),
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.colors.errorContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: BoxDecoration(color: context.colors.errorContainer, borderRadius: BorderRadius.circular(16)),
               child: Text(
                 context.i18n.trem_station_warning,
-                style: context.theme.textTheme.bodyLarge!.copyWith(
-                  color: context.colors.onErrorContainer,
-                ),
+                style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
               ),
             ),
             const SizedBox(height: 16),
@@ -157,10 +135,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
                 color: context.colors.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                context.i18n.trem_monitor_description,
-                style: context.theme.textTheme.bodyLarge,
-              ),
+              child: Text(context.i18n.trem_monitor_description, style: context.theme.textTheme.bodyLarge),
             ),
             const SizedBox(height: 16),
             Container(
@@ -169,10 +144,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
                 color: context.colors.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                context.i18n.station_noise_warning,
-                style: context.theme.textTheme.bodyLarge,
-              ),
+              child: Text(context.i18n.station_noise_warning, style: context.theme.textTheme.bodyLarge),
             ),
             const SizedBox(height: 16),
             Container(
@@ -181,10 +153,7 @@ class _WelcomeTosPageState extends State<WelcomeTosPage> {
                 color: context.colors.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                context.i18n.trem_net_deployment,
-                style: context.theme.textTheme.bodyLarge,
-              ),
+              child: Text(context.i18n.trem_net_deployment, style: context.theme.textTheme.bodyLarge),
             ),
           ],
         ),

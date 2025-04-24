@@ -74,13 +74,15 @@ class ExpTech {
     var requestUrl = Route.rts();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl
-          .toString()
-          .replaceAll("rts", "rts/${time ~/ 1000}")
-          .replaceAll("lb-", "api-")
-          .replaceAll("-3", "-1")
-          .replaceAll("-4", "-2")
-          .replaceAll(RegExp(r'api-\d+'), 'api-1'));
+      requestUrl = Uri.parse(
+        requestUrl
+            .toString()
+            .replaceAll("rts", "rts/${time ~/ 1000}")
+            .replaceAll("lb-", "api-")
+            .replaceAll("-3", "-1")
+            .replaceAll("-4", "-2")
+            .replaceAll(RegExp(r'api-\d+'), 'api-1'),
+      );
     }
 
     var res = await get(requestUrl);
@@ -96,13 +98,15 @@ class ExpTech {
     var requestUrl = Route.eew();
 
     if (time != 0) {
-      requestUrl = Uri.parse(requestUrl
-          .toString()
-          .replaceAll("eew", "eew/${time ~/ 1000}")
-          .replaceAll("lb-", "api-")
-          .replaceAll("-3", "-1")
-          .replaceAll("-4", "-2")
-          .replaceAll(RegExp(r'api-\d+'), 'api-1'));
+      requestUrl = Uri.parse(
+        requestUrl
+            .toString()
+            .replaceAll("eew", "eew/${time ~/ 1000}")
+            .replaceAll("lb-", "api-")
+            .replaceAll("-3", "-1")
+            .replaceAll("-4", "-2")
+            .replaceAll(RegExp(r'api-\d+'), 'api-1'),
+      );
     }
 
     var res = await get(requestUrl);

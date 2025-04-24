@@ -99,5 +99,6 @@ class Route {
   static Uri status() => Uri.parse("https://status.exptech.dev/api/v1/status/data?duration=1d");
 
   static Uri monitor(String token, String status) => Uri.parse(
-      "https://api-1.exptech.dev/api/v1/notify/setting/$token/$status/${DateTime.now().millisecondsSinceEpoch}");
+    "https://api-1.exptech.dev/api/v1/notify/setting/$token/$status/${DateTime.now().millisecondsSinceEpoch}",
+  );
 }

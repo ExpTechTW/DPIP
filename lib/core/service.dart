@@ -123,11 +123,7 @@ Future<void> androidForegroundService() async {
       initialNotificationContent: "前景服務啟動中...",
       foregroundServiceNotificationId: 888,
     ),
-    iosConfiguration: IosConfiguration(
-      autoStart: true,
-      onForeground: onStart,
-      onBackground: onIosBackground,
-    ),
+    iosConfiguration: IosConfiguration(autoStart: true, onForeground: onStart, onBackground: onIosBackground),
   );
 }
 
@@ -164,12 +160,7 @@ void onStart(ServiceInstance service) async {
       "DPIP",
       "前景服務啟動中...",
       const NotificationDetails(
-        android: AndroidNotificationDetails(
-          "my_foreground",
-          "前景自動定位",
-          icon: "@mipmap/ic_launcher",
-          ongoing: true,
-        ),
+        android: AndroidNotificationDetails("my_foreground", "前景自動定位", icon: "@mipmap/ic_launcher", ongoing: true),
       ),
     );
 
@@ -195,9 +186,10 @@ void onStart(ServiceInstance service) async {
         service.invoke("sendposition", {"position": position.toJson()});
         String lat = position.lat.toString();
         String lon = position.lng.toString();
-        String location = position.code == null
-            ? "服務區域外"
-            : "${Global.location[position.code.toString()]?.city}${Global.location[position.code.toString()]?.town}";
+        String location =
+            position.code == null
+                ? "服務區域外"
+                : "${Global.location[position.code.toString()]?.city}${Global.location[position.code.toString()]?.town}";
         String? fcmToken = Global.preference.getString("fcm-token");
         if (position.change && fcmToken != null) {
           final body = await ExpTech().getNotifyLocation(fcmToken, lat, lon);
@@ -214,19 +206,11 @@ void onStart(ServiceInstance service) async {
           notifyTitle,
           notifyBody,
           const NotificationDetails(
-            android: AndroidNotificationDetails(
-              "my_foreground",
-              "前景自動定位",
-              icon: "@mipmap/ic_launcher",
-              ongoing: true,
-            ),
+            android: AndroidNotificationDetails("my_foreground", "前景自動定位", icon: "@mipmap/ic_launcher", ongoing: true),
           ),
         );
 
-        service.setForegroundNotificationInfo(
-          title: notifyTitle,
-          content: notifyBody,
-        );
+        service.setForegroundNotificationInfo(title: notifyTitle, content: notifyBody);
       }
     }
 

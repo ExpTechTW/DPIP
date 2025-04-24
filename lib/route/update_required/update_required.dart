@@ -30,11 +30,7 @@ class UpdateRequiredPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Icon(
-                  Icons.system_update,
-                  size: 120,
-                  color: context.colors.onPrimary,
-                ),
+                Icon(Icons.system_update, size: 120, color: context.colors.onPrimary),
                 const SizedBox(height: 32),
                 Text(
                   context.i18n.discover_new_version,
@@ -47,23 +43,22 @@ class UpdateRequiredPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   context.i18n.update_to_latest_version,
-                  style: context.theme.textTheme.bodyLarge?.copyWith(
-                    color: context.colors.onPrimary,
-                  ),
+                  style: context.theme.textTheme.bodyLarge?.copyWith(color: context.colors.onPrimary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 Card(
                   elevation: 8,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
                         _buildVersionInfo(
-                            context.i18n.current_version, Global.packageInfo.version, Colors.red.shade400),
+                          context.i18n.current_version,
+                          Global.packageInfo.version,
+                          Colors.red.shade400,
+                        ),
                         const SizedBox(height: 12),
                         _buildVersionInfo(context.i18n.latest_version, lastVersion, Colors.green.shade400),
                       ],
@@ -74,8 +69,11 @@ class UpdateRequiredPage extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     if (Platform.isIOS) {
-                      launchUrl(Uri.parse(
-                          "https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362"));
+                      launchUrl(
+                        Uri.parse(
+                          "https://apps.apple.com/tw/app/dpip-%E7%81%BD%E5%AE%B3%E5%A4%A9%E6%B0%A3%E8%88%87%E5%9C%B0%E9%9C%87%E9%80%9F%E5%A0%B1/id6468026362",
+                        ),
+                      );
                     } else {
                       launchUrl(Uri.parse("https://play.google.com/store/apps/details?id=com.exptech.dpip"));
                     }
@@ -84,13 +82,13 @@ class UpdateRequiredPage extends StatelessWidget {
                     foregroundColor: context.colors.onPrimary,
                     backgroundColor: context.colors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 4,
                   ),
-                  child:
-                      Text(context.i18n.update_now, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    context.i18n.update_now,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 if (showSkipButton) ...[
                   const SizedBox(height: 16),
@@ -103,13 +101,8 @@ class UpdateRequiredPage extends StatelessWidget {
                         (Route<dynamic> route) => false,
                       );
                     },
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: Text(
-                      context.i18n.skip_for_now,
-                      style: TextStyle(fontSize: 16, color: Colors.blue.shade700),
-                    ),
+                    style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                    child: Text(context.i18n.skip_for_now, style: TextStyle(fontSize: 16, color: Colors.blue.shade700)),
                   ),
                 ],
               ],
@@ -127,18 +120,8 @@ class UpdateRequiredPage extends StatelessWidget {
         Text(label, style: TextStyle(fontSize: 16, color: Colors.grey.shade700)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: versionColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            version,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: versionColor,
-            ),
-          ),
+          decoration: BoxDecoration(color: versionColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+          child: Text(version, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: versionColor)),
         ),
       ],
     );
