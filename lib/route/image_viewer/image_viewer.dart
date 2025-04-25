@@ -39,7 +39,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           status = await Permission.photos.request();
         }
       } else {
-        status = await Permission.photos.request();
+        status = await Permission.photosAddOnly.request();
       }
 
       if (!mounted) return;
