@@ -113,7 +113,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [Permission.notification, Permission.locationAlways, Permission.photos];
+          permissions = [Permission.notification, Permission.locationAlways, Permission.photosAddOnly];
         }
       } else {
         if (Platform.isAndroid) {
@@ -125,7 +125,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
-          permissions = [Permission.notification, Permission.location, Permission.photos];
+          permissions = [Permission.notification, Permission.location, Permission.photosAddOnly];
         }
       }
 
@@ -169,6 +169,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           break;
         case Permission.storage:
         case Permission.photos:
+        case Permission.photosAddOnly:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
           text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;

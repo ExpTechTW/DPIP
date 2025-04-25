@@ -7,3 +7,4 @@
 *.g.dart
 /lib/l10n
 macos/Flutter/ephemeral
+.flutter-plugins
