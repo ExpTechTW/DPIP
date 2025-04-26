@@ -39,26 +39,8 @@ void main() async {
   );
 }
 
-class DpipApp extends StatefulWidget {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+class DpipApp extends StatelessWidget {
   const DpipApp({super.key});
-
-  @override
-  State<DpipApp> createState() => DpipAppState();
-}
-
-class DpipAppState extends State<DpipApp> {
-  bool showWelcomeScreen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (Global.preference.getBool("welcome-1.0.0") == null) {
-      Global.preference.setString("changelog", Global.packageInfo.version);
-      showWelcomeScreen = true;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
