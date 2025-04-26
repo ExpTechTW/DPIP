@@ -1,3 +1,4 @@
+import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -16,24 +17,29 @@ class SettingsLocalePage extends StatelessWidget {
     return ListView(
       controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
       children: [
-        Consumer<SettingsUserInterfaceModel>(
-          builder: (context, model, child) {
-            return SettingsListTile(
-              leading: Symbols.translate_rounded,
-              title: context.i18n.settings_display_locale,
-              subtitle: Text(model.locale?.nativeName ?? 'System Language'),
-              onTap: () => context.push('/settings/locale/select'),
-            );
-          },
-        ),
-        SettingsListTile(
-          leading: Symbols.groups_rounded,
-          title: context.i18n.settings_locale_crowdin,
-          subtitle: Text(context.i18n.settings_locale_crowdin_description),
-          trailing: const Icon(Symbols.arrow_outward_rounded),
-          onTap: () {
-            launchUrl(Uri.parse("https://crowdin.com/project/dpip"));
-          },
+        SettingsListSection(
+          title: context.i18n.settings_locale,
+          children: [
+            Consumer<SettingsUserInterfaceModel>(
+              builder: (context, model, child) {
+                return SettingsListTile(
+                  icon: Symbols.translate_rounded,
+                  title: context.i18n.settings_display_locale,
+                  subtitle: Text(model.locale?.nativeName ?? 'System Language'),
+                  onTap: () => context.push('/settings/locale/select'),
+                );
+              },
+            ),
+            SettingsListTile(
+              icon: Symbols.groups_rounded,
+              title: context.i18n.settings_locale_crowdin,
+              subtitle: Text(context.i18n.settings_locale_crowdin_description),
+              trailing: const Icon(Symbols.arrow_outward_rounded),
+              onTap: () {
+                launchUrl(Uri.parse("https://crowdin.com/project/dpip"));
+              },
+            ),
+          ],
         ),
       ],
     );

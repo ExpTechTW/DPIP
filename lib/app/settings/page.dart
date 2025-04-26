@@ -17,7 +17,7 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'User Interface',
           children: [
             SettingsListTile(
-              leading: Symbols.brush_rounded,
+              icon: Symbols.brush_rounded,
               title: context.i18n.settings_theme,
               subtitle: Text(context.i18n.settings_theme_description),
               onTap: () {
@@ -25,7 +25,7 @@ class SettingsIndexPage extends StatelessWidget {
               },
             ),
             SettingsListTile(
-              leading: Symbols.translate_rounded,
+              icon: Symbols.translate_rounded,
               title: context.i18n.settings_locale,
               subtitle: Text(context.i18n.settings_locale_description),
               onTap: () {
@@ -38,7 +38,7 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'Notification',
           children: [
             SettingsListTile(
-              leading: Symbols.notifications_rounded,
+              icon: Symbols.notifications_rounded,
               title: 'Notification',
               subtitle: Text('Notification'),
               onTap: () {

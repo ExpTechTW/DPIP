@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SettingsListTile extends StatelessWidget {
-  final IconData? leading;
+  final Widget? leading;
+  final IconData? icon;
   final String title;
   final Widget? subtitle;
   final Widget? trailing;
@@ -11,6 +12,7 @@ class SettingsListTile extends StatelessWidget {
   const SettingsListTile({
     super.key,
     this.leading,
+    this.icon,
     required this.title,
     this.subtitle,
     this.trailing,
@@ -21,7 +23,7 @@ class SettingsListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(leading, weight: 600),
+      leading: icon != null ? Icon(icon!, weight: 600) : leading,
       title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: subtitle,
       trailing: trailing,

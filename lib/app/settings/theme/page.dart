@@ -145,9 +145,7 @@ class SettingsThemePage extends StatelessWidget {
                         );
                       },
                     );
-
                     if (result == null) return;
-
                     model.setThemeColor(result);
                   },
                 );

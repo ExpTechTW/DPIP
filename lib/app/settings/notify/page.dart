@@ -3,6 +3,7 @@ import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 class SettingsNotifyPage extends StatelessWidget {
@@ -208,26 +209,22 @@ class SettingsNotifyPage extends StatelessWidget {
         SettingsListSection(
           title: '地震速報',
           children: [
-            Consumer<SettingsNotificationModel>(
-              builder: (context, model, child) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SettingsListTile(
+            Selector<SettingsNotificationModel, EewNotifyType>(
+              selector: (_, model) => model.eew,
+              builder: (context, eew, child) {
+                return SettingsListTile(
+                  title: context.i18n.emergency_earthquake_warning,
+                  subtitle: Text(getEewNotifyTypeName(eew)),
+                  icon: Symbols.crisis_alert_rounded,
+                  onTap: () async {
+                    final result = await openEewNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.emergency_earthquake_warning,
-                      subtitle: Text(getEewNotifyTypeName(model.eew)),
-                      onTap: () async {
-                        final result = await openEewNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.emergency_earthquake_warning,
-                          groupValue: model.eew,
-                        );
-                        if (result == null) return;
-                        model.setEew(result);
-                      },
-                    ),
-                  ],
+                      groupValue: eew,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setEew(result);
+                  },
                 );
               },
             ),
@@ -236,52 +233,60 @@ class SettingsNotifyPage extends StatelessWidget {
         SettingsListSection(
           title: '地震',
           children: [
-            Consumer<SettingsNotificationModel>(
-              builder: (context, model, child) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SettingsListTile(
+            Selector<SettingsNotificationModel, EarthquakeNotifyType>(
+              selector: (_, model) => model.monitor,
+              builder: (context, monitor, child) {
+                return SettingsListTile(
+                  title: context.i18n.monitor,
+                  subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
+                  icon: Symbols.earthquake_rounded,
+                  onTap: () async {
+                    final result = await openEarthquakeNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.monitor,
-                      subtitle: Text(getEarthquakeNotifyTypeName(model.monitor)),
-                      onTap: () async {
-                        final result = await openEarthquakeNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.monitor,
-                          groupValue: model.monitor,
-                        );
-                        if (result == null) return;
-                        model.setMonitor(result);
-                      },
-                    ),
-                    SettingsListTile(
+                      groupValue: monitor,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setMonitor(result);
+                  },
+                );
+              },
+            ),
+            Selector<SettingsNotificationModel, EarthquakeNotifyType>(
+              selector: (_, model) => model.report,
+              builder: (context, report, child) {
+                return SettingsListTile(
+                  title: context.i18n.report,
+                  subtitle: Text(getEarthquakeNotifyTypeName(report)),
+                  icon: Symbols.docs_rounded,
+                  onTap: () async {
+                    final result = await openEarthquakeNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.report,
-                      subtitle: Text(getEarthquakeNotifyTypeName(model.report)),
-                      onTap: () async {
-                        final result = await openEarthquakeNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.report,
-                          groupValue: model.report,
-                        );
-                        if (result == null) return;
-                        model.setReport(result);
-                      },
-                    ),
-                    SettingsListTile(
+                      groupValue: report,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setReport(result);
+                  },
+                );
+              },
+            ),
+            Selector<SettingsNotificationModel, EarthquakeNotifyType>(
+              selector: (_, model) => model.intensity,
+              builder: (context, intensity, child) {
+                return SettingsListTile(
+                  title: context.i18n.sound_int_report_minor,
+                  subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
+                  icon: Symbols.summarize_rounded,
+                  onTap: () async {
+                    final result = await openEarthquakeNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.sound_int_report_minor,
-                      subtitle: Text(getEarthquakeNotifyTypeName(model.intensity)),
-                      onTap: () async {
-                        final result = await openEarthquakeNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.sound_int_report_minor,
-                          groupValue: model.intensity,
-                        );
-                        if (result == null) return;
-                        model.setIntensity(result);
-                      },
-                    ),
-                  ],
+                      groupValue: intensity,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setIntensity(result);
+                  },
                 );
               },
             ),
@@ -290,52 +295,60 @@ class SettingsNotifyPage extends StatelessWidget {
         SettingsListSection(
           title: '天氣',
           children: [
-            Consumer<SettingsNotificationModel>(
-              builder: (context, model, child) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SettingsListTile(
+            Selector<SettingsNotificationModel, WeatherNotifyType>(
+              selector: (_, model) => model.thunderstorm,
+              builder: (context, thunderstorm, child) {
+                return SettingsListTile(
+                  title: context.i18n.sound_rain_instant,
+                  subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
+                  icon: Symbols.thunderstorm_rounded,
+                  onTap: () async {
+                    final result = await openWeatherNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.sound_rain_instant,
-                      subtitle: Text(getWeatherNotifyTypeName(model.thunderstorm)),
-                      onTap: () async {
-                        final result = await openWeatherNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.sound_rain_instant,
-                          groupValue: model.thunderstorm,
-                        );
-                        if (result == null) return;
-                        model.setThunderstorm(result);
-                      },
-                    ),
-                    SettingsListTile(
+                      groupValue: thunderstorm,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setThunderstorm(result);
+                  },
+                );
+              },
+            ),
+            Selector<SettingsNotificationModel, WeatherNotifyType>(
+              selector: (_, model) => model.weatherAdvisory,
+              builder: (context, weatherAdvisory, child) {
+                return SettingsListTile(
+                  title: context.i18n.sound_weather_alert,
+                  subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
+                  icon: Symbols.warning_rounded,
+                  onTap: () async {
+                    final result = await openWeatherNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.sound_weather_alert,
-                      subtitle: Text(getWeatherNotifyTypeName(model.weatherAdvisory)),
-                      onTap: () async {
-                        final result = await openWeatherNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.sound_weather_alert,
-                          groupValue: model.weatherAdvisory,
-                        );
-                        if (result == null) return;
-                        model.setWeatherAdvisory(result);
-                      },
-                    ),
-                    SettingsListTile(
+                      groupValue: weatherAdvisory,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setWeatherAdvisory(result);
+                  },
+                );
+              },
+            ),
+            Selector<SettingsNotificationModel, WeatherNotifyType>(
+              selector: (_, model) => model.evacuation,
+              builder: (context, evacuation, child) {
+                return SettingsListTile(
+                  title: context.i18n.sound_evacuation,
+                  subtitle: Text(getWeatherNotifyTypeName(evacuation)),
+                  icon: Symbols.directions_run_rounded,
+                  onTap: () async {
+                    final result = await openWeatherNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.sound_evacuation,
-                      subtitle: Text(getWeatherNotifyTypeName(model.evacuation)),
-                      onTap: () async {
-                        final result = await openWeatherNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.sound_evacuation,
-                          groupValue: model.evacuation,
-                        );
-                        if (result == null) return;
-                        model.setEvacuation(result);
-                      },
-                    ),
-                  ],
+                      groupValue: evacuation,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setEvacuation(result);
+                  },
                 );
               },
             ),
@@ -344,26 +357,22 @@ class SettingsNotifyPage extends StatelessWidget {
         SettingsListSection(
           title: '海嘯',
           children: [
-            Consumer<SettingsNotificationModel>(
-              builder: (context, model, child) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SettingsListTile(
+            Selector<SettingsNotificationModel, TsunamiNotifyType>(
+              selector: (_, model) => model.tsunami,
+              builder: (context, tsunami, child) {
+                return SettingsListTile(
+                  title: context.i18n.tsunami_alert_sound,
+                  subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
+                  icon: Symbols.tsunami_rounded,
+                  onTap: () async {
+                    final result = await openTsunamiNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.tsunami_alert_sound,
-                      subtitle: Text(getTsunamiNotifyTypeName(model.tsunami)),
-                      onTap: () async {
-                        final result = await openTsunamiNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.tsunami_alert_sound,
-                          groupValue: model.tsunami,
-                        );
-                        if (result == null) return;
-                        model.setTsunami(result);
-                      },
-                    ),
-                  ],
+                      groupValue: tsunami,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setTsunami(result);
+                  },
                 );
               },
             ),
@@ -372,26 +381,22 @@ class SettingsNotifyPage extends StatelessWidget {
         SettingsListSection(
           title: '其他',
           children: [
-            Consumer<SettingsNotificationModel>(
-              builder: (context, model, child) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SettingsListTile(
+            Selector<SettingsNotificationModel, BasicNotifyType>(
+              selector: (_, model) => model.announcement,
+              builder: (context, announcement, child) {
+                return SettingsListTile(
+                  title: context.i18n.announcement,
+                  subtitle: Text(getBasicNotifyTypeName(announcement)),
+                  icon: Symbols.campaign_rounded,
+                  onTap: () async {
+                    final result = await openBasicNotifyTypeSelectorDialog(
+                      context,
                       title: context.i18n.announcement,
-                      subtitle: Text(getBasicNotifyTypeName(model.announcement)),
-                      onTap: () async {
-                        final result = await openBasicNotifyTypeSelectorDialog(
-                          context,
-                          title: context.i18n.announcement,
-                          groupValue: model.announcement,
-                        );
-                        if (result == null) return;
-                        model.setAnnouncement(result);
-                      },
-                    ),
-                  ],
+                      groupValue: announcement,
+                    );
+                    if (!context.mounted || result == null) return;
+                    context.read<SettingsNotificationModel>().setAnnouncement(result);
+                  },
                 );
               },
             ),

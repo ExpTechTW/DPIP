@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,6 +45,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       }
     }
     if (mounted) {
+      Preference.isFirstLaunch = false;
       context.go('/home');
     }
   }

@@ -29,6 +29,7 @@ class Preference {
   }
 
   static bool get isFirstLaunch => instance.getString('welcome') != 'done';
+  static set isFirstLaunch(bool value) => instance.set('welcome', value ? null : 'done');
 
   static String? get themeMode => instance.getString(PreferenceKeys.themeMode);
   static set themeMode(String? value) => instance.set(PreferenceKeys.themeMode, value);

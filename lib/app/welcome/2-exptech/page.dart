@@ -11,7 +11,7 @@ class WelcomeExpTechPage extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(child: Text(context.i18n.next_step), onPressed: () => context.go('/welcome/notice')),
+          child: FilledButton(child: Text(context.i18n.next_step), onPressed: () => context.push('/welcome/notice')),
         ),
       ),
       body: SingleChildScrollView(

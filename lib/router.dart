@@ -27,7 +27,7 @@ final GlobalKey<NavigatorState> _settingsNavigatorKey = GlobalKey<NavigatorState
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Preference.isFirstLaunch ? '/welcome' : '/app',
+  initialLocation: Preference.isFirstLaunch ? '/welcome' : '/home',
   routes: [
     ShellRoute(
       navigatorKey: _welcomeNavigatorKey,

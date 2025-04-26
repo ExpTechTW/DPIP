@@ -12,7 +12,10 @@ class WelcomeNoticePage extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(child: Text(context.i18n.next_step), onPressed: () => context.go('/welcome/permissions')),
+          child: FilledButton(
+            child: Text(context.i18n.next_step),
+            onPressed: () => context.push('/welcome/permissions'),
+          ),
         ),
       ),
       body: SingleChildScrollView(
