@@ -215,6 +215,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.emergency_earthquake_warning,
                   subtitle: Text(getEewNotifyTypeName(eew)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.crisis_alert_rounded,
                   onTap: () async {
                     final result = await openEewNotifyTypeSelectorDialog(
@@ -239,6 +240,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.monitor,
                   subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.earthquake_rounded,
                   onTap: () async {
                     final result = await openEarthquakeNotifyTypeSelectorDialog(
@@ -258,6 +260,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.report,
                   subtitle: Text(getEarthquakeNotifyTypeName(report)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.docs_rounded,
                   onTap: () async {
                     final result = await openEarthquakeNotifyTypeSelectorDialog(
@@ -277,6 +280,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.sound_int_report_minor,
                   subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.summarize_rounded,
                   onTap: () async {
                     final result = await openEarthquakeNotifyTypeSelectorDialog(
@@ -301,6 +305,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.sound_rain_instant,
                   subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.thunderstorm_rounded,
                   onTap: () async {
                     final result = await openWeatherNotifyTypeSelectorDialog(
@@ -320,6 +325,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.sound_weather_alert,
                   subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.warning_rounded,
                   onTap: () async {
                     final result = await openWeatherNotifyTypeSelectorDialog(
@@ -339,6 +345,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.sound_evacuation,
                   subtitle: Text(getWeatherNotifyTypeName(evacuation)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.directions_run_rounded,
                   onTap: () async {
                     final result = await openWeatherNotifyTypeSelectorDialog(
@@ -363,6 +370,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.tsunami_alert_sound,
                   subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.tsunami_rounded,
                   onTap: () async {
                     final result = await openTsunamiNotifyTypeSelectorDialog(
@@ -387,6 +395,7 @@ class SettingsNotifyPage extends StatelessWidget {
                 return SettingsListTile(
                   title: context.i18n.announcement,
                   subtitle: Text(getBasicNotifyTypeName(announcement)),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   icon: Symbols.campaign_rounded,
                   onTap: () async {
                     final result = await openBasicNotifyTypeSelectorDialog(

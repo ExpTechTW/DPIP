@@ -25,31 +25,36 @@ class SettingsListSection extends StatelessWidget {
             .toList()
           ..removeLast();
 
+    final finalChildren = [
+      if (title != null)
+        Padding(
+          padding: const EdgeInsets.only(left: 8, bottom: 4),
+          child: Text(
+            title!,
+            style: context.theme.textTheme.labelLarge!.copyWith(color: context.theme.colorScheme.outline),
+          ),
+        ),
+      Material(
+        color: context.theme.colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: separatedChildren,
+        ),
+      ),
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (title != null)
-            Padding(
-              padding: const EdgeInsets.only(left: 8, bottom: 4),
-              child: Text(
-                title!,
-                style: context.theme.textTheme.labelLarge!.copyWith(color: context.theme.colorScheme.outline),
-              ),
-            ),
-          Material(
-            color: context.theme.colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(16),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: separatedChildren,
-            ),
-          ),
-        ],
+      child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: finalChildren.length,
+        itemBuilder: (context, index) {
+          return finalChildren[index];
+        },
       ),
     );
   }
