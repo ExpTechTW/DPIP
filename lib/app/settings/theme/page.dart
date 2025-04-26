@@ -23,6 +23,7 @@ class SettingsThemePage extends StatelessWidget {
                   leading: Icon(Symbols.dark_mode_rounded),
                   title: Text('主題模式', style: TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(model.themeMode.name.capitalize),
+                  trailing: Icon(Symbols.chevron_right_rounded),
                   onTap: () {
                     showDialog(
                       context: context,
