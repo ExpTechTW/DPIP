@@ -36,7 +36,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   void setThemeColor(Color? color) {
     _themeColor = color?.toARGB32();
 
-    Preference.themeColor = _themeColor!;
+    Preference.themeColor = _themeColor;
 
     _log('Changed ${PreferenceKeys.themeColor} to ${Preference.themeColor}');
     notifyListeners();
