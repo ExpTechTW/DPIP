@@ -6,7 +6,6 @@ import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
 import "package:dpip/route/log/log.dart";
 import "package:dpip/route/notification/notification.dart";
-import "package:dpip/route/settings/settings.dart";
 import "package:dpip/route/sound/sound.dart";
 import "package:dpip/route/status/status.dart";
 import "package:dpip/utils/extensions/build_context.dart";
@@ -39,14 +38,7 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.tune),
           title: Text(context.i18n.settings),
           subtitle: Text(context.i18n.settingsDescription),
-          onTap:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  settings: const RouteSettings(name: "/settings"),
-                  builder: (context) => const SettingsRoute(),
-                ),
-              ),
+          onTap: () => context.push("/settings"),
         ),
 
         /**

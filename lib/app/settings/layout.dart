@@ -3,8 +3,9 @@ import 'package:go_router/go_router.dart';
 
 class SettingsLayout extends StatefulWidget {
   final Widget child;
+  final String title;
 
-  const SettingsLayout({super.key, required this.child});
+  const SettingsLayout({super.key, required this.child, required this.title});
 
   @override
   State<SettingsLayout> createState() => _SettingsLayoutState();
@@ -16,24 +17,8 @@ class _SettingsLayoutState extends State<SettingsLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        controller: controller,
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar.large(
-              pinned: true,
-              floating: true,
-              title: Text('設定'),
-              leading: BackButton(
-                onPressed: () {
-                  context.pop();
-                },
-              ),
-            ),
-          ];
-        },
-        body: widget.child,
-      ),
+      appBar: AppBar(title: Text(widget.title), leading: BackButton(onPressed: () => context.pop())),
+      body: widget.child,
     );
   }
 }

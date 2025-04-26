@@ -16,7 +16,7 @@ class SettingsThemePage extends StatelessWidget {
         Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
             return ListTile(
-              leading: Icon(Symbols.dark_mode),
+              leading: Icon(Symbols.dark_mode_rounded),
               title: Text('Theme Mode', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text(model.themeMode.name.capitalize),
               onTap: () {

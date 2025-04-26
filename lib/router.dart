@@ -1,5 +1,8 @@
 import 'package:dpip/app/layout.dart';
+import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/layout.dart';
+import 'package:dpip/app/settings/locale/select/page.dart';
+import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
@@ -12,6 +15,7 @@ import 'package:dpip/app_old/page/home/home.dart';
 import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -72,7 +76,15 @@ final router = GoRouter(
     ),
     ShellRoute(
       navigatorKey: _settingsNavigatorKey,
-      builder: (context, state, child) => SettingsLayout(child: child),
+      builder: (context, state, child) {
+        final title = switch (state.fullPath) {
+          "/settings/theme" => context.i18n.settings_theme,
+          "/settings/locale" => context.i18n.settings_locale,
+          "/settings/locale/select" => context.i18n.settings_locale,
+          _ => context.i18n.settings,
+        };
+        return SettingsLayout(title: title, child: child);
+      },
       routes: [
         GoRoute(
           path: '/settings',
@@ -81,6 +93,19 @@ final router = GoRouter(
         GoRoute(
           path: '/settings/theme',
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsThemePage()),
+        ),
+        GoRoute(
+          path: '/settings/locale',
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocalePage()),
+        ),
+        GoRoute(
+          path: '/settings/locale/select',
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocaleSelectPage()),
+        ),
+        GoRoute(
+          path: '/settings/notify',
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsNotifyPage()),
         ),
       ],
     ),

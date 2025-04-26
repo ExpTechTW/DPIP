@@ -63,7 +63,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   String _intensity = Preference.notifyIntensity ?? EarthquakeNotifyType.localIntensityAbove1.name;
   String _thunderstorm = Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
   String _weatherAdvisory = Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
-  String _evacuation = Preference.notifyEvacuation ?? BasicNotifyType.all.name;
+  String _evacuation = Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
   String _tsunami = Preference.notifyTsunami ?? TsunamiNotifyType.all.name;
   String _announcement = Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
 
@@ -93,8 +93,8 @@ class SettingsNotificationModel extends ChangeNotifier {
   ///
   /// 預設：所在地震度1以上
   EarthquakeNotifyType get report => EarthquakeNotifyType.values.byName(_report);
-  void setReport(String value) {
-    _report = value;
+  void setReport(EarthquakeNotifyType value) {
+    _report = value.name;
     Preference.notifyReport = _report;
     _log('Changed ${PreferenceKeys.notifyReport} to ${Preference.notifyReport}');
     notifyListeners();
@@ -136,9 +136,12 @@ class SettingsNotificationModel extends ChangeNotifier {
   /// 防災避難通知設定
   ///
   /// 預設：接收全部
-  BasicNotifyType get evacuation => BasicNotifyType.values.byName(_evacuation);
-  void setEvacuation(BasicNotifyType value) {
+  WeatherNotifyType get evacuation => WeatherNotifyType.values.byName(_evacuation);
+  void setEvacuation(WeatherNotifyType value) {
     _evacuation = value.name;
+    Preference.notifyEvacuation = _evacuation;
+    _log('Changed ${PreferenceKeys.notifyEvacuation} to ${Preference.notifyEvacuation}');
+    notifyListeners();
   }
 
   /// 海嘯通知設定

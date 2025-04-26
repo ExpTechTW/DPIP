@@ -1,3 +1,6 @@
+import 'package:dpip/app/settings/_widgets/list_section.dart';
+import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -10,13 +13,39 @@ class SettingsIndexPage extends StatelessWidget {
     return ListView(
       controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
       children: [
-        ListTile(
-          leading: Icon(Symbols.brush_rounded),
-          title: Text('Theme', style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text('Adjust how the app looks'),
-          onTap: () {
-            context.push('/settings/theme');
-          },
+        SettingsListSection(
+          title: 'User Interface',
+          children: [
+            SettingsListTile(
+              leading: Symbols.brush_rounded,
+              title: context.i18n.settings_theme,
+              subtitle: Text(context.i18n.settings_theme_description),
+              onTap: () {
+                context.push('/settings/theme');
+              },
+            ),
+            SettingsListTile(
+              leading: Symbols.translate_rounded,
+              title: context.i18n.settings_locale,
+              subtitle: Text(context.i18n.settings_locale_description),
+              onTap: () {
+                context.push('/settings/locale');
+              },
+            ),
+          ],
+        ),
+        SettingsListSection(
+          title: 'Notification',
+          children: [
+            SettingsListTile(
+              leading: Symbols.notifications_rounded,
+              title: 'Notification',
+              subtitle: Text('Notification'),
+              onTap: () {
+                context.push('/settings/notify');
+              },
+            ),
+          ],
         ),
       ],
     );
