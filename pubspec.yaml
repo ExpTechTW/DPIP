@@ -21,7 +21,6 @@ dependencies:
     git:
       url: https://github.com/pvsvamsi/Disable-Battery-Optimizations.git
       ref: 414b781
-  dynamic_color: 1.7.0
   firebase_core: ^3.13.0
   firebase_messaging: 15.2.5
   flutter_background_service: 5.1.0
@@ -61,6 +60,7 @@ dependencies:
   go_router: ^15.1.1
   flex_color_picker: ^3.7.0
   dash_flags: ^0.1.1
+  dynamic_system_colors: ^1.8.0
 
 dependency_overrides:
   intl: 0.19.0

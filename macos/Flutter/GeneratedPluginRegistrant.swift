@@ -8,7 +8,7 @@ import Foundation
 import awesome_notifications
 import awesome_notifications_core
 import device_info_plus
-import dynamic_color
+import dynamic_system_colors
 import firebase_core
 import firebase_crashlytics
 import firebase_messaging
