@@ -59,3 +59,32 @@ class SettingsListSection extends StatelessWidget {
     );
   }
 }
+
+class SettingsListTextSection extends StatelessWidget {
+  final String content;
+  final IconData? icon;
+
+  const SettingsListTextSection({super.key, required this.content, this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          if (icon != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 8, right: 16),
+              child: Icon(icon, color: context.theme.colorScheme.onSurfaceVariant),
+            ),
+          Expanded(
+            child: Text(
+              content,
+              style: context.theme.textTheme.bodyMedium!.copyWith(color: context.theme.colorScheme.onSurfaceVariant),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

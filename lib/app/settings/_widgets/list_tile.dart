@@ -6,6 +6,7 @@ class SettingsListTile extends StatelessWidget {
   final String title;
   final Widget? subtitle;
   final Widget? trailing;
+  final bool enabled;
   final void Function()? onTap;
   final void Function()? onLongPress;
 
@@ -16,6 +17,7 @@ class SettingsListTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.trailing,
+    this.enabled = true,
     this.onTap,
     this.onLongPress,
   });
@@ -27,6 +29,7 @@ class SettingsListTile extends StatelessWidget {
       title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: subtitle,
       trailing: trailing,
+      enabled: enabled,
       visualDensity: VisualDensity.comfortable,
       onTap: onTap,
       onLongPress: onLongPress,
