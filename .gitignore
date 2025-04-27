@@ -8,3 +8,4 @@
 /lib/l10n
 macos/Flutter/ephemeral
 .flutter-plugins
+/android/app/.cxx
