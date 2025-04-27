@@ -17,6 +17,19 @@ class SettingsIndexPage extends StatelessWidget {
       controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
       children: [
         SettingsListSection(
+          title: context.i18n.settings_position,
+          children: [
+            SettingsListTile(
+              icon: Symbols.pin_drop_rounded,
+              title: context.i18n.settings_location,
+              subtitle: Text(context.i18n.settings_location_description),
+              onTap: () {
+                context.push('/settings/location');
+              },
+            ),
+          ],
+        ),
+        SettingsListSection(
           title: 'User Interface',
           children: [
             SettingsListTile(

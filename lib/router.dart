@@ -3,6 +3,7 @@ import 'package:dpip/app/layout.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/layout.dart';
 import 'package:dpip/app/settings/locale/select/page.dart';
+import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
@@ -93,6 +94,10 @@ final router = GoRouter(
         GoRoute(
           path: '/settings',
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsIndexPage()),
+        ),
+        GoRoute(
+          path: '/settings/location',
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationPage()),
         ),
         GoRoute(
           path: '/settings/theme',

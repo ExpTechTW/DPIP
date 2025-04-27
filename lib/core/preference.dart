@@ -2,6 +2,11 @@ import 'package:dpip/utils/extensions/preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceKeys {
+  // #region Location
+  static const locationAuto = 'location:auto';
+  static const locationCode = 'location:code';
+  // #endregion
+
   // #region User Interface
   static const themeMode = 'pref:ui:mode';
   static const themeColor = 'pref:ui:color';
@@ -31,6 +36,15 @@ class Preference {
   static bool get isFirstLaunch => instance.getString('welcome') != 'done';
   static set isFirstLaunch(bool value) => instance.set('welcome', value ? null : 'done');
 
+  // #region Location
+  static bool? get locationAuto => instance.getBool(PreferenceKeys.locationAuto);
+  static set locationAuto(bool? value) => instance.set(PreferenceKeys.locationAuto, value);
+
+  static int? get locationCode => instance.getInt(PreferenceKeys.locationCode);
+  static set locationCode(int? value) => instance.set(PreferenceKeys.locationCode, value);
+  // #endregion
+
+  // #region User Interface
   static String? get themeMode => instance.getString(PreferenceKeys.themeMode);
   static set themeMode(String? value) => instance.set(PreferenceKeys.themeMode, value);
 
@@ -39,6 +53,7 @@ class Preference {
 
   static String? get locale => instance.getString(PreferenceKeys.locale);
   static set locale(String? value) => instance.set(PreferenceKeys.locale, value);
+  // #endregion
 
   // #region Notification
   static String? get notifyEew => instance.getString(PreferenceKeys.notifyEew);
