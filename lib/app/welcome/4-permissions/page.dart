@@ -107,11 +107,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       PermissionStatus status = await Permission.location.status;
       if (status.isGranted) {
         if (Platform.isAndroid) {
-          final androidInfo = await deviceInfo.androidInfo;
           permissions = [
             Permission.notification,
             Permission.locationAlways,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
@@ -119,11 +117,9 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         }
       } else {
         if (Platform.isAndroid) {
-          final androidInfo = await deviceInfo.androidInfo;
           permissions = [
             Permission.notification,
             Permission.location,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
