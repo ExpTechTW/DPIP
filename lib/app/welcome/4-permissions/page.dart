@@ -111,7 +111,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           permissions = [
             Permission.notification,
             Permission.locationAlways,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            if (androidInfo.version.sdkInt <= 28) Permission.storage,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
@@ -123,7 +123,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           permissions = [
             Permission.notification,
             Permission.location,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            if (androidInfo.version.sdkInt <= 28) Permission.storage,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {

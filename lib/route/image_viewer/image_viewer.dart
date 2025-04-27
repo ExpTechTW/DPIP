@@ -33,10 +33,10 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
       if (Platform.isAndroid) {
         final androidInfo = await DeviceInfoPlugin().androidInfo;
-        if (androidInfo.version.sdkInt <= 32) {
+        if (androidInfo.version.sdkInt <= 28) {
           status = await Permission.storage.request();
         } else {
-          status = await Permission.photos.request();
+          status = PermissionStatus.granted;
         }
       } else {
         status = await Permission.photosAddOnly.request();
