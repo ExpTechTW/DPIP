@@ -1,3 +1,4 @@
+import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/layout.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/layout.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dpip/core/preference.dart';
@@ -35,19 +37,20 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: '/welcome',
-          pageBuilder: (context, state) => BackTransitionPage(key: state.pageKey, child: WelcomeAboutPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeAboutPage()),
         ),
         GoRoute(
           path: '/welcome/exptech',
-          pageBuilder: (context, state) => BackTransitionPage(key: state.pageKey, child: WelcomeExpTechPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeExpTechPage()),
         ),
         GoRoute(
           path: '/welcome/notice',
-          pageBuilder: (context, state) => BackTransitionPage(key: state.pageKey, child: WelcomeNoticePage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeNoticePage()),
         ),
         GoRoute(
           path: '/welcome/permissions',
-          pageBuilder: (context, state) => BackTransitionPage(key: state.pageKey, child: WelcomePermissionPage()),
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomePermissionPage()),
         ),
       ],
     ),
@@ -89,7 +92,7 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: '/settings',
-          pageBuilder: (context, state) => BackTransitionPage(key: state.pageKey, child: SettingsIndexPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsIndexPage()),
         ),
         GoRoute(
           path: '/settings/theme',
@@ -110,6 +113,7 @@ final router = GoRouter(
         ),
       ],
     ),
+    if (kDebugMode) GoRoute(path: '/debug/logs', builder: (context, state) => AppDebugLogsPage()),
   ],
   debugLogDiagnostics: true,
 );
