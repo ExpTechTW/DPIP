@@ -82,6 +82,7 @@ final router = GoRouter(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
         final title = switch (state.fullPath) {
+          '/settings/location' => context.i18n.settings_location,
           '/settings/theme' => context.i18n.settings_theme,
           '/settings/locale' => context.i18n.settings_locale,
           '/settings/locale/select' => context.i18n.settings_locale,
