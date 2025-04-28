@@ -132,7 +132,7 @@ class SettingsNotifyPage extends StatelessWidget {
               visualDensity: VisualDensity.comfortable,
             ),
             RadioListTile(
-              title: const Text('海嘯警報、海嘯警報'),
+              title: const Text('海嘯消息、海嘯警報'),
               value: TsunamiNotifyType.all,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
@@ -194,7 +194,7 @@ class SettingsNotifyPage extends StatelessWidget {
 
   String getTsunamiNotifyTypeName(TsunamiNotifyType value) => switch (value) {
     TsunamiNotifyType.warningOnly => '海嘯警報',
-    TsunamiNotifyType.all => '海嘯警報、海嘯警報',
+    TsunamiNotifyType.all => '海嘯消息、海嘯警報',
   };
 
   String getBasicNotifyTypeName(BasicNotifyType value) => switch (value) {
