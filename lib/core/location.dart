@@ -38,6 +38,13 @@ class LocationService {
     final lastLatitude = GlobalProviders.location.latitude ?? 0;
     final lastLongitude = GlobalProviders.location.longitude ?? 0;
 
+    final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!isLocationServiceEnabled) {
+      TalkerManager.instance.warning("位置服務未啟用");
+      return GetLocationResult(null, false, 0, 0);
+    }
+
     final currentPosition = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
     );

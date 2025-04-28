@@ -19,13 +19,14 @@ void main() async {
   talker.log("start");
   FlutterError.onError = (details) => talker.handle(details.exception, details.stack);
 
-  GlobalProviders.init();
   await Global.init();
   await DeviceInfo.init();
   await Preference.init();
+  GlobalProviders.init();
 
   TalkerManager.instance.info('global init');
   initializeTimeZones();
+
   runApp(
     MultiProvider(
       providers: [

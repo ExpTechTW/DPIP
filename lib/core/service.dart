@@ -7,6 +7,8 @@ import "package:dpip/app_old/page/home/home.dart";
 import "package:dpip/app_old/page/map/monitor/monitor.dart";
 import "package:dpip/app_old/page/map/radar/radar.dart";
 import "package:dpip/core/location.dart";
+import "package:dpip/core/preference.dart";
+import "package:dpip/core/providers.dart";
 import "package:dpip/global.dart";
 import "package:dpip/utils/location_to_code.dart";
 import "package:dpip/utils/log.dart";
@@ -66,15 +68,12 @@ void androidSendPositionlisten() {
 
       GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(lat, lng);
 
-      if (location != null) {
-        Global.preference.setInt("user-code", location.code);
-      } else {
-        Global.preference.remove("user-code");
-      }
+      GlobalProviders.location.setCode(location?.code.toString());
+      GlobalProviders.location.setLatitude(lat);
+      GlobalProviders.location.setLongitude(lng);
 
-      Global.preference.setDouble("user-lat", lat);
-      Global.preference.setDouble("user-lon", lng);
       const MonitorPage(data: 0).createState();
+
       HomePage.updatePosition();
       RadarMap.updatePosition();
       MonitorPage.updatePosition();
@@ -134,8 +133,10 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma("vm:entry-point")
 void onStart(ServiceInstance service) async {
-  DartPluginRegistrant.ensureInitialized();
+  // DartPluginRegistrant.ensureInitialized();
   await Global.init();
+  await Preference.init();
+  GlobalProviders.init();
 
   LocationService locationService = LocationService();
 
@@ -173,9 +174,9 @@ void onStart(ServiceInstance service) async {
     });
 
     service.on("removeposition").listen((event) {
-      Global.preference.remove("user-lat");
-      Global.preference.remove("user-lon");
-      Global.preference.remove("user-code");
+      GlobalProviders.location.setCode(null);
+      GlobalProviders.location.setLatitude(null);
+      GlobalProviders.location.setLongitude(null);
     });
 
     void task() async {
