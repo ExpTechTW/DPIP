@@ -1,9 +1,8 @@
 import "package:dpip/core/device_info.dart";
 import "package:dpip/core/preference.dart";
+import "package:dpip/core/providers.dart";
 import "package:dpip/global.dart";
 import 'package:dpip/l10n/app_localizations.dart';
-import "package:dpip/models/settings/location.dart";
-import "package:dpip/models/settings/notify.dart";
 import "package:dpip/models/settings/ui.dart";
 import "package:dpip/router.dart";
 import "package:dpip/utils/log.dart";
@@ -19,6 +18,8 @@ void main() async {
   final talker = TalkerManager.instance;
   talker.log("start");
   FlutterError.onError = (details) => talker.handle(details.exception, details.stack);
+
+  GlobalProviders.init();
   await Global.init();
   await DeviceInfo.init();
   await Preference.init();
@@ -28,9 +29,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => SettingsLocationModel()),
-        ChangeNotifierProvider(create: (context) => SettingsNotificationModel()),
-        ChangeNotifierProvider(create: (context) => SettingsUserInterfaceModel()),
+        ChangeNotifierProvider.value(value: GlobalProviders.location),
+        ChangeNotifierProvider.value(value: GlobalProviders.notification),
+        ChangeNotifierProvider.value(value: GlobalProviders.ui),
       ],
       child: const DpipApp(),
     ),

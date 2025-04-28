@@ -1,6 +1,6 @@
 import "dart:async";
 
-import "package:dpip/global.dart";
+import "package:dpip/core/providers.dart";
 import "package:dpip/utils/location_to_code.dart";
 import "package:dpip/utils/log.dart";
 import "package:geolocator/geolocator.dart";
@@ -34,32 +34,39 @@ class LocationService {
 
   @pragma("vm:entry-point")
   Future<GetLocationResult> androidGetLocation() async {
-    bool positionchange = false;
-    final positionlattemp = Global.preference.getDouble("user-lat") ?? 0.0;
-    final positionlontemp = Global.preference.getDouble("user-lon") ?? 0.0;
+    bool hasLocationChanged = false;
+    final lastLatitude = GlobalProviders.location.latitude ?? 0;
+    final lastLongitude = GlobalProviders.location.longitude ?? 0;
 
-    final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.medium);
-    GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(position.latitude, position.longitude);
-    double distance = Geolocator.distanceBetween(
-      positionlattemp,
-      positionlontemp,
-      position.latitude,
-      position.longitude,
+    final currentPosition = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
     );
-    if (distance >= 250) {
-      Global.preference.setDouble("user-lat", position.latitude);
-      Global.preference.setDouble("user-lon", position.longitude);
-      positionchange = true;
-      TalkerManager.instance.debug("距離: $distance 更新位置");
+
+    final currentLocation = GeoJsonHelper.checkPointInPolygons(currentPosition.latitude, currentPosition.longitude);
+
+    final distanceInMeters = Geolocator.distanceBetween(
+      lastLatitude,
+      lastLongitude,
+      currentPosition.latitude,
+      currentPosition.longitude,
+    );
+
+    if (distanceInMeters >= 250) {
+      GlobalProviders.location.setLatitude(currentPosition.latitude);
+      GlobalProviders.location.setLongitude(currentPosition.longitude);
+      hasLocationChanged = true;
+      TalkerManager.instance.debug("距離: $distanceInMeters 更新位置");
     } else {
-      TalkerManager.instance.debug("距離: $distance 不更新位置");
-    }
-    if (location?.code == null) {
-      Global.preference.remove("user-code");
-    } else {
-      Global.preference.setInt("user-code", location!.code);
+      TalkerManager.instance.debug("距離: $distanceInMeters 不更新位置");
     }
 
-    return GetLocationResult(location?.code, positionchange, position.latitude, position.longitude);
+    GlobalProviders.location.setCode(currentLocation?.code.toString());
+
+    return GetLocationResult(
+      currentLocation?.code,
+      hasLocationChanged,
+      currentPosition.latitude,
+      currentPosition.longitude,
+    );
   }
 }

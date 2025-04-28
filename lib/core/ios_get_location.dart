@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import "package:dpip/app_old/page/home/home.dart";
-import "package:dpip/app_old/page/map/monitor/monitor.dart";
-import "package:dpip/app_old/page/map/radar/radar.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/location_to_code.dart";
-import "package:dpip/utils/log.dart";
-import "package:flutter/services.dart";
+import 'package:dpip/app_old/page/home/home.dart';
+import 'package:dpip/app_old/page/map/monitor/monitor.dart';
+import 'package:dpip/app_old/page/map/radar/radar.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/location_to_code.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:flutter/services.dart';
 
-const _channel = MethodChannel("com.exptech.dpip/data");
+const _channel = MethodChannel('com.exptech.dpip/data');
 Completer<void>? _completer;
 
 Future<void> getSavedLocation() async {
@@ -19,21 +19,19 @@ Future<void> getSavedLocation() async {
   _completer = Completer<void>();
 
   try {
-    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>("getSavedLocation");
+    final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getSavedLocation');
     final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
-    await Global.preference.setDouble("user-lat", data?["lat"] ?? 0.0);
-    await Global.preference.setDouble("user-lon", data?["lon"] ?? 0.0);
 
-    GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?["lat"], data?["lon"]);
+    GlobalProviders.location.setLongitude(data?['lon']);
+    GlobalProviders.location.setLatitude(data?['lat']);
 
-    if (location != null) {
-      await Global.preference.setInt("user-code", location.code);
-    } else {
-      await Global.preference.remove("user-code");
-    }
+    GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?['lat'], data?['lon']);
+
+    GlobalProviders.location.setCode(location?.code.toString());
+
     _updateAllPositions();
   } catch (e) {
-    TalkerManager.instance.error("Error in getSavedLocation: $e");
+    TalkerManager.instance.error('Error in getSavedLocation: $e');
   } finally {
     _completer?.complete();
     _completer = null;
