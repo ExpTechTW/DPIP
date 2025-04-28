@@ -162,6 +162,7 @@ class SettingsIndexPage extends StatelessWidget {
           content:
               'ExpTech Studio © 2025\n'
               '${context.i18n.official_info}',
+          contentColor: context.theme.colorScheme.outline,
         ),
       ],
     );
