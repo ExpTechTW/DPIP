@@ -35,6 +35,9 @@ class SettingsLocationModel extends ChangeNotifier {
   double? get longitude => _longitude;
   void setLongitude(double? value) {
     _longitude = value;
+    Preference.locationLongitude = _longitude;
+    _log('Changed ${PreferenceKeys.locationLongitude} to ${Preference.locationLongitude}');
+    notifyListeners();
   }
 
   /// 緯度

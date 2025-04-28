@@ -35,6 +35,8 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
                         context.pop();
                         context.pop();
                         context.read<SettingsLocationModel>().setCode(town.key);
+                        context.read<SettingsLocationModel>().setLongitude(town.value.lng);
+                        context.read<SettingsLocationModel>().setLatitude(town.value.lat);
                       },
                     ),
               ),
