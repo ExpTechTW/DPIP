@@ -8,6 +8,8 @@ class SettingsLocationModel extends ChangeNotifier {
 
   bool _auto = Preference.locationAuto ?? false;
   String? _code = Preference.locationCode;
+  double? _longitude = Preference.locationLongitude;
+  double? _latitude = Preference.locationLatitude;
 
   /// 自動定位
   ///
@@ -26,6 +28,21 @@ class SettingsLocationModel extends ChangeNotifier {
     _code = value;
     Preference.locationCode = _code;
     _log('Changed ${PreferenceKeys.locationCode} to ${Preference.locationCode}');
+    notifyListeners();
+  }
+
+  /// 經度
+  double? get longitude => _longitude;
+  void setLongitude(double? value) {
+    _longitude = value;
+  }
+
+  /// 緯度
+  double? get latitude => _latitude;
+  void setLatitude(double? value) {
+    _latitude = value;
+    Preference.locationLatitude = _latitude;
+    _log('Changed ${PreferenceKeys.locationLatitude} to ${Preference.locationLatitude}');
     notifyListeners();
   }
 }

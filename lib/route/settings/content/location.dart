@@ -320,7 +320,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
         return;
       }
     } else if (Platform.isAndroid) {
-      androidstopBackgroundService(isAutoLocatingEnabled);
+      androidStopBackgroundService(isAutoLocatingEnabled);
     }
 
     Global.preference.remove("user-code");

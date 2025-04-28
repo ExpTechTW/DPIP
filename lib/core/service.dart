@@ -45,12 +45,12 @@ void androidStartBackgroundService(bool init) async {
   if (!isRunning) {
     service.startService();
   } else if (!init) {
-    androidstopBackgroundService(false);
+    androidStopBackgroundService(false);
     service.startService();
   }
 }
 
-void androidstopBackgroundService(bool isAutoLocatingEnabled) async {
+void androidStopBackgroundService(bool isAutoLocatingEnabled) async {
   if (await service.isRunning()) {
     if (isAutoLocatingEnabled) {
       service.invoke("removeposition");

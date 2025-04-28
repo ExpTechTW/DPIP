@@ -5,6 +5,8 @@ class PreferenceKeys {
   // #region Location
   static const locationAuto = 'location:auto';
   static const locationCode = 'location:code';
+  static const locationLongitude = 'location:longitude';
+  static const locationLatitude = 'location:latitude';
   // #endregion
 
   // #region User Interface
@@ -42,6 +44,12 @@ class Preference {
 
   static String? get locationCode => instance.getString(PreferenceKeys.locationCode);
   static set locationCode(String? value) => instance.set(PreferenceKeys.locationCode, value);
+
+  static double? get locationLongitude => instance.getDouble(PreferenceKeys.locationLongitude);
+  static set locationLongitude(double? value) => instance.set(PreferenceKeys.locationLongitude, value);
+
+  static double? get locationLatitude => instance.getDouble(PreferenceKeys.locationLatitude);
+  static set locationLatitude(double? value) => instance.set(PreferenceKeys.locationLatitude, value);
   // #endregion
 
   // #region User Interface

@@ -8,8 +8,8 @@ import "package:dpip/app/settings/_widgets/list_tile.dart";
 import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/models/settings/location.dart";
-import "package:dpip/route/location_selector/location_selector.dart";
 import "package:dpip/utils/extensions/build_context.dart";
+import "package:dpip/utils/log.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import "package:go_router/go_router.dart";
@@ -28,34 +28,16 @@ class SettingsLocationPage extends StatefulWidget {
 
   @override
   State<SettingsLocationPage> createState() => _SettingsLocationPageState();
-
-  static PositionUpdateCallback? _activeCallback;
-
-  static void setActiveCallback(PositionUpdateCallback callback) {
-    _activeCallback = callback;
-  }
-
-  static void clearActiveCallback() {
-    _activeCallback = null;
-  }
-
-  static void updatePosition() {
-    _activeCallback?.call();
-  }
 }
 
+const platform = MethodChannel("com.exptech.dpip/location");
+
 class _SettingsLocationPageState extends State<SettingsLocationPage> with WidgetsBindingObserver {
-  static const platform = MethodChannel("com.exptech.dpip/location");
-  bool isAutoLocatingEnabled = Global.preference.getBool("auto-location") ?? false;
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
   bool? autoStartPermission;
   bool? batteryOptimizationPermission;
-
-  String? city;
-  String? town;
-  int code = -1;
 
   Future<bool> requestLocationAlwaysPermission() async {
     var status = await Permission.locationWhenInUse.status;
@@ -225,14 +207,14 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   }
 
   Future<bool> androidCheckAutoStartPermission(int num) async {
-    if (Platform.isIOS) return true;
+    if (!Platform.isAndroid) return true;
+
     try {
       bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
       if (isAvailable == null || !isAvailable) return true;
 
       bool? status = await Autostarter.checkAutoStartState();
-      if (status == null) return true;
-      if (status) return status;
+      if (status == null || status) return true;
 
       if (!mounted) return true;
 
@@ -269,15 +251,18 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
           ) ??
           false;
     } catch (err) {
+      TalkerManager.instance.error(err);
       return false;
     }
   }
 
   Future<bool> androidCheckBatteryOptimizationPermission(int num) async {
-    if (Platform.isIOS) return true;
+    if (!Platform.isAndroid) return true;
+
     try {
       bool status = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
       if (status) return true;
+
       if (!mounted) return true;
 
       String contentText =
@@ -311,30 +296,15 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
           ) ??
           false;
     } catch (err) {
+      TalkerManager.instance.error(err);
       return false;
     }
   }
 
   Future toggleAutoLocation() async {
-    if (Platform.isIOS) {
-      try {
-        await platform.invokeMethod("toggleLocation", {"isEnabled": !isAutoLocatingEnabled});
-      } catch (e) {
-        return;
-      }
-    } else if (Platform.isAndroid) {
-      androidstopBackgroundService(isAutoLocatingEnabled);
-    }
+    final isAuto = context.read<SettingsLocationModel>().auto;
 
-    Global.preference.remove("user-code");
-    Global.preference.remove("user-lat");
-    Global.preference.remove("user-lon");
-
-    if (isAutoLocatingEnabled) {
-      setState(() {
-        isAutoLocatingEnabled = false;
-      });
-    } else {
+    if (!isAuto) {
       final notification = await checkNotificationPermission();
       if (!notification) return;
 
@@ -345,27 +315,29 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
       bool autoStart = await androidCheckAutoStartPermission(0);
       autoStartPermission = autoStart;
-
       if (!autoStart) return;
 
       bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
       batteryOptimizationPermission = batteryOptimization;
-
       if (!batteryOptimization) return;
 
-      if (Platform.isAndroid) {
+      androidStopBackgroundService(!isAuto);
+
+      if (!isAuto) {
         androidStartBackgroundService(false);
       }
-
-      city = null;
-      town = null;
-
-      setState(() {
-        isAutoLocatingEnabled = true;
-      });
     }
 
-    Global.preference.setBool("auto-location", isAutoLocatingEnabled);
+    if (Platform.isIOS) {
+      await platform.invokeMethod("toggleLocation", {"isEnabled": !isAuto}).catchError((_) {});
+    }
+
+    if (!mounted) return;
+
+    context.read<SettingsLocationModel>().setAuto(!isAuto);
+    context.read<SettingsLocationModel>().setCode(null);
+    context.read<SettingsLocationModel>().setLongitude(null);
+    context.read<SettingsLocationModel>().setLatitude(null);
   }
 
   @override
@@ -373,18 +345,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     permissionStatusUpdate();
-    SettingsLocationPage.setActiveCallback(sendpositionUpdate);
-
-    code = Global.preference.getInt("user-code") ?? -1;
-    if (code != -1) {
-      city = Global.location[code.toString()]?.city;
-      town = Global.location[code.toString()]?.town;
-    }
   }
 
   @override
   void dispose() {
-    SettingsLocationPage.clearActiveCallback();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -434,16 +398,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     }
   }
 
-  void sendpositionUpdate() {
-    if (mounted) {
-      code = Global.preference.getInt("user-code") ?? -1;
-      if (code != -1) {
-        city = Global.location[code.toString()]?.city;
-        town = Global.location[code.toString()]?.town;
-      }
-      setState(() {});
-      widget.onPositionUpdate?.call(city, town);
-    }
+  void updateLocation(String? code) {
+    final city = Global.location[code.toString()]?.city;
+    final town = Global.location[code.toString()]?.town;
+
+    widget.onPositionUpdate?.call(city, town);
   }
 
   @override
@@ -453,162 +412,151 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       children: [
         SettingsListSection(
           children: [
-            SettingsListTile(
-              title: context.i18n.settings_location_auto,
-              subtitle: Text('自動更新所在地'),
-              icon: Symbols.my_location_rounded,
-              trailing: Switch(value: isAutoLocatingEnabled, onChanged: (value) => toggleAutoLocation()),
+            Selector<SettingsLocationModel, bool>(
+              selector: (context, model) => model.auto,
+              builder: (context, auto, child) {
+                return SettingsListTile(
+                  title: context.i18n.settings_location_auto,
+                  subtitle: Text('自動更新所在地'),
+                  icon: Symbols.my_location_rounded,
+                  trailing: Switch(value: auto, onChanged: (value) => toggleAutoLocation()),
+                );
+              },
             ),
           ],
         ),
         SettingsListTextSection(icon: Symbols.info_rounded, content: context.i18n.settings_location_auto_description),
         if (locationAlwaysPermission != null)
-          Visibility(
-            visible: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity: isAutoLocatingEnabled && !locationAlwaysPermission!.isGranted ? 1 : 0,
-              curve: const Interval(0.2, 1, curve: Easing.standard),
-              duration: Durations.medium2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Symbols.warning, color: context.colors.error),
+          Selector<SettingsLocationModel, bool>(
+            selector: (context, model) => model.auto,
+            builder: (context, auto, child) {
+              return Visibility(
+                visible: auto && !locationAlwaysPermission!.isGranted,
+                maintainAnimation: true,
+                maintainState: true,
+                child: AnimatedOpacity(
+                  opacity: auto && !locationAlwaysPermission!.isGranted ? 1 : 0,
+                  curve: const Interval(0.2, 1, curve: Easing.standard),
+                  duration: Durations.medium2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(Symbols.warning, color: context.colors.error),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            context.i18n.auto_location_permission_upgrade_needed(permissionType.toString()),
+                            style: TextStyle(color: context.colors.error),
+                          ),
+                        ),
+                        TextButton(child: Text(context.i18n.settings), onPressed: () => openAppSettings()),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.auto_location_permission_upgrade_needed(permissionType.toString()),
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        openAppSettings();
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         if (notificationPermission != null)
-          Visibility(
-            visible: isAutoLocatingEnabled && !notificationPermission!.isGranted,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity: isAutoLocatingEnabled && !notificationPermission!.isGranted ? 1 : 0,
-              curve: const Interval(0.2, 1, curve: Easing.standard),
-              duration: Durations.medium2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Symbols.warning, color: context.colors.error),
+          Selector<SettingsLocationModel, bool>(
+            selector: (context, model) => model.auto,
+            builder: (context, auto, child) {
+              return Visibility(
+                visible: auto && !notificationPermission!.isGranted,
+                maintainAnimation: true,
+                maintainState: true,
+                child: AnimatedOpacity(
+                  opacity: auto && !notificationPermission!.isGranted ? 1 : 0,
+                  curve: const Interval(0.2, 1, curve: Easing.standard),
+                  duration: Durations.medium2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Icon(Symbols.warning, color: context.colors.error),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            context.i18n.notification_permission_denied,
+                            style: TextStyle(color: context.colors.error),
+                          ),
+                        ),
+                        TextButton(child: Text(context.i18n.settings), onPressed: () => openAppSettings()),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.notification_permission_denied,
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
-                      child: Text(context.i18n.settings),
-                      onPressed: () {
-                        openAppSettings();
-                      },
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        if (autoStartPermission != null && Platform.isAndroid)
-          Visibility(
-            visible: isAutoLocatingEnabled && !autoStartPermission!,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity: isAutoLocatingEnabled && !autoStartPermission! ? 1 : 0,
-              curve: const Interval(0.2, 1, curve: Easing.standard),
-              duration: Durations.medium2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Symbols.warning, color: context.colors.error),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.autoStart_permission_denied,
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
+        if (Platform.isAndroid && autoStartPermission != null)
+          Selector<SettingsLocationModel, bool>(
+            selector: (context, model) => model.auto,
+            builder: (context, auto, child) {
+              return Visibility(
+                visible: auto && !autoStartPermission!,
+                maintainAnimation: true,
+                maintainState: true,
+                child: AnimatedOpacity(
+                  opacity: auto && !autoStartPermission! ? 1 : 0,
+                  curve: const Interval(0.2, 1, curve: Easing.standard),
+                  duration: Durations.medium2,
+                  child: SettingsListTextSection(
+                    icon: Symbols.warning,
+                    iconColor: context.colors.error,
+                    content: context.i18n.autoStart_permission_denied,
+                    contentColor: context.colors.error,
+                    trailing: TextButton(
                       child: Text(context.i18n.settings),
-                      onPressed: () async {
-                        await Autostarter.getAutoStartPermission(newTask: true);
-                      },
+                      onPressed: () => Autostarter.getAutoStartPermission(newTask: true),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         if (batteryOptimizationPermission != null && Platform.isAndroid)
-          Visibility(
-            visible: isAutoLocatingEnabled && !batteryOptimizationPermission!,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity: isAutoLocatingEnabled && !batteryOptimizationPermission! ? 1 : 0,
-              curve: const Interval(0.2, 1, curve: Easing.standard),
-              duration: Durations.medium2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Symbols.warning, color: context.colors.error),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.batteryOptimization_permission_denied,
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
+          Selector<SettingsLocationModel, bool>(
+            selector: (context, model) => model.auto,
+            builder: (context, auto, child) {
+              return Visibility(
+                visible: auto && !batteryOptimizationPermission!,
+                maintainAnimation: true,
+                maintainState: true,
+                child: AnimatedOpacity(
+                  opacity: auto && !batteryOptimizationPermission! ? 1 : 0,
+                  curve: const Interval(0.2, 1, curve: Easing.standard),
+                  duration: Durations.medium2,
+                  child: SettingsListTextSection(
+                    icon: Symbols.warning,
+                    iconColor: context.colors.error,
+                    content: context.i18n.batteryOptimization_permission_denied,
+                    contentColor: context.colors.error,
+                    trailing: TextButton(
                       child: Text(context.i18n.settings),
                       onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                        Navigator.pop(context);
                       },
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         SettingsListSection(
           title: context.i18n.settings_location,
           children: [
-            Selector<SettingsLocationModel, String?>(
-              selector: (context, model) => model.code,
-              builder: (context, code, child) {
+            Selector<SettingsLocationModel, ({bool auto, String? code})>(
+              selector: (context, model) => (auto: model.auto, code: model.code),
+              builder: (context, data, child) {
+                final (:auto, :code) = data;
                 final city = Global.location[code]?.city;
 
                 return SettingsListTile(
@@ -616,7 +564,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   subtitle: Text(city ?? context.i18n.location_Not_set),
                   icon: Symbols.location_city_rounded,
                   trailing: Icon(Symbols.chevron_right_rounded),
-                  enabled: !isAutoLocatingEnabled,
+                  enabled: !auto,
                   onTap: () async {
                     bool autoStart = await androidCheckAutoStartPermission(1);
                     if (!autoStart) return;
@@ -627,15 +575,16 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                     if (!context.mounted) return;
 
                     context.push('/settings/location/select');
-
-                    // setState(() => sendpositionUpdate());
                   },
                 );
               },
             ),
-            Selector<SettingsLocationModel, String?>(
-              selector: (context, model) => model.code,
-              builder: (context, code, child) {
+            Selector<SettingsLocationModel, ({bool auto, String? code})>(
+              selector: (context, model) => (auto: model.auto, code: model.code),
+              builder: (context, data, child) {
+                final (:auto, :code) = data;
+
+                final city = Global.location[code]?.city;
                 final town = Global.location[code]?.town;
 
                 return SettingsListTile(
@@ -643,7 +592,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   subtitle: Text(town ?? context.i18n.location_Not_set),
                   icon: Symbols.forest_rounded,
                   trailing: Icon(Symbols.chevron_right_rounded),
-                  enabled: !isAutoLocatingEnabled && city != null,
+                  enabled: !auto && city != null,
                   onTap: () async {
                     bool autoStart = await androidCheckAutoStartPermission(1);
                     if (!autoStart) return;
@@ -653,12 +602,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
                     if (!context.mounted) return;
 
-                    await Navigator.of(
-                      context,
-                      rootNavigator: true,
-                    ).push(MaterialPageRoute(builder: (context) => LocationSelectorRoute(city: city, town: town)));
-
-                    setState(() => sendpositionUpdate());
+                    context.push('/settings/location/select/$city');
                   },
                 );
               },
@@ -666,76 +610,65 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
           ],
         ),
         if (autoStartPermission != null && Platform.isAndroid)
-          Visibility(
-            visible: !isAutoLocatingEnabled && city != null && town != null && !autoStartPermission!,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity: !isAutoLocatingEnabled && city != null && town != null && !autoStartPermission! ? 1 : 0,
-              curve: const Interval(0.2, 1, curve: Easing.standard),
-              duration: Durations.medium2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Symbols.warning, color: context.colors.error),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.autoStart_permission_denied,
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
+          Selector<SettingsLocationModel, ({bool auto, String? code})>(
+            selector: (context, model) => (auto: model.auto, code: model.code),
+            builder: (context, data, child) {
+              final (:auto, :code) = data;
+
+              return Visibility(
+                visible: !auto && code != null && !autoStartPermission!,
+                maintainAnimation: true,
+                maintainState: true,
+                child: AnimatedOpacity(
+                  opacity: !auto && code != null && !autoStartPermission! ? 1 : 0,
+                  curve: const Interval(0.2, 1, curve: Easing.standard),
+                  duration: Durations.medium2,
+                  child: SettingsListTextSection(
+                    icon: Symbols.warning,
+                    iconColor: context.colors.error,
+                    content: context.i18n.autoStart_permission_denied,
+                    contentColor: context.colors.error,
+                    trailing: TextButton(
                       child: Text(context.i18n.settings),
                       onPressed: () async {
                         await Autostarter.getAutoStartPermission(newTask: true);
                       },
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         if (batteryOptimizationPermission != null && Platform.isAndroid)
-          Visibility(
-            visible: !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission!,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity:
-                  !isAutoLocatingEnabled && city != null && town != null && !batteryOptimizationPermission! ? 1 : 0,
-              curve: const Interval(0.2, 1, curve: Easing.standard),
-              duration: Durations.medium2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Icon(Symbols.warning, color: context.colors.error),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        context.i18n.batteryOptimization_permission_denied,
-                        style: TextStyle(color: context.colors.error),
-                      ),
-                    ),
-                    TextButton(
+          Selector<SettingsLocationModel, ({bool auto, String? code})>(
+            selector: (context, model) => (auto: model.auto, code: model.code),
+            builder: (context, data, child) {
+              final (:auto, :code) = data;
+
+              return Visibility(
+                visible: !auto && code != null && !batteryOptimizationPermission!,
+                maintainAnimation: true,
+                maintainState: true,
+                child: AnimatedOpacity(
+                  opacity: !auto && code != null && !batteryOptimizationPermission! ? 1 : 0,
+                  curve: const Interval(0.2, 1, curve: Easing.standard),
+                  duration: Durations.medium2,
+                  child: SettingsListTextSection(
+                    icon: Symbols.warning,
+                    iconColor: context.colors.error,
+                    content: context.i18n.batteryOptimization_permission_denied,
+                    contentColor: context.colors.error,
+                    trailing: TextButton(
                       child: Text(context.i18n.settings),
                       onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                         Navigator.pop(context);
                       },
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
       ],
     );
