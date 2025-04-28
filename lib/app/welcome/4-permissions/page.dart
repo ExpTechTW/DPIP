@@ -15,6 +15,8 @@ import 'package:permission_handler/permission_handler.dart';
 class WelcomePermissionPage extends StatefulWidget {
   const WelcomePermissionPage({super.key});
 
+  static const route = '/welcome/permissions';
+
   @override
   State<WelcomePermissionPage> createState() => _WelcomePermissionPageState();
 }

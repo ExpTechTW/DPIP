@@ -1,6 +1,11 @@
 import 'package:clipboard/clipboard.dart';
+import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/app/settings/locale/page.dart';
+import 'package:dpip/app/settings/location/page.dart';
+import 'package:dpip/app/settings/notify/page.dart';
+import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -13,6 +18,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SettingsIndexPage extends StatelessWidget {
   const SettingsIndexPage({super.key});
+
+  static const route = '/settings';
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +38,7 @@ class SettingsIndexPage extends StatelessWidget {
               title: context.i18n.settings_location,
               subtitle: Text(context.i18n.settings_location_description),
               onTap: () {
-                context.push('/settings/location');
+                context.push(SettingsLocationPage.route);
               },
             ),
           ],
@@ -44,7 +51,7 @@ class SettingsIndexPage extends StatelessWidget {
               title: context.i18n.settings_theme,
               subtitle: Text(context.i18n.settings_theme_description),
               onTap: () {
-                context.push('/settings/theme');
+                context.push(SettingsThemePage.route);
               },
             ),
             SettingsListTile(
@@ -52,7 +59,7 @@ class SettingsIndexPage extends StatelessWidget {
               title: context.i18n.settings_locale,
               subtitle: Text(context.i18n.settings_locale_description),
               onTap: () {
-                context.push('/settings/locale');
+                context.push(SettingsLocalePage.route);
               },
             ),
           ],
@@ -64,7 +71,7 @@ class SettingsIndexPage extends StatelessWidget {
               icon: Symbols.notifications_rounded,
               title: 'Notification',
               subtitle: Text('Notification'),
-              onTap: () => context.push('/settings/notify'),
+              onTap: () => context.push(SettingsNotifyPage.route),
             ),
           ],
         ),
@@ -154,7 +161,7 @@ class SettingsIndexPage extends StatelessWidget {
                 icon: Symbols.bug_report_rounded,
                 title: context.i18n.app_logs,
                 trailing: Icon(Symbols.chevron_right_rounded),
-                onTap: () => context.push('/debug/logs'),
+                onTap: () => context.push(AppDebugLogsPage.route),
               ),
             ],
           ),

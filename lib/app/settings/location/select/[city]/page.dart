@@ -1,5 +1,6 @@
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -11,6 +12,8 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
   final String city;
 
   const SettingsLocationSelectCityPage({super.key, required this.city});
+
+  static String route([String city = ':city']) => '/settings/location/select/$city';
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
                       ),
                       trailing: Icon(code == town.key ? Symbols.check_rounded : null),
                       onTap: () {
-                        context.popUntil("/settings/location");
+                        context.popUntil(SettingsLocationPage.route);
                         context.read<SettingsLocationModel>().setCode(town.key);
                         context.read<SettingsLocationModel>().setLongitude(town.value.lng);
                         context.read<SettingsLocationModel>().setLatitude(town.value.lat);

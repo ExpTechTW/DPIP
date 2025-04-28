@@ -17,6 +17,8 @@ import "package:provider/provider.dart";
 class SettingsLocaleSelectPage extends StatefulWidget {
   const SettingsLocaleSelectPage({super.key});
 
+  static const route = '/settings/locale/select';
+
   @override
   State<StatefulWidget> createState() => _SettingsLocaleSelectPageState();
 }

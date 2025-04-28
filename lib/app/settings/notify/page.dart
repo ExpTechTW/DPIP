@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 class SettingsNotifyPage extends StatelessWidget {
   const SettingsNotifyPage({super.key});
 
+  static const route = '/settings/notify';
+
   Future<EewNotifyType?> openEewNotifyTypeSelectorDialog(
     BuildContext context, {
     required String title,

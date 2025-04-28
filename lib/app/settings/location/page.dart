@@ -5,6 +5,8 @@ import "package:autostarter/autostarter.dart";
 import "package:disable_battery_optimization/disable_battery_optimization.dart";
 import "package:dpip/app/settings/_widgets/list_section.dart";
 import "package:dpip/app/settings/_widgets/list_tile.dart";
+import "package:dpip/app/settings/location/select/%5Bcity%5D/page.dart";
+import "package:dpip/app/settings/location/select/page.dart";
 import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/models/settings/location.dart";
@@ -23,6 +25,8 @@ typedef PositionUpdateCallback = void Function();
 
 class SettingsLocationPage extends StatefulWidget {
   final Function(String?, String?)? onPositionUpdate;
+
+  static const route = '/settings/location';
 
   const SettingsLocationPage({super.key, this.onPositionUpdate});
 
@@ -574,7 +578,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
                     if (!context.mounted) return;
 
-                    context.push('/settings/location/select');
+                    context.push(SettingsLocationSelectPage.route);
                   },
                 );
               },
@@ -594,6 +598,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   trailing: Icon(Symbols.chevron_right_rounded),
                   enabled: !auto && city != null,
                   onTap: () async {
+                    if (city == null) return;
+
                     bool autoStart = await androidCheckAutoStartPermission(1);
                     if (!autoStart) return;
 
@@ -602,7 +608,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
                     if (!context.mounted) return;
 
-                    context.push('/settings/location/select/$city');
+                    context.push(SettingsLocationSelectCityPage.route(city));
                   },
                 );
               },

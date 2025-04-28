@@ -1,5 +1,6 @@
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/locale.dart';
@@ -11,6 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class SettingsLocalePage extends StatelessWidget {
   const SettingsLocalePage({super.key});
+
+  static const route = '/settings/locale';
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +28,9 @@ class SettingsLocalePage extends StatelessWidget {
                 return SettingsListTile(
                   icon: Symbols.translate_rounded,
                   title: context.i18n.settings_display_locale,
-                  subtitle: Text(model.locale?.nativeName ?? 'System Language'),
+                  subtitle: Text(model.locale?.nativeName ?? '系統語言'),
                   trailing: Icon(Symbols.chevron_right_rounded),
-                  onTap: () => context.push('/settings/locale/select'),
+                  onTap: () => context.push(SettingsLocaleSelectPage.route),
                 );
               },
             ),

@@ -1,3 +1,4 @@
+import "package:dpip/app/welcome/3-notice/page.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
@@ -5,13 +6,18 @@ import "package:go_router/go_router.dart";
 class WelcomeExpTechPage extends StatelessWidget {
   const WelcomeExpTechPage({super.key});
 
+  static const route = '/welcome/exptech';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(child: Text(context.i18n.next_step), onPressed: () => context.push('/welcome/notice')),
+          child: FilledButton(
+            child: Text(context.i18n.next_step),
+            onPressed: () => context.push(WelcomeNoticePage.route),
+          ),
         ),
       ),
       body: SingleChildScrollView(

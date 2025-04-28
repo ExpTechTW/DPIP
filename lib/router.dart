@@ -37,26 +37,26 @@ final GlobalKey<NavigatorState> _settingsNavigatorKey = GlobalKey<NavigatorState
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Preference.isFirstLaunch ? '/welcome' : '/home',
+  initialLocation: Preference.isFirstLaunch ? WelcomeAboutPage.route : '/home',
   routes: [
     ShellRoute(
       navigatorKey: _welcomeNavigatorKey,
       builder: (context, state, child) => WelcomeLayout(child: child),
       routes: [
         GoRoute(
-          path: '/welcome',
+          path: WelcomeAboutPage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeAboutPage()),
         ),
         GoRoute(
-          path: '/welcome/exptech',
+          path: WelcomeExpTechPage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeExpTechPage()),
         ),
         GoRoute(
-          path: '/welcome/notice',
+          path: WelcomeNoticePage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeNoticePage()),
         ),
         GoRoute(
-          path: '/welcome/permissions',
+          path: WelcomePermissionPage.route,
           pageBuilder:
               (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomePermissionPage()),
         ),
@@ -89,69 +89,60 @@ final router = GoRouter(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
         final title = switch (state.fullPath) {
-          '/settings/location' => context.i18n.settings_location,
-          '/settings/location/select' => context.i18n.settings_location,
-          '/settings/location/select/:city' => context.i18n.settings_location,
-          '/settings/theme' => context.i18n.settings_theme,
-          '/settings/theme/select' => context.i18n.settings_theme,
-          '/settings/locale' => context.i18n.settings_locale,
-          '/settings/locale/select' => context.i18n.settings_locale,
-          '/settings/notify' => '通知',
+          SettingsLocationPage.route => context.i18n.settings_location,
+          SettingsLocationSelectPage.route => context.i18n.settings_location,
+          SettingsLocationSelectCityPage.route => context.i18n.settings_location,
+          SettingsThemePage.route => context.i18n.settings_theme,
+          SettingsThemeSelectPage.route => context.i18n.settings_theme,
+          SettingsLocalePage.route => context.i18n.settings_locale,
+          SettingsLocaleSelectPage.route => context.i18n.settings_locale,
+          SettingsNotifyPage.route => '通知',
           _ => context.i18n.settings,
         };
         return SettingsLayout(title: title, child: child);
       },
       routes: [
         GoRoute(
-          path: '/settings',
+          path: SettingsIndexPage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsIndexPage()),
         ),
         GoRoute(
-          path: '/settings/location',
+          path: SettingsLocationPage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationPage()),
-          routes: [
-            GoRoute(
-              path: 'select',
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationSelectPage()),
-              routes: [
-                GoRoute(
-                  path: ':city',
-                  pageBuilder:
-                      (context, state) => ForwardBackTransitionPage(
-                        key: state.pageKey,
-                        child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
-                      ),
-                ),
-              ],
-            ),
-          ],
         ),
         GoRoute(
-          path: '/settings/theme',
+          path: SettingsLocationSelectPage.route,
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationSelectPage()),
+        ),
+        GoRoute(
+          path: SettingsLocationSelectCityPage.route(),
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(
+                key: state.pageKey,
+                child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
+              ),
+        ),
+        GoRoute(
+          path: SettingsThemePage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsThemePage()),
-          routes: [
-            GoRoute(
-              path: 'select',
-              pageBuilder:
-                  (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsThemeSelectPage()),
-            ),
-          ],
         ),
         GoRoute(
-          path: '/settings/locale',
+          path: SettingsThemeSelectPage.route,
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsThemeSelectPage()),
+        ),
+        GoRoute(
+          path: SettingsLocalePage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocalePage()),
-          routes: [
-            GoRoute(
-              path: 'select',
-              pageBuilder:
-                  (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocaleSelectPage()),
-            ),
-          ],
         ),
         GoRoute(
-          path: '/settings/notify',
+          path: SettingsLocaleSelectPage.route,
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocaleSelectPage()),
+        ),
+        GoRoute(
+          path: SettingsNotifyPage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsNotifyPage()),
         ),
       ],
@@ -159,7 +150,7 @@ final router = GoRouter(
     GoRoute(path: '/announcement', builder: (context, state) => AnnouncementPage()),
     GoRoute(path: '/changelog', builder: (context, state) => ChangelogPage()),
     GoRoute(path: '/license', builder: (context, state) => LicensePage()),
-    if (kDebugMode) GoRoute(path: '/debug/logs', builder: (context, state) => AppDebugLogsPage()),
+    if (kDebugMode) GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => AppDebugLogsPage()),
   ],
   observers: [TalkerRouteObserver(TalkerManager.instance)],
   debugLogDiagnostics: true,

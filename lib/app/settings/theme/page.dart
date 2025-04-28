@@ -1,5 +1,6 @@
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/app/settings/theme/select/page.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
@@ -10,6 +11,8 @@ import 'package:provider/provider.dart';
 
 class SettingsThemePage extends StatelessWidget {
   const SettingsThemePage({super.key});
+
+  static const route = '/settings/theme';
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class SettingsThemePage extends StatelessWidget {
                     ThemeMode.system => context.i18n.theme_system,
                   }),
                   trailing: Icon(Symbols.chevron_right_rounded),
-                  onTap: () => context.push('/settings/theme/select'),
+                  onTap: () => context.push(SettingsThemeSelectPage.route),
                 );
               },
             ),
@@ -81,7 +84,7 @@ class SettingsThemePage extends StatelessWidget {
                               actionsOverflowButtonSpacing: 8,
                               actions: [
                                 TextButton(
-                                  child: Text('Use system color'),
+                                  child: Text('使用系統顏色'),
                                   onPressed: () {
                                     model.setThemeColor(null);
                                     Navigator.of(context).pop();

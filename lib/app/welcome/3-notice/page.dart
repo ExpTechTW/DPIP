@@ -1,3 +1,4 @@
+import "package:dpip/app/welcome/4-permissions/page.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
@@ -5,6 +6,8 @@ import "package:material_symbols_icons/symbols.dart";
 
 class WelcomeNoticePage extends StatelessWidget {
   const WelcomeNoticePage({super.key});
+
+  static const route = '/welcome/notice';
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,7 @@ class WelcomeNoticePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
             child: Text(context.i18n.next_step),
-            onPressed: () => context.push('/welcome/permissions'),
+            onPressed: () => context.push(WelcomePermissionPage.route),
           ),
         ),
       ),

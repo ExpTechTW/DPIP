@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 class SettingsThemeSelectPage extends StatelessWidget {
   const SettingsThemeSelectPage({super.key});
 
+  static const route = '/settings/theme/select';
+
   @override
   Widget build(BuildContext context) {
     return ListView(

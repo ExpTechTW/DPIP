@@ -6,6 +6,8 @@ import 'package:talker_flutter/talker_flutter.dart';
 class AppDebugLogsPage extends StatelessWidget {
   const AppDebugLogsPage({super.key});
 
+  static const route = '/debug/logs';
+
   @override
   Widget build(BuildContext context) {
     return TalkerScreen(

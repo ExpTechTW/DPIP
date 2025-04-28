@@ -14,6 +14,8 @@ final cities = Global.location.entries.map((e) => e.value.city).toSet().toList()
 class SettingsLocationSelectPage extends StatelessWidget {
   const SettingsLocationSelectPage({super.key});
 
+  static const route = '/settings/location/select';
+
   @override
   Widget build(BuildContext context) {
     return ListView(

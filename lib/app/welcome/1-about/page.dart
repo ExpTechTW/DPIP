@@ -1,3 +1,4 @@
+import "package:dpip/app/welcome/2-exptech/page.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
@@ -5,13 +6,18 @@ import "package:go_router/go_router.dart";
 class WelcomeAboutPage extends StatelessWidget {
   const WelcomeAboutPage({super.key});
 
+  static const route = '/welcome/about';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(child: Text(context.i18n.next_step), onPressed: () => context.push('/welcome/exptech')),
+          child: FilledButton(
+            child: Text(context.i18n.next_step),
+            onPressed: () => context.push(WelcomeExpTechPage.route),
+          ),
         ),
       ),
       body: SingleChildScrollView(
