@@ -1,6 +1,6 @@
-import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class WelcomeAnnouncementDialog extends StatelessWidget {
@@ -24,7 +24,7 @@ class WelcomeAnnouncementDialog extends StatelessWidget {
           child: Text(context.i18n.go_to_view),
           onPressed: () {
             Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const AnnouncementPage()));
+            context.push('/announcement');
           },
         ),
       ],

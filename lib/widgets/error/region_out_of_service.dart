@@ -1,6 +1,6 @@
-import "package:dpip/route/settings/settings.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 
 class RegionOutOfService extends StatelessWidget {
   const RegionOutOfService({super.key});
@@ -16,13 +16,8 @@ class RegionOutOfService extends StatelessWidget {
           FilledButton(
             child: Text(context.i18n.settings),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  settings: const RouteSettings(name: "/settings"),
-                  builder: (context) => const SettingsRoute(initialRoute: "/location"),
-                ),
-              );
+              context.push('/settings');
+              context.push('/settings/location');
             },
           ),
         ],

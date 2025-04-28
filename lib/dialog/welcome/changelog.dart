@@ -1,6 +1,6 @@
-import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class WelcomeChangelogDialog extends StatelessWidget {
@@ -24,7 +24,7 @@ class WelcomeChangelogDialog extends StatelessWidget {
           child: Text(context.i18n.go_to_view),
           onPressed: () {
             Navigator.pop(context);
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangelogPage()));
+            context.push('/changelog');
           },
         ),
       ],

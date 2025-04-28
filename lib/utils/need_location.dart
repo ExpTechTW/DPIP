@@ -1,6 +1,6 @@
-import "package:dpip/route/settings/settings.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
+import "package:go_router/go_router.dart";
 import "package:material_symbols_icons/symbols.dart";
 
 Future<void> showLocationDialog(BuildContext context) async {
@@ -18,13 +18,8 @@ Future<void> showLocationDialog(BuildContext context) async {
             child: Text(context.i18n.go_to_settings),
             onPressed: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  settings: const RouteSettings(name: "/settings"),
-                  builder: (context) => const SettingsRoute(initialRoute: "/location"),
-                ),
-              );
+              context.push('/settings');
+              context.push('/settings/location');
             },
           ),
         ],

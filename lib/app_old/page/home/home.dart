@@ -7,12 +7,12 @@ import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/route/settings/settings.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/time_convert.dart';
 import 'package:dpip/utils/weather_icon.dart';
 import 'package:dpip/widgets/error/region_out_of_service.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
@@ -143,13 +143,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  settings: const RouteSettings(name: '/settings'),
-                  builder: (context) => const SettingsRoute(initialRoute: '/location'),
-                ),
-              );
+              context.push('/settings');
+              context.push('/settings/location');
             },
             icon: const Icon(Symbols.pin_drop_rounded),
             label: Text(

@@ -5,15 +5,12 @@ import "package:dpip/global.dart";
 import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
 import "package:dpip/route/log/log.dart";
-import "package:dpip/route/notification/notification.dart";
 import "package:dpip/route/sound/sound.dart";
-import "package:dpip/route/status/status.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/widgets/list/tile_group_header.dart";
 import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons/symbols.dart";
-import "package:simple_icons/simple_icons.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "developer.dart";
@@ -126,117 +123,7 @@ class _MePageState extends State<MePage> {
         ListTile(
           leading: const Icon(Icons.visibility),
           title: Text(context.i18n.me_welcome),
-          onTap: () => context.go('/welcome'),
-        ),
-
-        /**
-         * App 資訊
-         */
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Container(
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: context.colors.surfaceContainer, borderRadius: BorderRadius.circular(16)),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset("assets/DPIP.png", height: 64, width: 64),
-                  ),
-                ),
-                const Text("DPIP", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    context.i18n.me_version(
-                      Global.packageInfo.version.toString(),
-                      Global.packageInfo.buildNumber.toString(),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 12,
-                  children: [
-                    ActionChip(
-                      avatar: const Icon(Symbols.group_rounded, fill: 1),
-                      label: Text(context.i18n.contributor),
-                    ),
-                    ActionChip(
-                      avatar: const Icon(SimpleIcons.github),
-                      label: const Text("GitHub"),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://github.com/exptechtw/dpip"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(SimpleIcons.discord),
-                      label: const Text("Discord"),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://exptech.com.tw/dc"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(Symbols.web_rounded),
-                      label: Text(context.i18n.official_web),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://exptech.com.tw/dpip"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(Symbols.notifications_rounded),
-                      label: Text(context.i18n.notification_record),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const NotificationHistoryPage()),
-                        );
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(Symbols.dns_rounded),
-                      label: Text(context.i18n.server_status),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ServerStatusPage()));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(SimpleIcons.threads),
-                      label: Text(context.i18n.threads),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://www.threads.net/@dpip.tw"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(SimpleIcons.youtube),
-                      label: Text(context.i18n.youtube),
-                      onPressed: () {
-                        launchUrl(Uri.parse("https://www.youtube.com/@exptechtw/live"));
-                      },
-                    ),
-                    ActionChip(
-                      avatar: const Icon(Symbols.book_rounded, fill: 1),
-                      label: Text(context.i18n.third_party_libraries),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return const LicensePage();
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          onTap: () => context.push('/welcome'),
         ),
       ],
     );

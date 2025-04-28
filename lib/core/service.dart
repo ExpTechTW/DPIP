@@ -8,7 +8,6 @@ import "package:dpip/app_old/page/map/monitor/monitor.dart";
 import "package:dpip/app_old/page/map/radar/radar.dart";
 import "package:dpip/core/location.dart";
 import "package:dpip/global.dart";
-import "package:dpip/route/settings/content/location.dart";
 import "package:dpip/utils/location_to_code.dart";
 import "package:dpip/utils/log.dart";
 import "package:flutter/cupertino.dart";
@@ -76,7 +75,6 @@ void androidSendPositionlisten() {
       Global.preference.setDouble("user-lat", lat);
       Global.preference.setDouble("user-lon", lng);
       const MonitorPage(data: 0).createState();
-      SettingsLocationView.updatePosition();
       HomePage.updatePosition();
       RadarMap.updatePosition();
       MonitorPage.updatePosition();
