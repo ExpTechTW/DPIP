@@ -1,4 +1,5 @@
 import 'package:dpip/app/settings/_widgets/list_section.dart';
+import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
@@ -20,9 +21,9 @@ class SettingsThemePage extends StatelessWidget {
           children: [
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return ListTile(
-                  leading: Icon(Symbols.dark_mode_rounded),
-                  title: Text('主題模式', style: TextStyle(fontWeight: FontWeight.bold)),
+                return SettingsListTile(
+                  icon: Symbols.dark_mode_rounded,
+                  title: '主題模式',
                   subtitle: Text(switch (model.themeMode) {
                     ThemeMode.light => context.i18n.theme_light,
                     ThemeMode.dark => context.i18n.theme_dark,
@@ -35,9 +36,9 @@ class SettingsThemePage extends StatelessWidget {
             ),
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return ListTile(
-                  leading: Icon(Symbols.palette_rounded),
-                  title: Text('主題色', style: TextStyle(fontWeight: FontWeight.bold)),
+                return SettingsListTile(
+                  icon: Symbols.palette_rounded,
+                  title: '主題色',
                   subtitle: Text(model.themeColor != null ? ColorTools.nameThatColor(model.themeColor!) : '系統色彩'),
                   trailing: ColorIndicator(color: model.themeColor ?? context.colors.primary),
                   onTap: () async {

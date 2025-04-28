@@ -1,3 +1,4 @@
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
 class SettingsListTile extends StatelessWidget {
@@ -25,7 +26,7 @@ class SettingsListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: icon != null ? Icon(icon!, weight: 600) : leading,
+      leading: icon != null ? Icon(icon!, weight: 600, color: context.colors.secondary) : leading,
       title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
       subtitle: subtitle,
       trailing: trailing,
