@@ -444,7 +444,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(Symbols.warning, color: context.colors.error),
+                          child: Icon(Symbols.warning_rounded, color: context.colors.error),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -479,7 +479,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(8),
-                          child: Icon(Symbols.warning, color: context.colors.error),
+                          child: Icon(Symbols.warning_rounded, color: context.colors.error),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -509,7 +509,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: SettingsListTextSection(
-                    icon: Symbols.warning,
+                    icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
                     content: context.i18n.autoStart_permission_denied,
                     contentColor: context.colors.error,
@@ -535,7 +535,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: SettingsListTextSection(
-                    icon: Symbols.warning,
+                    icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
                     content: context.i18n.batteryOptimization_permission_denied,
                     contentColor: context.colors.error,
@@ -624,7 +624,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: SettingsListTextSection(
-                    icon: Symbols.warning,
+                    icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
                     content: context.i18n.autoStart_permission_denied,
                     contentColor: context.colors.error,
@@ -654,7 +654,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: SettingsListTextSection(
-                    icon: Symbols.warning,
+                    icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
                     content: context.i18n.batteryOptimization_permission_denied,
                     contentColor: context.colors.error,
