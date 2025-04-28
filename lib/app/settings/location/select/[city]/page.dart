@@ -2,8 +2,8 @@ import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -32,8 +32,7 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
                       ),
                       trailing: Icon(code == town.key ? Symbols.check_rounded : null),
                       onTap: () {
-                        context.pop();
-                        context.pop();
+                        context.popUntil("/settings/location");
                         context.read<SettingsLocationModel>().setCode(town.key);
                         context.read<SettingsLocationModel>().setLongitude(town.value.lng);
                         context.read<SettingsLocationModel>().setLatitude(town.value.lat);
