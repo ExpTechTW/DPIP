@@ -1,4 +1,5 @@
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/list.dart';
 import 'package:flutter/material.dart';
 
 class SettingsListSection extends StatelessWidget {
@@ -9,21 +10,9 @@ class SettingsListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final separatedChildren =
-        children
-            .expand(
-              (element) => [
-                element,
-                Divider(
-                  height: 1,
-                  indent: 16,
-                  endIndent: 16,
-                  color: context.colors.outlineVariant.withValues(alpha: 0.6),
-                ),
-              ],
-            )
-            .toList()
-          ..removeLast();
+    final separatedChildren = children.superJoin(
+      Divider(height: 1, indent: 16, endIndent: 16, color: context.colors.outlineVariant.withValues(alpha: 0.6)),
+    );
 
     final finalChildren = [
       if (title != null)
@@ -47,7 +36,7 @@ class SettingsListSection extends StatelessWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -70,20 +59,20 @@ class SettingsListTextSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          if (icon != null)
-            Padding(
-              padding: const EdgeInsets.only(left: 8, right: 16),
-              child: Icon(icon, color: context.theme.colorScheme.onSurfaceVariant),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: Row(
+          spacing: 16,
+          children: [
+            if (icon != null) Icon(icon, color: context.theme.colorScheme.onSurfaceVariant),
+            Expanded(
+              child: Text(
+                content,
+                style: context.theme.textTheme.bodyMedium!.copyWith(color: context.theme.colorScheme.onSurfaceVariant),
+              ),
             ),
-          Expanded(
-            child: Text(
-              content,
-              style: context.theme.textTheme.bodyMedium!.copyWith(color: context.theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

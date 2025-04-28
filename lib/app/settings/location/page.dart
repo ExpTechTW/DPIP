@@ -9,9 +9,9 @@ import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
 import "package:dpip/route/location_selector/location_selector.dart";
 import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/widgets/list/tile_group_header.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import "package:go_router/go_router.dart";
 import "package:material_symbols_icons/symbols.dart";
 import "package:permission_handler/permission_handler.dart";
 
@@ -619,12 +619,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
                 if (!context.mounted) return;
 
-                await Navigator.of(
-                  context,
-                  rootNavigator: true,
-                ).push(MaterialPageRoute(builder: (context) => LocationSelectorRoute(city: null, town: town)));
+                context.push('/settings/location/select');
 
-                setState(() => sendpositionUpdate());
+                // setState(() => sendpositionUpdate());
               },
             ),
             SettingsListTile(

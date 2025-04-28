@@ -40,8 +40,8 @@ class Preference {
   static bool? get locationAuto => instance.getBool(PreferenceKeys.locationAuto);
   static set locationAuto(bool? value) => instance.set(PreferenceKeys.locationAuto, value);
 
-  static int? get locationCode => instance.getInt(PreferenceKeys.locationCode);
-  static set locationCode(int? value) => instance.set(PreferenceKeys.locationCode, value);
+  static String? get locationCode => instance.getString(PreferenceKeys.locationCode);
+  static set locationCode(String? value) => instance.set(PreferenceKeys.locationCode, value);
   // #endregion
 
   // #region User Interface

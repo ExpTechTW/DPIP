@@ -7,7 +7,7 @@ class SettingsLocationModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsLocationModel');
 
   bool _auto = Preference.locationAuto ?? false;
-  int? _code = Preference.locationCode;
+  String? _code = Preference.locationCode;
 
   /// 自動定位
   ///
@@ -21,8 +21,8 @@ class SettingsLocationModel extends ChangeNotifier {
   }
 
   /// 縣市代碼
-  int? get code => _code;
-  void setCode(int? value) {
+  String? get code => _code;
+  void setCode(String? value) {
     _code = value;
     Preference.locationCode = _code;
     _log('Changed ${PreferenceKeys.locationCode} to ${Preference.locationCode}');

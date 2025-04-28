@@ -3,6 +3,7 @@ import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -22,50 +23,13 @@ class SettingsThemePage extends StatelessWidget {
                 return ListTile(
                   leading: Icon(Symbols.dark_mode_rounded),
                   title: Text('主題模式', style: TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(model.themeMode.name.capitalize),
+                  subtitle: Text(switch (model.themeMode) {
+                    ThemeMode.light => context.i18n.theme_light,
+                    ThemeMode.dark => context.i18n.theme_dark,
+                    ThemeMode.system => context.i18n.theme_system,
+                  }),
                   trailing: Icon(Symbols.chevron_right_rounded),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return SimpleDialog(
-                          title: Text('主題模式'),
-                          children: [
-                            RadioListTile(
-                              value: ThemeMode.light,
-                              groupValue: model.themeMode,
-                              title: Text(context.i18n.theme_light),
-                              onChanged: (value) {
-                                if (value == null) return;
-                                model.setThemeMode(value);
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            RadioListTile(
-                              value: ThemeMode.dark,
-                              groupValue: model.themeMode,
-                              title: Text(context.i18n.theme_dark),
-                              onChanged: (value) {
-                                if (value == null) return;
-                                model.setThemeMode(value);
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            RadioListTile(
-                              value: ThemeMode.system,
-                              groupValue: model.themeMode,
-                              title: Text(context.i18n.theme_system),
-                              onChanged: (value) {
-                                if (value == null) return;
-                                model.setThemeMode(value);
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
+                  onTap: () => context.push('/settings/theme/select'),
                 );
               },
             ),
