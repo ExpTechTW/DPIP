@@ -52,8 +52,9 @@ class SettingsListSection extends StatelessWidget {
 class SettingsListTextSection extends StatelessWidget {
   final String content;
   final IconData? icon;
+  final Widget? trailing;
 
-  const SettingsListTextSection({super.key, required this.content, this.icon});
+  const SettingsListTextSection({super.key, required this.content, this.icon, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +72,7 @@ class SettingsListTextSection extends StatelessWidget {
                 style: context.theme.textTheme.bodyMedium!.copyWith(color: context.theme.colorScheme.onSurfaceVariant),
               ),
             ),
+            if (trailing != null) trailing!,
           ],
         ),
       ),

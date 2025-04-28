@@ -1,3 +1,4 @@
+import "package:dpip/core/device_info.dart";
 import "package:dpip/core/preference.dart";
 import "package:dpip/global.dart";
 import 'package:dpip/l10n/app_localizations.dart';
@@ -19,6 +20,7 @@ void main() async {
   talker.log("start");
   FlutterError.onError = (details) => talker.handle(details.exception, details.stack);
   await Global.init();
+  await DeviceInfo.init();
   await Preference.init();
 
   TalkerManager.instance.info('global init');

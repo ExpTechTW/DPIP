@@ -7,6 +7,7 @@ import "package:dpip/app/settings/_widgets/list_section.dart";
 import "package:dpip/app/settings/_widgets/list_tile.dart";
 import "package:dpip/core/service.dart";
 import "package:dpip/global.dart";
+import "package:dpip/models/settings/location.dart";
 import "package:dpip/route/location_selector/location_selector.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
@@ -14,6 +15,7 @@ import "package:flutter/services.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons/symbols.dart";
 import "package:permission_handler/permission_handler.dart";
+import "package:provider/provider.dart";
 
 final stateSettingsLocationView = _SettingsLocationPageState();
 
@@ -604,47 +606,61 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
         SettingsListSection(
           title: context.i18n.settings_location,
           children: [
-            SettingsListTile(
-              title: context.i18n.location_city,
-              subtitle: Text(city ?? context.i18n.location_Not_set),
-              icon: Symbols.location_city_rounded,
-              trailing: Icon(Symbols.chevron_right_rounded),
-              enabled: !isAutoLocatingEnabled,
-              onTap: () async {
-                bool autoStart = await androidCheckAutoStartPermission(1);
-                if (!autoStart) return;
+            Selector<SettingsLocationModel, String?>(
+              selector: (context, model) => model.code,
+              builder: (context, code, child) {
+                final city = Global.location[code]?.city;
 
-                bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
-                if (!batteryOptimization) return;
+                return SettingsListTile(
+                  title: context.i18n.location_city,
+                  subtitle: Text(city ?? context.i18n.location_Not_set),
+                  icon: Symbols.location_city_rounded,
+                  trailing: Icon(Symbols.chevron_right_rounded),
+                  enabled: !isAutoLocatingEnabled,
+                  onTap: () async {
+                    bool autoStart = await androidCheckAutoStartPermission(1);
+                    if (!autoStart) return;
 
-                if (!context.mounted) return;
+                    bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
+                    if (!batteryOptimization) return;
 
-                context.push('/settings/location/select');
+                    if (!context.mounted) return;
 
-                // setState(() => sendpositionUpdate());
+                    context.push('/settings/location/select');
+
+                    // setState(() => sendpositionUpdate());
+                  },
+                );
               },
             ),
-            SettingsListTile(
-              title: context.i18n.location_town,
-              subtitle: Text(town ?? context.i18n.location_Not_set),
-              icon: Symbols.forest_rounded,
-              trailing: Icon(Symbols.chevron_right_rounded),
-              enabled: !isAutoLocatingEnabled && city != null,
-              onTap: () async {
-                bool autoStart = await androidCheckAutoStartPermission(1);
-                if (!autoStart) return;
+            Selector<SettingsLocationModel, String?>(
+              selector: (context, model) => model.code,
+              builder: (context, code, child) {
+                final town = Global.location[code]?.town;
 
-                bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
-                if (!batteryOptimization) return;
+                return SettingsListTile(
+                  title: context.i18n.location_town,
+                  subtitle: Text(town ?? context.i18n.location_Not_set),
+                  icon: Symbols.forest_rounded,
+                  trailing: Icon(Symbols.chevron_right_rounded),
+                  enabled: !isAutoLocatingEnabled && city != null,
+                  onTap: () async {
+                    bool autoStart = await androidCheckAutoStartPermission(1);
+                    if (!autoStart) return;
 
-                if (!context.mounted) return;
+                    bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
+                    if (!batteryOptimization) return;
 
-                await Navigator.of(
-                  context,
-                  rootNavigator: true,
-                ).push(MaterialPageRoute(builder: (context) => LocationSelectorRoute(city: city, town: town)));
+                    if (!context.mounted) return;
 
-                setState(() => sendpositionUpdate());
+                    await Navigator.of(
+                      context,
+                      rootNavigator: true,
+                    ).push(MaterialPageRoute(builder: (context) => LocationSelectorRoute(city: city, town: town)));
+
+                    setState(() => sendpositionUpdate());
+                  },
+                );
               },
             ),
           ],

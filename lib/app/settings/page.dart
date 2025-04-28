@@ -1,6 +1,7 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/core/device_info.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +16,10 @@ class SettingsIndexPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appInfo = '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
+    final deviceInfo =
+        '${DeviceInfo.model}${DeviceInfo.serial != null ? '(${DeviceInfo.serial})' : ''}(${DeviceInfo.version})';
+
     return ListView(
       controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
       children: [
@@ -136,14 +141,14 @@ class SettingsIndexPage extends StatelessWidget {
               SettingsListTile(
                 icon: Symbols.bug_report_rounded,
                 title: 'App Version',
-                trailing: Text(Global.packageInfo.version),
-                onLongPress: () => FlutterClipboard.copy(Global.packageInfo.version),
+                trailing: Text(appInfo),
+                onLongPress: () => FlutterClipboard.copy(appInfo),
               ),
               SettingsListTile(
                 icon: Symbols.bug_report_rounded,
-                title: 'Build Number',
-                trailing: Text(Global.packageInfo.buildNumber),
-                onLongPress: () => FlutterClipboard.copy(Global.packageInfo.buildNumber),
+                title: 'Device Info',
+                trailing: Text(deviceInfo),
+                onLongPress: () => FlutterClipboard.copy(deviceInfo),
               ),
               SettingsListTile(
                 icon: Symbols.bug_report_rounded,
