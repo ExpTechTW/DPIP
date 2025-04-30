@@ -92,7 +92,7 @@ final router = GoRouter(
         final title = switch (state.fullPath) {
           SettingsLocationPage.route => context.i18n.settings_location,
           SettingsLocationSelectPage.route => context.i18n.settings_location,
-          SettingsLocationSelectCityPage.route => context.i18n.settings_location,
+          final p when p == SettingsLocationSelectCityPage.route() => context.i18n.settings_location,
           SettingsThemePage.route => context.i18n.settings_theme,
           SettingsThemeSelectPage.route => context.i18n.settings_theme,
           SettingsLocalePage.route => context.i18n.settings_locale,
