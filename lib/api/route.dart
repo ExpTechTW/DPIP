@@ -55,7 +55,7 @@ class Route {
   static Uri station() => Uri.parse("$api/v1/trem/station");
 
   static Uri location(String token, String lat, String lng) =>
-      Uri.parse("$onlyapi/v1/notify/location/${Global.packageInfo.version}/${Platform.isIOS ? 1 : 0}/$lat,$lng/$token");
+      Uri.parse("$onlyapi/v2/location/${Platform.isIOS ? 1 : 0}/$token/${Global.packageInfo.version}/$lat,$lng");
 
   static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
 
@@ -98,10 +98,6 @@ class Route {
   static Uri notificationHistory() => Uri.parse("$onlyapi/v1/notify/history");
 
   static Uri status() => Uri.parse("https://status.exptech.dev/api/v1/status/data?duration=1d");
-
-  static Uri monitor(String token, String status) => Uri.parse(
-    "https://api-1.exptech.dev/api/v1/notify/setting/$token/$status/${DateTime.now().millisecondsSinceEpoch}",
-  );
 
   /// ## 設定通知
   ///
