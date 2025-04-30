@@ -6,6 +6,7 @@ import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
+import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -61,6 +62,12 @@ class SettingsIndexPage extends StatelessWidget {
               onTap: () {
                 context.push(SettingsLocalePage.route);
               },
+            ),
+            SettingsListTile(
+              icon: Symbols.percent_rounded,
+              title: '單位',
+              subtitle: Text('調整 DPIP 顯示數值時使用的單位'),
+              onTap: () => context.push(SettingsUnitPage.route),
             ),
           ],
         ),

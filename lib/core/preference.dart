@@ -13,6 +13,7 @@ class PreferenceKeys {
   static const themeMode = 'pref:ui:mode';
   static const themeColor = 'pref:ui:color';
   static const locale = 'pref:ui:locale';
+  static const useFahrenheit = 'pref:ui:fahrenheit';
   // #endregion
 
   // #region Notification
@@ -61,6 +62,9 @@ class Preference {
 
   static String? get locale => instance.getString(PreferenceKeys.locale);
   static set locale(String? value) => instance.set(PreferenceKeys.locale, value);
+
+  static bool? get useFahrenheit => instance.getBool(PreferenceKeys.useFahrenheit);
+  static set useFahrenheit(bool? value) => instance.set(PreferenceKeys.useFahrenheit, value);
   // #endregion
 
   // #region Notification

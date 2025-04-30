@@ -10,13 +10,14 @@ import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
+import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/app/welcome/1-about/page.dart';
 import 'package:dpip/app/welcome/2-exptech/page.dart';
 import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/welcome/layout.dart';
 import 'package:dpip/app_old/page/history/history.dart';
-import 'package:dpip/app_old/page/home/home.dart';
+import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
@@ -96,6 +97,7 @@ final router = GoRouter(
           SettingsThemeSelectPage.route => context.i18n.settings_theme,
           SettingsLocalePage.route => context.i18n.settings_locale,
           SettingsLocaleSelectPage.route => context.i18n.settings_locale,
+          SettingsUnitPage.route => '單位',
           SettingsNotifyPage.route => '通知',
           _ => context.i18n.settings,
         };
@@ -140,6 +142,10 @@ final router = GoRouter(
           path: SettingsLocaleSelectPage.route,
           pageBuilder:
               (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocaleSelectPage()),
+        ),
+        GoRoute(
+          path: SettingsUnitPage.route,
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsUnitPage()),
         ),
         GoRoute(
           path: SettingsNotifyPage.route,

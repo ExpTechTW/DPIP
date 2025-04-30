@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 class DateTimelineItem extends StatelessWidget {
   final String date;
+  final bool first;
+  final bool last;
 
-  const DateTimelineItem(this.date, {super.key});
+  const DateTimelineItem(this.date, {super.key, this.first = false, this.last = false});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +21,9 @@ class DateTimelineItem extends StatelessWidget {
               children: [
                 Positioned(
                   left: 0,
-                  top: 0,
-                  bottom: 0,
+                  top: first ? 21 : 0,
+                  bottom: last ? null : 0,
+                  height: last ? 21 : null,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [

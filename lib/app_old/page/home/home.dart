@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
+import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
@@ -45,7 +46,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late final locale = Localizations.localeOf(context).toString();
   List<History> realtimeList = [];
-  Map<String, dynamic> weatherData = {};
+  RealtimeWeather? weatherData;
   bool country = false;
   String city = '';
   String town = '';
@@ -275,9 +276,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildTemperatureDisplay() {
-    final tempParts = (weatherData['weather']?['data']?['air']?['temperature'] ?? '--').toString().split('.');
-    final weatherCode = weatherData['weather']?['data']?['weatherCode'] ?? 0;
-    const isDay = 1;
+    final tempParts = (weatherData?.weather.data.air.temperature ?? '--').toString().split('.');
+    final weatherCode = weatherData?.weather.data.weatherCode ?? 0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -317,13 +317,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  WeatherIcons.getWeatherContent(context, weatherCode.toString()),
+                  WeatherIcons.getWeatherContent(context, weatherCode),
                   style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant),
                 ),
               ],
             ),
           ),
-          Icon(WeatherIcons.getWeatherIcon(weatherCode, isDay), size: 80, color: context.colors.primary),
+          Icon(WeatherIcons.getWeatherIcon(weatherCode, true), size: 80, color: context.colors.primary),
         ],
       ),
     );
@@ -335,13 +335,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWeatherDetailItem(
-            context.i18n.home_precipitation,
-            '${weatherData['rain']?['data']?['1h'] ?? '- -'} mm/h',
-          ),
+          _buildWeatherDetailItem(context.i18n.home_precipitation, '${weatherData?.rain.data.oneHour ?? '- -'} mm/h'),
           _buildWeatherDetailItem(
             context.i18n.humidity_monitor,
-            '${weatherData['weather']?['data']?['air']?['relative_humidity'] ?? '- -'} %',
+            '${weatherData?.weather.data.air.relative_humidity ?? '- -'} %',
           ),
         ],
       ),

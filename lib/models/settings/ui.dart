@@ -8,6 +8,10 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
 
   String _themeMode = Preference.themeMode ?? 'system';
+  int? _themeColor = Preference.themeColor;
+  Locale? _locale = Preference.locale?.asLocale;
+  bool _useFahrenheit = Preference.useFahrenheit ?? false;
+
   ThemeMode get themeMode => switch (_themeMode) {
     'light' => ThemeMode.light,
     'dark' => ThemeMode.dark,
@@ -27,7 +31,6 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  int? _themeColor = Preference.themeColor;
   Color? get themeColor {
     final color = _themeColor;
     return color == null ? null : Color(color);
@@ -42,7 +45,6 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Locale? _locale = Preference.locale?.asLocale;
   Locale? get locale => _locale;
   void setLocale(Locale? value) {
     _locale = value;
@@ -50,6 +52,16 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
     Preference.locale = value?.toLanguageTag();
 
     _log('Changed ${PreferenceKeys.locale} to ${Preference.locale}');
+    notifyListeners();
+  }
+
+  bool get useFahrenheit => _useFahrenheit;
+  void setUseFahrenheit(bool value) {
+    _useFahrenheit = value;
+
+    Preference.useFahrenheit = value;
+
+    _log('Changed ${PreferenceKeys.useFahrenheit} to ${Preference.useFahrenheit}');
     notifyListeners();
   }
 }
