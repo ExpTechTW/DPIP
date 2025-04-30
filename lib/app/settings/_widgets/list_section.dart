@@ -38,6 +38,7 @@ class SettingsListSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: ListView.builder(
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: finalChildren.length,
