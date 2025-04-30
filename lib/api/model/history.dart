@@ -1,6 +1,7 @@
-import "package:dpip/utils/parser.dart";
 import "package:json_annotation/json_annotation.dart";
 import "package:timezone/timezone.dart";
+
+import "package:dpip/utils/parser.dart";
 
 part "history.g.dart";
 

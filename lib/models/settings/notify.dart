@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+
 import 'package:dpip/core/preference.dart';
 
 /// 緊急地震速報通知設定

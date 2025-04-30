@@ -1,3 +1,12 @@
+import "package:flutter/material.dart";
+import "package:flutter/services.dart";
+
+import "package:dynamic_system_colors/dynamic_system_colors.dart";
+import "package:flutter_localizations/flutter_localizations.dart";
+import "package:flutter_localized_locales/flutter_localized_locales.dart";
+import "package:provider/provider.dart";
+import "package:timezone/data/latest.dart";
+
 import "package:dpip/core/device_info.dart";
 import "package:dpip/core/preference.dart";
 import "package:dpip/core/providers.dart";
@@ -6,15 +15,13 @@ import 'package:dpip/l10n/app_localizations.dart';
 import "package:dpip/models/settings/ui.dart";
 import "package:dpip/router.dart";
 import "package:dpip/utils/log.dart";
-import "package:dynamic_system_colors/dynamic_system_colors.dart";
-import "package:flutter/material.dart";
-import "package:flutter_localizations/flutter_localizations.dart";
-import "package:flutter_localized_locales/flutter_localized_locales.dart";
-import "package:provider/provider.dart";
-import "package:timezone/data/latest.dart";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent));
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
+
   final talker = TalkerManager.instance;
   talker.log("start");
   FlutterError.onError = (details) => talker.handle(details.exception, details.stack);
@@ -24,7 +31,6 @@ void main() async {
   await Preference.init();
   GlobalProviders.init();
 
-  TalkerManager.instance.info('global init');
   initializeTimeZones();
 
   runApp(

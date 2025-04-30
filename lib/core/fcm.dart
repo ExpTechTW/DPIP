@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/log.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();

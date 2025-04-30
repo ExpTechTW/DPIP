@@ -1,6 +1,7 @@
+import "package:json_annotation/json_annotation.dart";
+
 import "package:dpip/api/model/tsunami/tsunami_earthquake.dart";
 import "package:dpip/api/model/tsunami/tsunami_info.dart";
-import "package:json_annotation/json_annotation.dart";
 
 part "tsunami.g.dart";
 
@@ -75,8 +76,7 @@ class Tsunami {
     required this.info,
   });
 
-  factory Tsunami.fromJson(Map<String, dynamic> json) =>
-      _$TsunamiFromJson(json);
+  factory Tsunami.fromJson(Map<String, dynamic> json) => _$TsunamiFromJson(json);
 
   Map<String, dynamic> toJson() => _$TsunamiToJson(this);
 }

@@ -1,5 +1,6 @@
-import "package:dpip/api/model/station_info.dart";
 import "package:json_annotation/json_annotation.dart";
+
+import "package:dpip/api/model/station_info.dart";
 
 part "station.g.dart";
 

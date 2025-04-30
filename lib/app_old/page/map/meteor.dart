@@ -1,11 +1,13 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/meteor_station.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 typedef StationIdUpdateCallback = void Function(String?);
 

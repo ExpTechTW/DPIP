@@ -1,6 +1,7 @@
+import "package:json_annotation/json_annotation.dart";
+
 import "package:dpip/api/model/eew_info.dart";
 import "package:dpip/utils/parser.dart";
-import "package:json_annotation/json_annotation.dart";
 
 part "eew.g.dart";
 

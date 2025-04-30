@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
+import 'package:material_symbols_icons/symbols.dart';
+
 import 'package:dpip/app_old/page/more/ranking/tabs/precipitation.dart';
 import 'package:dpip/app_old/page/more/ranking/tabs/temperature.dart';
 import 'package:dpip/app_old/page/more/ranking/tabs/wind.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});

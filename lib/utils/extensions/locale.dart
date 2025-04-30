@@ -1,5 +1,6 @@
-import "package:dash_flags/dash_flags.dart";
 import "package:flutter/material.dart";
+
+import "package:dash_flags/dash_flags.dart";
 import "package:flutter_localized_locales/flutter_localized_locales.dart";
 
 extension NativeLocale on Locale {

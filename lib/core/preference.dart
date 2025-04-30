@@ -1,5 +1,6 @@
-import 'package:dpip/utils/extensions/preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:dpip/utils/extensions/preference.dart';
 
 class PreferenceKeys {
   // #region Location

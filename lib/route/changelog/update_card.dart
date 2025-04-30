@@ -1,5 +1,6 @@
-import "package:dpip/utils/extensions/build_context.dart";
 import "package:flutter/material.dart";
+
+import "package:dpip/utils/extensions/build_context.dart";
 
 class UpdateCard extends StatelessWidget {
   final String title;

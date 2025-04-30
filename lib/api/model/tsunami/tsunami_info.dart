@@ -19,18 +19,11 @@ class TsunamiInfo {
     if (type == "estimate") {
       data =
           (json["data"] as List<dynamic>)
-              .map(
-                (item) =>
-                    TsunamiEstimate.fromJson(item as Map<String, dynamic>),
-              )
+              .map((item) => TsunamiEstimate.fromJson(item as Map<String, dynamic>))
               .toList();
     } else if (type == "actual") {
       data =
-          (json["data"] as List<dynamic>)
-              .map(
-                (item) => TsunamiActual.fromJson(item as Map<String, dynamic>),
-              )
-              .toList();
+          (json["data"] as List<dynamic>).map((item) => TsunamiActual.fromJson(item as Map<String, dynamic>)).toList();
     }
 
     return TsunamiInfo(type: type, data: data);

@@ -1,6 +1,12 @@
 import "dart:io";
 
+import "package:flutter/material.dart";
+
 import "package:clipboard/clipboard.dart";
+import "package:go_router/go_router.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:url_launcher/url_launcher.dart";
+
 import "package:dpip/global.dart";
 import "package:dpip/route/announcement/announcement.dart";
 import "package:dpip/route/changelog/changelog.dart";
@@ -8,10 +14,6 @@ import "package:dpip/route/log/log.dart";
 import "package:dpip/route/sound/sound.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/widgets/list/tile_group_header.dart";
-import "package:flutter/material.dart";
-import "package:go_router/go_router.dart";
-import "package:material_symbols_icons/symbols.dart";
-import "package:url_launcher/url_launcher.dart";
 
 import "developer.dart";
 

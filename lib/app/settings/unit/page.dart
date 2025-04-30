@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/ui.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
 
 class SettingsUnitPage extends StatelessWidget {
   const SettingsUnitPage({super.key});

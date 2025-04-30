@@ -1,7 +1,14 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+
 import 'package:dpip/app/debug/logs/page.dart';
+import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/layout.dart';
-import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/layout.dart';
+import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
@@ -17,20 +24,15 @@ import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/welcome/layout.dart';
 import 'package:dpip/app_old/page/history/history.dart';
-import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:dpip/core/preference.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();

@@ -1,5 +1,12 @@
-import "package:dpip/app_old/page/map/monitor/monitor.dart";
+import "package:flutter/material.dart";
+
+import "package:intl/intl.dart";
+import "package:maplibre_gl/maplibre_gl.dart";
+import "package:material_symbols_icons/symbols.dart";
+import "package:url_launcher/url_launcher.dart";
+
 import "package:dpip/api/model/report/earthquake_report.dart";
+import "package:dpip/app_old/page/map/monitor/monitor.dart";
 import "package:dpip/utils/depth_color.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/utils/extensions/int.dart";
@@ -9,11 +16,6 @@ import "package:dpip/widgets/list/detail_field_tile.dart";
 import "package:dpip/widgets/report/enlargeable_image.dart";
 import "package:dpip/widgets/report/intensity_box.dart";
 import "package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart";
-import "package:flutter/material.dart";
-import "package:intl/intl.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
-import "package:material_symbols_icons/symbols.dart";
-import "package:url_launcher/url_launcher.dart";
 
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;

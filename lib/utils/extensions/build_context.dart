@@ -1,7 +1,9 @@
+import "package:flutter/material.dart";
+
+import 'package:go_router/go_router.dart';
+
 import 'package:dpip/l10n/app_localizations.dart';
 import 'package:dpip/utils/extensions/go_router.dart';
-import "package:flutter/material.dart";
-import 'package:go_router/go_router.dart';
 
 extension CommonContext on BuildContext {
   AppLocalizations get i18n => AppLocalizations.of(this)!;

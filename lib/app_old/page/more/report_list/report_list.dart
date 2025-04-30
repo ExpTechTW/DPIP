@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/report/list_item.dart';
-import 'package:flutter/material.dart';
 
 class ReportListPage extends StatefulWidget {
   const ReportListPage({super.key});

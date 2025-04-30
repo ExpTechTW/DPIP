@@ -1,5 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
+import 'package:in_app_update/in_app_update.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app_old/page/history/history.dart';
 import 'package:dpip/app_old/page/home/home.dart';
@@ -15,9 +20,6 @@ import 'package:dpip/global.dart';
 import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:flutter/material.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});

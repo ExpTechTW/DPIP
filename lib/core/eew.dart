@@ -11,11 +11,7 @@ Map<String, double> psWaveDist(double depth, int time, int now) {
 
   double t = (now - time) / 1000.0;
 
-  var timeTable =
-      Global.timeTable[findClosest(
-        Global.timeTable.keys.map(int.parse).toList(),
-        depth,
-      ).toString()];
+  var timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
   var prevTable;
 
   for (var table in timeTable) {
@@ -52,18 +48,10 @@ Map<String, double> psWaveDist(double depth, int time, int now) {
 }
 
 int findClosest(List<int> arr, double target) {
-  return arr.reduce(
-    (prev, curr) => (curr - target).abs() < (prev - target).abs() ? curr : prev,
-  );
+  return arr.reduce((prev, curr) => (curr - target).abs() < (prev - target).abs() ? curr : prev);
 }
 
-Map<String, dynamic> eewAreaPga(
-  double lat,
-  double lon,
-  double depth,
-  double mag,
-  Map<String, Location> region,
-) {
+Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag, Map<String, Location> region) {
   Map<String, dynamic> json = {};
   double eewMaxI = 0.0;
 
@@ -85,30 +73,15 @@ Map<String, dynamic> eewAreaPga(
   return json;
 }
 
-double eewAreaPgv(
-  List<double> epicenterLocation,
-  List<double> pointLocation,
-  double depth,
-  double magW,
-) {
+double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, double depth, double magW) {
   double long = pow(10, 0.5 * magW - 1.85).toDouble() / 2;
-  double epicenterDistance = distance(
-    epicenterLocation[0],
-    epicenterLocation[1],
-    pointLocation[0],
-    pointLocation[1],
-  );
-  double hypocenterDistance =
-      sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
+  double epicenterDistance = distance(epicenterLocation[0], epicenterLocation[1], pointLocation[0], pointLocation[1]);
+  double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   double x = max(hypocenterDistance, 3);
   double gpv600 =
       pow(
         10,
-        0.58 * magW +
-            0.0038 * depth -
-            1.29 -
-            log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 -
-            0.002 * x,
+        0.58 * magW + 0.0038 * depth - 1.29 - log(x + 0.0028 * pow(10, 0.5 * magW)) / ln10 - 0.002 * x,
       ).toDouble();
   double pgv400 = gpv600 * 1.31;
   double pgv = pgv400 * 1.0;
@@ -126,18 +99,13 @@ double distance(double latA, double lngA, double latB, double lngB) {
   double cosLatA = cos(atan(tan(latA)));
   double cosLatB = cos(atan(tan(latB)));
 
-  return acos(sinLatA * sinLatB + cosLatA * cosLatB * cos(lngA - lngB)) *
-      6371.008;
+  return acos(sinLatA * sinLatB + cosLatA * cosLatB * cos(lngA - lngB)) * 6371.008;
 }
 
 double sWaveTimeByDistance(double depth, double sDist) {
   double sTime = 0.0;
 
-  var timeTable =
-      Global.timeTable[findClosest(
-        Global.timeTable.keys.map(int.parse).toList(),
-        depth,
-      ).toString()];
+  var timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
   var prevTable;
 
   for (var table in timeTable) {
@@ -163,11 +131,7 @@ double sWaveTimeByDistance(double depth, double sDist) {
 double pWaveTimeByDistance(double depth, double pDist) {
   double pTime = 0.0;
 
-  var timeTable =
-      Global.timeTable[findClosest(
-        Global.timeTable.keys.map(int.parse).toList(),
-        depth,
-      ).toString()];
+  var timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
   var prevTable;
 
   for (var table in timeTable) {

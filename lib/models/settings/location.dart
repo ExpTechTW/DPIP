@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+
 import 'package:dpip/core/preference.dart';
 
 class SettingsLocationModel extends ChangeNotifier {

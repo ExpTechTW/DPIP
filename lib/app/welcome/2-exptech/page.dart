@@ -1,7 +1,9 @@
+import "package:flutter/material.dart";
+
+import "package:go_router/go_router.dart";
+
 import "package:dpip/app/welcome/3-notice/page.dart";
 import "package:dpip/utils/extensions/build_context.dart";
-import "package:flutter/material.dart";
-import "package:go_router/go_router.dart";
 
 class WelcomeExpTechPage extends StatelessWidget {
   const WelcomeExpTechPage({super.key});

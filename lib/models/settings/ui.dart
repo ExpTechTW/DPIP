@@ -1,8 +1,9 @@
 import 'dart:developer';
 
-import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
+
 import 'package:dpip/core/preference.dart';
+import 'package:dpip/utils/extensions/string.dart';
 
 class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
