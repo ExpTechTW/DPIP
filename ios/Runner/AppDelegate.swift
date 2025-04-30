@@ -200,7 +200,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
             ?? "Unknown"
 
         let urlString =
-            "https://api-1.exptech.dev/api/v1/notify/location/\(appVersion)/1/\(latitude),\(longitude)/\(token)"
+            "https://api-1.exptech.dev/api/v2/location/1/\(token)/\(appVersion)/\(latitude),\(longitude)"
         print(urlString)
         guard let url = URL(string: urlString) else { return }
         UserDefaults.standard.set(latitude, forKey: "user-lat")
