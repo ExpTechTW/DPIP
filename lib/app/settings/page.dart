@@ -1,3 +1,4 @@
+import 'package:dpip/core/preference.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -166,6 +167,12 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'Device Info',
           trailing: Text(deviceInfo),
           onLongPress: () => FlutterClipboard.copy(deviceInfo),
+        ),
+        SettingsListTile(
+          icon: Symbols.bug_report_rounded,
+          title: context.i18n.settings_fcm,
+          trailing: Icon(Symbols.content_copy_rounded),
+          onTap: () => FlutterClipboard.copy(Preference.notifyToken),
         ),
         SettingsListTile(
           icon: Symbols.bug_report_rounded,

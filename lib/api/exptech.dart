@@ -20,6 +20,8 @@ import "package:dpip/api/model/weather/rain.dart";
 import "package:dpip/api/model/weather/weather.dart";
 import "package:dpip/api/model/weather_schema.dart";
 import "package:dpip/api/route.dart";
+import "package:dpip/models/settings/notify.dart";
+import "package:dpip/utils/extensions/response.dart";
 
 class ExpTech {
   String? apikey;
@@ -504,5 +506,15 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return jsonData.map((item) => History.fromJson(item)).toList();
+  }
+
+  Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
+    final requestUrl = Route.notify(token: token, channel: channel, status: status);
+
+    var res = await get(requestUrl);
+
+    if (!res.ok) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
   }
 }

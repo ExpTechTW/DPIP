@@ -20,8 +20,8 @@ class PreferenceKeys {
   // #region Notification
   static const notifyEew = 'pref:notify:eew';
   static const notifyMonitor = 'pref:notify:monitor';
-  static const notifyIntensity = 'pref:notify:intensity';
   static const notifyReport = 'pref:notify:report';
+  static const notifyIntensity = 'pref:notify:intensity';
   static const notifyThunderstorm = 'pref:notify:thunderstorm';
   static const notifyWeatherAdvisory = 'pref:notify:weatherAdvisory';
   static const notifyEvacuation = 'pref:notify:evacuation';
@@ -39,6 +39,9 @@ class Preference {
 
   static bool get isFirstLaunch => instance.getString('welcome') != 'done';
   static set isFirstLaunch(bool value) => instance.set('welcome', value ? null : 'done');
+
+  static String get notifyToken => instance.getString("notify-token") ?? "";
+  static set notifyToken(String? value) => instance.set("notify-token", value);
 
   // #region Location
   static bool? get locationAuto => instance.getBool(PreferenceKeys.locationAuto);

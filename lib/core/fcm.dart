@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
 
 Future<void> fcmInit() async {
@@ -22,17 +22,17 @@ Future<void> fcmInit() async {
   await AwesomeNotificationsFcm().requestFirebaseAppToken();
 
   if (Platform.isIOS) {
-    Global.preference.setString("apns-token", await FirebaseMessaging.instance.getAPNSToken() ?? '');
+    Preference.notifyToken = await FirebaseMessaging.instance.getAPNSToken();
   }
 }
 
 Future<void> onFcmTokenHandle(String token) async {
-  Global.preference.setString("fcm-token", token);
+  Preference.notifyToken = token;
 }
 
 Future<void> onNativeTokenHandle(String token) async {
   TalkerManager.instance.info('FCM Token:"$token"');
-  Global.preference.setString("fcm-token", token);
+  Preference.notifyToken = token;
 }
 
 Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {

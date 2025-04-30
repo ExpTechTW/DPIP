@@ -228,7 +228,7 @@ class SettingsNotifyPage extends StatelessWidget {
                       groupValue: eew,
                     );
                     if (!context.mounted || result == null) return;
-                    context.read<SettingsNotificationModel>().setEew(result);
+                    await context.read<SettingsNotificationModel>().setEew(result);
                   },
                 );
               },

@@ -2,6 +2,7 @@ import "dart:io";
 import "dart:math";
 
 import "package:dpip/global.dart";
+import "package:dpip/models/settings/notify.dart";
 
 class Route {
   static String get api => baseApi();
@@ -101,4 +102,25 @@ class Route {
   static Uri monitor(String token, String status) => Uri.parse(
     "https://api-1.exptech.dev/api/v1/notify/setting/$token/$status/${DateTime.now().millisecondsSinceEpoch}",
   );
+
+  /// ## 設定通知
+  ///
+  /// ### Endpoint:
+  /// ```
+  /// '/notify/$platform/$token/$channel/$status'
+  /// ```
+  ///
+  /// ### 參數
+  /// - `token`: FCM Token
+  /// - `channel`: 通知頻道
+  /// - `status`: 通知狀態
+  static Uri notify({required String token, required NotifyChannel channel, required Enum status}) {
+    if (token.isEmpty) throw Exception("Token is empty");
+
+    final platform = Platform.isIOS ? 1 : 0;
+    final type = channel.index;
+    final value = status.index;
+
+    return Uri.parse("https://api-1.exptech.dev/api/v2/notify/$platform/$token/$type/$value");
+  }
 }

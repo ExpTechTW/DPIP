@@ -1,3 +1,6 @@
+import "package:dpip/core/fcm.dart";
+import "package:dpip/core/notify.dart";
+import "package:dpip/core/service.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
@@ -32,6 +35,10 @@ void main() async {
   GlobalProviders.init();
 
   initializeTimeZones();
+
+  await fcmInit();
+  await notifyInit();
+  initBackgroundService();
 
   runApp(
     MultiProvider(
