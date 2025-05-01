@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:dpip/core/eew.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -225,10 +226,29 @@ void _onServiceStart(ServiceInstance service) async {
         ),
       );
       service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
+
+      double dist = distance(
+        position.lat ?? 0,
+        position.lng ?? 0,
+        GlobalProviders.location.oldLatitude ?? 0,
+        GlobalProviders.location.oldLongitude ?? 0,
+      );
+
+      int time = 15;
+
+      if (dist > 30) {
+        time = 5;
+      } else if (dist > 10) {
+        time = 10;
+      }
+
+      GlobalProviders.location.setOldLongitude(position.lng);
+      GlobalProviders.location.setOldLatitude(position.lat);
+
+      _locationUpdateTimer = Timer.periodic(Duration(minutes: time), (timer) async => updateLocation());
     }
 
     // Start the periodic task
     updateLocation();
-    _locationUpdateTimer = Timer.periodic(const Duration(minutes: 5), (timer) async => updateLocation());
   }
 }
