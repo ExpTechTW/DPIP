@@ -20,7 +20,7 @@ class SettingsLocalePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
+      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SettingsListSection(
           title: context.i18n.settings_locale,

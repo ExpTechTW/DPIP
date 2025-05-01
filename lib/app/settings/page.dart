@@ -1,5 +1,3 @@
-import 'package:dpip/core/preference.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:clipboard/clipboard.dart';
@@ -17,6 +15,7 @@ import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
@@ -154,7 +153,7 @@ class SettingsIndexPage extends StatelessWidget {
     );
 
     final debug = SettingsListSection(
-      title: 'Debug',
+      title: context.i18n.me_debug,
       children: [
         SettingsListTile(
           icon: Symbols.bug_report_rounded,
@@ -192,7 +191,7 @@ class SettingsIndexPage extends StatelessWidget {
 
     return ListView(
       padding: EdgeInsets.only(top: 16, bottom: 16 + context.padding.bottom),
-      children: [location, userInterface, notification, information, links, if (kDebugMode) debug, footer],
+      children: [location, userInterface, notification, information, links, debug, footer],
     );
   }
 }

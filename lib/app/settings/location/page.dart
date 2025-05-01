@@ -414,7 +414,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   @override
   Widget build(BuildContext context) {
     final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
+
     return ListView(
+      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SettingsListSection(
           children: [

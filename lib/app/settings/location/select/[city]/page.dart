@@ -1,13 +1,13 @@
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/preference.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/app/settings/location/page.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -31,6 +31,7 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
     final towns = Global.location.entries.where((e) => e.value.city == widget.city).toList();
 
     return ListView(
+      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SettingsListSection(
           title: widget.city,

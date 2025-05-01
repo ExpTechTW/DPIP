@@ -41,6 +41,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SettingsListSection(
           title: '選擇語言',

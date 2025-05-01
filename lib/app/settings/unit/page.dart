@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/ui.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class SettingsUnitPage extends StatelessWidget {
   const SettingsUnitPage({super.key});
@@ -15,7 +16,7 @@ class SettingsUnitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      controller: context.findAncestorStateOfType<NestedScrollViewState>()?.innerController,
+      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         SettingsListSection(
           title: '單位',
