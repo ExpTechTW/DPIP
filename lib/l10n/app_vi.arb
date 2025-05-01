@@ -1115,7 +1115,7 @@
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
-  "settings_earthquake_monitor": ".",
+  "settings_earthquake_monitor": "Vui lòng bật giám sát động đất trong chức năng nâng cao trong cài đặt.",
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
@@ -1183,7 +1183,7 @@
   "@no_fee_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如果植入廣告行不通，那對大眾收費呢？變成付費軟體？"
   },
-  "public_charge_consideration": "首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。",
+  "public_charge_consideration": "Đầu tiên, như một phần mềm phòng chống thiên tai, chúng tôi hy vọng sẽ truyền tải thông tin phòng chống thiên tai càng nhiều càng tốt. Và có lẽ những người thực sự cần không thể trả thêm tiền để trang trải chi phí đó, và chúng tôi muốn giúp đỡ nhiều người hơn. Thứ hai, với tư cách là nhà phát triển, chúng tôi hy vọng rằng phần mềm có thể được sử dụng bởi nhiều người, và các khoản phí sẽ trực tiếp dẫn đến việc giảm ý chí sử dụng.",
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
@@ -1199,7 +1199,7 @@
   "@developer_message": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
   },
-  "error_fetching_announcement": "獲取公告時發生錯誤:",
+  "error_fetching_announcement": "Một lỗi xảy ra trong việc thu thập thông tin thông báo:",
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
@@ -1389,7 +1389,7 @@
   "@sound_rain_instant": {
     "description": "「我」路徑 → 「通知測試」內容 → 「雷雨即時訊息」標題"
   },
-  "sound_weather_alert": "天氣警特報",
+  "sound_weather_alert": "Cảnh báo thời tiết",
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
@@ -1401,7 +1401,7 @@
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
-  "sound_weather_minor_h2": "所在地(鄉鎮)發布上述除外燈號之\n天氣警特報",
+  "sound_weather_minor_h2": "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu",
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
@@ -1453,7 +1453,7 @@
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
-  "sunny_with_rain": "晴有雨",
+  "sunny_with_rain": "Những ngày nắng với mưa",
   "@sunny_with_rain": {
     "description": "天氣狀況：晴天伴有雨"
   },
@@ -1509,7 +1509,7 @@
   "@sunny_with_thunder": {
     "description": "天氣狀況：晴天伴有雷"
   },
-  "partly__cloudy": "多雲",
+  "partly__cloudy": "Đám mây",
   "@partly__cloudy": {
     "description": "天氣狀況：多雲"
   },
@@ -1657,11 +1657,11 @@
   "@overcast_with_thunder": {
     "description": "天氣狀況：陰天伴有雷"
   },
-  "get_weather_abnormal": "取得天氣異常",
+  "get_weather_abnormal": "Ngoại lệ xảy ra khi thu thập thông tin thời tiết",
   "@get_weather_abnormal": {
     "description": "取得天氣異常"
   },
-  "map_average": "平均",
+  "map_average": "Trung bình",
   "@map_average": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 平均"
   },
@@ -1677,15 +1677,15 @@
   "@active": {
     "description": "「天氣警特報」狀態 → 生效中"
   },
-  "save_image_permission": "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。",
+  "save_image_permission": "Để lưu trữ hình ảnh, bạn cần cho phép DPIP sử dụng quyền ảnh và phương tiện truyền thông để hoạt động đúng.",
   "@save_image_permission": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。"
   },
-  "save_image_error": "儲存圖片時發生錯誤:",
+  "save_image_error": "Đã xảy ra lỗi khi lưu hình ảnh:",
   "@save_image_error": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片時發生錯誤:"
   },
-  "error_occurred": "發生錯誤:",
+  "error_occurred": "Sai lầm xảy ra:",
   "@error_occurred": {
     "description": "Weather Status: An error occurred:"
   },
@@ -1713,11 +1713,11 @@
   "@level_7": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 7級"
   },
-  "home_click_settings": "點擊設定所在地",
+  "home_click_settings": "Nhấp vào thiết lập vị trí của mình",
   "@home_click_settings": {
     "description": "「首頁」路徑 → 點擊設定所在地"
   },
-  "history_earthquake_intensity": "TREM 觀測網實測震度",
+  "history_earthquake_intensity": "Cường độ địa chấn được đo bằng mạng quan trắc TREM",
   "@history_earthquake_intensity": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → TREM 觀測網實測震度"
   },
@@ -1725,23 +1725,23 @@
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
-  "history_seismic_intensity_reference": "本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。",
+  "history_seismic_intensity_reference": "Thông tin này có nguồn gốc từ kết quả quan sát tự động của mạng quan sát TREM-Net, mà chưa được xác nhận bởi kiểm tra của con người, chỉ để tham khảo sơ bộ. Thông tin được Cơ quan Khí tượng Trung ương (CWA) công bố nên dựa trên thông tin thực tế.",
   "@history_seismic_intensity_reference": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
   },
-  "map_no_data": "沒有有效資料可顯示",
+  "map_no_data": "Không có thông tin hợp lệ có sẵn để hiển thị",
   "@map_no_data": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → 沒有有效資料可顯示"
   },
-  "map_hh_time": "HH時",
+  "map_hh_time": "HH",
   "@map_hh_time": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → HH時"
   },
-  "ranking": "排行榜",
+  "ranking": "Bảng xếp hạng",
   "@ranking": {
     "description": "「排行榜」頁面 → 標題"
   },
-  "ranking_time": "資料時間：{time}\n共 {ranked_length} 觀測點",
+  "ranking_time": "Thời gian：{thời gian}\nTổng cộng {ranked_length} điểm trạm",
   "@ranking_time": {
     "description": "「排行榜」頁面 → 資料時間：{time}\n共 {ranked_length} 觀測點",
     "placeholders": {
@@ -1753,19 +1753,19 @@
       }
     }
   },
-  "according": "依",
+  "according": "Theo",
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_descending": "降冪",
+  "ranking_descending": "Giảm dần",
   "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_ascending": "升冪",
+  "ranking_ascending": "Tăng dần",
   "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
-  "ranking_merge_into": "合併至",
+  "ranking_merge_into": "Được sáp nhập vào",
   "@ranking_merge_into": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
   },
@@ -1773,7 +1773,7 @@
   "@permission_storage": {
     "description": "「歡迎」頁面 → 儲存"
   },
-  "hours_24_trend": "24小時{type}趨勢",
+  "hours_24_trend": "Xu hướng trong {type} trong vòng 24 giờ",
   "@hours_24_trend": {
     "description": "「地圖」路徑 → 地圖列表 → 氣溫 → 點擊測站 → 資訊托盤 → '24小時${dataTypeToChineseMap[selectedDataType]}趨勢",
     "placeholders": {
@@ -1786,15 +1786,15 @@
   "@power_saving_position": {
     "description": "「歡迎」頁面 → 省電策略"
   },
-  "power_saving_position_text": "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。",
+  "power_saving_position_text": "Cho phép DPIP tiếp tục hoạt động ở chế độ nền để thông báo phòng ngừa thảm họa ngay lập tức.",
   "@power_saving_position_text": {
     "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
   },
-  "automatic_start_position": "自動化啟動",
+  "automatic_start_position": "Bắt đầu Chế độ tự động hóa",
   "@automatic_start_position": {
     "description": "「歡迎」頁面 → 自動化啟動"
   },
-  "automatic_start_position_text": "允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。",
+  "automatic_start_position_text": "Cho phép DPIP tự động bắt đầu sau khi thiết bị khởi động lại hoặc tắt để cung cấp dịch vụ thông báo phòng chống thiên tai liên tục.",
   "@automatic_start_position_text": {
     "description": "「歡迎」頁面 → 允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。"
   }
