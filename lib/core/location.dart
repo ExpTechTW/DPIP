@@ -35,16 +35,16 @@ class LocationService {
 
   @pragma("vm:entry-point")
   Future<GetLocationResult> androidGetLocation() async {
-    bool hasLocationChanged = false;
-    final lastLatitude = GlobalProviders.location.latitude ?? 0;
-    final lastLongitude = GlobalProviders.location.longitude ?? 0;
-
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
       TalkerManager.instance.warning("位置服務未啟用");
       return GetLocationResult(null, false, 0, 0);
     }
+
+    bool hasLocationChanged = false;
+    final lastLatitude = GlobalProviders.location.latitude ?? 0;
+    final lastLongitude = GlobalProviders.location.longitude ?? 0;
 
     final currentPosition = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
@@ -62,13 +62,12 @@ class LocationService {
     if (distanceInMeters >= 250) {
       GlobalProviders.location.setLatitude(currentPosition.latitude);
       GlobalProviders.location.setLongitude(currentPosition.longitude);
+      GlobalProviders.location.setCode(currentLocation?.code.toString());
       hasLocationChanged = true;
       TalkerManager.instance.debug("距離: $distanceInMeters 更新位置");
     } else {
       TalkerManager.instance.debug("距離: $distanceInMeters 不更新位置");
     }
-
-    GlobalProviders.location.setCode(currentLocation?.code.toString());
 
     return GetLocationResult(
       currentLocation?.code,
