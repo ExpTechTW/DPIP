@@ -176,20 +176,6 @@ class ExpTech {
     return json.map((e) => e as String).toList();
   }
 
-  Future<String> getNotifyLocation(String token, String lat, String lng) async {
-    final requestUrl = Route.location(token, lat, lng);
-
-    var res = await get(requestUrl);
-
-    if (res.statusCode == 200) {
-      return res.body;
-    } else if (res.statusCode == 204) {
-      return "${res.statusCode} $requestUrl";
-    } else {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
-    }
-  }
-
   Future<List<CrowdinLocalizationProgress>> getLocalizationProgress() async {
     final requestUrl = Route.locale();
 
@@ -494,6 +480,22 @@ class ExpTech {
     return jsonData.map((item) => History.fromJson(item)).toList();
   }
 
+  /// 回傳所在地
+  Future<String> getNotifyLocation({required String token, required String lat, required String lng}) async {
+    final requestUrl = Route.location(token: token, lat: lat, lng: lng);
+
+    var res = await get(requestUrl);
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else if (res.statusCode == 204) {
+      return "${res.statusCode} $requestUrl";
+    } else {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
+  }
+
+  /// 設定通知
   Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
     final requestUrl = Route.notify(token: token, channel: channel, status: status);
 

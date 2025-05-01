@@ -54,9 +54,6 @@ class Route {
 
   static Uri station() => Uri.parse("$api/v1/trem/station");
 
-  static Uri location(String token, String lat, String lng) =>
-      Uri.parse("$onlyapi/v2/location/${Platform.isIOS ? 1 : 0}/$token/${Global.packageInfo.version}/$lat,$lng");
-
   static Uri locale() => Uri.parse("https://exptech.dev/api/dpip/locale");
 
   static Uri radarList() => Uri.parse("$onlyapi/v1/tiles/radar/list");
@@ -99,6 +96,28 @@ class Route {
 
   static Uri status() => Uri.parse("https://status.exptech.dev/api/v1/status/data?duration=1d");
 
+  /// 回傳所在地
+  ///
+  /// ### Endpoint:
+  /// ```
+  /// '/location/$platform/$token/$version/$lat,$lng'
+  /// ```
+  ///
+  /// ### 參數
+  /// - `token`: FCM Token
+  /// - `lat`: 緯度
+  /// - `lng`: 經度
+  static Uri location({required String token, required String lat, required String lng}) {
+    if (token.isEmpty) {
+      throw ArgumentError("Token is empty", 'token');
+    }
+
+    final platform = Platform.isIOS ? 1 : 0;
+    final version = Global.packageInfo.version;
+
+    return Uri.parse("$onlyapi/v2/location/$platform/$token/$version/$lat,$lng");
+  }
+
   /// ## 設定通知
   ///
   /// ### Endpoint:
@@ -109,9 +128,27 @@ class Route {
   /// ### 參數
   /// - `token`: FCM Token
   /// - `channel`: 通知頻道
-  /// - `status`: 通知狀態
+  /// - `status`: 通知狀態，必須是 [EewNotifyType]、[EarthquakeNotifyType]、[WeatherNotifyType]、[TsunamiNotifyType] 或
+  ///   [BasicNotifyType] 其中一個
+  ///
+  /// ### 回傳
+  /// - `204`: 成功
+  /// - `401`: 需要先呼叫 [ExpTech.getLocation]
   static Uri notify({required String token, required NotifyChannel channel, required Enum status}) {
-    if (token.isEmpty) throw Exception("Token is empty");
+    if (token.isEmpty) {
+      throw ArgumentError("Token is empty", 'token');
+    }
+
+    if (status is! EewNotifyType ||
+        status is! EarthquakeNotifyType ||
+        status is! WeatherNotifyType ||
+        status is! TsunamiNotifyType ||
+        status is! BasicNotifyType) {
+      throw ArgumentError(
+        "Invalid status, must be one of EewNotifyType, EarthquakeNotifyType, WeatherNotifyType, TsunamiNotifyType, or BasicNotifyType",
+        'status',
+      );
+    }
 
     final platform = Platform.isIOS ? 1 : 0;
     final type = channel.index;
