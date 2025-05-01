@@ -327,7 +327,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       batteryOptimizationPermission = batteryOptimization;
       if (!batteryOptimization) return;
 
-      androidStopBackgroundService(!isAuto);
+      androidStopBackgroundService();
 
       if (!isAuto) {
         androidStartBackgroundService(false);

@@ -139,10 +139,10 @@ class Route {
       throw ArgumentError("Token is empty", 'token');
     }
 
-    if (status is! EewNotifyType ||
-        status is! EarthquakeNotifyType ||
-        status is! WeatherNotifyType ||
-        status is! TsunamiNotifyType ||
+    if (status is! EewNotifyType &&
+        status is! EarthquakeNotifyType &&
+        status is! WeatherNotifyType &&
+        status is! TsunamiNotifyType &&
         status is! BasicNotifyType) {
       throw ArgumentError(
         "Invalid status, must be one of EewNotifyType, EarthquakeNotifyType, WeatherNotifyType, TsunamiNotifyType, or BasicNotifyType",

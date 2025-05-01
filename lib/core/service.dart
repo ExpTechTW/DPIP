@@ -205,7 +205,7 @@ void onStart(ServiceInstance service) async {
       // Handle FCM notification if position changed
       final fcmToken = Preference.notifyToken;
       if (position.change && fcmToken.isNotEmpty) {
-        final body = await ExpTech().getNotifyLocation(token: fcmToken, lat: lat, lng: lon);
+        final body = await ExpTech().updateDeviceLocation(token: fcmToken, lat: lat, lng: lon);
         TalkerManager.instance.debug(body);
       }
 

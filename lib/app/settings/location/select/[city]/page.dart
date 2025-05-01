@@ -1,3 +1,5 @@
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -36,11 +38,19 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
                         '${town.key}・${town.value.lng.toStringAsFixed(2)}°E・${town.value.lat.toStringAsFixed(2)}°N',
                       ),
                       trailing: Icon(code == town.key ? Symbols.check_rounded : null),
-                      onTap: () {
-                        context.popUntil(SettingsLocationPage.route);
+                      onTap: () async {
+                        await ExpTech().updateDeviceLocation(
+                          token: Preference.notifyToken,
+                          lat: town.value.lat.toString(),
+                          lng: town.value.lng.toString(),
+                        );
+
+                        if (!context.mounted) return;
+
                         context.read<SettingsLocationModel>().setCode(town.key);
                         context.read<SettingsLocationModel>().setLongitude(town.value.lng);
                         context.read<SettingsLocationModel>().setLatitude(town.value.lat);
+                        context.popUntil(SettingsLocationPage.route);
                       },
                     ),
               ),

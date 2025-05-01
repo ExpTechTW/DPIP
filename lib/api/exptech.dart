@@ -481,7 +481,7 @@ class ExpTech {
   }
 
   /// 回傳所在地
-  Future<String> getNotifyLocation({required String token, required String lat, required String lng}) async {
+  Future<String> updateDeviceLocation({required String token, required String lat, required String lng}) async {
     final requestUrl = Route.location(token: token, lat: lat, lng: lng);
 
     var res = await get(requestUrl);
