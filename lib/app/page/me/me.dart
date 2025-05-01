@@ -83,14 +83,6 @@ class _MePageState extends State<MePage> {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangelogPage()));
           },
         ),
-        ListTile(
-          leading: const Icon(Symbols.favorite_rounded, fill: 1),
-          title: Text(context.i18n.donate),
-          subtitle: Text(context.i18n.donate_h2),
-          onTap: () {
-            launchUrl(Uri.parse("https://exptech.com.tw/donate"));
-          },
-        ),
         ListTileGroupHeader(title: context.i18n.me_debug),
         ListTile(
           leading: const Icon(Symbols.bug_report),
