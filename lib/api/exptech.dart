@@ -496,17 +496,6 @@ class ExpTech {
     }
   }
 
-  /// 設定通知
-  Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
-    final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
-
-    var res = await get(requestUrl);
-
-    if (!res.ok) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
-    }
-  }
-
   /// 取得通知
   Future<NotifySettings> getNotify({required String token}) async {
     final requestUrl = Route.notify(token: token);
@@ -520,5 +509,16 @@ class ExpTech {
     final List<dynamic> jsonData = jsonDecode(res.body);
 
     return NotifySettings.fromJson(jsonData.map((e) => e as int).toList());
+  }
+
+  /// 設定通知
+  Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
+    final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
+
+    var res = await get(requestUrl);
+
+    if (!res.ok) {
+      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+    }
   }
 }

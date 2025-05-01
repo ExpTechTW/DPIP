@@ -127,9 +127,6 @@ class Route {
   ///
   /// ### 參數
   /// - `token`: FCM Token
-  /// - `channel`: 通知頻道
-  /// - `status`: 通知狀態，必須是 [EewNotifyType]、[EarthquakeNotifyType]、[WeatherNotifyType]、[TsunamiNotifyType] 或
-  ///   [BasicNotifyType] 其中一個
   ///
   /// ### 回傳
   /// - `200`: 成功
