@@ -230,20 +230,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, EewNotifyType>(
                   selector: (_, model) => model.eew,
                   builder: (context, eew, child) {
-                    return SettingsListTile(
-                      title: context.i18n.emergency_earthquake_warning,
-                      subtitle: Text(getEewNotifyTypeName(eew)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.crisis_alert_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openEewNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.emergency_earthquake_warning,
-                          groupValue: eew,
+                          subtitle: Text(getEewNotifyTypeName(eew)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.crisis_alert_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openEewNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.emergency_earthquake_warning,
+                              groupValue: eew,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setEew(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        await context.read<SettingsNotificationModel>().setEew(result);
                       },
                     );
                   },
@@ -256,20 +268,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                   selector: (_, model) => model.monitor,
                   builder: (context, monitor, child) {
-                    return SettingsListTile(
-                      title: context.i18n.monitor,
-                      subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.earthquake_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openEarthquakeNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.monitor,
-                          groupValue: monitor,
+                          subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.earthquake_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openEarthquakeNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.monitor,
+                              groupValue: monitor,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setMonitor(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setMonitor(result);
                       },
                     );
                   },
@@ -277,20 +301,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                   selector: (_, model) => model.report,
                   builder: (context, report, child) {
-                    return SettingsListTile(
-                      title: context.i18n.report,
-                      subtitle: Text(getEarthquakeNotifyTypeName(report)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.docs_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openEarthquakeNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.report,
-                          groupValue: report,
+                          subtitle: Text(getEarthquakeNotifyTypeName(report)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.docs_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openEarthquakeNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.report,
+                              groupValue: report,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setReport(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setReport(result);
                       },
                     );
                   },
@@ -298,20 +334,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                   selector: (_, model) => model.intensity,
                   builder: (context, intensity, child) {
-                    return SettingsListTile(
-                      title: context.i18n.sound_int_report_minor,
-                      subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.summarize_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openEarthquakeNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.sound_int_report_minor,
-                          groupValue: intensity,
+                          subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.summarize_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openEarthquakeNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.sound_int_report_minor,
+                              groupValue: intensity,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setIntensity(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setIntensity(result);
                       },
                     );
                   },
@@ -324,20 +372,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, WeatherNotifyType>(
                   selector: (_, model) => model.thunderstorm,
                   builder: (context, thunderstorm, child) {
-                    return SettingsListTile(
-                      title: context.i18n.sound_rain_instant,
-                      subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.thunderstorm_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openWeatherNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.sound_rain_instant,
-                          groupValue: thunderstorm,
+                          subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.thunderstorm_rounded,
+                          enabled: enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openWeatherNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.sound_rain_instant,
+                              groupValue: thunderstorm,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setThunderstorm(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setThunderstorm(result);
                       },
                     );
                   },
@@ -345,20 +405,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, WeatherNotifyType>(
                   selector: (_, model) => model.weatherAdvisory,
                   builder: (context, weatherAdvisory, child) {
-                    return SettingsListTile(
-                      title: context.i18n.sound_weather_alert,
-                      subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.warning_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openWeatherNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.sound_weather_alert,
-                          groupValue: weatherAdvisory,
+                          subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.warning_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openWeatherNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.sound_weather_alert,
+                              groupValue: weatherAdvisory,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setWeatherAdvisory(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setWeatherAdvisory(result);
                       },
                     );
                   },
@@ -366,20 +438,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, WeatherNotifyType>(
                   selector: (_, model) => model.evacuation,
                   builder: (context, evacuation, child) {
-                    return SettingsListTile(
-                      title: context.i18n.sound_evacuation,
-                      subtitle: Text(getWeatherNotifyTypeName(evacuation)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.directions_run_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openWeatherNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.sound_evacuation,
-                          groupValue: evacuation,
+                          subtitle: Text(getWeatherNotifyTypeName(evacuation)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.directions_run_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openWeatherNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.sound_evacuation,
+                              groupValue: evacuation,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setEvacuation(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setEvacuation(result);
                       },
                     );
                   },
@@ -392,20 +476,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, TsunamiNotifyType>(
                   selector: (_, model) => model.tsunami,
                   builder: (context, tsunami, child) {
-                    return SettingsListTile(
-                      title: context.i18n.tsunami_alert_sound,
-                      subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.tsunami_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openTsunamiNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.tsunami_alert_sound,
-                          groupValue: tsunami,
+                          subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.tsunami_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openTsunamiNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.tsunami_alert_sound,
+                              groupValue: tsunami,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setTsunami(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setTsunami(result);
                       },
                     );
                   },
@@ -418,20 +514,32 @@ class SettingsNotifyPage extends StatelessWidget {
                 Selector<SettingsNotificationModel, BasicNotifyType>(
                   selector: (_, model) => model.announcement,
                   builder: (context, announcement, child) {
-                    return SettingsListTile(
-                      title: context.i18n.announcement,
-                      subtitle: Text(getBasicNotifyTypeName(announcement)),
-                      trailing: Icon(Symbols.chevron_right_rounded),
-                      icon: Symbols.campaign_rounded,
-                      enabled: enabled,
-                      onTap: () async {
-                        final result = await openBasicNotifyTypeSelectorDialog(
-                          context,
+                    bool isLoading = false;
+
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return SettingsListTile(
                           title: context.i18n.announcement,
-                          groupValue: announcement,
+                          subtitle: Text(getBasicNotifyTypeName(announcement)),
+                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.campaign_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () async {
+                            if (isLoading || !enabled) return;
+
+                            final result = await openBasicNotifyTypeSelectorDialog(
+                              context,
+                              title: context.i18n.announcement,
+                              groupValue: announcement,
+                            );
+
+                            if (!context.mounted || result == null) return;
+
+                            setState(() => isLoading = true);
+                            await context.read<SettingsNotificationModel>().setAnnouncement(result);
+                            setState(() => isLoading = false);
+                          },
                         );
-                        if (!context.mounted || result == null) return;
-                        context.read<SettingsNotificationModel>().setAnnouncement(result);
                       },
                     );
                   },
