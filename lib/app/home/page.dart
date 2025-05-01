@@ -23,6 +23,8 @@ import 'package:dpip/utils/weather_icon.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  static const route = '/home';
+
   @override
   State<HomePage> createState() => _HomePageState();
 }

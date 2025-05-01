@@ -1,3 +1,4 @@
+import 'package:dpip/app/changelog/page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +30,6 @@ import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
-import 'package:dpip/route/changelog/changelog.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
@@ -40,7 +40,7 @@ final GlobalKey<NavigatorState> _settingsNavigatorKey = GlobalKey<NavigatorState
 
 final router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: Preference.isFirstLaunch ? WelcomeAboutPage.route : '/home',
+  initialLocation: Preference.isFirstLaunch ? WelcomeAboutPage.route : HomePage.route,
   routes: [
     ShellRoute(
       navigatorKey: _welcomeNavigatorKey,
@@ -156,7 +156,7 @@ final router = GoRouter(
       ],
     ),
     GoRoute(path: '/announcement', builder: (context, state) => AnnouncementPage()),
-    GoRoute(path: '/changelog', builder: (context, state) => ChangelogPage()),
+    GoRoute(path: ChangelogPage.route, builder: (context, state) => ChangelogPage()),
     GoRoute(path: '/license', builder: (context, state) => LicensePage()),
     if (kDebugMode) GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => AppDebugLogsPage()),
   ],

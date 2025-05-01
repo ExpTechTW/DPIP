@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:dpip/app/home/page.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
@@ -50,7 +51,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     }
     if (mounted) {
       Preference.isFirstLaunch = false;
-      context.go('/home');
+      context.go(HomePage.route);
     }
   }
 
