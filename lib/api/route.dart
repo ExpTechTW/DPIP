@@ -150,10 +150,9 @@ class Route {
       );
     }
 
-    final platform = Platform.isIOS ? 1 : 0;
     final type = channel.index;
     final value = status.index;
 
-    return Uri.parse("https://api-1.exptech.dev/api/v2/notify/$platform/$token/$type/$value");
+    return Uri.parse("https://api-1.exptech.dev/api/v2/notify/$token/$type/$value");
   }
 }
