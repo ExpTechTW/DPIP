@@ -5,7 +5,7 @@
   "@datetime_format": {
     "description": "日期時間顯示格式"
   },
-  "full_date_format": "yyyy/MM/dd (EEEE)",
+  "full_date_format": "Năm/Tháng/Ngày (EEEE)",
   "@full_date_format": {
     "description": "完整日期顯示格式"
   },
@@ -300,7 +300,7 @@
   "@report_error": {
     "description": "「更多」路徑 → 地震報告 → 取得地震報告時發生錯誤，請檢查網路狀況後再試一次。"
   },
-  "me_version": "版本 {version}\n組建 {buildNumber}\n由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
+  "me_version": "Phiên bản {version}\nXây dựng {buildNumber}\nĐược sản xuất bởi ExpTech Exploration Technology. Một số nguồn dữ liệu: CWA (Cục Quản lý Thời tiết Trung Ương Quốc Gia.",
   "@me_version": {
     "description": "「我」頁面標題 → 版本 {version}\n組建 {buildNumber}由 ExpTech 探索科技製作\n部分資料來源 CWA(中央氣象署)",
     "placeholders": {
@@ -324,19 +324,19 @@
   "@notify_test_description": {
     "description": "「我」路徑 → 「通知測試」副標題敘述 → 測試即時天氣資訊、地震速報等音效通知"
   },
-  "eew_alert_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上",
+  "eew_alert_description_sound": "Cường độ động đất tối đa là 5 yếu hoặc cao hơn và\nCường độ động đất ước tính tại địa điểm (thị trấn) là 4 hoặc cao hơn",
   "@eew_alert_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上以 且\n所在地(鄉鎮)預估震度 4 以上"
   },
-  "eew_description_sound": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上",
+  "eew_description_sound": "Cường độ mạnh nhất là 5 yếu trở lên và cường độ ước tính tại địa điểm (thị trấn) là 2 trở lên",
   "@eew_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震速報音效」副標題敘述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上"
   },
-  "eq_description_sound": "偵測到晃動",
+  "eq_description_sound": "Đã phát hiện rung lắc do động đất ở địa điểm của bạn",
   "@eq_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 偵測到晃動"
   },
-  "report_description_sound": "所在地(縣市)實測震度 3 以上",
+  "report_description_sound": "Cường độ động đất tại địa điểm (quận hoặc thành phố) ở mức trên 3",
   "@report_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 所在地(縣市)實測震度 3 以上"
   },
@@ -356,7 +356,7 @@
   "@tsunami_alert_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（警報）"
   },
-  "tsunami_alert_description_sound": "海嘯警報發布時\n沿海地區鄉鎮",
+  "tsunami_alert_description_sound": "Cảnh báo sóng thần được ban hành",
   "@tsunami_alert_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n沿海地區鄉鎮"
   },
@@ -364,11 +364,11 @@
   "@tsunami_alert2_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報（注意）"
   },
-  "tsunami_alert2_description_sound": "海嘯警報發布時\n上述除外地區",
+  "tsunami_alert2_description_sound": "Khi cảnh báo sóng thần được ban hành.\nCác khu vực bị loại trừ khỏi các mục trên.",
   "@tsunami_alert2_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「災害資訊」標題 → 海嘯警報發布時\n上述除外地區"
   },
-  "server_announcement_description_sound": "發送公告時",
+  "server_announcement_description_sound": "Khi gửi thông báo",
   "@server_announcement_description_sound": {
     "description": "「設定」路徑 → 「通知測試」內容 →「其他通知」標題 → 發送公告時"
   },
@@ -702,11 +702,11 @@
   "@notification": {
     "description": "「歡迎」頁面 → 通知"
   },
-  "notification_service_description": "在重大災害發生時以通知來傳遞即時防災資訊",
+  "notification_service_description": "Cung cấp thông tin phòng ngừa thiên tai theo thời gian thực thông qua các thông báo khi xảy ra thiên tai lớn.",
   "@notification_service_description": {
     "description": "「歡迎」頁面 → 在重大災害發生時以通知來傳遞即時防災資訊"
   },
-  "location_based_service": "使用定位來自動更新所在地設定，提供當地的即時防災資訊",
+  "location_based_service": "Sử dụng định vị để tự động cập nhật cài đặt vị trí và cung cấp thông tin phòng ngừa thảm họa tại địa phương theo thời gian thực.",
   "@location_based_service": {
     "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
@@ -870,11 +870,11 @@
   "@notification_permission_denied": {
     "description": "「存取權限彈窗」 → 通知功能已被拒絕，請移至設定允許權限。"
   },
-  "autoStart_permission_denied": "自啟動權限已被拒絕，請移至設定允許權限。",
+  "autoStart_permission_denied": "Quyền tự động khởi động đã bị từ chối. Vui lòng vào Cài đặt để cấp quyền",
   "@autoStart_permission_denied": {
     "description": "「存取權限彈窗」 → 自啟動權限已被拒絕，請移至設定允許權限。"
   },
-  "batteryOptimization_permission_denied": "省電策略已被拒絕，請移至設定允許權限。",
+  "batteryOptimization_permission_denied": "Chính sách tiết kiệm điện đã bị từ chối. Vui lòng vào Cài đặt để cấp quyền.",
   "@batteryOptimization_permission_denied": {
     "description": "「存取權限彈窗」 → 省電策略已被拒絕，請移至設定允許權限。"
   },
@@ -1095,87 +1095,87 @@
   "@me_developer": {
     "description": "「我」路徑 → 「開發者想說的話」標題"
   },
-  "me_about": "關於",
+  "me_about": "Về tôi.",
   "@me_about": {
     "description": "「我」路徑 → 關於"
   },
-  "alarm_area": "警報區域",
+  "alarm_area": "Khu vực nhận cảnh báo.",
   "@alarm_area": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 警報區域"
   },
-  "estimated_intensity": "預估最大震度",
+  "estimated_intensity": "Cường độ động đất tối đa ước tính",
   "@estimated_intensity": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 預估最大震度"
   },
-  "time_earthquake": "發震",
+  "time_earthquake": "Động đất",
   "@time_earthquake": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 發震"
   },
-  "no_earthquake_monitor": "未啟用強震監視器",
+  "no_earthquake_monitor": "Không bật chức năng giám sát động đất mạnh",
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
-  "settings_earthquake_monitor": "請至設定進階功能中開啟強震監視器。",
+  "settings_earthquake_monitor": ".",
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
-  "view_prompt_information": "點擊查看提示資訊",
+  "view_prompt_information": "Nhấp để xem lời nhắc",
   "@view_prompt_information": {
     "description": "「地圖」路徑 → 強震監視器 → 點擊查看提示資訊"
   },
-  "highest": "最高",
+  "highest": "Cao nhất",
   "@highest": {
     "description": "「首頁」路徑 → 「最高」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最高"
   },
-  "lowest": "最低",
+  "lowest": "Thấp nhất",
   "@lowest": {
     "description": "「首頁」路徑 → 「最低」描述、「排行榜」頁面 → 氣溫資訊頁面 → 最低"
   },
-  "not_enabled": " (未啟用)",
+  "not_enabled": "(Không bật)",
   "@not_enabled": {
     "description": "「設定」路徑 → 「通知測試」內容 →「 (未啟用)」副標題 "
   },
-  "introduction": "簡介",
+  "introduction": "Giới thiệu",
   "@introduction": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 簡介"
   },
-  "first_gratitude": "首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。",
+  "first_gratitude": "Trước hết, chúng tôi muốn cảm ơn tất cả người dùng đã tải phần mềm này. Toàn thể nhóm phát triển xin gửi lời cảm ơn chân thành nhất đến các bạn.",
   "@first_gratitude": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先感謝所有下載這個軟體的使用者，整個開發團隊在此獻上最誠摯的謝意。"
   },
-  "dpip_goal": "DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。",
+  "dpip_goal": "Ứng dụng DPIP có mục đích tích hợp mọi thông tin phòng chống thiên tai, mong muốn trở thành một phần không thể thiếu trong cuộc sống của con người. Mặc dù tỉ lệ hoàn thành hiện tại chưa cao cũng còn nhiều khó khăn, chúng tôi sẽ tiếp tục hướng tới mục tiêu này.",
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
-  "development_investment": "在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。",
+  "development_investment": "Khi phát triển phần mềm, chúng tôi đã đầu tư rất nhiều tiền bạc, thời gian và công sức, chi hơn 500.000 Đài tệ cho chi phí nhân sự, chi phí thiết bị, dịch vụ đám mây, phí mạng và các khoản mục khác. Để đạt được mục đích này, chúng tôi hy vọng sẽ nhận được sự ủng hộ của người dùng và tiếp tục hoạt động mà không cần dựa vào các công ty bên thứ ba khác.",
   "@development_investment": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
   },
-  "profit_model": "營利模式",
+  "profit_model": "Mô hình lợi nhuận",
   "@profit_model": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利模式"
   },
-  "profit_discussion": "為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。",
+  "profit_discussion": "Để duy trì sự phát triển của Ứng dụng, nhóm đã có nhiều cuộc thảo luận sôi nổi về cách kiếm lợi nhuận. Chúng tôi đã cố gắng tìm ra một mô hình lợi nhuận phù hợp trong số nhiều lựa chọn. Chúng tôi thấy rằng hầu hết các phần mềm tương tự đều sử dụng quảng cáo nhúng để đạt được mục đích lợi nhuận, điều này khiến chúng tôi cân nhắc áp dụng phương pháp này như một phương pháp kiếm lợi nhuận.",
   "@profit_discussion": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為了維持 App 的開發，團隊內部進行了多次激烈討論，思考如何才能營利？我們試圖在眾多方案中，找出一個適合的營利模式。我們發現，大多數同類型軟體採用植入廣告的方式來達到營利目的，這使得我們一度考慮採用該方式作為營利的方法。"
   },
-  "profit_difficulty": "營利真的太難了",
+  "profit_difficulty": "Thật ra rất khó để kiếm được lợi nhuận ",
   "@profit_difficulty": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 營利真的太難了"
   },
-  "user_payment_survey": "我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。",
+  "user_payment_survey": "Chúng tôi đã điều tra mức độ sẵn sàng chi trả của công chúng và thấy rằng hầu hết mọi người thường thiếu nhận thức về phòng chống thiên tai và không sẵn sàng chi tiền cho việc này. Dữ liệu cơ bản có thể gián tiếp xác nhận tuyên bố này. Theo thống kê, số lượng người nhiệt tình tài trợ chỉ chiếm khoảng 1/100.000 tổng số người dùng, điều này khiến quảng cáo nhúng có vẻ là giải pháp tốt nhất.",
   "@user_payment_survey": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。"
   },
-  "why_no_ads": "為什麼不採用廣告？",
+  "why_no_ads": "Tại sao lại không có quảng cáo?",
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
-  "no_ads_reason": "當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。",
+  "no_ads_reason": "Khi thảm họa xảy ra, không ai muốn xem quảng cáo phải không? Đây là lý do đầu tiên tại sao chúng tôi không chèn quảng cáo. Phần mềm hướng đến phòng ngừa thiên tai có nhiệm vụ chính là cung cấp thông tin phòng ngừa thiên tai một cách nhanh chóng và chính xác. Nếu quảng cáo ngăn cản mọi người hiểu đúng thông tin phòng chống thiên tai thì điều này sẽ đi ngược lại triết lý của chúng tôi. Hơn nữa, khi thảm họa xảy ra, chất lượng truyền thông thường kém và việc lãng phí lưu lượng mạng bổ sung để tải quảng cáo rất gây khó chịu",
   "@no_ads_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
   },
-  "charge_public": "對大眾收費？",
+  "charge_public": "Thu phí của người sử dụng ",
   "@charge_public": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 對大眾收費？"
   },
@@ -1187,15 +1187,15 @@
   "@public_charge_consideration": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。"
   },
-  "how_to_profit": "如何營利？",
+  "how_to_profit": "Làm thế nào để kiếm được lợi nhuận?",
   "@how_to_profit": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 如何營利？"
   },
-  "summary": "總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。",
+  "summary": "Tóm lại, chúng tôi hy vọng sẽ đào tạo được những người quan tâm đến phòng chống thiên tai và coi trọng công tác phòng chống thiên tai, hỗ trợ quá trình phát triển phần mềm của chúng tôi và cùng nhau tiến lên.",
   "@summary": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 總結上述，我們希望培養出對防災有興趣的人、重視防災的人，支持我們的軟體開發，一起往前發展。"
   },
-  "developer_message": "DPIP 開發者的話",
+  "developer_message": "Lời từ các nhà phát triển DPIP",
   "@developer_message": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 開發者的話"
   },
@@ -1203,39 +1203,39 @@
   "@error_fetching_announcement": {
     "description": "「我」路徑 →「公告」標題 → 獲取公告時發生錯誤:"
   },
-  "invalid_operation": "無效操作",
+  "invalid_operation": "Hoạt động không hợp lệ",
   "@invalid_operation": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 無效操作"
   },
-  "operation_interval_too_short": "操作間隔過短，請稍後再嘗試。",
+  "operation_interval_too_short": "Khoảng thời gian thao tác quá ngắn, vui lòng thử lại sau.",
   "@operation_interval_too_short": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 操作間隔過短，請稍後再嘗試。"
   },
-  "got_it": "知道了",
+  "got_it": "Đã hiểu",
   "@got_it": {
     "description": "「通知測試」 → 「操作時間過短」彈窗 → 知道了"
   },
-  "error_fcm_token": "錯誤: 無法取得 FCM Token",
+  "error_fcm_token": "Lỗi: Không thể lấy được FCM Token",
   "@error_fcm_token": {
     "description": "錯誤：無法取得 FCM Token"
   },
-  "error_fetching_notifications": "獲取通知紀錄時發生錯誤",
+  "error_fetching_notifications": "Đã xảy ra lỗi khi truy xuất hồ sơ thông báo",
   "@error_fetching_notifications": {
     "description": "「我」路徑 →「行動通知推播紀錄」→ 獲取通知紀錄時發生錯誤"
   },
-  "auto_location_permission_required": "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。",
+  "auto_location_permission_required": "Tính năng định vị tự động yêu cầu bạn phải cho phép DPIP sử dụng quyền thông báo để hoạt động bình thường.",
   "@auto_location_permission_required": {
     "description": "「通知權限」彈窗 → 自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。"
   },
-  "location_permission_needed": "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。",
+  "location_permission_needed": "Chức năng định vị tự động yêu cầu bạn phải cho phép DPIP sử dụng quyền vị trí để hoạt động bình thường.",
   "@location_permission_needed": {
     "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
   },
-  "location_permission": "位置權限",
+  "location_permission": "Quyền truy cập vị trí",
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
-  "improve_auto_location_experience": "為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
+  "improve_auto_location_experience": "Để có trải nghiệm định vị tự động tốt hơn, bạn cần tăng quyền vị trí thành \"luôn cho phép\" để DPIP có thể tự động thiết lập thông tin vị trí ở chế độ nền.",
   "@improve_auto_location_experience": {
     "description": "「位置權限」彈窗 → 為了獲得更好的自動定位體驗，您需要將位置權限提升至「{permissionType}」以便讓 DPIP 在背景自動設定所在地資訊。",
     "placeholders": {
@@ -1244,7 +1244,7 @@
       }
     }
   },
-  "auto_location_permission_upgrade_needed": "自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
+  "auto_location_permission_upgrade_needed": "Tính năng định vị tự động yêu cầu quyền vị trí phải được nâng lên \"(luôn cho phép)\" để sử dụng ở chế độ nền.",
   "@auto_location_permission_upgrade_needed": {
     "description": "「通知權限」彈窗 → 自動定位功能需要將位置權限提升至「{permissionType}」以在背景使用。",
     "placeholders": {
@@ -1253,135 +1253,135 @@
       }
     }
   },
-  "error_prefix": "錯誤:",
+  "error_prefix": "Sai lầm:",
   "@error_prefix": {
     "description": "錯誤：前綴"
   },
-  "home_precipitation": "降水量",
+  "home_precipitation": "Lượng mưa",
   "@home_precipitation": {
     "description": "「首頁」頁面 → 降水量"
   },
-  "history_nationwide": "全國",
+  "history_nationwide": "Toàn quốc (Đài Loan)",
   "@history_nationwide": {
     "description": "「歷史」頁面 → 全國"
   },
-  "me_welcome": "歡迎頁面",
+  "me_welcome": "Trang chào mừng",
   "@me_welcome": {
     "description": "「我」頁面 → 「歡迎頁面」按鈕"
   },
-  "donate_h2": "幫助我們維護伺服器的穩定和長久發展",
+  "donate_h2": "Hỗ trợ chúng tôi duy trì sự ổn định và phát triển lâu dài của các máy chủ của chúng tôi",
   "@donate_h2": {
     "description": "「我」頁面 →「幫助我們維護伺服器的穩定和長久發展」描述"
   },
-  "max_earthquake_intensity": "最大震度",
+  "max_earthquake_intensity": "Cường độ động đất tối đa",
   "@max_earthquake_intensity": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 最大震度"
   },
-  "report_all": "全部",
+  "report_all": "Báo cáo tất cả ",
   "@report_all": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」→ 全部"
   },
-  "report_filter": "篩選器",
+  "report_filter": "Bộ lọc",
   "@report_filter": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」"
   },
-  "report_filter_reset": "重置",
+  "report_filter_reset": "Cài lại",
   "@report_filter_reset": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 重置"
   },
-  "report_filter_apply": "套用",
+  "report_filter_apply": "Áp dụng ",
   "@report_filter_apply": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 套用"
   },
-  "report_end": "到底了",
+  "report_end": "Cuối cùng ",
   "@report_end": {
     "description": "「更多」路徑 → 地震報告 → 使用「篩選器」 → 到底了"
   },
-  "history_send_time": "發送時間",
+  "history_send_time": "Thời gian gửi",
   "@history_send_time": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 發送時間"
   },
-  "history_valid_until": "有效至",
+  "history_valid_until": "Áp dụng đến",
   "@history_valid_until": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 有效至"
   },
-  "history_affected_area": "影響區域",
+  "history_affected_area": "Khu vực bị ảnh hưởng",
   "@history_affected_area": {
     "description": "「歷史」路徑 → 歷史事件資訊列表 → 彈窗事件 → 影響區域"
   },
-  "sound_eew_alert_major": "緊急地震速報(重大)",
+  "sound_eew_alert_major": "Cảnh báo động đất khẩn cấp (Lớn)",
   "@sound_eew_alert_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(重大)"
   },
-  "sound_eew_minor": "緊急地震速報(一般)",
+  "sound_eew_minor": "Cảnh báo động đất (Nhỏ)",
   "@sound_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(一般)"
   },
-  "sound_eew_silent": "緊急地震速報(無聲)",
+  "sound_eew_silent": "Cảnn báo động đất (Im Lặng)",
   "@sound_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 緊急地震速報(無聲)"
   },
-  "sound_eew_silent_h2": "最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上",
+  "sound_eew_silent_h2": "Cường độ địa chấn tối đa từ 5 trở lên\nvà cường độ địa chấn ước tính của vị trí (thị trấn) từ 1 trở lên",
   "@sound_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「緊急地震速報(無聲)」描述 → 最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上"
   },
-  "sound_earthquake_eew_major": "地震速報(重大)",
+  "sound_earthquake_eew_major": "Báo cáo chớp nhoáng động đất (Lớn)",
   "@sound_earthquake_eew_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(重大)"
   },
-  "sound_earthquake_eew_major_h2": "所在地(鄉鎮)預估震度 4 以上",
+  "sound_earthquake_eew_major_h2": "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 4",
   "@sound_earthquake_eew_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(重大)」描述 → 所在地(鄉鎮)預估震度 4 以上"
   },
-  "sound_earthquake_eew_minor": "地震速報(一般)",
+  "sound_earthquake_eew_minor": "Cảnh báo sớm về động đất (Chung)",
   "@sound_earthquake_eew_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(一般)"
   },
-  "sound_earthquake_eew_minor_h2": "所在地(鄉鎮)預估震度 2 以上",
+  "sound_earthquake_eew_minor_h2": "Cường độ động đất ước tính tại địa điểm (thị trấn) là 2 hoặc cao hơn",
   "@sound_earthquake_eew_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 2 以上"
   },
-  "sound_earthquake_eew_silent": "地震速報(無聲)",
+  "sound_earthquake_eew_silent": "Báo cáo nhanh về động đất (im lặng)",
   "@sound_earthquake_eew_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 地震速報(無聲)"
   },
-  "sound_earthquake_eew_silent_h2": "所在地(鄉鎮)預估震度 1 以上",
+  "sound_earthquake_eew_silent_h2": "Cường độ địa chấn ước tính của vị trí (thị trấn) là 1 trở lên",
   "@sound_earthquake_eew_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「緊急地震速報」標題 → 「地震速報(一般)」描述 → 所在地(鄉鎮)預估震度 1 以上"
   },
-  "sound_int_report_minor": "震度速報(一般)",
+  "sound_int_report_minor": "Báo cáo chớp nhoáng cường độ địa chấn (Chung)",
   "@sound_int_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(一般)"
   },
-  "sound_int_report_minor_h2": "所在地(鄉鎮)實測震度 3 以上",
+  "sound_int_report_minor_h2": "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 3",
   "@sound_report_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(一般)」描述 → 所在地(鄉鎮)實測震度 3 以上"
   },
-  "sound_int_report_silent": "震度速報(無聲通知)",
+  "sound_int_report_silent": "Báo cáo chớp nhoáng cường độ địa chấn (Thông báo im lặng)",
   "@sound_int_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 震度速報(無聲通知)"
   },
-  "sound_int_report_silent_h2": "所在地(鄉鎮)實測震度 1 以上",
+  "sound_int_report_silent_h2": "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 1",
   "@sound_int_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「震度速報(無聲通知)」描述 → 所在地(鄉鎮)實測震度 1 以上。"
   },
-  "sound_monitor_minor": "強震監視器(一般)",
+  "sound_monitor_minor": "Giám sát động đất mạnh(Chung)",
   "@sound_monitor_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 強震監視器(一般)"
   },
-  "sound_report_minor": "地震報告(一般)",
+  "sound_report_minor": "Báo cáo động đất (Chung)",
   "@sound_report_minor": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(一般)"
   },
-  "sound_report_silent": "地震報告(無聲通知)",
+  "sound_report_silent": "Báo cáo động đất (Thông báo im lặng)",
   "@sound_report_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 地震報告(無聲通知)"
   },
-  "sound_report_silent_h2": "所在地(縣市)實測震度 1 以上",
+  "sound_report_silent_h2": "Cường độ động đất tại địa điểm (Quận và thành phố) ở mức trên 1",
   "@sound_report_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「地震資訊」標題 → 「地震報告(無聲通知)」描述 → 所在地(縣市)實測震度 1 以上"
   },
-  "sound_weather_warning": "氣象警報",
+  "sound_weather_warning": "Cảnh báo thời tiết",
   "@sound_weather_warning": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題"
   },
@@ -1393,11 +1393,11 @@
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
-  "sound_rain_minor_h2": "所在地(鄉鎮)發布雷雨即時訊息或\n山區暴雨時",
+  "sound_rain_minor_h2": "Khi tin tức về sóng thần Thái Bình Dương được công bố",
   "@sound_rain_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
   },
-  "sound_weather_major_h2": "所在地(鄉鎮)發布紅色燈號之\n天氣警特報",
+  "sound_weather_major_h2": "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu đỏ",
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
@@ -1405,35 +1405,35 @@
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
-  "sound_disaster": "災害資訊",
+  "sound_disaster": "Thông tin thiên tai",
   "@sound_disaster": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題"
   },
-  "sound_evacuation": "避難資訊",
+  "sound_evacuation": "Thông tin di tản",
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
-  "sound_evacuation_major_h2": "所在地(鄉鎮)發布避難警訊時",
+  "sound_evacuation_major_h2": "Khi khu vực địa phương (thị trấn) ban hành cảnh báo sơ tán",
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
-  "sound_evacuation_minor_h2": "所在地(鄉鎮)發布避難資訊時",
+  "sound_evacuation_minor_h2": "Khi khu vực địa phương (thị trấn) thông báo thông tin sơ tán",
   "@sound_evacuation_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(一般)」描述 → 所在地(鄉鎮)發布避難資訊時"
   },
-  "sound_tsunami_silent": "太平洋海嘯消息(無聲通知)",
+  "sound_tsunami_silent": "Tin tức về sóng thần Thái Bình Dương (Thông báo im lặng)",
   "@sound_tsunami_silent": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 太平洋海嘯消息(無聲通知)"
   },
-  "sound_tsunami_silent_h2": "太平洋海嘯消息發布時",
+  "sound_tsunami_silent_h2": "Khi tin tức về sóng thần Thái Bình Dương được công bố",
   "@sound_tsunami_silent_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「海嘯警報」標題 → 「太平洋海嘯消息(無聲通知)」描述 → 太平洋海嘯消息發布時"
   },
-  "sound_other_notifications": "其他通知",
+  "sound_other_notifications": "Thông báo khác",
   "@sound_other_notifications": {
     "description": "「我」路徑 → 「通知測試」內容 → 「其他通知」標題 "
   },
-  "sound_major": "重大",
+  "sound_major": "Chuyên ngành",
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
@@ -1621,15 +1621,15 @@
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
-  "overcast_with_snow_showers": "陰有陣雪",
+  "overcast_with_snow_showers": "Có mây, mưa và tuyết",
   "@overcast_with_snow_showers": {
     "description": "天氣狀況：陰天伴有陣雪"
   },
-  "overcast_with_sleet_showers": "陰陣雨雪",
+  "overcast_with_sleet_showers": "Trời u ám có mưa đá",
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
-  "overcast_with_hail": "陰有雹",
+  "overcast_with_hail": "Có mây và mưa đá",
   "@overcast_with_hail": {
     "description": "天氣狀況：陰天伴有冰雹"
   },
@@ -1669,11 +1669,11 @@
   "@radar_synthetic_echo": {
     "description": "「天氣警特報」地圖解釋 → 雷達合成回波"
   },
-  "completed": "已結束",
+  "completed": "Hoàn thành",
   "@completed": {
     "description": "「天氣警特報」狀態 → 已結束"
   },
-  "active": "生效中",
+  "active": "Có hiệu lực",
   "@active": {
     "description": "「天氣警特報」狀態 → 生效中"
   },
@@ -1689,27 +1689,27 @@
   "@error_occurred": {
     "description": "Weather Status: An error occurred:"
   },
-  "history_final": "(最終)",
+  "history_final": "(Chung kết)",
   "@history_final": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → (最終)"
   },
-  "level_1": "1級",
+  "level_1": "Cường độ 1",
   "@level_1": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 1級"
   },
-  "level_2": "2級",
+  "level_2": "Cường độ 2",
   "@level_2": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 2級"
   },
-  "level_3": "3級",
+  "level_3": "Cường độ 3",
   "@level_3": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 3級"
   },
-  "level_4": "4級",
+  "level_4": "Cường độ 4",
   "@level_4": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 4級"
   },
-  "level_7": "7級",
+  "level_7": "Cường độ 7",
   "@level_7": {
     "description": "「更多」路徑 → 地震報告 → 「篩選器」圖例 → 彈出資訊 → 7級"
   },
