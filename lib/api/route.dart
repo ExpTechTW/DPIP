@@ -118,11 +118,28 @@ class Route {
     return Uri.parse("$onlyapi/v2/location/$platform/$token/$version/$lat,$lng");
   }
 
+  /// ## 取得通知
+  ///
+  /// ### Endpoint:
+  /// ```
+  /// '/notify/$token'
+  /// ```
+  ///
+  /// ### 參數
+  /// - `token`: FCM Token
+  /// - `channel`: 通知頻道
+  /// - `status`: 通知狀態，必須是 [EewNotifyType]、[EarthquakeNotifyType]、[WeatherNotifyType]、[TsunamiNotifyType] 或
+  ///   [BasicNotifyType] 其中一個
+  ///
+  /// ### 回傳
+  /// - `200`: 成功
+  static Uri notify({required String token}) => Uri.parse("https://api-1.exptech.dev/api/v2/notify/$token");
+
   /// ## 設定通知
   ///
   /// ### Endpoint:
   /// ```
-  /// '/notify/$platform/$token/$channel/$status'
+  /// '/notify/$token/$channel/$status'
   /// ```
   ///
   /// ### 參數
@@ -134,7 +151,7 @@ class Route {
   /// ### 回傳
   /// - `204`: 成功
   /// - `401`: 需要先呼叫 [ExpTech.getLocation]
-  static Uri notify({required String token, required NotifyChannel channel, required Enum status}) {
+  static Uri notifyStatus({required String token, required NotifyChannel channel, required Enum status}) {
     if (token.isEmpty) {
       throw ArgumentError.value(token, 'token', "Token is empty");
     }

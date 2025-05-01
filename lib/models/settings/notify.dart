@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dpip/api/model/notify/notify_settings.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -98,6 +99,18 @@ class SettingsNotificationModel extends ChangeNotifier {
   String get _evacuation => Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
   String get _tsunami => Preference.notifyTsunami ?? TsunamiNotifyType.all.name;
   String get _announcement => Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
+
+  void apply(NotifySettings settings) {
+    setEew(settings.eew);
+    setMonitor(settings.monitor);
+    setReport(settings.report);
+    setIntensity(settings.intensity);
+    setThunderstorm(settings.thunderstorm);
+    setWeatherAdvisory(settings.weatherAdvisory);
+    setEvacuation(settings.evacuation);
+    setTsunami(settings.tsunami);
+    setAnnouncement(settings.announcement);
+  }
 
   /// 地震速報通知設定
   ///

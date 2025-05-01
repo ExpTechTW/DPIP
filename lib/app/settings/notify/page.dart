@@ -1,4 +1,7 @@
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/location/page.dart';
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +15,16 @@ import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
-class SettingsNotifyPage extends StatelessWidget {
+class SettingsNotifyPage extends StatefulWidget {
   const SettingsNotifyPage({super.key});
 
   static const route = '/settings/notify';
 
+  @override
+  State<SettingsNotifyPage> createState() => _SettingsNotifyPageState();
+}
+
+class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
   Future<EewNotifyType?> openEewNotifyTypeSelectorDialog(
     BuildContext context, {
     required String title,
@@ -214,6 +222,29 @@ class SettingsNotifyPage extends StatelessWidget {
     showToast(context, ToastWidget.text('已更新通知設定', icon: Icon(Symbols.check_rounded)));
   }
 
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (Preference.notifyEew == null ||
+        Preference.notifyMonitor == null ||
+        Preference.notifyReport == null ||
+        Preference.notifyIntensity == null ||
+        Preference.notifyThunderstorm == null ||
+        Preference.notifyWeatherAdvisory == null ||
+        Preference.notifyEvacuation == null ||
+        Preference.notifyTsunami == null ||
+        Preference.notifyAnnouncement == null) {
+      setState(() => isLoading = true);
+      ExpTech().getNotify(token: Preference.notifyToken).then((value) {
+        GlobalProviders.notification.apply(value);
+        setState(() => isLoading = false);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsLocationModel, String?>(
@@ -221,360 +252,374 @@ class SettingsNotifyPage extends StatelessWidget {
       builder: (context, code, child) {
         final enabled = code != null;
 
-        return ListView(
+        return Stack(
           children: [
-            if (!enabled)
-              SettingsListTextSection(
-                icon: Symbols.warning_rounded,
-                content: '請先設定所在地來使用通知功能',
-                trailing: TextButton(onPressed: () => context.push(SettingsLocationPage.route), child: Text('設定')),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                opacity: isLoading ? 1 : 0,
+                duration: Durations.short4,
+                child: LinearProgressIndicator(),
               ),
-            SettingsListSection(
-              title: '地震速報',
+            ),
+            ListView(
               children: [
-                Selector<SettingsNotificationModel, EewNotifyType>(
-                  selector: (_, model) => model.eew,
-                  builder: (context, eew, child) {
-                    bool isLoading = false;
+                if (!enabled)
+                  SettingsListTextSection(
+                    icon: Symbols.warning_rounded,
+                    content: '請先設定所在地來使用通知功能',
+                    trailing: TextButton(onPressed: () => context.push(SettingsLocationPage.route), child: Text('設定')),
+                  ),
+                SettingsListSection(
+                  title: '地震速報',
+                  children: [
+                    Selector<SettingsNotificationModel, EewNotifyType>(
+                      selector: (_, model) => model.eew,
+                      builder: (context, eew, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.emergency_earthquake_warning,
-                          subtitle: Text(getEewNotifyTypeName(eew)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.crisis_alert_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openEewNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.emergency_earthquake_warning,
-                              groupValue: eew,
+                              subtitle: Text(getEewNotifyTypeName(eew)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.crisis_alert_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openEewNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.emergency_earthquake_warning,
+                                  groupValue: eew,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setEew(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setEew(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SettingsListSection(
-              title: '地震',
-              children: [
-                Selector<SettingsNotificationModel, EarthquakeNotifyType>(
-                  selector: (_, model) => model.monitor,
-                  builder: (context, monitor, child) {
-                    bool isLoading = false;
+                SettingsListSection(
+                  title: '地震',
+                  children: [
+                    Selector<SettingsNotificationModel, EarthquakeNotifyType>(
+                      selector: (_, model) => model.monitor,
+                      builder: (context, monitor, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.monitor,
-                          subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.earthquake_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openEarthquakeNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.monitor,
-                              groupValue: monitor,
+                              subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.earthquake_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openEarthquakeNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.monitor,
+                                  groupValue: monitor,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setMonitor(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setMonitor(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
-                ),
-                Selector<SettingsNotificationModel, EarthquakeNotifyType>(
-                  selector: (_, model) => model.report,
-                  builder: (context, report, child) {
-                    bool isLoading = false;
+                    ),
+                    Selector<SettingsNotificationModel, EarthquakeNotifyType>(
+                      selector: (_, model) => model.report,
+                      builder: (context, report, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.report,
-                          subtitle: Text(getEarthquakeNotifyTypeName(report)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.docs_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openEarthquakeNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.report,
-                              groupValue: report,
+                              subtitle: Text(getEarthquakeNotifyTypeName(report)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.docs_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openEarthquakeNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.report,
+                                  groupValue: report,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setReport(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setReport(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
-                ),
-                Selector<SettingsNotificationModel, EarthquakeNotifyType>(
-                  selector: (_, model) => model.intensity,
-                  builder: (context, intensity, child) {
-                    bool isLoading = false;
+                    ),
+                    Selector<SettingsNotificationModel, EarthquakeNotifyType>(
+                      selector: (_, model) => model.intensity,
+                      builder: (context, intensity, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.sound_int_report_minor,
-                          subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.summarize_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openEarthquakeNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.sound_int_report_minor,
-                              groupValue: intensity,
+                              subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.summarize_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openEarthquakeNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.sound_int_report_minor,
+                                  groupValue: intensity,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setIntensity(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setIntensity(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SettingsListSection(
-              title: '天氣',
-              children: [
-                Selector<SettingsNotificationModel, WeatherNotifyType>(
-                  selector: (_, model) => model.thunderstorm,
-                  builder: (context, thunderstorm, child) {
-                    bool isLoading = false;
+                SettingsListSection(
+                  title: '天氣',
+                  children: [
+                    Selector<SettingsNotificationModel, WeatherNotifyType>(
+                      selector: (_, model) => model.thunderstorm,
+                      builder: (context, thunderstorm, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.sound_rain_instant,
-                          subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.thunderstorm_rounded,
-                          enabled: enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openWeatherNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.sound_rain_instant,
-                              groupValue: thunderstorm,
+                              subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.thunderstorm_rounded,
+                              enabled: enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openWeatherNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.sound_rain_instant,
+                                  groupValue: thunderstorm,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setThunderstorm(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setThunderstorm(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
-                ),
-                Selector<SettingsNotificationModel, WeatherNotifyType>(
-                  selector: (_, model) => model.weatherAdvisory,
-                  builder: (context, weatherAdvisory, child) {
-                    bool isLoading = false;
+                    ),
+                    Selector<SettingsNotificationModel, WeatherNotifyType>(
+                      selector: (_, model) => model.weatherAdvisory,
+                      builder: (context, weatherAdvisory, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.sound_weather_alert,
-                          subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.warning_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openWeatherNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.sound_weather_alert,
-                              groupValue: weatherAdvisory,
+                              subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.warning_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openWeatherNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.sound_weather_alert,
+                                  groupValue: weatherAdvisory,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setWeatherAdvisory(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setWeatherAdvisory(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
-                ),
-                Selector<SettingsNotificationModel, WeatherNotifyType>(
-                  selector: (_, model) => model.evacuation,
-                  builder: (context, evacuation, child) {
-                    bool isLoading = false;
+                    ),
+                    Selector<SettingsNotificationModel, WeatherNotifyType>(
+                      selector: (_, model) => model.evacuation,
+                      builder: (context, evacuation, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.sound_evacuation,
-                          subtitle: Text(getWeatherNotifyTypeName(evacuation)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.directions_run_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openWeatherNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.sound_evacuation,
-                              groupValue: evacuation,
+                              subtitle: Text(getWeatherNotifyTypeName(evacuation)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.directions_run_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openWeatherNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.sound_evacuation,
+                                  groupValue: evacuation,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setEvacuation(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setEvacuation(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SettingsListSection(
-              title: '海嘯',
-              children: [
-                Selector<SettingsNotificationModel, TsunamiNotifyType>(
-                  selector: (_, model) => model.tsunami,
-                  builder: (context, tsunami, child) {
-                    bool isLoading = false;
+                SettingsListSection(
+                  title: '海嘯',
+                  children: [
+                    Selector<SettingsNotificationModel, TsunamiNotifyType>(
+                      selector: (_, model) => model.tsunami,
+                      builder: (context, tsunami, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.tsunami_alert_sound,
-                          subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.tsunami_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openTsunamiNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.tsunami_alert_sound,
-                              groupValue: tsunami,
+                              subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.tsunami_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openTsunamiNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.tsunami_alert_sound,
+                                  groupValue: tsunami,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setTsunami(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setTsunami(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            SettingsListSection(
-              title: '其他',
-              children: [
-                Selector<SettingsNotificationModel, BasicNotifyType>(
-                  selector: (_, model) => model.announcement,
-                  builder: (context, announcement, child) {
-                    bool isLoading = false;
+                SettingsListSection(
+                  title: '其他',
+                  children: [
+                    Selector<SettingsNotificationModel, BasicNotifyType>(
+                      selector: (_, model) => model.announcement,
+                      builder: (context, announcement, child) {
+                        bool isLoading = false;
 
-                    return StatefulBuilder(
-                      builder: (context, setState) {
-                        return SettingsListTile(
-                          title: context.i18n.announcement,
-                          subtitle: Text(getBasicNotifyTypeName(announcement)),
-                          trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
-                          icon: Symbols.campaign_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () async {
-                            if (isLoading || !enabled) return;
-
-                            final result = await openBasicNotifyTypeSelectorDialog(
-                              context,
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return SettingsListTile(
                               title: context.i18n.announcement,
-                              groupValue: announcement,
+                              subtitle: Text(getBasicNotifyTypeName(announcement)),
+                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              icon: Symbols.campaign_rounded,
+                              enabled: !isLoading && enabled,
+                              onTap: () async {
+                                if (isLoading || !enabled) return;
+
+                                final result = await openBasicNotifyTypeSelectorDialog(
+                                  context,
+                                  title: context.i18n.announcement,
+                                  groupValue: announcement,
+                                );
+
+                                if (!context.mounted || result == null) return;
+
+                                setState(() => isLoading = true);
+                                await context.read<SettingsNotificationModel>().setAnnouncement(result);
+                                setState(() => isLoading = false);
+
+                                if (!context.mounted) return;
+                                showSuccessToast(context);
+                              },
                             );
-
-                            if (!context.mounted || result == null) return;
-
-                            setState(() => isLoading = true);
-                            await context.read<SettingsNotificationModel>().setAnnouncement(result);
-                            setState(() => isLoading = false);
-
-                            if (!context.mounted) return;
-                            showSuccessToast(context);
                           },
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ],
             ),
