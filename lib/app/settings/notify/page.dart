@@ -28,20 +28,20 @@ class SettingsNotifyPage extends StatelessWidget {
           title: Text(title),
           children: [
             RadioListTile(
-              title: const Text('所在地震度4以上'),
-              value: EewNotifyType.localIntensityAbove4,
+              title: Text(getEewNotifyTypeName(EewNotifyType.all)),
+              value: EewNotifyType.all,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
             ),
             RadioListTile(
-              title: const Text('所在地震度1以上'),
+              title: Text(getEewNotifyTypeName(EewNotifyType.localIntensityAbove1)),
               value: EewNotifyType.localIntensityAbove1,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
             ),
             RadioListTile(
-              title: const Text('全部'),
-              value: EewNotifyType.all,
+              title: Text(getEewNotifyTypeName(EewNotifyType.localIntensityAbove4)),
+              value: EewNotifyType.localIntensityAbove4,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
             ),
@@ -63,21 +63,21 @@ class SettingsNotifyPage extends StatelessWidget {
           title: Text(title),
           children: [
             RadioListTile(
-              title: const Text('全部'),
+              title: Text(getEarthquakeNotifyTypeName(EarthquakeNotifyType.all)),
               value: EarthquakeNotifyType.all,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
               visualDensity: VisualDensity.comfortable,
             ),
             RadioListTile(
-              title: const Text('所在地震度1以上'),
+              title: Text(getEarthquakeNotifyTypeName(EarthquakeNotifyType.localIntensityAbove1)),
               value: EarthquakeNotifyType.localIntensityAbove1,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
               visualDensity: VisualDensity.comfortable,
             ),
             RadioListTile(
-              title: const Text('關閉'),
+              title: Text(getEarthquakeNotifyTypeName(EarthquakeNotifyType.off)),
               value: EarthquakeNotifyType.off,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
@@ -101,14 +101,14 @@ class SettingsNotifyPage extends StatelessWidget {
           title: Text(title),
           children: [
             RadioListTile(
-              title: const Text('接收所在地'),
+              title: Text(getWeatherNotifyTypeName(WeatherNotifyType.local)),
               value: WeatherNotifyType.local,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
               visualDensity: VisualDensity.comfortable,
             ),
             RadioListTile(
-              title: const Text('關閉'),
+              title: Text(getWeatherNotifyTypeName(WeatherNotifyType.off)),
               value: WeatherNotifyType.off,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
@@ -132,15 +132,15 @@ class SettingsNotifyPage extends StatelessWidget {
           title: Text(title),
           children: [
             RadioListTile(
-              title: const Text('海嘯警報'),
-              value: TsunamiNotifyType.warningOnly,
+              title: Text(getTsunamiNotifyTypeName(TsunamiNotifyType.all)),
+              value: TsunamiNotifyType.all,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
               visualDensity: VisualDensity.comfortable,
             ),
             RadioListTile(
-              title: const Text('海嘯消息、海嘯警報'),
-              value: TsunamiNotifyType.all,
+              title: Text(getTsunamiNotifyTypeName(TsunamiNotifyType.warningOnly)),
+              value: TsunamiNotifyType.warningOnly,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
               visualDensity: VisualDensity.comfortable,
@@ -163,14 +163,14 @@ class SettingsNotifyPage extends StatelessWidget {
           title: Text(title),
           children: [
             RadioListTile(
-              title: const Text('全部'),
+              title: Text(getBasicNotifyTypeName(BasicNotifyType.all)),
               value: BasicNotifyType.all,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
               visualDensity: VisualDensity.comfortable,
             ),
             RadioListTile(
-              title: const Text('關閉'),
+              title: Text(getBasicNotifyTypeName(BasicNotifyType.off)),
               value: BasicNotifyType.off,
               groupValue: groupValue,
               onChanged: (value) => Navigator.pop(context, value),
@@ -185,13 +185,13 @@ class SettingsNotifyPage extends StatelessWidget {
   String getEewNotifyTypeName(EewNotifyType value) => switch (value) {
     EewNotifyType.localIntensityAbove4 => '所在地震度4以上',
     EewNotifyType.localIntensityAbove1 => '所在地震度1以上',
-    EewNotifyType.all => '全部',
+    EewNotifyType.all => '接收全部',
   };
 
   String getEarthquakeNotifyTypeName(EarthquakeNotifyType value) => switch (value) {
-    EarthquakeNotifyType.all => '全部',
-    EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上',
     EarthquakeNotifyType.off => '關閉',
+    EarthquakeNotifyType.localIntensityAbove1 => '所在地震度1以上',
+    EarthquakeNotifyType.all => '接收全部',
   };
 
   String getWeatherNotifyTypeName(WeatherNotifyType value) => switch (value) {
@@ -206,7 +206,7 @@ class SettingsNotifyPage extends StatelessWidget {
 
   String getBasicNotifyTypeName(BasicNotifyType value) => switch (value) {
     BasicNotifyType.off => '關閉',
-    BasicNotifyType.all => '全部',
+    BasicNotifyType.all => '接收全部',
   };
 
   @override
