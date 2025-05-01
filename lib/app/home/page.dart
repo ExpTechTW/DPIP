@@ -40,12 +40,8 @@ class _HomePageState extends State<HomePage> {
               builder: (context, code, child) {
                 final location = Global.location[code];
 
-                if (code == null || location == null) {
-                  return Text(
-                    context.i18n.location_Not_set,
-                    style: context.textTheme.bodyMedium!.copyWith(color: context.colors.outline),
-                  );
-                }
+                if (code == null || location == null) return child!;
+
                 return FutureBuilder(
                   future: (() async => await ExpTech().getWeatherRealtime(code))(),
                   builder: (context, snapshot) {
