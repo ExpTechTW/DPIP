@@ -89,15 +89,15 @@ enum BasicNotifyType {
 class SettingsNotificationModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsNotificationModel');
 
-  String _eew = Preference.notifyEew ?? EewNotifyType.localIntensityAbove1.name;
-  String _monitor = Preference.notifyMonitor ?? EarthquakeNotifyType.localIntensityAbove1.name;
-  String _report = Preference.notifyReport ?? EarthquakeNotifyType.localIntensityAbove1.name;
-  String _intensity = Preference.notifyIntensity ?? EarthquakeNotifyType.localIntensityAbove1.name;
-  String _thunderstorm = Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
-  String _weatherAdvisory = Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
-  String _evacuation = Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
-  String _tsunami = Preference.notifyTsunami ?? TsunamiNotifyType.all.name;
-  String _announcement = Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
+  String get _eew => Preference.notifyEew ?? EewNotifyType.localIntensityAbove1.name;
+  String get _monitor => Preference.notifyMonitor ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _report => Preference.notifyReport ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _intensity => Preference.notifyIntensity ?? EarthquakeNotifyType.localIntensityAbove1.name;
+  String get _thunderstorm => Preference.notifyThunderstorm ?? WeatherNotifyType.local.name;
+  String get _weatherAdvisory => Preference.notifyWeatherAdvisory ?? WeatherNotifyType.local.name;
+  String get _evacuation => Preference.notifyEvacuation ?? WeatherNotifyType.local.name;
+  String get _tsunami => Preference.notifyTsunami ?? TsunamiNotifyType.all.name;
+  String get _announcement => Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
 
   /// 地震速報通知設定
   ///
@@ -106,8 +106,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setEew(EewNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.eew, status: value);
 
-    _eew = value.name;
-    Preference.notifyEew = _eew;
+    Preference.notifyEew = value.name;
     _log('Changed ${PreferenceKeys.notifyEew} to ${Preference.notifyEew}');
     notifyListeners();
   }
@@ -119,8 +118,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setMonitor(EarthquakeNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.monitor, status: value);
 
-    _monitor = value.name;
-    Preference.notifyMonitor = _monitor;
+    Preference.notifyMonitor = value.name;
     _log('Changed ${PreferenceKeys.notifyMonitor} to ${Preference.notifyMonitor}');
     notifyListeners();
   }
@@ -132,8 +130,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setReport(EarthquakeNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.report, status: value);
 
-    _report = value.name;
-    Preference.notifyReport = _report;
+    Preference.notifyReport = value.name;
     _log('Changed ${PreferenceKeys.notifyReport} to ${Preference.notifyReport}');
     notifyListeners();
   }
@@ -145,8 +142,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setIntensity(EarthquakeNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.intensity, status: value);
 
-    _intensity = value.name;
-    Preference.notifyIntensity = _intensity;
+    Preference.notifyIntensity = value.name;
     _log('Changed ${PreferenceKeys.notifyIntensity} to ${Preference.notifyIntensity}');
     notifyListeners();
   }
@@ -158,8 +154,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setThunderstorm(WeatherNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.thunderstorm, status: value);
 
-    _thunderstorm = value.name;
-    Preference.notifyThunderstorm = _thunderstorm;
+    Preference.notifyThunderstorm = value.name;
     _log('Changed ${PreferenceKeys.notifyThunderstorm} to ${Preference.notifyThunderstorm}');
     notifyListeners();
   }
@@ -171,8 +166,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setWeatherAdvisory(WeatherNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.weatherAdvisory, status: value);
 
-    _weatherAdvisory = value.name;
-    Preference.notifyWeatherAdvisory = _weatherAdvisory;
+    Preference.notifyWeatherAdvisory = value.name;
     _log('Changed ${PreferenceKeys.notifyWeatherAdvisory} to ${Preference.notifyWeatherAdvisory}');
     notifyListeners();
   }
@@ -184,8 +178,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setEvacuation(WeatherNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.evacuation, status: value);
 
-    _evacuation = value.name;
-    Preference.notifyEvacuation = _evacuation;
+    Preference.notifyEvacuation = value.name;
     _log('Changed ${PreferenceKeys.notifyEvacuation} to ${Preference.notifyEvacuation}');
     notifyListeners();
   }
@@ -197,8 +190,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setTsunami(TsunamiNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.tsunami, status: value);
 
-    _tsunami = value.name;
-    Preference.notifyTsunami = _tsunami;
+    Preference.notifyTsunami = value.name;
     _log('Changed ${PreferenceKeys.notifyTsunami} to ${Preference.notifyTsunami}');
     notifyListeners();
   }
@@ -210,8 +202,7 @@ class SettingsNotificationModel extends ChangeNotifier {
   Future<void> setAnnouncement(BasicNotifyType value) async {
     await ExpTech().setNotify(token: Preference.notifyToken, channel: NotifyChannel.announcement, status: value);
 
-    _announcement = value.name;
-    Preference.notifyAnnouncement = _announcement;
+    Preference.notifyAnnouncement = value.name;
     _log('Changed ${PreferenceKeys.notifyAnnouncement} to ${Preference.notifyAnnouncement}');
     notifyListeners();
   }

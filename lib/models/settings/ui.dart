@@ -8,39 +8,24 @@ import 'package:dpip/utils/extensions/string.dart';
 class SettingsUserInterfaceModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsUserInterfaceModel');
 
-  String _themeMode = Preference.themeMode ?? 'system';
-  int? _themeColor = Preference.themeColor;
-  Locale? _locale = Preference.locale?.asLocale;
-  bool _useFahrenheit = Preference.useFahrenheit ?? false;
+  String get _themeMode => Preference.themeMode ?? 'system';
+  int? get _themeColor => Preference.themeColor;
+  Locale? get _locale => Preference.locale?.asLocale;
+  bool get _useFahrenheit => Preference.useFahrenheit ?? false;
 
-  ThemeMode get themeMode => switch (_themeMode) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
-
+  ThemeMode get themeMode => ThemeMode.values.byName(_themeMode);
   void setThemeMode(ThemeMode value) {
-    _themeMode = switch (value) {
-      ThemeMode.light => 'light',
-      ThemeMode.dark => 'dark',
-      ThemeMode.system => 'system',
-    };
-
-    Preference.themeMode = _themeMode;
+    Preference.themeMode = value.name;
 
     _log('Changed ${PreferenceKeys.themeMode} to ${Preference.themeMode}');
     notifyListeners();
   }
 
-  Color? get themeColor {
-    final color = _themeColor;
-    return color == null ? null : Color(color);
-  }
-
+  Color? get themeColor => _themeColor == null ? null : Color(_themeColor!);
   void setThemeColor(Color? color) {
-    _themeColor = color?.toARGB32();
+    final colorInt = color?.toARGB32();
 
-    Preference.themeColor = _themeColor;
+    Preference.themeColor = colorInt;
 
     _log('Changed ${PreferenceKeys.themeColor} to ${Preference.themeColor}');
     notifyListeners();
@@ -48,8 +33,6 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
 
   Locale? get locale => _locale;
   void setLocale(Locale? value) {
-    _locale = value;
-
     Preference.locale = value?.toLanguageTag();
 
     _log('Changed ${PreferenceKeys.locale} to ${Preference.locale}');
@@ -58,8 +41,6 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
 
   bool get useFahrenheit => _useFahrenheit;
   void setUseFahrenheit(bool value) {
-    _useFahrenheit = value;
-
     Preference.useFahrenheit = value;
 
     _log('Changed ${PreferenceKeys.useFahrenheit} to ${Preference.useFahrenheit}');
