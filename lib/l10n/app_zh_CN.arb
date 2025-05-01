@@ -404,7 +404,7 @@
   "@typhoon_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 颱風"
   },
-  "tsunami_info_monitor": "海嘯信息",
+  "tsunami_info_monitor": "海啸信息",
   "@tsunami_info_monitor": {
     "description": "「地圖」路徑 → 地圖列表 → 海嘯資訊"
   },
@@ -416,7 +416,7 @@
   "@unit_dbz": {
     "description": "「地圖」路徑 → 地圖列表 → 「雷達回波」圖例 → 單位：dBZ"
   },
-  "unit_mm": "单位：毫米(mm)",
+  "unit_mm": "单位：毫米 (mm)",
   "@unit_mm": {
     "description": "「地圖」路徑 → 地圖列表 → 「降水」圖例 → 單位：毫米 (mm)"
   },
@@ -650,7 +650,7 @@
   "@who_we_are": {
     "description": "「歡迎」頁面 → 我們是誰？"
   },
-  "exptech_studio_description": "ExpTech Studio 是一群大部分由学生组成，平均年龄未满 20 岁、人数超过 15 + 的团体。成员来自台湾北中南、日本、韩国、中国的学生。",
+  "exptech_studio_description": "ExpTech Studio 是一群大部分由学生组成，平均年龄未满 20 岁、人数超过 15 人 的团体。成员来自台湾北中南、日本、韩国、中国的学生。",
   "@exptech_studio_description": {
     "description": "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
   },
@@ -682,7 +682,7 @@
   "@strong_shake_warning": {
     "description": "「歡迎」頁面 → 強烈搖晃有機率比通知早抵達使用者所在地。"
   },
-  "earthquake_alert_warning": "地震速报为快速计算之结果，可能存在较大误差，应理解并谨慎使用。",
+  "earthquake_alert_warning": "地震速报为快速计算的结果，可能存在较大误差，应理解并谨慎使用。",
   "@earthquake_alert_warning": {
     "description": "「歡迎」頁面 → 地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
   },
@@ -710,7 +710,7 @@
   "@location_based_service": {
     "description": "「歡迎」頁面 → 使用定位來自動更新所在地設定，提供當地的即時防災資訊"
   },
-  "data_visualization_storage": "用于存储中央气象署或 ExpTech 提供之数据可视化图片",
+  "data_visualization_storage": "用于存储中央气象署或 ExpTech 提供的数据可视化图片",
   "@data_visualization_storage": {
     "description": "「歡迎」頁面 → 用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
   },
@@ -722,11 +722,11 @@
   "@agree": {
     "description": "「歡迎」頁面 → 強震監視器 → 同意"
   },
-  "trem_service_description": "在 DPIP 中可以查看来自 ExpTech 旗下 TREM 之强震监视器服务，请详细阅读以下条件，并选择是否激活。",
+  "trem_service_description": "在 DPIP 中可以查看来自 ExpTech 旗下 TREM 的强震监视器服务，请详细阅读以下条件，并选择是否激活。",
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "显示的即时震度不是中央气象署所提供之资料，因此可能与中央气象署观测到的结果不一致，应以中央气象署公布之资讯为主。",
+  "real_time_magnitude_warning": "显示的即时震度不是中央气象署所提供的资料，因此可能与中央气象署观测到的结果不一致，应以中央气象署公布的资讯为主。",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
@@ -1115,7 +1115,7 @@
   "@no_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 未啟用強震監視器"
   },
-  "settings_earthquake_monitor": "请至设定进阶功能中开启强震监视器。",
+  "settings_earthquake_monitor": "请至高级选项设置中开启强震监视器。",
   "@settings_earthquake_monitor": {
     "description": "「地圖」路徑 → 強震監視器 → 提示資訊 → 請至設定進階功能中開啟強震監視器。"
   },
@@ -1147,7 +1147,7 @@
   "@dpip_goal": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → DPIP 是一個以整合所有防災資訊為目標的軟體，希望能成為民眾生活中不可或缺的一部分。儘管目前完成度不高且困難重重，但我們仍會持續朝這個目標前進。"
   },
-  "development_investment": "在开发软件时，我们投入了大量的金钱、时间与精力，在人事成本、设备费用、云端服务、网络费用等项目上，花费超过50万新台币。为此，我们希望获得用户的支持，在不依赖其他第三方公司的前提下，继续维持营运。",
+  "development_investment": "在开发软件时，我们投入了大量的金钱、时间与精力，在人事成本、设备费用、云端服务、网络费用等项目上，花费超过50万新台币。为此，我们希望获得用户的支持，在不依赖其他第三方公司的前提下，继续维持运行。",
   "@development_investment": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 在開發軟體時，我們投入了大量的金錢、時間與精力，在人事成本、設備費用、雲端服務、網路費用等項目上，花費超過50萬新台幣。為此，我們希望獲得使用者的支持，在不依賴其他第三方公司的前提下，繼續維持營運。"
   },
@@ -1171,7 +1171,7 @@
   "@why_no_ads": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 為什麼不採用廣告？"
   },
-  "no_ads_reason": "当灾害发生时，大家一定不会想要看广告吧？这是我们不植入广告的第一个理由。防灾导向的软件，快速正确地传递防灾信息是首要任务。如果因为广告而导致无法正确掌握防灾信息，这反而和我们的理念相违背。况且，灾害发生时通常通信品质不佳，还要额外浪费网络流量在加载广告，这件事太令人沮丧了。",
+  "no_ads_reason": "当灾害发生时，大家一定不会想要看广告吧？这是我们不植入广告的第一个理由。防灾导向的软件，快速正确地传递防灾信息是首要任务。如果因为广告而导致无法正确掌握防灾信息，这反而和我们的理念相违背。况且，灾害发生时通常通信质量不佳，还要额外浪费网络流量再加载广告，这件事太令人沮丧了。",
   "@no_ads_reason": {
     "description": "「我」路徑 → 「開發者想說的話」內容 → 當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。"
   },
@@ -1393,15 +1393,15 @@
   "@sound_weather_alert": {
     "description": "「我」路徑 → 「通知測試」內容 → 「天氣警特報」標題"
   },
-  "sound_rain_minor_h2": "所在地(乡镇)发布雷雨即时讯息或\n山区暴雨时",
+  "sound_rain_minor_h2": "所在地(乡镇)发布雷雨即时信息或\n山区暴雨时",
   "@sound_rain_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「雷雨即時訊息(一般)」描述 → 所在地(鄉鎮)發布雷雨即時訊息\n或山區暴雨時"
   },
-  "sound_weather_major_h2": "所在地(乡镇)发布红色灯号之\n天气警特报",
+  "sound_weather_major_h2": "所在地(乡镇)发布红灯信号的\n天气警特报",
   "@sound_weather_warning_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(重大)」描述 → 所在地(鄉鎮)發布紅色燈號之天氣警特報"
   },
-  "sound_weather_minor_h2": "所在地(乡镇)发布上述除外灯号之\n天气警特报",
+  "sound_weather_minor_h2": "所在地(乡镇)发布上述除外灯信号的\n天气警特报",
   "@sound_weather_warning_minor_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「氣象警報」標題 → 「天氣警特報(一般)」描述 → 所在地(鄉鎮)發布上述除外燈號之天氣警特報"
   },
@@ -1413,7 +1413,7 @@
   "@sound_evacuation": {
     "description": "「我」路徑 → 「通知測試」內容 → 「避難資訊」標題"
   },
-  "sound_evacuation_major_h2": "所在地(乡镇)发布避难警讯时",
+  "sound_evacuation_major_h2": "所在地(乡镇)发布避难警报时",
   "@sound_evacuation_major_h2": {
     "description": "「我」路徑 → 「通知測試」內容 → 「災害資訊」標題 → 「避難資訊(重大)」描述 → 所在地(鄉鎮)發布避難警訊時"
   },
@@ -1437,215 +1437,215 @@
   "@sound_major": {
     "description": "「我」路徑 → 「通知測試」內容 → 重大"
   },
-  "sunny_with_haze": "晴有霾",
+  "sunny_with_haze": "晴天有霾",
   "@sunny_with_haze": {
     "description": "天氣狀況：晴天伴有霾"
   },
-  "sunny_with_mist": "晴有薄雾",
+  "sunny_with_mist": "晴天有薄雾",
   "@sunny_with_mist": {
     "description": "天氣狀況：晴天伴有靄"
   },
-  "sunny_with_lightning": "晴有闪电",
+  "sunny_with_lightning": "晴天有闪电",
   "@sunny_with_lightning": {
     "description": "天氣狀況：晴天伴有閃電"
   },
-  "sunny_with_fog": "晴有雾",
+  "sunny_with_fog": "晴天有雾",
   "@sunny_with_fog": {
     "description": "天氣狀況：晴天伴有霧"
   },
-  "sunny_with_rain": "晴有雨",
+  "sunny_with_rain": "晴天有雨",
   "@sunny_with_rain": {
     "description": "天氣狀況：晴天伴有雨"
   },
-  "sunny_with_sleet": "晴有雨雪",
+  "sunny_with_sleet": "晴天有雨夹雪",
   "@sunny_with_sleet": {
     "description": "天氣狀況：晴天伴有雨夾雪"
   },
-  "sunny_with_heavy_snow": "晴有大雪",
+  "sunny_with_heavy_snow": "晴天有大雪",
   "@sunny_with_heavy_snow": {
     "description": "天氣狀況：晴天伴有大雪"
   },
-  "sunny_with_snow_pellets": "晴有雪珠",
+  "sunny_with_snow_pellets": "晴天有雪丸",
   "@sunny_with_snow_pellets": {
     "description": "天氣狀況：晴天伴有雪珠"
   },
-  "sunny_with_ice_pellets": "晴有冰珠",
+  "sunny_with_ice_pellets": "晴天有冰丸",
   "@sunny_with_ice_pellets": {
     "description": "天氣狀況：晴天伴有冰珠"
   },
-  "sunny_with_snow_showers": "晴有阵雪",
+  "sunny_with_snow_showers": "晴天有阵雪",
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
-  "sunny_with_sleet_showers": "晴阵雨雪",
+  "sunny_with_sleet_showers": "晴天有阵雨夹雪",
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
-  "sunny_with_hail": "晴有冰雹",
+  "sunny_with_hail": "晴天有冰雹",
   "@sunny_with_hail": {
     "description": "天氣狀況：晴天伴有冰雹"
   },
-  "sunny_with_thunderstorm": "晴有雷雨",
+  "sunny_with_thunderstorm": "晴天有雷阵雨",
   "@sunny_with_thunderstorm": {
     "description": "天氣狀況：晴天伴有雷雨"
   },
-  "sunny_with_thundersnow": "晴有雷雪",
+  "sunny_with_thundersnow": "晴天有雷雪",
   "@sunny_with_thundersnow": {
     "description": "天氣狀況：晴天伴有雷雪"
   },
-  "sunny_with_thunderhail": "晴有雷冰雹",
+  "sunny_with_thunderhail": "晴天有雷冰雹",
   "@sunny_with_thunderhail": {
     "description": "天氣狀況：晴天伴有雷雹"
   },
-  "sunny_with_severe_thunderstorm": "晴大雷雨",
+  "sunny_with_severe_thunderstorm": "晴天有强雷阵雨",
   "@sunny_with_severe_thunderstorm": {
     "description": "天氣狀況：晴天伴有強雷雨"
   },
-  "sunny_with_severe_thunderhail": "晴大雷冰雹",
+  "sunny_with_severe_thunderhail": "晴天有强雷冰雹",
   "@sunny_with_severe_thunderhail": {
     "description": "天氣狀況：晴天伴有強雷雹"
   },
-  "sunny_with_thunder": "晴天伴有雷",
+  "sunny_with_thunder": "晴天有雷",
   "@sunny_with_thunder": {
     "description": "天氣狀況：晴天伴有雷"
   },
-  "partly__cloudy": "多云",
+  "partly__cloudy": "局部多云",
   "@partly__cloudy": {
     "description": "天氣狀況：多雲"
   },
-  "partly_cloudy_with_haze": "多云有霾",
+  "partly_cloudy_with_haze": "局部多云有霾",
   "@partly_cloudy_with_haze": {
     "description": "天氣狀況：多雲伴有霾"
   },
-  "partly_cloudy_with_mist": "多云有薄雾",
+  "partly_cloudy_with_mist": "局部多云有薄雾",
   "@partly_cloudy_with_mist": {
     "description": "天氣狀況：多雲伴有靄"
   },
-  "partly_cloudy_with_lightning": "多云有雷电",
+  "partly_cloudy_with_lightning": "局部多云有闪电",
   "@partly_cloudy_with_lightning": {
     "description": "天氣狀況：多雲伴有閃電"
   },
-  "partly_cloudy_with_fog": "多云有雾",
+  "partly_cloudy_with_fog": "局部多云有雾",
   "@partly_cloudy_with_fog": {
     "description": "天氣狀況：多雲伴有霧"
   },
-  "partly_cloudy_with_rain": "多云有雨",
+  "partly_cloudy_with_rain": "局部多云有雨",
   "@partly_cloudy_with_rain": {
     "description": "天氣狀況：多雲伴有雨"
   },
-  "partly_cloudy_with_sleet": "多云有雨雪",
+  "partly_cloudy_with_sleet": "局部多云有雨夹雪",
   "@partly_cloudy_with_sleet": {
     "description": "天氣狀況：多雲伴有雨夾雪"
   },
-  "partly_cloudy_with_heavy_snow": "多云有大雪",
+  "partly_cloudy_with_heavy_snow": "局部多云有大雪",
   "@partly_cloudy_with_heavy_snow": {
     "description": "天氣狀況：多雲伴有大雪"
   },
-  "partly_cloudy_with_snow_pellets": "多云有雪珠",
+  "partly_cloudy_with_snow_pellets": "局部多云有雪丸",
   "@partly_cloudy_with_snow_pellets": {
     "description": "天氣狀況：多雲伴有雪珠"
   },
-  "partly_cloudy_with_ice_pellets": "多云有冰珠",
+  "partly_cloudy_with_ice_pellets": "局部多云有冰丸",
   "@partly_cloudy_with_ice_pellets": {
     "description": "天氣狀況：多雲伴有冰珠"
   },
-  "partly_cloudy_with_snow_showers": "多云有阵雪",
+  "partly_cloudy_with_snow_showers": "局部多云有阵雪",
   "@partly_cloudy_with_snow_showers": {
     "description": "天氣狀況：多雲伴有陣雪"
   },
-  "partly_cloudy_with_sleet_showers": "多云阵雨雪",
+  "partly_cloudy_with_sleet_showers": "局部多云有阵雨夹雪",
   "@partly_cloudy_with_sleet_showers": {
     "description": "天氣狀況：多雲伴有陣雨夾雪"
   },
-  "partly_cloudy_with_hail": "多云有冰雹",
+  "partly_cloudy_with_hail": "局部多云有冰雹",
   "@partly_cloudy_with_hail": {
     "description": "天氣狀況：多雲伴有冰雹"
   },
-  "partly_cloudy_with_thunderstorm": "多云有雷雨",
+  "partly_cloudy_with_thunderstorm": "局部多云有雷阵雨",
   "@partly_cloudy_with_thunderstorm": {
     "description": "天氣狀況：多雲伴有雷雨"
   },
-  "partly_cloudy_with_thundersnow": "多云有雷雪",
+  "partly_cloudy_with_thundersnow": "局部多云有雷雪",
   "@partly_cloudy_with_thundersnow": {
     "description": "天氣狀況：多雲伴有雷雪"
   },
-  "partly_cloudy_with_thunderhail": "多云有雷冰雹",
+  "partly_cloudy_with_thunderhail": "局部多云有雷冰雹",
   "@partly_cloudy_with_thunderhail": {
     "description": "天氣狀況：多雲伴有雷雹"
   },
-  "partly_cloudy_with_severe_thunderstorm": "多云大雷雨",
+  "partly_cloudy_with_severe_thunderstorm": "局部多云有强雷阵雨",
   "@partly_cloudy_with_severe_thunderstorm": {
     "description": "天氣狀況：多雲伴有強雷雨"
   },
-  "partly_cloudy_with_severe_thunderhail": "多云大雷冰雹",
+  "partly_cloudy_with_severe_thunderhail": "局部多云有强雷冰雹",
   "@partly_cloudy_with_severe_thunderhail": {
     "description": "天氣狀況：多雲伴有強雷雹"
   },
-  "partly_cloudy_with_thunder": "多云伴有雷",
+  "partly_cloudy_with_thunder": "局部多云有雷",
   "@partly_cloudy_with_thunder": {
     "description": "天氣狀況：多雲伴有雷"
   },
-  "overcast_with_haze": "阴有霾",
+  "overcast_with_haze": "阴天有霾",
   "@overcast_with_haze": {
     "description": "天氣狀況：陰天伴有霾"
   },
-  "overcast_with_mist": "阴有薄雾",
+  "overcast_with_mist": "阴天有薄雾",
   "@overcast_with_mist": {
     "description": "天氣狀況：陰天伴有靄"
   },
-  "overcast_with_lightning": "阴有雷电",
+  "overcast_with_lightning": "阴天有闪电",
   "@overcast_with_lightning": {
     "description": "天氣狀況：陰天伴有閃電"
   },
-  "overcast_with_fog": "阴有雾",
+  "overcast_with_fog": "阴天有雾",
   "@overcast_with_fog": {
     "description": "天氣狀況：陰天伴有霧"
   },
-  "overcast_with_rain": "阴有雨",
+  "overcast_with_rain": "阴天有雨",
   "@overcast_with_rain": {
     "description": "天氣狀況：陰天伴有雨"
   },
-  "overcast_with_sleet": "阴有雨雪",
+  "overcast_with_sleet": "阴天有雨夹雪",
   "@overcast_with_sleet": {
     "description": "天氣狀況：陰天伴有雨夾雪"
   },
-  "overcast_with_heavy_snow": "阴有大雪",
+  "overcast_with_heavy_snow": "阴天有大雪",
   "@overcast_with_heavy_snow": {
     "description": "天氣狀況：陰天伴有大雪"
   },
-  "overcast_with_snow_pellets": "阴有雪珠",
+  "overcast_with_snow_pellets": "阴天有雪丸",
   "@overcast_with_snow_pellets": {
     "description": "天氣狀況：陰天伴有雪珠"
   },
-  "overcast_with_ice_pellets": "阴有冰珠",
+  "overcast_with_ice_pellets": "阴天有冰丸",
   "@overcast_with_ice_pellets": {
     "description": "天氣狀況：陰天伴有冰珠"
   },
-  "overcast_with_snow_showers": "阴有阵雪",
+  "overcast_with_snow_showers": "阴天有阵雪",
   "@overcast_with_snow_showers": {
     "description": "天氣狀況：陰天伴有陣雪"
   },
-  "overcast_with_sleet_showers": "阴阵雨雪",
+  "overcast_with_sleet_showers": "阴天有阵雨夹雪",
   "@overcast_with_sleet_showers": {
     "description": "天氣狀況：陰天伴有陣雨夾雪"
   },
-  "overcast_with_hail": "阴有冰雹",
+  "overcast_with_hail": "阴天有冰雹",
   "@overcast_with_hail": {
     "description": "天氣狀況：陰天伴有冰雹"
   },
-  "overcast_with_thunderstorm": "阴有雷雨",
+  "overcast_with_thunderstorm": "阴天有雷阵雨",
   "@overcast_with_thunderstorm": {
     "description": "天氣狀況：陰天伴有雷雨"
   },
-  "overcast_with_thundersnow": "阴有雷雪",
+  "overcast_with_thundersnow": "阴天有雷雪",
   "@overcast_with_thundersnow": {
     "description": "天氣狀況：陰天伴有雷雪"
   },
-  "overcast_with_thunderhail": "阴有雷冰雹",
+  "overcast_with_thunderhail": "阴天有雷冰雹",
   "@overcast_with_thunderhail": {
     "description": "天氣狀況：陰天伴有雷雹"
   },
-  "overcast_with_severe_thunderstorm": "阴大雷雨",
+  "overcast_with_severe_thunderstorm": "阴天有强雷阵雨",
   "@overcast_with_severe_thunderstorm": {
     "description": "天氣狀況：陰天伴有強雷雨"
   },
@@ -1677,7 +1677,7 @@
   "@active": {
     "description": "「天氣警特報」狀態 → 生效中"
   },
-  "save_image_permission": "存储图片需要您允许 DPIP 使用相片和媒体权限才能正常运作。",
+  "save_image_permission": "存储图片需要您允许 DPIP 使用图片和媒体权限才能正常运作。",
   "@save_image_permission": {
     "description": "當儲存圖片失敗時顯示的錯誤消息 → 儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。"
   },
@@ -1725,7 +1725,7 @@
   "@history_earthquake_intensity_h2": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 「i」圖例 → 使用 JMA 震度標準 (0.3秒三分量合成加速度)"
   },
-  "history_seismic_intensity_reference": "本资料由 TREM-Net 观测网自动观测结果所得，尚未经人为检视确认，仅供应变之初步参考。实际应以中央气象署发布的信息为准。",
+  "history_seismic_intensity_reference": "本资料由 TREM-Net 观测网自动观测结果所得，尚未经人为检视确认，仅供作为应变的初步参考。实际应以中央气象署发布的信息为准。",
   "@history_seismic_intensity_reference": {
     "description": "「歷史」路徑 → 「震度速報」內容 → 資訊托盤 → 本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。"
   },
@@ -1786,7 +1786,7 @@
   "@power_saving_position": {
     "description": "「歡迎」頁面 → 省電策略"
   },
-  "power_saving_position_text": "允许DPIP在后台持续运行，以便实时防灾通知。",
+  "power_saving_position_text": "允许DPIP在后台持续运行，以便获取实时防灾通知。",
   "@power_saving_position_text": {
     "description": "「歡迎」頁面 → 允許DPIP在背景中持續運行，以便即時防災通知資訊。"
   },
