@@ -146,7 +146,7 @@ class Route {
   ///   [BasicNotifyType] 其中一個
   ///
   /// ### 回傳
-  /// - `204`: 成功
+  /// - `202`: 成功
   /// - `401`: 需要先呼叫 [ExpTech.getLocation]
   static Uri notifyStatus({required String token, required NotifyChannel channel, required Enum status}) {
     if (token.isEmpty) {

@@ -489,7 +489,7 @@ class ExpTech {
 
     if (res.statusCode == 200) {
       return res.body;
-    } else if (res.statusCode == 204) {
+    } else if (res.statusCode == 202) {
       return "${res.statusCode} $requestUrl";
     } else {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
@@ -517,7 +517,7 @@ class ExpTech {
 
     var res = await get(requestUrl);
 
-    if (!res.ok) {
+    if (res.statusCode != 202) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
   }
