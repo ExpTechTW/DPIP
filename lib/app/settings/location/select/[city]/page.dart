@@ -12,7 +12,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
-class SettingsLocationSelectCityPage extends StatelessWidget {
+class SettingsLocationSelectCityPage extends StatefulWidget {
   final String city;
 
   const SettingsLocationSelectCityPage({super.key, required this.city});
@@ -20,13 +20,20 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
   static String route([String city = ':city']) => '/settings/location/select/$city';
 
   @override
+  State<SettingsLocationSelectCityPage> createState() => _SettingsLocationSelectCityPageState();
+}
+
+class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectCityPage> {
+  String? loadingTown;
+
+  @override
   Widget build(BuildContext context) {
-    final towns = Global.location.entries.where((e) => e.value.city == city).toList();
+    final towns = Global.location.entries.where((e) => e.value.city == widget.city).toList();
 
     return ListView(
       children: [
         SettingsListSection(
-          title: city,
+          title: widget.city,
           children: [
             for (final town in towns)
               Selector<SettingsLocationModel, String?>(
@@ -37,8 +44,15 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
                       subtitle: Text(
                         '${town.key}・${town.value.lng.toStringAsFixed(2)}°E・${town.value.lat.toStringAsFixed(2)}°N',
                       ),
-                      trailing: Icon(code == town.key ? Symbols.check_rounded : null),
+                      trailing:
+                          loadingTown == town.key
+                              ? const LoadingIcon()
+                              : Icon(code == town.key ? Symbols.check_rounded : null),
+                      enabled: loadingTown == null,
                       onTap: () async {
+                        if (loadingTown != null) return;
+
+                        setState(() => loadingTown = town.key);
                         await ExpTech().updateDeviceLocation(
                           token: Preference.notifyToken,
                           lat: town.value.lat.toString(),
@@ -46,6 +60,7 @@ class SettingsLocationSelectCityPage extends StatelessWidget {
                         );
 
                         if (!context.mounted) return;
+                        setState(() => loadingTown = null);
 
                         context.read<SettingsLocationModel>().setCode(town.key);
                         context.read<SettingsLocationModel>().setLongitude(town.value.lng);
