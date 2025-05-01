@@ -1,5 +1,6 @@
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/utils/toast.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -209,6 +210,10 @@ class SettingsNotifyPage extends StatelessWidget {
     BasicNotifyType.all => '接收全部',
   };
 
+  void showSuccessToast(BuildContext context) {
+    showToast(context, ToastWidget.text('已更新通知設定', icon: Icon(Symbols.check_rounded)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<SettingsLocationModel, String?>(
@@ -254,6 +259,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setEew(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -292,6 +300,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setMonitor(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -325,6 +336,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setReport(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -358,6 +372,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setIntensity(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -396,6 +413,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setThunderstorm(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -429,6 +449,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setWeatherAdvisory(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -462,6 +485,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setEvacuation(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -500,6 +526,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setTsunami(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
@@ -538,6 +567,9 @@ class SettingsNotifyPage extends StatelessWidget {
                             setState(() => isLoading = true);
                             await context.read<SettingsNotificationModel>().setAnnouncement(result);
                             setState(() => isLoading = false);
+
+                            if (!context.mounted) return;
+                            showSuccessToast(context);
                           },
                         );
                       },
