@@ -1,4 +1,5 @@
 import 'package:dpip/app/changelog/page.dart';
+import 'package:dpip/app/map/radar/page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -159,6 +160,7 @@ final router = GoRouter(
     GoRoute(path: ChangelogPage.route, builder: (context, state) => ChangelogPage()),
     GoRoute(path: '/license', builder: (context, state) => LicensePage()),
     if (kDebugMode) GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => AppDebugLogsPage()),
+    GoRoute(path: MapRadarPage.route, builder: (context, state) => MapRadarPage()),
   ],
   observers: [TalkerRouteObserver(TalkerManager.instance)],
   debugLogDiagnostics: true,

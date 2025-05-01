@@ -17,30 +17,16 @@ import "package:dpip/widgets/map/map.dart";
 
 typedef PositionUpdateCallback = void Function();
 
-class RadarMap extends StatefulWidget {
-  final Function()? onPositionUpdate;
+class MapRadarPage extends StatefulWidget {
+  static const String route = '/map/radar';
 
-  const RadarMap({super.key, this.onPositionUpdate});
+  const MapRadarPage({super.key});
 
   @override
-  State<RadarMap> createState() => _RadarMapState();
-
-  static PositionUpdateCallback? _activeCallback;
-
-  static void setActiveCallback(PositionUpdateCallback callback) {
-    _activeCallback = callback;
-  }
-
-  static void clearActiveCallback() {
-    _activeCallback = null;
-  }
-
-  static void updatePosition() {
-    _activeCallback?.call();
-  }
+  State<MapRadarPage> createState() => _MapRadarPageState();
 }
 
-class _RadarMapState extends State<RadarMap> {
+class _MapRadarPageState extends State<MapRadarPage> {
   late MapLibreMapController _mapController;
 
   List<String> radar_list = [];
@@ -60,19 +46,16 @@ class _RadarMapState extends State<RadarMap> {
   @override
   void initState() {
     super.initState();
-    RadarMap.setActiveCallback(sendpositionUpdate);
   }
 
   void sendpositionUpdate() {
     if (mounted) {
       start();
-      widget.onPositionUpdate?.call();
     }
   }
 
   @override
   void dispose() {
-    RadarMap.clearActiveCallback();
     _mapController.dispose();
     super.dispose();
   }
@@ -169,7 +152,7 @@ class _RadarMapState extends State<RadarMap> {
           },
         ],
       });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
+      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 7.5);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
 
@@ -217,72 +200,74 @@ class _RadarMapState extends State<RadarMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap, rotateGesturesEnabled: true),
-        Positioned(
-          left: 4,
-          bottom: 4,
-          child: Material(
-            color: context.colors.secondary,
-            elevation: 4.0,
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: _toggleLegend,
-              child: Tooltip(
-                message: context.i18n.map_legend,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    _showLegend ? Icons.close : Icons.info_outline,
-                    size: 20,
-                    color: context.colors.onSecondary,
+    return Scaffold(
+      body: Stack(
+        children: [
+          DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap, rotateGesturesEnabled: true),
+          Positioned(
+            left: 4,
+            bottom: 4 + context.padding.bottom,
+            child: Material(
+              color: context.colors.secondary,
+              elevation: 4.0,
+              shape: const CircleBorder(),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: _toggleLegend,
+                child: Tooltip(
+                  message: context.i18n.map_legend,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      _showLegend ? Icons.close : Icons.info_outline,
+                      size: 20,
+                      color: context.colors.onSecondary,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        if (radar_list.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 2,
-            child: TimeSelector(
-              timeList: radar_list,
-              onTimeExpanded: () {
-                _showLegend = false;
-                setState(() {});
-              },
-              onTimeSelected: (time) {
-                String newTileUrl = getTileUrl(time);
+          if (radar_list.isNotEmpty)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 2 + context.padding.bottom,
+              child: TimeSelector(
+                timeList: radar_list,
+                onTimeExpanded: () {
+                  _showLegend = false;
+                  setState(() {});
+                },
+                onTimeSelected: (time) {
+                  String newTileUrl = getTileUrl(time);
 
-                _mapController.removeLayer("radarLayer");
-                _mapController.removeSource("radarSource");
+                  _mapController.removeLayer("radarLayer");
+                  _mapController.removeSource("radarSource");
 
-                _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+                  _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
-                _mapController.addLayer(
-                  "radarSource",
-                  "radarLayer",
-                  const RasterLayerProperties(),
-                  belowLayerId: "county-outline",
-                );
+                  _mapController.addLayer(
+                    "radarSource",
+                    "radarLayer",
+                    const RasterLayerProperties(),
+                    belowLayerId: "county-outline",
+                  );
 
-                _addUserLocationMarker();
-              },
+                  _addUserLocationMarker();
+                },
+              ),
             ),
-          ),
-        if (_showLegend)
-          Positioned(
-            left: 6,
-            bottom: 50, // Adjusted to be above the legend button
-            child: _buildLegend(),
-          ),
-      ],
+          if (_showLegend)
+            Positioned(
+              left: 6,
+              bottom: 50, // Adjusted to be above the legend button
+              child: _buildLegend(),
+            ),
+        ],
+      ),
     );
   }
 }

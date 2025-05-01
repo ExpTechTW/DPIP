@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/home/_widgets/radar_card.dart';
+import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/global.dart';
@@ -210,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(16),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
-                  onTap: () => context.push('/settings/location'),
+                  onTap: () => context.push(SettingsLocationPage.route),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Selector<SettingsLocationModel, String?>(
@@ -290,6 +292,7 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
+        Padding(padding: const EdgeInsets.all(16), child: RadarMapCard()),
       ],
     );
   }
