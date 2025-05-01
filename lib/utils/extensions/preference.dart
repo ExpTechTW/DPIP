@@ -32,7 +32,7 @@ extension PreferenceExtension on SharedPreferencesWithCache {
       case List<String>():
         return setStringList(key, value);
       default:
-        throw ArgumentError('Unsupported type: ${value.runtimeType}', 'value');
+        throw ArgumentError.value(value, 'value', 'Unsupported type: ${value.runtimeType}');
     }
   }
 }

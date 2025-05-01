@@ -109,7 +109,7 @@ class Route {
   /// - `lng`: 經度
   static Uri location({required String token, required String lat, required String lng}) {
     if (token.isEmpty) {
-      throw ArgumentError("Token is empty", 'token');
+      throw ArgumentError.value(token, 'token', 'Token is empty');
     }
 
     final platform = Platform.isIOS ? 1 : 0;
@@ -136,7 +136,7 @@ class Route {
   /// - `401`: 需要先呼叫 [ExpTech.getLocation]
   static Uri notify({required String token, required NotifyChannel channel, required Enum status}) {
     if (token.isEmpty) {
-      throw ArgumentError("Token is empty", 'token');
+      throw ArgumentError.value(token, 'token', "Token is empty");
     }
 
     if (status is! EewNotifyType &&
@@ -144,9 +144,10 @@ class Route {
         status is! WeatherNotifyType &&
         status is! TsunamiNotifyType &&
         status is! BasicNotifyType) {
-      throw ArgumentError(
-        "Invalid status, must be one of EewNotifyType, EarthquakeNotifyType, WeatherNotifyType, TsunamiNotifyType, or BasicNotifyType",
+      throw ArgumentError.value(
+        status,
         'status',
+        "Invalid status, must be one of EewNotifyType, EarthquakeNotifyType, WeatherNotifyType, TsunamiNotifyType, or BasicNotifyType",
       );
     }
 
