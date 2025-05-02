@@ -80,12 +80,14 @@ class _TsunamiMapState extends State<TsunamiMap> {
 
   String heightToColor(int height) {
     Color color;
-    if (height >= 2) {
+    if (height == 3) {
       color = const Color(0xFFE543FF);
-    } else if (height == 1) {
+    } else if (height == 2) {
       color = const Color(0xFFC90000);
-    } else {
+    } else if (height == 1) {
       color = const Color(0xFFFFC900);
+    } else {
+      color = const Color(0xFF00AAFF);
     }
     return "#${color.value.toRadixString(16).padLeft(8, "0").substring(2)}";
   }
