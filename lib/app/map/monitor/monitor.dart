@@ -34,15 +34,16 @@ import "eew_info.dart";
 
 typedef PositionUpdateCallback = void Function();
 
-class MonitorPage extends StatefulWidget {
+class MapMonitorPage extends StatefulWidget {
   final Function()? onPositionUpdate;
-
-  const MonitorPage({super.key, required this.data, this.onPositionUpdate});
-
   final int data;
 
+  const MapMonitorPage({super.key, required this.data, this.onPositionUpdate});
+
+  static const route = "/map/monitor";
+
   @override
-  State<MonitorPage> createState() => _MonitorPageState();
+  State<MapMonitorPage> createState() => _MapMonitorPageState();
 
   static PositionUpdateCallback? _activeCallback;
 
@@ -59,7 +60,7 @@ class MonitorPage extends StatefulWidget {
   }
 }
 
-class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStateMixin {
+class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
   final monitor = Global.preference.getBool("monitor") ?? false;
@@ -108,7 +109,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
-    MonitorPage.setActiveCallback(sendpositionUpdate);
+    MapMonitorPage.setActiveCallback(sendpositionUpdate);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (monitor) return;
@@ -947,7 +948,7 @@ class _MonitorPageState extends State<MonitorPage> with SingleTickerProviderStat
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
-    MonitorPage.clearActiveCallback();
+    MapMonitorPage.clearActiveCallback();
     _mapController.dispose();
     super.dispose();
   }

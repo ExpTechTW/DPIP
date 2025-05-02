@@ -6,7 +6,7 @@ import "package:material_symbols_icons/symbols.dart";
 import "package:url_launcher/url_launcher.dart";
 
 import "package:dpip/api/model/report/earthquake_report.dart";
-import "package:dpip/app_old/page/map/monitor/monitor.dart";
+import "package:dpip/app/map/monitor/monitor.dart";
 import "package:dpip/utils/depth_color.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/utils/extensions/int.dart";
@@ -74,7 +74,9 @@ class ReportSheetContent extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MonitorPage(data: report.time.millisecondsSinceEpoch - 5000)),
+                  MaterialPageRoute(
+                    builder: (context) => MapMonitorPage(data: report.time.millisecondsSinceEpoch - 5000),
+                  ),
                 );
               },
             ),

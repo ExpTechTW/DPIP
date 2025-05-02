@@ -46,7 +46,6 @@ class _RadarMapCardState extends State<RadarMapCard> {
     await _setupRadarLayer();
     if (userLocation.isValid) {
       await _setupUserLocationLayer(userLocation);
-      await _centerMapOnUser(userLocation);
     }
   }
 
@@ -84,11 +83,6 @@ class _RadarMapCardState extends State<RadarMapCard> {
     );
   }
 
-  Future<void> _centerMapOnUser(LatLng userLocation) async {
-    final cameraUpdate = CameraUpdate.newLatLngZoom(userLocation, 7);
-    await mapController.moveCamera(cameraUpdate);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -111,9 +105,15 @@ class _RadarMapCardState extends State<RadarMapCard> {
                   selector: (context, location) => (latitude: location.latitude, longitude: location.longitude),
                   builder: (context, data, _) {
                     final userLocation = LatLng(data.latitude ?? 0, data.longitude ?? 0);
+
                     return DpipMap(
+                      key: UniqueKey(),
                       onMapCreated: (controller) => mapController = controller,
                       onStyleLoadedCallback: () => _initializeMap(userLocation),
+                      initialCameraPosition:
+                          userLocation.isValid
+                              ? CameraPosition(target: userLocation, zoom: 7)
+                              : const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
                       dragEnabled: false,
                       rotateGesturesEnabled: false,
                       zoomGesturesEnabled: false,

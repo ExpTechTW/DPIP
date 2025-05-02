@@ -1,19 +1,18 @@
-import "dart:io";
-
-import "package:dpip/core/providers.dart";
+import "package:dpip/models/settings/location.dart";
+import "package:dpip/utils/extensions/latlng.dart";
+import "package:dpip/utils/geojson.dart";
 import "package:flutter/material.dart";
 
 import "package:maplibre_gl/maplibre_gl.dart";
 
 import "package:dpip/api/exptech.dart";
-import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/utils/map_utils.dart";
-import "package:dpip/utils/need_location.dart";
 import "package:dpip/utils/radar_color.dart";
 import "package:dpip/widgets/list/time_selector.dart";
 import "package:dpip/widgets/map/legend.dart";
 import "package:dpip/widgets/map/map.dart";
+import "package:provider/provider.dart";
 
 typedef PositionUpdateCallback = void Function();
 
@@ -27,148 +26,69 @@ class MapRadarPage extends StatefulWidget {
 }
 
 class _MapRadarPageState extends State<MapRadarPage> {
-  late MapLibreMapController _mapController;
+  late MapLibreMapController mapController;
+  List<String> radarList = [];
 
-  List<String> radar_list = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
   bool _showLegend = false;
 
-  String getTileUrl(String timestamp) {
-    return "https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png";
+  String _getTileUrl(String timestamp) {
+    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
   }
 
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadGPSImage(_mapController);
-  }
+  Future<void> _initializeMap(LatLng userLocation) async {
+    await loadGPSImage(mapController);
 
-  @override
-  void initState() {
-    super.initState();
-  }
+    radarList = await ExpTech().getRadarList();
+    if (!mounted) return;
 
-  void sendpositionUpdate() {
-    if (mounted) {
-      start();
+    await _setupRadarLayer();
+    if (userLocation.isValid) {
+      await _setupUserLocationLayer(userLocation);
+      await _centerMapOnUser(userLocation);
     }
   }
 
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
+  Future<void> _setupRadarLayer() async {
+    final newTileUrl = _getTileUrl(radarList.last);
+    await mapController.addSource('radar-source', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+
+    mapController.addLayer('radar-source', 'radar', const RasterLayerProperties(), belowLayerId: 'county-outline');
   }
 
-  void _initMap(MapLibreMapController controller) async {
-    _mapController = controller;
-  }
-
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
-      await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
-        const SymbolLayerProperties(
-          symbolZOrder: "source",
-          iconSize: [
-            Expressions.interpolate,
-            ["linear"],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: "gps",
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
-  void _loadMap() async {
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    await _loadMapImages(isDark);
-
-    radar_list = await ExpTech().getRadarList();
-
-    String newTileUrl = getTileUrl(radar_list.last);
-
-    _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
-
-    _mapController.removeLayer("county-outline");
-    _mapController.removeLayer("county");
-
-    _mapController.addLayer(
-      "map",
-      "county",
-      FillLayerProperties(fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(), fillOpacity: 1),
-      sourceLayer: "city",
-      belowLayerId: "radarLayer",
+  Future<void> _setupUserLocationLayer(LatLng userLocation) async {
+    await mapController.addSource(
+      'gps-geojson',
+      GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(userLocation.toFeatureBuilder()).build()),
     );
 
-    _mapController.addLayer(
-      "map",
-      "county-outline",
-      LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB()),
-      sourceLayer: "city",
-    );
-
-    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(), belowLayerId: "county-outline");
-
-    if (Platform.isIOS && GlobalProviders.location.auto) {
-      await getSavedLocation();
-    }
-
-    await _mapController.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
-    );
-
-    start();
-  }
-
-  void start() async {
-    userLat = GlobalProviders.location.latitude ?? 0;
-    userLon = GlobalProviders.location.longitude ?? 0;
-
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
-    if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
-          {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
-            },
-          },
+    await mapController.addLayer(
+      'gps-geojson',
+      'gps',
+      const SymbolLayerProperties(
+        symbolZOrder: 'source',
+        iconSize: [
+          Expressions.interpolate,
+          ['linear'],
+          [Expressions.zoom],
+          5,
+          0.5,
+          10,
+          1.5,
         ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 7.5);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
-    }
+        iconImage: 'gps',
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
+      ),
+    );
+  }
 
-    if (!isUserLocationValid && !GlobalProviders.location.auto) {
-      await showLocationDialog(context);
-    }
-
-    _addUserLocationMarker();
-
-    setState(() {});
+  Future<void> _centerMapOnUser(LatLng userLocation) async {
+    final cameraUpdate = CameraUpdate.newLatLngZoom(userLocation, 7);
+    await mapController.moveCamera(cameraUpdate);
   }
 
   void _toggleLegend() {
-    setState(() {
-      _showLegend = !_showLegend;
-    });
+    setState(() => _showLegend = !_showLegend);
   }
 
   Widget _buildLegend() {
@@ -203,7 +123,18 @@ class _MapRadarPageState extends State<MapRadarPage> {
     return Scaffold(
       body: Stack(
         children: [
-          DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap, rotateGesturesEnabled: true),
+          Selector<SettingsLocationModel, ({double? latitude, double? longitude})>(
+            selector: (context, model) => (latitude: model.latitude, longitude: model.longitude),
+            builder: (context, data, _) {
+              final userLocation = LatLng(data.latitude ?? 0, data.longitude ?? 0);
+
+              return DpipMap(
+                onMapCreated: (controller) => mapController = controller,
+                onStyleLoadedCallback: () => _initializeMap(userLocation),
+                rotateGesturesEnabled: true,
+              );
+            },
+          ),
           Positioned(
             left: 4,
             bottom: 4 + context.padding.bottom,
@@ -230,42 +161,32 @@ class _MapRadarPageState extends State<MapRadarPage> {
               ),
             ),
           ),
-          if (radar_list.isNotEmpty)
+          if (radarList.isNotEmpty)
             Positioned(
               left: 0,
               right: 0,
               bottom: 2 + context.padding.bottom,
               child: TimeSelector(
-                timeList: radar_list,
-                onTimeExpanded: () {
-                  _showLegend = false;
-                  setState(() {});
-                },
+                timeList: radarList,
+                onTimeExpanded: () => setState(() => _showLegend = false),
                 onTimeSelected: (time) {
-                  String newTileUrl = getTileUrl(time);
+                  final newTileUrl = _getTileUrl(time);
 
-                  _mapController.removeLayer("radarLayer");
-                  _mapController.removeSource("radarSource");
+                  mapController.removeLayer("radarLayer");
+                  mapController.removeSource("radarSource");
 
-                  _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+                  mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
-                  _mapController.addLayer(
+                  mapController.addLayer(
                     "radarSource",
                     "radarLayer",
                     const RasterLayerProperties(),
                     belowLayerId: "county-outline",
                   );
-
-                  _addUserLocationMarker();
                 },
               ),
             ),
-          if (_showLegend)
-            Positioned(
-              left: 6,
-              bottom: 50, // Adjusted to be above the legend button
-              child: _buildLegend(),
-            ),
+          if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
         ],
       ),
     );

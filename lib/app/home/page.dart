@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                         data.weather.data.air.temperature + 0.33 * e - 0.7 * data.weather.data.wind.speed - 4.0;
 
                     return Column(
-                      spacing: 20,
+                      spacing: 24,
                       children: [
                         child!,
                         Row(
@@ -239,6 +240,10 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+
+        Padding(padding: const EdgeInsets.all(16), child: EewCard()),
+        Padding(padding: const EdgeInsets.all(16), child: RadarMapCard()),
+
         Selector<SettingsLocationModel, String?>(
           selector: (context, model) => model.code,
           builder: (context, code, child) {
@@ -292,7 +297,6 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
-        Padding(padding: const EdgeInsets.all(16), child: RadarMapCard()),
       ],
     );
   }

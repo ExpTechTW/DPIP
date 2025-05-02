@@ -3,7 +3,7 @@ import "package:flutter/material.dart";
 import "package:material_symbols_icons/symbols.dart";
 
 import "package:dpip/app_old/page/map/lightning/lightning.dart";
-import "package:dpip/app_old/page/map/monitor/monitor.dart";
+import "package:dpip/app/map/monitor/monitor.dart";
 import "package:dpip/app_old/page/map/radar/radar.dart";
 import "package:dpip/app_old/page/map/rain/rain.dart";
 import "package:dpip/app_old/page/map/tsunami/tsunami.dart";
@@ -96,7 +96,7 @@ class _MapPageState extends State<MapPage> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          MonitorPage(data: 0),
+          MapMonitorPage(data: 0),
           RadarMap(),
           RainMap(),
           TemperatureMap(),

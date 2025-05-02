@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 import 'package:dpip/app_old/page/home/home.dart';
-import 'package:dpip/app_old/page/map/monitor/monitor.dart';
+import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/location_to_code.dart';
@@ -42,7 +42,7 @@ Future<void> getSavedLocation() async {
 void _updateAllPositions() {
   RadarMap.updatePosition();
   HomePage.updatePosition();
-  MonitorPage.updatePosition();
+  MapMonitorPage.updatePosition();
 }
 
 void cancelSavedLocationOperation() {
