@@ -162,7 +162,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
           circleColor: [
             Expressions.step,
             [Expressions.get, "waveHeight"],
-            "#606060",
+            "#00AAFF",
             30,
             "#FFC900",
             100,
