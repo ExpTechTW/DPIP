@@ -25,7 +25,7 @@ class TsunamiObservedList extends StatelessWidget {
     } else if (height >= 30) {
       return const Color(0xFFFFC900);
     } else {
-      return const Color(0xFF606060);
+      return const Color(0xFF00AAFF);
     }
   }
 

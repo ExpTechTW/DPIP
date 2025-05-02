@@ -42,10 +42,10 @@ class TsunamiEstimateList extends StatelessWidget {
   }
 
   heightToTextColor(height) {
-    if (height >= 1) {
-      return const Color(0xFFFFFFFF);
-    } else {
+    if (height == 1) {
       return const Color(0xFF202020);
+    } else {
+      return const Color(0xFFFFFFFF);
     }
   }
 
