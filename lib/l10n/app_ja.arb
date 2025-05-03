@@ -726,7 +726,7 @@
   "@trem_service_description": {
     "description": "「歡迎」頁面 → 在 DPIP 中可以查看來自 ExpTech 旗下 TREM 之強震監視器服務，請詳細閱讀以下條件，並選擇是否啟用。"
   },
-  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、中央気象署（CMA）が提供する情報ではなく、最終的には中央気象署が発表する情報に従うべき観測結果とは一致しない可能性があります。",
+  "real_time_magnitude_warning": "表示されるリアルタイムの震度は、台湾中央氣象署（CWA）が提供する情報ではなく、CWAの情報とは一致しない可能性があります。CWAの情報を優先して防災行動に活用してください。",
   "@real_time_magnitude_warning": {
     "description": "「歡迎」頁面 → 顯示的即時震度不是中央氣象署所提供之資料，因此可能與中央氣象署觀測到的結果不一致，應以中央氣象署公布之資訊為主。"
   },
@@ -1231,7 +1231,7 @@
   "@location_permission_needed": {
     "description": "「位置權限」彈窗 → 自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。"
   },
-  "location_permission": "ロケーション許可",
+  "location_permission": "位置情報を許可",
   "@location_permission": {
     "description": "「位置權限」彈窗 → 用於提示用戶授予位置權限"
   },
