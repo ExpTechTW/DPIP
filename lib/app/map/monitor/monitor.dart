@@ -1,9 +1,9 @@
 import "dart:async";
-import "dart:io";
 import "dart:ui" as ui;
 
 import "package:flutter/material.dart";
 
+import "package:go_router/go_router.dart";
 import "package:intl/intl.dart";
 import "package:maplibre_gl/maplibre_gl.dart";
 import "package:material_symbols_icons/symbols.dart";
@@ -14,10 +14,13 @@ import "package:dpip/api/model/eew.dart";
 import "package:dpip/api/model/rts/rts.dart";
 import "package:dpip/api/model/station.dart";
 import "package:dpip/api/model/station_info.dart";
+import "package:dpip/app/map/monitor/_widgets/layer_toggle.dart";
+import "package:dpip/app/map/monitor/_widgets/tos_sheet.dart";
 import "package:dpip/core/eew.dart";
-import "package:dpip/core/ios_get_location.dart";
+import "package:dpip/core/preference.dart";
 import "package:dpip/core/rts.dart";
 import "package:dpip/global.dart";
+import "package:dpip/utils/constants.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/utils/extensions/int.dart";
 import "package:dpip/utils/extensions/latlng.dart";
@@ -26,44 +29,23 @@ import "package:dpip/utils/instrumental_intensity_color.dart";
 import "package:dpip/utils/intensity_color.dart";
 import "package:dpip/utils/log.dart";
 import "package:dpip/utils/map_utils.dart";
-import "package:dpip/utils/need_location.dart";
 import "package:dpip/widgets/map/legend.dart";
 import "package:dpip/widgets/map/map.dart";
 
 import "eew_info.dart";
 
-typedef PositionUpdateCallback = void Function();
-
 class MapMonitorPage extends StatefulWidget {
-  final Function()? onPositionUpdate;
-  final int data;
-
-  const MapMonitorPage({super.key, required this.data, this.onPositionUpdate});
+  const MapMonitorPage({super.key});
 
   static const route = "/map/monitor";
 
   @override
   State<MapMonitorPage> createState() => _MapMonitorPageState();
-
-  static PositionUpdateCallback? _activeCallback;
-
-  static void setActiveCallback(PositionUpdateCallback callback) {
-    _activeCallback = callback;
-  }
-
-  static void clearActiveCallback() {
-    _activeCallback = null;
-  }
-
-  static void updatePosition() {
-    _activeCallback?.call();
-  }
 }
 
 class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
-  final monitor = Global.preference.getBool("monitor") ?? false;
 
   Timer? _dataUpdateTimer;
   Timer? _eewUpdateTimer;
@@ -102,31 +84,12 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   void initState() {
     super.initState();
     _initTimeOffset();
-    _timeReplay = widget.data;
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
       final scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
       animController.animateTo(scrollPosition, duration: Duration.zero);
     });
-    MapMonitorPage.setActiveCallback(sendpositionUpdate);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (monitor) return;
-      bool disable_monitor_tip = Global.preference.getBool("disable_monitor_tip") ?? false;
-      if (!disable_monitor_tip) {
-        Global.preference.setBool("disable_monitor_tip", true);
-        initTargets();
-        showTutorial();
-      }
-    });
-  }
-
-  void sendpositionUpdate() {
-    if (mounted) {
-      userLocation();
-      widget.onPositionUpdate?.call();
-    }
   }
 
   void _initTimeOffset() async {
@@ -138,27 +101,8 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     _mapController = controller;
   }
 
-  void userLocation() async {
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
-      await getSavedLocation();
-    }
-
-    if (!mounted) return;
-
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
-
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
-    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
-      await showLocationDialog(context);
-    }
-  }
-
   void _loadMap() async {
     _initStations();
-
-    userLocation();
 
     _eewUI.add(
       Padding(
@@ -310,7 +254,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   void _startDataUpdates() {
     _dataUpdateTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      if (monitor) {
+      if (_showLayerRts) {
         _updateRtsData();
       } else {
         _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
@@ -948,7 +892,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     _dataUpdateTimer?.cancel();
     _eewUpdateTimer?.cancel();
     _blinkTimer?.cancel();
-    MapMonitorPage.clearActiveCallback();
     _mapController.dispose();
     super.dispose();
   }
@@ -957,13 +900,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     setState(() {
       _showMonitorInfo = false;
       _showLegend = !_showLegend;
-    });
-  }
-
-  void _toggleMonitorInfo() {
-    setState(() {
-      _showLegend = false;
-      _showMonitorInfo = !_showMonitorInfo;
     });
   }
 
@@ -1043,166 +979,202 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     );
   }
 
-  void showTutorial() {
-    TutorialCoachMark(
-      targets: targets,
-      colorShadow: context.colors.primary,
-      paddingFocus: 10,
-      opacityShadow: 0.95,
-      onFinish: () {
-        _toggleMonitorInfo();
+  bool _showLayerRts = false;
+  void toggleLayerRts() async {
+    if (!_showLayerRts && !Preference.isTosAccepted) {
+      final result = await showModalBottomSheet<bool>(
+        context: context,
+        showDragHandle: true,
+        useRootNavigator: true,
+        enableDrag: true,
+        useSafeArea: true,
+        isScrollControlled: true,
+        constraints: context.bottomSheetConstraints,
+        builder: (context) => TosBottomSheet(),
+      );
+      if (result == true) {
+        Preference.isTosAccepted = true;
+        setState(() => _showLayerRts = !_showLayerRts);
+      }
+      return;
+    }
+
+    setState(() => _showLayerRts = !_showLayerRts);
+  }
+
+  void showLayerBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      useRootNavigator: true,
+      enableDrag: true,
+      useSafeArea: true,
+      sheetAnimationStyle: kEmphasizedAnimationStyle,
+      constraints: context.bottomSheetConstraints,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [LayerToggle(checked: _showLayerRts, label: 'rts', onChanged: (value) => toggleLayerRts())],
+          ),
+        );
       },
-    ).show(context: context);
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _timeReplay != 0 ? AppBar(title: Text(context.i18n.monitor)) : null,
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
-          Positioned(
-            right: 4,
-            top: 4,
-            child: Material(
-              color: context.colors.secondary,
-              elevation: 4.0,
-              shape: const CircleBorder(),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: _toggleLegend,
-                child: Tooltip(
-                  message: context.i18n.map_legend,
-                  child: Container(
-                    width: 30,
-                    height: 30,
-                    alignment: Alignment.center,
-                    child: Icon(
-                      _showLegend ? Icons.close : Icons.info_outline,
-                      size: 20,
-                      color: context.colors.onSecondary,
-                    ),
+          SafeArea(
+            bottom: false,
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: IconButton.filledTonal(
+                    onPressed: () => context.pop(),
+                    icon: const Icon(Symbols.arrow_back_rounded),
                   ),
                 ),
-              ),
-            ),
-          ),
-          if (!monitor)
-            Positioned(
-              key: monitorButtonKey,
-              left: 4,
-              top: 40,
-              child: Material(
-                color: context.colors.error,
-                elevation: 4.0,
-                shape: const CircleBorder(),
-                clipBehavior: Clip.antiAlias,
-                child: InkWell(
-                  onTap: _toggleMonitorInfo,
-                  child: Tooltip(
-                    message: context.i18n.map_legend,
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      alignment: Alignment.center,
-                      child: Icon(Icons.warning_amber_rounded, size: 20, color: context.colors.onError),
-                    ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton.filledTonal(
+                    onPressed: showLayerBottomSheet,
+                    icon: const Icon(Symbols.layers_rounded),
                   ),
                 ),
-              ),
-            ),
-          Positioned(
-            left: 4,
-            top: 4,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
-                  child: Text(
-                    DateFormat(context.i18n.datetime_format).format(
-                      (!_dataStatus())
-                          ? _lsatGetRtsDataTime.asTZDateTime
-                          : (_timeReplay == 0)
-                          ? _getCurrentTime().asTZDateTime
-                          : _timeReplay.asTZDateTime,
-                    ),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          (!_dataStatus())
-                              ? Colors.red
-                              : (_timeReplay == 0)
-                              ? context.colors.onSurface
-                              : Colors.orangeAccent,
+
+                /* 
+                Positioned(
+                  right: 4,
+                  top: 4,
+                  child: Material(
+                    color: context.colors.secondary,
+                    elevation: 4.0,
+                    shape: const CircleBorder(),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: _toggleLegend,
+                      child: Tooltip(
+                        message: context.i18n.map_legend,
+                        child: Container(
+                          width: 30,
+                          height: 30,
+                          alignment: Alignment.center,
+                          child: Icon(
+                            _showLegend ? Icons.close : Icons.info_outline,
+                            size: 20,
+                            color: context.colors.onSecondary,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-          ),
-          if (monitor)
-            Positioned(
-              left: 4,
-              top: 32,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
-                    child: Text(
-                      (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color:
+                ), */
+                Positioned(
+                  left: 4,
+                  top: 4,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                        child: Text(
+                          DateFormat(context.i18n.datetime_format).format(
                             (!_dataStatus())
-                                ? Colors.red
-                                : (_ping > 1)
-                                ? Colors.orange
-                                : Colors.green,
+                                ? _lsatGetRtsDataTime.asTZDateTime
+                                : (_timeReplay == 0)
+                                ? _getCurrentTime().asTZDateTime
+                                : _timeReplay.asTZDateTime,
+                          ),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                (!_dataStatus())
+                                    ? Colors.red
+                                    : (_timeReplay == 0)
+                                    ? context.colors.onSurface
+                                    : Colors.orangeAccent,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          if (_rtsUI.isNotEmpty)
-            Positioned(left: 4, top: 58, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: _rtsUI)),
-          if (_showLegend)
-            Positioned(
-              right: 6,
-              top: 50, // Adjusted to be above the legend button
-              child: _buildLegend(),
-            ),
-          if (_showMonitorInfo)
-            Padding(
-              padding: const EdgeInsets.only(top: 75, left: 6, right: 6),
-              child: Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(Symbols.warning_amber_rounded, size: 50, color: Colors.red),
-                      const SizedBox(height: 10),
-                      Text(context.i18n.no_earthquake_monitor, style: context.theme.textTheme.bodyLarge),
-                      const SizedBox(height: 10),
-                      Text(context.i18n.settings_earthquake_monitor, style: context.theme.textTheme.bodyMedium),
-                    ],
+                if (_showLayerRts)
+                  Positioned(
+                    left: 4,
+                    top: 32,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: BackdropFilter(
+                        filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                          child: Text(
+                            (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  (!_dataStatus())
+                                      ? Colors.red
+                                      : (_ping > 1)
+                                      ? Colors.orange
+                                      : Colors.green,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                if (_rtsUI.isNotEmpty)
+                  Positioned(
+                    left: 4,
+                    top: 58,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: _rtsUI),
+                  ),
+                if (_showLegend)
+                  Positioned(
+                    right: 6,
+                    top: 50, // Adjusted to be above the legend button
+                    child: _buildLegend(),
+                  ),
+                if (_showMonitorInfo)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 75, left: 6, right: 6),
+                    child: Card(
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const Icon(Symbols.warning_amber_rounded, size: 50, color: Colors.red),
+                            const SizedBox(height: 10),
+                            Text(context.i18n.no_earthquake_monitor, style: context.theme.textTheme.bodyLarge),
+                            const SizedBox(height: 10),
+                            Text(context.i18n.settings_earthquake_monitor, style: context.theme.textTheme.bodyMedium),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                Positioned.fill(child: EewDraggableSheet(child: _eewUI)),
+              ],
             ),
-          Positioned.fill(child: EewDraggableSheet(child: _eewUI)),
+          ),
         ],
       ),
     );

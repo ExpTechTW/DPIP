@@ -39,6 +39,9 @@ class Preference {
     instance = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
   }
 
+  static bool get isTosAccepted => instance.getInt('accepted-tos-version') == 1;
+  static set isTosAccepted(bool value) => instance.set('accepted-tos-version', value ? 1 : null);
+
   static bool get isFirstLaunch => instance.getString('welcome') != 'done';
   static set isFirstLaunch(bool value) => instance.set('welcome', value ? null : 'done');
 

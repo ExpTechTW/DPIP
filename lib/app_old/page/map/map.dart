@@ -96,7 +96,7 @@ class _MapPageState extends State<MapPage> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          MapMonitorPage(data: 0),
+          MapMonitorPage(),
           RadarMap(),
           RainMap(),
           TemperatureMap(),

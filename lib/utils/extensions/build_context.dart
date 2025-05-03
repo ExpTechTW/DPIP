@@ -15,10 +15,14 @@ extension CommonContext on BuildContext {
   EdgeInsets get padding => MediaQuery.paddingOf(this);
   TextTheme get textTheme => theme.textTheme;
   Locale get locale => Localizations.localeOf(this);
+  Size get screen => MediaQuery.sizeOf(this);
 }
 
 extension BuildContextExtension on BuildContext {
   /// Pops the navigation stack until reaching the specified path
   /// Returns true if successfully popped to the path, false if path not found
   void popUntil(String path) => GoRouter.of(this).popUntil(path);
+
+  /// The height and width constraints for the bottom sheet in Material 3
+  BoxConstraints get bottomSheetConstraints => BoxConstraints(maxHeight: screen.height - 72, maxWidth: 640);
 }

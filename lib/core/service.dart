@@ -12,7 +12,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app_old/page/home/home.dart';
-import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/preference.dart';
@@ -86,11 +85,8 @@ void _setupPositionListener() {
     GlobalProviders.location.setLatitude(latitude);
     GlobalProviders.location.setLongitude(longitude);
 
-    const MapMonitorPage(data: 0).createState();
-
     HomePage.updatePosition();
     RadarMap.updatePosition();
-    MapMonitorPage.updatePosition();
   });
 
   _backgroundService.on(ServiceEvent.sendDebug.name).listen((event) {
