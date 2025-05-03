@@ -113,8 +113,8 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextButton(onPressed: () => context.pop(false), child: const Text('同意しない')),
-                FilledButton(onPressed: _isAgreeUnlocked ? () => context.pop(true) : null, child: const Text('同意')),
+                TextButton(onPressed: () => context.pop(false), child: Text(context.i18n.disagree)),
+                FilledButton(onPressed: _isAgreeUnlocked ? () => context.pop(true) : null, child: Text(context.i18n.agree)),
               ],
             ),
           ),
