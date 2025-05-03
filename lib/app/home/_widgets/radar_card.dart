@@ -85,62 +85,70 @@ class _RadarMapCardState extends State<RadarMapCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: context.colors.surfaceContainer,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: context.colors.outlineVariant),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.push(MapRadarPage.route),
-        borderRadius: BorderRadius.circular(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: 200,
-              child: IgnorePointer(
-                child: Selector<SettingsLocationModel, ({double? latitude, double? longitude})>(
-                  selector: (context, location) => (latitude: location.latitude, longitude: location.longitude),
-                  builder: (context, data, _) {
-                    final userLocation = LatLng(data.latitude ?? 0, data.longitude ?? 0);
-
-                    return DpipMap(
-                      key: UniqueKey(),
-                      onMapCreated: (controller) => mapController = controller,
-                      onStyleLoadedCallback: () => _initializeMap(userLocation),
-                      initialCameraPosition:
-                          userLocation.isValid
-                              ? CameraPosition(target: userLocation, zoom: 7)
-                              : const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
-                      dragEnabled: false,
-                      rotateGesturesEnabled: false,
-                      zoomGesturesEnabled: false,
-                    );
-                  },
-                ),
-              ),
+    return Stack(
+      children: [
+        IgnorePointer(
+          child: Container(
+            decoration: BoxDecoration(
+              color: context.colors.surfaceContainer,
+              border: Border.all(color: context.colors.outlineVariant),
+              borderRadius: BorderRadius.circular(16),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    spacing: 8,
-                    children: [
-                      Icon(Symbols.radar, size: 24),
-                      Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
-                    ],
+                  SizedBox(
+                    height: 200,
+                    child: Selector<SettingsLocationModel, ({double? latitude, double? longitude})>(
+                      selector: (context, location) => (latitude: location.latitude, longitude: location.longitude),
+                      builder: (context, data, _) {
+                        final userLocation = LatLng(data.latitude ?? 0, data.longitude ?? 0);
+
+                        return DpipMap(
+                          key: UniqueKey(),
+                          onMapCreated: (controller) => mapController = controller,
+                          onStyleLoadedCallback: () => _initializeMap(userLocation),
+                          initialCameraPosition:
+                              userLocation.isValid
+                                  ? CameraPosition(target: userLocation, zoom: 7)
+                                  : const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
+                          dragEnabled: false,
+                          rotateGesturesEnabled: false,
+                          zoomGesturesEnabled: false,
+                        );
+                      },
+                    ),
                   ),
-                  const Icon(Symbols.chevron_right_rounded, size: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          spacing: 8,
+                          children: [
+                            Icon(Symbols.radar, size: 24),
+                            Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
+                          ],
+                        ),
+                        const Icon(Symbols.chevron_right_rounded, size: 24),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(onTap: () => context.push(MapRadarPage.route), borderRadius: BorderRadius.circular(16)),
+          ),
+        ),
+      ],
     );
   }
 }
