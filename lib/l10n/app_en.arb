@@ -1477,7 +1477,7 @@
   "@sunny_with_snow_showers": {
     "description": "天氣狀況：晴天伴有陣雪"
   },
-  "sunny_with_sleet_showers": "晴陣雨雪",
+  "sunny_with_sleet_showers": "Sunny with sleet showers",
   "@sunny_with_sleet_showers": {
     "description": "天氣狀況：晴天伴有陣雨夾雪"
   },
@@ -1489,7 +1489,7 @@
   "@sunny_with_thunderstorm": {
     "description": "天氣狀況：晴天伴有雷雨"
   },
-  "sunny_with_thundersnow": "晴有雷雪",
+  "sunny_with_thundersnow": "",
   "@sunny_with_thundersnow": {
     "description": "天氣狀況：晴天伴有雷雪"
   },

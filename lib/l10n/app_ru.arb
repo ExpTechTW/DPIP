@@ -61,7 +61,7 @@
   "@server_status": {
     "description": "「我」頁面 → 應用程式資訊 → 「伺服器狀態」按鈕"
   },
-  "third_party_libraries": "第三方套件授權",
+  "third_party_libraries": "Разрешение на люкс третьих сторон",
   "@third_party_libraries": {
     "description": "「我」頁面 → 應用程式資訊 → 「第三方套件授權」按鈕"
   },
@@ -100,7 +100,7 @@
   "@report_event_time": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 發震時間"
   },
-  "report_location": "位於",
+  "report_location": "Расположен в",
   "@report_location": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 位於、「地圖」路徑 → 地圖列表 → 「海嘯資訊」圖例 → 資訊托盤 → 位於"
   },
@@ -112,7 +112,7 @@
   "@report_depth": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 震源深度"
   },
-  "report_image": "地震報告圖",
+  "report_image": "Отчёт о землетрясении Фигура",
   "@report_image": {
     "description": "「更多」路徑 → 地震報告 → 詳細資訊托盤 → 地震報告圖"
   },
@@ -136,7 +136,7 @@
   "@settings_locale": {
     "description": "「設定」路徑 → 「語言」標題"
   },
-  "settings_locale_description": "調整 DPIP 的顯示語言",
+  "settings_locale_description": "Настройка языка отображения DPIP",
   "@settings_locale_description": {
     "description": "「設定」路徑 → 「語言」副標題敘述"
   },
@@ -144,7 +144,7 @@
   "@settings_display_locale": {
     "description": "「設定」路徑 → 「顯示語言」標題"
   },
-  "settings_locale_translated": "已翻譯 {percentage}",
+  "settings_locale_translated": "Переведен {percentage}",
   "@settings_locale_translated": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已翻譯百分比",
     "placeholders": {
@@ -154,7 +154,7 @@
       }
     }
   },
-  "settings_locale_approved": "已校對 {percentage}",
+  "settings_locale_approved": "Корректированные {percentage}",
   "@settings_locale_approved": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 語言選項已校對百分比",
     "placeholders": {
@@ -164,7 +164,7 @@
       }
     }
   },
-  "settings_locale_crowdin": "協助翻譯",
+  "settings_locale_crowdin": "Помощь в переводе",
   "@settings_locale_crowdin": {
     "description": "「設定」路徑 → 「協助翻譯」標題"
   },
@@ -180,11 +180,11 @@
   "@no_earthquake_warning": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 目前無生效中的地震速報"
   },
-  "earthquake_warning": "地震速報",
+  "earthquake_warning": "Землетрясение раннее предупреждение",
   "@earthquake_warning": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 地震速報"
   },
-  "emergency_earthquake_warning": "緊急地震速報",
+  "emergency_earthquake_warning": "Землетрясение раннее предупреждение",
   "@emergency_earthquake_warning": {
     "description": "「地圖」路徑 → 強震監視器 → 資訊托盤 → 緊急地震速報"
   },
@@ -224,7 +224,7 @@
   "@settings_Personalization": {
     "description": "「設定」路徑 → 「個人化」標題"
   },
-  "settings_theme": "主題色",
+  "settings_theme": "Цвет темы",
   "@settings_theme": {
     "description": "「設定」路徑 → 「主題色」副標題"
   },
@@ -312,11 +312,11 @@
       }
     }
   },
-  "source_language": "來源語言",
+  "source_language": "Язык Источника",
   "@source_language": {
     "description": "「設定」路徑 → 「顯示語言」設定 → 來源語言"
   },
-  "notify_test": "通知測試",
+  "notify_test": "Уведомление теста",
   "@notify_test": {
     "description": "「我」路徑 → 「通知」標題 → 通知測試"
   },
@@ -340,7 +340,7 @@
   "@report_description_sound": {
     "description": "「我」路徑 → 「通知測試」內容 →「地震資訊」副標題敘述 → 所在地(縣市)實測震度 3 以上"
   },
-  "eew_sound_title": "地震速報音效",
+  "eew_sound_title": "Землетрясение раннее предупреждение Звуки",
   "@eew_sound_title": {
     "description": "「我」路徑 → 「通知測試」內容 → 地震速報音效"
   },
@@ -1753,19 +1753,19 @@
       }
     }
   },
-  "according": "依",
+  "according": "По словам",
   "@according": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 依"
   },
-  "ranking_descending": "降冪",
+  "ranking_descending": "снижение",
   "@ranking_descending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 降冪"
   },
-  "ranking_ascending": "升冪",
+  "ranking_ascending": "восходя",
   "@ranking_ascending": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 升冪"
   },
-  "ranking_merge_into": "合併至",
+  "ranking_merge_into": "слияние в",
   "@ranking_merge_into": {
     "description": "「排行榜」頁面 → 氣溫/風速資訊頁面 → 合併至"
   },
@@ -1782,7 +1782,7 @@
       }
     }
   },
-  "power_saving_position": "省電策略",
+  "power_saving_position": "Режим экономии энергии стратегия",
   "@power_saving_position": {
     "description": "「歡迎」頁面 → 省電策略"
   },
