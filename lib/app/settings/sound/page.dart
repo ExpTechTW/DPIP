@@ -7,14 +7,16 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/tile_group_header.dart';
 import 'package:dpip/widgets/settings/sound/sound_list_tile.dart';
 
-class SoundRoute extends StatefulWidget {
-  const SoundRoute({super.key});
+class SettingsSoundPage extends StatefulWidget {
+  const SettingsSoundPage({super.key});
+  
+  static const route = '/settings/sound';
 
   @override
-  State<SoundRoute> createState() => _SoundRouteState();
+  State<SettingsSoundPage> createState() => _SettingsSoundPage();
 }
 
-class _SoundRouteState extends State<SoundRoute> {
+class _SettingsSoundPage extends State<SettingsSoundPage> {
   @override
   Widget build(BuildContext context) {
     const tileTitleTextStyle = TextStyle(fontWeight: FontWeight.bold);

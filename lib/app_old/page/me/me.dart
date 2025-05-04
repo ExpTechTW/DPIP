@@ -3,7 +3,7 @@ import "package:flutter/material.dart";
 import "package:go_router/go_router.dart";
 import "package:material_symbols_icons/symbols.dart";
 
-import "package:dpip/route/sound/sound.dart";
+
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/widgets/list/tile_group_header.dart";
 
@@ -30,23 +30,6 @@ class _MePageState extends State<MePage> {
           title: Text(context.i18n.settings),
           subtitle: Text(context.i18n.settingsDescription),
           onTap: () => context.push("/settings"),
-        ),
-
-        /**
-         * 音效測試
-         */
-        ListTile(
-          leading: const Icon(Symbols.audiotrack_sharp),
-          title: Text(context.i18n.notify_test),
-          subtitle: Text(context.i18n.notify_test_description),
-          onTap:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  settings: const RouteSettings(name: "/sound"),
-                  builder: (context) => const SoundRoute(),
-                ),
-              ),
         ),
         ListTileGroupHeader(title: context.i18n.me_about),
         ListTile(

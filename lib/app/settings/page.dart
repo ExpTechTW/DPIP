@@ -12,6 +12,7 @@ import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
+import 'package:dpip/app/settings/sound/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
@@ -71,7 +72,7 @@ class SettingsIndexPage extends StatelessWidget {
         ),
       ],
     );
-
+    
     final notification = SettingsListSection(
       title: 'Notification',
       children: [
@@ -80,6 +81,12 @@ class SettingsIndexPage extends StatelessWidget {
           title: 'Notification',
           subtitle: Text('Notification'),
           onTap: () => context.push(SettingsNotifyPage.route),
+        ),
+        SettingsListTile(
+          icon: Symbols.audiotrack_sharp,
+          title: context.i18n.notify_test,
+          subtitle: Text(context.i18n.notify_test_description),
+          onTap: () => context.push(SettingsSoundPage.route),
         ),
       ],
     );
