@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:io";
 
+import "package:dpip/core/providers.dart";
 import "package:awesome_notifications/awesome_notifications.dart";
 import "package:dpip/core/ios_get_location.dart";
 import "package:dpip/global.dart";
@@ -41,14 +42,14 @@ class SoundListTileState extends State<SoundListTile> {
   }
 
   void _initUserLocation() async {
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && GlobalProviders.location.auto) {
       await getSavedLocation();
     }
 
     if (!mounted) return;
 
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = GlobalProviders.location.latitude ?? 0;
+    userLon = GlobalProviders.location.longitude ?? 0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
   }
@@ -56,7 +57,7 @@ class SoundListTileState extends State<SoundListTile> {
   void playSound() async {
     if (!widget.enable!) return;
     _initUserLocation();
-    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+    if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     } else {
       int limit = Global.preference.getInt("limit-sound-test") ?? 0;
