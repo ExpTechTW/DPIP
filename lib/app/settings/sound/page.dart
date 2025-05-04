@@ -25,7 +25,6 @@ class _SettingsSoundPage extends State<SettingsSoundPage> {
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
-            SliverAppBar.large(pinned: true, floating: true, title: Text(context.i18n.notify_test)),
             SliverPadding(
               padding: const EdgeInsets.only(bottom: 20), // 在这里添加底部 padding
               sliver: SliverList(
@@ -39,7 +38,13 @@ class _SettingsSoundPage extends State<SettingsSoundPage> {
                     tileTitleTextStyle,
                   ),
                   ListTileGroupHeader(title: context.i18n.eew_info_sound_title),
-                  _buildSoundTile(context, context.i18n.eew_info_sound_title, 'eq', Symbols.info, tileTitleTextStyle),
+                  _buildSoundTile(
+                    context,
+                    context.i18n.eew_info_sound_title,
+                    'eq',
+                    Symbols.info,
+                    tileTitleTextStyle
+                  ),
                   ListTileGroupHeader(title: context.i18n.sound_weather_warning),
                   _buildSoundTile(
                     context,
@@ -111,7 +116,6 @@ class SoundDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
       body: ListView(padding: EdgeInsets.only(bottom: context.padding.bottom), children: _buildListItems(context)),
     );
   }

@@ -17,6 +17,7 @@ import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
+import 'package:dpip/app/settings/sound/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
@@ -103,6 +104,7 @@ final router = GoRouter(
           SettingsLocaleSelectPage.route => context.i18n.settings_locale,
           SettingsUnitPage.route => '單位',
           SettingsNotifyPage.route => '通知',
+          SettingsSoundPage.route => context.i18n.notify_test,
           _ => context.i18n.settings,
         };
         return SettingsLayout(title: title, child: child);
@@ -154,6 +156,10 @@ final router = GoRouter(
         GoRoute(
           path: SettingsNotifyPage.route,
           pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsNotifyPage()),
+        ),
+        GoRoute(
+          path: SettingsSoundPage.route,
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsSoundPage()),
         ),
       ],
     ),
