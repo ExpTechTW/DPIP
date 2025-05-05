@@ -88,7 +88,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                     SettingsListTile(
                       title: product.title,
                       subtitle: Text(product.description),
-                      trailing: Text('${product.currencySymbol} ${product.price}'),
+                      trailing: Text(' ${product.price}'),
                       onTap: () {
                         if (product.isSubscription) {
                           InAppPurchase.instance.buyNonConsumable(
