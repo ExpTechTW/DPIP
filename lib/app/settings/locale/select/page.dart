@@ -72,19 +72,18 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                             children: [
                                               LinearProgressIndicator(
                                                 value: p.translation / 100,
-                                                borderRadius: BorderRadius.circular(8),
-                                                color: context.theme.extendedColors.blue,
-                                                backgroundColor: context.colors.outlineVariant,
+                                                color: Colors.blue,
+                                                year2023: false,
                                               ),
                                               LinearProgressIndicator(
                                                 value: p.approval / 100,
-                                                borderRadius: BorderRadius.circular(8),
-                                                color: context.theme.extendedColors.green,
+                                                color: Colors.lightGreen,
                                                 backgroundColor: Colors.transparent,
+                                                year2023: false,
                                               ),
                                             ],
                                           )
-                                          : const LinearProgressIndicator(),
+                                          : const LinearProgressIndicator(year2023: false),
                                 ),
                               ],
                             )

@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
@@ -72,7 +73,7 @@ class SettingsIndexPage extends StatelessWidget {
         ),
       ],
     );
-    
+
     final notification = SettingsListSection(
       title: 'Notification',
       children: [
@@ -112,8 +113,8 @@ class SettingsIndexPage extends StatelessWidget {
           icon: Symbols.volunteer_activism_rounded,
           title: context.i18n.donate,
           subtitle: Text(context.i18n.donate_h2),
-          trailing: const Icon(Symbols.arrow_outward_rounded),
-          onTap: () => launchUrl(Uri.parse('https://exptech.com.tw/donate')),
+          trailing: const Icon(Symbols.chevron_right_rounded),
+          onTap: () => context.push(SettingsDonatePage.route),
         ),
         SettingsListTile(
           icon: Symbols.book_rounded,

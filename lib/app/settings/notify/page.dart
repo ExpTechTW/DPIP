@@ -261,7 +261,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               child: AnimatedOpacity(
                 opacity: isLoading ? 1 : 0,
                 duration: Durations.short4,
-                child: const LinearProgressIndicator(),
+                child: const LinearProgressIndicator(year2023: false),
               ),
             ),
             ListView(
@@ -271,7 +271,10 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                   SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     content: '請先設定所在地來使用通知功能',
-                    trailing: TextButton(onPressed: () => context.push(SettingsLocationPage.route), child: const Text('設定')),
+                    trailing: TextButton(
+                      onPressed: () => context.push(SettingsLocationPage.route),
+                      child: const Text('設定'),
+                    ),
                   ),
                 SettingsListSection(
                   title: '地震速報',
