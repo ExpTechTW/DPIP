@@ -1,16 +1,17 @@
-import 'package:dpip/app/map/radar/page.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
+import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/map/radar/page.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/map.dart';
 
@@ -27,60 +28,76 @@ class _RadarMapCardState extends State<RadarMapCard> {
   late MapLibreMapController mapController;
   List<String> radarList = [];
 
-  @override
-  void dispose() {
-    mapController.dispose();
-    super.dispose();
-  }
-
   String _getTileUrl(String timestamp) {
     return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
   }
 
   Future<void> _initializeMap(LatLng userLocation) async {
-    await loadGPSImage(mapController);
+    try {
+      await loadGPSImage(mapController);
 
-    radarList = await ExpTech().getRadarList();
-    if (!mounted) return;
+      radarList = await ExpTech().getRadarList();
+      if (!mounted) return;
 
-    await _setupRadarLayer();
-    if (userLocation.isValid) {
-      await _setupUserLocationLayer(userLocation);
+      await _setupRadarLayer();
+      if (!mounted) return;
+
+      if (userLocation.isValid) {
+        await _setupUserLocationLayer(userLocation);
+      }
+    } catch (e) {
+      TalkerManager.instance.error('RadarMapCard._initializeMap', e);
     }
   }
 
   Future<void> _setupRadarLayer() async {
-    final newTileUrl = _getTileUrl(radarList.last);
-    await mapController.addSource('radar-source', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+    try {
+      final newTileUrl = _getTileUrl(radarList.last);
 
-    mapController.addLayer('radar-source', 'radar', const RasterLayerProperties(), belowLayerId: 'county-outline');
+      await mapController.addSource('radar-source', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+      if (!mounted) return;
+
+      await mapController.addLayer(
+        'radar-source',
+        'radar',
+        const RasterLayerProperties(),
+        belowLayerId: 'county-outline',
+      );
+    } catch (e) {
+      TalkerManager.instance.error('RadarMapCard._setupRadarLayer', e);
+    }
   }
 
   Future<void> _setupUserLocationLayer(LatLng userLocation) async {
-    await mapController.addSource(
-      'gps-geojson',
-      GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(userLocation.toFeatureBuilder()).build()),
-    );
+    try {
+      await mapController.addSource(
+        'gps-geojson',
+        GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(userLocation.toFeatureBuilder()).build()),
+      );
+      if (!mounted) return;
 
-    await mapController.addLayer(
-      'gps-geojson',
-      'gps',
-      const SymbolLayerProperties(
-        symbolZOrder: 'source',
-        iconSize: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: 'gps',
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
+      await mapController.addLayer(
+        'gps-geojson',
+        'gps',
+        const SymbolLayerProperties(
+          symbolZOrder: 'source',
+          iconSize: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: 'gps',
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+      );
+    } catch (e) {
+      TalkerManager.instance.error('RadarMapCard._setupUserLocationLayer', e);
+    }
   }
 
   @override
@@ -107,7 +124,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
                         final userLocation = LatLng(data.latitude ?? 0, data.longitude ?? 0);
 
                         return DpipMap(
-                          key: UniqueKey(),
+                          key: Key(userLocation.toString()),
                           onMapCreated: (controller) => mapController = controller,
                           onStyleLoadedCallback: () => _initializeMap(userLocation),
                           initialCameraPosition:
@@ -150,5 +167,11 @@ class _RadarMapCardState extends State<RadarMapCard> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
   }
 }

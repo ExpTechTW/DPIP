@@ -24,10 +24,11 @@ class BlurredTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // blur issue https://github.com/flutter/flutter/issues/115926
     return Container(
       height: 48,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(double.maxFinite)),
-      clipBehavior: Clip.hardEdge,
+      clipBehavior: Clip.antiAlias,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
         child: TextButton(
@@ -66,7 +67,7 @@ class BlurredIconButton extends StatelessWidget {
       width: 48,
       height: 48,
       decoration: BoxDecoration(shape: BoxShape.circle),
-      clipBehavior: Clip.hardEdge,
+      clipBehavior: Clip.antiAlias,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
         child: IconButton(
