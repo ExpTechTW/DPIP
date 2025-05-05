@@ -21,7 +21,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   Completer<List<ProductDetails>> products = Completer();
 
-  final Set<String> _kIds = <String>{'s_donate75', 'donate100', 'donate300', 'donate1000'};
+  final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
 
   Future<void> refresh() async {
     setState(() => products = Completer<List<ProductDetails>>());
