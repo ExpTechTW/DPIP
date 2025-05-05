@@ -65,11 +65,13 @@ class DpipApp extends StatelessWidget {
               colorSchemeSeed: model.themeColor,
               colorScheme: model.themeColor == null ? lightDynamic : null,
               brightness: Brightness.light,
+              snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
             );
             final darkTheme = ThemeData(
               colorSchemeSeed: model.themeColor,
               colorScheme: model.themeColor == null ? darkDynamic : null,
               brightness: Brightness.dark,
+              snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
             );
 
             return MaterialApp.router(

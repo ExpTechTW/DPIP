@@ -6,3 +6,5 @@ const kEmphasizedAnimationStyle = AnimationStyle(
   reverseCurve: Easing.emphasizedDecelerate,
   reverseDuration: Durations.short4,
 );
+
+const kPersistSnackBar = Duration(days: 365);

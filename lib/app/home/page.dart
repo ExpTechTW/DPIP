@@ -1,6 +1,9 @@
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
@@ -27,6 +30,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Preference.version ??= Global.packageInfo.version;
+      if (Global.packageInfo.version == Preference.version) return;
+
+      Preference.version = Global.packageInfo.version;
+      context.scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text('已更新至 v${Global.packageInfo.version}'),
+          action: SnackBarAction(
+            label: context.i18n.update_log,
+            onPressed: () => context.push('/changelog/v${Global.packageInfo.version}'),
+          ),
+          duration: kPersistSnackBar,
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(

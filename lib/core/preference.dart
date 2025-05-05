@@ -1,3 +1,4 @@
+import 'package:dpip/global.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:dpip/utils/extensions/preference.dart';
@@ -33,11 +34,16 @@ class PreferenceKeys {
 }
 
 class Preference {
+  Preference._();
+
   static late SharedPreferencesWithCache instance;
 
   static Future<void> init() async {
     instance = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
   }
+
+  static String? get version => instance.getString('app-version');
+  static set version(String? value) => instance.set('app-version', value);
 
   static bool get isTosAccepted => instance.getInt('accepted-tos-version') == 1;
   static set isTosAccepted(bool value) => instance.set('accepted-tos-version', value ? 1 : null);
