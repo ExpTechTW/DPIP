@@ -63,7 +63,8 @@ class _HomePageState extends State<HomePage> {
             const Padding(padding: EdgeInsets.symmetric(vertical: 32), child: WeatherHeader()),
 
             // 即時資訊
-            if (false) // TODO: 將監視器地圖的地震資訊移至 ChangeNotifier
+            if (false)
+              // TODO(kamiya10): 將監視器地圖的地震資訊移至 ChangeNotifier
               const Padding(padding: EdgeInsets.all(16), child: EewCard()),
 
             // 地圖

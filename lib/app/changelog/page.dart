@@ -124,7 +124,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
       final List<dynamic> data = (await ExpTech().getChangelog()).reversed.toList();
       SupportStatus.supportList = await ExpTech().getSupport();
       setState(() {
-        _changelogEntries = data.map((json) => ChangelogEntry.fromJson(json)).toList();
+        _changelogEntries = data.map((json) => ChangelogEntry.fromJson(json as Map<String, dynamic>)).toList();
         _isLoading = false;
       });
     } catch (e) {

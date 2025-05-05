@@ -129,7 +129,7 @@ class _ReportListPageState extends State<ReportListPage> {
   }
 
   @override
-  Widget build(context) {
+  Widget build(BuildContext context) {
     return NestedScrollView(
       headerSliverBuilder: (context, innerBoxIsScrolled) {
         return [
