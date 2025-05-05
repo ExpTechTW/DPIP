@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/symbols.dart';
 
+import 'package:dpip/app/settings/_widgets/list_section.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/tile_group_header.dart';
 import 'package:dpip/widgets/settings/sound/sound_list_tile.dart';
 
 class SettingsSoundPage extends StatefulWidget {
@@ -21,68 +21,66 @@ class _SettingsSoundPage extends State<SettingsSoundPage> {
   Widget build(BuildContext context) {
     const tileTitleTextStyle = TextStyle(fontWeight: FontWeight.bold);
 
-    return PopScope(
-      child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: 20), // 在这里添加底部 padding
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  ListTileGroupHeader(title: context.i18n.eew_sound_title),
-                  _buildSoundTile(
-                    context,
-                    context.i18n.emergency_earthquake_warning,
-                    'eew',
-                    Symbols.warning,
-                    tileTitleTextStyle,
-                  ),
-                  ListTileGroupHeader(title: context.i18n.eew_info_sound_title),
-                  _buildSoundTile(context, context.i18n.eew_info_sound_title, 'eq', Symbols.info, tileTitleTextStyle),
-                  ListTileGroupHeader(title: context.i18n.sound_weather_warning),
-                  _buildSoundTile(
-                    context,
-                    context.i18n.sound_rain_instant,
-                    'rain',
-                    Symbols.thunderstorm,
-                    tileTitleTextStyle,
-                  ),
-                  _buildSoundTile(
-                    context,
-                    context.i18n.sound_weather_alert,
-                    'weather',
-                    Symbols.cloudy_snowing,
-                    tileTitleTextStyle,
-                  ),
-                  ListTileGroupHeader(title: context.i18n.sound_disaster),
-                  _buildSoundTile(
-                    context,
-                    context.i18n.sound_evacuation,
-                    'evacuation',
-                    Symbols.directions_run,
-                    tileTitleTextStyle,
-                  ),
-                  _buildSoundTile(
-                    context,
-                    context.i18n.tsunami_warning,
-                    'tsunami',
-                    Symbols.tsunami,
-                    tileTitleTextStyle,
-                  ),
-                  ListTileGroupHeader(title: context.i18n.other_title),
-                  _buildSoundTile(
-                    context,
-                    context.i18n.sound_other_notifications,
-                    'other',
-                    Symbols.notifications,
-                    tileTitleTextStyle,
-                  ),
-                ]),
-              ),
+    return ListView(
+      padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
+      children: [
+        SettingsListSection(
+          title: context.i18n.eew_sound_title,
+          children: [
+            _buildSoundTile(
+              context,
+              context.i18n.emergency_earthquake_warning,
+              'eew',
+              Symbols.warning,
+              tileTitleTextStyle,
             ),
           ],
         ),
-      ),
+        SettingsListSection(
+          title: context.i18n.eew_info_sound_title,
+          children: [
+            _buildSoundTile(context, context.i18n.eew_info_sound_title, 'eq', Symbols.info, tileTitleTextStyle),
+          ],
+        ),
+        SettingsListSection(
+          title: context.i18n.sound_weather_warning,
+          children: [
+            _buildSoundTile(context, context.i18n.sound_rain_instant, 'rain', Symbols.thunderstorm, tileTitleTextStyle),
+            _buildSoundTile(
+              context,
+              context.i18n.sound_weather_alert,
+              'weather',
+              Symbols.cloudy_snowing,
+              tileTitleTextStyle,
+            ),
+          ],
+        ),
+        SettingsListSection(
+          title: context.i18n.sound_disaster,
+          children: [
+            _buildSoundTile(
+              context,
+              context.i18n.sound_evacuation,
+              'evacuation',
+              Symbols.directions_run,
+              tileTitleTextStyle,
+            ),
+            _buildSoundTile(context, context.i18n.tsunami_warning, 'tsunami', Symbols.tsunami, tileTitleTextStyle),
+          ],
+        ),
+        SettingsListSection(
+          title: context.i18n.other_title,
+          children: [
+            _buildSoundTile(
+              context,
+              context.i18n.sound_other_notifications,
+              'other',
+              Symbols.notifications,
+              tileTitleTextStyle,
+            ),
+          ],
+        ),
+      ],
     );
   }
 
