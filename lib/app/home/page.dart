@@ -1,3 +1,4 @@
+import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:flutter/material.dart';
@@ -66,6 +67,9 @@ class _HomePageState extends State<HomePage> {
             if (false)
               // TODO(kamiya10): 將監視器地圖的地震資訊移至 ChangeNotifier
               const Padding(padding: EdgeInsets.all(16), child: EewCard()),
+            if (false)
+              // TODO(kamiya10): 實作雷雨即時訊息顯示
+              const Padding(padding: EdgeInsets.all(16), child: ThunderstormCard()),
 
             // 地圖
             const Padding(padding: EdgeInsets.all(16), child: RadarMapCard()),
