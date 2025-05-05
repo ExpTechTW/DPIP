@@ -59,11 +59,11 @@ class _PressureMapState extends State<PressureMap> {
     await loadGPSImage(_mapController);
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -83,7 +83,7 @@ class _PressureMapState extends State<PressureMap> {
 
     weather_list = await ExpTech().getWeatherList();
 
-    List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
     pressureDataList =
         weatherData
@@ -343,7 +343,7 @@ class _PressureMapState extends State<PressureMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
-                List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
                 pressureDataList = [];
 
@@ -374,7 +374,6 @@ class _PressureMapState extends State<PressureMap> {
           DraggableScrollableSheet(
             initialChildSize: 0.3,
             minChildSize: 0.1,
-            maxChildSize: 1,
             snap: true,
             snapSizes: const [0.1, 0.3, 0.7, 1],
             builder: (BuildContext context, ScrollController scrollController) {

@@ -31,18 +31,15 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   bool _isRequestingPermission = false;
   bool _isNotificationPermission = false;
 
-  void getNotify() async {
+  Future<void> getNotify() async {
     if (!_isNotificationPermission) {
       await Permission.notification.request();
       if (Platform.isIOS) {
-        NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-          alert: true,
+        final NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
           announcement: true,
-          badge: true,
           carPlay: true,
           criticalAlert: true,
           provisional: true,
-          sound: true,
         );
         if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
           _isNotificationPermission = true;
@@ -69,7 +66,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     });
   }
 
-  void _autoStartStatusCheck() async {
+  Future<void> _autoStartStatusCheck() async {
     _autoStartStatus = await Autostarter.checkAutoStartState() ?? true;
     _autoStartPermission = Future.value(_autoStartStatus);
   }
@@ -109,7 +106,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     List<Permission> permissions = [];
 
     try {
-      PermissionStatus status = await Permission.location.status;
+      final PermissionStatus status = await Permission.location.status;
       if (status.isGranted) {
         if (Platform.isAndroid) {
           final androidInfo = await deviceInfo.androidInfo;
@@ -146,7 +143,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
 
   List<PermissionItem> _createPermissionItems(List<Permission> permissions, BuildContext context) {
     final items = <PermissionItem>[];
-    for (Permission permission in permissions) {
+    for (final Permission permission in permissions) {
       IconData icon;
       String text;
       String description;
@@ -160,27 +157,27 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           description = context.i18n.notification_service_description;
           color = Colors.orange;
           isHighlighted = true;
-          break;
+
         case Permission.locationAlways:
         case Permission.location:
           icon = Icons.location_on;
           text = context.i18n.settings_position;
           description = context.i18n.location_based_service;
           color = Colors.blue;
-          break;
+
         case Permission.ignoreBatteryOptimizations:
           icon = Icons.battery_full;
           text = context.i18n.power_saving_position;
           description = context.i18n.power_saving_position_text;
           color = Colors.greenAccent;
-          break;
+
         case Permission.storage:
         case Permission.photosAddOnly:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
           text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;
           color = Colors.green;
-          break;
+
         default:
           continue;
       }
@@ -210,7 +207,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
         ),
         child: ListTile(
           leading: CircleAvatar(
-            backgroundColor: item.color.withOpacity(0.1),
+            backgroundColor: item.color.withValues(alpha: 0.1),
             child: Icon(item.icon, color: item.color),
           ),
           title: Text(item.text),
@@ -256,14 +253,11 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
               await openAppSettings();
             }
           } else if (Platform.isIOS) {
-            NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
-              alert: true,
+            final NotificationSettings iosrp = await FirebaseMessaging.instance.requestPermission(
               announcement: true,
-              badge: true,
               carPlay: true,
               criticalAlert: true,
               provisional: true,
-              sound: true,
             );
             if (iosrp.criticalAlert == AppleNotificationSetting.enabled) {
               _isNotificationPermission = true;
@@ -404,14 +398,14 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                         Text(
                           context.i18n.privacy_commitment,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withOpacity(0.7),
+                            color: context.colors.primary.withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           context.i18n.disaster_info_platform,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withOpacity(0.7),
+                            color: context.colors.primary.withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -448,7 +442,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             //         ),
             //         child: ListTile(
             //           leading: CircleAvatar(
-            //             backgroundColor: Colors.orange.withOpacity(0.1),
+            //             backgroundColor: Colors.orange.withValues(alpha: 0.1),
             //             child: const Icon(Icons.start, color: Colors.orange),
             //           ),
             //           title: Text(context.i18n.automatic_start_position),

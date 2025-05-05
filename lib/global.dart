@@ -18,7 +18,7 @@ class Global {
   static late Map<String, dynamic> box;
   static ExpTech api = ExpTech();
 
-  static loadLocationData() async {
+  static Future<void> loadLocationData() async {
     final json = await rootBundle.loadString("assets/location.json");
     final data = jsonDecode(json) as Map<String, dynamic>;
 

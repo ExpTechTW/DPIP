@@ -233,7 +233,7 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
   }
 
   String get _selectedTyphoonName {
-    int index = widget.typhoonIdList.indexOf(_selectedTyphoonId);
+    final int index = widget.typhoonIdList.indexOf(_selectedTyphoonId);
     if (index != -1 && index < widget.typhoonList.length) {
       return widget.typhoonList[index];
     }

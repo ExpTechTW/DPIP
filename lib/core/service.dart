@@ -26,7 +26,7 @@ bool _isAndroidServiceInitialized = false;
 
 enum ServiceEvent { setAsForeground, setAsBackground, sendPosition, sendDebug, removePosition, stopService }
 
-void initBackgroundService() async {
+Future<void> initBackgroundService() async {
   final isAutoLocationEnabled = GlobalProviders.location.auto;
   if (!isAutoLocationEnabled) {
     TalkerManager.instance.info('自動定位未啟用，不初始化背景服務');
@@ -45,7 +45,7 @@ void initBackgroundService() async {
   }
 }
 
-void startAndroidBackgroundService({required bool shouldInitialize}) async {
+Future<void> startAndroidBackgroundService({required bool shouldInitialize}) async {
   if (!_isAndroidServiceInitialized) {
     _initializeAndroidForegroundService();
     _setupPositionListener();
@@ -60,7 +60,7 @@ void startAndroidBackgroundService({required bool shouldInitialize}) async {
   }
 }
 
-void stopAndroidBackgroundService() async {
+Future<void> stopAndroidBackgroundService() async {
   final isServiceRunning = await _backgroundService.isRunning();
   if (!isServiceRunning) return;
 
@@ -122,7 +122,6 @@ Future<void> _initializeAndroidForegroundService() async {
   await _backgroundService.configure(
     androidConfiguration: AndroidConfiguration(
       onStart: _onServiceStart,
-      autoStart: true,
       isForegroundMode: true,
       foregroundServiceTypes: [AndroidForegroundType.location],
       notificationChannelId: 'my_foreground',
@@ -130,7 +129,7 @@ Future<void> _initializeAndroidForegroundService() async {
       initialNotificationContent: '前景服務啟動中...',
       foregroundServiceNotificationId: 888,
     ),
-    iosConfiguration: IosConfiguration(autoStart: true, onForeground: _onServiceStart, onBackground: _onIosBackground),
+    iosConfiguration: IosConfiguration(onForeground: _onServiceStart, onBackground: _onIosBackground),
   );
 }
 
@@ -142,7 +141,7 @@ Future<bool> _onIosBackground(ServiceInstance service) async {
 }
 
 @pragma('vm:entry-point')
-void _onServiceStart(ServiceInstance service) async {
+Future<void> _onServiceStart(ServiceInstance service) async {
   // Initialize required services and dependencies
   await Global.init();
   await Preference.init();
@@ -186,7 +185,7 @@ void _onServiceStart(ServiceInstance service) async {
     });
 
     // Define the periodic location update task
-    void updateLocation() async {
+    Future<void> updateLocation() async {
       if (!await service.isForegroundService()) return;
 
       // Get current position and location info
@@ -208,7 +207,7 @@ void _onServiceStart(ServiceInstance service) async {
       }
 
       // Update notification with current position
-      final notificationTitle = '自動定位中';
+      const notificationTitle = '自動定位中';
       final timestamp = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
       final notificationBody = '$timestamp\n$latitude,$longitude $locationName';
 
@@ -223,7 +222,7 @@ void _onServiceStart(ServiceInstance service) async {
       );
       service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
 
-      double dist = distance(
+      final double dist = distance(
         position.lat ?? 0,
         position.lng ?? 0,
         GlobalProviders.location.oldLatitude ?? 0,

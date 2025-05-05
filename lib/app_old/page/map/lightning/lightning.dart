@@ -13,8 +13,8 @@ import "package:dpip/widgets/list/time_selector.dart";
 import "package:dpip/widgets/map/legend.dart";
 import "package:dpip/widgets/map/map.dart";
 
-import "../../../../core/ios_get_location.dart";
-import "../../../../global.dart";
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 
 class LightningData {
   final double latitude;
@@ -128,7 +128,7 @@ class _LightningMapState extends State<LightningMap> {
   }
 
   Future<void> _loadLightningData(String time) async {
-    List<Lightning> lightningData = await ExpTech().getLightning(time);
+    final List<Lightning> lightningData = await ExpTech().getLightning(time);
     lightningDataList =
         lightningData
             .map(

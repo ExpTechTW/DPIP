@@ -24,7 +24,7 @@ class RtsStation {
 
   RtsStation({required this.pga, required this.pgv, required this.i, required this.I, this.alert});
 
-  factory RtsStation.fromJson(dynamic json) => _$RtsStationFromJson(json);
+  factory RtsStation.fromJson(Map<String, dynamic> json) => _$RtsStationFromJson(json);
 
   Map<String, dynamic> toJson() => _$RtsStationToJson(this);
 }

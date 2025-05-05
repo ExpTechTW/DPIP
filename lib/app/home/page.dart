@@ -36,14 +36,14 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 48 + context.padding.top),
 
             // 天氣標頭
-            Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader()),
+            const Padding(padding: EdgeInsets.symmetric(vertical: 32), child: WeatherHeader()),
 
             // 即時資訊
             if (false) // TODO: 將監視器地圖的地震資訊移至 ChangeNotifier
-              Padding(padding: const EdgeInsets.all(16), child: EewCard()),
+              const Padding(padding: EdgeInsets.all(16), child: EewCard()),
 
             // 地圖
-            Padding(padding: const EdgeInsets.all(16), child: RadarMapCard()),
+            const Padding(padding: EdgeInsets.all(16), child: RadarMapCard()),
 
             // 歷史資訊
             Selector<SettingsLocationModel, String?>(
@@ -102,7 +102,13 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        Positioned(top: 48, left: 0, right: 0, child: Align(alignment: Alignment.topCenter, child: LocationButton())),
+
+        const Positioned(
+          top: 48,
+          left: 0,
+          right: 0,
+          child: Align(alignment: Alignment.topCenter, child: LocationButton()),
+        ),
       ],
     );
   }

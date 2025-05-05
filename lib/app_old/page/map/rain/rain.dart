@@ -61,11 +61,11 @@ class _RainMapState extends State<RainMap> {
     await loadGPSImage(_mapController);
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -118,7 +118,7 @@ class _RainMapState extends State<RainMap> {
   }
 
   Future<void> updateRainData(String timestamp, String interval) async {
-    List<RainStation> rainData = await ExpTech().getRain(timestamp);
+    final List<RainStation> rainData = await ExpTech().getRain(timestamp);
 
     rainDataList =
         rainData
@@ -127,31 +127,22 @@ class _RainMapState extends State<RainMap> {
               switch (interval) {
                 case "now":
                   rainfall = station.data.now;
-                  break;
                 case "10m":
                   rainfall = station.data.tenMinutes;
-                  break;
                 case "1h":
                   rainfall = station.data.oneHour;
-                  break;
                 case "3h":
                   rainfall = station.data.threeHours;
-                  break;
                 case "6h":
                   rainfall = station.data.sixHours;
-                  break;
                 case "12h":
                   rainfall = station.data.twelveHours;
-                  break;
                 case "24h":
                   rainfall = station.data.twentyFourHours;
-                  break;
                 case "2d":
                   rainfall = station.data.twoDays;
-                  break;
                 case "3d":
                   rainfall = station.data.threeDays;
-                  break;
                 default:
                   rainfall = station.data.now;
               }
@@ -479,7 +470,6 @@ class _RainMapState extends State<RainMap> {
           DraggableScrollableSheet(
             initialChildSize: 0.3,
             minChildSize: 0.1,
-            maxChildSize: 1,
             snap: true,
             snapSizes: const [0.1, 0.3, 0.7, 1],
             builder: (BuildContext context, ScrollController scrollController) {

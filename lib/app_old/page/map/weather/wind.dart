@@ -56,7 +56,7 @@ class _WindMapState extends State<WindMap> {
     await loadWindImage(_mapController);
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
@@ -79,7 +79,7 @@ class _WindMapState extends State<WindMap> {
     setState(() {});
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -99,7 +99,7 @@ class _WindMapState extends State<WindMap> {
 
     weather_list = await ExpTech().getWeatherList();
 
-    List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
     _updateWindData(weatherData);
 
@@ -393,7 +393,7 @@ class _WindMapState extends State<WindMap> {
                 });
               },
               onTimeSelected: (time) async {
-                List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
                 await _updateWindData(weatherData);
               },
             ),
@@ -402,7 +402,6 @@ class _WindMapState extends State<WindMap> {
           DraggableScrollableSheet(
             initialChildSize: 0.3,
             minChildSize: 0.1,
-            maxChildSize: 1,
             snap: true,
             snapSizes: const [0.1, 0.3, 0.7, 1],
             builder: (BuildContext context, ScrollController scrollController) {

@@ -8,16 +8,16 @@ class TsunamiObservedList extends StatelessWidget {
 
   const TsunamiObservedList({super.key, required this.tsunamiList});
 
-  convertTimestamp(int timestamp) {
-    var location = tz.getLocation("Asia/Taipei");
-    DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
+  String convertTimestamp(int timestamp) {
+    final location = tz.getLocation("Asia/Taipei");
+    final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat("dd日HH:mm");
-    String formattedDate = formatter.format(dateTime);
+    final DateFormat formatter = DateFormat("dd日HH:mm");
+    final String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
 
-  heightToColor(height) {
+  Color heightToColor(height) {
     if (height >= 300) {
       return const Color(0xFFE543FF);
     } else if (height >= 100) {
@@ -29,7 +29,7 @@ class TsunamiObservedList extends StatelessWidget {
     }
   }
 
-  heightToTextColor(height) {
+  Color heightToTextColor(height) {
     if (height >= 100) {
       return const Color(0xFFFFFFFF);
     } else if (height >= 30) {
@@ -48,7 +48,6 @@ class TsunamiObservedList extends StatelessWidget {
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(item.name, style: const TextStyle(fontSize: 18, letterSpacing: 2)),
                     Row(

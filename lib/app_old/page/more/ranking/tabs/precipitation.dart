@@ -35,7 +35,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
     rank();
   }
 
-  rank() {
+  void rank() {
     setState(() {
       ranked = data.entries
           .map((e) {
@@ -43,31 +43,22 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
             switch (interval) {
               case Intervals.now:
                 value = e.value.now;
-                break;
               case Intervals.tenMinutes:
                 value = e.value.tenMinutes;
-                break;
               case Intervals.oneHour:
                 value = e.value.oneHour;
-                break;
               case Intervals.threeHours:
                 value = e.value.threeHours;
-                break;
               case Intervals.sixHours:
                 value = e.value.sixHours;
-                break;
               case Intervals.twelveHours:
                 value = e.value.twelveHours;
-                break;
               case Intervals.twentyFourHours:
                 value = e.value.twentyFourHours;
-                break;
               case Intervals.twoDays:
                 value = e.value.twoDays;
-                break;
               case Intervals.threeDays:
                 value = e.value.threeDays;
-                break;
             }
             return (e.key, value);
           })
@@ -76,7 +67,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
     });
   }
 
-  setInterval(Intervals i) {
+  void setInterval(Intervals i) {
     interval = i;
     rank();
   }

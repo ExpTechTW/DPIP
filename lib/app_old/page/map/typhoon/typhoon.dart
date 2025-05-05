@@ -37,7 +37,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
     _mapController = controller;
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     try {
       typhoonImagesList = await ExpTech().getTyphoonImagesList();
       typhoonData = await ExpTech().getTyphoonGeojson();
@@ -180,7 +180,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
     await _mapController.addLayer(
       "typhoon-geojson",
       "typhoon-wind-circle",
-      FillLayerProperties(fillColor: 'rgba(255, 0, 0, 0.1)', fillOutlineColor: 'rgba(255, 0, 0, 0.6)'),
+      const FillLayerProperties(fillColor: 'rgba(255, 0, 0, 0.1)', fillOutlineColor: 'rgba(255, 0, 0, 0.6)'),
       filter: [
         'all',
         [
@@ -228,8 +228,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   void _addTransparentLayerFromDataset() {
-    List<double> lonRange = [110, 150];
-    List<double> latRange = [10, 32];
+    final List<double> lonRange = [110, 150];
+    final List<double> latRange = [10, 32];
 
     final bounds = LatLngBounds(
       southwest: LatLng(latRange[0], lonRange[0]),

@@ -22,7 +22,7 @@ class Rts {
 
   Rts({required this.station, required this.box, required this.time, required this.intensity});
 
-  factory Rts.fromJson(dynamic json) => _$RtsFromJson(json);
+  factory Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 
   Map<String, dynamic> toJson() => _$RtsToJson(this);
 }

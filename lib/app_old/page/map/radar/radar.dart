@@ -77,7 +77,7 @@ class _RadarMapState extends State<RadarMap> {
     super.dispose();
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
@@ -106,14 +106,15 @@ class _RadarMapState extends State<RadarMap> {
     }
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
     radar_list = await ExpTech().getRadarList();
+    if (!mounted) return;
 
-    String newTileUrl = getTileUrl(radar_list.last);
+    final String newTileUrl = getTileUrl(radar_list.last);
 
     _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
@@ -149,7 +150,7 @@ class _RadarMapState extends State<RadarMap> {
     start();
   }
 
-  void start() async {
+  Future<void> start() async {
     userLat = GlobalProviders.location.latitude ?? 0;
     userLon = GlobalProviders.location.longitude ?? 0;
 
@@ -172,6 +173,8 @@ class _RadarMapState extends State<RadarMap> {
       final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
+
+    if (!mounted) return;
 
     if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
@@ -258,7 +261,7 @@ class _RadarMapState extends State<RadarMap> {
                 setState(() {});
               },
               onTimeSelected: (time) {
-                String newTileUrl = getTileUrl(time);
+                final String newTileUrl = getTileUrl(time);
 
                 _mapController.removeLayer("radarLayer");
                 _mapController.removeSource("radarSource");

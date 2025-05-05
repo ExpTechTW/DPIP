@@ -37,7 +37,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     rank();
   }
 
-  rank() {
+  void rank() {
     final temp =
         (merge != MergeType.none)
             ? groupBy(
@@ -61,7 +61,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     });
   }
 
-  setMerge(MergeType state) {
+  void setMerge(MergeType state) {
     if (state == merge) {
       merge = MergeType.none;
     } else {
@@ -70,7 +70,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     rank();
   }
 
-  setReversed(bool state) {
+  void setReversed(bool state) {
     reversed = state;
     rank();
   }

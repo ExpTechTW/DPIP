@@ -68,7 +68,7 @@ class _ReportListPageState extends State<ReportListPage> {
 
     setState(() => isLoading = true);
 
-    var newList = await ExpTech().getReportList(
+    final newList = await ExpTech().getReportList(
       limit: 500,
       page: _currentPage,
       minIntensity: (_intensityRange.start + 1).round(),
@@ -102,7 +102,7 @@ class _ReportListPageState extends State<ReportListPage> {
   }
 
   String _getFilterSummary() {
-    List<String> summaries = [];
+    final List<String> summaries = [];
 
     if (_intensityRange.start > 0 || _intensityRange.end < 8) {
       summaries.add(
@@ -235,7 +235,6 @@ class _ReportListPageState extends State<ReportListPage> {
                     Text(context.i18n.max_earthquake_intensity),
                     RangeSlider(
                       values: _intensityRange,
-                      min: 0,
                       max: 8,
                       divisions: 8,
                       labels: RangeLabels(
@@ -251,7 +250,6 @@ class _ReportListPageState extends State<ReportListPage> {
                     Text(context.i18n.scale),
                     RangeSlider(
                       values: _magnitudeRange,
-                      min: 0,
                       max: 10,
                       divisions: 10,
                       labels: RangeLabels(
@@ -267,7 +265,6 @@ class _ReportListPageState extends State<ReportListPage> {
                     Text(context.i18n.depth),
                     RangeSlider(
                       values: _depthRange,
-                      min: 0,
                       max: 700,
                       divisions: 70,
                       labels: RangeLabels("${_depthRange.start.round()}km", "${_depthRange.end.round()}km"),

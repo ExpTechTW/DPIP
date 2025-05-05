@@ -93,7 +93,6 @@ class NotificationCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
@@ -147,7 +146,7 @@ class NotificationCard extends StatelessWidget {
       ),
       backgroundColor: record.critical ? Colors.red.withOpacity(0.16) : Colors.grey.withOpacity(0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 
@@ -261,7 +260,7 @@ class NotificationDetailPage extends StatelessWidget {
       ),
       backgroundColor: record.critical ? Colors.red.withOpacity(0.16) : Colors.grey.withOpacity(0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 

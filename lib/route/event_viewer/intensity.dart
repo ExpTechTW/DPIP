@@ -90,7 +90,7 @@ class _IntensityPageState extends State<IntensityPage> {
     }
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -109,11 +109,11 @@ class _IntensityPageState extends State<IntensityPage> {
     start();
   }
 
-  void start() async {
+  Future<void> start() async {
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
-    isUserLocationValid = (userLon != 0 && userLat != 0);
+    isUserLocationValid = userLon != 0 && userLat != 0;
 
     if (isUserLocationValid) {
       await _mapController.setGeoJsonSource("markers-geojson", {
@@ -154,12 +154,12 @@ class _IntensityPageState extends State<IntensityPage> {
     }
   }
 
-  void getEventInfo() async {
-    Map<String, dynamic> originalArea = data?.addition?['area'];
-    Map<String, int> invertedArea = {};
+  Future<void> getEventInfo() async {
+    final Map<String, dynamic> originalArea = data?.addition?['area'];
+    final Map<String, int> invertedArea = {};
 
     originalArea.forEach((key, value) {
-      for (var code in value) {
+      for (final code in value) {
         invertedArea[code.toString()] = int.parse(key);
       }
     });
@@ -396,7 +396,7 @@ class _IntensityPageState extends State<IntensityPage> {
 
   Widget _buildAffectedAreas() {
     final grouped = groupBy(data!.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
-    List<Widget> areas = [];
+    final List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {
       areas.add(

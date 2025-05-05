@@ -27,7 +27,7 @@ class SettingsUnitPage extends StatelessWidget {
                 return SettingsListTile(
                   icon: Symbols.thermostat_rounded,
                   title: '使用華氏度',
-                  subtitle: Text('切換溫度顯示單位為華氏度 (°F)'),
+                  subtitle: const Text('切換溫度顯示單位為華氏度 (°F)'),
                   trailing: Switch(
                     value: useFahrenheit,
                     onChanged: (value) => context.read<SettingsUserInterfaceModel>().setUseFahrenheit(value),

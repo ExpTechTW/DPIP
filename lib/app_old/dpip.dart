@@ -45,10 +45,10 @@ class _DpipState extends State<Dpip> {
   }
 
   int compareVersions(String version1, String version2) {
-    List<int> v1Parts = version1.split(".").map(int.parse).toList();
-    List<int> v2Parts = version2.split(".").map(int.parse).toList();
+    final List<int> v1Parts = version1.split(".").map(int.parse).toList();
+    final List<int> v2Parts = version2.split(".").map(int.parse).toList();
 
-    int maxLength = v1Parts.length > v2Parts.length ? v1Parts.length : v2Parts.length;
+    final int maxLength = v1Parts.length > v2Parts.length ? v1Parts.length : v2Parts.length;
     v1Parts.length = maxLength;
     v2Parts.length = maxLength;
     v1Parts.fillRange(v1Parts.length, maxLength, 0);
@@ -67,8 +67,8 @@ class _DpipState extends State<Dpip> {
 
   Future<void> checkForUpdates() async {
     try {
-      var data = await ExpTech().getSupport();
-      List<String> criticalList = (data["support-version"] as List<dynamic>).cast<String>();
+      final data = await ExpTech().getSupport();
+      final List<String> criticalList = (data["support-version"] as List<dynamic>).cast<String>();
 
       if (Global.packageInfo.version.endsWith(".0")) {
         lastVersion = data["last-version"]["release"];
@@ -81,7 +81,7 @@ class _DpipState extends State<Dpip> {
 
       criticalUpdate = !criticalList.contains(Global.packageInfo.version);
 
-      bool skip =
+      final bool skip =
           (DateTime.now().millisecondsSinceEpoch - (Global.preference.getInt("update-skip") ?? 0)) < 86400 * 3 * 1000;
 
       if ((update && !skip) || criticalUpdate) {
@@ -114,7 +114,7 @@ class _DpipState extends State<Dpip> {
           }
         }
       } else {
-        var data = await ExpTech().getAnnouncement();
+        final data = await ExpTech().getAnnouncement();
         if (data.last.show && Global.preference.getString("announcement") != data.last.time.toString()) {
           Global.preference.setString("announcement", data.last.time.toString());
           if (context.mounted) {

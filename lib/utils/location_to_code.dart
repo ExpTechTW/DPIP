@@ -37,7 +37,7 @@ class GeoJsonHelper {
     if (_geoJsonData == null) return null;
     for (final feature in _geoJsonData!['features']) {
       if (feature['geometry']['type'] == 'Polygon' || feature['geometry']['type'] == 'MultiPolygon') {
-        List<List<List<double>>> polygons = _getPolygons(feature['geometry']);
+        final List<List<List<double>>> polygons = _getPolygons(feature['geometry']);
 
         for (final polygon in polygons) {
           if (_isPointInPolygon(lat, lng, polygon)) {
@@ -50,12 +50,12 @@ class GeoJsonHelper {
   }
 
   static List<List<List<double>>> _getPolygons(Map<String, dynamic> geometry) {
-    List<List<List<double>>> polygons = [];
+    final List<List<List<double>>> polygons = [];
 
     if (geometry['type'] == 'Polygon') {
       polygons.add(_convertToDoubleList(geometry['coordinates'][0]));
     } else if (geometry['type'] == 'MultiPolygon') {
-      for (var polygon in geometry['coordinates']) {
+      for (final polygon in geometry['coordinates']) {
         polygons.add(_convertToDoubleList(polygon[0]));
       }
     }
@@ -80,7 +80,7 @@ class GeoJsonHelper {
       double xi = polygon[i][0], yi = polygon[i][1];
       double xj = polygon[j][0], yj = polygon[j][1];
 
-      bool intersect = ((yi > lat) != (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+      final bool intersect = ((yi > lat) != (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
       if (intersect) isInside = !isInside;
 
       j = i;

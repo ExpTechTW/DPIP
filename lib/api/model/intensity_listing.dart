@@ -11,7 +11,7 @@ class IntensityListing {
 
   IntensityListing({required this.code, required this.area, required this.station, required this.i});
 
-  factory IntensityListing.fromJson(dynamic json) => _$IntensityListingFromJson(json);
+  factory IntensityListing.fromJson(Map<String, dynamic> json) => _$IntensityListingFromJson(json);
 
   Map<String, dynamic> toJson() => _$IntensityListingToJson(this);
 }

@@ -1,7 +1,6 @@
 import "dart:convert";
 import "dart:io";
 
-import "package:dpip/api/model/notify/notify_settings.dart";
 import "package:http/http.dart";
 
 import "package:dpip/api/model/announcement.dart";
@@ -10,6 +9,7 @@ import "package:dpip/api/model/eew.dart";
 import "package:dpip/api/model/history.dart";
 import "package:dpip/api/model/meteor_station.dart";
 import "package:dpip/api/model/notification_record.dart";
+import "package:dpip/api/model/notify/notify_settings.dart";
 import "package:dpip/api/model/report/earthquake_report.dart";
 import "package:dpip/api/model/report/partial_earthquake_report.dart";
 import "package:dpip/api/model/rts/rts.dart";
@@ -32,7 +32,7 @@ class ExpTech {
   Future<EarthquakeReport> getReport(String reportId) async {
     final requestUrl = Route.report(reportId);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
@@ -40,7 +40,7 @@ class ExpTech {
 
     final json = jsonDecode(res.body);
 
-    return EarthquakeReport.fromJson(json);
+    return EarthquakeReport.fromJson(json as Map<String, dynamic>);
   }
 
   Future<List<PartialEarthquakeReport>> getReportList({
@@ -64,15 +64,15 @@ class ExpTech {
       maxDepth: maxDepth,
     );
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final json = jsonDecode(res.body) as List;
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return json.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
+    return jsonData.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   Future<Rts> getRts(int time) async {
@@ -90,13 +90,13 @@ class ExpTech {
       );
     }
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    return Rts.fromJson(jsonDecode(res.body));
+    return Rts.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
   Future<List<Eew>> getEew(int time) async {
@@ -114,10 +114,10 @@ class ExpTech {
       );
     }
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode == 200) {
-      return (jsonDecode(res.body) as List<dynamic>).map((e) => Eew.fromJson(e)).toList();
+      return (jsonDecode(res.body) as List<dynamic>).map((e) => Eew.fromJson(e as Map<String, dynamic>)).toList();
     } else {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
@@ -126,7 +126,7 @@ class ExpTech {
   Future<int> getNtp() async {
     final requestUrl = Route.ntp();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode == 200) {
       return int.parse(res.body);
@@ -138,7 +138,7 @@ class ExpTech {
   Future<Map<String, Station>> getStations() async {
     final requestUrl = Route.station();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
@@ -152,13 +152,13 @@ class ExpTech {
   Future<Tsunami> getTsunami(String tsuId) async {
     final requestUrl = Route.tsunami(tsuId);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final json = jsonDecode(res.body);
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
 
     return Tsunami.fromJson(json);
   }
@@ -166,7 +166,7 @@ class ExpTech {
   Future<List<String>> getTsunamiList() async {
     final requestUrl = Route.tsunamiList();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
@@ -180,7 +180,7 @@ class ExpTech {
   Future<List<CrowdinLocalizationProgress>> getLocalizationProgress() async {
     final requestUrl = Route.locale();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
@@ -194,13 +194,13 @@ class ExpTech {
   Future<List<String>> getRadarList() async {
     final requestUrl = Route.radarList();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
     return jsonData.map((item) => item.toString()).toList();
   }
@@ -208,13 +208,13 @@ class ExpTech {
   Future<List<String>> getWeatherList() async {
     final requestUrl = Route.weatherList();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
     return jsonData.map((item) => item.toString()).toList();
   }
@@ -222,27 +222,27 @@ class ExpTech {
   Future<List<WeatherStation>> getWeather(String time) async {
     final requestUrl = Route.weather(time);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => WeatherStation.fromJson(item)).toList();
+    return jsonData.map((item) => WeatherStation.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<RealtimeWeather> getWeatherRealtime(String region) async {
     final requestUrl = Route.weatherRealtime(region);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final json = jsonDecode(res.body);
+    final json = jsonDecode(res.body) as Map<String, dynamic>;
 
     return RealtimeWeather.fromJson(json);
   }
@@ -250,13 +250,13 @@ class ExpTech {
   Future<List<String>> getRainList() async {
     final requestUrl = Route.rainList();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
     return jsonData.map((item) => item.toString()).toList();
   }
@@ -264,27 +264,27 @@ class ExpTech {
   Future<List<RainStation>> getRain(String time) async {
     final requestUrl = Route.rain(time);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => RainStation.fromJson(item)).toList();
+    return jsonData.map((item) => RainStation.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List> getTyphoonImagesList() async {
     final requestUrl = Route.typhoonImagesList();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
     return jsonData.map((item) => item).toList();
   }
@@ -292,13 +292,13 @@ class ExpTech {
   Future<List<String>> getLightningList() async {
     final requestUrl = Route.lightningList();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
     return jsonData.map((item) => item.toString()).toList();
   }
@@ -306,13 +306,13 @@ class ExpTech {
   Future<Map<String, dynamic>> getTyphoonGeojson() async {
     final requestUrl = Route.typhoonGeojson();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final jsonData = jsonDecode(res.body);
+    final jsonData = jsonDecode(res.body) as Map<String, dynamic>;
 
     return jsonData;
   }
@@ -320,149 +320,149 @@ class ExpTech {
   Future<List<Lightning>> getLightning(String time) async {
     final requestUrl = Route.lightning(time);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => Lightning.fromJson(item)).toList();
+    return jsonData.map((item) => Lightning.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<History>> getRealtime() async {
     final requestUrl = Route.realtime();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => History.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<History>> getHistory() async {
     final requestUrl = Route.history();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => History.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<History>> getRealtimeRegion(String region) async {
     final requestUrl = Route.realtimeRegion(region);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => History.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<History>> getHistoryRegion(String region) async {
     final requestUrl = Route.historyRegion(region);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => History.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<Map<String, dynamic>> getSupport() async {
     final requestUrl = Route.support();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    return jsonDecode(res.body);
+    return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
   Future<List<dynamic>> getChangelog() async {
     final requestUrl = Route.changelog();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    return jsonDecode(res.body);
+    return jsonDecode(res.body) as List<dynamic>;
   }
 
   Future<List<Announcement>> getAnnouncement() async {
     final requestUrl = Route.announcement();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => Announcement.fromJson(item)).toList();
+    return jsonData.map((item) => Announcement.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<NotificationRecord>> getNotificationHistory() async {
     final requestUrl = Route.notificationHistory();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => NotificationRecord.fromJson(item)).toList();
+    return jsonData.map((item) => NotificationRecord.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<ServerStatus>> getStatus() async {
     final requestUrl = Route.status();
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => ServerStatus.fromJson(item)).toList();
+    return jsonData.map((item) => ServerStatus.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<MeteorStation> getMeteorStation(String id) async {
     final requestUrl = Route.meteorStation(id);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final Map<String, dynamic> jsonData = jsonDecode(res.body);
+    final Map<String, dynamic> jsonData = jsonDecode(res.body) as Map<String, dynamic>;
 
     return MeteorStation.fromJson(jsonData);
   }
@@ -470,22 +470,22 @@ class ExpTech {
   Future<List<History>> getEvent(String id) async {
     final requestUrl = Route.event(id);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
-    return jsonData.map((item) => History.fromJson(item)).toList();
+    return jsonData.map((item) => History.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   /// 回傳所在地
   Future<String> updateDeviceLocation({required String token, required String lat, required String lng}) async {
     final requestUrl = Route.location(token: token, lat: lat, lng: lng);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode == 200) {
       return res.body;
@@ -500,13 +500,13 @@ class ExpTech {
   Future<NotifySettings> getNotify({required String token}) async {
     final requestUrl = Route.notify(token: token);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (!res.ok) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    final List<dynamic> jsonData = jsonDecode(res.body);
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
 
     return NotifySettings.fromJson(jsonData.map((e) => e as int).toList());
   }
@@ -515,7 +515,7 @@ class ExpTech {
   Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
     final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
 
-    var res = await get(requestUrl);
+    final res = await get(requestUrl);
 
     if (res.statusCode != 202) {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);

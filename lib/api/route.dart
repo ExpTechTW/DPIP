@@ -33,7 +33,7 @@ class Route {
     int? minDepth,
     int? maxDepth,
   }) {
-    String url =
+    final String url =
         "$onlyapi/v2/eq/report?limit=$limit&page=$page&minIntensity=$minIntensity&maxIntensity=$maxIntensity&minMagnitude=$minMagnitude&maxMagnitude=$maxMagnitude&minDepth=$minDepth&maxDepth=$maxDepth";
     return Uri.parse(url);
   }

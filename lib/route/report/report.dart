@@ -52,7 +52,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
   bool isLoading = true;
   bool isLoaded = false;
 
-  void refreshReport() async {
+  Future<void> refreshReport() async {
     if (isLoaded) {
       return;
     }
@@ -65,13 +65,13 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       final data = await ExpTech().getReport(widget.id);
       final controller = await mapController.future;
 
-      List markers = [];
-      List<double> bounds = [];
+      final List markers = [];
+      final List<double> bounds = [];
 
-      Map<String, int> cityMaxIntensity = {};
+      final Map<String, int> cityMaxIntensity = {};
 
-      for (var MapEntry(key: areaName, value: area) in data.list.entries) {
-        for (var MapEntry(key: _, value: town) in area.town.entries) {
+      for (final MapEntry(key: areaName, value: area) in data.list.entries) {
+        for (final MapEntry(key: _, value: town) in area.town.entries) {
           if (cityMaxIntensity[areaName] == null || cityMaxIntensity[areaName]! < town.intensity) {
             cityMaxIntensity[areaName] = town.intensity;
           }
@@ -221,7 +221,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
     }
   }
 
-  void focus(LatLng target) async {
+  Future<void> focus(LatLng target) async {
     final controller = await mapController.future;
     sheetController.animateTo(sheetInitialSize, duration: Durations.short4, curve: Easing.standard);
     scrollController.jumpTo(0);
@@ -237,7 +237,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
     sheetController.addListener(() {
       final newSize = sheetController.size;
-      double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
+      final double scrollPosition = ((newSize - sheetInitialSize) / (1 - sheetInitialSize)).clamp(0.0, 1.0);
 
       if (scrollPosition > 1e-5) {
         if (!isAppBarVisible) {

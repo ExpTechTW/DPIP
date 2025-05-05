@@ -59,11 +59,11 @@ class _HumidityMapState extends State<HumidityMap> {
     await loadGPSImage(_mapController);
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -83,7 +83,7 @@ class _HumidityMapState extends State<HumidityMap> {
 
     weather_list = await ExpTech().getWeatherList();
 
-    List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
     humidityDataList =
         weatherData
@@ -339,7 +339,7 @@ class _HumidityMapState extends State<HumidityMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
-                List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
                 humidityDataList = [];
 
@@ -370,7 +370,6 @@ class _HumidityMapState extends State<HumidityMap> {
           DraggableScrollableSheet(
             initialChildSize: 0.3,
             minChildSize: 0.1,
-            maxChildSize: 1,
             snap: true,
             snapSizes: const [0.1, 0.3, 0.7, 1],
             builder: (BuildContext context, ScrollController scrollController) {

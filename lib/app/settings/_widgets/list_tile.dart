@@ -7,7 +7,7 @@ class LoadingIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2));
+    return const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2));
   }
 }
 
@@ -36,8 +36,8 @@ class SettingsListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: icon != null ? Icon(icon!, weight: 600, color: context.colors.secondary) : leading,
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+      leading: icon != null ? Icon(icon, weight: 600, color: context.colors.secondary) : leading,
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: subtitle,
       trailing: trailing,
       enabled: enabled,

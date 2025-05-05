@@ -106,9 +106,9 @@ class DpipMapState extends State<DpipMap> {
   String? styleAbsoluteFilePath;
 
   double adjustedZoom(double zoom) {
-    double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-    double baseZoomAdjustment = 1.0;
-    double mediumZoomAdjustment = 0.3;
+    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    const double baseZoomAdjustment = 1.0;
+    const double mediumZoomAdjustment = 0.3;
 
     if (devicePixelRatio >= 4.0) {
       return zoom - baseZoomAdjustment;
@@ -147,7 +147,7 @@ class DpipMapState extends State<DpipMap> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
+    final double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
 
     return MapLibreMap(
       minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(3, 9),

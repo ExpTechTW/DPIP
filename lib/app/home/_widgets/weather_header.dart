@@ -37,7 +37,7 @@ class WeatherHeader extends StatelessWidget {
 
               // Apparent temperature formula from https://en.wikipedia.org/wiki/Apparent_temperature
               final e =
-                  data.weather.data.air.relative_humidity /
+                  data.weather.data.air.relativeHumidity /
                   100 *
                   6.105 *
                   exp(17.27 * data.weather.data.air.temperature / (data.weather.data.air.temperature + 237.3));
@@ -132,7 +132,7 @@ class WeatherHeader extends StatelessWidget {
                         children: [
                           Icon(Symbols.water_drop_rounded, size: 16, color: context.colors.onSurfaceVariant),
                           Text(
-                            '${data.weather.data.air.relative_humidity}%',
+                            '${data.weather.data.air.relativeHumidity}%',
                             style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onSurfaceVariant),
                           ),
                           Container(

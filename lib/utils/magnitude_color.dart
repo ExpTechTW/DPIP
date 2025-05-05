@@ -22,7 +22,7 @@ class MagnitudeColor {
 
     for (int i = 0; i < magnitudeList.length - 1; i++) {
       if (mag >= magnitudeList[i] && mag < magnitudeList[i + 1]) {
-        double localT = (mag - magnitudeList[i]) / (magnitudeList[i + 1] - magnitudeList[i]);
+        final double localT = (mag - magnitudeList[i]) / (magnitudeList[i + 1] - magnitudeList[i]);
         return Color.lerp(colorList[i], colorList[i + 1], localT)!;
       }
     }

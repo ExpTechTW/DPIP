@@ -15,7 +15,7 @@ class AreaIntensity {
 
   AreaIntensity({required this.intensity, required this.town});
 
-  factory AreaIntensity.fromJson(dynamic json) => _$AreaIntensityFromJson(json);
+  factory AreaIntensity.fromJson(Map<String, dynamic> json) => _$AreaIntensityFromJson(json);
 
   Map<String, dynamic> toJson() => _$AreaIntensityToJson(this);
 }

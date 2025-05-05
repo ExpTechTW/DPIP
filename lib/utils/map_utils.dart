@@ -216,7 +216,7 @@ GeoJsonFeatureBuilder circleFeature({
 }) {
   // main
   final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
-  List coordinates = [];
+  final List coordinates = [];
 
   for (var i = 0; i < steps; i++) {
     final point = destination(center, radius, (i * -360) / steps, units: units);

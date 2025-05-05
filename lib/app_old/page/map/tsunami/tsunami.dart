@@ -39,7 +39,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
@@ -48,7 +48,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     await loadCrossImage(_mapController);
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     await refreshTsunami();
     await _mapController.addSource(
       "tsunami-data",
@@ -102,9 +102,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
     _blinkTimer?.cancel();
     await _mapController.setLayerProperties("tsunami", const LineLayerProperties(lineOpacity: 0));
     if (tsunami.info.type == "estimate") {
-      Map<String, String> area_color = {};
+      final Map<String, String> area_color = {};
       tsunami.info.data.forEach((station) {
-        var estimateStation = station as TsunamiEstimate;
+        final estimateStation = station as TsunamiEstimate;
         area_color[estimateStation.area] = heightToColor(estimateStation.waveHeight);
       });
 
@@ -128,7 +128,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     } else {
       final features =
           tsunami.info.data.map((station) {
-            var actualStation = station as TsunamiActual;
+            final actualStation = station as TsunamiActual;
             return {
               "type": "Feature",
               "properties": {
@@ -235,7 +235,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
         iconIgnorePlacement: true,
       ),
     );
-    List markers_features = [];
+    final List markers_features = [];
     final tsunami = this.tsunami;
     if (tsunami != null) {
       markers_features.add({
@@ -262,7 +262,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   Future<Tsunami?> refreshTsunami() async {
-    var idList = await ExpTech().getTsunamiList();
+    final idList = await ExpTech().getTsunamiList();
     var id = "";
     if (idList.isNotEmpty) {
       id = idList.first;
@@ -275,7 +275,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
           ? tsunamiStatus = context.i18n.tsunami_renew
           : tsunamiStatus = context.i18n.tsunami_relieve;
 
-      List<String> options = generateTsunamiOptions();
+      final List<String> options = generateTsunamiOptions();
       if (options.isNotEmpty && _selectedOption == null) {
         _selectedOption = options.last;
       }
@@ -284,40 +284,43 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   String convertTimestamp(int timestamp) {
-    var location = tz.getLocation("Asia/Taipei");
-    DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
+    final location = tz.getLocation("Asia/Taipei");
+    final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
-    String formattedDate = formatter.format(dateTime);
+    final DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
+    final String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
 
   String getTime() {
-    DateTime now = DateTime.now();
-    DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
-    String formattedDate = formatter.format(now);
-    return (formattedDate);
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
+    final String formattedDate = formatter.format(now);
+    return formattedDate;
   }
 
-  String convertLatLon(double lat, double lon) {
+  String convertLatLon(double latitude, double longitude) {
+    double lat = latitude;
+    double lon = longitude;
+
     var latFormat = "";
     var lonFormat = "";
-    if (lat > 90) {
-      lat = lat - 180;
-    }
-    if (lon > 180) {
-      lat = lat - 360;
-    }
+
+    if (latitude > 90) lat = latitude - 180;
+    if (longitude > 180) lat = latitude - 360;
+
     if (lat < 0) {
       latFormat = context.i18n.south_latitude(lat.abs().toString());
     } else {
       latFormat = context.i18n.north_latitude(lat.toString());
     }
+
     if (lon < 0) {
       lonFormat = context.i18n.west_longitude(lon.abs().toString());
     } else {
       lonFormat = context.i18n.east_longitude(lon.toString());
     }
+
     return "$latFormat　$lonFormat";
   }
 
@@ -329,7 +332,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   List<String> generateTsunamiOptions() {
-    List<String> options = [];
+    final List<String> options = [];
     for (int i = 1; i <= _tsunami_serial; i++) {
       options.add("$_tsunami_id-$i");
     }
@@ -339,7 +342,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   @override
   Widget build(BuildContext context) {
     const sheetInitialSize = 0.16;
-    List<String> tsunamiOptions = generateTsunamiOptions();
+    final List<String> tsunamiOptions = generateTsunamiOptions();
 
     return Stack(
       children: [
@@ -354,8 +357,8 @@ class _TsunamiMapState extends State<TsunamiMap> {
             minChildSize: sheetInitialSize,
             snap: true,
             builder: (context, scrollController) {
-              return Container(
-                color: context.colors.surface.withOpacity(0.9),
+              return ColoredBox(
+                color: context.colors.surface.withValues(alpha: 0.9),
                 child: ListView(
                   controller: scrollController,
                   children: [
@@ -366,7 +369,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                           width: 32,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: context.colors.onSurfaceVariant.withOpacity(0.4),
+                            color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
@@ -407,7 +410,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500,
-                                                  color: context.colors.onSurface.withOpacity(0.8),
+                                                  color: context.colors.onSurface.withValues(alpha: 0.8),
                                                 ),
                                               ),
                                             const SizedBox(height: 4),
@@ -429,7 +432,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                             color: context.colors.surface,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: context.colors.onSurface.withOpacity(0.1),
+                                                color: context.colors.onSurface.withValues(alpha: 0.1),
                                                 blurRadius: 4,
                                                 offset: const Offset(0, 2),
                                               ),

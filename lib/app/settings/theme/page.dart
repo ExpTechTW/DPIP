@@ -34,7 +34,7 @@ class SettingsThemePage extends StatelessWidget {
                     ThemeMode.dark => context.i18n.theme_dark,
                     ThemeMode.system => context.i18n.theme_system,
                   }),
-                  trailing: Icon(Symbols.chevron_right_rounded),
+                  trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => context.push(SettingsThemeSelectPage.route),
                 );
               },
@@ -78,15 +78,15 @@ class SettingsThemePage extends StatelessWidget {
                                     snackBarParseError: true,
                                     longPressMenu: true,
                                   ),
-                                  actionButtons: ColorPickerActionButtons(dialogActionButtons: false),
+                                  actionButtons: const ColorPickerActionButtons(dialogActionButtons: false),
                                 ),
                               ),
-                              contentPadding: EdgeInsets.fromLTRB(24, 24, 24, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
                               actionsAlignment: MainAxisAlignment.spaceBetween,
                               actionsOverflowButtonSpacing: 8,
                               actions: [
                                 TextButton(
-                                  child: Text('使用系統顏色'),
+                                  child: const Text('使用系統顏色'),
                                   onPressed: () {
                                     model.setThemeColor(null);
                                     Navigator.of(context).pop();

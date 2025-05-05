@@ -1,1 +1,10 @@
-include: package:flutter_lints/flutter.yaml
+include: package:lint/strict.yaml
+
+analyzer:
+  exclude:
+    - '**.freezed.dart'
+    - '**.g.dart'
+
+linter:
+  rules:
+    directives_ordering: false

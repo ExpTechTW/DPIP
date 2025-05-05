@@ -216,15 +216,15 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     if (!Platform.isAndroid) return true;
 
     try {
-      bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
+      final bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
       if (isAvailable == null || !isAvailable) return true;
 
-      bool? status = await Autostarter.checkAutoStartState();
+      final bool? status = await Autostarter.checkAutoStartState();
       if (status == null || status) return true;
 
       if (!mounted) return true;
 
-      String contentText =
+      final String contentText =
           (num == 0) ? context.i18n.auto_start_permission_info : context.i18n.auto_start_permission_experience;
 
       return await showDialog<bool>(
@@ -266,12 +266,12 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     if (!Platform.isAndroid) return true;
 
     try {
-      bool status = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
+      final bool status = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
       if (status) return true;
 
       if (!mounted) return true;
 
-      String contentText =
+      final String contentText =
           (num == 0) ? context.i18n.auto_location_experience_info : context.i18n.unlimited_permission_experience_info;
 
       return await showDialog<bool>(
@@ -319,11 +319,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
       await checkLocationAlwaysPermission();
 
-      bool autoStart = await androidCheckAutoStartPermission(0);
+      final bool autoStart = await androidCheckAutoStartPermission(0);
       autoStartPermission = autoStart;
       if (!autoStart) return;
 
-      bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
+      final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
       batteryOptimizationPermission = batteryOptimization;
       if (!batteryOptimization) return;
 
@@ -425,7 +425,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               builder: (context, auto, child) {
                 return SettingsListTile(
                   title: context.i18n.settings_location_auto,
-                  subtitle: Text('自動更新所在地'),
+                  subtitle: const Text('自動更新所在地'),
                   icon: Symbols.my_location_rounded,
                   trailing: Switch(value: auto, onChanged: (value) => toggleAutoLocation()),
                 );
@@ -571,13 +571,13 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   title: context.i18n.location_city,
                   subtitle: Text(city ?? context.i18n.location_Not_set),
                   icon: Symbols.location_city_rounded,
-                  trailing: Icon(Symbols.chevron_right_rounded),
+                  trailing: const Icon(Symbols.chevron_right_rounded),
                   enabled: !auto,
                   onTap: () async {
-                    bool autoStart = await androidCheckAutoStartPermission(1);
+                    final bool autoStart = await androidCheckAutoStartPermission(1);
                     if (!autoStart) return;
 
-                    bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
+                    final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
                     if (!batteryOptimization) return;
 
                     if (!context.mounted) return;
@@ -599,15 +599,15 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   title: context.i18n.location_town,
                   subtitle: Text(town ?? context.i18n.location_Not_set),
                   icon: Symbols.forest_rounded,
-                  trailing: Icon(Symbols.chevron_right_rounded),
+                  trailing: const Icon(Symbols.chevron_right_rounded),
                   enabled: !auto && city != null,
                   onTap: () async {
                     if (city == null) return;
 
-                    bool autoStart = await androidCheckAutoStartPermission(1);
+                    final bool autoStart = await androidCheckAutoStartPermission(1);
                     if (!autoStart) return;
 
-                    bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
+                    final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
                     if (!batteryOptimization) return;
 
                     if (!context.mounted) return;

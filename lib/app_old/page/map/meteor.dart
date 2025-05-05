@@ -166,7 +166,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildHeader() {
-    String displayValue =
+    final String displayValue =
         touchedIndex != -1
             ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
             : '${context.i18n.map_average}   ${_calculate24HourAverage()}${units[selectedDataType]}';
@@ -209,9 +209,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   String _calculate24HourAverage() {
-    List<double> validData = weatherData[selectedDataType]!.where((value) => value != -99).toList();
+    final List<double> validData = weatherData[selectedDataType]!.where((value) => value != -99).toList();
     if (validData.isEmpty) return 'N/A';
-    double sum = validData.reduce((a, b) => a + b);
+    final double sum = validData.reduce((a, b) => a + b);
     return (sum / validData.length).toStringAsFixed(1);
   }
 
@@ -236,12 +236,12 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildLineChart() {
-    List<Color> lineColor = getDataTypeColor(selectedDataType!);
-    List<FlSpot> spots = [];
+    final List<Color> lineColor = getDataTypeColor(selectedDataType!);
+    final List<FlSpot> spots = [];
     double minY = double.infinity;
     double maxY = double.negativeInfinity;
 
-    bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    final bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (_invalid) {
       return Center(child: Text(context.i18n.map_no_data));
@@ -251,7 +251,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
       if (weatherData[selectedDataType]![i] == -99) {
         spots.add(FlSpot.nullSpot);
       } else {
-        double value = weatherData[selectedDataType]![i];
+        final double value = weatherData[selectedDataType]![i];
         spots.add(FlSpot(i.toDouble(), value));
         minY = min(minY, value);
         maxY = max(maxY, value);
@@ -267,22 +267,18 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         interval = 3;
         startY = (minY / interval).floor() * interval;
         endY = (maxY / interval).ceil() * interval;
-        break;
       case 'wind_speed':
         interval = 1;
         startY = minY.floor().toDouble();
         endY = maxY.ceil().toDouble();
-        break;
       case 'humidity':
         interval = 20;
         startY = 0;
         endY = 100;
-        break;
       case 'pressure':
         interval = 15;
         startY = (minY / interval).floor() * interval;
         endY = (maxY / interval).ceil() * interval;
-        break;
       default:
         interval = 1;
         startY = minY.floor().toDouble();
@@ -298,9 +294,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               showTitles: true,
               reservedSize: 30,
               getTitlesWidget: (value, meta) {
-                int index = value.toInt();
+                final int index = value.toInt();
                 if (index >= 0 && index < weatherData['time']!.length) {
-                  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
+                  final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
                   return Text(
                     DateFormat(context.i18n.map_hh_time).format(dateTime),
                     style: const TextStyle(fontSize: 10),
@@ -325,8 +321,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(),
+          rightTitles: const AxisTitles(),
         ),
         borderData: FlBorderData(show: true),
         minY: startY,
@@ -368,9 +364,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
           getTouchedSpotIndicator: (LineChartBarData barData, List<int> spotIndexes) {
             return spotIndexes.map((spotIndex) {
               return TouchedSpotIndicatorData(
-                const FlLine(color: Colors.white, strokeWidth: 2, dashArray: [5, 5]),
+                const FlLine(color: Colors.white, dashArray: [5, 5]),
                 FlDotData(
-                  show: true,
                   getDotPainter: (spot, percent, barData, index) {
                     return FlDotCirclePainter(radius: 3, color: Colors.white, strokeWidth: 2, strokeColor: Colors.grey);
                   },
@@ -394,20 +389,20 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Widget _buildBarChart() {
-    Color barColor = getDataTypeColor(selectedDataType!)[0];
-    Color abnormalColor = Colors.red.withOpacity(0.3);
+    final Color barColor = getDataTypeColor(selectedDataType!)[0];
+    final Color abnormalColor = Colors.red.withOpacity(0.3);
 
-    bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    final bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (_invalid) {
       return Center(child: Text(context.i18n.map_no_data));
     }
 
-    double maxRainfall = weatherData[selectedDataType]!
+    final double maxRainfall = weatherData[selectedDataType]!
         .where((value) => value != -99)
         .fold(0, (max, value) => value > max ? value : max);
 
-    double interval = _calculateDynamicInterval(maxRainfall);
+    final double interval = _calculateDynamicInterval(maxRainfall);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -426,9 +421,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                     showTitles: true,
                     reservedSize: 30,
                     getTitlesWidget: (value, meta) {
-                      int index = value.toInt();
+                      final int index = value.toInt();
                       if (index % 3 == 0 && index >= 0 && index < weatherData['time']!.length) {
-                        DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
+                        final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
@@ -456,8 +451,8 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                     },
                   ),
                 ),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: const AxisTitles(),
+                rightTitles: const AxisTitles(),
               ),
               borderData: FlBorderData(show: true),
               barGroups:
@@ -574,7 +569,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               width: 20,
               height: 1,
               decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey, width: 1, style: BorderStyle.solid)),
+                border: Border(bottom: BorderSide(color: Colors.grey)),
               ),
             ),
             const SizedBox(width: 8),
@@ -600,10 +595,10 @@ class BackgroundPainter extends CustomPainter {
           ..color = abnormalColor
           ..style = PaintingStyle.fill;
 
-    final double leftPadding = 55;
-    final double bottomPadding = 30;
-    final double topPadding = 0;
-    final double rightPadding = 10;
+    const double leftPadding = 55;
+    const double bottomPadding = 30;
+    const double topPadding = 0;
+    const double rightPadding = 10;
 
     final double chartWidth = chartAreaSize.width - leftPadding - rightPadding;
     final double chartHeight = chartAreaSize.height - bottomPadding - topPadding;

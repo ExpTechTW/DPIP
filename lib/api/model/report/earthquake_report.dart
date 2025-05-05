@@ -69,10 +69,10 @@ class EarthquakeReport {
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag$id");
+      return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id");
     }
 
-    return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join("")}$mag");
+    return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag");
   }
 
   String get reportImageName {

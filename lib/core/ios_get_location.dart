@@ -25,7 +25,7 @@ Future<void> getSavedLocation() async {
     GlobalProviders.location.setLongitude(data?['lon']);
     GlobalProviders.location.setLatitude(data?['lat']);
 
-    GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?['lat'], data?['lon']);
+    final GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?['lat'], data?['lon']);
 
     GlobalProviders.location.setCode(location?.code.toString());
 

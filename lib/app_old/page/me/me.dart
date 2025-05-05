@@ -7,7 +7,7 @@ import "package:material_symbols_icons/symbols.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 import "package:dpip/widgets/list/tile_group_header.dart";
 
-import "developer.dart";
+import 'package:dpip/app_old/page/me/developer.dart';
 
 class MePage extends StatefulWidget {
   const MePage({super.key});

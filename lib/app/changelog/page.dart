@@ -53,7 +53,7 @@ class SupportStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       side: BorderSide(color: SupportStatus.getSupportTypeColor(isSupported)),
       backgroundColor: SupportStatus.getSupportTypeColor(isSupported).withValues(alpha: 0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -73,7 +73,7 @@ class VersionTypeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       side: BorderSide(color: VersionType.getTypeColor(type)),
       backgroundColor: VersionType.getTypeColor(type).withValues(alpha: 0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -182,7 +182,6 @@ class ChangelogCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SupportStatusChip(isSupported: isSupported),
               const SizedBox(width: 8),

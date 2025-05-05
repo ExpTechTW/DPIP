@@ -32,11 +32,11 @@ class SettingsLocationSelectPage extends StatelessWidget {
                 builder:
                     (context, code, child) => SettingsListTile(
                       title: city,
-                      trailing: Icon(Symbols.chevron_right_rounded),
+                      trailing: const Icon(Symbols.chevron_right_rounded),
                       subtitle:
                           code != null &&
                                   Global.location.entries.containsWhere((e) => e.value.city == city && e.key == code)
-                              ? Text('目前所在地')
+                              ? const Text('目前所在地')
                               : null,
                       onTap: () => context.push('/settings/location/select/$city'),
                     ),

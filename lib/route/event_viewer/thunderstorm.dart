@@ -91,14 +91,14 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     }
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
 
     radarList = await ExpTech().getRadarList();
 
-    String newTileUrl = getTileUrl(radarList.last);
+    final String newTileUrl = getTileUrl(radarList.last);
 
     await _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
@@ -152,11 +152,11 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     });
   }
 
-  void start() async {
+  Future<void> start() async {
     userLat = Global.preference.getDouble("user-lat") ?? 0.0;
     userLon = Global.preference.getDouble("user-lon") ?? 0.0;
 
-    isUserLocationValid = (userLon != 0 && userLat != 0);
+    isUserLocationValid = userLon != 0 && userLat != 0;
 
     if (isUserLocationValid) {
       await _mapController.setGeoJsonSource("markers-geojson", {
@@ -458,7 +458,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Widget _buildAffectedAreas() {
     final grouped = groupBy(widget.item.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
-    List<Widget> areas = [];
+    final List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {
       areas.add(

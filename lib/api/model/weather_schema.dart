@@ -46,10 +46,10 @@ class RealtimeWeatherAir {
   final double temperature;
   @JsonKey(fromJson: parseDouble)
   final double pressure;
-  @JsonKey(fromJson: parseDouble)
-  final double relative_humidity;
+  @JsonKey(fromJson: parseDouble, name: 'relative_humidity')
+  final double relativeHumidity;
 
-  RealtimeWeatherAir({required this.temperature, required this.pressure, required this.relative_humidity});
+  RealtimeWeatherAir({required this.temperature, required this.pressure, required this.relativeHumidity});
 
   factory RealtimeWeatherAir.fromJson(Map<String, dynamic> json) => _$RealtimeWeatherAirFromJson(json);
   Map<String, dynamic> toJson() => _$RealtimeWeatherAirToJson(this);
@@ -60,7 +60,6 @@ class RealtimeWeatherWeatherData {
   final String weather;
   final RealtimeWeatherWind wind;
   final RealtimeWeatherAir air;
-  @JsonKey(name: 'weatherCode')
   final int weatherCode;
 
   RealtimeWeatherWeatherData({required this.weather, required this.wind, required this.air, required this.weatherCode});

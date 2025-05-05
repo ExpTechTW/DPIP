@@ -54,7 +54,6 @@ class ReportSheetContent extends StatelessWidget {
           ),
         ),
         Wrap(
-          direction: Axis.horizontal,
           spacing: 8,
           children: [
             ActionChip(

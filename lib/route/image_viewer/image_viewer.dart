@@ -85,7 +85,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
       final res = await get(Uri.parse(widget.imageUrl));
 
-      final result = await ImageGallerySaver.saveImage(res.bodyBytes, quality: 100, name: widget.imageName);
+      final result = await ImageGallerySaver.saveImage(res.bodyBytes, name: widget.imageName);
 
       if (!mounted) return;
 

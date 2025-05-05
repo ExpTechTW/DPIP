@@ -59,11 +59,11 @@ class _TemperatureMapState extends State<TemperatureMap> {
     await loadGPSImage(_mapController);
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
     await _loadMapImages(isDark);
@@ -83,7 +83,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
 
     weather_list = await ExpTech().getWeatherList();
 
-    List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
+    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
 
     temperatureDataList =
         weatherData
@@ -352,7 +352,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
                 setState(() {});
               },
               onTimeSelected: (time) async {
-                List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
 
                 temperatureDataList = [];
 
@@ -385,7 +385,6 @@ class _TemperatureMapState extends State<TemperatureMap> {
           DraggableScrollableSheet(
             initialChildSize: 0.3,
             minChildSize: 0.1,
-            maxChildSize: 1,
             snap: true,
             snapSizes: const [0.1, 0.3, 0.7, 1],
             builder: (BuildContext context, ScrollController scrollController) {
@@ -408,7 +407,6 @@ class _TemperatureMapState extends State<TemperatureMap> {
                         decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
-                        type: "temperature",
                         stationId: _selectedStationId!,
                         onClose: () {
                           setState(() {

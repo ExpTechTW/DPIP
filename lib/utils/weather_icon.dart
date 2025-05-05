@@ -5,6 +5,8 @@ import "package:material_symbols_icons/material_symbols_icons.dart";
 import "package:dpip/utils/extensions/build_context.dart";
 
 class WeatherIcons {
+  WeatherIcons._();
+
   static const Map<String, IconData> iconMap = {
     "sunny": Symbols.sunny_rounded,
     "nightlight": Symbols.nightlight_rounded,
@@ -278,7 +280,7 @@ class WeatherIcons {
   }
 
   static String getWeatherContent(BuildContext context, int code) {
-    Map<int, String> iconLabel = {
+    final Map<int, String> iconLabel = {
       0: context.i18n.get_weather_abnormal,
       100: context.i18n.sunny,
       101: context.i18n.sunny_with_haze,
@@ -395,7 +397,7 @@ class WeatherIcons {
   static String mapNumberToWeather(int number) {
     final weatherInfo = weatherCodeMap[number];
     if (weatherInfo != null) {
-      return weatherInfo["key"];
+      return weatherInfo["key"] as String;
     }
     return "unknown_weather";
   }

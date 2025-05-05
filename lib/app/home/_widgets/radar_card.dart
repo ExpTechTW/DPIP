@@ -146,7 +146,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
                         Row(
                           spacing: 8,
                           children: [
-                            Icon(Symbols.radar, size: 24),
+                            const Icon(Symbols.radar, size: 24),
                             Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
                           ],
                         ),

@@ -10,16 +10,16 @@ class ForwardBackPageRouteBuilder extends PageRouteBuilder {
   final forwardTransition = const Interval(0.5, 1, curve: Easing.emphasizedDecelerate);
 
   @override
-  get transitionDuration => Durations.long4;
+  Duration get transitionDuration => Durations.long4;
 
   @override
-  get reverseTransitionDuration => Durations.long4;
+  Duration get reverseTransitionDuration => Durations.long4;
 
   @override
-  get transitionsBuilder => (context, animation, secondaryAnimation, child) {
-    var slide = Tween(begin: const Offset(0.2, 0.0), end: Offset.zero).chain(CurveTween(curve: forwardTransition));
+  SlideTransition Function(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) get transitionsBuilder => (context, animation, secondaryAnimation, child) {
+    final slide = Tween(begin: const Offset(0.2, 0.0), end: Offset.zero).chain(CurveTween(curve: forwardTransition));
 
-    var fade = Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: forwardTransition));
+    final fade = Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: forwardTransition));
 
     return SlideTransition(
       position: animation.drive(slide),

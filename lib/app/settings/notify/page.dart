@@ -219,7 +219,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
   };
 
   void showSuccessToast(BuildContext context) {
-    showToast(context, ToastWidget.text('已更新通知設定', icon: Icon(Symbols.check_rounded)));
+    showToast(context, ToastWidget.text('已更新通知設定', icon: const Icon(Symbols.check_rounded)));
   }
 
   bool isLoading = false;
@@ -261,7 +261,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               child: AnimatedOpacity(
                 opacity: isLoading ? 1 : 0,
                 duration: Durations.short4,
-                child: LinearProgressIndicator(),
+                child: const LinearProgressIndicator(),
               ),
             ),
             ListView(
@@ -271,7 +271,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                   SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     content: '請先設定所在地來使用通知功能',
-                    trailing: TextButton(onPressed: () => context.push(SettingsLocationPage.route), child: Text('設定')),
+                    trailing: TextButton(onPressed: () => context.push(SettingsLocationPage.route), child: const Text('設定')),
                   ),
                 SettingsListSection(
                   title: '地震速報',
@@ -286,7 +286,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.emergency_earthquake_warning,
                               subtitle: Text(getEewNotifyTypeName(eew)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.crisis_alert_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -327,7 +327,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.monitor,
                               subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.earthquake_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -363,7 +363,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.report,
                               subtitle: Text(getEarthquakeNotifyTypeName(report)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.docs_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -399,7 +399,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.sound_int_report_minor,
                               subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.summarize_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -440,7 +440,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.sound_rain_instant,
                               subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.thunderstorm_rounded,
                               enabled: enabled,
                               onTap: () async {
@@ -476,7 +476,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.sound_weather_alert,
                               subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.warning_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -512,7 +512,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.sound_evacuation,
                               subtitle: Text(getWeatherNotifyTypeName(evacuation)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.directions_run_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -553,7 +553,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.tsunami_alert_sound,
                               subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.tsunami_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {
@@ -594,7 +594,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                             return SettingsListTile(
                               title: context.i18n.announcement,
                               subtitle: Text(getBasicNotifyTypeName(announcement)),
-                              trailing: isLoading ? const LoadingIcon() : Icon(Symbols.chevron_right_rounded),
+                              trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.campaign_rounded,
                               enabled: !isLoading && enabled,
                               onTap: () async {

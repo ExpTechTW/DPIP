@@ -51,39 +51,39 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: WelcomeAboutPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeAboutPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeAboutPage()),
         ),
         GoRoute(
           path: WelcomeExpTechPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeExpTechPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeExpTechPage()),
         ),
         GoRoute(
           path: WelcomeNoticePage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomeNoticePage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeNoticePage()),
         ),
         GoRoute(
           path: WelcomePermissionPage.route,
           pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: WelcomePermissionPage()),
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomePermissionPage()),
         ),
       ],
     ),
     StatefulShellRoute.indexedStack(
       branches: [
         StatefulShellBranch(
-          routes: [GoRoute(path: '/home', pageBuilder: (context, state) => NoTransitionPage(child: HomePage()))],
+          routes: [GoRoute(path: '/home', pageBuilder: (context, state) => const NoTransitionPage(child: HomePage()))],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/history', pageBuilder: (context, state) => NoTransitionPage(child: HistoryPage()))],
+          routes: [GoRoute(path: '/history', pageBuilder: (context, state) => const NoTransitionPage(child: HistoryPage()))],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/map', pageBuilder: (context, state) => NoTransitionPage(child: MapPage()))],
+          routes: [GoRoute(path: '/map', pageBuilder: (context, state) => const NoTransitionPage(child: MapPage()))],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/more', pageBuilder: (context, state) => NoTransitionPage(child: MorePage()))],
+          routes: [GoRoute(path: '/more', pageBuilder: (context, state) => const NoTransitionPage(child: MorePage()))],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/me', pageBuilder: (context, state) => NoTransitionPage(child: MePage()))],
+          routes: [GoRoute(path: '/me', pageBuilder: (context, state) => const NoTransitionPage(child: MePage()))],
         ),
       ],
 
@@ -112,16 +112,16 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: SettingsIndexPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsIndexPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsIndexPage()),
         ),
         GoRoute(
           path: SettingsLocationPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationPage()),
         ),
         GoRoute(
           path: SettingsLocationSelectPage.route,
           pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationSelectPage()),
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationSelectPage()),
         ),
         GoRoute(
           path: SettingsLocationSelectCityPage.route(),
@@ -133,42 +133,42 @@ final router = GoRouter(
         ),
         GoRoute(
           path: SettingsThemePage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsThemePage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemePage()),
         ),
         GoRoute(
           path: SettingsThemeSelectPage.route,
           pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsThemeSelectPage()),
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemeSelectPage()),
         ),
         GoRoute(
           path: SettingsLocalePage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocalePage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocalePage()),
         ),
         GoRoute(
           path: SettingsLocaleSelectPage.route,
           pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocaleSelectPage()),
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocaleSelectPage()),
         ),
         GoRoute(
           path: SettingsUnitPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsUnitPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage()),
         ),
         GoRoute(
           path: SettingsNotifyPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsNotifyPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage()),
         ),
         GoRoute(
           path: SettingsSoundPage.route,
-          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: SettingsSoundPage()),
+          pageBuilder: (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsSoundPage()),
         ),
       ],
     ),
-    GoRoute(path: '/announcement', builder: (context, state) => AnnouncementPage()),
-    GoRoute(path: ChangelogPage.route, builder: (context, state) => ChangelogPage()),
-    GoRoute(path: '/license', builder: (context, state) => LicensePage()),
-    if (kDebugMode) GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => AppDebugLogsPage()),
-    GoRoute(path: MapRadarPage.route, builder: (context, state) => MapRadarPage()),
-    GoRoute(path: MapMonitorPage.route, builder: (context, state) => MapMonitorPage()),
+    GoRoute(path: '/announcement', builder: (context, state) => const AnnouncementPage()),
+    GoRoute(path: ChangelogPage.route, builder: (context, state) => const ChangelogPage()),
+    GoRoute(path: '/license', builder: (context, state) => const LicensePage()),
+    if (kDebugMode) GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => const AppDebugLogsPage()),
+    GoRoute(path: MapRadarPage.route, builder: (context, state) => const MapRadarPage()),
+    GoRoute(path: MapMonitorPage.route, builder: (context, state) => const MapMonitorPage()),
   ],
   observers: [TalkerRouteObserver(TalkerManager.instance)],
   debugLogDiagnostics: true,

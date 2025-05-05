@@ -32,7 +32,7 @@ import "package:dpip/utils/map_utils.dart";
 import "package:dpip/widgets/map/legend.dart";
 import "package:dpip/widgets/map/map.dart";
 
-import "eew_info.dart";
+import 'package:dpip/app/map/monitor/eew_info.dart';
 
 class MapMonitorPage extends StatefulWidget {
   const MapMonitorPage({super.key});
@@ -92,16 +92,16 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     });
   }
 
-  void _initTimeOffset() async {
+  Future<void> _initTimeOffset() async {
     final data = await ExpTech().getNtp();
     _timeOffset = DateTime.now().millisecondsSinceEpoch - data;
   }
 
-  void _initMap(MapLibreMapController controller) async {
+  Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
   }
 
-  void _loadMap() async {
+  Future<void> _loadMap() async {
     _initStations();
 
     _eewUI.add(
@@ -116,7 +116,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     );
   }
 
-  void _initStations() async {
+  Future<void> _initStations() async {
     final data = await ExpTech().getStations();
 
     if (!mounted) return;
@@ -143,7 +143,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     await loadGPSImage(_mapController);
   }
 
-  void _setupStationSource(Map<String, Station> data) async {
+  Future<void> _setupStationSource(Map<String, Station> data) async {
     _stations = data;
     await _mapController.addSource(
       "station-geojson",
@@ -160,7 +160,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     _addStationLayer();
   }
 
-  void _addStationLayer() async {
+  Future<void> _addStationLayer() async {
     await _mapController.addCircleLayer(
       "station-geojson",
       "station",
@@ -273,22 +273,22 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   }
 
   bool _dataStatus() {
-    bool status = (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) - _lsatGetRtsDataTime) < 3000;
+    final bool status = (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) - _lsatGetRtsDataTime) < 3000;
     if (!status && _rtsData != null) {
       _rtsData = null;
-      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(null));
-      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(null));
+      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson());
+      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0());
     }
     return status;
   }
 
-  void _updateRtsData() async {
+  Future<void> _updateRtsData() async {
     try {
-      int t = DateTime.now().millisecondsSinceEpoch;
+      final int t = DateTime.now().millisecondsSinceEpoch;
       final data = await ExpTech().getRts(_timeReplay);
       if (data.time < (_rtsData?.time ?? 0)) return;
       _ping = (DateTime.now().millisecondsSinceEpoch - t) / 1000;
-      String formattedPing = _ping.toStringAsFixed(2);
+      final String formattedPing = _ping.toStringAsFixed(2);
       _formattedPing = formattedPing;
       _rtsData = data;
       _lsatGetRtsDataTime = (_timeReplay == 0) ? _getCurrentTime() : _timeReplay;
@@ -304,7 +304,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     await _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
   }
 
-  void _updateEewData() async {
+  Future<void> _updateEewData() async {
     try {
       final data = await ExpTech().getEew(_timeReplay);
       _processEewData(data);
@@ -315,10 +315,10 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   }
 
   Future<void> _updateCrossMarker() async {
-    List<GeoJsonFeatureBuilder> markers = [];
+    final List<GeoJsonFeatureBuilder> markers = [];
 
     if (_isMarkerVisible) {
-      for (var id in _eewLastInfo.keys) {
+      for (final id in _eewLastInfo.keys) {
         markers.add(
           GeoJsonFeatureBuilder(
             GeoJsonFeatureType.Point,
@@ -328,9 +328,9 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     }
 
     _rtsData?.station.forEach((key, value) {
-      int intensity = intensityFloatToInt(value.I);
+      final int intensity = intensityFloatToInt(value.I);
       if (value.alert == true && intensity > 0) {
-        StationInfo info = findAppropriateItem(_stations[key]!.info, _timeReplay);
+        final StationInfo info = findAppropriateItem(_stations[key]!.info, _timeReplay);
         markers.add(
           GeoJsonFeatureBuilder(
             GeoJsonFeatureType.Point,
@@ -366,14 +366,14 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
 
   Future<void> _updateBoxLine() async {
     if (_rtsData == null) return;
-    List<GeoJsonFeatureBuilder> features = [];
-    List<Widget> rtsUI = [];
+    final List<GeoJsonFeatureBuilder> features = [];
+    final List<Widget> rtsUI = [];
     if (_rtsData!.box.keys.isNotEmpty) {
       if (_isBoxVisible) {
-        for (var area in Global.box["features"]) {
-          int id = area["properties"]["ID"];
+        for (final area in Global.box["features"]) {
+          final int id = area["properties"]["ID"];
           if (_rtsData!.box[id.toString()] == null) continue;
-          bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
+          final bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
           if (!skip) {
             features.add(
               GeoJsonFeatureBuilder(
@@ -385,7 +385,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
       }
 
       int count = 0;
-      for (var area in _rtsData!.intensity) {
+      for (final area in _rtsData!.intensity) {
         rtsUI.add(
           Chip(
             padding: const EdgeInsets.all(4),
@@ -425,9 +425,9 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     _rtsUI = rtsUI;
   }
 
-  void _processEewData(List<Eew> data) async {
-    List<Widget> eewUI = [];
-    for (var eew in data) {
+  Future<void> _processEewData(List<Eew> data) async {
+    final List<Widget> eewUI = [];
+    for (final eew in data) {
       if ((_eewUpdateList[eew.id] ?? 0) < eew.serial) {
         if (_eewUpdateList[eew.id] == null) {
           _addEewCircle(eew);
@@ -439,7 +439,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
         _updateEewIntensityArea(eew);
         _updateMapArea();
 
-        Map<String, dynamic> info = eewLocationInfo(
+        final Map<String, dynamic> info = eewLocationInfo(
           eew.eq.magnitude,
           eew.eq.depth,
           eew.eq.latitude,
@@ -456,14 +456,14 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
 
       if (!mounted) return;
 
-      List<String> alertArea = [];
+      final List<String> alertArea = [];
 
       if (_eewLastInfo[eew.id]?.status == 1) {
         _eewIntensityArea[eew.id].forEach((key, data) {
           if (key != "max_i") {
-            int i = intensityFloatToInt(data["i"]);
+            final int i = intensityFloatToInt(data["i"]);
             if (i >= 4) {
-              String city = Global.location[key]?.city ?? "";
+              final String city = Global.location[key]?.city ?? "";
               if (city != "" && !alertArea.contains(city)) {
                 alertArea.add(city);
               }
@@ -523,10 +523,8 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         context.i18n.estimated_intensity,
@@ -667,7 +665,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     _eewUI = eewUI;
   }
 
-  void _addEewCircle(Eew eew) async {
+  Future<void> _addEewCircle(Eew eew) async {
     final geojson =
         GeoJsonBuilder()
             .addFeature(circleFeature(center: LatLng(eew.eq.latitude, eew.eq.longitude), radius: 0, steps: 256))
@@ -678,7 +676,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     _addEewLayers(eew);
   }
 
-  void _addEewLayers(Eew eew) async {
+  Future<void> _addEewLayers(Eew eew) async {
     final color = (eew.status == 1) ? "#ff0000" : "#ffaa00";
     await _mapController.addLineLayer(
       "${eew.id}-circle",
@@ -708,9 +706,9 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     );
   }
 
-  void _updateEewCircles() async {
+  Future<void> _updateEewCircles() async {
     if (_eewLastInfo.keys.isEmpty) return;
-    for (var id in _eewLastInfo.keys) {
+    for (final id in _eewLastInfo.keys) {
       final dist = psWaveDist(_eewLastInfo[id]!.eq.depth, _eewLastInfo[id]!.eq.time, _getCurrentTime());
       _eewDist[id] = dist["s_dist"]!;
 
@@ -731,11 +729,11 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
 
   int _getCurrentTime() => (_timeReplay != 0) ? _timeReplay : DateTime.now().millisecondsSinceEpoch + _timeOffset;
 
-  void _removeOldEews(List<Eew> data) async {
+  Future<void> _removeOldEews(List<Eew> data) async {
     final currentEewIds = data.map((e) => e.id).toSet();
     final idsToRemove = _eewLastInfo.keys.where((id) => !currentEewIds.contains(id)).toList();
 
-    for (var id in idsToRemove) {
+    for (final id in idsToRemove) {
       _eewLastInfo.remove(id);
       await _removeEewLayers(id);
       _eewIntensityArea.remove(id);
@@ -756,12 +754,12 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     await _mapController.removeSource("$id-circle-p");
   }
 
-  void _updateMapArea() async {
-    Map<String, int> eewArea = {};
+  Future<void> _updateMapArea() async {
+    final Map<String, int> eewArea = {};
     _eewIntensityArea.forEach((String key, dynamic intensity) {
       intensity.forEach((name, value) {
         if (name != "max_i") {
-          int I = intensityFloatToInt(value["i"]);
+          final int I = intensityFloatToInt(value["i"]);
           if (eewArea[name] == null || eewArea[name]! < I) {
             eewArea[name] = I;
           }
@@ -810,7 +808,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
               return false;
             })
             .map((e) {
-              StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
+              final StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
               return info.latlng.toFeatureBuilder().setId(int.parse(e.key));
             })
             .toList();
@@ -837,7 +835,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
               return true;
             })
             .map((e) {
-              StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
+              final StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
               return info.latlng.toFeatureBuilder().setProperty("i", rtsData.station[e.key]?.i).setId(int.parse(e.key));
             })
             .toList();
@@ -954,7 +952,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
         keyTarget: monitorButtonKey,
         contents: [
           TargetContent(
-            align: ContentAlign.bottom,
             builder: (context, controller) {
               return Text(
                 context.i18n.view_prompt_information,
@@ -971,17 +968,16 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   }
 
   bool _showLayerRts = false;
-  void toggleLayerRts() async {
+  Future<void> toggleLayerRts() async {
     if (!_showLayerRts && !Preference.isTosAccepted) {
       final result = await showModalBottomSheet<bool>(
         context: context,
         showDragHandle: true,
         useRootNavigator: true,
-        enableDrag: true,
         useSafeArea: true,
         isScrollControlled: true,
         constraints: context.bottomSheetConstraints,
-        builder: (context) => TosBottomSheet(),
+        builder: (context) => const TosBottomSheet(),
       );
       if (result == true) {
         Preference.isTosAccepted = true;
@@ -998,7 +994,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
       context: context,
       showDragHandle: true,
       useRootNavigator: true,
-      enableDrag: true,
       useSafeArea: true,
       sheetAnimationStyle: kEmphasizedAnimationStyle,
       constraints: context.bottomSheetConstraints,
@@ -1077,7 +1072,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                       filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                        decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
                         child: Text(
                           DateFormat(context.i18n.datetime_format).format(
                             (!_dataStatus())
@@ -1150,7 +1145,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const Icon(Symbols.warning_amber_rounded, size: 50, color: Colors.red),
                             const SizedBox(height: 10),
@@ -1187,7 +1181,7 @@ class _TopInfoBox extends StatelessWidget {
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: IntensityColor.intensity(intensity!)),
       child: Row(
         children: [
-          Expanded(flex: 1, child: _IntensityBox(title: context.i18n.location_estimate, intensity: intensity ?? 0)),
+          Expanded(child: _IntensityBox(title: context.i18n.location_estimate, intensity: intensity ?? 0)),
           Container(
             width: 1,
             color: IntensityColor.onIntensity(intensity!),

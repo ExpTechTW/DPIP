@@ -13,7 +13,7 @@ class TsunamiInfo {
   TsunamiInfo({required this.type, required this.data});
 
   factory TsunamiInfo.fromJson(Map<String, dynamic> json) {
-    var type = json["type"] as String;
+    final type = json["type"] as String;
     var data = [];
 
     if (type == "estimate") {

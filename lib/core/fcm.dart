@@ -36,10 +36,10 @@ Future<void> onNativeTokenHandle(String token) async {
 }
 
 Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
-  Map<String, dynamic> data = silentData.data!.cast<String, dynamic>();
+  final Map<String, dynamic> data = silentData.data!.cast<String, dynamic>();
 
   if (silentData.createdLifeCycle == NotificationLifeCycle.AppKilled) {
-    String channelKey = data['channel'] ?? 'other';
+    final String channelKey = data['channel'] ?? 'other';
     data['content'] = {
       'id': int.parse(data['id'] ?? '0'),
       'channelKey': channelKey,
@@ -55,7 +55,7 @@ Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
 }
 
 Future<void> showNotify(Map<String, dynamic> data) async {
-  String channelKey = data['channel'] ?? 'other';
+  final String channelKey = data['channel'] ?? 'other';
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
@@ -63,7 +63,6 @@ Future<void> showNotify(Map<String, dynamic> data) async {
       channelKey: channelKey,
       title: data['title'],
       body: data['body'],
-      notificationLayout: NotificationLayout.Default,
     ),
   );
 }

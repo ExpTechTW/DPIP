@@ -36,12 +36,12 @@ class SoundListTileState extends State<SoundListTile> {
     start();
   }
 
-  void start() async {
+  Future<void> start() async {
     final json = await rootBundle.loadString("assets/notify_test.json");
     data = jsonDecode(json) as Map<String, dynamic>;
   }
 
-  void _initUserLocation() async {
+  Future<void> _initUserLocation() async {
     if (Platform.isIOS && GlobalProviders.location.auto) {
       await getSavedLocation();
     }
@@ -54,14 +54,14 @@ class SoundListTileState extends State<SoundListTile> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
   }
 
-  void playSound() async {
+  Future<void> playSound() async {
     if (!widget.enable!) return;
     _initUserLocation();
     if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     } else {
-      int limit = Global.preference.getInt("limit-sound-test") ?? 0;
-      int now = DateTime.now().millisecondsSinceEpoch;
+      final int limit = Global.preference.getInt("limit-sound-test") ?? 0;
+      final int now = DateTime.now().millisecondsSinceEpoch;
       if (now - limit > 1000) {
         Global.preference.setInt("limit-sound-test", now);
         AwesomeNotifications().createNotification(

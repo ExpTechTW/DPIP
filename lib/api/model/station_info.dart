@@ -23,7 +23,7 @@ class StationInfo {
 
   LatLng get latlng => LatLng(latitude, longitude);
 
-  factory StationInfo.fromJson(dynamic json) => _$StationInfoFromJson(json);
+  factory StationInfo.fromJson(Map<String, dynamic> json) => _$StationInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
 }

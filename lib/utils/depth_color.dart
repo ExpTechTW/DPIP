@@ -23,7 +23,7 @@ class DepthColor {
 
     for (int i = 0; i < depthList.length - 1; i++) {
       if (depth >= depthList[i] && depth < depthList[i + 1]) {
-        double localT = (depth - depthList[i]) / (depthList[i + 1] - depthList[i]);
+        final double localT = (depth - depthList[i]) / (depthList[i + 1] - depthList[i]);
         return Color.lerp(colorList[i], colorList[i + 1], localT)!;
       }
     }

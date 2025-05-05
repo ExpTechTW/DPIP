@@ -37,7 +37,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
     rank();
   }
 
-  rank() {
+  void rank() {
     final temp =
         (merge != MergeType.none)
             ? groupBy(
@@ -64,7 +64,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
     });
   }
 
-  setMerge(MergeType state) {
+  void setMerge(MergeType state) {
     if (state == merge) {
       merge = MergeType.none;
     } else {
@@ -73,7 +73,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
     rank();
   }
 
-  setReversed(bool state) {
+  void setReversed(bool state) {
     reversed = state;
     rank();
   }

@@ -33,7 +33,7 @@ class LayerToggle extends StatelessWidget {
                     height: 64,
                     width: 64,
                     color: context.colors.secondaryContainer,
-                    child: Icon(Symbols.layers_rounded),
+                    child: const Icon(Symbols.layers_rounded),
                   ),
                 ),
               ),

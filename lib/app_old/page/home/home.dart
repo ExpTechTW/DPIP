@@ -84,11 +84,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  void _initData() async {
+  Future<void> _initData() async {
     if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
       await getSavedLocation();
     }
-    int code = Global.preference.getInt("user-code") ?? -1;
+    final int code = Global.preference.getInt("user-code") ?? -1;
     city = Global.location[code.toString()]?.city ?? "";
     town = Global.location[code.toString()]?.town ?? "";
     region = code == -1 ? null : code.toString();
@@ -284,7 +284,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
@@ -340,7 +339,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           _buildWeatherDetailItem(context.i18n.home_precipitation, '${weatherData?.rain.data.oneHour ?? '- -'} mm/h'),
           _buildWeatherDetailItem(
             context.i18n.humidity_monitor,
-            '${weatherData?.weather.data.air.relative_humidity ?? '- -'} %',
+            '${weatherData?.weather.data.air.relativeHumidity ?? '- -'} %',
           ),
         ],
       ),

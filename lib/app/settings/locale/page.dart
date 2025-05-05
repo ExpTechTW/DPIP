@@ -31,7 +31,7 @@ class SettingsLocalePage extends StatelessWidget {
                   icon: Symbols.translate_rounded,
                   title: context.i18n.settings_display_locale,
                   subtitle: Text(model.locale?.nativeName ?? '系統語言'),
-                  trailing: Icon(Symbols.chevron_right_rounded),
+                  trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => context.push(SettingsLocaleSelectPage.route),
                 );
               },
