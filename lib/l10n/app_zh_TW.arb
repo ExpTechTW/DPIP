@@ -914,21 +914,14 @@
   "@only_used_during_earthquake_alerts": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
-  "weak_5": "5弱",
-  "@weak_5": {
-    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5弱"
-  },
-  "strong_5": "5強",
-  "@strong_5": {
-    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 5強"
-  },
-  "weak_6": "6弱",
-  "@weak_6": {
-    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6弱"
-  },
-  "strong_6": "6強",
-  "@strong_6": {
-    "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 6強"
+  "intensity": "{count, select, 5{5弱} 6{5強} 7{6弱} 8{6強} other{{count}級}}",
+  "@intensity": {
+    "description": "震度",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   },
   "lightning_1_5": "5 分鐘內對地閃電",
   "@lightning_1_5": {

@@ -25,17 +25,7 @@ class _ReportListPageState extends State<ReportListPage> {
   RangeValues _magnitudeRange = const RangeValues(0, 10);
   RangeValues _depthRange = const RangeValues(0, 700);
 
-  List<String> get _intensityLevels => [
-    context.i18n.level_1,
-    context.i18n.level_2,
-    context.i18n.level_3,
-    context.i18n.level_4,
-    context.i18n.weak_5,
-    context.i18n.strong_5,
-    context.i18n.weak_6,
-    context.i18n.strong_6,
-    context.i18n.level_7,
-  ];
+  List<String> get _intensityLevels => List.generate(9, (i) => context.i18n.intensity('${i + 1}'));
 
   Future<void> refreshReportList() async {
     if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {

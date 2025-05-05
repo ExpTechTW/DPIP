@@ -212,17 +212,8 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = [
-      "1",
-      "2",
-      "3",
-      "4",
-      context.i18n.weak_5,
-      context.i18n.strong_5,
-      context.i18n.weak_6,
-      context.i18n.strong_6,
-      "7",
-    ];
+    final labels = List.generate(9, (i) => context.i18n.intensity('${i + 1}'));
+
     return SizedBox(
       width: 300,
       child: Row(
