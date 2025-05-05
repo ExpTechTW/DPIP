@@ -46,6 +46,7 @@ dependencies:
     git:
       url: https://github.com/knottx/image_gallery_saver.git
       ref: knottx-latest
+  in_app_purchase: ^3.2.1
   in_app_update: 4.2.3
   intl: any
   json_annotation: 4.9.0
@@ -69,6 +70,7 @@ dev_dependencies:
   build_runner: 2.4.15
   flutter_test:
     sdk: flutter
+  in_app_purchase_platform_interface: ^1.4.0
   json_serializable: 6.9.5
   lint: ^2.0.0
 
