@@ -42,7 +42,7 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
                     child: IntrinsicHeight(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 16,
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 16),
