@@ -11,6 +11,7 @@ import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
+import "package:dpip/core/providers.dart";
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -97,7 +98,7 @@ class _IntensityPageState extends State<IntensityPage> {
 
     radarList = await ExpTech().getRadarList();
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && GlobalProviders.location.auto) {
       await getSavedLocation();
     }
 
@@ -110,8 +111,8 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Future<void> start() async {
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = GlobalProviders.location.latitude ?? 0;
+    userLon = GlobalProviders.location.longitude ?? 0;
 
     isUserLocationValid = userLon != 0 && userLat != 0;
 
@@ -133,7 +134,7 @@ class _IntensityPageState extends State<IntensityPage> {
       await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
     }
 
-    if (!isUserLocationValid && !(Global.preference.getBool("auto-location") ?? false)) {
+    if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     }
 
