@@ -20,6 +20,7 @@ class SettingsListTile extends StatelessWidget {
   final bool enabled;
   final void Function()? onTap;
   final void Function()? onLongPress;
+  final TextStyle? titleStyle;
 
   const SettingsListTile({
     super.key,
@@ -31,13 +32,14 @@ class SettingsListTile extends StatelessWidget {
     this.enabled = true,
     this.onTap,
     this.onLongPress,
+    this.titleStyle,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: icon != null ? Icon(icon, weight: 600, color: context.colors.secondary) : leading,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(title, style: titleStyle ?? const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: subtitle,
       trailing: trailing,
       enabled: enabled,

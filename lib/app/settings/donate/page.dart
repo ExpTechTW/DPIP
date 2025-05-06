@@ -80,6 +80,14 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
             );
           }
 
+          final order = ['donation100', 'donation300', 'donation1000'];
+
+          data.sort((a, b) {
+            final indexA = order.indexOf(a.id);
+            final indexB = order.indexOf(b.id);
+            return indexA.compareTo(indexB);
+          });
+
           return ListView(
             children: [
               SettingsListSection(
@@ -87,6 +95,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   for (final product in data)
                     SettingsListTile(
                       title: product.title,
+                      titleStyle: product.id == 's_donation75'
+                          ? const TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)
+                          : const TextStyle(fontWeight: FontWeight.bold),
                       subtitle: Text(product.description),
                       trailing: Text(' ${product.price}'),
                       onTap: () {
