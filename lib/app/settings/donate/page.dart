@@ -88,30 +88,57 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
             return indexA.compareTo(indexB);
           });
 
+          final specialDonation = data.where((p) => p.id == 's_donation75').toList();
+          final regularDonations = data.where((p) => p.id != 's_donation75').toList();
+
           return ListView(
             children: [
-              SettingsListSection(
-                children: [
-                  for (final product in data)
-                    SettingsListTile(
-                      title: product.title,
-                      titleStyle: product.id == 's_donation75'
-                          ? const TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)
-                          : const TextStyle(fontWeight: FontWeight.bold),
-                      subtitle: Text(product.description),
-                      trailing: Text(' ${product.price}'),
-                      onTap: () {
-                        if (product.isSubscription) {
-                          InAppPurchase.instance.buyNonConsumable(
-                            purchaseParam: PurchaseParam(productDetails: product),
-                          );
-                        } else {
-                          InAppPurchase.instance.buyConsumable(purchaseParam: PurchaseParam(productDetails: product));
-                        }
-                      },
-                    ),
-                ],
-              ),
+              if (specialDonation.isNotEmpty)
+                SettingsListSection(
+                  title: '特別支持',
+                  children: [
+                    for (final product in specialDonation)
+                      SettingsListTile(
+                        title: product.title,
+                        titleStyle: product.id == 's_donation75'
+                                ? const TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)
+                                : const TextStyle(fontWeight: FontWeight.bold),
+                        subtitle: Text(product.description),
+                        trailing: Text(' ${product.price}'),
+                        onTap: () {
+                          if (product.isSubscription) {
+                            InAppPurchase.instance.buyNonConsumable(
+                              purchaseParam: PurchaseParam(productDetails: product),
+                            );
+                          } else {
+                            InAppPurchase.instance.buyConsumable(purchaseParam: PurchaseParam(productDetails: product));
+                          }
+                        },
+                      ),
+                  ],
+                ),
+              if (regularDonations.isNotEmpty)
+                SettingsListSection(
+                  title: '一般',
+                  children: [
+                    for (final product in regularDonations)
+                      SettingsListTile(
+                        title: product.title,
+                        titleStyle: const TextStyle(fontWeight: FontWeight.bold),
+                        subtitle: Text(product.description),
+                        trailing: Text(' ${product.price}'),
+                        onTap: () {
+                          if (product.isSubscription) {
+                            InAppPurchase.instance.buyNonConsumable(
+                              purchaseParam: PurchaseParam(productDetails: product),
+                            );
+                          } else {
+                            InAppPurchase.instance.buyConsumable(purchaseParam: PurchaseParam(productDetails: product));
+                          }
+                        },
+                      ),
+                  ],
+                ),
             ],
           );
         },
