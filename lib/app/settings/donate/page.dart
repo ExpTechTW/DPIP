@@ -99,7 +99,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     for (final product in specialDonation)
                       SettingsListTile(
-                        title: product.title,
+                        title: product.title.replaceAll(RegExp(r'\(.*?\)'), '').trim(),
                         titleStyle: product.id == 's_donation75'
                                 ? const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)
                                 : const TextStyle(fontWeight: FontWeight.bold),
@@ -123,7 +123,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     for (final product in regularDonations)
                       SettingsListTile(
-                        title: product.title,
+                        title: product.title.replaceAll(RegExp(r'\(.*?\)'), '').trim(),
                         titleStyle: const TextStyle(fontWeight: FontWeight.bold),
                         subtitle: Text(product.description),
                         trailing: Text(' ${product.price}'),
