@@ -101,7 +101,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                       SettingsListTile(
                         title: product.title,
                         titleStyle: product.id == 's_donation75'
-                                ? const TextStyle(color: Colors.yellow, fontWeight: FontWeight.bold)
+                                ? const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)
                                 : const TextStyle(fontWeight: FontWeight.bold),
                         subtitle: Text(product.description),
                         trailing: Text(' ${product.price}'),
