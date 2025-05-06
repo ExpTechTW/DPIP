@@ -32,79 +32,88 @@ class _TosBottomSheetState extends State<TosBottomSheet> {
       child: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              controller: _controller,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 16,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Column(
-                      children: [
-                        Icon(Symbols.monitor_heart_rounded, size: 36, color: context.colors.secondary),
-                        const SizedBox(height: 16),
-                        Text(
-                          context.i18n.monitor,
-                          style: context.theme.textTheme.headlineMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  controller: _controller,
+                  padding: const EdgeInsets.all(16),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight + 1),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Column(
+                              children: [
+                                Icon(Symbols.monitor_heart_rounded, size: 36, color: context.colors.secondary),
+                                const SizedBox(height: 16),
+                                Text(
+                                    context.i18n.monitor,
+                                    style: context.theme.textTheme.headlineMedium,
+                                    textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(context.i18n.trem_service_description, style: context.theme.textTheme.bodyLarge),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: context.colors.errorContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              context.i18n.real_time_magnitude_warning,
+                              style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: context.colors.errorContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              context.i18n.trem_station_warning,
+                              style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: context.colors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(context.i18n.trem_monitor_description, style: context.theme.textTheme.bodyLarge),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: context.colors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(context.i18n.station_noise_warning, style: context.theme.textTheme.bodyLarge),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: context.colors.surfaceContainer,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(context.i18n.trem_net_deployment, style: context.theme.textTheme.bodyLarge),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(context.i18n.trem_service_description, style: context.theme.textTheme.bodyLarge),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: context.colors.errorContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      context.i18n.real_time_magnitude_warning,
-                      style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: context.colors.errorContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      context.i18n.trem_station_warning,
-                      style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(context.i18n.trem_monitor_description, style: context.theme.textTheme.bodyLarge),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(context.i18n.station_noise_warning, style: context.theme.textTheme.bodyLarge),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: context.colors.surfaceContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(context.i18n.trem_net_deployment, style: context.theme.textTheme.bodyLarge),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ),
           const Divider(height: 1),
