@@ -30,7 +30,7 @@ class SettingsIndexPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final appInfo = '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
     final deviceInfo =
-        '${DeviceInfo.model}${DeviceInfo.serial != null ? '(${DeviceInfo.serial})' : ''}(${DeviceInfo.version})';
+        '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
     final location = SettingsListSection(
       title: context.i18n.settings_position,
