@@ -34,7 +34,7 @@
 
 ## [3.0.001] - 2025-05-01
 
-[unreleased]: https://github.com/exptechtw/dpip/compare/v3.0.005...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.005...HEAD
 [3.0.005]: https://github.com/exptechtw/dpip/compare/v3.0.004...v3.0.005
 [3.0.004]: https://github.com/exptechtw/dpip/compare/v3.0.003...v3.0.004
 [3.0.003]: https://github.com/exptechtw/dpip/compare/v3.0.002...v3.0.003
