@@ -1,32 +1,32 @@
-# Changelog
+# 更新日誌
 
-All notable changes to this project will be documented in this file.
+本專案的所有重要更改都將記錄在此文件中。
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/lang/zh-TW/spec/v2.0.0.html).
+格式基於 [如何維護更新日誌](https://keepachangelog.com/zh-TW/1.1.0/)，
+並且本專案遵循 [語意化版本](https://semver.org/lang/zh-TW/spec/v2.0.0.html)。
 
-## [Unreleased]
+## [未發布]
 
-### Added
-- Added donation disclaimer text.
-- Rework changelog page.
+### 新增
+- 新增贊助免責聲明文字。
+- 重新設計更新日誌頁面。
 
-### Changed
-- Optimized donation page.
+### 更改
+- 優化贊助頁面。
 
 ## [3.0.005] - 2025-05-06
 
-### Fixed
-- Cannot accept monitor terms when using devices with larger display.
-- Separate comsunable and non-comsunable donation item.
-- Removed redundant currency symbol inside donation price.
-- (iOS) Fixed Device Info value overflowing.
+### 修復
+- 修復使用較大顯示器設備時無法接受監控條款的問題。
+- 分開消耗性和非消耗性贊助項目。
+- 移除贊助價格中多餘的貨幣符號。
+- (iOS) 修復裝置資訊值溢出的問題。
 
 ## [3.0.004] - 2025-05-05
 
-### Changed
-- Switch donation to use in-app-purchase.
-- Refactor notification sound testing page.
+### 更改
+- 將贊助改為使用應用內購買。
+- 重構通知聲音測試頁面。
 
 ## [3.0.003] - 2025-05-05
 
