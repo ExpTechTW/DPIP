@@ -1,6 +1,6 @@
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:flutter/material.dart";
-import "package:intl/intl.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class RainTimeSelector extends StatefulWidget {
   final Function(String, String) onSelectionChanged;
@@ -46,7 +46,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
   void initState() {
     super.initState();
     _selectedTimestamp = widget.timeList.last;
-    _selectedInterval = "now"; // Default to now
+    _selectedInterval = 'now'; // Default to now
     _timeScrollController = ScrollController();
     _intervalScrollController = ScrollController();
     _animationController = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
@@ -169,7 +169,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          DateFormat("HH:mm").format(time),
+                          DateFormat('HH:mm').format(time),
                           style: TextStyle(
                             color: isSelected ? context.colors.onSecondary : context.colors.onSurface,
                             fontWeight: FontWeight.bold,
@@ -177,7 +177,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                           ),
                         ),
                         Text(
-                          DateFormat("MM/dd").format(time),
+                          DateFormat('MM/dd').format(time),
                           style: TextStyle(
                             color: isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
                             fontSize: 12,

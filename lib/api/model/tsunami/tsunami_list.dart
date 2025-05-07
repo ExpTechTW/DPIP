@@ -1,6 +1,6 @@
-import "package:freezed_annotation/freezed_annotation.dart";
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-part "tsunami_list.g.dart";
+part 'tsunami_list.g.dart';
 
 @JsonSerializable()
 class TsunamiList {

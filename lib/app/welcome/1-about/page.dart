@@ -1,9 +1,9 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:go_router/go_router.dart";
+import 'package:go_router/go_router.dart';
 
-import "package:dpip/app/welcome/2-exptech/page.dart";
-import "package:dpip/utils/extensions/build_context.dart";
+import 'package:dpip/app/welcome/2-exptech/page.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class WelcomeAboutPage extends StatelessWidget {
   const WelcomeAboutPage({super.key});
@@ -35,7 +35,7 @@ class WelcomeAboutPage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset("assets/DPIP.png", width: 120, height: 120),
+                      child: Image.asset('assets/DPIP.png', width: 120, height: 120),
                     ),
                   ),
                   Padding(
@@ -54,7 +54,7 @@ class WelcomeAboutPage extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          "Disaster Prevention Information Platform",
+                          'Disaster Prevention Information Platform',
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withOpacity(0.7),
                           ),

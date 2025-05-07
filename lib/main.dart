@@ -1,23 +1,23 @@
-import "package:dpip/core/fcm.dart";
-import "package:dpip/core/notify.dart";
-import "package:dpip/core/service.dart";
-import "package:flutter/material.dart";
-import "package:flutter/services.dart";
+import 'package:dpip/core/fcm.dart';
+import 'package:dpip/core/notify.dart';
+import 'package:dpip/core/service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import "package:dynamic_system_colors/dynamic_system_colors.dart";
-import "package:flutter_localizations/flutter_localizations.dart";
-import "package:flutter_localized_locales/flutter_localized_locales.dart";
-import "package:provider/provider.dart";
-import "package:timezone/data/latest.dart";
+import 'package:dynamic_system_colors/dynamic_system_colors.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:provider/provider.dart';
+import 'package:timezone/data/latest.dart';
 
-import "package:dpip/core/device_info.dart";
-import "package:dpip/core/preference.dart";
-import "package:dpip/core/providers.dart";
-import "package:dpip/global.dart";
+import 'package:dpip/core/device_info.dart';
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/l10n/app_localizations.dart';
-import "package:dpip/models/settings/ui.dart";
-import "package:dpip/router.dart";
-import "package:dpip/utils/log.dart";
+import 'package:dpip/models/settings/ui.dart';
+import 'package:dpip/router.dart';
+import 'package:dpip/utils/log.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +26,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
 
   final talker = TalkerManager.instance;
-  talker.log("start");
+  talker.log('start');
   FlutterError.onError = (details) => talker.handle(details.exception, details.stack);
 
   await Global.init();
@@ -80,7 +80,7 @@ class DpipApp extends StatelessWidget {
                 final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.2);
                 return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: scale), child: child!);
               },
-              title: "DPIP",
+              title: 'DPIP',
               theme: lightTheme,
               darkTheme: darkTheme,
               themeMode: model.themeMode,

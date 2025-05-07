@@ -1,4 +1,4 @@
-import "dart:ui";
+import 'dart:ui';
 
 class MagnitudeColor {
   static const magnitude0 = Color(0xFF000000);

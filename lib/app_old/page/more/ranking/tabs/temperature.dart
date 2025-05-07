@@ -22,7 +22,7 @@ class RankingTemperatureTab extends StatefulWidget {
 class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
   MergeType merge = MergeType.none;
   bool reversed = false;
-  String time = "";
+  String time = '';
   List<WeatherStation> data = [];
   List<WeatherStation> ranked = [];
 
@@ -201,7 +201,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                           size: iconSize,
                           fill: 1,
                         )
-                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
+                        : Text('$rank', style: TextStyle(color: foregroundColor, fontSize: fontSize));
 
                 final percentage =
                     reversed
@@ -215,7 +215,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                         ? [
                           Text(
                             merge == MergeType.town
-                                ? "${item.station.county}${item.station.town}"
+                                ? '${item.station.county}${item.station.town}'
                                 : item.station.county,
                             style: TextStyle(
                               fontSize: fontSize,
@@ -243,7 +243,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "${item.station.county}${item.station.town}",
+                            '${item.station.county}${item.station.town}',
                             style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
                           ),
                         ];
@@ -256,7 +256,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                             : Row(children: location),
                   ),
                   Text(
-                    "${item.data.air.temperature.toStringAsFixed(1)}℃",
+                    '${item.data.air.temperature.toStringAsFixed(1)}℃',
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight:

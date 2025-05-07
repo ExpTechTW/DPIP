@@ -1,20 +1,20 @@
-import "dart:io";
-import "dart:math";
+import 'dart:io';
+import 'dart:math';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/weather/weather.dart";
-import "package:dpip/app_old/page/map/meteor.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/app_old/page/map/meteor.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class HumidityData {
   final double latitude;
@@ -68,17 +68,17 @@ class _HumidityMapState extends State<HumidityMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-      "humidity-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'humidity-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     weather_list = await ExpTech().getWeatherList();
@@ -105,18 +105,18 @@ class _HumidityMapState extends State<HumidityMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-        "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        'markers-geojson',
+        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
       );
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -132,22 +132,22 @@ class _HumidityMapState extends State<HumidityMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -160,26 +160,26 @@ class _HumidityMapState extends State<HumidityMap> {
         humidityDataList
             .map(
               (data) => {
-                "type": "Feature",
-                "properties": {"id": data.id, "humidity": data.humidity},
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [data.longitude, data.latitude],
+                'type': 'Feature',
+                'properties': {'id': data.id, 'humidity': data.humidity},
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [data.longitude, data.latitude],
                 },
               },
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("humidity-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource('humidity-data', {'type': 'FeatureCollection', 'features': features});
 
-    await _mapController.removeLayer("humidity-circles");
+    await _mapController.removeLayer('humidity-circles');
     await _mapController.addLayer(
-      "humidity-data",
-      "humidity-circles",
+      'humidity-data',
+      'humidity-circles',
       const CircleLayerProperties(
         circleRadius: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           7,
           5,
@@ -188,18 +188,18 @@ class _HumidityMapState extends State<HumidityMap> {
         ],
         circleColor: [
           Expressions.interpolate,
-          ["linear"],
-          [Expressions.get, "humidity"],
+          ['linear'],
+          [Expressions.get, 'humidity'],
           0,
-          "#ffb63d",
+          '#ffb63d',
           50,
-          "#ffffff",
+          '#ffffff',
           100,
-          "#0000FF",
+          '#0000FF',
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
-        circleStrokeColor: "#000000",
+        circleStrokeColor: '#000000',
         circleStrokeOpacity: 0.7,
       ),
     );
@@ -220,17 +220,17 @@ class _HumidityMapState extends State<HumidityMap> {
       }
     });
 
-    await _mapController.removeLayer("humidity-labels");
+    await _mapController.removeLayer('humidity-labels');
     await _mapController.addSymbolLayer(
-      "humidity-data",
-      "humidity-labels",
+      'humidity-data',
+      'humidity-labels',
       const SymbolLayerProperties(
-        textField: ["get", "humidity"],
+        textField: ['get', 'humidity'],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 1,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
@@ -276,7 +276,7 @@ class _HumidityMapState extends State<HumidityMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["0%", "25%", "50%", "75%", "100%"];
+    final labels = ['0%', '25%', '50%', '75%', '100%'];
     return SizedBox(
       width: 300,
       child: Row(
@@ -392,7 +392,7 @@ class _HumidityMapState extends State<HumidityMap> {
                         decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
-                        type: "humidity",
+                        type: 'humidity',
                         stationId: _selectedStationId!,
                         onClose: () {
                           setState(() {

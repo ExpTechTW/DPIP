@@ -1,19 +1,19 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:material_symbols_icons/symbols.dart";
+import 'package:material_symbols_icons/symbols.dart';
 
-import "package:dpip/app_old/page/map/lightning/lightning.dart";
-import "package:dpip/app/map/monitor/monitor.dart";
-import "package:dpip/app_old/page/map/radar/radar.dart";
-import "package:dpip/app_old/page/map/rain/rain.dart";
-import "package:dpip/app_old/page/map/tsunami/tsunami.dart";
-import "package:dpip/app_old/page/map/typhoon/typhoon.dart";
-import "package:dpip/app_old/page/map/weather/humidity.dart";
-import "package:dpip/app_old/page/map/weather/pressure.dart";
-import "package:dpip/app_old/page/map/weather/temperature.dart";
-import "package:dpip/app_old/page/map/weather/wind.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/widgets/list/tile_group_header.dart";
+import 'package:dpip/app_old/page/map/lightning/lightning.dart';
+import 'package:dpip/app/map/monitor/monitor.dart';
+import 'package:dpip/app_old/page/map/radar/radar.dart';
+import 'package:dpip/app_old/page/map/rain/rain.dart';
+import 'package:dpip/app_old/page/map/tsunami/tsunami.dart';
+import 'package:dpip/app_old/page/map/typhoon/typhoon.dart';
+import 'package:dpip/app_old/page/map/weather/humidity.dart';
+import 'package:dpip/app_old/page/map/weather/pressure.dart';
+import 'package:dpip/app_old/page/map/weather/temperature.dart';
+import 'package:dpip/app_old/page/map/weather/wind.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/list/tile_group_header.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});

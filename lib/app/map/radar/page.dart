@@ -1,18 +1,18 @@
-import "package:dpip/models/settings/location.dart";
-import "package:dpip/utils/extensions/latlng.dart";
-import "package:dpip/utils/geojson.dart";
-import "package:flutter/material.dart";
+import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/utils/radar_color.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
-import "package:provider/provider.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/utils/radar_color.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
+import 'package:provider/provider.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -172,16 +172,16 @@ class _MapRadarPageState extends State<MapRadarPage> {
                 onTimeSelected: (time) {
                   final newTileUrl = _getTileUrl(time);
 
-                  mapController.removeLayer("radarLayer");
-                  mapController.removeSource("radarSource");
+                  mapController.removeLayer('radarLayer');
+                  mapController.removeSource('radarSource');
 
-                  mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+                  mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
                   mapController.addLayer(
-                    "radarSource",
-                    "radarLayer",
+                    'radarSource',
+                    'radarLayer',
                     const RasterLayerProperties(),
-                    belowLayerId: "county-outline",
+                    belowLayerId: 'county-outline',
                   );
                 },
               ),
@@ -204,7 +204,7 @@ class ColorBarPainter extends CustomPainter {
     final width = size.width / colors.length;
 
     for (int i = 0; i < colors.length; i++) {
-      paint.color = Color(int.parse("0xFF${colors[i]}"));
+      paint.color = Color(int.parse('0xFF${colors[i]}'));
       canvas.drawRect(Rect.fromLTWH(i * width, 0, width, size.height), paint);
     }
   }

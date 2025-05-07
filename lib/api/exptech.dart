@@ -1,30 +1,30 @@
-import "dart:convert";
-import "dart:io";
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:dpip/api/model/changelog/changelog.dart';
-import "package:dpip/utils/extensions/string.dart";
-import "package:http/http.dart";
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:http/http.dart';
 
-import "package:dpip/api/model/announcement.dart";
-import "package:dpip/api/model/crowdin/localization_progress.dart";
-import "package:dpip/api/model/eew.dart";
-import "package:dpip/api/model/history.dart";
-import "package:dpip/api/model/meteor_station.dart";
-import "package:dpip/api/model/notification_record.dart";
-import "package:dpip/api/model/notify/notify_settings.dart";
-import "package:dpip/api/model/report/earthquake_report.dart";
-import "package:dpip/api/model/report/partial_earthquake_report.dart";
-import "package:dpip/api/model/rts/rts.dart";
-import "package:dpip/api/model/server_status.dart";
-import "package:dpip/api/model/station.dart";
-import "package:dpip/api/model/tsunami/tsunami.dart";
-import "package:dpip/api/model/weather/lightning.dart";
-import "package:dpip/api/model/weather/rain.dart";
-import "package:dpip/api/model/weather/weather.dart";
-import "package:dpip/api/model/weather_schema.dart";
-import "package:dpip/api/route.dart";
-import "package:dpip/models/settings/notify.dart";
-import "package:dpip/utils/extensions/response.dart";
+import 'package:dpip/api/model/announcement.dart';
+import 'package:dpip/api/model/crowdin/localization_progress.dart';
+import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/api/model/history.dart';
+import 'package:dpip/api/model/meteor_station.dart';
+import 'package:dpip/api/model/notification_record.dart';
+import 'package:dpip/api/model/notify/notify_settings.dart';
+import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/api/model/report/partial_earthquake_report.dart';
+import 'package:dpip/api/model/rts/rts.dart';
+import 'package:dpip/api/model/server_status.dart';
+import 'package:dpip/api/model/station.dart';
+import 'package:dpip/api/model/tsunami/tsunami.dart';
+import 'package:dpip/api/model/weather/lightning.dart';
+import 'package:dpip/api/model/weather/rain.dart';
+import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/api/route.dart';
+import 'package:dpip/models/settings/notify.dart';
+import 'package:dpip/utils/extensions/response.dart';
 
 class ExpTech {
   String? apikey;
@@ -37,7 +37,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final json = jsonDecode(res.body);
@@ -69,7 +69,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -84,10 +84,10 @@ class ExpTech {
       requestUrl = Uri.parse(
         requestUrl
             .toString()
-            .replaceAll("rts", "rts/${time ~/ 1000}")
-            .replaceAll("lb-", "api-")
-            .replaceAll("-3", "-1")
-            .replaceAll("-4", "-2")
+            .replaceAll('rts', 'rts/${time ~/ 1000}')
+            .replaceAll('lb-', 'api-')
+            .replaceAll('-3', '-1')
+            .replaceAll('-4', '-2')
             .replaceAll(RegExp(r'api-\d+'), 'api-1'),
       );
     }
@@ -95,7 +95,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     return Rts.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
@@ -108,10 +108,10 @@ class ExpTech {
       requestUrl = Uri.parse(
         requestUrl
             .toString()
-            .replaceAll("eew", "eew/${time ~/ 1000}")
-            .replaceAll("lb-", "api-")
-            .replaceAll("-3", "-1")
-            .replaceAll("-4", "-2")
+            .replaceAll('eew', 'eew/${time ~/ 1000}')
+            .replaceAll('lb-', 'api-')
+            .replaceAll('-3', '-1')
+            .replaceAll('-4', '-2')
             .replaceAll(RegExp(r'api-\d+'), 'api-1'),
       );
     }
@@ -121,7 +121,7 @@ class ExpTech {
     if (res.statusCode == 200) {
       return (jsonDecode(res.body) as List<dynamic>).map((e) => Eew.fromJson(e as Map<String, dynamic>)).toList();
     } else {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
   }
 
@@ -133,7 +133,7 @@ class ExpTech {
     if (res.statusCode == 200) {
       return int.parse(res.body);
     } else {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
   }
 
@@ -143,7 +143,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     return (jsonDecode(res.body) as Map<String, dynamic>).map((key, value) {
@@ -157,7 +157,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
@@ -171,7 +171,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final json = jsonDecode(res.body) as List;
@@ -185,7 +185,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final json = jsonDecode(res.body) as List;
@@ -199,7 +199,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -213,7 +213,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -227,7 +227,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -241,7 +241,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final json = jsonDecode(res.body) as Map<String, dynamic>;
@@ -255,7 +255,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -269,7 +269,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -283,7 +283,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -297,7 +297,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -311,7 +311,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final jsonData = jsonDecode(res.body) as Map<String, dynamic>;
@@ -325,7 +325,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -339,7 +339,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -353,7 +353,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -367,7 +367,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -381,7 +381,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -395,7 +395,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     return jsonDecode(res.body) as Map<String, dynamic>;
@@ -407,7 +407,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -421,7 +421,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -435,7 +435,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -449,7 +449,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -463,7 +463,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final Map<String, dynamic> jsonData = jsonDecode(res.body) as Map<String, dynamic>;
@@ -477,7 +477,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 200) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -494,9 +494,9 @@ class ExpTech {
     if (res.statusCode == 200) {
       return res.body;
     } else if (res.statusCode == 202) {
-      return "${res.statusCode} $requestUrl";
+      return '${res.statusCode} $requestUrl';
     } else {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
   }
 
@@ -507,7 +507,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (!res.ok) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
 
     final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
@@ -522,7 +522,7 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode != 202) {
-      throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
   }
 }

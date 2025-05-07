@@ -33,7 +33,7 @@ class _DpipState extends State<Dpip> {
   int currentActivePage = 0;
   bool update = false;
   bool criticalUpdate = false;
-  String lastVersion = "";
+  String lastVersion = '';
 
   @override
   void initState() {
@@ -45,8 +45,8 @@ class _DpipState extends State<Dpip> {
   }
 
   int compareVersions(String version1, String version2) {
-    final List<int> v1Parts = version1.split(".").map(int.parse).toList();
-    final List<int> v2Parts = version2.split(".").map(int.parse).toList();
+    final List<int> v1Parts = version1.split('.').map(int.parse).toList();
+    final List<int> v2Parts = version2.split('.').map(int.parse).toList();
 
     final int maxLength = v1Parts.length > v2Parts.length ? v1Parts.length : v2Parts.length;
     v1Parts.length = maxLength;
@@ -68,21 +68,21 @@ class _DpipState extends State<Dpip> {
   Future<void> checkForUpdates() async {
     try {
       final data = await ExpTech().getSupport();
-      final List<String> criticalList = (data["support-version"] as List<dynamic>).cast<String>();
+      final List<String> criticalList = (data['support-version'] as List<dynamic>).cast<String>();
 
-      if (Global.packageInfo.version.endsWith(".0")) {
-        lastVersion = data["last-version"]["release"];
-      } else if (Global.packageInfo.version.endsWith("00")) {
-        lastVersion = data["last-version"]["beta"];
+      if (Global.packageInfo.version.endsWith('.0')) {
+        lastVersion = data['last-version']['release'];
+      } else if (Global.packageInfo.version.endsWith('00')) {
+        lastVersion = data['last-version']['beta'];
       } else {
-        lastVersion = data["last-version"]["alpha"];
+        lastVersion = data['last-version']['alpha'];
       }
       update = compareVersions(lastVersion, Global.packageInfo.version) == 1 ? true : false;
 
       criticalUpdate = !criticalList.contains(Global.packageInfo.version);
 
       final bool skip =
-          (DateTime.now().millisecondsSinceEpoch - (Global.preference.getInt("update-skip") ?? 0)) < 86400 * 3 * 1000;
+          (DateTime.now().millisecondsSinceEpoch - (Global.preference.getInt('update-skip') ?? 0)) < 86400 * 3 * 1000;
 
       if ((update && !skip) || criticalUpdate) {
         if (!criticalUpdate && Platform.isAndroid) {
@@ -115,14 +115,14 @@ class _DpipState extends State<Dpip> {
         }
       } else {
         final data = await ExpTech().getAnnouncement();
-        if (data.last.show && Global.preference.getString("announcement") != data.last.time.toString()) {
-          Global.preference.setString("announcement", data.last.time.toString());
+        if (data.last.show && Global.preference.getString('announcement') != data.last.time.toString()) {
+          Global.preference.setString('announcement', data.last.time.toString());
           if (context.mounted) {
             await showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
           }
         } else {
-          if (Global.preference.getString("changelog") != Global.packageInfo.version) {
-            Global.preference.setString("changelog", Global.packageInfo.version);
+          if (Global.preference.getString('changelog') != Global.packageInfo.version) {
+            Global.preference.setString('changelog', Global.packageInfo.version);
             showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
           }
         }
@@ -132,7 +132,7 @@ class _DpipState extends State<Dpip> {
         setState(() {});
       }
     } catch (e) {
-      TalkerManager.instance.error("Error checking for updates: $e");
+      TalkerManager.instance.error('Error checking for updates: $e');
       await _showErrorDialog();
     }
   }

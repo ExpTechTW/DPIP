@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
 class InstrumentalIntensityColor {
   static const intensity_3 = Color(0xff0005d0);
@@ -38,7 +38,7 @@ class InstrumentalIntensityColor {
       case 7:
         return intensity7;
       default:
-        throw "Intensity index out of range. Range: 0..9, Received: $intensity";
+        throw 'Intensity index out of range. Range: 0..9, Received: $intensity';
     }
   }
 

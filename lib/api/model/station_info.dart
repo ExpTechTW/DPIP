@@ -1,7 +1,7 @@
-import "package:json_annotation/json_annotation.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-part "station_info.g.dart";
+part 'station_info.g.dart';
 
 @JsonSerializable()
 class StationInfo {
@@ -9,11 +9,11 @@ class StationInfo {
   final int code;
 
   /// 測站經度
-  @JsonKey(name: "lon")
+  @JsonKey(name: 'lon')
   final double longitude;
 
   /// 測站緯度
-  @JsonKey(name: "lat")
+  @JsonKey(name: 'lat')
   final double latitude;
 
   /// 測站安裝時間

@@ -1,6 +1,6 @@
-import "package:freezed_annotation/freezed_annotation.dart";
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-part "localization_progress.g.dart";
+part 'localization_progress.g.dart';
 
 @JsonSerializable()
 class CrowdinLocalizationProgress {

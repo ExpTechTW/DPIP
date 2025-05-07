@@ -1,15 +1,15 @@
-import "dart:convert";
-import "dart:io";
+import 'dart:convert';
+import 'dart:io';
 
-import "package:dpip/core/providers.dart";
-import "package:awesome_notifications/awesome_notifications.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/need_location.dart";
-import "package:flutter/material.dart";
-import "package:flutter/services.dart";
-import "package:material_symbols_icons/symbols.dart";
+import 'package:dpip/core/providers.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/need_location.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class SoundListTile extends StatefulWidget {
   final String title;
@@ -37,7 +37,7 @@ class SoundListTileState extends State<SoundListTile> {
   }
 
   Future<void> start() async {
-    final json = await rootBundle.loadString("assets/notify_test.json");
+    final json = await rootBundle.loadString('assets/notify_test.json');
     data = jsonDecode(json) as Map<String, dynamic>;
   }
 
@@ -60,10 +60,10 @@ class SoundListTileState extends State<SoundListTile> {
     if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     } else {
-      final int limit = Global.preference.getInt("limit-sound-test") ?? 0;
+      final int limit = Global.preference.getInt('limit-sound-test') ?? 0;
       final int now = DateTime.now().millisecondsSinceEpoch;
       if (now - limit > 1000) {
-        Global.preference.setInt("limit-sound-test", now);
+        Global.preference.setInt('limit-sound-test', now);
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: -1,

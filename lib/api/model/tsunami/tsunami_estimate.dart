@@ -1,6 +1,6 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
-part "tsunami_estimate.g.dart";
+part 'tsunami_estimate.g.dart';
 
 @JsonSerializable()
 class TsunamiEstimate {
@@ -18,7 +18,7 @@ class TsunamiEstimate {
   /// ```
   /// 1712102340000
   /// ```
-  @JsonKey(name: "arrival_time")
+  @JsonKey(name: 'arrival_time')
   final int arrivalTime;
 
   /// - 海嘯最高預估高度
@@ -27,7 +27,7 @@ class TsunamiEstimate {
   /// ```
   /// 0
   /// ```
-  @JsonKey(name: "wave_height")
+  @JsonKey(name: 'wave_height')
   final int waveHeight;
 
   TsunamiEstimate({required this.area, required this.arrivalTime, required this.waveHeight});

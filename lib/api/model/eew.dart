@@ -1,13 +1,13 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
-import "package:dpip/api/model/eew_info.dart";
-import "package:dpip/utils/parser.dart";
+import 'package:dpip/api/model/eew_info.dart';
+import 'package:dpip/utils/parser.dart';
 
-part "eew.g.dart";
+part 'eew.g.dart';
 
 @JsonSerializable()
 class Eew {
-  final String type = "eew";
+  final String type = 'eew';
 
   /// 地震速報來源機關
   final String author;
@@ -22,7 +22,7 @@ class Eew {
   final int status;
 
   /// 地震速報是否為最終報
-  @JsonKey(name: "final", fromJson: parseBoolishInt)
+  @JsonKey(name: 'final', fromJson: parseBoolishInt)
   final bool isFinal;
 
   /// 地震速報參數

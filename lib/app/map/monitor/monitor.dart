@@ -1,43 +1,43 @@
-import "dart:async";
-import "dart:ui" as ui;
+import 'dart:async';
+import 'dart:ui' as ui;
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:go_router/go_router.dart";
-import "package:intl/intl.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
-import "package:material_symbols_icons/symbols.dart";
-import "package:tutorial_coach_mark/tutorial_coach_mark.dart";
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/eew.dart";
-import "package:dpip/api/model/rts/rts.dart";
-import "package:dpip/api/model/station.dart";
-import "package:dpip/api/model/station_info.dart";
-import "package:dpip/app/map/monitor/_widgets/layer_toggle.dart";
-import "package:dpip/app/map/monitor/_widgets/tos_sheet.dart";
-import "package:dpip/core/eew.dart";
-import "package:dpip/core/preference.dart";
-import "package:dpip/core/rts.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/constants.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/extensions/int.dart";
-import "package:dpip/utils/extensions/latlng.dart";
-import "package:dpip/utils/geojson.dart";
-import "package:dpip/utils/instrumental_intensity_color.dart";
-import "package:dpip/utils/intensity_color.dart";
-import "package:dpip/utils/log.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/api/model/rts/rts.dart';
+import 'package:dpip/api/model/station.dart';
+import 'package:dpip/api/model/station_info.dart';
+import 'package:dpip/app/map/monitor/_widgets/layer_toggle.dart';
+import 'package:dpip/app/map/monitor/_widgets/tos_sheet.dart';
+import 'package:dpip/core/eew.dart';
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/core/rts.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/instrumental_intensity_color.dart';
+import 'package:dpip/utils/intensity_color.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 import 'package:dpip/app/map/monitor/eew_info.dart';
 
 class MapMonitorPage extends StatefulWidget {
   const MapMonitorPage({super.key});
 
-  static const route = "/map/monitor";
+  static const route = '/map/monitor';
 
   @override
   State<MapMonitorPage> createState() => _MapMonitorPageState();
@@ -57,7 +57,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   double userLat = 0;
   double userLon = 0;
   double _ping = 0;
-  String _formattedPing = "";
+  String _formattedPing = '';
   final Map<String, double> _eewDist = {};
   final Map<String, int> _eewUpdateList = {};
   final Map<String, Map<String, int>> _userEewArriveTime = {};
@@ -146,41 +146,41 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   Future<void> _setupStationSource(Map<String, Station> data) async {
     _stations = data;
     await _mapController.addSource(
-      "station-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'station-geojson',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
     await _mapController.addSource(
-      "station-geojson-intensity-0",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'station-geojson-intensity-0',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
     await _mapController.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'markers-geojson',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
     _addStationLayer();
   }
 
   Future<void> _addStationLayer() async {
     await _mapController.addCircleLayer(
-      "station-geojson",
-      "station",
+      'station-geojson',
+      'station',
       CircleLayerProperties(circleColor: _getStationColorExpression(), circleRadius: _getStationRadiusExpression()),
     );
     await _mapController.addCircleLayer(
-      "station-geojson-intensity-0",
-      "station-intensity-0",
-      CircleLayerProperties(circleColor: "#7B7B7B", circleRadius: _getStationRadiusExpression()),
+      'station-geojson-intensity-0',
+      'station-intensity-0',
+      CircleLayerProperties(circleColor: '#7B7B7B', circleRadius: _getStationRadiusExpression()),
     );
 
     await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
+      'markers-geojson',
+      'markers',
       const SymbolLayerProperties(
-        symbolSortKey: [Expressions.get, "intensity"],
-        symbolZOrder: "source",
+        symbolSortKey: [Expressions.get, 'intensity'],
+        symbolZOrder: 'source',
         iconSize: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           5,
           0.5,
@@ -189,63 +189,63 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
         ],
         iconImage: [
           Expressions.match,
-          [Expressions.get, "intensity"],
+          [Expressions.get, 'intensity'],
           1,
-          "intensity-1",
+          'intensity-1',
           2,
-          "intensity-2",
+          'intensity-2',
           3,
-          "intensity-3",
+          'intensity-3',
           4,
-          "intensity-4",
+          'intensity-4',
           5,
-          "intensity-5",
+          'intensity-5',
           6,
-          "intensity-6",
+          'intensity-6',
           7,
-          "intensity-7",
+          'intensity-7',
           8,
-          "intensity-8",
+          'intensity-8',
           9,
-          "intensity-9",
+          'intensity-9',
           10,
-          "cross",
-          "gps",
+          'cross',
+          'gps',
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
       ),
     );
 
-    await _mapController.addGeoJsonSource("box-geojson", GeoJsonBuilder.empty);
+    await _mapController.addGeoJsonSource('box-geojson', GeoJsonBuilder.empty);
 
     await _mapController.addLayer(
-      "box-geojson",
-      "box-geojson",
+      'box-geojson',
+      'box-geojson',
       const LineLayerProperties(
         lineWidth: 2,
         lineColor: [
-          "match",
-          ["get", "i"],
+          'match',
+          ['get', 'i'],
           9,
-          "#FF0000",
+          '#FF0000',
           8,
-          "#FF0000",
+          '#FF0000',
           7,
-          "#FF0000",
+          '#FF0000',
           6,
-          "#FF0000",
+          '#FF0000',
           5,
-          "#FF0000",
+          '#FF0000',
           4,
-          "#FF0000",
+          '#FF0000',
           3,
-          "#EAC100",
+          '#EAC100',
           2,
-          "#EAC100",
+          '#EAC100',
           1,
-          "#00DB00",
-          "#00DB00",
+          '#00DB00',
+          '#00DB00',
         ],
       ),
     );
@@ -276,8 +276,8 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     final bool status = (((_timeReplay == 0) ? _getCurrentTime() : _timeReplay) - _lsatGetRtsDataTime) < 3000;
     if (!status && _rtsData != null) {
       _rtsData = null;
-      _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson());
-      _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0());
+      _mapController.setGeoJsonSource('station-geojson', _generateStationGeoJson());
+      _mapController.setGeoJsonSource('station-geojson-intensity-0', _generateStationGeoJsonIntensity0());
     }
     return status;
   }
@@ -300,8 +300,8 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   }
 
   Future<void> _updateMarkers() async {
-    await _mapController.setGeoJsonSource("station-geojson", _generateStationGeoJson(_rtsData));
-    await _mapController.setGeoJsonSource("station-geojson-intensity-0", _generateStationGeoJsonIntensity0(_rtsData));
+    await _mapController.setGeoJsonSource('station-geojson', _generateStationGeoJson(_rtsData));
+    await _mapController.setGeoJsonSource('station-geojson-intensity-0', _generateStationGeoJsonIntensity0(_rtsData));
   }
 
   Future<void> _updateEewData() async {
@@ -322,7 +322,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
         markers.add(
           GeoJsonFeatureBuilder(
             GeoJsonFeatureType.Point,
-          ).setProperty("intensity", 10).setGeometry(_eewLastInfo[id]!.eq.latlng.toGeoJsonCoordinates()),
+          ).setProperty('intensity', 10).setGeometry(_eewLastInfo[id]!.eq.latlng.toGeoJsonCoordinates()),
         );
       }
     }
@@ -334,19 +334,19 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
         markers.add(
           GeoJsonFeatureBuilder(
             GeoJsonFeatureType.Point,
-          ).setProperty("intensity", intensity).setGeometry(info.latlng.toGeoJsonCoordinates()),
+          ).setProperty('intensity', intensity).setGeometry(info.latlng.toGeoJsonCoordinates()),
         );
       }
     });
 
     if (isUserLocationValid) {
       markers.add(
-        GeoJsonFeatureBuilder(GeoJsonFeatureType.Point).setGeometry([userLon, userLat]).setProperty("intensity", 11),
+        GeoJsonFeatureBuilder(GeoJsonFeatureType.Point).setGeometry([userLon, userLat]).setProperty('intensity', 11),
       );
     }
 
     if (markers.isNotEmpty) {
-      await _mapController.setGeoJsonSource("markers-geojson", GeoJsonBuilder().setFeatures(markers).build());
+      await _mapController.setGeoJsonSource('markers-geojson', GeoJsonBuilder().setFeatures(markers).build());
     }
   }
 
@@ -370,15 +370,15 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     final List<Widget> rtsUI = [];
     if (_rtsData!.box.keys.isNotEmpty) {
       if (_isBoxVisible) {
-        for (final area in Global.box["features"]) {
-          final int id = area["properties"]["ID"];
+        for (final area in Global.box['features']) {
+          final int id = area['properties']['ID'];
           if (_rtsData!.box[id.toString()] == null) continue;
-          final bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area["geometry"]["coordinates"][0]);
+          final bool skip = checkBoxSkip(_eewLastInfo, _eewDist, area['geometry']['coordinates'][0]);
           if (!skip) {
             features.add(
               GeoJsonFeatureBuilder(
                 GeoJsonFeatureType.Polygon,
-              ).setGeometry(area["geometry"]["coordinates"][0]).setProperty("i", _rtsData!.box[id.toString()]),
+              ).setGeometry(area['geometry']['coordinates'][0]).setProperty('i', _rtsData!.box[id.toString()]),
             );
           }
         }
@@ -421,7 +421,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
       }
     }
 
-    await _mapController.setGeoJsonSource("box-geojson", GeoJsonBuilder().setFeatures(features).build());
+    await _mapController.setGeoJsonSource('box-geojson', GeoJsonBuilder().setFeatures(features).build());
     _rtsUI = rtsUI;
   }
 
@@ -447,10 +447,10 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
           userLat,
           userLon,
         );
-        _userEewIntensity[eew.id] = intensityFloatToInt(info["i"]);
+        _userEewIntensity[eew.id] = intensityFloatToInt(info['i']);
         _userEewArriveTime[eew.id] = {
-          "s": (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
-          "p": (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info["dist"])).floor(),
+          's': (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info['dist'])).floor(),
+          'p': (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info['dist'])).floor(),
         };
       }
 
@@ -460,11 +460,11 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
 
       if (_eewLastInfo[eew.id]?.status == 1) {
         _eewIntensityArea[eew.id].forEach((key, data) {
-          if (key != "max_i") {
-            final int i = intensityFloatToInt(data["i"]);
+          if (key != 'max_i') {
+            final int i = intensityFloatToInt(data['i']);
             if (i >= 4) {
-              final String city = Global.location[key]?.city ?? "";
-              if (city != "" && !alertArea.contains(city)) {
+              final String city = Global.location[key]?.city ?? '';
+              if (city != '' && !alertArea.contains(city)) {
                 alertArea.add(city);
               }
             }
@@ -501,7 +501,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                             style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                           ),
                           Text(
-                            context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ""),
+                            context.i18n.eew_no_x(_eewLastInfo[eew.id]?.serial.toString() ?? ''),
                             style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant),
                           ),
                         ],
@@ -510,7 +510,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                       _TopInfoBox(
                         intensity: isUserLocationValid ? _userEewIntensity[eew.id] ?? 0 : null,
                         isValid: isUserLocationValid,
-                        arrivalTime: _userEewArriveTime[eew.id]!["s"],
+                        arrivalTime: _userEewArriveTime[eew.id]!['s'],
                         currentTime: _getCurrentTime(),
                       ),
                       const SizedBox(height: 10),
@@ -568,7 +568,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          "${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} ${context.i18n.time_earthquake}",
+                                          '${DateFormat(context.i18n.datetime_format).format(_eewLastInfo[eew.id]!.eq.time.asTZDateTime)} ${context.i18n.time_earthquake}',
                                           style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
                                         ),
                                         const SizedBox(height: 8),
@@ -576,7 +576,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                "M${_eewLastInfo[eew.id]?.eq.magnitude}",
+                                                'M${_eewLastInfo[eew.id]?.eq.magnitude}',
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   color: context.colors.onSurface,
@@ -585,7 +585,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                                               ),
                                             ),
                                             Text(
-                                              "${_eewLastInfo[eew.id]?.eq.depth} km",
+                                              '${_eewLastInfo[eew.id]?.eq.depth} km',
                                               style: TextStyle(
                                                 fontSize: 20,
                                                 color: context.colors.onSurface,
@@ -671,28 +671,28 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
             .addFeature(circleFeature(center: LatLng(eew.eq.latitude, eew.eq.longitude), radius: 0, steps: 256))
             .build();
 
-    await _mapController.addSource("${eew.id}-circle", GeojsonSourceProperties(data: geojson, tolerance: 1));
-    await _mapController.addSource("${eew.id}-circle-p", GeojsonSourceProperties(data: geojson, tolerance: 1));
+    await _mapController.addSource('${eew.id}-circle', GeojsonSourceProperties(data: geojson, tolerance: 1));
+    await _mapController.addSource('${eew.id}-circle-p', GeojsonSourceProperties(data: geojson, tolerance: 1));
     _addEewLayers(eew);
   }
 
   Future<void> _addEewLayers(Eew eew) async {
-    final color = (eew.status == 1) ? "#ff0000" : "#ffaa00";
+    final color = (eew.status == 1) ? '#ff0000' : '#ffaa00';
     await _mapController.addLineLayer(
-      "${eew.id}-circle",
-      "${eew.id}-wave-outline",
+      '${eew.id}-circle',
+      '${eew.id}-wave-outline',
       LineLayerProperties(lineColor: color, lineWidth: 2),
     );
     await _mapController.addFillLayer(
-      "${eew.id}-circle",
-      "${eew.id}-wave-bg",
+      '${eew.id}-circle',
+      '${eew.id}-wave-bg',
       FillLayerProperties(fillColor: color, fillOpacity: 0.25),
-      belowLayerId: "county",
+      belowLayerId: 'county',
     );
     await _mapController.addLineLayer(
-      "${eew.id}-circle-p",
-      "${eew.id}-wave-outline-p",
-      const LineLayerProperties(lineColor: "#00CACA", lineWidth: 2),
+      '${eew.id}-circle-p',
+      '${eew.id}-wave-outline-p',
+      const LineLayerProperties(lineColor: '#00CACA', lineWidth: 2),
     );
   }
 
@@ -710,18 +710,18 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
     if (_eewLastInfo.keys.isEmpty) return;
     for (final id in _eewLastInfo.keys) {
       final dist = psWaveDist(_eewLastInfo[id]!.eq.depth, _eewLastInfo[id]!.eq.time, _getCurrentTime());
-      _eewDist[id] = dist["s_dist"]!;
+      _eewDist[id] = dist['s_dist']!;
 
       await _mapController.setGeoJsonSource(
-        "$id-circle",
+        '$id-circle',
         GeoJsonBuilder()
-            .addFeature(circleFeature(center: _eewLastInfo[id]!.eq.latlng, radius: dist["s_dist"]!, steps: 256))
+            .addFeature(circleFeature(center: _eewLastInfo[id]!.eq.latlng, radius: dist['s_dist']!, steps: 256))
             .build(),
       );
       await _mapController.setGeoJsonSource(
-        "$id-circle-p",
+        '$id-circle-p',
         GeoJsonBuilder()
-            .addFeature(circleFeature(center: _eewLastInfo[id]!.eq.latlng, radius: dist["p_dist"]!, steps: 256))
+            .addFeature(circleFeature(center: _eewLastInfo[id]!.eq.latlng, radius: dist['p_dist']!, steps: 256))
             .build(),
       );
     }
@@ -747,19 +747,19 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   }
 
   Future<void> _removeEewLayers(String id) async {
-    await _mapController.removeLayer("$id-wave-outline");
-    await _mapController.removeLayer("$id-wave-outline-p");
-    await _mapController.removeLayer("$id-wave-bg");
-    await _mapController.removeSource("$id-circle");
-    await _mapController.removeSource("$id-circle-p");
+    await _mapController.removeLayer('$id-wave-outline');
+    await _mapController.removeLayer('$id-wave-outline-p');
+    await _mapController.removeLayer('$id-wave-bg');
+    await _mapController.removeSource('$id-circle');
+    await _mapController.removeSource('$id-circle-p');
   }
 
   Future<void> _updateMapArea() async {
     final Map<String, int> eewArea = {};
     _eewIntensityArea.forEach((String key, dynamic intensity) {
       intensity.forEach((name, value) {
-        if (name != "max_i") {
-          final int I = intensityFloatToInt(value["i"]);
+        if (name != 'max_i') {
+          final int I = intensityFloatToInt(value['i']);
           if (eewArea[name] == null || eewArea[name]! < I) {
             eewArea[name] = I;
           }
@@ -769,18 +769,18 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
 
     if (eewArea.keys.isEmpty) {
       await _mapController.setLayerProperties(
-        "town",
+        'town',
         FillLayerProperties(fillColor: context.colors.surfaceContainerHighest.toHexStringRGB(), fillOpacity: 1),
       );
       return;
     }
 
     await _mapController.setLayerProperties(
-      "town",
+      'town',
       FillLayerProperties(
         fillColor: [
-          "match",
-          ["get", "CODE"],
+          'match',
+          ['get', 'CODE'],
           ...eewArea.entries.expand(
             (entry) => [int.parse(entry.key), IntensityColor.intensity(entry.value).toHexStringRGB()],
           ),
@@ -836,7 +836,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
             })
             .map((e) {
               final StationInfo info = findAppropriateItem(e.value.info, _timeReplay);
-              return info.latlng.toFeatureBuilder().setProperty("i", rtsData.station[e.key]?.i).setId(int.parse(e.key));
+              return info.latlng.toFeatureBuilder().setProperty('i', rtsData.station[e.key]?.i).setId(int.parse(e.key));
             })
             .toList();
 
@@ -846,8 +846,8 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   dynamic _getStationColorExpression() {
     return [
       Expressions.interpolate,
-      ["linear"],
-      ["get", "i"],
+      ['linear'],
+      ['get', 'i'],
       -3,
       InstrumentalIntensityColor.intensity_3.toHexStringRGB(),
       -2,
@@ -876,7 +876,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   dynamic _getStationRadiusExpression() {
     return [
       Expressions.interpolate,
-      ["linear"],
+      ['linear'],
       [Expressions.zoom],
       4,
       2,
@@ -948,7 +948,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   void initTargets() {
     targets.add(
       TargetFocus(
-        identify: "monitorButton",
+        identify: 'monitorButton',
         keyTarget: monitorButtonKey,
         contents: [
           TargetContent(
@@ -1108,7 +1108,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
                           child: Text(
-                            (!_dataStatus()) ? "2+s" : "${_formattedPing}s",
+                            (!_dataStatus()) ? '2+s' : '${_formattedPing}s',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,

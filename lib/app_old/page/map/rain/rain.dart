@@ -1,20 +1,20 @@
-import "dart:io";
-import "dart:math";
+import 'dart:io';
+import 'dart:math';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/weather/rain.dart";
-import "package:dpip/app_old/page/map/meteor.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/list/rain_time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/rain.dart';
+import 'package:dpip/app_old/page/map/meteor.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/rain_time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class RainData {
   final double latitude;
@@ -54,8 +54,8 @@ class _RainMapState extends State<RainMap> {
   String? _selectedStationId;
 
   List<RainData> rainDataList = [];
-  String selectedTimestamp = "";
-  String selectedInterval = "now"; // 默認選擇 "now"
+  String selectedTimestamp = '';
+  String selectedInterval = 'now'; // 默認選擇 "now"
 
   Future<void> _loadMapImages(bool isDark) async {
     await loadGPSImage(_mapController);
@@ -70,17 +70,17 @@ class _RainMapState extends State<RainMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-      "rain-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'rain-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     rainTimeList = await ExpTech().getRainList();
@@ -92,18 +92,18 @@ class _RainMapState extends State<RainMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-        "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        'markers-geojson',
+        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
       );
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -125,23 +125,23 @@ class _RainMapState extends State<RainMap> {
             .map((station) {
               double rainfall;
               switch (interval) {
-                case "now":
+                case 'now':
                   rainfall = station.data.now;
-                case "10m":
+                case '10m':
                   rainfall = station.data.tenMinutes;
-                case "1h":
+                case '1h':
                   rainfall = station.data.oneHour;
-                case "3h":
+                case '3h':
                   rainfall = station.data.threeHours;
-                case "6h":
+                case '6h':
                   rainfall = station.data.sixHours;
-                case "12h":
+                case '12h':
                   rainfall = station.data.twelveHours;
-                case "24h":
+                case '24h':
                   rainfall = station.data.twentyFourHours;
-                case "2d":
+                case '2d':
                   rainfall = station.data.twoDays;
-                case "3d":
+                case '3d':
                   rainfall = station.data.threeDays;
                 default:
                   rainfall = station.data.now;
@@ -169,22 +169,22 @@ class _RainMapState extends State<RainMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -197,76 +197,76 @@ class _RainMapState extends State<RainMap> {
         rainDataList
             .map(
               (data) => {
-                "type": "Feature",
-                "properties": {"id": data.id, "rainfall": data.rainfall},
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [data.longitude, data.latitude],
+                'type': 'Feature',
+                'properties': {'id': data.id, 'rainfall': data.rainfall},
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [data.longitude, data.latitude],
                 },
               },
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("rain-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource('rain-data', {'type': 'FeatureCollection', 'features': features});
 
-    await _mapController.removeLayer("rain-0-circles");
+    await _mapController.removeLayer('rain-0-circles');
     await _mapController.addLayer(
-      "rain-data",
-      "rain-0-circles",
+      'rain-data',
+      'rain-0-circles',
       const CircleLayerProperties(
         circleRadius: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           5,
           3,
           10,
           6,
         ],
-        circleColor: "#808080",
+        circleColor: '#808080',
         circleStrokeWidth: 0.8,
-        circleStrokeColor: "#FFFFFF",
+        circleStrokeColor: '#FFFFFF',
       ),
       filter: [
-        "==",
-        ["get", "rainfall"],
+        '==',
+        ['get', 'rainfall'],
         0,
       ],
       minzoom: 10,
     );
 
-    await _mapController.removeLayer("rain-0-labels");
+    await _mapController.removeLayer('rain-0-labels');
     await _mapController.addSymbolLayer(
-      "rain-data",
-      "rain-0-labels",
+      'rain-data',
+      'rain-0-labels',
       const SymbolLayerProperties(
-        textField: ["get", "rainfall"],
+        textField: ['get', 'rainfall'],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 1,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
         ],
       ),
       filter: [
-        "==",
-        ["get", "rainfall"],
+        '==',
+        ['get', 'rainfall'],
         0,
       ],
       minzoom: 10,
     );
 
-    await _mapController.removeLayer("rain-circles");
+    await _mapController.removeLayer('rain-circles');
     await _mapController.addLayer(
-      "rain-data",
-      "rain-circles",
+      'rain-data',
+      'rain-circles',
       const CircleLayerProperties(
         circleRadius: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           7,
           5,
@@ -275,43 +275,43 @@ class _RainMapState extends State<RainMap> {
         ],
         circleColor: [
           Expressions.interpolate,
-          ["linear"],
-          [Expressions.get, "rainfall"],
+          ['linear'],
+          [Expressions.get, 'rainfall'],
           0,
-          "#c2c2c2",
+          '#c2c2c2',
           10,
-          "#9cfcff",
+          '#9cfcff',
           30,
-          "#059bff",
+          '#059bff',
           50,
-          "#39ff03",
+          '#39ff03',
           100,
-          "#fffb03",
+          '#fffb03',
           200,
-          "#ff9500",
+          '#ff9500',
           300,
-          "#ff0000",
+          '#ff0000',
           500,
-          "#fb00ff",
+          '#fb00ff',
           1000,
-          "#960099",
+          '#960099',
           2000,
-          "#000000",
+          '#000000',
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
-        circleStrokeColor: "#000000",
+        circleStrokeColor: '#000000',
         circleStrokeOpacity: 0.7,
       ),
       filter: [
-        "!=",
-        ["get", "rainfall"],
+        '!=',
+        ['get', 'rainfall'],
         0,
       ],
     );
 
     _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['rain-circles', "rain-0-circles"], null);
+      final features = await _mapController.queryRenderedFeatures(point, ['rain-circles', 'rain-0-circles'], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
@@ -326,25 +326,25 @@ class _RainMapState extends State<RainMap> {
       }
     });
 
-    await _mapController.removeLayer("rain-labels");
+    await _mapController.removeLayer('rain-labels');
     await _mapController.addSymbolLayer(
-      "rain-data",
-      "rain-labels",
+      'rain-data',
+      'rain-labels',
       const SymbolLayerProperties(
-        textField: ["get", "rainfall"],
+        textField: ['get', 'rainfall'],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 1,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
         ],
       ),
       filter: [
-        "!=",
-        ["get", "rainfall"],
+        '!=',
+        ['get', 'rainfall'],
         0,
       ],
       minzoom: 9,
@@ -394,7 +394,7 @@ class _RainMapState extends State<RainMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["0", "10", "30", "50", "100", "200", "300", "500", "1000", "2000+"];
+    final labels = ['0', '10', '30', '50', '100', '200', '300', '500', '1000', '2000+'];
     return SizedBox(
       width: 300,
       child: Row(
@@ -492,7 +492,7 @@ class _RainMapState extends State<RainMap> {
                         decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
-                        type: "precipitation",
+                        type: 'precipitation',
                         stationId: _selectedStationId!,
                         onClose: () {
                           setState(() {

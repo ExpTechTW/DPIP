@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import "dart:ui" as ui;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -13,7 +13,7 @@ import 'package:timezone/timezone.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
-import "package:dpip/core/providers.dart";
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -56,7 +56,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   String getTileUrl(String timestamp) {
-    return "https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png";
+    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
   }
 
   Future<void> _loadMapImages(bool isDark) async {
@@ -69,22 +69,22 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -101,20 +101,20 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
     final String newTileUrl = getTileUrl(radarList.last);
 
-    await _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+    await _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
     await _mapController.addLayer(
-      "map",
-      "town-outline-default",
+      'map',
+      'town-outline-default',
       LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB(), lineWidth: 1),
-      sourceLayer: "town",
+      sourceLayer: 'town',
     );
 
     await _mapController.addLayer(
-      "map",
-      "town-outline-highlighted",
-      const LineLayerProperties(lineColor: "#9e10fd", lineWidth: 2),
-      sourceLayer: "town",
+      'map',
+      'town-outline-highlighted',
+      const LineLayerProperties(lineColor: '#9e10fd', lineWidth: 2),
+      sourceLayer: 'town',
       filter: [
         'in',
         ['get', 'CODE'],
@@ -124,10 +124,10 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
     if (!isExpired) {
       await _mapController.addLayer(
-        "radarSource",
-        "radarLayer",
+        'radarSource',
+        'radarLayer',
         const RasterLayerProperties(),
-        belowLayerId: "county-outline",
+        belowLayerId: 'county-outline',
       );
     }
 
@@ -136,8 +136,8 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     }
 
     await _mapController.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'markers-geojson',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     start();
@@ -145,7 +145,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
       if (!mounted) return;
       await _mapController.setLayerProperties(
-        "town-outline-highlighted",
+        'town-outline-highlighted',
         LineLayerProperties(lineOpacity: (_blink < 6) ? 1 : 0),
       );
       _blink++;
@@ -160,15 +160,15 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     isUserLocationValid = userLon != 0 && userLat != 0;
 
     if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -228,7 +228,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final TZDateTime radarTime = TZDateTime.from(radarDateTime, getLocation('Asia/Taipei'));
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ""), elevation: 0),
+      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ''), elevation: 0),
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
@@ -339,7 +339,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Widget _buildWarningHeader() {
-    final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
+    final String subtitle = widget.item.text.content['all']?.subtitle ?? '';
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
     isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
@@ -385,7 +385,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     final DateTime sendTime = widget.item.time.send;
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
-    final String description = widget.item.text.description["all"] ?? "";
+    final String description = widget.item.text.description['all'] ?? '';
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     final DateTime localExpireTime = expireTimeUTC;
 

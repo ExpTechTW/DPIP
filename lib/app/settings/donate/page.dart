@@ -31,13 +31,13 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
     final isAvailable = await InAppPurchase.instance.isAvailable();
 
     if (!isAvailable) {
-      products.completeError("無法連線至商店，請稍後再試");
+      products.completeError('無法連線至商店，請稍後再試');
       return;
     }
 
     final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
-      products.completeError("找不到商品，請稍候再試");
+      products.completeError('找不到商品，請稍候再試');
       return;
     }
 

@@ -76,7 +76,7 @@ class HistoryTimelineItem extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      history.text.content["all"]!.subtitle,
+                      history.text.content['all']!.subtitle,
                       style: context.theme.textTheme.titleMedium?.copyWith(
                         color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
                       ),
@@ -84,7 +84,7 @@ class HistoryTimelineItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      history.text.description["all"]!,
+                      history.text.description['all']!,
                       style: context.theme.textTheme.bodyMedium?.copyWith(
                         color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
                       ),

@@ -1,8 +1,8 @@
-import "dart:ui";
+import 'dart:ui';
 
 extension LocaleString on String {
   Locale get asLocale {
-    final a = split("-");
+    final a = split('-');
     return Locale(a[0], a.elementAtOrNull(1));
   }
 

@@ -1,32 +1,32 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:json_annotation/json_annotation.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
-import "package:timezone/timezone.dart";
+import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:timezone/timezone.dart';
 
-import "package:dpip/utils/parser.dart";
+import 'package:dpip/utils/parser.dart';
 
-part "partial_earthquake_report.g.dart";
+part 'partial_earthquake_report.g.dart';
 
 @JsonSerializable()
 class PartialEarthquakeReport {
   final String id;
 
-  @JsonKey(name: "lon")
+  @JsonKey(name: 'lon')
   final double longitude;
 
-  @JsonKey(name: "lat")
+  @JsonKey(name: 'lat')
   final double latitude;
 
-  @JsonKey(name: "loc")
+  @JsonKey(name: 'loc')
   final String location;
 
   final double depth;
 
-  @JsonKey(name: "mag")
+  @JsonKey(name: 'mag')
   final double magnitude;
 
-  @JsonKey(name: "int")
+  @JsonKey(name: 'int')
   final int intensity;
 
   @JsonKey(fromJson: parseDateTime, toJson: dateTimeToJson)
@@ -53,9 +53,9 @@ class PartialEarthquakeReport {
   Map<String, dynamic> toJson() => _$PartialEarthquakeReportToJson(this);
 
   String? get number {
-    final n = id.split("-").first;
+    final n = id.split('-').first;
 
-    if (!n.endsWith("000")) {
+    if (!n.endsWith('000')) {
       return n;
     }
 
@@ -67,39 +67,39 @@ class PartialEarthquakeReport {
   bool get hasNumber => number != null;
 
   Uri get reportUrl {
-    final arr = id.split("-");
+    final arr = id.split('-');
     arr.removeAt(0);
-    final mag = "${(magnitude * 10).floor()}";
+    final mag = '${(magnitude * 10).floor()}';
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id");
+      return Uri.parse('https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag$id');
     }
 
-    return Uri.parse("https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag");
+    return Uri.parse('https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${arr.join()}$mag');
   }
 
   String get reportImageName {
     final year = time.year.toString();
-    final month = time.month.toString().padLeft(2, "0");
-    final day = time.day.toString().padLeft(2, "0");
-    final hour = time.hour.toString().padLeft(2, "0");
-    final minute = time.minute.toString().padLeft(2, "0");
-    final second = time.second.toString().padLeft(2, "0");
-    final mag = "${(magnitude * 10).floor()}";
+    final month = time.month.toString().padLeft(2, '0');
+    final day = time.day.toString().padLeft(2, '0');
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    final second = time.second.toString().padLeft(2, '0');
+    final mag = '${(magnitude * 10).floor()}';
 
     if (hasNumber) {
       final id = number!.substring(3);
-      return "$year$month$day$hour$minute$second$mag${id}_H.png";
+      return '$year$month$day$hour$minute$second$mag${id}_H.png';
     }
 
-    return "$year$month$day$hour$minute$second${mag}_H.png";
+    return '$year$month$day$hour$minute$second${mag}_H.png';
   }
 
   String get reportImageUrl {
     final name = reportImageName;
     final time = name.substring(0, 6);
-    return "https://scweb.cwa.gov.tw/webdata/OLDEQ/$time/$reportImageName";
+    return 'https://scweb.cwa.gov.tw/webdata/OLDEQ/$time/$reportImageName';
   }
 
   String? get mapImageBaseName {
@@ -108,43 +108,43 @@ class PartialEarthquakeReport {
     final year = time.year.toString();
     final id = number!.substring(3);
 
-    return "$year$id";
+    return '$year$id';
   }
 
   String get traceBaseUrl {
     final year = time.year.toString();
-    return "https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year/";
+    return 'https://scweb.cwa.gov.tw/webdata/drawTrace/plotContour/$year/';
   }
 
   String? get intensityMapImageName {
     if (!hasNumber) return null;
 
-    return "${mapImageBaseName}i.png";
+    return '${mapImageBaseName}i.png';
   }
 
-  String? get intensityMapImageUrl => intensityMapImageName == null ? null : "$traceBaseUrl/$intensityMapImageName";
+  String? get intensityMapImageUrl => intensityMapImageName == null ? null : '$traceBaseUrl/$intensityMapImageName';
 
   String? get pgaMapImageName {
     if (!hasNumber) return null;
 
-    return "${mapImageBaseName}a.png";
+    return '${mapImageBaseName}a.png';
   }
 
-  String? get pgaMapImageUrl => pgaMapImageName == null ? null : "$traceBaseUrl/$pgaMapImageName";
+  String? get pgaMapImageUrl => pgaMapImageName == null ? null : '$traceBaseUrl/$pgaMapImageName';
 
   String? get pgvMapImageName {
     if (!hasNumber) return null;
 
-    return "${mapImageBaseName}v.png";
+    return '${mapImageBaseName}v.png';
   }
 
-  String? get pgvMapImageUrl => pgvMapImageName == null ? null : "$traceBaseUrl/$pgvMapImageName";
+  String? get pgvMapImageUrl => pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
 
   String extractLocation() {
-    if (location.contains("(")) {
-      return location.substring(location.indexOf("(") + 3, location.indexOf(")"));
+    if (location.contains('(')) {
+      return location.substring(location.indexOf('(') + 3, location.indexOf(')'));
     } else {
-      return location.substring(0, location.indexOf("方") + 1);
+      return location.substring(0, location.indexOf('方') + 1);
     }
   }
 

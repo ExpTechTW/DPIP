@@ -1,9 +1,9 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:go_router/go_router.dart";
+import 'package:go_router/go_router.dart';
 
-import "package:dpip/app/welcome/3-notice/page.dart";
-import "package:dpip/utils/extensions/build_context.dart";
+import 'package:dpip/app/welcome/3-notice/page.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class WelcomeExpTechPage extends StatelessWidget {
   const WelcomeExpTechPage({super.key});
@@ -35,13 +35,13 @@ class WelcomeExpTechPage extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.asset("assets/ExpTech.png", width: 120, height: 120),
+                      child: Image.asset('assets/ExpTech.png', width: 120, height: 120),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      "ExpTech Studio",
+                      'ExpTech Studio',
                       style: context.theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.colors.primary,
@@ -54,7 +54,7 @@ class WelcomeExpTechPage extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          "©2024 ExpTech Studio Ltd.",
+                          '©2024 ExpTech Studio Ltd.',
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withOpacity(0.7),
                           ),

@@ -20,7 +20,7 @@ class RankingPrecipitationTab extends StatefulWidget {
 
 class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
   Intervals interval = Intervals.now;
-  String time = "";
+  String time = '';
   Map<StationInfo, RainData> data = {};
   List<(StationInfo, double)> ranked = [];
 
@@ -217,7 +217,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                           size: iconSize,
                           fill: 1,
                         )
-                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
+                        : Text('$rank', style: TextStyle(color: foregroundColor, fontSize: fontSize));
 
                 final percentage = item.$2 / ranked.first.$2;
 
@@ -236,7 +236,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    "${item.$1.county}${item.$1.town}",
+                    '${item.$1.county}${item.$1.town}',
                     style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
                   ),
                 ];
@@ -249,7 +249,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                             : Row(children: location),
                   ),
                   Text(
-                    "${item.$2} mm",
+                    '${item.$2} mm',
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight:

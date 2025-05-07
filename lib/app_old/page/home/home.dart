@@ -85,12 +85,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Future<void> _initData() async {
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    final int code = Global.preference.getInt("user-code") ?? -1;
-    city = Global.location[code.toString()]?.city ?? "";
-    town = Global.location[code.toString()]?.town ?? "";
+    final int code = Global.preference.getInt('user-code') ?? -1;
+    city = Global.location[code.toString()]?.city ?? '';
+    town = Global.location[code.toString()]?.town ?? '';
     region = code == -1 ? null : code.toString();
     await _refreshWeatherData();
     await refreshRealtimeList();
@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       TextSpan(
                         text:
                             tempParts[0] == '--'
-                                ? ".-°C"
+                                ? '.-°C'
                                 : tempParts.length > 1
                                 ? '.${tempParts[1]}°C'
                                 : '.0°C',

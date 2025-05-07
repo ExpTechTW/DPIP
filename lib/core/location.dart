@@ -1,10 +1,10 @@
-import "dart:async";
+import 'dart:async';
 
-import "package:geolocator/geolocator.dart";
+import 'package:geolocator/geolocator.dart';
 
-import "package:dpip/core/providers.dart";
-import "package:dpip/utils/location_to_code.dart";
-import "package:dpip/utils/log.dart";
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/location_to_code.dart';
+import 'package:dpip/utils/log.dart';
 
 StreamSubscription<Position>? positionStreamSubscription;
 Timer? restartTimer;
@@ -18,7 +18,7 @@ class GetLocationResult {
   GetLocationResult(this.code, this.change, this.lat, this.lng);
 
   Map<String, dynamic> toJson() {
-    return {"code": code, "change": change, "lat": lat, "lng": lng};
+    return {'code': code, 'change': change, 'lat': lat, 'lng': lng};
   }
 }
 
@@ -33,12 +33,12 @@ class LocationService {
 
   final GeolocatorPlatform geolocatorPlatform = GeolocatorPlatform.instance;
 
-  @pragma("vm:entry-point")
+  @pragma('vm:entry-point')
   Future<GetLocationResult> androidGetLocation() async {
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
-      TalkerManager.instance.warning("位置服務未啟用");
+      TalkerManager.instance.warning('位置服務未啟用');
       return GetLocationResult(null, false, 0, 0);
     }
 
@@ -64,9 +64,9 @@ class LocationService {
       GlobalProviders.location.setLongitude(currentPosition.longitude);
       GlobalProviders.location.setCode(currentLocation?.code.toString());
       hasLocationChanged = true;
-      TalkerManager.instance.debug("距離: $distanceInMeters 更新位置");
+      TalkerManager.instance.debug('距離: $distanceInMeters 更新位置');
     } else {
-      TalkerManager.instance.debug("距離: $distanceInMeters 不更新位置");
+      TalkerManager.instance.debug('距離: $distanceInMeters 不更新位置');
     }
 
     return GetLocationResult(

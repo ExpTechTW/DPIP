@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/symbols.dart';
 
-import "package:dpip/utils/extensions/build_context.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class DPIPInfoPage extends StatelessWidget {
   const DPIPInfoPage({Key? key}) : super(key: key);

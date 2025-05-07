@@ -1,21 +1,21 @@
-import "dart:async";
+import 'dart:async';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
-import "package:material_symbols_icons/symbols.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/report/earthquake_report.dart";
-import "package:dpip/core/eew.dart";
-import "package:dpip/route/report/report_sheet_content.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/extensions/color_scheme.dart";
-import "package:dpip/utils/geojson.dart";
-import "package:dpip/utils/intensity_color.dart";
-import "package:dpip/utils/log.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/core/eew.dart';
+import 'package:dpip/route/report/report_sheet_content.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color_scheme.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/intensity_color.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class ReportRoute extends StatefulWidget {
   final String id;
@@ -77,11 +77,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           }
 
           markers.add({
-            "type": "Feature",
-            "properties": {"intensity": town.intensity},
-            "geometry": {
-              "coordinates": [town.lon, town.lat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {'intensity': town.intensity},
+            'geometry': {
+              'coordinates': [town.lon, town.lat],
+              'type': 'Point',
             },
           });
 
@@ -94,11 +94,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       }
 
       markers.add({
-        "type": "Feature",
-        "properties": {
-          "intensity": 10, // 10 is for classifying epicenter cross
+        'type': 'Feature',
+        'properties': {
+          'intensity': 10, // 10 is for classifying epicenter cross
         },
-        "geometry": {"coordinates": data.latlng.toGeoJsonCoordinates(), "type": "Point"},
+        'geometry': {'coordinates': data.latlng.toGeoJsonCoordinates(), 'type': 'Point'},
       });
 
       expandBounds(bounds, data.latlng);
@@ -117,7 +117,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         await controller.moveCamera(CameraUpdate.zoomTo(9));
       }
 
-      await controller.addGeoJsonSource("markers-geojson", {"type": "FeatureCollection", "features": markers});
+      await controller.addGeoJsonSource('markers-geojson', {'type': 'FeatureCollection', 'features': markers});
 
       final waves = GeoJsonBuilder();
 
@@ -128,12 +128,12 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           data.time.millisecondsSinceEpoch + i * 5000,
         );
 
-        if (distance["s_dist"] == null || distance["s_dist"]! < 0) continue;
+        if (distance['s_dist'] == null || distance['s_dist']! < 0) continue;
 
-        waves.addFeature(circleFeature(center: LatLng(data.latitude, data.longitude), radius: distance["s_dist"]!));
+        waves.addFeature(circleFeature(center: LatLng(data.latitude, data.longitude), radius: distance['s_dist']!));
       }
 
-      await controller.addGeoJsonSource("waves-geojson", waves.build());
+      await controller.addGeoJsonSource('waves-geojson', waves.build());
 
       if (!mounted) return;
 
@@ -149,14 +149,14 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       await loadCrossImage(controller);
 
       await controller.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolSortKey: [Expressions.get, "intensity"],
-          symbolZOrder: "source",
+          symbolSortKey: [Expressions.get, 'intensity'],
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
@@ -165,26 +165,26 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           ],
           iconImage: [
             Expressions.match,
-            [Expressions.get, "intensity"],
+            [Expressions.get, 'intensity'],
             1,
-            "intensity-1",
+            'intensity-1',
             2,
-            "intensity-2",
+            'intensity-2',
             3,
-            "intensity-3",
+            'intensity-3',
             4,
-            "intensity-4",
+            'intensity-4',
             5,
-            "intensity-5",
+            'intensity-5',
             6,
-            "intensity-6",
+            'intensity-6',
             7,
-            "intensity-7",
+            'intensity-7',
             8,
-            "intensity-8",
+            'intensity-8',
             9,
-            "intensity-9",
-            "cross",
+            'intensity-9',
+            'cross',
           ],
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
@@ -194,11 +194,11 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       if (!mounted) return;
 
       await controller.setLayerProperties(
-        "county",
+        'county',
         FillLayerProperties(
           fillColor: [
-            "match",
-            ["get", "NAME"],
+            'match',
+            ['get', 'NAME'],
             ...cityMaxIntensity.entries.expand(
               (entry) => [entry.key, IntensityColor.intensity(entry.value).toHexStringRGB()],
             ),
@@ -208,7 +208,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         ),
       );
 
-      await controller.setLayerProperties("town", const FillLayerProperties(fillOpacity: 0));
+      await controller.setLayerProperties('town', const FillLayerProperties(fillOpacity: 0));
 
       setState(() {
         report = data;
@@ -278,7 +278,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   if (report!.magnitude >= 6 &&
                       report!.magnitude < 7 &&
                       report!.depth <= 35 &&
-                      (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
+                      (report!.getLocation().endsWith('近海') || report!.getLocation().endsWith('海域')))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.theme.extendedColors.blue),
                       label: Text(
@@ -292,7 +292,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                   // 不要翻譯這
                   if (report!.magnitude >= 7 &&
                       report!.depth <= 35 &&
-                      (report!.getLocation().endsWith("近海") || report!.getLocation().endsWith("海域")))
+                      (report!.getLocation().endsWith('近海') || report!.getLocation().endsWith('海域')))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
                       label: Text(context.i18n.report_tsunami_attention, style: TextStyle(color: context.colors.error)),
@@ -318,7 +318,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
           Positioned.fill(
             top: context.padding.top + appBar.preferredSize.height - 24,
             child: DraggableScrollableSheet(
-              key: const GlobalObjectKey("DraggableScrollableSheet"),
+              key: const GlobalObjectKey('DraggableScrollableSheet'),
               initialChildSize: sheetInitialSize,
               minChildSize: sheetInitialSize,
               controller: sheetController,

@@ -1,10 +1,10 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:go_router/go_router.dart";
-import "package:material_symbols_icons/symbols.dart";
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-import "package:dpip/app/welcome/4-permissions/page.dart";
-import "package:dpip/utils/extensions/build_context.dart";
+import 'package:dpip/app/welcome/4-permissions/page.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class WelcomeNoticePage extends StatelessWidget {
   const WelcomeNoticePage({super.key});

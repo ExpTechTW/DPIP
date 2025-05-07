@@ -1,17 +1,17 @@
-import "dart:async";
-import "dart:io";
+import 'dart:async';
+import 'dart:io';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/weather/lightning.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/lightning.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
@@ -53,16 +53,16 @@ class _LightningMapState extends State<LightningMap> {
 
   Future<void> _loadMap() async {
     await _loadMapImages();
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
     await _mapController.addSource(
-      "lightning-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'lightning-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
     lightningTimeList = await ExpTech().getLightningList();
     if (lightningTimeList.isNotEmpty) {
@@ -72,18 +72,18 @@ class _LightningMapState extends State<LightningMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-        "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        'markers-geojson',
+        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
       );
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -99,22 +99,22 @@ class _LightningMapState extends State<LightningMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -160,25 +160,25 @@ class _LightningMapState extends State<LightningMap> {
           }
 
           return {
-            "type": "Feature",
-            "properties": {"type": "${data.type}-$level"},
-            "geometry": {
-              "type": "Point",
-              "coordinates": [data.longitude, data.latitude],
+            'type': 'Feature',
+            'properties': {'type': '${data.type}-$level'},
+            'geometry': {
+              'type': 'Point',
+              'coordinates': [data.longitude, data.latitude],
             },
           };
         }).toList();
 
-    await _mapController.setGeoJsonSource("lightning-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource('lightning-data', {'type': 'FeatureCollection', 'features': features});
 
-    await _mapController.removeLayer("lightning-markers");
+    await _mapController.removeLayer('lightning-markers');
     await _mapController.addLayer(
-      "lightning-data",
-      "lightning-markers",
+      'lightning-data',
+      'lightning-markers',
       const SymbolLayerProperties(
         iconSize: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           5,
           0.5,
@@ -187,22 +187,22 @@ class _LightningMapState extends State<LightningMap> {
         ],
         iconImage: [
           Expressions.match,
-          ["get", "type"],
-          "1-5",
-          "lightning-1-5",
-          "1-10",
-          "lightning-1-10",
-          "1-30",
-          "lightning-1-30",
-          "1-60",
-          "lightning-1-60",
-          "0-5",
-          "lightning-0-5",
-          "0-10",
-          "lightning-0-10",
-          "0-30",
-          "lightning-0-30",
-          "lightning-0-60",
+          ['get', 'type'],
+          '1-5',
+          'lightning-1-5',
+          '1-10',
+          'lightning-1-10',
+          '1-30',
+          'lightning-1-30',
+          '1-60',
+          'lightning-1-60',
+          '0-5',
+          'lightning-0-5',
+          '0-10',
+          'lightning-0-10',
+          '0-30',
+          'lightning-0-30',
+          'lightning-0-60',
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -222,14 +222,14 @@ class _LightningMapState extends State<LightningMap> {
     return MapLegend(
       label: context.i18n.map_legend,
       children: [
-        _legendItem("lightning-1-5", context.i18n.lightning_1_5),
-        _legendItem("lightning-1-10", context.i18n.lightning_1_10),
-        _legendItem("lightning-1-30", context.i18n.lightning_1_30),
-        _legendItem("lightning-1-60", context.i18n.lightning_1_60),
-        _legendItem("lightning-0-5", context.i18n.lightning_0_5),
-        _legendItem("lightning-0-10", context.i18n.lightning_0_10),
-        _legendItem("lightning-0-30", context.i18n.lightning_0_30),
-        _legendItem("lightning-0-60", context.i18n.lightning_0_60),
+        _legendItem('lightning-1-5', context.i18n.lightning_1_5),
+        _legendItem('lightning-1-10', context.i18n.lightning_1_10),
+        _legendItem('lightning-1-30', context.i18n.lightning_1_30),
+        _legendItem('lightning-1-60', context.i18n.lightning_1_60),
+        _legendItem('lightning-0-5', context.i18n.lightning_0_5),
+        _legendItem('lightning-0-10', context.i18n.lightning_0_10),
+        _legendItem('lightning-0-30', context.i18n.lightning_0_30),
+        _legendItem('lightning-0-60', context.i18n.lightning_0_60),
       ],
     );
   }
@@ -239,7 +239,7 @@ class _LightningMapState extends State<LightningMap> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Image.asset("assets/map/icons/$imageName.png", width: 24, height: 24),
+          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
           const SizedBox(width: 8),
           Text(label),
         ],

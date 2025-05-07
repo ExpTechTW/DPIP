@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import "package:flutter/services.dart";
+import 'package:flutter/services.dart';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-import "package:material_symbols_icons/symbols.dart";
-import "package:permission_handler/permission_handler.dart";
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/app/settings/_widgets/list_section.dart';
@@ -19,7 +19,7 @@ import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import "package:dpip/utils/log.dart";
+import 'package:dpip/utils/log.dart';
 
 final stateSettingsLocationView = _SettingsLocationPageState();
 
@@ -36,7 +36,7 @@ class SettingsLocationPage extends StatefulWidget {
   State<SettingsLocationPage> createState() => _SettingsLocationPageState();
 }
 
-const platform = MethodChannel("com.exptech.dpip/location");
+const platform = MethodChannel('com.exptech.dpip/location');
 
 class _SettingsLocationPageState extends State<SettingsLocationPage> with WidgetsBindingObserver {
   PermissionStatus? notificationPermission;
@@ -176,7 +176,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: Text("$permissionType${context.i18n.location_permission}"),
+                title: Text('$permissionType${context.i18n.location_permission}'),
                 content: Text(context.i18n.improve_auto_location_experience(permissionType.toString())),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
@@ -335,7 +335,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     }
 
     if (Platform.isIOS) {
-      await platform.invokeMethod("toggleLocation", {"isEnabled": !isAuto}).catchError((_) {});
+      await platform.invokeMethod('toggleLocation', {'isEnabled': !isAuto}).catchError((_) {});
     }
 
     if (!mounted) return;

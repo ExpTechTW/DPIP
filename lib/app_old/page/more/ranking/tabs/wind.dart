@@ -22,7 +22,7 @@ class RankingWindTab extends StatefulWidget {
 class _RankingWindTabState extends State<RankingWindTab> {
   MergeType merge = MergeType.none;
   bool reversed = false;
-  String time = "";
+  String time = '';
   List<WeatherStation> data = [];
   List<WeatherStation> ranked = [];
 
@@ -204,7 +204,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                           size: iconSize,
                           fill: 1,
                         )
-                        : Text("$rank", style: TextStyle(color: foregroundColor, fontSize: fontSize));
+                        : Text('$rank', style: TextStyle(color: foregroundColor, fontSize: fontSize));
 
                 final minWind = reversed ? ranked.first.data.wind.speed : ranked.last.data.wind.speed;
                 final maxWind = reversed ? ranked.last.data.wind.speed : ranked.first.data.wind.speed;
@@ -215,7 +215,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                         ? [
                           Text(
                             merge == MergeType.town
-                                ? "${item.station.county}${item.station.town}"
+                                ? '${item.station.county}${item.station.town}'
                                 : item.station.county,
                             style: TextStyle(
                               fontSize: fontSize,
@@ -243,7 +243,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "${item.station.county}${item.station.town}",
+                            '${item.station.county}${item.station.town}',
                             style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
                           ),
                         ];
@@ -256,7 +256,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
                             : Row(children: location),
                   ),
                   Text(
-                    "${item.data.wind.speed.toStringAsFixed(1)} m/s",
+                    '${item.data.wind.speed.toStringAsFixed(1)} m/s',
                     style: TextStyle(
                       fontSize: fontSize,
                       fontWeight:

@@ -1,6 +1,6 @@
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:flutter/material.dart";
-import "package:intl/intl.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TimeSelector extends StatefulWidget {
   final Function(String) onTimeSelected;
@@ -77,7 +77,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
         FilledButton.tonalIcon(
           onPressed: _toggleExpanded,
           label: Text(
-            DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp)),
+            DateFormat('yyyy/MM/dd HH:mm').format(_convertTimestamp(_selectedTimestamp)),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           icon: Icon(_isExpanded ? Icons.expand_more : Icons.expand_less),
@@ -139,7 +139,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
                                   ),
-                                  child: Text(DateFormat("HH:mm").format(time)),
+                                  child: Text(DateFormat('HH:mm').format(time)),
                                 ),
                                 AnimatedDefaultTextStyle(
                                   duration: const Duration(milliseconds: 200),
@@ -150,7 +150,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                             : context.colors.onSurface.withOpacity(0.7),
                                     fontSize: 12,
                                   ),
-                                  child: Text(DateFormat("MM/dd").format(time)),
+                                  child: Text(DateFormat('MM/dd').format(time)),
                                 ),
                               ],
                             ),

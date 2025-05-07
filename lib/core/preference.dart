@@ -50,8 +50,8 @@ class Preference {
   static bool get isFirstLaunch => instance.getString('welcome') != 'done';
   static set isFirstLaunch(bool value) => instance.set('welcome', value ? null : 'done');
 
-  static String get notifyToken => instance.getString("notify-token") ?? "";
-  static set notifyToken(String? value) => instance.set("notify-token", value);
+  static String get notifyToken => instance.getString('notify-token') ?? '';
+  static set notifyToken(String? value) => instance.set('notify-token', value);
 
   // #region Location
   static bool? get locationAuto => instance.getBool(PreferenceKeys.locationAuto);

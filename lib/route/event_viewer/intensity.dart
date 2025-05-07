@@ -11,7 +11,7 @@ import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
-import "package:dpip/core/providers.dart";
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -68,22 +68,22 @@ class _IntensityPageState extends State<IntensityPage> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -103,8 +103,8 @@ class _IntensityPageState extends State<IntensityPage> {
     }
 
     await _mapController.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'markers-geojson',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     start();
@@ -117,15 +117,15 @@ class _IntensityPageState extends State<IntensityPage> {
     isUserLocationValid = userLon != 0 && userLat != 0;
 
     if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -144,11 +144,11 @@ class _IntensityPageState extends State<IntensityPage> {
 
     getEventInfo();
 
-    if (widget.item.addition?["final"] != 1) {
+    if (widget.item.addition?['final'] != 1) {
       _update = Timer.periodic(const Duration(seconds: 1), (_) async {
         data = (await ExpTech().getEvent(widget.item.id))[0];
         getEventInfo();
-        if (data?.addition?["final"] == 1) {
+        if (data?.addition?['final'] == 1) {
           _update?.cancel();
         }
       });
@@ -165,11 +165,11 @@ class _IntensityPageState extends State<IntensityPage> {
       }
     });
     _mapController.setLayerProperties(
-      "town",
+      'town',
       FillLayerProperties(
         fillColor: [
-          "match",
-          ["get", "CODE"],
+          'match',
+          ['get', 'CODE'],
           ...invertedArea.entries.expand(
             (entry) => [int.parse(entry.key), IntensityColor.intensity(entry.value).toHexStringRGB()],
           ),
@@ -233,7 +233,7 @@ class _IntensityPageState extends State<IntensityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ""), elevation: 0),
+      appBar: AppBar(title: Text(widget.item.text.content['all']?.title ?? ''), elevation: 0),
       body: Stack(
         children: [
           DpipMap(onMapCreated: _initMap, onStyleLoadedCallback: _loadMap),
@@ -313,7 +313,7 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildWarningHeader() {
-    final String subtitle = widget.item.text.content["all"]?.subtitle ?? "";
+    final String subtitle = widget.item.text.content['all']?.subtitle ?? '';
 
     return Padding(
       padding: const EdgeInsets.all(8),
@@ -350,7 +350,7 @@ class _IntensityPageState extends State<IntensityPage> {
     final DateTime sendTime = widget.item.time.send;
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
-    final String description = data?.text.description["all"] ?? "";
+    final String description = data?.text.description['all'] ?? '';
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     final DateTime localExpireTime = expireTimeUTC;
 

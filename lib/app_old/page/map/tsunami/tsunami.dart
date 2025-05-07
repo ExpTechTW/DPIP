@@ -1,23 +1,23 @@
-import "dart:async";
-import "dart:io";
+import 'dart:async';
+import 'dart:io';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:intl/intl.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
-import "package:timezone/timezone.dart" as tz;
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/tsunami/tsunami.dart";
-import "package:dpip/api/model/tsunami/tsunami_actual.dart";
-import "package:dpip/api/model/tsunami/tsunami_estimate.dart";
-import "package:dpip/app_old/page/map/tsunami/tsunami_estimate_list.dart";
-import "package:dpip/app_old/page/map/tsunami/tsunami_observed_list.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/tsunami/tsunami.dart';
+import 'package:dpip/api/model/tsunami/tsunami_actual.dart';
+import 'package:dpip/api/model/tsunami/tsunami_estimate.dart';
+import 'package:dpip/app_old/page/map/tsunami/tsunami_estimate_list.dart';
+import 'package:dpip/app_old/page/map/tsunami/tsunami_observed_list.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class TsunamiMap extends StatefulWidget {
   const TsunamiMap({super.key});
@@ -30,9 +30,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
   late MapLibreMapController _mapController;
   Timer? _blinkTimer;
   Tsunami? tsunami;
-  String tsunamiStatus = "";
+  String tsunamiStatus = '';
   int _isTsunamiVisible = 0;
-  String _tsunami_id = "";
+  String _tsunami_id = '';
   int _tsunami_serial = 0;
   String? _selectedOption;
   double userLat = 0;
@@ -51,8 +51,8 @@ class _TsunamiMapState extends State<TsunamiMap> {
   Future<void> _loadMap() async {
     await refreshTsunami();
     await _mapController.addSource(
-      "tsunami-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'tsunami-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     if (tsunami != null) {
@@ -63,11 +63,11 @@ class _TsunamiMapState extends State<TsunamiMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
@@ -97,11 +97,11 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   Future<void> addTsunamiObservationPoints(Tsunami tsunami) async {
-    await _mapController.removeLayer("tsunami-actual-circles");
-    await _mapController.removeLayer("tsunami-actual-labels");
+    await _mapController.removeLayer('tsunami-actual-circles');
+    await _mapController.removeLayer('tsunami-actual-labels');
     _blinkTimer?.cancel();
-    await _mapController.setLayerProperties("tsunami", const LineLayerProperties(lineOpacity: 0));
-    if (tsunami.info.type == "estimate") {
+    await _mapController.setLayerProperties('tsunami', const LineLayerProperties(lineOpacity: 0));
+    if (tsunami.info.type == 'estimate') {
       final Map<String, String> area_color = {};
       tsunami.info.data.forEach((station) {
         final estimateStation = station as TsunamiEstimate;
@@ -111,13 +111,13 @@ class _TsunamiMapState extends State<TsunamiMap> {
       _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
         if (!mounted) return;
         await _mapController.setLayerProperties(
-          "tsunami",
+          'tsunami',
           LineLayerProperties(
             lineColor: [
-              "match",
-              ["get", "AREANAME"],
+              'match',
+              ['get', 'AREANAME'],
               ...area_color.entries.expand((entry) => [entry.key, entry.value]),
-              "#000000",
+              '#000000',
             ],
             lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0,
           ),
@@ -130,29 +130,29 @@ class _TsunamiMapState extends State<TsunamiMap> {
           tsunami.info.data.map((station) {
             final actualStation = station as TsunamiActual;
             return {
-              "type": "Feature",
-              "properties": {
-                "name": actualStation.name,
-                "id": actualStation.id,
-                "waveHeight": actualStation.waveHeight,
-                "arrivalTime": DateFormat("MM/dd HH:mm").format(_convertTimestamp(actualStation.arrivalTime)),
+              'type': 'Feature',
+              'properties': {
+                'name': actualStation.name,
+                'id': actualStation.id,
+                'waveHeight': actualStation.waveHeight,
+                'arrivalTime': DateFormat('MM/dd HH:mm').format(_convertTimestamp(actualStation.arrivalTime)),
               },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [actualStation.lon ?? 0, actualStation.lat ?? 0],
+              'geometry': {
+                'type': 'Point',
+                'coordinates': [actualStation.lon ?? 0, actualStation.lat ?? 0],
               },
             };
           }).toList();
 
-      await _mapController.setGeoJsonSource("tsunami-data", {"type": "FeatureCollection", "features": features});
+      await _mapController.setGeoJsonSource('tsunami-data', {'type': 'FeatureCollection', 'features': features});
 
       await _mapController.addLayer(
-        "tsunami-data",
-        "tsunami-actual-circles",
+        'tsunami-data',
+        'tsunami-actual-circles',
         const CircleLayerProperties(
           circleRadius: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             7,
             8,
@@ -161,40 +161,40 @@ class _TsunamiMapState extends State<TsunamiMap> {
           ],
           circleColor: [
             Expressions.step,
-            [Expressions.get, "waveHeight"],
-            "#00AAFF",
+            [Expressions.get, 'waveHeight'],
+            '#00AAFF',
             30,
-            "#FFC900",
+            '#FFC900',
             100,
-            "#C90000",
+            '#C90000',
             300,
-            "#E543FF",
+            '#E543FF',
           ],
           circleOpacity: 1,
           circleStrokeWidth: 0.2,
-          circleStrokeColor: "#000000",
+          circleStrokeColor: '#000000',
           circleStrokeOpacity: 0.7,
         ),
       );
 
       await _mapController.addSymbolLayer(
-        "tsunami-data",
-        "tsunami-actual-labels",
+        'tsunami-data',
+        'tsunami-actual-labels',
         SymbolLayerProperties(
           textField: [
             Expressions.concat,
-            ["get", "name"],
-            "\n",
-            ["get", "arrivalTime"],
-            "\n",
-            ["get", "waveHeight"],
-            "cm\n${context.i18n.monitor_arrival}",
+            ['get', 'name'],
+            '\n',
+            ['get', 'arrivalTime'],
+            '\n',
+            ['get', 'waveHeight'],
+            'cm\n${context.i18n.monitor_arrival}',
           ],
           textSize: 12,
-          textColor: "#ffffff",
-          textHaloColor: "#000000",
+          textColor: '#ffffff',
+          textHaloColor: '#000000',
           textHaloWidth: 1,
-          textFont: ["Noto Sans Regular"],
+          textFont: ['Noto Sans Regular'],
           textOffset: [
             Expressions.literal,
             [0, 3.5],
@@ -207,17 +207,17 @@ class _TsunamiMapState extends State<TsunamiMap> {
 
   Future<void> _addUserLocationMarker() async {
     await _mapController.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'markers-geojson',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
     await _mapController.addLayer(
-      "markers-geojson",
-      "markers",
+      'markers-geojson',
+      'markers',
       const SymbolLayerProperties(
-        symbolZOrder: "source",
+        symbolZOrder: 'source',
         iconSize: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           5,
           0.5,
@@ -226,10 +226,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
         ],
         iconImage: [
           Expressions.match,
-          [Expressions.get, "cross"],
+          [Expressions.get, 'cross'],
           1,
-          "cross",
-          "gps",
+          'cross',
+          'gps',
         ],
         iconAllowOverlap: true,
         iconIgnorePlacement: true,
@@ -239,35 +239,35 @@ class _TsunamiMapState extends State<TsunamiMap> {
     final tsunami = this.tsunami;
     if (tsunami != null) {
       markers_features.add({
-        "type": "Feature",
-        "properties": {"cross": 1},
-        "geometry": {
-          "coordinates": [tsunami.eq.lon, tsunami.eq.lat],
-          "type": "Point",
+        'type': 'Feature',
+        'properties': {'cross': 1},
+        'geometry': {
+          'coordinates': [tsunami.eq.lon, tsunami.eq.lat],
+          'type': 'Point',
         },
       });
     }
     markers_features.add({
-      "type": "Feature",
-      "properties": {},
-      "geometry": {
-        "coordinates": [userLon, userLat],
-        "type": "Point",
+      'type': 'Feature',
+      'properties': {},
+      'geometry': {
+        'coordinates': [userLon, userLat],
+        'type': 'Point',
       },
     });
-    await _mapController.setGeoJsonSource("markers-geojson", {
-      "type": "FeatureCollection",
-      "features": markers_features,
+    await _mapController.setGeoJsonSource('markers-geojson', {
+      'type': 'FeatureCollection',
+      'features': markers_features,
     });
   }
 
   Future<Tsunami?> refreshTsunami() async {
     final idList = await ExpTech().getTsunamiList();
-    var id = "";
+    var id = '';
     if (idList.isNotEmpty) {
       id = idList.first;
-      _tsunami_id = id.split("-")[0];
-      _tsunami_serial = int.parse(id.split("-")[1]);
+      _tsunami_id = id.split('-')[0];
+      _tsunami_serial = int.parse(id.split('-')[1]);
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
           ? tsunamiStatus = context.i18n.tsunami_publish
@@ -284,17 +284,17 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   String convertTimestamp(int timestamp) {
-    final location = tz.getLocation("Asia/Taipei");
+    final location = tz.getLocation('Asia/Taipei');
     final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    final DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
+    final DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
     final String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
 
   String getTime() {
     final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat("yyyy/MM/dd HH:mm");
+    final DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
     final String formattedDate = formatter.format(now);
     return formattedDate;
   }
@@ -303,8 +303,8 @@ class _TsunamiMapState extends State<TsunamiMap> {
     double lat = latitude;
     double lon = longitude;
 
-    var latFormat = "";
-    var lonFormat = "";
+    var latFormat = '';
+    var lonFormat = '';
 
     if (latitude > 90) lat = latitude - 180;
     if (longitude > 180) lat = latitude - 360;
@@ -321,7 +321,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
       lonFormat = context.i18n.east_longitude(lon.toString());
     }
 
-    return "$latFormat　$lonFormat";
+    return '$latFormat　$lonFormat';
   }
 
   @override
@@ -334,7 +334,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
   List<String> generateTsunamiOptions() {
     final List<String> options = [];
     for (int i = 1; i <= _tsunami_serial; i++) {
-      options.add("$_tsunami_id-$i");
+      options.add('$_tsunami_id-$i');
     }
     return options;
   }
@@ -416,8 +416,8 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                             const SizedBox(height: 4),
                                             Text(
                                               tsunami != null
-                                                  ? "${convertTimestamp(tsunami!.time)} $tsunamiStatus"
-                                                  : "${getTime()} 更新",
+                                                  ? '${convertTimestamp(tsunami!.time)} $tsunamiStatus'
+                                                  : '${getTime()} 更新',
                                               style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
                                             ),
                                           ],
@@ -477,11 +477,11 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "${tsunami?.content}",
+                                            '${tsunami?.content}',
                                             style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                           ),
                                           const SizedBox(height: 20),
-                                          tsunami?.info.type == "estimate"
+                                          tsunami?.info.type == 'estimate'
                                               ? Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
@@ -592,7 +592,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                       style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                                     ),
                                                     Text(
-                                                      "${tsunami!.eq.mag}",
+                                                      '${tsunami!.eq.mag}',
                                                       style: TextStyle(
                                                         fontSize: 18,
                                                         fontWeight: FontWeight.bold,
@@ -612,7 +612,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                                       style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                                     ),
                                                     Text(
-                                                      "${tsunami!.eq.depth}km",
+                                                      '${tsunami!.eq.depth}km',
                                                       style: TextStyle(
                                                         fontSize: 18,
                                                         fontWeight: FontWeight.bold,

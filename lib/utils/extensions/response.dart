@@ -1,4 +1,4 @@
-import "package:http/http.dart";
+import 'package:http/http.dart';
 
 extension ResponseExtension on Response {
   /// Checks if the response status code is in the 2xx range (200-299).

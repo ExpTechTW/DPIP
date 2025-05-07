@@ -1,11 +1,11 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:go_router/go_router.dart";
-import "package:material_symbols_icons/symbols.dart";
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/widgets/list/tile_group_header.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/list/tile_group_header.dart';
 
 import 'package:dpip/app_old/page/me/developer.dart';
 
@@ -29,7 +29,7 @@ class _MePageState extends State<MePage> {
           leading: const Icon(Symbols.tune),
           title: Text(context.i18n.settings),
           subtitle: Text(context.i18n.settingsDescription),
-          onTap: () => context.push("/settings"),
+          onTap: () => context.push('/settings'),
         ),
         ListTileGroupHeader(title: context.i18n.me_about),
         ListTile(

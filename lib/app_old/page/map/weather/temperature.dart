@@ -1,20 +1,20 @@
-import "dart:io";
-import "dart:math";
+import 'dart:io';
+import 'dart:math';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/weather/weather.dart";
-import "package:dpip/app_old/page/map/meteor.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/app_old/page/map/meteor.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class TemperatureData {
   final double latitude;
@@ -68,17 +68,17 @@ class _TemperatureMapState extends State<TemperatureMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-      "temperature-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'temperature-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     weather_list = await ExpTech().getWeatherList();
@@ -105,18 +105,18 @@ class _TemperatureMapState extends State<TemperatureMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-        "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        'markers-geojson',
+        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
       );
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -132,22 +132,22 @@ class _TemperatureMapState extends State<TemperatureMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -160,26 +160,26 @@ class _TemperatureMapState extends State<TemperatureMap> {
         temperatureDataList
             .map(
               (data) => {
-                "type": "Feature",
-                "properties": {"id": data.id, "temperature": data.temperature},
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [data.longitude, data.latitude],
+                'type': 'Feature',
+                'properties': {'id': data.id, 'temperature': data.temperature},
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [data.longitude, data.latitude],
                 },
               },
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("temperature-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource('temperature-data', {'type': 'FeatureCollection', 'features': features});
 
-    await _mapController.removeLayer("temperature-circles");
+    await _mapController.removeLayer('temperature-circles');
     await _mapController.addLayer(
-      "temperature-data",
-      "temperature-circles",
+      'temperature-data',
+      'temperature-circles',
       const CircleLayerProperties(
         circleRadius: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           7,
           5,
@@ -188,26 +188,26 @@ class _TemperatureMapState extends State<TemperatureMap> {
         ],
         circleColor: [
           Expressions.interpolate,
-          ["linear"],
-          [Expressions.get, "temperature"],
+          ['linear'],
+          [Expressions.get, 'temperature'],
           -20,
-          "#4d4e51",
+          '#4d4e51',
           -10,
-          "#0000FF",
+          '#0000FF',
           0,
-          "#6495ED",
+          '#6495ED',
           10,
-          "#95d07e",
+          '#95d07e',
           20,
-          "#f6e78b",
+          '#f6e78b',
           30,
-          "#FF4500",
+          '#FF4500',
           40,
-          "#8B0000",
+          '#8B0000',
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
-        circleStrokeColor: "#000000",
+        circleStrokeColor: '#000000',
         circleStrokeOpacity: 0.7,
       ),
     );
@@ -228,17 +228,17 @@ class _TemperatureMapState extends State<TemperatureMap> {
       }
     });
 
-    await _mapController.removeLayer("temperature-labels");
+    await _mapController.removeLayer('temperature-labels');
     await _mapController.addSymbolLayer(
-      "temperature-data",
-      "temperature-labels",
+      'temperature-data',
+      'temperature-labels',
       const SymbolLayerProperties(
-        textField: ["get", "temperature"],
+        textField: ['get', 'temperature'],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 1,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
@@ -289,7 +289,7 @@ class _TemperatureMapState extends State<TemperatureMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["-20", "-10", "0", "10", "20", "30", "40"];
+    final labels = ['-20', '-10', '0', '10', '20', '30', '40'];
     return SizedBox(
       width: 300,
       child: Row(

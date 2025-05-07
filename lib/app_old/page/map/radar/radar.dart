@@ -1,19 +1,19 @@
-import "dart:io";
+import 'dart:io';
 
-import "package:dpip/core/providers.dart";
-import "package:flutter/material.dart";
+import 'package:dpip/core/providers.dart';
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/utils/need_location.dart";
-import "package:dpip/utils/radar_color.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/utils/need_location.dart';
+import 'package:dpip/utils/radar_color.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -50,7 +50,7 @@ class _RadarMapState extends State<RadarMap> {
   bool _showLegend = false;
 
   String getTileUrl(String timestamp) {
-    return "https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png";
+    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
   }
 
   Future<void> _loadMapImages(bool isDark) async {
@@ -83,22 +83,22 @@ class _RadarMapState extends State<RadarMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -116,35 +116,35 @@ class _RadarMapState extends State<RadarMap> {
 
     final String newTileUrl = getTileUrl(radar_list.last);
 
-    _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+    _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
-    _mapController.removeLayer("county-outline");
-    _mapController.removeLayer("county");
+    _mapController.removeLayer('county-outline');
+    _mapController.removeLayer('county');
 
     _mapController.addLayer(
-      "map",
-      "county",
+      'map',
+      'county',
       FillLayerProperties(fillColor: context.colors.surfaceContainerHigh.toHexStringRGB(), fillOpacity: 1),
-      sourceLayer: "city",
-      belowLayerId: "radarLayer",
+      sourceLayer: 'city',
+      belowLayerId: 'radarLayer',
     );
 
     _mapController.addLayer(
-      "map",
-      "county-outline",
+      'map',
+      'county-outline',
       LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB()),
-      sourceLayer: "city",
+      sourceLayer: 'city',
     );
 
-    _mapController.addLayer("radarSource", "radarLayer", const RasterLayerProperties(), belowLayerId: "county-outline");
+    _mapController.addLayer('radarSource', 'radarLayer', const RasterLayerProperties(), belowLayerId: 'county-outline');
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
       await getSavedLocation();
     }
 
     await _mapController.addSource(
-      "markers-geojson",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'markers-geojson',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     start();
@@ -157,15 +157,15 @@ class _RadarMapState extends State<RadarMap> {
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -263,16 +263,16 @@ class _RadarMapState extends State<RadarMap> {
               onTimeSelected: (time) {
                 final String newTileUrl = getTileUrl(time);
 
-                _mapController.removeLayer("radarLayer");
-                _mapController.removeSource("radarSource");
+                _mapController.removeLayer('radarLayer');
+                _mapController.removeSource('radarSource');
 
-                _mapController.addSource("radarSource", RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+                _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
                 _mapController.addLayer(
-                  "radarSource",
-                  "radarLayer",
+                  'radarSource',
+                  'radarLayer',
                   const RasterLayerProperties(),
-                  belowLayerId: "county-outline",
+                  belowLayerId: 'county-outline',
                 );
 
                 _addUserLocationMarker();
@@ -301,7 +301,7 @@ class ColorBarPainter extends CustomPainter {
     final width = size.width / colors.length;
 
     for (int i = 0; i < colors.length; i++) {
-      paint.color = Color(int.parse("0xFF${colors[i]}"));
+      paint.color = Color(int.parse('0xFF${colors[i]}'));
       canvas.drawRect(Rect.fromLTWH(i * width, 0, width, size.height), paint);
     }
   }

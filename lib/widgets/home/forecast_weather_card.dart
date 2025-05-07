@@ -1,6 +1,6 @@
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/extensions/color_scheme.dart";
-import "package:flutter/material.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color_scheme.dart';
+import 'package:flutter/material.dart';
 
 class ForecastWeatherCard extends StatelessWidget {
   final String time;
@@ -32,16 +32,16 @@ class ForecastWeatherCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "$maxTemperature°",
+                  '$maxTemperature°',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: context.colors.onSurface),
                 ),
                 Text(
-                  "/$minTemperature°",
+                  '/$minTemperature°',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: context.colors.onSurfaceVariant),
                 ),
               ],
             ),
-            Text("$rain%", style: TextStyle(fontSize: 16, color: context.theme.extendedColors.blue)),
+            Text('$rain%', style: TextStyle(fontSize: 16, color: context.theme.extendedColors.blue)),
             const SizedBox(height: 8),
             Icon(icon, fill: 1, size: 36, color: context.colors.onPrimaryContainer.withOpacity(0.75)),
           ],

@@ -1,7 +1,7 @@
-import "package:json_annotation/json_annotation.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-part "eew_info.g.dart";
+part 'eew_info.g.dart';
 
 @JsonSerializable()
 class EewInfo {
@@ -9,22 +9,22 @@ class EewInfo {
   final int time;
 
   /// 地震震央預估經度
-  @JsonKey(name: "lon")
+  @JsonKey(name: 'lon')
   final double longitude;
 
   /// 地震震央預估緯度
-  @JsonKey(name: "lat")
+  @JsonKey(name: 'lat')
   final double latitude;
 
   /// 地震預估深度
   final double depth;
 
   /// 地震預估芮氏規模
-  @JsonKey(name: "mag")
+  @JsonKey(name: 'mag')
   final double magnitude;
 
   /// 地震預估位置
-  @JsonKey(name: "loc")
+  @JsonKey(name: 'loc')
   final String location;
 
   /// 地震預估最大震度

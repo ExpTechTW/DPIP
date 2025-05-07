@@ -10,7 +10,7 @@ final Map<String, Widget Function(History item)> typeConfigs = {
   'extremely-heavy-rain': (History item) => ThunderstormPage(item: item),
   'torrential-rain': (History item) => ThunderstormPage(item: item),
   'extremely-torrential-rain': (History item) => ThunderstormPage(item: item),
-  'earthquake': (History item) => ReportRoute(id: item.addition?["id"]),
+  'earthquake': (History item) => ReportRoute(id: item.addition?['id']),
   'intensity': (History item) => IntensityPage(item: item),
 };
 

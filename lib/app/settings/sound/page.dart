@@ -113,7 +113,7 @@ class SoundDetailPage extends StatelessWidget {
   }
 
   List<Widget> _buildListItems(BuildContext context) {
-    final monitor = Global.preference.getBool("monitor") ?? false;
+    final monitor = Global.preference.getBool('monitor') ?? false;
 
     Widget buildSoundListTile(String title, String subtitle, String type, {bool? enable}) {
       return SoundListTile(title: title, subtitle: subtitle, type: type, enable: enable ?? true);
@@ -125,24 +125,24 @@ class SoundDetailPage extends StatelessWidget {
           buildSoundListTile(
             context.i18n.sound_eew_alert_major,
             context.i18n.eew_alert_description_sound,
-            "eew_alert-important",
+            'eew_alert-important',
           ),
-          buildSoundListTile(context.i18n.sound_eew_minor, context.i18n.eew_description_sound, "eew_alert-general"),
-          buildSoundListTile(context.i18n.sound_eew_silent, context.i18n.sound_eew_silent_h2, "eew_alert-silent"),
+          buildSoundListTile(context.i18n.sound_eew_minor, context.i18n.eew_description_sound, 'eew_alert-general'),
+          buildSoundListTile(context.i18n.sound_eew_silent, context.i18n.sound_eew_silent_h2, 'eew_alert-silent'),
           buildSoundListTile(
             context.i18n.sound_earthquake_eew_major,
             context.i18n.sound_earthquake_eew_major_h2,
-            "eew-important",
+            'eew-important',
           ),
           buildSoundListTile(
             context.i18n.sound_earthquake_eew_minor,
             context.i18n.sound_earthquake_eew_minor_h2,
-            "eew-general",
+            'eew-general',
           ),
           buildSoundListTile(
             context.i18n.sound_earthquake_eew_silent,
             context.i18n.sound_earthquake_eew_silent_h2,
-            "eew-silence",
+            'eew-silence',
           ),
         ];
       case 'eq':
@@ -150,42 +150,42 @@ class SoundDetailPage extends StatelessWidget {
           buildSoundListTile(
             context.i18n.sound_int_report_minor,
             context.i18n.sound_int_report_minor_h2,
-            "int_report-general",
+            'int_report-general',
             enable: monitor,
           ),
           buildSoundListTile(
             context.i18n.sound_int_report_silent,
             context.i18n.sound_int_report_silent_h2,
-            "int_report-silence",
+            'int_report-silence',
             enable: monitor,
           ),
           buildSoundListTile(
             context.i18n.sound_monitor_minor,
             context.i18n.eq_description_sound,
-            "eq",
+            'eq',
             enable: monitor,
           ),
-          buildSoundListTile(context.i18n.sound_report_minor, context.i18n.report_description_sound, "report-general"),
-          buildSoundListTile(context.i18n.sound_report_silent, context.i18n.sound_report_silent_h2, "report-silence"),
+          buildSoundListTile(context.i18n.sound_report_minor, context.i18n.report_description_sound, 'report-general'),
+          buildSoundListTile(context.i18n.sound_report_silent, context.i18n.sound_report_silent_h2, 'report-silence'),
         ];
       case 'rain':
-        return [buildSoundListTile(context.i18n.me_general, context.i18n.sound_rain_minor_h2, "thunderstorm-general")];
+        return [buildSoundListTile(context.i18n.me_general, context.i18n.sound_rain_minor_h2, 'thunderstorm-general')];
       case 'weather':
         return [
-          buildSoundListTile(context.i18n.sound_major, context.i18n.sound_weather_major_h2, "weather_major-important"),
-          buildSoundListTile(context.i18n.me_general, context.i18n.sound_weather_minor_h2, "weather_minor-general"),
+          buildSoundListTile(context.i18n.sound_major, context.i18n.sound_weather_major_h2, 'weather_major-important'),
+          buildSoundListTile(context.i18n.me_general, context.i18n.sound_weather_minor_h2, 'weather_minor-general'),
         ];
       case 'evacuation':
         return [
           buildSoundListTile(
             context.i18n.sound_major,
             context.i18n.sound_evacuation_major_h2,
-            "evacuation_major-important",
+            'evacuation_major-important',
           ),
           buildSoundListTile(
             context.i18n.me_general,
             context.i18n.sound_evacuation_minor_h2,
-            "evacuation_minor-general",
+            'evacuation_minor-general',
           ),
         ];
       case 'tsunami':
@@ -193,17 +193,17 @@ class SoundDetailPage extends StatelessWidget {
           buildSoundListTile(
             context.i18n.sound_major,
             context.i18n.tsunami_alert_description_sound,
-            "tsunami-important",
+            'tsunami-important',
           ),
-          buildSoundListTile(context.i18n.me_general, context.i18n.tsunami_alert2_description_sound, "tsunami-general"),
-          buildSoundListTile(context.i18n.sound_tsunami_silent, context.i18n.sound_tsunami_silent_h2, "tsunami-silent"),
+          buildSoundListTile(context.i18n.me_general, context.i18n.tsunami_alert2_description_sound, 'tsunami-general'),
+          buildSoundListTile(context.i18n.sound_tsunami_silent, context.i18n.sound_tsunami_silent_h2, 'tsunami-silent'),
         ];
       case 'other':
         return [
           buildSoundListTile(
             context.i18n.announcement,
             context.i18n.server_announcement_description_sound,
-            "announcement-general",
+            'announcement-general',
           ),
         ];
       default:

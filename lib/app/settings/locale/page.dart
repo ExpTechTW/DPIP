@@ -42,7 +42,7 @@ class SettingsLocalePage extends StatelessWidget {
               subtitle: Text(context.i18n.settings_locale_crowdin_description),
               trailing: const Icon(Symbols.arrow_outward_rounded),
               onTap: () {
-                launchUrl(Uri.parse("https://crowdin.com/project/dpip"));
+                launchUrl(Uri.parse('https://crowdin.com/project/dpip'));
               },
             ),
           ],

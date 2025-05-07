@@ -1,20 +1,20 @@
-import "dart:io";
-import "dart:math";
+import 'dart:io';
+import 'dart:math';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/weather/weather.dart";
-import "package:dpip/app_old/page/map/meteor.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/app_old/page/map/meteor.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class PressureData {
   final double latitude;
@@ -68,17 +68,17 @@ class _PressureMapState extends State<PressureMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-      "pressure-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'pressure-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     weather_list = await ExpTech().getWeatherList();
@@ -105,18 +105,18 @@ class _PressureMapState extends State<PressureMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-        "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        'markers-geojson',
+        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
       );
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -132,22 +132,22 @@ class _PressureMapState extends State<PressureMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -160,26 +160,26 @@ class _PressureMapState extends State<PressureMap> {
         pressureDataList
             .map(
               (data) => {
-                "type": "Feature",
-                "properties": {"id": data.id, "pressure": data.pressure},
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [data.longitude, data.latitude],
+                'type': 'Feature',
+                'properties': {'id': data.id, 'pressure': data.pressure},
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [data.longitude, data.latitude],
                 },
               },
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("pressure-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource('pressure-data', {'type': 'FeatureCollection', 'features': features});
 
-    await _mapController.removeLayer("pressure-circles");
+    await _mapController.removeLayer('pressure-circles');
     await _mapController.addLayer(
-      "pressure-data",
-      "pressure-circles",
+      'pressure-data',
+      'pressure-circles',
       const CircleLayerProperties(
         circleRadius: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           7,
           5,
@@ -188,20 +188,20 @@ class _PressureMapState extends State<PressureMap> {
         ],
         circleColor: [
           Expressions.interpolate,
-          ["linear"],
-          [Expressions.get, "pressure"],
+          ['linear'],
+          [Expressions.get, 'pressure'],
           725,
-          "#77bfcc",
+          '#77bfcc',
           850,
-          "#82cb75",
+          '#82cb75',
           975,
-          "#f7e78a",
+          '#f7e78a',
           1020,
-          "#ffffff",
+          '#ffffff',
         ],
         circleOpacity: 0.7,
         circleStrokeWidth: 0.2,
-        circleStrokeColor: "#000000",
+        circleStrokeColor: '#000000',
         circleStrokeOpacity: 0.7,
       ),
     );
@@ -222,17 +222,17 @@ class _PressureMapState extends State<PressureMap> {
       }
     });
 
-    await _mapController.removeLayer("pressure-labels");
+    await _mapController.removeLayer('pressure-labels');
     await _mapController.addSymbolLayer(
-      "pressure-data",
-      "pressure-labels",
+      'pressure-data',
+      'pressure-labels',
       const SymbolLayerProperties(
-        textField: ["get", "pressure"],
+        textField: ['get', 'pressure'],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 1,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
@@ -280,7 +280,7 @@ class _PressureMapState extends State<PressureMap> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = ["725", "850", "975", "1020"];
+    final labels = ['725', '850', '975', '1020'];
     return SizedBox(
       width: 300,
       child: Row(
@@ -396,7 +396,7 @@ class _PressureMapState extends State<PressureMap> {
                         decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
-                        type: "pressure",
+                        type: 'pressure',
                         stationId: _selectedStationId!,
                         onClose: () {
                           setState(() {

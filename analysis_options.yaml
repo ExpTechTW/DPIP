@@ -11,3 +11,4 @@ linter:
   rules:
     directives_ordering: false
     flutter_style_todos: true
+    prefer_single_quotes: true

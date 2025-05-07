@@ -1,6 +1,6 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
-part "tsunami_actual.g.dart";
+part 'tsunami_actual.g.dart';
 
 @JsonSerializable()
 class TsunamiActual {
@@ -42,7 +42,7 @@ class TsunamiActual {
   /// ```
   /// 27
   /// ```
-  @JsonKey(name: "wave_height")
+  @JsonKey(name: 'wave_height')
   final int waveHeight;
 
   /// - 海嘯實際抵達時間
@@ -51,7 +51,7 @@ class TsunamiActual {
   /// ```
   /// 1712104200000
   /// ```
-  @JsonKey(name: "arrival_time")
+  @JsonKey(name: 'arrival_time')
   final int arrivalTime;
 
   TsunamiActual({

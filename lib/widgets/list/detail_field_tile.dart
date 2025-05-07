@@ -1,5 +1,5 @@
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:flutter/widgets.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/widgets.dart';
 
 class DetailFieldTile extends StatelessWidget {
   final String label;

@@ -1,6 +1,6 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
-part "tsunami_earthquake.g.dart";
+part 'tsunami_earthquake.g.dart';
 
 @JsonSerializable()
 class TsunamiEarthquake {

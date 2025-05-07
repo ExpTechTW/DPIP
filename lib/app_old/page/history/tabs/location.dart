@@ -58,7 +58,7 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       getSavedLocation();
     }
 

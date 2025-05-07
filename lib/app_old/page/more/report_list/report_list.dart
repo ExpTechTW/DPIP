@@ -267,7 +267,7 @@ class _ReportListPageState extends State<ReportListPage> {
                       values: _depthRange,
                       max: 700,
                       divisions: 70,
-                      labels: RangeLabels("${_depthRange.start.round()}km", "${_depthRange.end.round()}km"),
+                      labels: RangeLabels('${_depthRange.start.round()}km', '${_depthRange.end.round()}km'),
                       onChanged: (RangeValues values) {
                         setState(() {
                           _depthRange = RangeValues(values.start.roundToDouble(), values.end.roundToDouble());

@@ -1,9 +1,9 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
-import "package:dpip/api/model/rts/rts_intensity.dart";
-import "package:dpip/api/model/rts/rts_station.dart";
+import 'package:dpip/api/model/rts/rts_intensity.dart';
+import 'package:dpip/api/model/rts/rts_station.dart';
 
-part "rts.g.dart";
+part 'rts.g.dart';
 
 @JsonSerializable()
 class Rts {
@@ -17,7 +17,7 @@ class Rts {
   final int time;
 
   /// 震度列表
-  @JsonKey(name: "int")
+  @JsonKey(name: 'int')
   final List<RtsIntensity> intensity;
 
   Rts({required this.station, required this.box, required this.time, required this.intensity});

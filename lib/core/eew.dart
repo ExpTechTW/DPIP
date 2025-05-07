@@ -1,8 +1,8 @@
-import "dart:math";
+import 'dart:math';
 
-import "package:dpip/api/model/location/location.dart";
-import "package:dpip/api/model/wave_time.dart";
-import "package:dpip/global.dart";
+import 'package:dpip/api/model/location/location.dart';
+import 'package:dpip/api/model/wave_time.dart';
+import 'package:dpip/global.dart';
 
 Map<String, double> psWaveDist(double depth, int time, int now) {
   double pDist = 0;
@@ -15,28 +15,28 @@ Map<String, double> psWaveDist(double depth, int time, int now) {
   var prevTable;
 
   for (final table in timeTable) {
-    if (pDist == 0 && table["P"] > t) {
+    if (pDist == 0 && table['P'] > t) {
       if (prevTable != null) {
-        final double tDiff = table["P"].toDouble() - prevTable["P"].toDouble();
-        final double rDiff = table["R"].toDouble() - prevTable["R"].toDouble();
-        final double tOffset = t - prevTable["P"].toDouble();
+        final double tDiff = table['P'].toDouble() - prevTable['P'].toDouble();
+        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
+        final double tOffset = t - prevTable['P'].toDouble();
         final double rOffset = (tOffset / tDiff) * rDiff;
-        pDist = prevTable["R"].toDouble() + rOffset;
+        pDist = prevTable['R'].toDouble() + rOffset;
       } else {
-        pDist = table["R"].toDouble();
+        pDist = table['R'].toDouble();
       }
     }
 
-    if (sDist == 0 && table["S"] > t) {
+    if (sDist == 0 && table['S'] > t) {
       if (prevTable != null) {
-        final double tDiff = table["S"].toDouble() - prevTable["S"].toDouble();
-        final double rDiff = table["R"].toDouble() - prevTable["R"].toDouble();
-        final double tOffset = t - prevTable["S"].toDouble();
+        final double tDiff = table['S'].toDouble() - prevTable['S'].toDouble();
+        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
+        final double tOffset = t - prevTable['S'].toDouble();
         final double rOffset = (tOffset / tDiff) * rDiff;
-        sDist = prevTable["R"].toDouble() + rOffset;
+        sDist = prevTable['R'].toDouble() + rOffset;
       } else {
-        sDist = table["R"].toDouble();
-        sT = table["S"].toDouble();
+        sDist = table['R'].toDouble();
+        sT = table['S'].toDouble();
       }
     }
 
@@ -44,7 +44,7 @@ Map<String, double> psWaveDist(double depth, int time, int now) {
     prevTable = table;
   }
 
-  return {"p_dist": pDist, "s_dist": sDist, "s_t": sT};
+  return {'p_dist': pDist, 's_dist': sDist, 's_t': sT};
 }
 
 int findClosest(List<int> arr, double target) {
@@ -66,10 +66,10 @@ Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag
     if (i > eewMaxI) {
       eewMaxI = i;
     }
-    json[key] = {"dist": dist, "i": i};
+    json[key] = {'dist': dist, 'i': i};
   });
 
-  json["max_i"] = eewMaxI;
+  json['max_i'] = eewMaxI;
   return json;
 }
 
@@ -114,15 +114,15 @@ double sWaveTimeByDistance(double depth, double sDist) {
   var prevTable;
 
   for (final table in timeTable) {
-    if (sTime == 0 && table["R"].toDouble() >= sDist) {
+    if (sTime == 0 && table['R'].toDouble() >= sDist) {
       if (prevTable != null) {
-        final double rDiff = table["R"].toDouble() - prevTable["R"].toDouble();
-        final double tDiff = table["S"].toDouble() - prevTable["S"].toDouble();
-        final double rOffset = sDist - prevTable["R"].toDouble();
+        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
+        final double tDiff = table['S'].toDouble() - prevTable['S'].toDouble();
+        final double rOffset = sDist - prevTable['R'].toDouble();
         final double tOffset = (rOffset / rDiff) * tDiff;
-        sTime = prevTable["S"].toDouble() + tOffset;
+        sTime = prevTable['S'].toDouble() + tOffset;
       } else {
-        sTime = table["S"].toDouble();
+        sTime = table['S'].toDouble();
       }
     }
 
@@ -140,15 +140,15 @@ double pWaveTimeByDistance(double depth, double pDist) {
   var prevTable;
 
   for (final table in timeTable) {
-    if (pTime == 0 && table["R"].toDouble() >= pDist) {
+    if (pTime == 0 && table['R'].toDouble() >= pDist) {
       if (prevTable != null) {
-        final double rDiff = table["R"].toDouble() - prevTable["R"].toDouble();
-        final double tDiff = table["P"].toDouble() - prevTable["P"].toDouble();
-        final double rOffset = pDist - prevTable["R"].toDouble();
+        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
+        final double tDiff = table['P'].toDouble() - prevTable['P'].toDouble();
+        final double rOffset = pDist - prevTable['R'].toDouble();
         final double tOffset = (rOffset / rDiff) * tDiff;
-        pTime = prevTable["P"].toDouble() + tOffset;
+        pTime = prevTable['P'].toDouble() + tOffset;
       } else {
-        pTime = table["P"].toDouble();
+        pTime = table['P'].toDouble();
       }
     }
 
@@ -187,15 +187,15 @@ int intensityFloatToInt(double floatValue) {
 
 String intensityToNumberString(int level) {
   return (level == 5)
-      ? "5⁻"
+      ? '5⁻'
       : (level == 6)
-      ? "5⁺"
+      ? '5⁺'
       : (level == 7)
-      ? "6⁻"
+      ? '6⁻'
       : (level == 8)
-      ? "6⁺"
+      ? '6⁺'
       : (level == 9)
-      ? "7"
+      ? '7'
       : level.toString();
 }
 
@@ -255,5 +255,5 @@ Map<String, dynamic> eewLocationInfo(
   if (intensity > 4.5) {
     intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
   }
-  return {"dist": dist, "i": intensity};
+  return {'dist': dist, 'i': intensity};
 }

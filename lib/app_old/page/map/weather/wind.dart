@@ -1,20 +1,20 @@
-import "dart:io";
-import "dart:math";
+import 'dart:io';
+import 'dart:math';
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:maplibre_gl/maplibre_gl.dart";
+import 'package:maplibre_gl/maplibre_gl.dart';
 
-import "package:dpip/api/exptech.dart";
-import "package:dpip/api/model/weather/weather.dart";
-import "package:dpip/app_old/page/map/meteor.dart";
-import "package:dpip/core/ios_get_location.dart";
-import "package:dpip/global.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/map_utils.dart";
-import "package:dpip/widgets/list/time_selector.dart";
-import "package:dpip/widgets/map/legend.dart";
-import "package:dpip/widgets/map/map.dart";
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/app_old/page/map/meteor.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class WindData {
   final double latitude;
@@ -84,17 +84,17 @@ class _WindMapState extends State<WindMap> {
 
     await _loadMapImages(isDark);
 
-    if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
-    userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-    userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
     isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
     await _mapController.addSource(
-      "wind-data",
-      const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+      'wind-data',
+      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
     );
 
     weather_list = await ExpTech().getWeatherList();
@@ -105,18 +105,18 @@ class _WindMapState extends State<WindMap> {
 
     if (isUserLocationValid) {
       await _mapController.addSource(
-        "markers-geojson",
-        const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+        'markers-geojson',
+        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
       );
-      await _mapController.setGeoJsonSource("markers-geojson", {
-        "type": "FeatureCollection",
-        "features": [
+      await _mapController.setGeoJsonSource('markers-geojson', {
+        'type': 'FeatureCollection',
+        'features': [
           {
-            "type": "Feature",
-            "properties": {},
-            "geometry": {
-              "coordinates": [userLon, userLat],
-              "type": "Point",
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+              'coordinates': [userLon, userLat],
+              'type': 'Point',
             },
           },
         ],
@@ -132,22 +132,22 @@ class _WindMapState extends State<WindMap> {
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -160,79 +160,79 @@ class _WindMapState extends State<WindMap> {
         windDataList
             .map(
               (data) => {
-                "type": "Feature",
-                "properties": {"id": data.id, "direction": data.direction, "speed": data.speed},
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": [data.longitude, data.latitude],
+                'type': 'Feature',
+                'properties': {'id': data.id, 'direction': data.direction, 'speed': data.speed},
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [data.longitude, data.latitude],
                 },
               },
             )
             .toList();
 
-    await _mapController.setGeoJsonSource("wind-data", {"type": "FeatureCollection", "features": features});
+    await _mapController.setGeoJsonSource('wind-data', {'type': 'FeatureCollection', 'features': features});
 
-    await _mapController.removeLayer("wind-circles");
+    await _mapController.removeLayer('wind-circles');
     await _mapController.addLayer(
-      "wind-data",
-      "wind-circles",
+      'wind-data',
+      'wind-circles',
       const CircleLayerProperties(
         circleRadius: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           5,
           3,
           10,
           6,
         ],
-        circleColor: "#808080",
+        circleColor: '#808080',
         circleStrokeWidth: 0.8,
-        circleStrokeColor: "#FFFFFF",
+        circleStrokeColor: '#FFFFFF',
       ),
       filter: [
-        "==",
-        ["get", "speed"],
+        '==',
+        ['get', 'speed'],
         0,
       ],
       minzoom: 10,
     );
 
-    await _mapController.removeLayer("wind-speed-0-labels");
+    await _mapController.removeLayer('wind-speed-0-labels');
     await _mapController.addSymbolLayer(
-      "wind-data",
-      "wind-speed-0-labels",
+      'wind-data',
+      'wind-speed-0-labels',
       const SymbolLayerProperties(
         textField: [
           Expressions.format,
-          ["get", "speed"],
+          ['get', 'speed'],
         ],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 2,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
         ],
       ),
       filter: [
-        "==",
-        ["get", "speed"],
+        '==',
+        ['get', 'speed'],
         0,
       ],
       minzoom: 10,
     );
 
-    await _mapController.removeLayer("wind-arrows");
+    await _mapController.removeLayer('wind-arrows');
     await _mapController.addLayer(
-      "wind-data",
-      "wind-arrows",
+      'wind-data',
+      'wind-arrows',
       const SymbolLayerProperties(
         iconSize: [
           Expressions.interpolate,
-          ["linear"],
+          ['linear'],
           [Expressions.zoom],
           5,
           0.4,
@@ -241,30 +241,30 @@ class _WindMapState extends State<WindMap> {
         ],
         iconImage: [
           Expressions.step,
-          [Expressions.get, "speed"],
-          "wind-1",
+          [Expressions.get, 'speed'],
+          'wind-1',
           3.4,
-          "wind-2",
+          'wind-2',
           8,
-          "wind-3",
+          'wind-3',
           13.9,
-          "wind-4",
+          'wind-4',
           32.7,
-          "wind-5",
+          'wind-5',
         ],
-        iconRotate: [Expressions.get, "direction"],
+        iconRotate: [Expressions.get, 'direction'],
         textAllowOverlap: true,
         iconAllowOverlap: true,
       ),
       filter: [
-        "!=",
-        ["get", "speed"],
+        '!=',
+        ['get', 'speed'],
         0,
       ],
     );
 
     _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['wind-arrows', "wind-circles"], null);
+      final features = await _mapController.queryRenderedFeatures(point, ['wind-arrows', 'wind-circles'], null);
 
       if (features.isNotEmpty) {
         final stationId = features[0]['properties']['id'] as String;
@@ -279,28 +279,28 @@ class _WindMapState extends State<WindMap> {
       }
     });
 
-    await _mapController.removeLayer("wind-speed-labels");
+    await _mapController.removeLayer('wind-speed-labels');
     await _mapController.addSymbolLayer(
-      "wind-data",
-      "wind-speed-labels",
+      'wind-data',
+      'wind-speed-labels',
       const SymbolLayerProperties(
         textField: [
           Expressions.format,
-          ["get", "speed"],
+          ['get', 'speed'],
         ],
         textSize: 12,
-        textColor: "#ffffff",
-        textHaloColor: "#000000",
+        textColor: '#ffffff',
+        textHaloColor: '#000000',
         textHaloWidth: 2,
-        textFont: ["Noto Sans Regular"],
+        textFont: ['Noto Sans Regular'],
         textOffset: [
           Expressions.literal,
           [0, 2],
         ],
       ),
       filter: [
-        "!=",
-        ["get", "speed"],
+        '!=',
+        ['get', 'speed'],
         0,
       ],
       minzoom: 9,
@@ -316,11 +316,11 @@ class _WindMapState extends State<WindMap> {
   Widget _buildLegend() {
     return MapLegend(
       children: [
-        _legendItem("wind-1", "0.1 - 3.3 m/s"),
-        _legendItem("wind-2", "3.4 - 7.9 m/s"),
-        _legendItem("wind-3", "8.0 - 13.8 m/s"),
-        _legendItem("wind-4", "13.9 - 32.6 m/s"),
-        _legendItem("wind-5", "≥ 32.7 m/s"),
+        _legendItem('wind-1', '0.1 - 3.3 m/s'),
+        _legendItem('wind-2', '3.4 - 7.9 m/s'),
+        _legendItem('wind-3', '8.0 - 13.8 m/s'),
+        _legendItem('wind-4', '13.9 - 32.6 m/s'),
+        _legendItem('wind-5', '≥ 32.7 m/s'),
       ],
     );
   }
@@ -330,7 +330,7 @@ class _WindMapState extends State<WindMap> {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          Image.asset("assets/map/icons/$imageName.png", width: 24, height: 24),
+          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
           const SizedBox(width: 8),
           Text(label),
         ],
@@ -364,7 +364,7 @@ class _WindMapState extends State<WindMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: "圖例",
+                message: '圖例',
                 child: Container(
                   width: 30,
                   height: 30,
@@ -424,7 +424,7 @@ class _WindMapState extends State<WindMap> {
                         decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
                       ),
                       AdvancedWeatherChart(
-                        type: "wind_speed",
+                        type: 'wind_speed',
                         stationId: _selectedStationId!,
                         onClose: () {
                           setState(() {

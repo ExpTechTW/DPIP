@@ -1,7 +1,7 @@
-import "package:flutter/cupertino.dart";
+import 'package:flutter/cupertino.dart';
 
-import "package:intl/intl.dart";
-import "package:timezone/timezone.dart" as tz;
+import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class TsunamiEstimateList extends StatelessWidget {
   final List tsunamiList;
@@ -9,23 +9,23 @@ class TsunamiEstimateList extends StatelessWidget {
   const TsunamiEstimateList({super.key, required this.tsunamiList});
 
   String convertTimestamp(int timestamp) {
-    final location = tz.getLocation("Asia/Taipei");
+    final location = tz.getLocation('Asia/Taipei');
     final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
 
-    final DateFormat formatter = DateFormat("d日HH:mm");
+    final DateFormat formatter = DateFormat('d日HH:mm');
     final String formattedDate = formatter.format(dateTime);
     return formattedDate;
   }
 
   String heightToString(height) {
     if (height == 3) {
-      return ">3m";
+      return '>3m';
     } else if (height == 2) {
-      return "1~3m";
+      return '1~3m';
     } else if (height == 1) {
-      return "0.3~1m";
+      return '0.3~1m';
     } else {
-      return "<0.3m";
+      return '<0.3m';
     }
   }
 

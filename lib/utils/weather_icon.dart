@@ -1,279 +1,279 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:material_symbols_icons/material_symbols_icons.dart";
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import "package:dpip/utils/extensions/build_context.dart";
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class WeatherIcons {
   WeatherIcons._();
 
   static const Map<String, IconData> iconMap = {
-    "sunny": Symbols.sunny_rounded,
-    "nightlight": Symbols.nightlight_rounded,
-    "partly_cloudy_day": Symbols.partly_cloudy_day_rounded,
-    "partly_cloudy_night": Symbols.partly_cloudy_night_rounded,
-    "cloudy": Symbols.cloud_rounded,
-    "foggy": Symbols.foggy_rounded,
-    "rainy": Symbols.rainy_rounded,
-    "snowy": Symbols.ac_unit_rounded,
-    "rainy_snow": Symbols.weather_mix_rounded,
-    "thunderstorm": Symbols.thunderstorm_rounded,
-    "hail": Symbols.grain_rounded,
-    "unknown": Symbols.error_rounded,
+    'sunny': Symbols.sunny_rounded,
+    'nightlight': Symbols.nightlight_rounded,
+    'partly_cloudy_day': Symbols.partly_cloudy_day_rounded,
+    'partly_cloudy_night': Symbols.partly_cloudy_night_rounded,
+    'cloudy': Symbols.cloud_rounded,
+    'foggy': Symbols.foggy_rounded,
+    'rainy': Symbols.rainy_rounded,
+    'snowy': Symbols.ac_unit_rounded,
+    'rainy_snow': Symbols.weather_mix_rounded,
+    'thunderstorm': Symbols.thunderstorm_rounded,
+    'hail': Symbols.grain_rounded,
+    'unknown': Symbols.error_rounded,
   };
 
   static final Map<int, Map<String, dynamic>> weatherCodeMap = {
     // Sunny (晴)
     100: {
-      "icon": {"day": "sunny", "night": "nightlight"},
-      "key": "sunny",
+      'icon': {'day': 'sunny', 'night': 'nightlight'},
+      'key': 'sunny',
     },
     101: {
-      "icon": {"day": "sunny", "night": "nightlight"},
-      "key": "sunny_haze",
+      'icon': {'day': 'sunny', 'night': 'nightlight'},
+      'key': 'sunny_haze',
     },
     102: {
-      "icon": {"day": "sunny", "night": "nightlight"},
-      "key": "sunny_mist",
+      'icon': {'day': 'sunny', 'night': 'nightlight'},
+      'key': 'sunny_mist',
     },
     103: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_lightning",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_lightning',
     },
     104: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_thunder',
     },
     105: {
-      "icon": {"day": "foggy", "night": "foggy"},
-      "key": "sunny_fog",
+      'icon': {'day': 'foggy', 'night': 'foggy'},
+      'key': 'sunny_fog',
     },
     106: {
-      "icon": {"day": "rainy", "night": "rainy"},
-      "key": "sunny_rain",
+      'icon': {'day': 'rainy', 'night': 'rainy'},
+      'key': 'sunny_rain',
     },
     107: {
-      "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "sunny_rain_snow",
+      'icon': {'day': 'rainy_snow', 'night': 'rainy_snow'},
+      'key': 'sunny_rain_snow',
     },
     108: {
-      "icon": {"day": "snowy", "night": "snowy"},
-      "key": "sunny_heavy_snow",
+      'icon': {'day': 'snowy', 'night': 'snowy'},
+      'key': 'sunny_heavy_snow',
     },
     109: {
-      "icon": {"day": "snowy", "night": "snowy"},
-      "key": "sunny_snow_pellets",
+      'icon': {'day': 'snowy', 'night': 'snowy'},
+      'key': 'sunny_snow_pellets',
     },
     110: {
-      "icon": {"day": "hail", "night": "hail"},
-      "key": "sunny_ice_pellets",
+      'icon': {'day': 'hail', 'night': 'hail'},
+      'key': 'sunny_ice_pellets',
     },
     111: {
-      "icon": {"day": "rainy", "night": "rainy"},
-      "key": "sunny_showers",
+      'icon': {'day': 'rainy', 'night': 'rainy'},
+      'key': 'sunny_showers',
     },
     112: {
-      "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "sunny_rain_snow_showers",
+      'icon': {'day': 'rainy_snow', 'night': 'rainy_snow'},
+      'key': 'sunny_rain_snow_showers',
     },
     113: {
-      "icon": {"day": "hail", "night": "hail"},
-      "key": "sunny_hail",
+      'icon': {'day': 'hail', 'night': 'hail'},
+      'key': 'sunny_hail',
     },
     114: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunderstorm",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_thunderstorm',
     },
     115: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder_snow",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_thunder_snow',
     },
     116: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder_hail",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_thunder_hail',
     },
     117: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_heavy_thunderstorm",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_heavy_thunderstorm',
     },
     118: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_heavy_thunder_hail",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_heavy_thunder_hail',
     },
     119: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "sunny_thunder",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'sunny_thunder',
     },
 
     // Cloudy (多雲)
     200: {
-      "icon": {"day": "partly_cloudy_day", "night": "partly_cloudy_night"},
-      "key": "cloudy",
+      'icon': {'day': 'partly_cloudy_day', 'night': 'partly_cloudy_night'},
+      'key': 'cloudy',
     },
     201: {
-      "icon": {"day": "partly_cloudy_day", "night": "partly_cloudy_night"},
-      "key": "cloudy_haze",
+      'icon': {'day': 'partly_cloudy_day', 'night': 'partly_cloudy_night'},
+      'key': 'cloudy_haze',
     },
     202: {
-      "icon": {"day": "partly_cloudy_day", "night": "partly_cloudy_night"},
-      "key": "cloudy_mist",
+      'icon': {'day': 'partly_cloudy_day', 'night': 'partly_cloudy_night'},
+      'key': 'cloudy_mist',
     },
     203: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_lightning",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_lightning',
     },
     204: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_thunder',
     },
     205: {
-      "icon": {"day": "foggy", "night": "foggy"},
-      "key": "cloudy_fog",
+      'icon': {'day': 'foggy', 'night': 'foggy'},
+      'key': 'cloudy_fog',
     },
     206: {
-      "icon": {"day": "rainy", "night": "rainy"},
-      "key": "cloudy_rain",
+      'icon': {'day': 'rainy', 'night': 'rainy'},
+      'key': 'cloudy_rain',
     },
     207: {
-      "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "cloudy_rain_snow",
+      'icon': {'day': 'rainy_snow', 'night': 'rainy_snow'},
+      'key': 'cloudy_rain_snow',
     },
     208: {
-      "icon": {"day": "snowy", "night": "snowy"},
-      "key": "cloudy_heavy_snow",
+      'icon': {'day': 'snowy', 'night': 'snowy'},
+      'key': 'cloudy_heavy_snow',
     },
     209: {
-      "icon": {"day": "snowy", "night": "snowy"},
-      "key": "cloudy_snow_pellets",
+      'icon': {'day': 'snowy', 'night': 'snowy'},
+      'key': 'cloudy_snow_pellets',
     },
     210: {
-      "icon": {"day": "hail", "night": "hail"},
-      "key": "cloudy_ice_pellets",
+      'icon': {'day': 'hail', 'night': 'hail'},
+      'key': 'cloudy_ice_pellets',
     },
     211: {
-      "icon": {"day": "rainy", "night": "rainy"},
-      "key": "cloudy_showers",
+      'icon': {'day': 'rainy', 'night': 'rainy'},
+      'key': 'cloudy_showers',
     },
     212: {
-      "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "cloudy_rain_snow_showers",
+      'icon': {'day': 'rainy_snow', 'night': 'rainy_snow'},
+      'key': 'cloudy_rain_snow_showers',
     },
     213: {
-      "icon": {"day": "hail", "night": "hail"},
-      "key": "cloudy_hail",
+      'icon': {'day': 'hail', 'night': 'hail'},
+      'key': 'cloudy_hail',
     },
     214: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunderstorm",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_thunderstorm',
     },
     215: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder_snow",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_thunder_snow',
     },
     216: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder_hail",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_thunder_hail',
     },
     217: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_heavy_thunderstorm",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_heavy_thunderstorm',
     },
     218: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_heavy_thunder_hail",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_heavy_thunder_hail',
     },
     219: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "cloudy_thunder",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'cloudy_thunder',
     },
 
     // Overcast (陰)
     300: {
-      "icon": {"day": "cloudy", "night": "cloudy"},
-      "key": "overcast",
+      'icon': {'day': 'cloudy', 'night': 'cloudy'},
+      'key': 'overcast',
     },
     301: {
-      "icon": {"day": "cloudy", "night": "cloudy"},
-      "key": "overcast_haze",
+      'icon': {'day': 'cloudy', 'night': 'cloudy'},
+      'key': 'overcast_haze',
     },
     302: {
-      "icon": {"day": "cloudy", "night": "cloudy"},
-      "key": "overcast_mist",
+      'icon': {'day': 'cloudy', 'night': 'cloudy'},
+      'key': 'overcast_mist',
     },
     303: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_lightning",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_lightning',
     },
     304: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_thunder',
     },
     305: {
-      "icon": {"day": "foggy", "night": "foggy"},
-      "key": "overcast_fog",
+      'icon': {'day': 'foggy', 'night': 'foggy'},
+      'key': 'overcast_fog',
     },
     306: {
-      "icon": {"day": "rainy", "night": "rainy"},
-      "key": "overcast_rain",
+      'icon': {'day': 'rainy', 'night': 'rainy'},
+      'key': 'overcast_rain',
     },
     307: {
-      "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "overcast_rain_snow",
+      'icon': {'day': 'rainy_snow', 'night': 'rainy_snow'},
+      'key': 'overcast_rain_snow',
     },
     308: {
-      "icon": {"day": "snowy", "night": "snowy"},
-      "key": "overcast_heavy_snow",
+      'icon': {'day': 'snowy', 'night': 'snowy'},
+      'key': 'overcast_heavy_snow',
     },
     309: {
-      "icon": {"day": "snowy", "night": "snowy"},
-      "key": "overcast_snow_pellets",
+      'icon': {'day': 'snowy', 'night': 'snowy'},
+      'key': 'overcast_snow_pellets',
     },
     310: {
-      "icon": {"day": "hail", "night": "hail"},
-      "key": "overcast_ice_pellets",
+      'icon': {'day': 'hail', 'night': 'hail'},
+      'key': 'overcast_ice_pellets',
     },
     311: {
-      "icon": {"day": "rainy", "night": "rainy"},
-      "key": "overcast_showers",
+      'icon': {'day': 'rainy', 'night': 'rainy'},
+      'key': 'overcast_showers',
     },
     312: {
-      "icon": {"day": "rainy_snow", "night": "rainy_snow"},
-      "key": "overcast_rain_snow_showers",
+      'icon': {'day': 'rainy_snow', 'night': 'rainy_snow'},
+      'key': 'overcast_rain_snow_showers',
     },
     313: {
-      "icon": {"day": "hail", "night": "hail"},
-      "key": "overcast_hail",
+      'icon': {'day': 'hail', 'night': 'hail'},
+      'key': 'overcast_hail',
     },
     314: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunderstorm",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_thunderstorm',
     },
     315: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder_snow",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_thunder_snow',
     },
     316: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder_hail",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_thunder_hail',
     },
     317: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_heavy_thunderstorm",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_heavy_thunderstorm',
     },
     318: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_heavy_thunder_hail",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_heavy_thunder_hail',
     },
     319: {
-      "icon": {"day": "thunderstorm", "night": "thunderstorm"},
-      "key": "overcast_thunder",
+      'icon': {'day': 'thunderstorm', 'night': 'thunderstorm'},
+      'key': 'overcast_thunder',
     },
   };
 
   static IconData getWeatherIcon(int code, bool isDay) {
     final weatherInfo = weatherCodeMap[code];
     if (weatherInfo != null) {
-      final iconName = isDay ? weatherInfo["icon"]["day"] : weatherInfo["icon"]["night"];
+      final iconName = isDay ? weatherInfo['icon']['day'] : weatherInfo['icon']['night'];
       return iconMap[iconName] ?? Symbols.error_rounded;
     }
     return Symbols.error_rounded;
@@ -391,14 +391,14 @@ class WeatherIcons {
       // 282: context.i18n.moderate_or_heavy_snow_with_thunder,
     };
 
-    return iconLabel[code] ?? "Unknown weather";
+    return iconLabel[code] ?? 'Unknown weather';
   }
 
   static String mapNumberToWeather(int number) {
     final weatherInfo = weatherCodeMap[number];
     if (weatherInfo != null) {
-      return weatherInfo["key"] as String;
+      return weatherInfo['key'] as String;
     }
-    return "unknown_weather";
+    return 'unknown_weather';
   }
 }

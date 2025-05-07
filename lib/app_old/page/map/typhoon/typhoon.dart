@@ -28,7 +28,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
   List<String> layerList = [];
   List<String> typhoon_name_list = [];
   List<int> typhoon_id_list = [];
-  String selectedTimestamp = "";
+  String selectedTimestamp = '';
   double userLat = 0;
   double userLon = 0;
   bool isUserLocationValid = false;
@@ -42,11 +42,11 @@ class _TyphoonMapState extends State<TyphoonMap> {
       typhoonImagesList = await ExpTech().getTyphoonImagesList();
       typhoonData = await ExpTech().getTyphoonGeojson();
 
-      if (Platform.isIOS && (Global.preference.getBool("auto-location") ?? false)) {
+      if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
         await getSavedLocation();
       }
-      userLat = Global.preference.getDouble("user-lat") ?? 0.0;
-      userLon = Global.preference.getDouble("user-lon") ?? 0.0;
+      userLat = Global.preference.getDouble('user-lat') ?? 0.0;
+      userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
       isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
 
@@ -54,18 +54,18 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       if (isUserLocationValid) {
         await _mapController.addSource(
-          "markers-geojson",
-          const GeojsonSourceProperties(data: {"type": "FeatureCollection", "features": []}),
+          'markers-geojson',
+          const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
         );
-        await _mapController.setGeoJsonSource("markers-geojson", {
-          "type": "FeatureCollection",
-          "features": [
+        await _mapController.setGeoJsonSource('markers-geojson', {
+          'type': 'FeatureCollection',
+          'features': [
             {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "coordinates": [userLon, userLat],
-                "type": "Point",
+              'type': 'Feature',
+              'properties': {},
+              'geometry': {
+                'coordinates': [userLon, userLat],
+                'type': 'Point',
               },
             },
           ],
@@ -80,28 +80,28 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
       setState(() {});
     } catch (e) {
-      TalkerManager.instance.error("加載颱風列表時出錯: $e");
+      TalkerManager.instance.error('加載颱風列表時出錯: $e');
     }
   }
 
   Future<void> _addUserLocationMarker() async {
     if (isUserLocationValid) {
-      await _mapController.removeLayer("markers");
+      await _mapController.removeLayer('markers');
       await _mapController.addLayer(
-        "markers-geojson",
-        "markers",
+        'markers-geojson',
+        'markers',
         const SymbolLayerProperties(
-          symbolZOrder: "source",
+          symbolZOrder: 'source',
           iconSize: [
             Expressions.interpolate,
-            ["linear"],
+            ['linear'],
             [Expressions.zoom],
             5,
             0.5,
             10,
             1.5,
           ],
-          iconImage: "gps",
+          iconImage: 'gps',
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
         ),
@@ -110,11 +110,11 @@ class _TyphoonMapState extends State<TyphoonMap> {
   }
 
   Future<void> _loadTyphoonLayers() async {
-    await _mapController.addSource("typhoon-geojson", GeojsonSourceProperties(data: typhoonData));
+    await _mapController.addSource('typhoon-geojson', GeojsonSourceProperties(data: typhoonData));
 
     await _mapController.addLayer(
-      "typhoon-geojson",
-      "typhoon-path",
+      'typhoon-geojson',
+      'typhoon-path',
       const LineLayerProperties(
         lineColor: [
           'match',
@@ -134,8 +134,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
     );
 
     await _mapController.addLayer(
-      "typhoon-geojson",
-      "typhoon-points",
+      'typhoon-geojson',
+      'typhoon-points',
       const CircleLayerProperties(
         circleRadius: 3,
         circleColor: [
@@ -178,8 +178,8 @@ class _TyphoonMapState extends State<TyphoonMap> {
 
     // 添加風圈圖層（只顯示第一個 type.forecast 為 true 的點）
     await _mapController.addLayer(
-      "typhoon-geojson",
-      "typhoon-wind-circle",
+      'typhoon-geojson',
+      'typhoon-wind-circle',
       const FillLayerProperties(fillColor: 'rgba(255, 0, 0, 0.1)', fillOutlineColor: 'rgba(255, 0, 0, 0.6)'),
       filter: [
         'all',
@@ -237,9 +237,9 @@ class _TyphoonMapState extends State<TyphoonMap> {
     );
 
     _mapController.addSource(
-      "radarOverlaySource",
+      'radarOverlaySource',
       ImageSourceProperties(
-        url: "https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}",
+        url: 'https://api-1.exptech.dev/api/v1/meteor/typhoon/images/${typhoonImagesList.last}',
         coordinates: [
           [bounds.southwest.longitude, bounds.northeast.latitude],
           [bounds.northeast.longitude, bounds.northeast.latitude],
@@ -249,7 +249,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
       ),
     );
 
-    _mapController.addLayer("radarOverlaySource", "radarOverlayLayer", const RasterLayerProperties(rasterOpacity: 1));
+    _mapController.addLayer('radarOverlaySource', 'radarOverlayLayer', const RasterLayerProperties(rasterOpacity: 1));
   }
 
   @override

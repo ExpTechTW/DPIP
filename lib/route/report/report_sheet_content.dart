@@ -1,20 +1,20 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
-import "package:intl/intl.dart";
-import "package:maplibre_gl/maplibre_gl.dart";
-import "package:material_symbols_icons/symbols.dart";
-import "package:url_launcher/url_launcher.dart";
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import "package:dpip/api/model/report/earthquake_report.dart";
-import "package:dpip/utils/depth_color.dart";
-import "package:dpip/utils/extensions/build_context.dart";
-import "package:dpip/utils/extensions/int.dart";
-import "package:dpip/utils/intensity_color.dart";
-import "package:dpip/utils/magnitude_color.dart";
-import "package:dpip/widgets/list/detail_field_tile.dart";
-import "package:dpip/widgets/report/enlargeable_image.dart";
-import "package:dpip/widgets/report/intensity_box.dart";
-import "package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart";
+import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/utils/depth_color.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/intensity_color.dart';
+import 'package:dpip/utils/magnitude_color.dart';
+import 'package:dpip/widgets/list/detail_field_tile.dart';
+import 'package:dpip/widgets/report/enlargeable_image.dart';
+import 'package:dpip/widgets/report/intensity_box.dart';
+import 'package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart';
 
 class ReportSheetContent extends StatelessWidget {
   final ScrollController controller;
@@ -108,7 +108,7 @@ class ReportSheetContent extends StatelessWidget {
                         color: MagnitudeColor.magnitude(report.magnitude),
                       ),
                     ),
-                    Text("M ${report.magnitude}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('M ${report.magnitude}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -127,7 +127,7 @@ class ReportSheetContent extends StatelessWidget {
                         color: DepthColor.depth(report.depth),
                       ),
                     ),
-                    Text("${report.depth} km", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('${report.depth} km', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -203,7 +203,7 @@ class ReportSheetContent extends StatelessWidget {
           label: context.i18n.report_image,
           child: EnlargeableImage(
             aspectRatio: 4 / 3,
-            heroTag: "report-image-${report.id}",
+            heroTag: 'report-image-${report.id}',
             imageUrl: report.reportImageUrl,
             imageName: report.reportImageName,
           ),
@@ -213,7 +213,7 @@ class ReportSheetContent extends StatelessWidget {
             label: context.i18n.report_intensity_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
-              heroTag: "intensity-image-${report.id}",
+              heroTag: 'intensity-image-${report.id}',
               imageUrl: report.intensityMapImageUrl!,
               imageName: report.intensityMapImageName!,
             ),
@@ -223,7 +223,7 @@ class ReportSheetContent extends StatelessWidget {
             label: context.i18n.report_pga_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
-              heroTag: "pga-image-${report.id}",
+              heroTag: 'pga-image-${report.id}',
               imageUrl: report.pgaMapImageUrl!,
               imageName: report.pgaMapImageName!,
             ),
@@ -233,7 +233,7 @@ class ReportSheetContent extends StatelessWidget {
             label: context.i18n.report_pgv_image,
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
-              heroTag: "pgv-image-${report.id}",
+              heroTag: 'pgv-image-${report.id}',
               imageUrl: report.pgvMapImageUrl!,
               imageName: report.pgvMapImageName!,
             ),
