@@ -1,6 +1,8 @@
 import "dart:convert";
 import "dart:io";
 
+import 'package:dpip/api/model/changelog/changelog.dart';
+import "package:dpip/utils/extensions/string.dart";
 import "package:http/http.dart";
 
 import "package:dpip/api/model/announcement.dart";
@@ -399,8 +401,8 @@ class ExpTech {
     return jsonDecode(res.body) as Map<String, dynamic>;
   }
 
-  Future<List<dynamic>> getChangelog() async {
-    final requestUrl = Route.changelog();
+  Future<List<GithubRelease>> getReleases() async {
+    final requestUrl = 'https://api.github.com/repos/ExpTechTW/DPIP/releases'.asUri;
 
     final res = await get(requestUrl);
 
@@ -408,7 +410,9 @@ class ExpTech {
       throw HttpException("The server returned a status of ${res.statusCode}", uri: requestUrl);
     }
 
-    return jsonDecode(res.body) as List<dynamic>;
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+
+    return jsonData.map((item) => GithubRelease.fromJson(item as Map<String, dynamic>)).toList();
   }
 
   Future<List<Announcement>> getAnnouncement() async {

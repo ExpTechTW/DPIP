@@ -5,4 +5,6 @@ extension LocaleString on String {
     final a = split("-");
     return Locale(a[0], a.elementAtOrNull(1));
   }
+
+  Uri get asUri => Uri.parse(this);
 }

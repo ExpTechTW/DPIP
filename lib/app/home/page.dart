@@ -1,6 +1,3 @@
-import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
-import 'package:dpip/core/preference.dart';
-import 'package:dpip/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -10,14 +7,18 @@ import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/home/_widgets/eew_card.dart';
 import 'package:dpip/app/home/_widgets/location_button.dart';
 import 'package:dpip/app/home/_widgets/radar_card.dart';
+import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
 import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/time_convert.dart';
 
@@ -42,10 +43,7 @@ class _HomePageState extends State<HomePage> {
       context.scaffoldMessenger.showSnackBar(
         SnackBar(
           content: Text('已更新至 v${Global.packageInfo.version}'),
-          action: SnackBarAction(
-            label: context.i18n.update_log,
-            onPressed: () => context.push('/changelog/v${Global.packageInfo.version}'),
-          ),
+          action: SnackBarAction(label: context.i18n.update_log, onPressed: () => context.push(ChangelogPage.route)),
           duration: kPersistSnackBar,
         ),
       );
