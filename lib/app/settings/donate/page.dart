@@ -97,7 +97,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     for (final product in subscriptions)
                       SettingsListTile(
-                        title: product.title.substring(0, product.title.indexOf('(')).trim(),
+                        title: product.title.contains('(')
+                            ? product.title.substring(0, product.title.indexOf('(')).trim()
+                            : product.title,
                         subtitle: Text(product.description),
                         trailing: Text('${product.price}/月'),
                         onTap: () {
@@ -118,7 +120,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   children: [
                     for (final product in oneTime)
                       SettingsListTile(
-                        title: product.title.substring(0, product.title.indexOf('(')).trim(),
+                        title: product.title.contains('(')
+                            ? product.title.substring(0, product.title.indexOf('(')).trim()
+                            : product.title,
                         subtitle: Text(product.description),
                         trailing: Text(product.price),
                         onTap: () {
