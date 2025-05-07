@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
+import 'package:dpip/utils/functions.dart';
 import 'package:flutter/material.dart';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -19,7 +21,7 @@ class SettingsDonatePage extends StatefulWidget {
 
 class _SettingsDonatePageState extends State<SettingsDonatePage> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  Completer<List<ProductDetails>> products = Completer();
+  Completer<List<ProductDetails>> products = Completer()..future.onError((_, _) => []);
 
   final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
 
@@ -80,31 +82,24 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
             );
           }
 
-          final order = ['donation100', 'donation300', 'donation1000'];
-
-          data.sort((a, b) {
-            final indexA = order.indexOf(a.id);
-            final indexB = order.indexOf(b.id);
-            return indexA.compareTo(indexB);
-          });
-
-          final specialDonation = data.where((p) => p.id == 's_donation75').toList();
-          final regularDonations = data.where((p) => p.id != 's_donation75').toList();
+          final subscriptions = data
+              .where((item) => item.isSubscription)
+              .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
+          final oneTime = data
+              .where((item) => !item.isSubscription)
+              .sorted((a, b) => ascending(a.rawPrice, b.rawPrice));
 
           return ListView(
             children: [
-              if (specialDonation.isNotEmpty)
+              if (subscriptions.isNotEmpty)
                 SettingsListSection(
-                  title: '特別支持',
+                  title: '訂閱制',
                   children: [
-                    for (final product in specialDonation)
+                    for (final product in subscriptions)
                       SettingsListTile(
-                        title: product.title.replaceAll(RegExp(r'\(.*?\)'), '').trim(),
-                        titleStyle: product.id == 's_donation75'
-                                ? const TextStyle(color: Color(0xFFFFD700), fontWeight: FontWeight.bold)
-                                : const TextStyle(fontWeight: FontWeight.bold),
+                        title: product.title.substring(0, product.title.indexOf('(')).trim(),
                         subtitle: Text(product.description),
-                        trailing: Text(' ${product.price}'),
+                        trailing: Text('${product.price}/月'),
                         onTap: () {
                           if (product.isSubscription) {
                             InAppPurchase.instance.buyNonConsumable(
@@ -117,16 +112,15 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                       ),
                   ],
                 ),
-              if (regularDonations.isNotEmpty)
+              if (oneTime.isNotEmpty)
                 SettingsListSection(
-                  title: '一般',
+                  title: '單次支援',
                   children: [
-                    for (final product in regularDonations)
+                    for (final product in oneTime)
                       SettingsListTile(
-                        title: product.title.replaceAll(RegExp(r'\(.*?\)'), '').trim(),
-                        titleStyle: const TextStyle(fontWeight: FontWeight.bold),
+                        title: product.title.substring(0, product.title.indexOf('(')).trim(),
                         subtitle: Text(product.description),
-                        trailing: Text(' ${product.price}'),
+                        trailing: Text(product.price),
                         onTap: () {
                           if (product.isSubscription) {
                             InAppPurchase.instance.buyNonConsumable(
