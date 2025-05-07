@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart';
 
 extension TZDateTimeExtension on TZDateTime {
-  String toLocalTimeString(BuildContext context) {
-    return DateFormat(context.i18n.full_date_format, context.locale.toLanguageTag()).format(this);
-  }
+  String toLocaleFullDateString(BuildContext context) =>
+      DateFormat(context.i18n.full_date_format, context.locale.toLanguageTag()).format(this);
+  String toLocaleTimeString(BuildContext context) =>
+      DateFormat(context.i18n.time_format, context.locale.toLanguageTag()).format(this);
 }

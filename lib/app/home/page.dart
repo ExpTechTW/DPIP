@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                       return Center(child: Text(context.i18n.home_safety));
                     }
 
-                    final grouped = groupBy(data, (e) => e.time.send.toLocalTimeString(context));
+                    final grouped = groupBy(data, (e) => e.time.send.toLocaleFullDateString(context));
 
                     return Column(
                       children:

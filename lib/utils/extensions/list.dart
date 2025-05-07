@@ -35,4 +35,6 @@ extension IterableExtension<T> on Iterable<T> {
     }
     return false;
   }
+
+  T? get lastOrNull => isNotEmpty ? last : null;
 }
