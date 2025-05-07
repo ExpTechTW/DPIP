@@ -1,5 +1,8 @@
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
+import 'package:dpip/app/home/_widgets/location_out_of_service.dart';
+import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +39,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+
   bool _isLoading = false;
+  bool _isOutOfService = false;
   RealtimeWeather? _weather;
   List<History>? _history;
 
@@ -57,12 +63,20 @@ class _HomePageState extends State<HomePage> {
   Future<void> _refresh() async {
     if (_isLoading) return;
 
+    final auto = GlobalProviders.location.auto;
     final code = GlobalProviders.location.codeNotifier.value;
     final location = Global.location[code];
 
-    if (code == null || location == null) return;
+    if (code == null || location == null) {
+      if (auto) {
+        setState(() => _isOutOfService = true);
+      }
+      setState(() => _weather = _history = null);
+      return;
+    }
 
     setState(() => _isLoading = true);
+    _refreshIndicatorKey.currentState?.show();
 
     try {
       final v = await ExpTech().getWeatherRealtime(code);
@@ -90,6 +104,7 @@ class _HomePageState extends State<HomePage> {
 
     if (!mounted) return;
 
+    setState(() => _isOutOfService = false);
     setState(() => _isLoading = false);
   }
 
@@ -115,6 +130,7 @@ class _HomePageState extends State<HomePage> {
     return Stack(
       children: [
         RefreshIndicator(
+          key: _refreshIndicatorKey,
           onRefresh: _refresh,
           edgeOffset: topPadding,
           child: ListView(
@@ -122,16 +138,20 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: topPadding),
 
               // 天氣標頭
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: _weather != null ? WeatherHeader(_weather!) : WeatherHeader.skeleton(context),
-              ),
+              if (_isLoading)
+                Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader.skeleton(context))
+              else if (_weather != null)
+                Padding(padding: const EdgeInsets.symmetric(vertical: 32), child: WeatherHeader(_weather!))
+              else if (_isOutOfService)
+                const Padding(padding: EdgeInsets.all(16), child: LocationOutOfServiceCard())
+              else
+                const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard()),
 
               // 即時資訊
-              if (false)
+              if (!_isLoading && false)
                 // TODO(kamiya10): 將監視器地圖的地震資訊移至 ChangeNotifier
                 const Padding(padding: EdgeInsets.all(16), child: EewCard()),
-              if (_thunderstorm != null)
+              if (!_isLoading && _thunderstorm != null)
                 Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
 
               // 地圖
