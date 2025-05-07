@@ -1,3 +1,4 @@
+import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -148,6 +149,10 @@ class _RadarMapCardState extends State<RadarMapCard> {
                           children: [
                             const Icon(Symbols.radar, size: 24),
                             Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
+                            Text(
+                              radarList.last.toLocalTimeString(context),
+                              style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                            ),
                           ],
                         ),
                         const Icon(Symbols.chevron_right_rounded, size: 24),

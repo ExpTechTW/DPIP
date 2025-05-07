@@ -1,4 +1,7 @@
-import 'dart:ui';
+import 'package:flutter/widgets.dart';
+
+import 'package:dpip/utils/extensions/datetime.dart';
+import 'package:dpip/utils/extensions/int.dart';
 
 extension LocaleString on String {
   Locale get asLocale {
@@ -7,4 +10,8 @@ extension LocaleString on String {
   }
 
   Uri get asUri => Uri.parse(this);
+
+  int get asInt => int.parse(this);
+
+  String toLocalTimeString(BuildContext context) => asInt.asTZDateTime.toLocalTimeString(context);
 }

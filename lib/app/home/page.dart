@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
@@ -20,6 +19,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/time_convert.dart';
 
 class HomePage extends StatefulWidget {
@@ -95,11 +95,7 @@ class _HomePageState extends State<HomePage> {
                       return Center(child: Text(context.i18n.home_safety));
                     }
 
-                    final grouped = groupBy(
-                      data,
-                      (e) =>
-                          DateFormat(context.i18n.full_date_format, context.locale.toLanguageTag()).format(e.time.send),
-                    );
+                    final grouped = groupBy(data, (e) => e.time.send.toLocalTimeString(context));
 
                     return Column(
                       children:
