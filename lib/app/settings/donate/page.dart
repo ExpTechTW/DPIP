@@ -133,6 +133,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                       ),
                   ],
                 ),
+              const SettingsListTextSection(
+                content: '感謝您的慷慨支援與捐助！❤️\n此贊助屬自願性質，一經付款，恕不退還。所有款項將用於伺服器維護用途。若您有任何疑問，請於付款前與我們聯繫。',
+                contentAlignment: TextAlign.justify,
+              ),
             ],
           );
         },

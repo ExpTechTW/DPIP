@@ -54,6 +54,7 @@ class SettingsListSection extends StatelessWidget {
 class SettingsListTextSection extends StatelessWidget {
   final String content;
   final Color? contentColor;
+  final TextAlign contentAlignment;
   final IconData? icon;
   final Color? iconColor;
   final Widget? trailing;
@@ -61,6 +62,7 @@ class SettingsListTextSection extends StatelessWidget {
   const SettingsListTextSection({
     super.key,
     required this.content,
+    this.contentAlignment = TextAlign.start,
     this.contentColor,
     this.icon,
     this.iconColor,
@@ -83,6 +85,7 @@ class SettingsListTextSection extends StatelessWidget {
                 style: context.theme.textTheme.bodyMedium!.copyWith(
                   color: contentColor ?? context.theme.colorScheme.onSurfaceVariant,
                 ),
+                textAlign: contentAlignment,
               ),
             ),
             if (trailing != null) trailing!,
