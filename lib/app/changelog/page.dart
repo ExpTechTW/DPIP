@@ -18,8 +18,6 @@ class ChangelogPage extends StatefulWidget {
 }
 
 class _ChangelogPageState extends State<ChangelogPage> {
-  final refreshIndicator = GlobalKey<RefreshIndicatorState>();
-
   bool _isLoading = false;
   List<GithubRelease>? _releases;
 
@@ -103,6 +101,8 @@ class _ChangelogPageState extends State<ChangelogPage> {
                 );
               },
             )
+          else if (_isLoading)
+            const Center(child: CircularProgressIndicator())
           else
             Center(
               child: Column(

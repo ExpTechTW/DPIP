@@ -8,7 +8,7 @@ class SettingsLocationModel extends ChangeNotifier {
   void _log(String message) => log(message, name: 'SettingsLocationModel');
 
   bool get _auto => Preference.locationAuto ?? false;
-  String? get _code => Preference.locationCode;
+  final ValueNotifier<String?> codeNotifier = ValueNotifier(Preference.locationCode);
   double? get _longitude => Preference.locationLongitude;
   double? get _latitude => Preference.locationLatitude;
   double? get _oldLongitude => Preference.locationOldLongitude;
@@ -25,9 +25,10 @@ class SettingsLocationModel extends ChangeNotifier {
   }
 
   /// 縣市代碼
-  String? get code => _code;
+  String? get code => Preference.locationCode;
   void setCode(String? value) {
     Preference.locationCode = value;
+    codeNotifier.value = value;
     _log('Changed ${PreferenceKeys.locationCode} to ${Preference.locationCode}');
     notifyListeners();
   }

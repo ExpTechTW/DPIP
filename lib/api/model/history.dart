@@ -1,3 +1,4 @@
+import 'package:dpip/utils/time_convert.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timezone/timezone.dart';
 
@@ -31,6 +32,13 @@ class History {
 
   factory History.fromJson(Map<String, dynamic> json) => _$HistoryFromJson(json);
 
+  bool get isExpired {
+    final int? expireTimestamp = time.expires['all'];
+    final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+    return isExpired;
+  }
+
   Map<String, dynamic> toJson() => _$HistoryToJson(this);
 }
 
@@ -43,6 +51,11 @@ class InfoTime {
   InfoTime({required this.send, required this.expires});
 
   factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
+
+  TZDateTime get expiresAt {
+    final int expireTimestamp = expires['all']!;
+    return convertToTZDateTime(expireTimestamp);
+  }
 
   Map<String, dynamic> toJson() => _$InfoTimeToJson(this);
 }

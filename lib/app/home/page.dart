@@ -1,3 +1,7 @@
+import 'package:dpip/api/model/history.dart';
+import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -32,107 +36,159 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isLoading = false;
+  RealtimeWeather? _weather;
+  List<History>? _history;
+
+  void _checkVersion() {
+    Preference.version ??= Global.packageInfo.version;
+    if (Global.packageInfo.version == Preference.version) return;
+
+    Preference.version = Global.packageInfo.version;
+    context.scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text('已更新至 v${Global.packageInfo.version}'),
+        action: SnackBarAction(label: context.i18n.update_log, onPressed: () => context.push(ChangelogPage.route)),
+        duration: kPersistSnackBar,
+      ),
+    );
+  }
+
+  Future<void> _refresh() async {
+    if (_isLoading) return;
+
+    final code = GlobalProviders.location.codeNotifier.value;
+    final location = Global.location[code];
+
+    if (code == null || location == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      final v = await ExpTech().getWeatherRealtime(code);
+      if (!mounted) return;
+
+      setState(() => _weather = v);
+    } catch (e, s) {
+      if (!mounted) return;
+
+      TalkerManager.instance.error('_HomePageState._refresh', e, s);
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.get_weather_abnormal)));
+    }
+
+    try {
+      final v = await ExpTech().getHistoryRegion(code);
+      if (!mounted) return;
+
+      setState(() => _history = v);
+    } catch (e, s) {
+      if (!mounted) return;
+
+      TalkerManager.instance.error('_HomePageState._refresh', e, s);
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.get_weather_abnormal)));
+    }
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+  }
+
+  History? get _thunderstorm {
+    final item = _history?.firstWhereOrNull((e) => e.type == 'thunderstorm');
+    if (item == null || item.isExpired) return null;
+    return item;
+  }
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Preference.version ??= Global.packageInfo.version;
-      if (Global.packageInfo.version == Preference.version) return;
 
-      Preference.version = Global.packageInfo.version;
-      context.scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text('已更新至 v${Global.packageInfo.version}'),
-          action: SnackBarAction(label: context.i18n.update_log, onPressed: () => context.push(ChangelogPage.route)),
-          duration: kPersistSnackBar,
-        ),
-      );
-    });
+    _checkVersion();
+
+    GlobalProviders.location.codeNotifier.addListener(_refresh);
+    _refresh();
   }
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = 24 + 48 + context.padding.top;
     return Stack(
       children: [
-        ListView(
-          children: [
-            SizedBox(height: 48 + context.padding.top),
+        RefreshIndicator(
+          onRefresh: _refresh,
+          edgeOffset: topPadding,
+          child: ListView(
+            children: [
+              SizedBox(height: topPadding),
 
-            // 天氣標頭
-            const Padding(padding: EdgeInsets.symmetric(vertical: 32), child: WeatherHeader()),
+              // 天氣標頭
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: _weather != null ? WeatherHeader(_weather!) : WeatherHeader.skeleton(context),
+              ),
 
-            // 即時資訊
-            if (false)
-              // TODO(kamiya10): 將監視器地圖的地震資訊移至 ChangeNotifier
-              const Padding(padding: EdgeInsets.all(16), child: EewCard()),
-            if (false)
-              // TODO(kamiya10): 實作雷雨即時訊息顯示
-              const Padding(padding: EdgeInsets.all(16), child: ThunderstormCard()),
+              // 即時資訊
+              if (false)
+                // TODO(kamiya10): 將監視器地圖的地震資訊移至 ChangeNotifier
+                const Padding(padding: EdgeInsets.all(16), child: EewCard()),
+              if (_thunderstorm != null)
+                Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
 
-            // 地圖
-            const Padding(padding: EdgeInsets.all(16), child: RadarMapCard()),
+              // 地圖
+              const Padding(padding: EdgeInsets.all(16), child: RadarMapCard()),
 
-            // 歷史資訊
-            Selector<SettingsLocationModel, String?>(
-              selector: (context, model) => model.code,
-              builder: (context, code, child) {
-                final location = Global.location[code];
+              // 歷史資訊
+              Builder(
+                builder: (context) {
+                  final history = _history;
 
-                if (code == null || location == null) {
-                  return const SizedBox.shrink();
-                }
+                  if (history == null) {
+                    return const SizedBox.shrink();
+                  }
 
-                return FutureBuilder(
-                  future: ExpTech().getHistoryRegion(code),
-                  builder: (context, snapshot) {
-                    final data = snapshot.data;
+                  final grouped = groupBy(history, (e) => e.time.send.toLocaleFullDateString(context));
 
-                    if (data == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (data.isEmpty) {
-                      return Center(child: Text(context.i18n.home_safety));
-                    }
-
-                    final grouped = groupBy(data, (e) => e.time.send.toLocaleFullDateString(context));
-
-                    return Column(
-                      children:
-                          grouped.entries.mapIndexed((index, entry) {
-                            final date = entry.key;
-                            final historyGroup = entry.value;
-                            return Column(
-                              children: [
-                                DateTimelineItem(date, first: index == 0),
-                                ...historyGroup.map((history) {
-                                  final int? expireTimestamp = history.time.expires['all'];
-                                  final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-                                  final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-                                  return HistoryTimelineItem(
-                                    expired: isExpired,
-                                    history: history,
-                                    last: history == data.last,
-                                  );
-                                }),
-                              ],
-                            );
-                          }).toList(),
-                    );
-                  },
-                );
-              },
-            ),
-          ],
+                  return Column(
+                    children:
+                        grouped.entries.mapIndexed((index, entry) {
+                          final date = entry.key;
+                          final historyGroup = entry.value;
+                          return Column(
+                            children: [
+                              DateTimelineItem(date, first: index == 0),
+                              ...historyGroup.map((item) {
+                                final int? expireTimestamp = item.time.expires['all'];
+                                final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
+                                final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
+                                return HistoryTimelineItem(
+                                  expired: isExpired,
+                                  history: item,
+                                  last: item == history.last,
+                                );
+                              }),
+                            ],
+                          );
+                        }).toList(),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
 
         const Positioned(
-          top: 48,
+          top: 24,
           left: 0,
           right: 0,
-          child: Align(alignment: Alignment.topCenter, child: LocationButton()),
+          child: SafeArea(child: Align(alignment: Alignment.topCenter, child: LocationButton())),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    GlobalProviders.location.codeNotifier.removeListener(_refresh);
+    super.dispose();
   }
 }

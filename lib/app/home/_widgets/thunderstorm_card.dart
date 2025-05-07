@@ -1,13 +1,18 @@
+import 'package:dpip/api/model/history.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
+import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 class ThunderstormCard extends StatelessWidget {
-  const ThunderstormCard({super.key});
+  final History history;
+
+  const ThunderstormCard(this.history, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +74,10 @@ class ThunderstormCard extends StatelessWidget {
                     text: TextSpan(
                       children: [
                         const TextSpan(text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 '),
-                        const TextSpan(text: '05/04 14:45', style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(
+                          text: history.time.expiresAt.toSimpleDateTimeString(context),
+                          style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+                        ),
                         const TextSpan(text: ' 。'),
                       ],
                       style: context.textTheme.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
