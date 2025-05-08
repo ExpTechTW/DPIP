@@ -5,7 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
 class DPIPInfoPage extends StatelessWidget {
-  const DPIPInfoPage({Key? key}) : super(key: key);
+  const DPIPInfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class DPIPInfoPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [context.colors.primary.withOpacity(0.05), context.colors.surface],
+            colors: [context.colors.primary.withValues(alpha: 0.05), context.colors.surface],
           ),
         ),
         child: ListView(
@@ -105,14 +105,12 @@ class DPIPInfoPage extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
-            ...paragraphs
-                .map(
-                  (paragraph) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(paragraph, style: context.theme.textTheme.bodyLarge),
-                  ),
-                )
-                .toList(),
+            ...paragraphs.map(
+              (paragraph) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(paragraph, style: context.theme.textTheme.bodyLarge),
+              ),
+            ),
           ],
         ),
       ),

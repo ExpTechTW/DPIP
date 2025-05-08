@@ -285,7 +285,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                         context.i18n.report_offing,
                         style: TextStyle(color: context.theme.extendedColors.blue),
                       ),
-                      backgroundColor: Colors.blue.withOpacity(0.16),
+                      backgroundColor: Colors.blue.withValues(alpha: 0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.theme.extendedColors.blue),
                     ),
@@ -296,7 +296,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
                       label: Text(context.i18n.report_tsunami_attention, style: TextStyle(color: context.colors.error)),
-                      backgroundColor: Colors.red.withOpacity(0.16),
+                      backgroundColor: Colors.red.withValues(alpha: 0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.colors.error),
                     ),

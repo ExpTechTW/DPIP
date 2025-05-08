@@ -13,7 +13,6 @@ import 'package:dpip/global.dart';
 import 'package:dpip/l10n/app_localizations.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/locale.dart';
 
 class SettingsLocaleSelectPage extends StatefulWidget {

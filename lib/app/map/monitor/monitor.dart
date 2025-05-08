@@ -390,7 +390,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
           Chip(
             padding: const EdgeInsets.all(4),
             side: BorderSide(color: IntensityColor.intensity(area.i)),
-            backgroundColor: IntensityColor.intensity(area.i).withOpacity(0.16),
+            backgroundColor: IntensityColor.intensity(area.i).withValues(alpha: 0.16),
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             avatar: AspectRatio(
               aspectRatio: 1,
@@ -1106,7 +1106,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
                         filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                         child: Container(
                           padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                          decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
                           child: Text(
                             (!_dataStatus()) ? '2+s' : '${_formattedPing}s',
                             style: TextStyle(

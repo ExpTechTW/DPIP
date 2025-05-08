@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class InstrumentalIntensityColor {
+  InstrumentalIntensityColor._();
+
   static const intensity_3 = Color(0xff0005d0);
   static const intensity_2 = Color(0xff004bf8);
   static const intensity_1 = Color(0xff009EF8);

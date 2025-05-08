@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/wave_time.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/extensions/list.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 Map<String, double> psWaveDist(double depth, int time, int now) {
   double pDist = 0;
@@ -56,7 +59,7 @@ Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag
   double eewMaxI = 0.0;
 
   region.forEach((String key, Location info) {
-    final double distSurface = distance(lat, lon, info.lat, info.lng);
+    final double distSurface = LatLng(lat, lon).to(LatLng(info.lat, info.lng));
     final double dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
     final double pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
     double i = pgaToFloat(pga);
@@ -75,12 +78,7 @@ Map<String, dynamic> eewAreaPga(double lat, double lon, double depth, double mag
 
 double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, double depth, double magW) {
   final double long = pow(10, 0.5 * magW - 1.85).toDouble() / 2;
-  final double epicenterDistance = distance(
-    epicenterLocation[0],
-    epicenterLocation[1],
-    pointLocation[0],
-    pointLocation[1],
-  );
+  final double epicenterDistance = epicenterLocation.asLatLng.to(pointLocation.asLatLng);
   final double hypocenterDistance = sqrt(pow(depth, 2) + pow(epicenterDistance, 2)) - long;
   final double x = max(hypocenterDistance, 3);
   final double gpv600 =
@@ -91,20 +89,6 @@ double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, do
   final double pgv400 = gpv600 * 1.31;
   final double pgv = pgv400 * 1.0;
   return 2.68 + 1.72 * log(pgv) / ln10;
-}
-
-double distance(double latA, double lngA, double latB, double lngB) {
-  latA = latA * pi / 180;
-  lngA = lngA * pi / 180;
-  latB = latB * pi / 180;
-  lngB = lngB * pi / 180;
-
-  final double sinLatA = sin(atan(tan(latA)));
-  final double sinLatB = sin(atan(tan(latB)));
-  final double cosLatA = cos(atan(tan(latA)));
-  final double cosLatB = cos(atan(tan(latB)));
-
-  return acos(sinLatA * sinLatB + cosLatA * cosLatB * cos(lngA - lngB)) * 6371.008;
 }
 
 double sWaveTimeByDistance(double depth, double sDist) {
@@ -248,7 +232,7 @@ Map<String, dynamic> eewLocationInfo(
   double userLat,
   double userLon,
 ) {
-  final distSurface = distance(eqLat, eqLng, userLat, userLon);
+  final distSurface = LatLng(eqLat, eqLng).to(LatLng(userLat, userLon));
   final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
   final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
   var intensity = pgaToFloat(pga);

@@ -1,13 +1,9 @@
 import 'package:dpip/api/model/history.dart';
-import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
 
 class ThunderstormCard extends StatelessWidget {
   final History history;

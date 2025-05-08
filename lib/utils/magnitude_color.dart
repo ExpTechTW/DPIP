@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 class MagnitudeColor {
+  MagnitudeColor._();
+
   static const magnitude0 = Color(0xFF000000);
   static const magnitude1 = Color(0xFF00C8C8);
   static const magnitude2 = Color(0xFF00C800);

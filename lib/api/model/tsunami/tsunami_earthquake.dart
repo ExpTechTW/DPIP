@@ -7,7 +7,7 @@ class TsunamiEarthquake {
   /// - 地震發生時間
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// "1712102280000"
   /// ```
   final int time;
@@ -15,7 +15,7 @@ class TsunamiEarthquake {
   /// - 震央經度
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// 121.67
   /// ```
   final double lon;
@@ -23,7 +23,7 @@ class TsunamiEarthquake {
   /// - 震央緯度
   ///
   /// 範例：
-  /// ```
+  /// ```dart
   /// 23.77
   /// ```
   final double lat;
@@ -31,7 +31,7 @@ class TsunamiEarthquake {
   /// - 震源深度
   ///
   /// 範例：
-  /// ```
+  /// ```dart
   /// 15.5
   /// ```
   final double depth;
@@ -39,7 +39,7 @@ class TsunamiEarthquake {
   /// - 地震規模
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// 7.3
   /// ```
   final double mag;
@@ -47,7 +47,7 @@ class TsunamiEarthquake {
   /// - 地震位置描述
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// "花蓮縣中部外海"
   /// ```
   final String loc;
@@ -55,7 +55,7 @@ class TsunamiEarthquake {
   /// - 地震資訊發布單位
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// "cwa"
   /// ```
   final String author;

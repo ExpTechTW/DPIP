@@ -261,8 +261,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            context.colors.primary.withOpacity(0.12),
-            context.colors.primaryContainer.withOpacity(0.08),
+            context.colors.primary.withValues(alpha: 0.12),
+            context.colors.primaryContainer.withValues(alpha: 0.08),
             Colors.transparent,
           ],
           stops: const [0.16, 0.6, 1],
@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         style: TextStyle(
                           fontSize: 68,
                           fontWeight: FontWeight.w500,
-                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                          color: context.colors.onPrimaryContainer.withValues(alpha: 0.85),
                         ),
                       ),
                       TextSpan(
@@ -310,7 +310,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w500,
-                          color: context.colors.onPrimaryContainer.withOpacity(0.85),
+                          color: context.colors.onPrimaryContainer.withValues(alpha: 0.85),
                         ),
                       ),
                     ],
@@ -349,7 +349,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget _buildWeatherDetailItem(String label, String value) {
     return Text(
       '$label   $value',
-      style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant.withOpacity(0.75)),
+      style: TextStyle(fontSize: 18, color: context.colors.onSurfaceVariant.withValues(alpha: 0.75)),
     );
   }
 

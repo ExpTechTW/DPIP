@@ -28,7 +28,7 @@ class ReportListItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
-        splashColor: IntensityColor.intensity(report.intensity).withOpacity(0.16),
+        splashColor: IntensityColor.intensity(report.intensity).withValues(alpha: 0.16),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Row(

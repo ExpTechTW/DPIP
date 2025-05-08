@@ -77,8 +77,10 @@ class GeoJsonHelper {
     bool isInside = false;
     int j = polygon.length - 1;
     for (int i = 0; i < polygon.length; i++) {
-      double xi = polygon[i][0], yi = polygon[i][1];
-      double xj = polygon[j][0], yj = polygon[j][1];
+      final double xi = polygon[i][0];
+      final double yi = polygon[i][1];
+      final double xj = polygon[j][0];
+      final double yj = polygon[j][1];
 
       final bool intersect = ((yi > lat) != (yj > lat)) && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
       if (intersect) isInside = !isInside;

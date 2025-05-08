@@ -43,7 +43,7 @@ class ForecastWeatherCard extends StatelessWidget {
             ),
             Text('$rain%', style: TextStyle(fontSize: 16, color: context.theme.extendedColors.blue)),
             const SizedBox(height: 8),
-            Icon(icon, fill: 1, size: 36, color: context.colors.onPrimaryContainer.withOpacity(0.75)),
+            Icon(icon, fill: 1, size: 36, color: context.colors.onPrimaryContainer.withValues(alpha: 0.75)),
           ],
         ),
       ),

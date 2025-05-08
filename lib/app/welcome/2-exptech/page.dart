@@ -56,14 +56,14 @@ class WelcomeExpTechPage extends StatelessWidget {
                         Text(
                           '©2024 ExpTech Studio Ltd.',
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withOpacity(0.7),
+                            color: context.colors.primary.withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
                           context.i18n.disaster_info_platform,
                           style: context.theme.textTheme.titleMedium?.copyWith(
-                            color: context.colors.primary.withOpacity(0.7),
+                            color: context.colors.primary.withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),

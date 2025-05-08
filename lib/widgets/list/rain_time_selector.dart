@@ -179,7 +179,10 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                         Text(
                           DateFormat('MM/dd').format(time),
                           style: TextStyle(
-                            color: isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
+                            color:
+                                isSelected
+                                    ? context.colors.onSecondary
+                                    : context.colors.onSurface.withValues(alpha: 0.7),
                             fontSize: 12,
                           ),
                         ),

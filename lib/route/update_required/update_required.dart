@@ -122,7 +122,10 @@ class UpdateRequiredPage extends StatelessWidget {
         Text(label, style: TextStyle(fontSize: 16, color: Colors.grey.shade700)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(color: versionColor.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+          decoration: BoxDecoration(
+            color: versionColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
           child: Text(version, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: versionColor)),
         ),
       ],

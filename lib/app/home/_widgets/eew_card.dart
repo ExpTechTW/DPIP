@@ -67,13 +67,13 @@ class EewCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 8),
                   child: RichText(
                     text: TextSpan(
-                      children: [
-                        const TextSpan(text: '04/25 06:10 左右 '),
-                        const TextSpan(text: '嘉義縣大埔鄉', style: TextStyle(fontWeight: FontWeight.bold)),
-                        const TextSpan(text: ' 附近發生有感地震，預估規模 '),
-                        const TextSpan(text: '4.5', style: TextStyle(fontWeight: FontWeight.bold)),
-                        const TextSpan(text: '、最大震度 '),
-                        const TextSpan(text: '4級', style: TextStyle(fontWeight: FontWeight.bold)),
+                      children: const [
+                        TextSpan(text: '04/25 06:10 左右 '),
+                        TextSpan(text: '嘉義縣大埔鄉', style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: ' 附近發生有感地震，預估規模 '),
+                        TextSpan(text: '4.5', style: TextStyle(fontWeight: FontWeight.bold)),
+                        TextSpan(text: '、最大震度 '),
+                        TextSpan(text: '4級', style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
                       style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                     ),

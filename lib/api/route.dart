@@ -99,7 +99,7 @@ class Route {
   /// 回傳所在地
   ///
   /// ### Endpoint:
-  /// ```
+  /// ```dart
   /// '/location/$platform/$token/$version/$lat,$lng'
   /// ```
   ///
@@ -121,7 +121,7 @@ class Route {
   /// ## 取得通知
   ///
   /// ### Endpoint:
-  /// ```
+  /// ```dart
   /// '/notify/$token'
   /// ```
   ///
@@ -135,7 +135,7 @@ class Route {
   /// ## 設定通知
   ///
   /// ### Endpoint:
-  /// ```
+  /// ```dart
   /// '/notify/$token/$channel/$status'
   /// ```
   ///

@@ -129,7 +129,7 @@ class NotificationCard extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: context.theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                color: context.theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -144,7 +144,7 @@ class NotificationCard extends StatelessWidget {
         record.critical ? context.i18n.emergency : context.i18n.me_general,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      backgroundColor: record.critical ? Colors.red.withOpacity(0.16) : Colors.grey.withOpacity(0.16),
+      backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
       padding: const EdgeInsets.symmetric(horizontal: 8),
     );
@@ -172,7 +172,7 @@ class NotificationCard extends StatelessWidget {
                 (area) => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.16),
+                    color: Colors.blue.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.blue),
                   ),
@@ -185,7 +185,7 @@ class NotificationCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.16),
+                    color: Colors.blue.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.blue),
                   ),
@@ -237,9 +237,9 @@ class NotificationDetailPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: context.colors.primary.withOpacity(0.1),
+        color: context.colors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.colors.primary.withOpacity(0.3)),
+        border: Border.all(color: context.colors.primary.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -258,7 +258,7 @@ class NotificationDetailPage extends StatelessWidget {
         record.critical ? context.i18n.emergency_notification : context.i18n.general_notification,
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      backgroundColor: record.critical ? Colors.red.withOpacity(0.16) : Colors.grey.withOpacity(0.16),
+      backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
       padding: const EdgeInsets.symmetric(horizontal: 8),
     );
@@ -274,7 +274,7 @@ class NotificationDetailPage extends StatelessWidget {
                 (area) => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.16),
+                    color: Colors.blue.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.blue),
                   ),

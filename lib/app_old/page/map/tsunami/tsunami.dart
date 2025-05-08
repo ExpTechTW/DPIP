@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
@@ -37,7 +39,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
   String? _selectedOption;
   double userLat = 0;
   double userLon = 0;
-  bool isUserLocationValid = false;
 
   Future<void> _initMap(MapLibreMapController controller) async {
     _mapController = controller;
@@ -49,6 +50,8 @@ class _TsunamiMapState extends State<TsunamiMap> {
   }
 
   Future<void> _loadMap() async {
+    final isDark = context.theme.brightness == Brightness.dark;
+
     await refreshTsunami();
     await _mapController.addSource(
       'tsunami-data',
@@ -59,8 +62,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
       await addTsunamiObservationPoints(tsunami!);
     }
 
-    final isDark = context.theme.brightness == Brightness.dark;
-
     await _loadMapImages(isDark);
 
     if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
@@ -69,9 +70,9 @@ class _TsunamiMapState extends State<TsunamiMap> {
     userLat = Global.preference.getDouble('user-lat') ?? 0.0;
     userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+    final location = LatLng(userLat, userLon);
 
-    if (isUserLocationValid) {
+    if (location.isValid) {
       await _addUserLocationMarker();
     }
 
@@ -89,7 +90,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     } else {
       color = const Color(0xFF00AAFF);
     }
-    return "#${color.value.toRadixString(16).padLeft(8, "0").substring(2)}";
+    return '#${color.hex}';
   }
 
   DateTime _convertTimestamp(int timestamp) {
@@ -102,11 +103,11 @@ class _TsunamiMapState extends State<TsunamiMap> {
     _blinkTimer?.cancel();
     await _mapController.setLayerProperties('tsunami', const LineLayerProperties(lineOpacity: 0));
     if (tsunami.info.type == 'estimate') {
-      final Map<String, String> area_color = {};
-      tsunami.info.data.forEach((station) {
+      final Map<String, String> areaColor = {};
+      for (final station in tsunami.info.data) {
         final estimateStation = station as TsunamiEstimate;
-        area_color[estimateStation.area] = heightToColor(estimateStation.waveHeight);
-      });
+        areaColor[estimateStation.area] = heightToColor(estimateStation.waveHeight);
+      }
 
       _blinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) async {
         if (!mounted) return;
@@ -116,7 +117,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
             lineColor: [
               'match',
               ['get', 'AREANAME'],
-              ...area_color.entries.expand((entry) => [entry.key, entry.value]),
+              ...areaColor.entries.expand((entry) => [entry.key, entry.value]),
               '#000000',
             ],
             lineOpacity: (_isTsunamiVisible < 6) ? 1 : 0,
@@ -235,10 +236,10 @@ class _TsunamiMapState extends State<TsunamiMap> {
         iconIgnorePlacement: true,
       ),
     );
-    final List markers_features = [];
+    final List markersFeatures = [];
     final tsunami = this.tsunami;
     if (tsunami != null) {
-      markers_features.add({
+      markersFeatures.add({
         'type': 'Feature',
         'properties': {'cross': 1},
         'geometry': {
@@ -247,7 +248,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
         },
       });
     }
-    markers_features.add({
+    markersFeatures.add({
       'type': 'Feature',
       'properties': {},
       'geometry': {
@@ -257,7 +258,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
     });
     await _mapController.setGeoJsonSource('markers-geojson', {
       'type': 'FeatureCollection',
-      'features': markers_features,
+      'features': markersFeatures,
     });
   }
 
@@ -301,7 +302,7 @@ class _TsunamiMapState extends State<TsunamiMap> {
 
   String convertLatLon(double latitude, double longitude) {
     double lat = latitude;
-    double lon = longitude;
+    final double lon = longitude;
 
     var latFormat = '';
     var lonFormat = '';
@@ -472,161 +473,163 @@ class _TsunamiMapState extends State<TsunamiMap> {
                                     ],
                                   ),
                                   const SizedBox(height: 30),
-                                  tsunami != null
-                                      ? Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${tsunami?.content}',
-                                            style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                          ),
-                                          const SizedBox(height: 20),
-                                          tsunami?.info.type == 'estimate'
-                                              ? Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    context.i18n.estimated_time_wave,
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: context.colors.onSurface,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  TsunamiEstimateList(tsunamiList: tsunami!.info.data),
-                                                ],
-                                              )
-                                              : Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    context.i18n.observing_tsunamis,
-                                                    style: TextStyle(
-                                                      fontSize: 22,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: context.colors.onSurface,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  TsunamiObservedList(tsunamiList: tsunami!.info.data),
-                                                ],
-                                              ),
-                                          const SizedBox(height: 15),
-                                          Text(
-                                            context.i18n.eew_info_sound_title,
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              color: context.colors.onSurface,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  if (tsunami != null)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${tsunami?.content}',
+                                          style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        if (tsunami?.info.type == 'estimate')
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                context.i18n.occurrence_time,
-                                                style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                convertTimestamp(tsunami!.eq.time),
+                                                context.i18n.estimated_time_wave,
                                                 style: TextStyle(
-                                                  fontSize: 18,
+                                                  fontSize: 22,
                                                   fontWeight: FontWeight.bold,
                                                   color: context.colors.onSurface,
                                                 ),
                                               ),
+                                              const SizedBox(height: 10),
+                                              TsunamiEstimateList(tsunamiList: tsunami!.info.data),
                                             ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          )
+                                        else
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                context.i18n.report_location,
-                                                style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                context.i18n.observing_tsunamis,
+                                                style: TextStyle(
+                                                  fontSize: 22,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: context.colors.onSurface,
+                                                ),
                                               ),
+                                              const SizedBox(height: 10),
+                                              TsunamiObservedList(tsunamiList: tsunami!.info.data),
                                             ],
                                           ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                        const SizedBox(height: 15),
+                                        Text(
+                                          context.i18n.eew_info_sound_title,
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: context.colors.onSurface,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              context.i18n.occurrence_time,
+                                              style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              convertTimestamp(tsunami!.eq.time),
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: context.colors.onSurface,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              context.i18n.report_location,
+                                              style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  tsunami!.eq.loc,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  convertLatLon(tsunami!.eq.lat, tsunami!.eq.lon),
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: context.colors.onSurface,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text(
-                                                    tsunami!.eq.loc,
+                                                    context.i18n.scale,
+                                                    style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                  ),
+                                                  Text(
+                                                    '${tsunami!.eq.mag}',
                                                     style: TextStyle(
                                                       fontSize: 18,
                                                       fontWeight: FontWeight.bold,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
                                                   Text(
-                                                    convertLatLon(tsunami!.eq.lat, tsunami!.eq.lon),
+                                                    context.i18n.depth,
+                                                    style: TextStyle(fontSize: 18, color: context.colors.onSurface),
+                                                  ),
+                                                  Text(
+                                                    '${tsunami!.eq.depth}km',
                                                     style: TextStyle(
-                                                      fontSize: 14,
+                                                      fontSize: 18,
                                                       fontWeight: FontWeight.bold,
                                                       color: context.colors.onSurface,
                                                     ),
                                                   ),
                                                 ],
                                               ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      context.i18n.scale,
-                                                      style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                                    ),
-                                                    Text(
-                                                      '${tsunami!.eq.mag}',
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: context.colors.onSurface,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Expanded(
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      context.i18n.depth,
-                                                      style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                                    ),
-                                                    Text(
-                                                      '${tsunami!.eq.depth}km',
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.bold,
-                                                        color: context.colors.onSurface,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                      : Container(),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Container(),
                                 ],
                               ),
                     ),

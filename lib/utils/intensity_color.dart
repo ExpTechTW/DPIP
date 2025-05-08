@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class IntensityColor {
+  IntensityColor._();
+
   static const intensity0 = Colors.grey;
   static const intensity1 = Color(0xff003264);
   static const intensity2 = Color(0xff0064c8);

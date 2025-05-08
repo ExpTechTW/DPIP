@@ -77,7 +77,7 @@ class _DpipState extends State<Dpip> {
       } else {
         lastVersion = data['last-version']['alpha'];
       }
-      update = compareVersions(lastVersion, Global.packageInfo.version) == 1 ? true : false;
+      update = compareVersions(lastVersion, Global.packageInfo.version) == 1;
 
       criticalUpdate = !criticalList.contains(Global.packageInfo.version);
 
@@ -115,11 +115,12 @@ class _DpipState extends State<Dpip> {
         }
       } else {
         final data = await ExpTech().getAnnouncement();
+        if (!mounted) return;
+
         if (data.last.show && Global.preference.getString('announcement') != data.last.time.toString()) {
           Global.preference.setString('announcement', data.last.time.toString());
-          if (context.mounted) {
-            await showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
-          }
+
+          await showDialog(context: context, builder: (context) => const WelcomeAnnouncementDialog());
         } else {
           if (Global.preference.getString('changelog') != Global.packageInfo.version) {
             Global.preference.setString('changelog', Global.packageInfo.version);

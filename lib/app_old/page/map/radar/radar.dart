@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -154,9 +155,9 @@ class _RadarMapState extends State<RadarMap> {
     userLat = GlobalProviders.location.latitude ?? 0;
     userLon = GlobalProviders.location.longitude ?? 0;
 
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+    final location = LatLng(userLat, userLon);
 
-    if (isUserLocationValid) {
+    if (location.isValid) {
       await _mapController.setGeoJsonSource('markers-geojson', {
         'type': 'FeatureCollection',
         'features': [
@@ -176,7 +177,7 @@ class _RadarMapState extends State<RadarMap> {
 
     if (!mounted) return;
 
-    if (!isUserLocationValid && !GlobalProviders.location.auto) {
+    if (!location.isValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     }
 

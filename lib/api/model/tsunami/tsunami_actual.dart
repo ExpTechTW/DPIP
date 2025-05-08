@@ -7,7 +7,7 @@ class TsunamiActual {
   /// - 海嘯實測地區
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// "花蓮"
   /// ```
   final String name;
@@ -15,7 +15,7 @@ class TsunamiActual {
   /// - 海嘯實測地區編碼
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// "HL"
   /// ```
   final String id;
@@ -23,7 +23,7 @@ class TsunamiActual {
   /// - 海嘯實測地區緯度
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// 23.98
   /// ```
   final double? lat;
@@ -31,7 +31,7 @@ class TsunamiActual {
   /// - 海嘯實測地區經度
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// 121.62
   /// ```
   final double? lon;
@@ -39,7 +39,7 @@ class TsunamiActual {
   /// - 海嘯實測高度
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// 27
   /// ```
   @JsonKey(name: 'wave_height')
@@ -48,7 +48,7 @@ class TsunamiActual {
   /// - 海嘯實際抵達時間
   ///
   /// 範例
-  /// ```
+  /// ```dart
   /// 1712104200000
   /// ```
   @JsonKey(name: 'arrival_time')

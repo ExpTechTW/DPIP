@@ -168,7 +168,8 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
                       Text(
                         DateFormat('MM/dd').format(time),
                         style: TextStyle(
-                          color: isSelected ? context.colors.onSecondary : context.colors.onSurface.withOpacity(0.7),
+                          color:
+                              isSelected ? context.colors.onSecondary : context.colors.onSurface.withValues(alpha: 0.7),
                           fontSize: 12,
                         ),
                       ),
@@ -253,7 +254,9 @@ class _TyphoonTimeSelectorState extends State<TyphoonTimeSelector> with SingleTi
             decoration: BoxDecoration(
               color: context.colors.surface,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [
+                BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2)),
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

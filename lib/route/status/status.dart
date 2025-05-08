@@ -104,7 +104,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode ? Colors.black26 : Colors.grey.withOpacity(0.3),
+            color: isDarkMode ? Colors.black26 : Colors.grey.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -164,7 +164,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDarkMode ? statusColor.withOpacity(0.2) : statusColor.withOpacity(0.1),
+                color: isDarkMode ? statusColor.withValues(alpha: 0.2) : statusColor.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
               ),
               child: Row(
@@ -183,7 +183,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.2),
+                          color: isDarkMode ? statusColor.withValues(alpha: 0.3) : statusColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -265,7 +265,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isDarkMode ? statusColor.withOpacity(0.3) : statusColor.withOpacity(0.1),
+          color: isDarkMode ? statusColor.withValues(alpha: 0.3) : statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(statusText, style: TextStyle(color: statusColor, fontWeight: FontWeight.bold)),

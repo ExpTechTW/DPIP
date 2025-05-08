@@ -55,7 +55,7 @@ class HistoryTimelineItem extends StatelessWidget {
                         border: expired ? Border.all(color: context.colors.outlineVariant) : null,
                       ),
                       child: Icon(
-                        ListIcons.getListIcon(history.icon),
+                        getListIcon(history.icon),
                         color: expired ? context.colors.outline : context.colors.onPrimaryContainer,
                       ),
                     ),
@@ -72,13 +72,13 @@ class HistoryTimelineItem extends StatelessWidget {
                     Text(
                       DateFormat(context.i18n.time_format).format(history.time.send),
                       style: context.theme.textTheme.labelMedium?.copyWith(
-                        color: context.colors.outline.withOpacity(expired ? 0.6 : 1),
+                        color: context.colors.outline.withValues(alpha: expired ? 0.6 : 1),
                       ),
                     ),
                     Text(
                       history.text.content['all']!.subtitle,
                       style: context.theme.textTheme.titleMedium?.copyWith(
-                        color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
+                        color: context.colors.onSurface.withValues(alpha: expired ? 0.6 : 1),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -86,7 +86,7 @@ class HistoryTimelineItem extends StatelessWidget {
                     Text(
                       history.text.description['all']!,
                       style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.colors.onSurface.withOpacity(expired ? 0.6 : 1),
+                        color: context.colors.onSurface.withValues(alpha: expired ? 0.6 : 1),
                       ),
                       textAlign: TextAlign.justify,
                       maxLines: 3,

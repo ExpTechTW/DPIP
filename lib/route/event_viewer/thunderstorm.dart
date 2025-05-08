@@ -274,7 +274,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                   filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                    decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
                     child: Text(
                       DateFormat('yyyy/MM/dd HH:mm').format(radarTime),
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: context.colors.onSurface),
@@ -293,7 +293,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                   filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(color: context.colors.surface.withOpacity(0.5)),
+                    decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
                     child: Text(
                       context.i18n.radar_synthetic_echo,
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.colors.onSurface),
@@ -354,7 +354,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               color: context.colors.secondaryContainer,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(ListIcons.getListIcon(widget.item.icon), size: 28),
+            child: Icon(getListIcon(widget.item.icon), size: 28),
           ),
           const SizedBox(width: 12),
           Row(

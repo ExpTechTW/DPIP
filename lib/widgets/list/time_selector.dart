@@ -147,7 +147,7 @@ class _TimeSelectorState extends State<TimeSelector> with SingleTickerProviderSt
                                     color:
                                         isSelected
                                             ? context.colors.onSecondary
-                                            : context.colors.onSurface.withOpacity(0.7),
+                                            : context.colors.onSurface.withValues(alpha: 0.7),
                                     fontSize: 12,
                                   ),
                                   child: Text(DateFormat('MM/dd').format(time)),

@@ -162,7 +162,7 @@ class ReportSheetContent extends StatelessWidget {
                                   ActionChip(
                                     padding: const EdgeInsets.all(4),
                                     side: BorderSide(color: IntensityColor.intensity(town.intensity)),
-                                    backgroundColor: IntensityColor.intensity(town.intensity).withOpacity(0.16),
+                                    backgroundColor: IntensityColor.intensity(town.intensity).withValues(alpha: 0.16),
                                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                     avatar: AspectRatio(
                                       aspectRatio: 1,

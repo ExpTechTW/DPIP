@@ -5,21 +5,33 @@ import 'package:geolocator/geolocator.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/location_to_code.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 StreamSubscription<Position>? positionStreamSubscription;
 Timer? restartTimer;
 
 class GetLocationResult {
+  final bool change;
   final int? code;
   final double? lat;
   final double? lng;
-  final bool change;
 
-  GetLocationResult(this.code, this.change, this.lat, this.lng);
+  GetLocationResult({required this.change, this.code, this.lat, this.lng});
+
+  factory GetLocationResult.fromJson(Map<String, dynamic> json) {
+    return GetLocationResult(
+      change: json['change'] as bool,
+      code: json['code'] as int?,
+      lat: json['lat'] as double?,
+      lng: json['lng'] as double?,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {'code': code, 'change': change, 'lat': lat, 'lng': lng};
   }
+
+  LatLng get latlng => LatLng(lat ?? 0, lng ?? 0);
 }
 
 class LocationService {
@@ -39,7 +51,7 @@ class LocationService {
 
     if (!isLocationServiceEnabled) {
       TalkerManager.instance.warning('位置服務未啟用');
-      return GetLocationResult(null, false, 0, 0);
+      return GetLocationResult(change: false, code: null, lat: 0, lng: 0);
     }
 
     bool hasLocationChanged = false;
@@ -70,10 +82,10 @@ class LocationService {
     }
 
     return GetLocationResult(
-      currentLocation?.code,
-      hasLocationChanged,
-      currentPosition.latitude,
-      currentPosition.longitude,
+      change: hasLocationChanged,
+      code: currentLocation?.code,
+      lat: currentPosition.latitude,
+      lng: currentPosition.longitude,
     );
   }
 }

@@ -117,9 +117,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           },
         );
       } else {
-        context.scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text('${context.i18n.save_image_error}${e.toString()}')),
-        );
+        context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('${context.i18n.save_image_error}$e')));
       }
     }
   }
@@ -184,7 +182,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                       style: ButtonStyle(
                         foregroundColor: WidgetStateProperty.all(context.colors.onSurfaceVariant),
                         backgroundColor: WidgetStateProperty.all(
-                          context.colors.surfaceContainerHighest.withOpacity(0.8),
+                          context.colors.surfaceContainerHighest.withValues(alpha: 0.8),
                         ),
                       ),
                       onPressed: () {

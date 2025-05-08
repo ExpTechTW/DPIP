@@ -1,8 +1,10 @@
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:intl/intl.dart';
 
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/station_info.dart';
 import 'package:dpip/core/eew.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 StationInfo findAppropriateItem(List<StationInfo> infos, int date) {
   final DateTime targetDate = (date == 0) ? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(date);
@@ -23,10 +25,12 @@ bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, Lis
   for (final eew in eewLastInfo.keys) {
     int skip = 0;
     for (int i = 0; i < 4; i++) {
-      final dist = distance(eewLastInfo[eew]!.eq.latitude, eewLastInfo[eew]!.eq.longitude, box[i][1], box[i][0]);
-      if (eewDist[eew]! > dist) {
-        skip++;
-      }
+      final dist = LatLng(
+        eewLastInfo[eew]!.eq.latitude,
+        eewLastInfo[eew]!.eq.longitude,
+      ).to(LatLng(box[i][1], box[i][0]));
+
+      if (eewDist[eew]! > dist) skip++;
     }
     if (skip >= 4) {
       passed = true;

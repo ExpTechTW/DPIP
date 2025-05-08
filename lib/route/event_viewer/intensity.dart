@@ -325,7 +325,7 @@ class _IntensityPageState extends State<IntensityPage> {
               color: context.colors.secondaryContainer,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(ListIcons.getListIcon(widget.item.icon), size: 28),
+            child: Icon(getListIcon(widget.item.icon), size: 28),
           ),
           const SizedBox(width: 12),
           Row(

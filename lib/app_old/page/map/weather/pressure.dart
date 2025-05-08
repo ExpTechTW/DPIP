@@ -382,7 +382,7 @@ class _PressureMapState extends State<PressureMap> {
                   color: context.theme.cardColor,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   boxShadow: [
-                    BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, -5)),
+                    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -5)),
                   ],
                 ),
                 child: SingleChildScrollView(

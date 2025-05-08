@@ -80,7 +80,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
         'precipitation': data!.precipitation.reversed.toList(),
         'humidity': data!.humidity.reversed.toList(),
         'pressure': data!.pressure.reversed.toList(),
-        'time': data!.time.reversed.toList().map((item) => double.tryParse(item.toString()) ?? 0).toList(),
+        'time': data!.time.reversed.toList().map((item) => double.tryParse(item) ?? 0).toList(),
       };
       isLoading = false;
     });
@@ -138,7 +138,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               ),
               Text(
                 stationId!,
-                style: context.theme.textTheme.bodyMedium?.copyWith(color: context.colors.onSurface.withOpacity(0.6)),
+                style: context.theme.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.onSurface.withValues(alpha: 0.6),
+                ),
               ),
             ],
           ),
@@ -241,9 +243,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     double minY = double.infinity;
     double maxY = double.negativeInfinity;
 
-    final bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    final bool invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
-    if (_invalid) {
+    if (invalid) {
       return Center(child: Text(context.i18n.map_no_data));
     }
 
@@ -337,9 +339,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: lineColor[0].withOpacity(0.3),
+              color: lineColor[0].withValues(alpha: 0.3),
               gradient: LinearGradient(
-                colors: [lineColor[0].withOpacity(0.8), lineColor[1].withOpacity(0.1)],
+                colors: [lineColor[0].withValues(alpha: 0.8), lineColor[1].withValues(alpha: 0.1)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -390,11 +392,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   Widget _buildBarChart() {
     final Color barColor = getDataTypeColor(selectedDataType!)[0];
-    final Color abnormalColor = Colors.red.withOpacity(0.3);
+    final Color abnormalColor = Colors.red.withValues(alpha: 0.3);
 
-    final bool _invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
+    final bool invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
-    if (_invalid) {
+    if (invalid) {
       return Center(child: Text(context.i18n.map_no_data));
     }
 
@@ -423,7 +425,9 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                     getTitlesWidget: (value, meta) {
                       final int index = value.toInt();
                       if (index % 3 == 0 && index >= 0 && index < weatherData['time']!.length) {
-                        final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
+                        final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                          weatherData['time']![index].toInt(),
+                        );
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
@@ -568,9 +572,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             Container(
               width: 20,
               height: 1,
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey)),
-              ),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey))),
             ),
             const SizedBox(width: 8),
             Text(context.i18n.map_average),

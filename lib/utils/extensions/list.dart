@@ -1,3 +1,5 @@
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 extension ListExtension<T> on List<T> {
   /// Joins the elements of this list with the given [separator] between each element.
   ///
@@ -16,6 +18,10 @@ extension ListExtension<T> on List<T> {
     if (isEmpty) return [];
     return expand((element) => [element, separator]).take(length * 2 - 1).toList();
   }
+}
+
+extension ListExtension2 on List<double> {
+  LatLng get asLatLng => LatLng(this[0], this[1]);
 }
 
 extension IterableExtension<T> on Iterable<T> {

@@ -26,7 +26,7 @@ class LightningData {
 }
 
 class LightningMap extends StatefulWidget {
-  const LightningMap({Key? key}) : super(key: key);
+  const LightningMap({super.key});
 
   @override
   State<LightningMap> createState() => _LightningMapState();
@@ -59,7 +59,7 @@ class _LightningMapState extends State<LightningMap> {
     userLat = Global.preference.getDouble('user-lat') ?? 0.0;
     userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+    isUserLocationValid = !(userLon == 0 || userLat == 0);
     await _mapController.addSource(
       'lightning-data',
       const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),

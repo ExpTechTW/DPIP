@@ -83,21 +83,22 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   Navigator.pop(context);
                 },
               ),
-              status.isPermanentlyDenied
-                  ? FilledButton(
-                    child: Text(context.i18n.settings),
-                    onPressed: () {
-                      openAppSettings();
-                      Navigator.pop(context);
-                    },
-                  )
-                  : FilledButton(
-                    child: Text(context.i18n.again),
-                    onPressed: () {
-                      checkNotificationPermission();
-                      Navigator.pop(context);
-                    },
-                  ),
+              if (status.isPermanentlyDenied)
+                FilledButton(
+                  child: Text(context.i18n.settings),
+                  onPressed: () {
+                    openAppSettings();
+                    Navigator.pop(context);
+                  },
+                )
+              else
+                FilledButton(
+                  child: Text(context.i18n.again),
+                  onPressed: () {
+                    checkNotificationPermission();
+                    Navigator.pop(context);
+                  },
+                ),
             ],
           );
         },
@@ -133,21 +134,22 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   Navigator.pop(context);
                 },
               ),
-              status.isPermanentlyDenied
-                  ? FilledButton(
-                    child: Text(context.i18n.settings),
-                    onPressed: () {
-                      openAppSettings();
-                      Navigator.pop(context);
-                    },
-                  )
-                  : FilledButton(
-                    child: Text(context.i18n.again),
-                    onPressed: () {
-                      checkLocationPermission();
-                      Navigator.pop(context);
-                    },
-                  ),
+              if (status.isPermanentlyDenied)
+                FilledButton(
+                  child: Text(context.i18n.settings),
+                  onPressed: () {
+                    openAppSettings();
+                    Navigator.pop(context);
+                  },
+                )
+              else
+                FilledButton(
+                  child: Text(context.i18n.again),
+                  onPressed: () {
+                    checkLocationPermission();
+                    Navigator.pop(context);
+                  },
+                ),
             ],
           );
         },
@@ -177,7 +179,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
                 title: Text('$permissionType${context.i18n.location_permission}'),
-                content: Text(context.i18n.improve_auto_location_experience(permissionType.toString())),
+                content: Text(context.i18n.improve_auto_location_experience(permissionType)),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
@@ -291,7 +293,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   ),
                   FilledButton(
                     child: Text(context.i18n.confirm),
-                    onPressed: () async {
+                    onPressed: () {
                       DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                       Navigator.pop(context, false);
                     },
@@ -457,7 +459,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            context.i18n.auto_location_permission_upgrade_needed(permissionType.toString()),
+                            context.i18n.auto_location_permission_upgrade_needed(permissionType),
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),

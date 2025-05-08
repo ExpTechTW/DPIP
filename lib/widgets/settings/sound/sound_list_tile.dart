@@ -6,9 +6,11 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/need_location.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class SoundListTile extends StatefulWidget {
@@ -25,9 +27,7 @@ class SoundListTile extends StatefulWidget {
 
 class SoundListTileState extends State<SoundListTile> {
   bool isPlaying = false;
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
+  late LatLng _userLocation;
   Map<String, dynamic> data = {};
 
   @override
@@ -48,20 +48,20 @@ class SoundListTileState extends State<SoundListTile> {
 
     if (!mounted) return;
 
-    userLat = GlobalProviders.location.latitude ?? 0;
-    userLon = GlobalProviders.location.longitude ?? 0;
-
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
+    _userLocation = LatLng(GlobalProviders.location.latitude ?? 0, GlobalProviders.location.longitude ?? 0);
   }
 
   Future<void> playSound() async {
     if (!widget.enable!) return;
+
     _initUserLocation();
-    if (!isUserLocationValid && !GlobalProviders.location.auto) {
+
+    if (!_userLocation.isValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     } else {
       final int limit = Global.preference.getInt('limit-sound-test') ?? 0;
       final int now = DateTime.now().millisecondsSinceEpoch;
+
       if (now - limit > 1000) {
         Global.preference.setInt('limit-sound-test', now);
         AwesomeNotifications().createNotification(

@@ -13,7 +13,7 @@ class BottomSheetDragHandle extends StatelessWidget {
           width: 32,
           height: 4,
           decoration: BoxDecoration(
-            color: context.colors.onSurfaceVariant.withOpacity(0.4),
+            color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(16),
           ),
         ),

@@ -20,7 +20,10 @@ class UpdateCard extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [context.theme.primaryColor.withOpacity(0.1), context.theme.primaryColor.withOpacity(0.3)],
+            colors: [
+              context.theme.primaryColor.withValues(alpha: 0.1),
+              context.theme.primaryColor.withValues(alpha: 0.3),
+            ],
           ),
         ),
         child: Padding(
@@ -49,7 +52,7 @@ class UpdateCard extends StatelessWidget {
                     Text(
                       description,
                       style: context.theme.textTheme.bodyMedium?.copyWith(
-                        color: context.theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                        color: context.theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -59,7 +62,7 @@ class UpdateCard extends StatelessWidget {
               Container(
                 width: 80,
                 height: 80,
-                decoration: BoxDecoration(color: Colors.amber.withOpacity(0.2), shape: BoxShape.circle),
+                decoration: BoxDecoration(color: Colors.amber.withValues(alpha: 0.2), shape: BoxShape.circle),
                 child: const Icon(Icons.update, size: 48, color: Colors.amber),
               ),
             ],

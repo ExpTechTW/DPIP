@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:dpip/core/eew.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -76,8 +77,10 @@ void _setupPositionListener() {
   _backgroundService.on(ServiceEvent.sendPosition.name).listen((event) {
     if (event == null) return;
 
-    final latitude = event.values.first['lat'] ?? 0;
-    final longitude = event.values.first['lng'] ?? 0;
+    final result = GetLocationResult.fromJson(event);
+
+    final latitude = result.lat ?? 0;
+    final longitude = result.lng ?? 0;
 
     final location = GeoJsonHelper.checkPointInPolygons(latitude, longitude);
 
@@ -190,7 +193,7 @@ Future<void> _onServiceStart(ServiceInstance service) async {
 
       // Get current position and location info
       final position = await locationService.androidGetLocation();
-      service.invoke(ServiceEvent.sendPosition.name, {'position': position.toJson()});
+      service.invoke(ServiceEvent.sendPosition.name, position.toJson());
 
       final latitude = position.lat.toString();
       final longitude = position.lng.toString();
@@ -222,11 +225,8 @@ Future<void> _onServiceStart(ServiceInstance service) async {
       );
       service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
 
-      final double dist = distance(
-        position.lat ?? 0,
-        position.lng ?? 0,
-        GlobalProviders.location.oldLatitude ?? 0,
-        GlobalProviders.location.oldLongitude ?? 0,
+      final double dist = position.latlng.to(
+        LatLng(GlobalProviders.location.oldLatitude ?? 0, GlobalProviders.location.oldLongitude ?? 0),
       );
 
       int time = 15;

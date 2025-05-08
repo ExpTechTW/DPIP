@@ -165,7 +165,7 @@ class AnnouncementCard extends StatelessWidget {
               Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
-                color: context.theme.textTheme.bodySmall?.color?.withOpacity(0.5),
+                color: context.theme.textTheme.bodySmall?.color?.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -201,9 +201,9 @@ class AnnouncementCard extends StatelessWidget {
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
     return Chip(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       side: BorderSide(color: tagType.color),
-      backgroundColor: tagType.color.withOpacity(0.16),
+      backgroundColor: tagType.color.withValues(alpha: 0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
     );
@@ -258,9 +258,9 @@ class AnnouncementDetailPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: context.colors.primary.withOpacity(0.1),
+        color: context.colors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.colors.primary.withOpacity(0.3)),
+        border: Border.all(color: context.colors.primary.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -281,9 +281,9 @@ class AnnouncementDetailPage extends StatelessWidget {
 
   Widget _buildGlassyTag(BuildContext context, TagType tagType) {
     return Chip(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       side: BorderSide(color: tagType.color),
-      backgroundColor: tagType.color.withOpacity(0.16),
+      backgroundColor: tagType.color.withValues(alpha: 0.16),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       label: Text(tagType.text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
     );

@@ -147,7 +147,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
-              context.i18n.ranking_time(time.toString(), ranked.length.toString()),
+              context.i18n.ranking_time(time, ranked.length.toString()),
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),
@@ -237,7 +237,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                   const SizedBox(width: 8),
                   Text(
                     '${item.$1.county}${item.$1.town}',
-                    style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withOpacity(0.8)),
+                    style: TextStyle(fontSize: fontSize / 1.25, color: foregroundColor.withValues(alpha: 0.8)),
                   ),
                 ];
 
@@ -278,8 +278,8 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                               colors: [
                                 backgroundColor,
                                 backgroundColor,
-                                backgroundColor.withOpacity(0.4),
-                                backgroundColor.withOpacity(0.4),
+                                backgroundColor.withValues(alpha: 0.4),
+                                backgroundColor.withValues(alpha: 0.4),
                               ],
                               stops: [0, percentage, percentage, 1],
                             ),

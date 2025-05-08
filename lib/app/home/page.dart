@@ -2,14 +2,12 @@ import 'package:dpip/api/model/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/app/home/_widgets/location_not_set_card.dart';
 import 'package:dpip/app/home/_widgets/location_out_of_service.dart';
-import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -23,7 +21,6 @@ import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';

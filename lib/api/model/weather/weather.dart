@@ -73,9 +73,10 @@ class Wind {
 class AirCondition {
   final double temperature;
   final double pressure;
-  final int relative_humidity;
+  @JsonKey(name: 'relative_humidity')
+  final int relativeHumidity;
 
-  const AirCondition({required this.temperature, required this.pressure, required this.relative_humidity});
+  const AirCondition({required this.temperature, required this.pressure, required this.relativeHumidity});
 
   factory AirCondition.fromJson(Map<String, dynamic> json) => _$AirConditionFromJson(json);
 
