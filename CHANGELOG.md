@@ -7,6 +7,8 @@
 
 ## [未發布]
 
+## [3.0.006] - 2025-05-08
+
 ### 新增
 - 新增贊助免責聲明文字。
 - 重新設計更新日誌頁面。
@@ -16,7 +18,7 @@
 ### 更改
 - 優化贊助頁面。
 
-## 修復
+### 修復
 - 首頁所在地按鈕位置未對齊其他按鈕。
 
 ## [3.0.005] - 2025-05-06
@@ -39,9 +41,10 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.005...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.006...HEAD
+[3.0.006]: https://github.com/exptechtw/dpip/compare/v3.0.005...v3.0.006
 [3.0.005]: https://github.com/exptechtw/dpip/compare/v3.0.004...v3.0.005
 [3.0.004]: https://github.com/exptechtw/dpip/compare/v3.0.003...v3.0.004
 [3.0.003]: https://github.com/exptechtw/dpip/compare/v3.0.002...v3.0.003
 [3.0.002]: https://github.com/exptechtw/dpip/compare/v3.0.001...v3.0.002
-[3.0.001]: https://github.com/exptechtw/dpip/compare/v2.5.500...v3.0.002
+[3.0.001]: https://github.com/exptechtw/dpip/compare/2.5.500...v3.0.001
