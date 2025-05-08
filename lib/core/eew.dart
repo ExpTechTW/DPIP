@@ -14,32 +14,32 @@ Map<String, double> psWaveDist(double depth, int time, int now) {
 
   final double t = (now - time) / 1000.0;
 
-  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
-  var prevTable;
+  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()]!;
+  ({double P, double R, double S})? prevTable;
 
   for (final table in timeTable) {
-    if (pDist == 0 && table['P'] > t) {
+    if (pDist == 0 && table.P > t) {
       if (prevTable != null) {
-        final double tDiff = table['P'].toDouble() - prevTable['P'].toDouble();
-        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
-        final double tOffset = t - prevTable['P'].toDouble();
+        final double tDiff = table.P - prevTable.P;
+        final double rDiff = table.R - prevTable.R;
+        final double tOffset = t - prevTable.P;
         final double rOffset = (tOffset / tDiff) * rDiff;
-        pDist = prevTable['R'].toDouble() + rOffset;
+        pDist = prevTable.R + rOffset;
       } else {
-        pDist = table['R'].toDouble();
+        pDist = table.R;
       }
     }
 
-    if (sDist == 0 && table['S'] > t) {
+    if (sDist == 0 && table.S > t) {
       if (prevTable != null) {
-        final double tDiff = table['S'].toDouble() - prevTable['S'].toDouble();
-        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
-        final double tOffset = t - prevTable['S'].toDouble();
+        final double tDiff = table.S - prevTable.S;
+        final double rDiff = table.R - prevTable.R;
+        final double tOffset = t - prevTable.S;
         final double rOffset = (tOffset / tDiff) * rDiff;
-        sDist = prevTable['R'].toDouble() + rOffset;
+        sDist = prevTable.R + rOffset;
       } else {
-        sDist = table['R'].toDouble();
-        sT = table['S'].toDouble();
+        sDist = table.R;
+        sT = table.S;
       }
     }
 
@@ -94,19 +94,19 @@ double eewAreaPgv(List<double> epicenterLocation, List<double> pointLocation, do
 double sWaveTimeByDistance(double depth, double sDist) {
   double sTime = 0.0;
 
-  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
-  var prevTable;
+  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()]!;
+  ({double P, double R, double S})? prevTable;
 
   for (final table in timeTable) {
-    if (sTime == 0 && table['R'].toDouble() >= sDist) {
+    if (sTime == 0 && table.R >= sDist) {
       if (prevTable != null) {
-        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
-        final double tDiff = table['S'].toDouble() - prevTable['S'].toDouble();
-        final double rOffset = sDist - prevTable['R'].toDouble();
+        final double rDiff = table.R - prevTable.R;
+        final double tDiff = table.S - prevTable.S;
+        final double rOffset = sDist - prevTable.R;
         final double tOffset = (rOffset / rDiff) * tDiff;
-        sTime = prevTable['S'].toDouble() + tOffset;
+        sTime = prevTable.S + tOffset;
       } else {
-        sTime = table['S'].toDouble();
+        sTime = table.S;
       }
     }
 
@@ -120,19 +120,19 @@ double sWaveTimeByDistance(double depth, double sDist) {
 double pWaveTimeByDistance(double depth, double pDist) {
   double pTime = 0.0;
 
-  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()];
-  var prevTable;
+  final timeTable = Global.timeTable[findClosest(Global.timeTable.keys.map(int.parse).toList(), depth).toString()]!;
+  ({double P, double R, double S})? prevTable;
 
   for (final table in timeTable) {
-    if (pTime == 0 && table['R'].toDouble() >= pDist) {
+    if (pTime == 0 && table.R >= pDist) {
       if (prevTable != null) {
-        final double rDiff = table['R'].toDouble() - prevTable['R'].toDouble();
-        final double tDiff = table['P'].toDouble() - prevTable['P'].toDouble();
-        final double rOffset = pDist - prevTable['R'].toDouble();
+        final double rDiff = table.R - prevTable.R;
+        final double tDiff = table.P - prevTable.P;
+        final double rOffset = pDist - prevTable.R;
         final double tOffset = (rOffset / rDiff) * tDiff;
-        pTime = prevTable['P'].toDouble() + tOffset;
+        pTime = prevTable.P + tOffset;
       } else {
-        pTime = table['P'].toDouble();
+        pTime = table.P;
       }
     }
 

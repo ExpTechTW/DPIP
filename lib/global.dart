@@ -16,7 +16,7 @@ class Global {
   static late SharedPreferences preference;
   static late Map<String, Location> location;
   static late Map<String, dynamic> geojson;
-  static late Map<String, dynamic> timeTable;
+  static late Map<String, List<({double P, double S, double R})>> timeTable;
   static late Map<String, dynamic> box;
   static ExpTech api = ExpTech();
 
@@ -27,13 +27,32 @@ class Global {
     location = data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
   }
 
+  static Future<void> loadTimeTableData() async {
+    final json = await rootBundle.loadString('assets/time.json');
+    final data = jsonDecode(json) as Map<String, dynamic>;
+
+    timeTable = data.map((key, value) {
+      final list =
+          (value as List).map((item) {
+            final map = item as Map<String, dynamic>;
+            return (
+              P: double.parse(map['P'].toString()),
+              R: double.parse(map['R'].toString()),
+              S: double.parse(map['S'].toString()),
+            );
+          }).toList();
+      return MapEntry(key, list);
+    });
+  }
+
   static Future init() async {
     packageInfo = await PackageInfo.fromPlatform();
     preference = await SharedPreferences.getInstance();
-    timeTable = jsonDecode(await rootBundle.loadString('assets/time.json')) as Map<String, dynamic>;
     box = jsonDecode(await rootBundle.loadString('assets/box.json')) as Map<String, dynamic>;
 
     await loadLocationData();
+    await loadTimeTableData();
+
     await GeoJsonHelper.loadGeoJson('assets/map/town.json');
   }
 }
