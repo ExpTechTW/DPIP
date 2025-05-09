@@ -106,9 +106,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   History? get _thunderstorm {
-    final item = _history?.firstWhereOrNull((e) => e.type == 'thunderstorm');
-    if (item == null || item.isExpired) return null;
-    return item;
+    return _history?.firstWhereOrNull((e) =>
+    e.type == 'thunderstorm' && !e.isExpired);
   }
 
   @override

@@ -35,8 +35,7 @@ class History {
   bool get isExpired {
     final int? expireTimestamp = time.expires['all'];
     final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
-    final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
-    return isExpired;
+    return TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
   }
 
   Map<String, dynamic> toJson() => _$HistoryToJson(this);
