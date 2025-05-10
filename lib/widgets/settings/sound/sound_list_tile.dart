@@ -5,7 +5,6 @@ import 'package:dpip/core/providers.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/need_location.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +16,8 @@ class SoundListTile extends StatefulWidget {
   final String title;
   final String subtitle;
   final String type;
-  final bool? enable;
 
-  const SoundListTile({super.key, required this.title, required this.subtitle, required this.type, this.enable = true});
+  const SoundListTile({super.key, required this.title, required this.subtitle, required this.type});
 
   @override
   SoundListTileState createState() => SoundListTileState();
@@ -52,8 +50,6 @@ class SoundListTileState extends State<SoundListTile> {
   }
 
   Future<void> playSound() async {
-    if (!widget.enable!) return;
-
     _initUserLocation();
 
     if (!_userLocation.isValid && !GlobalProviders.location.auto) {
@@ -80,8 +76,8 @@ class SoundListTileState extends State<SoundListTile> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      trailing: !widget.enable! ? null : const Icon(Symbols.volume_up, fill: 1),
-      title: Text("${widget.title}${!widget.enable! ? context.i18n.not_enabled : ""}"),
+      trailing: const Icon(Symbols.volume_up, fill: 1),
+      title: Text(widget.title),
       subtitle: Text(widget.subtitle),
       onTap: playSound,
     );

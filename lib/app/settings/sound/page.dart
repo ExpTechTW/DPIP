@@ -115,8 +115,8 @@ class SoundDetailPage extends StatelessWidget {
   List<Widget> _buildListItems(BuildContext context) {
     final monitor = Global.preference.getBool('monitor') ?? false;
 
-    Widget buildSoundListTile(String title, String subtitle, String type, {bool? enable}) {
-      return SoundListTile(title: title, subtitle: subtitle, type: type, enable: enable ?? true);
+    Widget buildSoundListTile(String title, String subtitle, String type) {
+      return SoundListTile(title: title, subtitle: subtitle, type: type);
     }
 
     switch (category) {
@@ -151,19 +151,16 @@ class SoundDetailPage extends StatelessWidget {
             context.i18n.sound_int_report_minor,
             context.i18n.sound_int_report_minor_h2,
             'int_report-general',
-            enable: monitor,
           ),
           buildSoundListTile(
             context.i18n.sound_int_report_silent,
             context.i18n.sound_int_report_silent_h2,
             'int_report-silence',
-            enable: monitor,
           ),
           buildSoundListTile(
             context.i18n.sound_monitor_minor,
             context.i18n.eq_description_sound,
             'eq',
-            enable: monitor,
           ),
           buildSoundListTile(context.i18n.sound_report_minor, context.i18n.report_description_sound, 'report-general'),
           buildSoundListTile(context.i18n.sound_report_silent, context.i18n.sound_report_silent_h2, 'report-silence'),
