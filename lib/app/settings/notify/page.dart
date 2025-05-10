@@ -287,7 +287,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.emergency_earthquake_warning,
+                              title: context.i18n.notify_eew,
                               subtitle: Text(getEewNotifyTypeName(eew)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.crisis_alert_rounded,
@@ -297,7 +297,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openEewNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.emergency_earthquake_warning,
+                                  title: context.i18n.notify_eew,
                                   groupValue: eew,
                                 );
 
@@ -328,7 +328,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.monitor,
+                              title: context.i18n.notify_monitor,
                               subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.earthquake_rounded,
@@ -338,7 +338,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openEarthquakeNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.monitor,
+                                  title: context.i18n.notify_monitor,
                                   groupValue: monitor,
                                 );
 
@@ -364,7 +364,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.report,
+                              title: context.i18n.notify_report,
                               subtitle: Text(getEarthquakeNotifyTypeName(report)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.docs_rounded,
@@ -374,7 +374,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openEarthquakeNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.report,
+                                  title: context.i18n.notify_report,
                                   groupValue: report,
                                 );
 
@@ -400,7 +400,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.sound_int_report_minor,
+                              title: context.i18n.notify_intensity,
                               subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.summarize_rounded,
@@ -410,7 +410,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openEarthquakeNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.sound_int_report_minor,
+                                  title: context.i18n.notify_intensity,
                                   groupValue: intensity,
                                 );
 
@@ -441,7 +441,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.sound_rain_instant,
+                              title: context.i18n.notify_thunderstorm,
                               subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.thunderstorm_rounded,
@@ -451,7 +451,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openWeatherNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.sound_rain_instant,
+                                  title: context.i18n.notify_thunderstorm,
                                   groupValue: thunderstorm,
                                 );
 
@@ -477,7 +477,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.sound_weather_alert,
+                              title: context.i18n.notify_advisory,
                               subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.warning_rounded,
@@ -487,7 +487,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openWeatherNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.sound_weather_alert,
+                                  title: context.i18n.notify_advisory,
                                   groupValue: weatherAdvisory,
                                 );
 
@@ -513,7 +513,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.sound_evacuation,
+                              title: context.i18n.notify_evacuation,
                               subtitle: Text(getWeatherNotifyTypeName(evacuation)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.directions_run_rounded,
@@ -523,7 +523,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openWeatherNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.sound_evacuation,
+                                  title: context.i18n.notify_evacuation,
                                   groupValue: evacuation,
                                 );
 
@@ -554,7 +554,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return StatefulBuilder(
                           builder: (context, setState) {
                             return SettingsListTile(
-                              title: context.i18n.tsunami_alert_sound,
+                              title: context.i18n.notify_tsunami,
                               subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
                               trailing: isLoading ? const LoadingIcon() : const Icon(Symbols.chevron_right_rounded),
                               icon: Symbols.tsunami_rounded,
@@ -564,7 +564,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
 
                                 final result = await openTsunamiNotifyTypeSelectorDialog(
                                   context,
-                                  title: context.i18n.tsunami_alert_sound,
+                                  title: context.i18n.notify_tsunami,
                                   groupValue: tsunami,
                                 );
 
