@@ -27,7 +27,6 @@ import 'package:dpip/app/settings/notify/(4.tsunami)/tsunami/page.dart';
 import 'package:dpip/app/settings/notify/(5.basic)/announcement/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
-import 'package:dpip/app/settings/sound/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
@@ -129,7 +128,6 @@ final router = GoRouter(
           SettingsNotifyTsunamiPage.route => context.i18n.notify_tsunami,
           SettingsNotifyAnnouncementPage.route => context.i18n.announcement,
 
-          SettingsSoundPage.route => context.i18n.notify_test,
           SettingsDonatePage.route => context.i18n.donate,
           _ => context.i18n.settings,
         };
@@ -246,11 +244,6 @@ final router = GoRouter(
                       ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage()),
             ),
           ],
-        ),
-        GoRoute(
-          path: SettingsSoundPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsSoundPage()),
         ),
         GoRoute(
           path: SettingsDonatePage.route,
