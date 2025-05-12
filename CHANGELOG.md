@@ -7,9 +7,13 @@
 
 ## [未發布]
 
+## [3.0.007] - 2025-05-12
+
 ### 新增
-- 新增贊助免責聲明文字。
 - 合併推播通知設定和通知音效測試頁面。
+
+### 更改
+- 更改贊助免責聲明文字。
 
 ### 修復
 - 修正首頁「雷雨即時訊息」卡片顯示邏輯。
@@ -50,7 +54,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.006...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.007...HEAD
+[3.0.007]: https://github.com/exptechtw/dpip/compare/v3.0.006...v3.0.007
 [3.0.006]: https://github.com/exptechtw/dpip/compare/v3.0.005...v3.0.006
 [3.0.005]: https://github.com/exptechtw/dpip/compare/v3.0.004...v3.0.005
 [3.0.004]: https://github.com/exptechtw/dpip/compare/v3.0.003...v3.0.004
