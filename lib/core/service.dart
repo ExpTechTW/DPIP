@@ -172,7 +172,7 @@ Future<void> _onServiceStart(ServiceInstance service) async {
       'DPIP',
       '前景服務啟動中...',
       const NotificationDetails(
-        android: AndroidNotificationDetails('my_foreground', '前景自動定位', icon: '@mipmap/ic_launcher', ongoing: true),
+        android: AndroidNotificationDetails('my_foreground', '前景自動定位', icon: '@drawable/ic_stat_name', ongoing: true),
       ),
     );
 
@@ -220,7 +220,7 @@ Future<void> _onServiceStart(ServiceInstance service) async {
         notificationTitle,
         notificationBody,
         const NotificationDetails(
-          android: AndroidNotificationDetails('my_foreground', '前景自動定位', icon: '@mipmap/ic_launcher', ongoing: true),
+          android: AndroidNotificationDetails('my_foreground', '前景自動定位', icon: 'ic_stat_name', ongoing: true),
         ),
       );
       service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
