@@ -13,7 +13,6 @@ import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
-import 'package:dpip/app/settings/sound/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
@@ -29,8 +28,7 @@ class SettingsIndexPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appInfo = '${Global.packageInfo.version}(${Global.packageInfo.buildNumber})';
-    final deviceInfo =
-        '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
+    final deviceInfo = '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
     final location = SettingsListSection(
       title: context.i18n.settings_position,
@@ -75,19 +73,13 @@ class SettingsIndexPage extends StatelessWidget {
     );
 
     final notification = SettingsListSection(
-      title: 'Notification',
+      title: '通知',
       children: [
         SettingsListTile(
           icon: Symbols.notifications_rounded,
-          title: 'Notification',
-          subtitle: const Text('Notification'),
+          title: '通知',
+          subtitle: const Text('推播通知設定與通知音效測試'),
           onTap: () => context.push(SettingsNotifyPage.route),
-        ),
-        SettingsListTile(
-          icon: Symbols.audiotrack_sharp,
-          title: context.i18n.notify_test,
-          subtitle: Text(context.i18n.notify_test_description),
-          onTap: () => context.push(SettingsSoundPage.route),
         ),
       ],
     );
@@ -98,14 +90,14 @@ class SettingsIndexPage extends StatelessWidget {
         SettingsListTile(
           icon: Symbols.newspaper_rounded,
           title: context.i18n.announcement,
-          subtitle: const Text('來自 ExpTech Studio 的最新消息'),
+          subtitle: const Text('掌握 ExpTech Studio 的最新公告與資訊'),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/announcement'),
         ),
         SettingsListTile(
           icon: Symbols.update_rounded,
           title: context.i18n.update_log,
-          subtitle: const Text('查看 DPIP 更新了什麼新東西'),
+          subtitle: const Text('瀏覽 DPIP 的歷次更新紀錄'),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/changelog'),
         ),

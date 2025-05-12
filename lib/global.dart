@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:dpip/utils/extensions/asset_bundle.dart';
 import 'package:flutter/services.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
@@ -18,18 +17,17 @@ class Global {
   static late Map<String, dynamic> geojson;
   static late Map<String, List<({double P, double S, double R})>> timeTable;
   static late Map<String, dynamic> box;
+  static late Map<String, ({String title, String body})> notifyTestContent;
   static ExpTech api = ExpTech();
 
   static Future<void> loadLocationData() async {
-    final json = await rootBundle.loadString('assets/location.json');
-    final data = jsonDecode(json) as Map<String, dynamic>;
+    final data = await rootBundle.loadJson('assets/location.json');
 
     location = data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
   }
 
   static Future<void> loadTimeTableData() async {
-    final json = await rootBundle.loadString('assets/time.json');
-    final data = jsonDecode(json) as Map<String, dynamic>;
+    final data = await rootBundle.loadJson('assets/time.json');
 
     timeTable = data.map((key, value) {
       final list =
@@ -45,13 +43,23 @@ class Global {
     });
   }
 
+  static Future<void> loadNotifyTestContent() async {
+    final data = await rootBundle.loadJson('assets/notify_test.json');
+
+    notifyTestContent = data.map((type, value) {
+      final map = value as Map<String, dynamic>;
+      return MapEntry(type, (title: map['title'].toString(), body: map['body'].toString()));
+    });
+  }
+
   static Future init() async {
     packageInfo = await PackageInfo.fromPlatform();
     preference = await SharedPreferences.getInstance();
-    box = jsonDecode(await rootBundle.loadString('assets/box.json')) as Map<String, dynamic>;
+    box = await rootBundle.loadJson('assets/box.json');
 
     await loadLocationData();
     await loadTimeTableData();
+    await loadNotifyTestContent();
 
     await GeoJsonHelper.loadGeoJson('assets/map/town.json');
   }

@@ -16,6 +16,15 @@ import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
+import 'package:dpip/app/settings/notify/(1.eew)/eew/page.dart';
+import 'package:dpip/app/settings/notify/(2.earthquake)/intensity/page.dart';
+import 'package:dpip/app/settings/notify/(2.earthquake)/monitor/page.dart';
+import 'package:dpip/app/settings/notify/(2.earthquake)/report/page.dart';
+import 'package:dpip/app/settings/notify/(3.weather)/advisory/page.dart';
+import 'package:dpip/app/settings/notify/(3.weather)/evacuation/page.dart';
+import 'package:dpip/app/settings/notify/(3.weather)/thunderstorm/page.dart';
+import 'package:dpip/app/settings/notify/(4.tsunami)/tsunami/page.dart';
+import 'package:dpip/app/settings/notify/(5.basic)/announcement/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/page.dart';
 import 'package:dpip/app/settings/sound/page.dart';
@@ -108,7 +117,18 @@ final router = GoRouter(
           SettingsLocalePage.route => context.i18n.settings_locale,
           SettingsLocaleSelectPage.route => context.i18n.settings_locale,
           SettingsUnitPage.route => '單位',
+
           SettingsNotifyPage.route => '通知',
+          SettingsNotifyEewPage.route => context.i18n.notify_eew,
+          SettingsNotifyMonitorPage.route => context.i18n.notify_monitor,
+          SettingsNotifyReportPage.route => context.i18n.notify_report,
+          SettingsNotifyIntensityPage.route => context.i18n.notify_intensity,
+          SettingsNotifyThunderstormPage.route => context.i18n.notify_thunderstorm,
+          SettingsNotifyAdvisoryPage.route => context.i18n.notify_advisory,
+          SettingsNotifyEvacuationPage.route => context.i18n.notify_evacuation,
+          SettingsNotifyTsunamiPage.route => context.i18n.notify_tsunami,
+          SettingsNotifyAnnouncementPage.route => context.i18n.announcement,
+
           SettingsSoundPage.route => context.i18n.notify_test,
           SettingsDonatePage.route => context.i18n.donate,
           _ => context.i18n.settings,
@@ -170,6 +190,62 @@ final router = GoRouter(
           path: SettingsNotifyPage.route,
           pageBuilder:
               (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage()),
+          routes: [
+            GoRoute(
+              path: SettingsNotifyEewPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEewPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyMonitorPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyMonitorPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyReportPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyReportPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyIntensityPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyIntensityPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyThunderstormPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyAdvisoryPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyEvacuationPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyTsunamiPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage()),
+            ),
+            GoRoute(
+              path: SettingsNotifyAnnouncementPage.name,
+              pageBuilder:
+                  (context, state) =>
+                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage()),
+            ),
+          ],
         ),
         GoRoute(
           path: SettingsSoundPage.route,
