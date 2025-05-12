@@ -76,7 +76,7 @@ class SettingsIndexPage extends StatelessWidget {
       title: '通知',
       children: [
         SettingsListTile(
-          icon: Symbols.notifications_rounded,
+          icon: Symbols.notification_settings_rounded,
           title: '通知',
           subtitle: const Text('推播通知設定與通知音效測試'),
           onTap: () => context.push(SettingsNotifyPage.route),
