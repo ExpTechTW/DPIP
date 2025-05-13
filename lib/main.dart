@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import 'package:dynamic_system_colors/dynamic_system_colors.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart';
 
@@ -89,7 +88,6 @@ class DpipApp extends StatelessWidget {
                 GlobalMaterialLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
-                LocaleNamesLocalizationsDelegate(),
               ],
               supportedLocales: AppLocalizations.supportedLocales,
               locale: model.locale,

@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
 
 import 'package:dash_flags/dash_flags.dart';
-import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 extension NativeLocale on Locale {
   String get nativeName {
-    if (languageCode == 'zh' && countryCode == 'TW') {
-      return '繁體中文';
-    } else if (languageCode == 'zh') {
-      return '簡體中文';
+    switch (toString()) {
+      case 'zh_TW':
+        return '繁體中文';
+      case 'zh_CN':
+        return '简体中文';
+      case 'zh':
+        return '简体中文';
+      case 'en':
+        return 'English';
+      case 'ja':
+        return '日本語';
+      case 'ko':
+        return '한국어';
+      case 'vi':
+        return 'Tiếng Việt';
+      case 'ru':
+        return 'Русский';
+      default:
+        return toString();
     }
-
-    return LocaleNamesLocalizationsDelegate.nativeLocaleNames[toString()] ?? '';
   }
 
   Widget get flag {
