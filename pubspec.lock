@@ -482,34 +482,38 @@ packages:
   flutter_background_service:
     dependency: "direct main"
     description:
-      name: flutter_background_service
-      sha256: "70a1c185b1fa1a44f8f14ecd6c86f6e50366e3562f00b2fa5a54df39b3324d3d"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_background_service"
+      ref: master
+      resolved-ref: "75d76462be640b4db655a42aa49e853deace1cdc"
+      url: "https://github.com/ExpTechTW/flutter_background_service.git"
+    source: git
     version: "5.1.0"
   flutter_background_service_android:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      name: flutter_background_service_android
-      sha256: b73d903056240e23a5c56d9e52d3a5d02ae41cb18b2988a97304ae37b2bae4bf
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_background_service_android"
+      ref: HEAD
+      resolved-ref: "75d76462be640b4db655a42aa49e853deace1cdc"
+      url: "https://github.com/ExpTechTW/flutter_background_service.git"
+    source: git
     version: "6.3.0"
   flutter_background_service_ios:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      name: flutter_background_service_ios
-      sha256: "6037ffd45c4d019dab0975c7feb1d31012dd697e25edc05505a4a9b0c7dc9fba"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_background_service_ios"
+      ref: HEAD
+      resolved-ref: "75d76462be640b4db655a42aa49e853deace1cdc"
+      url: "https://github.com/ExpTechTW/flutter_background_service.git"
+    source: git
     version: "5.0.3"
   flutter_background_service_platform_interface:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      name: flutter_background_service_platform_interface
-      sha256: ca74aa95789a8304f4d3f57f07ba404faa86bed6e415f83e8edea6ad8b904a41
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/flutter_background_service_platform_interface"
+      ref: HEAD
+      resolved-ref: "75d76462be640b4db655a42aa49e853deace1cdc"
+      url: "https://github.com/ExpTechTW/flutter_background_service.git"
+    source: git
     version: "5.1.2"
   flutter_cache_manager:
     dependency: transitive
