@@ -20,10 +20,12 @@ class SettingsDonatePage extends StatefulWidget {
 }
 
 class _SettingsDonatePageState extends State<SettingsDonatePage> {
+  bool isPending = false;
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   Completer<List<ProductDetails>> products = Completer()..future.onError((_, _) => []);
 
   final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
+  late final StreamSubscription<List<PurchaseDetails>> subscription;
 
   Future<void> refresh() async {
     setState(() => products = Completer<List<ProductDetails>>());
@@ -48,7 +50,39 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   void initState() {
     super.initState();
     _refreshIndicatorKey.currentState?.show();
+
+    subscription = InAppPurchase.instance.purchaseStream.listen(onPurchaseUpdate, onError: (error) {
+      setState(() => isPending = false);
+    });
     refresh();
+  }
+
+  void onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
+    for (final purchaseDetails in purchaseDetailsList) {
+      switch (purchaseDetails.status) {
+        case PurchaseStatus.purchased:
+        case PurchaseStatus.restored:
+          if (purchaseDetails.pendingCompletePurchase) {
+            InAppPurchase.instance.completePurchase(purchaseDetails);
+          }
+          setState(() => isPending = false);
+          break;
+
+        case PurchaseStatus.error:
+        case PurchaseStatus.canceled:
+          setState(() => isPending = false);
+          break;
+
+        case PurchaseStatus.pending:
+          break;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -103,13 +137,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                         subtitle: Text(product.description),
                         trailing: Text('${product.price}/月'),
                         onTap: () {
-                          if (product.isSubscription) {
-                            InAppPurchase.instance.buyNonConsumable(
-                              purchaseParam: PurchaseParam(productDetails: product),
-                            );
-                          } else {
-                            InAppPurchase.instance.buyConsumable(purchaseParam: PurchaseParam(productDetails: product));
-                          }
+                          if (isPending) return;
+                          setState(() => isPending = true);
+                          final purchaseParam = PurchaseParam(productDetails: product);
+                          InAppPurchase.instance.buyNonConsumable(purchaseParam: purchaseParam);
                         },
                       ),
                   ],
@@ -126,13 +157,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                         subtitle: Text(product.description),
                         trailing: Text(product.price),
                         onTap: () {
-                          if (product.isSubscription) {
-                            InAppPurchase.instance.buyNonConsumable(
-                              purchaseParam: PurchaseParam(productDetails: product),
-                            );
-                          } else {
-                            InAppPurchase.instance.buyConsumable(purchaseParam: PurchaseParam(productDetails: product));
-                          }
+                          if (isPending) return;
+                          setState(() => isPending = true);
+                          final purchaseParam = PurchaseParam(productDetails: product);
+                          InAppPurchase.instance.buyConsumable(purchaseParam: purchaseParam);
                         },
                       ),
                   ],
