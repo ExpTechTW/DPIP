@@ -205,27 +205,27 @@ class _IntensityPageState extends State<IntensityPage> {
       width: 300,
       child: Row(
         children:
-            intensities.map((intensity) {
-              return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
-            }).toList(),
+        intensities.map((intensity) {
+          return Expanded(child: Container(color: IntensityColor.intensity(intensity)));
+        }).toList(),
       ),
     );
   }
 
   Widget _buildColorBarLabels() {
-    final labels = List.generate(9, (i) => context.i18n.intensity('${i + 1}'));
-
+    final intensities = [1, 2, 3, 4, 51, 52, 61, 62, 7];
+    final labels = intensities.map((i) => context.i18n.intensity('$i')).toList();
     return SizedBox(
       width: 300,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children:
-            labels.map((label) {
-              return SizedBox(
-                width: 300 / 9,
-                child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
-              );
-            }).toList(),
+        labels.map((label) {
+          return SizedBox(
+            width: 300 / 9,
+            child: Text(label, style: const TextStyle(fontSize: 10), textAlign: TextAlign.center),
+          );
+        }).toList(),
       ),
     );
   }
