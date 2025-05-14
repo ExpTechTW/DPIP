@@ -8,9 +8,9 @@ extension NativeLocale on Locale {
       case 'zh_TW':
         return '繁體中文';
       case 'zh_CN':
-        return '简体中文';
+        return '簡體中文';
       case 'zh':
-        return '简体中文';
+        return '簡體中文';
       case 'en':
         return 'English';
       case 'ja':
