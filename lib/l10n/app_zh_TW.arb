@@ -914,7 +914,7 @@
   "@only_used_during_earthquake_alerts": {
     "description": "「地圖」路徑 → 強震監視器 → 「！」圖例 → 此項目僅在地震速報時使用"
   },
-  "intensity": "{count, select, 5{5弱} 6{5強} 7{6弱} 8{6強} other{{count}級}}",
+  "intensity": "{count, select, 5{5弱} 6{5強} 7{6弱} 8{6強} 9{7級} other{{count}級}}",
   "@intensity": {
     "description": "震度",
     "placeholders": {
