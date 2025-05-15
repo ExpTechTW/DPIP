@@ -928,8 +928,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
   }
 
   Widget _buildColorBarLabels() {
-    final intensities = [1, 2, 3, 4, 51, 52, 61, 62, 7];
-    final labels = intensities.map((i) => context.i18n.intensity('$i')).toList();
+    final labels = List.generate(9, (i) => context.i18n.intensity('${i + 1}'));
 
     return SizedBox(
       width: 300,
