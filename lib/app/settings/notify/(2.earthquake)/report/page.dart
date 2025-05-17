@@ -35,12 +35,12 @@ class SettingsNotifyReportPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_report_minor,
               subtitle: Text(context.i18n.report_description_sound),
-              type: 'report-general',
+              type: 'report-general-v2',
             ),
             SoundListTile(
               title: context.i18n.sound_report_silent,
               subtitle: Text(context.i18n.sound_report_silent_h2),
-              type: 'report-silence',
+              type: 'report-silence-v2',
             ),
           ],
         ),

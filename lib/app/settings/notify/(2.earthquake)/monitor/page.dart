@@ -35,7 +35,7 @@ class SettingsNotifyMonitorPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_monitor_minor,
               subtitle: Text(context.i18n.eq_description_sound),
-              type: 'eq',
+              type: 'eq-v2',
             ),
           ],
         ),
