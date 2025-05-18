@@ -7,6 +7,25 @@
 
 ## [未發布]
 
+### 新增
+- 新增 Play 商店內建更新功能。
+
+## [3.0.008] - 2025-05-18
+
+### 新增
+- 新增 iOS 啟動畫面 icon。
+
+### 更改
+- 移除 部分套件以減少 app 大小。
+- 移除 iOS 停用 icon 資源。
+- 移除未使用的 iOS 檔案。
+
+### 修復
+- 修正 Android 自動定位服務 icon 問題。
+- 修復 iOS 贊助重複購買問題，簡化消耗性商品流程。
+- 修正震度速報資訊列表中的震度文字顯示錯誤。
+- 修正音效測試key設定。
+
 ## [3.0.007] - 2025-05-12
 
 ### 新增
@@ -54,7 +73,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.007...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.008...HEAD
+[3.0.008]: https://github.com/exptechtw/dpip/compare/v3.0.007...v3.0.008
 [3.0.007]: https://github.com/exptechtw/dpip/compare/v3.0.006...v3.0.007
 [3.0.006]: https://github.com/exptechtw/dpip/compare/v3.0.005...v3.0.006
 [3.0.005]: https://github.com/exptechtw/dpip/compare/v3.0.004...v3.0.005
