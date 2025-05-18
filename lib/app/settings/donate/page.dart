@@ -70,6 +70,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
 
         case PurchaseStatus.error:
         case PurchaseStatus.canceled:
+          if (purchaseDetails.pendingCompletePurchase) {
+            InAppPurchase.instance.completePurchase(purchaseDetails);
+          }
           setState(() => isPending = false);
           break;
 
@@ -169,6 +172,16 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。',
                 contentAlignment: TextAlign.justify,
               ),
+              // FilledButton.tonalIcon(
+              //   icon: const Icon(Icons.restore),
+              //   label: const Text('恢復購買'),
+              //   onPressed: () {
+              //     InAppPurchase.instance.restorePurchases();
+              //     ScaffoldMessenger.of(context).showSnackBar(
+              //       const SnackBar(content: Text('已開始恢復先前的購買項目（不包含單次支援的購買）')),
+              //     );
+              //   },
+              // ),
             ],
           );
         },
