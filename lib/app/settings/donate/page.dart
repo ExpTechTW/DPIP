@@ -22,10 +22,9 @@ class SettingsDonatePage extends StatefulWidget {
 class _SettingsDonatePageState extends State<SettingsDonatePage> {
   bool isPending = false;
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  Completer<List<ProductDetails>> products = Completer()..future.onError((_, _) => []);
+  Completer<List<ProductDetails>> products = Completer();
 
   final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
-  late final StreamSubscription<List<PurchaseDetails>> subscription;
 
   Future<void> refresh() async {
     setState(() => products = Completer<List<ProductDetails>>());
@@ -50,10 +49,6 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   void initState() {
     super.initState();
     _refreshIndicatorKey.currentState?.show();
-
-    subscription = InAppPurchase.instance.purchaseStream.listen(onPurchaseUpdate, onError: (error) {
-      setState(() => isPending = false);
-    });
     refresh();
   }
 
@@ -80,12 +75,6 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
           break;
       }
     }
-  }
-
-  @override
-  void dispose() {
-    subscription.cancel();
-    super.dispose();
   }
 
   @override
