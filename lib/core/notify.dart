@@ -9,7 +9,7 @@ Future<void> notifyInit() async {
     'resource://drawable/ic_stat_name',
     [
       NotificationChannel(
-        channelGroupKey: 'group_eew',
+        channelGroupKey: 'group_eew-v2',
         channelKey: 'eew_alert-important-v2',
         channelName: '緊急地震速報(重大)',
         channelDescription: '最大震度 5 弱以上以及所在地(鄉鎮)預估震度 4 以上',
@@ -26,7 +26,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eew',
+        channelGroupKey: 'group_eew-v2',
         channelKey: 'eew_alert-general-v2',
         channelName: '緊急地震速報(一般)',
         channelDescription: '最大震度 5 弱以上以及所在地(鄉鎮)預估震度 2 以上',
@@ -42,7 +42,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eew',
+        channelGroupKey: 'group_eew-v2',
         channelKey: 'eew_alert-silent-v2',
         channelName: '緊急地震速報(無聲通知)',
         channelDescription: '最大震度 5 弱以上以及所在地(鄉鎮)預估震度 1 以上',
@@ -55,7 +55,7 @@ Future<void> notifyInit() async {
         vibrationPattern: lowVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eew',
+        channelGroupKey: 'group_eew-v2',
         channelKey: 'eew-important-v2',
         channelName: '地震速報(重大)',
         channelDescription: '所在地(鄉鎮)預估震度 4 以上',
@@ -72,7 +72,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eew',
+        channelGroupKey: 'group_eew-v2',
         channelKey: 'eew-general-v2',
         channelName: '地震速報(一般)',
         channelDescription: '所在地(鄉鎮)預估震度 2 以上',
@@ -88,7 +88,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eew',
+        channelGroupKey: 'group_eew-v2',
         channelKey: 'eew-silence-v2',
         channelName: '地震速報 (無聲通知)',
         channelDescription: '所在地(鄉鎮)預估震度 1 以上',
@@ -101,7 +101,7 @@ Future<void> notifyInit() async {
         vibrationPattern: lowVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eq',
+        channelGroupKey: 'group_eq-v2',
         channelKey: 'int_report-general-v2',
         channelName: '震度速報(一般)',
         channelDescription: '所在地(鄉鎮)實測震度 3 以上',
@@ -115,7 +115,7 @@ Future<void> notifyInit() async {
         vibrationPattern: highVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eq',
+        channelGroupKey: 'group_eq-v2',
         channelKey: 'int_report-silence-v2',
         channelName: '震度速報 (無聲通知)',
         channelDescription: '所在地(鄉鎮)實測震度 1 以上',
@@ -128,7 +128,7 @@ Future<void> notifyInit() async {
         vibrationPattern: lowVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eq',
+        channelGroupKey: 'group_eq-v2',
         channelKey: 'eq-v2',
         channelName: '強震監視器(一般)',
         channelDescription: '偵測到晃動',
@@ -142,7 +142,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eq',
+        channelGroupKey: 'group_eq-v2',
         channelKey: 'report-general-v2',
         channelName: '地震報告(一般)',
         channelDescription: '地震報告所在地震度 3 以上',
@@ -156,7 +156,7 @@ Future<void> notifyInit() async {
         vibrationPattern: lowVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_eq',
+        channelGroupKey: 'group_eq-v2',
         channelKey: 'report-silence-v2',
         channelName: '地震報告 (無聲通知)',
         channelDescription: '地震報告所在地震度 3 以下的地區',
@@ -169,7 +169,7 @@ Future<void> notifyInit() async {
         enableVibration: false,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_rain',
+        channelGroupKey: 'group_weather-v2',
         channelKey: 'thunderstorm-general-v2',
         channelName: '雷雨即時訊息(一般)',
         channelDescription: '所在地(鄉鎮)發布雷雨即時訊息或山區暴雨時',
@@ -183,7 +183,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_weather',
+        channelGroupKey: 'group_weather-v2',
         channelKey: 'weather_major-important-v2',
         channelName: '天氣警特報(重大)',
         channelDescription: '所在地(鄉鎮)發布紅色燈號之天氣警特報',
@@ -200,7 +200,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_weather',
+        channelGroupKey: 'group_weather-v2',
         channelKey: 'weather_minor-general-v2',
         channelName: '天氣警特報(一般)',
         channelDescription: '所在地(鄉鎮)發布上述除外燈號之天氣警特報',
@@ -214,7 +214,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_evacuation',
+        channelGroupKey: 'group_info-v2',
         channelKey: 'evacuation_major-important-v2',
         channelName: '避難資訊(重大)',
         channelDescription: '所在地(鄉鎮)發布防空、土石流、淹水或堰塞湖避難警訊時',
@@ -231,7 +231,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_evacuation',
+        channelGroupKey: 'group_info-v2',
         channelKey: 'evacuation_minor-general-v2',
         channelName: '避難資訊(一般)',
         channelDescription: '所在地(鄉鎮)發布防空、土石流、淹水或堰塞湖避難警訊時',
@@ -245,7 +245,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_tsunami',
+        channelGroupKey: 'group_tsunami-v2',
         channelKey: 'tsunami-important-v2',
         channelName: '海嘯資訊(重大)',
         channelDescription: '海嘯警報發布時，沿海地區鄉鎮',
@@ -262,7 +262,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_tsunami',
+        channelGroupKey: 'group_tsunami-v2',
         channelKey: 'tsunami-general-v2',
         channelName: '海嘯資訊(一般)',
         channelDescription: '海嘯警報發布時，上述除外地區',
@@ -276,7 +276,7 @@ Future<void> notifyInit() async {
         vibrationPattern: lowVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_tsunami',
+        channelGroupKey: 'group_tsunami-v2',
         channelKey: 'tsunami-silent-v2',
         channelName: '太平洋海嘯消息 (無聲通知)',
         channelDescription: '地震報告所在地震度 3 以下的地區',
@@ -289,7 +289,7 @@ Future<void> notifyInit() async {
         enableVibration: false,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_other',
+        channelGroupKey: 'group_other-v2',
         channelKey: 'announcement-general-v2',
         channelName: '其他通知',
         channelDescription: '發送公告時',
@@ -304,10 +304,12 @@ Future<void> notifyInit() async {
       ),
     ],
     channelGroups: [
-      NotificationChannelGroup(channelGroupKey: 'group_eew', channelGroupName: '地震速報音效'),
-      NotificationChannelGroup(channelGroupKey: 'group_eq', channelGroupName: '地震資訊'),
-      NotificationChannelGroup(channelGroupKey: 'group_info', channelGroupName: '防災資訊'),
-      NotificationChannelGroup(channelGroupKey: 'group_other', channelGroupName: '其他'),
+      NotificationChannelGroup(channelGroupKey: 'group_eew-v2', channelGroupName: '地震速報音效_生效'),
+      NotificationChannelGroup(channelGroupKey: 'group_eq-v2', channelGroupName: '地震資訊_生效'),
+      NotificationChannelGroup(channelGroupKey: 'group_weather-v2', channelGroupName: '天氣資訊_生效'),
+      NotificationChannelGroup(channelGroupKey: 'group_info-v2', channelGroupName: '防災資訊_生效'),
+      NotificationChannelGroup(channelGroupKey: 'group_tsunami-v2', channelGroupName: '海嘯資訊_生效'),
+      NotificationChannelGroup(channelGroupKey: 'group_other-v2', channelGroupName: '其他_生效'),
     ],
     debug: true,
   );
