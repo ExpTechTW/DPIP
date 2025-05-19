@@ -35,7 +35,7 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.announcement,
               subtitle: Text(context.i18n.server_announcement_description_sound),
-              type: 'announcement-general-v2',
+              type: 'announcement-general',
             ),
           ],
         ),

@@ -35,12 +35,12 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_int_report_minor,
               subtitle: Text(context.i18n.sound_int_report_minor_h2),
-              type: 'int_report-general-v2',
+              type: 'int_report-general',
             ),
             SoundListTile(
               title: context.i18n.sound_int_report_silent,
               subtitle: Text(context.i18n.sound_int_report_silent_h2),
-              type: 'int_report-silence-v2',
+              type: 'int_report-silence',
             ),
           ],
         ),

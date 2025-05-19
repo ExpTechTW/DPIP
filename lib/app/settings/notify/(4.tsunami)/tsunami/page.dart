@@ -35,17 +35,17 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_major,
               subtitle: Text(context.i18n.tsunami_alert_description_sound),
-              type: 'tsunami-important-v2',
+              type: 'tsunami-important',
             ),
             SoundListTile(
               title: context.i18n.me_general,
               subtitle: Text(context.i18n.tsunami_alert2_description_sound),
-              type: 'tsunami-general-v2',
+              type: 'tsunami-general',
             ),
             SoundListTile(
               title: context.i18n.sound_tsunami_silent,
               subtitle: Text(context.i18n.sound_tsunami_silent_h2),
-              type: 'tsunami-silent-v2',
+              type: 'tsunami-silent',
             ),
           ],
         ),

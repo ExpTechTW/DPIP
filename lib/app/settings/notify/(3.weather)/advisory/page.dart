@@ -35,12 +35,12 @@ class SettingsNotifyAdvisoryPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_major,
               subtitle: Text(context.i18n.sound_weather_major_h2),
-              type: 'weather_major-important-v2',
+              type: 'weather_major-important',
             ),
             SoundListTile(
               title: '一般',
               subtitle: Text(context.i18n.sound_weather_minor_h2),
-              type: 'weather_minor-general-v2',
+              type: 'weather_minor-general',
             ),
           ],
         ),

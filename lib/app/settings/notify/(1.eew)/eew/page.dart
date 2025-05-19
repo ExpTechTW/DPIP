@@ -35,32 +35,32 @@ class SettingsNotifyEewPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_eew_alert_major,
               subtitle: Text(context.i18n.eew_alert_description_sound),
-              type: 'eew_alert-important-v2',
+              type: 'eew_alert-important',
             ),
             SoundListTile(
               title: context.i18n.sound_eew_minor,
               subtitle: Text(context.i18n.eew_description_sound),
-              type: 'eew_alert-general-v2',
+              type: 'eew_alert-general',
             ),
             SoundListTile(
               title: context.i18n.sound_eew_silent,
               subtitle: Text(context.i18n.sound_eew_silent_h2),
-              type: 'eew_alert-silent-v2',
+              type: 'eew_alert-silent',
             ),
             SoundListTile(
               title: context.i18n.sound_earthquake_eew_major,
               subtitle: Text(context.i18n.sound_earthquake_eew_major_h2),
-              type: 'eew-important-v2',
+              type: 'eew-important',
             ),
             SoundListTile(
               title: context.i18n.sound_earthquake_eew_minor,
               subtitle: Text(context.i18n.sound_earthquake_eew_minor_h2),
-              type: 'eew-general-v2',
+              type: 'eew-general',
             ),
             SoundListTile(
               title: context.i18n.sound_earthquake_eew_silent,
               subtitle: Text(context.i18n.sound_earthquake_eew_silent_h2),
-              type: 'eew-silence-v2',
+              type: 'eew-silence',
             ),
           ],
         ),

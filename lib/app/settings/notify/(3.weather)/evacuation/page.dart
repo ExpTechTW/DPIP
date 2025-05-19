@@ -35,12 +35,12 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
             SoundListTile(
               title: context.i18n.sound_major,
               subtitle: Text(context.i18n.sound_evacuation_major_h2),
-              type: 'evacuation_major-important-v2',
+              type: 'evacuation_major-important',
             ),
             SoundListTile(
               title: '一般',
               subtitle: Text(context.i18n.sound_evacuation_minor_h2),
-              type: 'evacuation_minor-general-v2',
+              type: 'evacuation_minor-general',
             ),
           ],
         ),

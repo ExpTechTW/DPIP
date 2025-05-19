@@ -32,11 +32,7 @@ class SettingsNotifyThunderstormPage extends StatelessWidget {
         SettingsListSection(
           title: context.i18n.notify_test,
           children: [
-            SoundListTile(
-              title: '一般',
-              subtitle: Text(context.i18n.sound_rain_minor_h2),
-              type: 'thunderstorm-general-v2',
-            ),
+            SoundListTile(title: '一般', subtitle: Text(context.i18n.sound_rain_minor_h2), type: 'thunderstorm-general'),
           ],
         ),
         const SettingsListTextSection(
