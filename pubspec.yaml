@@ -14,7 +14,6 @@ dependencies:
   cached_network_image: ^3.4.1
   clipboard: 0.1.3
   collection: ^1.19.1
-  dash_flags: ^0.1.1
   device_info_plus: ^11.4.0
   disable_battery_optimization:
     git:
@@ -36,6 +35,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.7
+  flutter_svg: ^2.1.0
   fluttertoast: 8.2.12
   freezed_annotation: ^3.0.0
   geolocator: ^14.0.0
@@ -79,6 +79,7 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
+  - assets/flags/
   - assets/map/
   - assets/map/icons/
   - assets/DPIP.png

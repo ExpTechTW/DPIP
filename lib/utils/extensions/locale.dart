@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:dash_flags/dash_flags.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 extension NativeLocale on Locale {
   String get nativeName {
@@ -26,11 +25,35 @@ extension NativeLocale on Locale {
     }
   }
 
-  Widget get flag {
-    if (countryCode == 'TW') {
-      return CountryFlag(country: Country.tw, height: 24);
+  String? flagCodeFromLocale(Locale locale) {
+    switch (locale.toString()) {
+      case 'zh_TW':
+        return 'tw';
+      case 'zh_CN':
+      case 'zh':
+        return 'cn';
+      case 'en':
+        return 'us';
+      case 'ja':
+        return 'jp';
+      case 'ko':
+        return 'kr';
+      case 'vi':
+        return 'vn';
+      case 'ru':
+        return 'ru';
+      default:
+        return null;
     }
+  }
 
-    return LanguageFlag(language: Language.fromCode(languageCode), height: 24);
+  Widget get flag {
+    final code = flagCodeFromLocale(this);
+    if (code == null) return const SizedBox.shrink();
+
+    return SvgPicture.asset(
+      'assets/flags/$code.svg',
+      height: 24,
+    );
   }
 }
