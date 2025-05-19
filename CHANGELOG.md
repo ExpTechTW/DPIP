@@ -11,6 +11,14 @@
 - 新增 Play 商店內建更新功能。
 
 ### 修復
+- 修正 Android 12+ 裝置啟動畫面重複顯示的問題。
+
+## [3.0.009] - 2025-05-20
+
+### 更改
+- 國旗圖示改用內建圖片，App 更輕盈。
+
+### 修復
 - 修復 iOS 交易取消後無法再次發起購買的問題。
 
 ## [3.0.008] - 2025-05-18
@@ -19,7 +27,7 @@
 - 新增 iOS 啟動畫面 icon。
 
 ### 更改
-- 移除 部分套件以減少 app 大小。
+- 移除部分套件以減少 app 大小。
 - 移除 iOS 停用 icon 資源。
 
 ### 修復
@@ -74,7 +82,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.008...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.009...HEAD
+[3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
 [3.0.008]: https://github.com/exptechtw/dpip/compare/v3.0.007...v3.0.008
 [3.0.007]: https://github.com/exptechtw/dpip/compare/v3.0.006...v3.0.007
 [3.0.006]: https://github.com/exptechtw/dpip/compare/v3.0.005...v3.0.006
