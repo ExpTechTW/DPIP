@@ -25,6 +25,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   Completer<List<ProductDetails>> products = Completer();
 
   final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
+  late final StreamSubscription<List<PurchaseDetails>> subscription;
 
   Future<void> refresh() async {
     setState(() => products = Completer<List<ProductDetails>>());
@@ -49,6 +50,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   void initState() {
     super.initState();
     _refreshIndicatorKey.currentState?.show();
+
+    subscription = InAppPurchase.instance.purchaseStream.listen(onPurchaseUpdate, onError: (error) {
+      setState(() => isPending = false);
+    });
     refresh();
   }
 
