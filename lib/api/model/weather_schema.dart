@@ -10,8 +10,8 @@ class RealtimeWeatherStation {
   final String county;
   final String town;
   final double altitude;
-  final String lat;
-  final String lng;
+  final double lat;
+  final double lng;
   final double distance;
 
   RealtimeWeatherStation({
@@ -30,8 +30,7 @@ class RealtimeWeatherStation {
 
 @JsonSerializable()
 class RealtimeWeatherWind {
-  final String direction;
-  @JsonKey(fromJson: parseDouble)
+  final double direction;
   final double speed;
 
   RealtimeWeatherWind({required this.direction, required this.speed});
@@ -42,11 +41,9 @@ class RealtimeWeatherWind {
 
 @JsonSerializable()
 class RealtimeWeatherAir {
-  @JsonKey(fromJson: parseDouble)
   final double temperature;
-  @JsonKey(fromJson: parseDouble)
   final double pressure;
-  @JsonKey(fromJson: parseDouble, name: 'relative_humidity')
+  @JsonKey(name: 'relative_humidity')
   final double relativeHumidity;
 
   RealtimeWeatherAir({required this.temperature, required this.pressure, required this.relativeHumidity});
@@ -107,23 +104,23 @@ class RealtimeWeatherWeather {
 
 @JsonSerializable()
 class RealtimeWeatherRainData {
-  final String now;
+  final int now;
   @JsonKey(name: '10m')
-  final String tenMinutes;
+  final int tenMinutes;
   @JsonKey(name: '1h')
-  final String oneHour;
+  final int oneHour;
   @JsonKey(name: '3h')
-  final String threeHours;
+  final int threeHours;
   @JsonKey(name: '6h')
-  final String sixHours;
+  final int sixHours;
   @JsonKey(name: '12h')
-  final String twelveHours;
+  final int twelveHours;
   @JsonKey(name: '24h')
-  final String twentyFourHours;
+  final int twentyFourHours;
   @JsonKey(name: '2d')
-  final String twoDays;
+  final int twoDays;
   @JsonKey(name: '3d')
-  final String threeDays;
+  final int threeDays;
 
   RealtimeWeatherRainData({
     required this.now,
