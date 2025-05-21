@@ -2,10 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
 
 class DpipMap extends StatefulWidget {
   final CameraPosition initialCameraPosition;
@@ -22,6 +29,13 @@ class DpipMap extends StatefulWidget {
   final bool? scrollGesturesEnabled;
   final bool? tiltGesturesEnabled;
 
+  /// Whether to set camera focus to user location when the user longitude or latitude is updated.
+  ///
+  /// Default is `false`.
+  final bool focusUserLocationOnValueUpdate;
+
+  static const kTaiwanCenter = LatLng(23.10, 120.85);
+
   const DpipMap({
     super.key,
     this.initialCameraPosition = const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
@@ -37,6 +51,7 @@ class DpipMap extends StatefulWidget {
     this.dragEnabled,
     this.scrollGesturesEnabled,
     this.tiltGesturesEnabled,
+    this.focusUserLocationOnValueUpdate = false,
   });
 
   @override
@@ -44,65 +59,70 @@ class DpipMap extends StatefulWidget {
 }
 
 class DpipMapState extends State<DpipMap> {
-  late String style = jsonEncode({
-    'version': 8,
-    'name': 'ExpTech Studio',
-    'center': [120.85, 23.10],
-    'zoom': 6.2,
-    'sources': {
-      'map': {
-        'type': 'vector',
-        'url': 'https://lb.exptech.dev/api/v1/map/tiles/tiles.json',
-        'tileSize': 512,
-        'buffer': 64,
-      },
-    },
-    'sprite': '',
-    'glyphs': 'https://glyphs.geolonia.com/{fontstack}/{range}.pbf',
-    'layers': [
-      {
-        'id': 'background',
-        'type': 'background',
-        'paint': {'background-color': context.colors.surface.toHexStringRGB()},
-      },
-      {
-        'id': 'county',
-        'type': 'fill',
-        'source': 'map',
-        'source-layer': 'city',
-        'paint': {'fill-color': context.colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
-      },
-      {
-        'id': 'town',
-        'type': 'fill',
-        'source': 'map',
-        'source-layer': 'town',
-        'paint': {'fill-color': context.colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
-      },
-      {
-        'id': 'county-outline',
-        'source': 'map',
-        'source-layer': 'city',
-        'type': 'line',
-        'paint': {'line-color': context.colors.outline.toHexStringRGB()},
-      },
-      {
-        'id': 'global',
-        'type': 'fill',
-        'source': 'map',
-        'source-layer': 'global',
-        'paint': {'fill-color': context.colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
-      },
-      {
-        'id': 'tsunami',
-        'type': 'line',
-        'source': 'map',
-        'source-layer': 'tsunami',
-        'paint': {'line-opacity': 0, 'line-width': 3, 'line-join': 'round'},
-      },
-    ],
-  });
+  String _getStyleJson(String spritePath) {
+    final colors = context.colors;
 
+    return jsonEncode({
+      'version': 8,
+      'name': 'ExpTech Studio',
+      'center': [120.85, 23.10],
+      'zoom': 6.2,
+      'sources': {
+        'map': {
+          'type': 'vector',
+          'url': 'https://lb.exptech.dev/api/v1/map/tiles/tiles.json',
+          'tileSize': 512,
+          'buffer': 64,
+        },
+      },
+      'sprite': spritePath,
+      'glyphs': 'https://glyphs.geolonia.com/{fontstack}/{range}.pbf',
+      'layers': [
+        {
+          'id': 'background',
+          'type': 'background',
+          'paint': {'background-color': colors.surface.toHexStringRGB()},
+        },
+        {
+          'id': 'county',
+          'type': 'fill',
+          'source': 'map',
+          'source-layer': 'city',
+          'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
+        },
+        {
+          'id': 'town',
+          'type': 'fill',
+          'source': 'map',
+          'source-layer': 'town',
+          'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
+        },
+        {
+          'id': 'county-outline',
+          'source': 'map',
+          'source-layer': 'city',
+          'type': 'line',
+          'paint': {'line-color': colors.outline.toHexStringRGB()},
+        },
+        {
+          'id': 'global',
+          'type': 'fill',
+          'source': 'map',
+          'source-layer': 'global',
+          'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
+        },
+        {
+          'id': 'tsunami',
+          'type': 'line',
+          'source': 'map',
+          'source-layer': 'tsunami',
+          'paint': {'line-opacity': 0, 'line-width': 3, 'line-join': 'round'},
+        },
+      ],
+    });
+  }
+
+  MapLibreMapController? _controller;
   String? styleAbsoluteFilePath;
 
   double adjustedZoom(double zoom) {
@@ -121,23 +141,126 @@ class DpipMapState extends State<DpipMap> {
     }
   }
 
+  Future<void> _updateUserLocation() async {
+    if (!mounted) return;
+
+    try {
+      final controller = _controller;
+      if (controller == null) return;
+
+      final latitude = GlobalProviders.location.latitudeNotifier.value;
+      final longitude = GlobalProviders.location.longitudeNotifier.value;
+
+      if (latitude == null || longitude == null) return;
+
+      final location = LatLng(latitude, longitude);
+
+      final isSourceExists = (await controller.getSourceIds()).contains('user-location');
+      final isLayerExists = (await controller.getLayerIds()).contains('user-location');
+
+      if (!location.isValid) {
+        if (isLayerExists) {
+          await controller.removeLayer('user-location');
+          TalkerManager.instance.info('Removed Layer "user-location"');
+        }
+
+        if (isSourceExists) {
+          await controller.removeSource('user-location');
+          TalkerManager.instance.info('Removed Source "user-location"');
+        }
+
+        await controller.moveCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.2));
+        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
+        return;
+      }
+
+      if (!isSourceExists) {
+        await controller.addSource(
+          'user-location',
+          GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build()),
+        );
+        TalkerManager.instance.info('Added Source "user-location"');
+      } else {
+        await controller.setGeoJsonSource(
+          'user-location',
+          GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build(),
+        );
+        TalkerManager.instance.info('Updated Source "user-location"');
+      }
+
+      if (!isLayerExists) {
+        await controller.addLayer(
+          'user-location',
+          'user-location',
+          const SymbolLayerProperties(
+            symbolZOrder: 'source',
+            iconImage: 'gps',
+            iconSize: [
+              Expressions.interpolate,
+              ['linear'],
+              [Expressions.zoom],
+              5,
+              0.1,
+              10,
+              0.6,
+            ],
+            iconAllowOverlap: true,
+            iconIgnorePlacement: true,
+          ),
+        );
+        TalkerManager.instance.info('Added Layer "user-location"');
+      }
+
+      await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));
+      TalkerManager.instance.info('Moved Camera to $location');
+    } catch (e, s) {
+      TalkerManager.instance.error('DpipMap._updateUserLocation', e, s);
+    }
+  }
+
+  void _initMap() {
+    if (_controller == null) return;
+
+    _updateUserLocation();
+  }
+
   @override
   void initState() {
     super.initState();
 
+    GlobalProviders.location.latitudeNotifier.addListener(_updateUserLocation);
+
     getApplicationDocumentsDirectory().then((dir) async {
       final documentDir = dir.path;
-      final stylesDir = '$documentDir/styles';
+      final mapDir = '$documentDir/map';
 
-      await Directory(stylesDir).create(recursive: true);
+      await Directory(mapDir).create(recursive: true);
 
-      final styleFile = File('$stylesDir/style.json');
+      // Copy sprite.png
+      final spritePngData = await rootBundle.load('assets/sprites.png');
+      final spritePngFile = File('$mapDir/sprites.png');
+      await spritePngFile.writeAsBytes(spritePngData.buffer.asUint8List());
+      final spritePngFile2x = File('$mapDir/sprites@2x.png');
+      await spritePngFile2x.writeAsBytes(spritePngData.buffer.asUint8List());
+      TalkerManager.instance.info('Copied sprite.png to $spritePngFile');
 
-      await styleFile.writeAsString(style);
+      // Copy sprite.json
+      final spriteJsonData = await rootBundle.load('assets/sprites.json');
+      final spriteJsonFile = File('$mapDir/sprites.json');
+      await spriteJsonFile.writeAsBytes(spriteJsonData.buffer.asUint8List());
+      final spriteJsonFile2x = File('$mapDir/sprites@2x.json');
+      await spriteJsonFile2x.writeAsBytes(spriteJsonData.buffer.asUint8List());
+      TalkerManager.instance.info('Copied sprite.json to $spriteJsonFile');
 
-      setState(() {
-        styleAbsoluteFilePath = styleFile.path;
-      });
+      final spriteUri = '${spriteJsonFile.parent.uri}sprites';
+      TalkerManager.instance.info('Sprite is $spriteUri');
+
+      // Create style.json
+      final styleJsonData = _getStyleJson(spriteUri);
+      final styleJsonFile = File('$mapDir/style.json');
+      await styleJsonFile.writeAsString(styleJsonData);
+
+      setState(() => styleAbsoluteFilePath = styleJsonFile.uri.toFilePath());
     });
   }
 
@@ -154,18 +277,30 @@ class DpipMapState extends State<DpipMap> {
       trackCameraPosition: true,
       initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
       styleString: styleAbsoluteFilePath!,
-      onMapCreated: widget.onMapCreated,
-      onMapClick: widget.onMapClick,
-      onMapIdle: widget.onMapIdle,
-      onMapLongClick: widget.onMapLongClick,
       tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
       scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
       rotateGesturesEnabled: widget.rotateGesturesEnabled ?? false,
       zoomGesturesEnabled: widget.zoomGesturesEnabled ?? true,
       doubleClickZoomEnabled: widget.doubleClickZoomEnabled ?? true,
       dragEnabled: widget.dragEnabled ?? true,
-      onStyleLoadedCallback: widget.onStyleLoadedCallback,
       attributionButtonMargins: const Point<double>(-100, -100),
+      onMapCreated: (controller) {
+        _controller = controller;
+        widget.onMapCreated?.call(controller);
+      },
+      onMapClick: widget.onMapClick,
+      onMapIdle: widget.onMapIdle,
+      onMapLongClick: widget.onMapLongClick,
+      onStyleLoadedCallback: () {
+        _initMap();
+        widget.onStyleLoadedCallback?.call();
+      },
     );
+  }
+
+  @override
+  void dispose() {
+    GlobalProviders.location.latitudeNotifier.removeListener(_updateUserLocation);
+    super.dispose();
   }
 }

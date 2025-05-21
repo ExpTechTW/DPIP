@@ -9,7 +9,6 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/utils/need_location.dart';
 import 'package:dpip/utils/radar_color.dart';
 import 'package:dpip/widgets/list/time_selector.dart';
@@ -52,10 +51,6 @@ class _RadarMapState extends State<RadarMap> {
 
   String getTileUrl(String timestamp) {
     return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
-  }
-
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadGPSImage(_mapController);
   }
 
   @override
@@ -108,10 +103,6 @@ class _RadarMapState extends State<RadarMap> {
   }
 
   Future<void> _loadMap() async {
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    await _loadMapImages(isDark);
-
     radar_list = await ExpTech().getRadarList();
     if (!mounted) return;
 

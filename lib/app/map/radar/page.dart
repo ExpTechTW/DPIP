@@ -1,13 +1,10 @@
 import 'package:dpip/models/settings/location.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:dpip/utils/geojson.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/utils/radar_color.dart';
 import 'package:dpip/widgets/list/time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
@@ -36,16 +33,10 @@ class _MapRadarPageState extends State<MapRadarPage> {
   }
 
   Future<void> _initializeMap(LatLng userLocation) async {
-    await loadGPSImage(mapController);
-
     radarList = await ExpTech().getRadarList();
     if (!mounted) return;
 
     await _setupRadarLayer();
-    if (userLocation.isValid) {
-      await _setupUserLocationLayer(userLocation);
-      await _centerMapOnUser(userLocation);
-    }
   }
 
   Future<void> _setupRadarLayer() async {
@@ -53,38 +44,6 @@ class _MapRadarPageState extends State<MapRadarPage> {
     await mapController.addSource('radar-source', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
     mapController.addLayer('radar-source', 'radar', const RasterLayerProperties(), belowLayerId: 'county-outline');
-  }
-
-  Future<void> _setupUserLocationLayer(LatLng userLocation) async {
-    await mapController.addSource(
-      'gps-geojson',
-      GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(userLocation.toFeatureBuilder()).build()),
-    );
-
-    await mapController.addLayer(
-      'gps-geojson',
-      'gps',
-      const SymbolLayerProperties(
-        symbolZOrder: 'source',
-        iconSize: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.5,
-        ],
-        iconImage: 'gps',
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
-  }
-
-  Future<void> _centerMapOnUser(LatLng userLocation) async {
-    final cameraUpdate = CameraUpdate.newLatLngZoom(userLocation, 7);
-    await mapController.moveCamera(cameraUpdate);
   }
 
   void _toggleLegend() {

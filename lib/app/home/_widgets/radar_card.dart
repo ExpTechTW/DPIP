@@ -1,4 +1,3 @@
-import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -8,12 +7,10 @@ import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/map/radar/page.dart';
-import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 typedef PositionUpdateCallback = void Function();
@@ -33,19 +30,13 @@ class _RadarMapCardState extends State<RadarMapCard> {
     return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
   }
 
-  Future<void> _initializeMap(LatLng userLocation) async {
+  Future<void> _initializeMap() async {
     try {
-      await loadGPSImage(mapController);
-
       radarList = await ExpTech().getRadarList();
       if (!mounted) return;
 
       await _setupRadarLayer();
       if (!mounted) return;
-
-      if (userLocation.isValid) {
-        await _setupUserLocationLayer(userLocation);
-      }
     } catch (e) {
       TalkerManager.instance.error('RadarMapCard._initializeMap', e);
     }
@@ -69,38 +60,6 @@ class _RadarMapCardState extends State<RadarMapCard> {
     }
   }
 
-  Future<void> _setupUserLocationLayer(LatLng userLocation) async {
-    try {
-      await mapController.addSource(
-        'gps-geojson',
-        GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(userLocation.toFeatureBuilder()).build()),
-      );
-      if (!mounted) return;
-
-      await mapController.addLayer(
-        'gps-geojson',
-        'gps',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    } catch (e) {
-      TalkerManager.instance.error('RadarMapCard._setupUserLocationLayer', e);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -119,19 +78,15 @@ class _RadarMapCardState extends State<RadarMapCard> {
                 children: [
                   SizedBox(
                     height: 200,
-                    child: Selector<SettingsLocationModel, ({double? latitude, double? longitude})>(
-                      selector: (context, location) => (latitude: location.latitude, longitude: location.longitude),
+                    child: Selector<SettingsUserInterfaceModel, ({ThemeMode? themeMode, Color? themeColor})>(
+                      selector: (context, ui) => (themeMode: ui.themeMode, themeColor: ui.themeColor),
                       builder: (context, data, _) {
-                        final userLocation = LatLng(data.latitude ?? 0, data.longitude ?? 0);
+                        final (:themeMode, :themeColor) = data;
 
                         return DpipMap(
-                          key: Key(userLocation.toString()),
+                          key: Key('$themeMode-$themeColor'),
                           onMapCreated: (controller) => mapController = controller,
-                          onStyleLoadedCallback: () => _initializeMap(userLocation),
-                          initialCameraPosition:
-                              userLocation.isValid
-                                  ? CameraPosition(target: userLocation, zoom: 7)
-                                  : const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
+                          onStyleLoadedCallback: () => _initializeMap(),
                           dragEnabled: false,
                           rotateGesturesEnabled: false,
                           zoomGesturesEnabled: false,

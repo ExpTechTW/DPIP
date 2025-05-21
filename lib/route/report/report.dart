@@ -60,8 +60,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
     setState(() => isLoading = true);
 
     try {
-      final isDark = context.theme.brightness == Brightness.dark;
-
       final data = await ExpTech().getReport(widget.id);
       final controller = await mapController.future;
 
@@ -144,9 +142,6 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       //     lineColor: context.colors.outline.toHexStringRGB(),
       //   ),
       // );
-
-      await loadIntensityImage(controller, isDark);
-      await loadCrossImage(controller);
 
       await controller.addLayer(
         'markers-geojson',

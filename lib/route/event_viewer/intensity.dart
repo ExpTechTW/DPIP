@@ -17,7 +17,6 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/utils/need_location.dart';
 import 'package:dpip/utils/parser.dart';
 import 'package:dpip/widgets/chip/label_chip.dart';
@@ -58,10 +57,6 @@ class _IntensityPageState extends State<IntensityPage> {
     super.dispose();
   }
 
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadGPSImage(_mapController);
-  }
-
   void _initMap(MapLibreMapController controller) {
     _mapController = controller;
   }
@@ -92,10 +87,6 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Future<void> _loadMap() async {
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    await _loadMapImages(isDark);
-
     radarList = await ExpTech().getRadarList();
 
     if (Platform.isIOS && GlobalProviders.location.auto) {

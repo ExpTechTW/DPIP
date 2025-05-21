@@ -18,7 +18,6 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/utils/need_location.dart';
 import 'package:dpip/utils/parser.dart';
 import 'package:dpip/utils/radar_color.dart';
@@ -59,10 +58,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
   }
 
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadGPSImage(_mapController);
-  }
-
   void _initMap(MapLibreMapController controller) {
     _mapController = controller;
   }
@@ -93,10 +88,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Future<void> _loadMap() async {
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    await _loadMapImages(isDark);
-
     radarList = await ExpTech().getRadarList();
 
     final String newTileUrl = getTileUrl(radarList.last);

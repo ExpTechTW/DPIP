@@ -18,7 +18,6 @@ import 'package:dpip/app_old/page/map/tsunami/tsunami_observed_list.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 class TsunamiMap extends StatefulWidget {
@@ -44,11 +43,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
     _mapController = controller;
   }
 
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadGPSImage(_mapController);
-    await loadCrossImage(_mapController);
-  }
-
   Future<void> _loadMap() async {
     final isDark = context.theme.brightness == Brightness.dark;
 
@@ -61,8 +55,6 @@ class _TsunamiMapState extends State<TsunamiMap> {
     if (tsunami != null) {
       await addTsunamiObservationPoints(tsunami!);
     }
-
-    await _loadMapImages(isDark);
 
     if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();

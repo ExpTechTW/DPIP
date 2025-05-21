@@ -72,8 +72,7 @@ class LocationService {
     );
 
     if (distanceInMeters >= 250) {
-      GlobalProviders.location.setLatitude(currentPosition.latitude);
-      GlobalProviders.location.setLongitude(currentPosition.longitude);
+      GlobalProviders.location.setLatLng(latitude: currentPosition.latitude, longitude: currentPosition.longitude);
       GlobalProviders.location.setCode(currentLocation?.code.toString());
       hasLocationChanged = true;
       TalkerManager.instance.debug('距離: $distanceInMeters 更新位置');

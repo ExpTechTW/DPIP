@@ -64,8 +64,10 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
                         setState(() => loadingTown = null);
 
                         context.read<SettingsLocationModel>().setCode(town.key);
-                        context.read<SettingsLocationModel>().setLongitude(town.value.lng);
-                        context.read<SettingsLocationModel>().setLatitude(town.value.lat);
+                        context.read<SettingsLocationModel>().setLatLng(
+                          latitude: town.value.lat,
+                          longitude: town.value.lng,
+                        );
                         context.popUntil(SettingsLocationPage.route);
                       },
                     ),

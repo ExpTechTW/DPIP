@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter/services.dart';
-
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/utils/geojson.dart';
@@ -26,70 +24,6 @@ List<double> expandBounds(List<double> bounds, LatLng point) {
   }
 
   return bounds;
-}
-
-@Deprecated('Migrate symbol image loading to sprite')
-Future<void> loadIntensityImage(MapLibreMapController controller, [bool dark = false]) async {
-  for (var i = 1; i < 10; i++) {
-    final path = "assets/map/icons/intensity-$i${dark ? "" : "-dark"}.png";
-
-    await controller.addImage('intensity-$i', Uint8List.sublistView(await rootBundle.load(path)));
-  }
-}
-
-@Deprecated('Migrate symbol image loading to sprite')
-Future<void> loadCrossImage(MapLibreMapController controller) async {
-  await controller.addImage('cross', Uint8List.sublistView(await rootBundle.load('assets/map/icons/cross.png')));
-}
-
-@Deprecated('Migrate symbol image loading to sprite')
-Future<void> loadGPSImage(MapLibreMapController controller) async {
-  await controller.addImage('gps', Uint8List.sublistView(await rootBundle.load('assets/map/icons/gps.png')));
-}
-
-@Deprecated('Migrate symbol image loading to sprite')
-Future<void> loadWindImage(MapLibreMapController controller) async {
-  await controller.addImage('wind-1', Uint8List.sublistView(await rootBundle.load('assets/map/icons/wind-1.png')));
-  await controller.addImage('wind-2', Uint8List.sublistView(await rootBundle.load('assets/map/icons/wind-2.png')));
-  await controller.addImage('wind-3', Uint8List.sublistView(await rootBundle.load('assets/map/icons/wind-3.png')));
-  await controller.addImage('wind-4', Uint8List.sublistView(await rootBundle.load('assets/map/icons/wind-4.png')));
-  await controller.addImage('wind-5', Uint8List.sublistView(await rootBundle.load('assets/map/icons/wind-5.png')));
-}
-
-@Deprecated('Migrate symbol image loading to sprite')
-Future<void> loadLightningImage(MapLibreMapController controller) async {
-  await controller.addImage(
-    'lightning-1-5',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-1-5.png')),
-  );
-  await controller.addImage(
-    'lightning-1-10',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-1-10.png')),
-  );
-  await controller.addImage(
-    'lightning-1-30',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-1-30.png')),
-  );
-  await controller.addImage(
-    'lightning-1-60',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-1-60.png')),
-  );
-  await controller.addImage(
-    'lightning-0-5',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-0-5.png')),
-  );
-  await controller.addImage(
-    'lightning-0-10',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-0-10.png')),
-  );
-  await controller.addImage(
-    'lightning-0-30',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-0-30.png')),
-  );
-  await controller.addImage(
-    'lightning-0-60',
-    Uint8List.sublistView(await rootBundle.load('assets/map/icons/lightning-0-60.png')),
-  );
 }
 
 enum Units {

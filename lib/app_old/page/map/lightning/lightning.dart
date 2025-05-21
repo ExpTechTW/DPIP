@@ -8,7 +8,6 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/lightning.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/list/time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -52,10 +51,10 @@ class _LightningMapState extends State<LightningMap> {
   }
 
   Future<void> _loadMap() async {
-    await _loadMapImages();
     if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
       await getSavedLocation();
     }
+
     userLat = Global.preference.getDouble('user-lat') ?? 0.0;
     userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
@@ -120,11 +119,6 @@ class _LightningMapState extends State<LightningMap> {
         ),
       );
     }
-  }
-
-  Future<void> _loadMapImages() async {
-    await loadGPSImage(_mapController);
-    await loadLightningImage(_mapController);
   }
 
   Future<void> _loadLightningData(String time) async {

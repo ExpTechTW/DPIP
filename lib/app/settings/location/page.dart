@@ -344,8 +344,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
     context.read<SettingsLocationModel>().setAuto(!isAuto);
     context.read<SettingsLocationModel>().setCode(null);
-    context.read<SettingsLocationModel>().setLongitude(null);
-    context.read<SettingsLocationModel>().setLatitude(null);
+    context.read<SettingsLocationModel>().setLatLng();
   }
 
   @override

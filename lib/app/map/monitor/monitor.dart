@@ -121,9 +121,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
 
     if (!mounted) return;
 
-    final isDark = context.theme.brightness == Brightness.dark;
-
-    await _loadMapImages(isDark);
     _setupStationSource(data);
     _startDataUpdates();
 
@@ -135,12 +132,6 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
       await _updateTsunamiLine();
       await _updateCrossMarker();
     });
-  }
-
-  Future<void> _loadMapImages(bool isDark) async {
-    await loadIntensityImage(_mapController, isDark);
-    await loadCrossImage(_mapController);
-    await loadGPSImage(_mapController);
   }
 
   Future<void> _setupStationSource(Map<String, Station> data) async {

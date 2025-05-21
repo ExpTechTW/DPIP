@@ -85,8 +85,7 @@ void _setupPositionListener() {
     final location = GeoJsonHelper.checkPointInPolygons(latitude, longitude);
 
     GlobalProviders.location.setCode(location?.code.toString());
-    GlobalProviders.location.setLatitude(latitude);
-    GlobalProviders.location.setLongitude(longitude);
+    GlobalProviders.location.setLatLng(latitude: latitude, longitude: longitude);
 
     HomePage.updatePosition();
     RadarMap.updatePosition();
@@ -183,8 +182,7 @@ Future<void> _onServiceStart(ServiceInstance service) async {
     service.on(ServiceEvent.setAsBackground.name).listen((event) => service.setAsBackgroundService());
     service.on(ServiceEvent.removePosition.name).listen((event) {
       GlobalProviders.location.setCode(null);
-      GlobalProviders.location.setLatitude(null);
-      GlobalProviders.location.setLongitude(null);
+      GlobalProviders.location.setLatLng();
     });
 
     // Define the periodic location update task

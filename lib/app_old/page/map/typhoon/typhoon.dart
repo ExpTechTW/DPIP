@@ -8,7 +8,6 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 class TyphoonMap extends StatefulWidget {
@@ -49,8 +48,6 @@ class _TyphoonMapState extends State<TyphoonMap> {
       userLon = Global.preference.getDouble('user-lon') ?? 0.0;
 
       isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
-      await loadGPSImage(_mapController);
 
       if (isUserLocationValid) {
         await _mapController.addSource(

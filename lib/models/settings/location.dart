@@ -9,8 +9,8 @@ class SettingsLocationModel extends ChangeNotifier {
 
   bool get _auto => Preference.locationAuto ?? false;
   final ValueNotifier<String?> codeNotifier = ValueNotifier(Preference.locationCode);
-  double? get _longitude => Preference.locationLongitude;
-  double? get _latitude => Preference.locationLatitude;
+  final ValueNotifier<double?> longitudeNotifier = ValueNotifier(Preference.locationLongitude);
+  final ValueNotifier<double?> latitudeNotifier = ValueNotifier(Preference.locationLatitude);
   double? get _oldLongitude => Preference.locationOldLongitude;
   double? get _oldLatitude => Preference.locationOldLatitude;
 
@@ -34,18 +34,19 @@ class SettingsLocationModel extends ChangeNotifier {
   }
 
   /// 經度
-  double? get longitude => _longitude;
-  void setLongitude(double? value) {
-    Preference.locationLongitude = value;
-    _log('Changed ${PreferenceKeys.locationLongitude} to ${Preference.locationLongitude}');
-    notifyListeners();
-  }
+  double? get longitude => Preference.locationLongitude;
 
   /// 緯度
-  double? get latitude => _latitude;
-  void setLatitude(double? value) {
-    Preference.locationLatitude = value;
+  double? get latitude => Preference.locationLatitude;
+  void setLatLng({double? latitude, double? longitude}) {
+    Preference.locationLatitude = latitude;
+    latitudeNotifier.value = latitude;
     _log('Changed ${PreferenceKeys.locationLatitude} to ${Preference.locationLatitude}');
+
+    Preference.locationLongitude = longitude;
+    longitudeNotifier.value = longitude;
+    _log('Changed ${PreferenceKeys.locationLongitude} to ${Preference.locationLongitude}');
+
     notifyListeners();
   }
 
