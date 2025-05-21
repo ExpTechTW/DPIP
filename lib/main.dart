@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:dpip/app.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart';
@@ -22,7 +25,13 @@ void main() async {
 
   final talker = TalkerManager.instance;
   talker.log('start');
-  FlutterError.onError = (details) => talker.handle(details.exception, details.stack);
+  FlutterError.onError = (FlutterErrorDetails details) {
+    talker.handle(details.exception, details.stack);
+
+    if (Platform.isAndroid) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
+  };
 
   await Global.init();
   await DeviceInfo.init();
