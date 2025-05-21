@@ -4,5 +4,10 @@
   "editor.rulers": [
     120
   ],
-  "dart.lineLength": 120
+  "dart.lineLength": 120,
+  "markdownlint.config": {
+    "no-duplicate-heading": {
+      "siblings_only": true
+    }
+  }
 }
