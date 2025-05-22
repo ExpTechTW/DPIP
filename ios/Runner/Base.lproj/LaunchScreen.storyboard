@@ -24,7 +24,7 @@
                                 <rect key="frame" x="111.33333333333333" y="340.66666666666669" width="170.66666666666669" height="170.66666666666669"/>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" name="systemBackgroundColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1a2-6s-vTC"/>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
@@ -38,8 +38,5 @@
     </scenes>
     <resources>
         <image name="LaunchImage" width="170.66667175292969" height="170.66667175292969"/>
-        <namedColor name="systemBackgroundColor">
-            <color red="0.32899999618530273" green="0.32400000095367432" blue="0.4779999852180481" alpha="0.33000001311302185" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
     </resources>
 </document>
