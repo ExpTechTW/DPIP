@@ -130,7 +130,9 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
             print("Started monitoring significant location changes")
 
             if let lastLocation = locationManager.location {
-                updateRegionMonitoring(for: lastLocation)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
+                    self.updateRegionMonitoring(for: lastLocation)
+                }
             }
         } else {
             print("Significant location change monitoring is not available")
