@@ -46,8 +46,6 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.0)
     - nanopb (~> 3.30910.0)
   - Flutter (1.0.0)
-  - flutter_background_service_ios (0.0.3):
-    - Flutter
   - flutter_image_gallery_saver (0.0.1):
     - Flutter
   - flutter_local_notifications (0.0.1):
@@ -147,7 +145,6 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
-  - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
   - flutter_image_gallery_saver (from `.symlinks/plugins/flutter_image_gallery_saver/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
@@ -193,8 +190,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
-  flutter_background_service_ios:
-    :path: ".symlinks/plugins/flutter_background_service_ios/ios"
   flutter_image_gallery_saver:
     :path: ".symlinks/plugins/flutter_image_gallery_saver/ios"
   flutter_local_notifications:
@@ -237,7 +232,6 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 9980995bdd06ec8081dfb6ab364162bdd64245c3
   FirebaseMessaging: 2b9f56aa4ed286e1f0ce2ee1d413aabb8f9f5cb9
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  flutter_background_service_ios: e30e0d3ee69e4cee66272d0c78eacd48c2e94aac
   flutter_image_gallery_saver: f356b5f265ba4e36f38b2fe96d0468e0712a6b37
   flutter_local_notifications: ff50f8405aaa0ccdc7dcfb9022ca192e8ad9688f
   fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
