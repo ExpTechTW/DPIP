@@ -584,6 +584,8 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 98Q7JARYZF;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "armv7 armv7s i386";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "x86_64 i386";
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DPIP;
 				IPHONEOS_DEPLOYMENT_TARGET = 13;
@@ -789,6 +791,8 @@
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 98Q7JARYZF;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "armv7 armv7s i386";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "x86_64 i386";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DPIP;
@@ -827,6 +831,8 @@
 				DEPLOYMENT_POSTPROCESSING = YES;
 				DEVELOPMENT_TEAM = 98Q7JARYZF;
 				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "armv7 armv7s i386";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "x86_64 i386";
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DPIP;
 				IPHONEOS_DEPLOYMENT_TARGET = 13;
