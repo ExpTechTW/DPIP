@@ -148,12 +148,7 @@ class DpipMapState extends State<DpipMap> {
       final controller = _controller;
       if (controller == null) return;
 
-      final latitude = GlobalProviders.location.latitudeNotifier.value;
-      final longitude = GlobalProviders.location.longitudeNotifier.value;
-
-      if (latitude == null || longitude == null) return;
-
-      final location = LatLng(latitude, longitude);
+      final location = GlobalProviders.location.coordinateNotifier.value;
 
       final isSourceExists = (await controller.getSourceIds()).contains('user-location');
       final isLayerExists = (await controller.getLayerIds()).contains('user-location');
@@ -228,7 +223,7 @@ class DpipMapState extends State<DpipMap> {
   void initState() {
     super.initState();
 
-    GlobalProviders.location.latitudeNotifier.addListener(_updateUserLocation);
+    GlobalProviders.location.coordinateNotifier.addListener(_updateUserLocation);
 
     getApplicationDocumentsDirectory().then((dir) async {
       final documentDir = dir.path;
@@ -300,7 +295,7 @@ class DpipMapState extends State<DpipMap> {
 
   @override
   void dispose() {
-    GlobalProviders.location.latitudeNotifier.removeListener(_updateUserLocation);
+    GlobalProviders.location.coordinateNotifier.removeListener(_updateUserLocation);
     super.dispose();
   }
 }
