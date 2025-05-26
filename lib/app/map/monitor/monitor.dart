@@ -16,6 +16,7 @@ import 'package:dpip/api/model/station.dart';
 import 'package:dpip/api/model/station_info.dart';
 import 'package:dpip/app/map/monitor/_widgets/layer_toggle.dart';
 import 'package:dpip/app/map/monitor/_widgets/tos_sheet.dart';
+import 'package:dpip/app/map/monitor/eew_info.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/rts.dart';
@@ -31,8 +32,6 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
-
-import 'package:dpip/app/map/monitor/eew_info.dart';
 
 class MapMonitorPage extends StatefulWidget {
   const MapMonitorPage({super.key});
@@ -430,7 +429,7 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
         _updateEewIntensityArea(eew);
         _updateMapArea();
 
-        final Map<String, dynamic> info = eewLocationInfo(
+        final info = eewLocationInfo(
           eew.eq.magnitude,
           eew.eq.depth,
           eew.eq.latitude,
@@ -438,10 +437,10 @@ class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProvid
           userLat,
           userLon,
         );
-        _userEewIntensity[eew.id] = intensityFloatToInt(info['i']);
+        _userEewIntensity[eew.id] = intensityFloatToInt(info.i);
         _userEewArriveTime[eew.id] = {
-          's': (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info['dist'])).floor(),
-          'p': (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info['dist'])).floor(),
+          's': (eew.eq.time + sWaveTimeByDistance(eew.eq.depth, info.dist)).floor(),
+          'p': (eew.eq.time + pWaveTimeByDistance(eew.eq.depth, info.dist)).floor(),
         };
       }
 

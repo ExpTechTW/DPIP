@@ -101,10 +101,10 @@ class ExpTech {
     return Rts.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
   }
 
-  Future<List<Eew>> getEew(int time) async {
+  Future<List<Eew>> getEew([int? time]) async {
     var requestUrl = Route.eew();
 
-    if (time != 0) {
+    if (time != null) {
       requestUrl = Uri.parse(
         requestUrl
             .toString()

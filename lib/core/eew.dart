@@ -1,11 +1,12 @@
 import 'dart:math';
 
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/wave_time.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/list.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
 Map<String, double> psWaveDist(double depth, int time, int now) {
   double pDist = 0;
@@ -224,7 +225,7 @@ WaveTime calculateWaveTime(double depth, double distance) {
   return WaveTime(p: ptime, s: stime);
 }
 
-Map<String, dynamic> eewLocationInfo(
+({double dist, double i}) eewLocationInfo(
   double mag,
   double depth,
   double eqLat,
@@ -239,5 +240,5 @@ Map<String, dynamic> eewLocationInfo(
   if (intensity > 4.5) {
     intensity = eewAreaPgv([eqLat, eqLng], [userLat, userLon], depth, mag);
   }
-  return {'dist': dist, 'i': intensity};
+  return (dist: dist, i: intensity);
 }

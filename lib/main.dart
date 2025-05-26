@@ -48,6 +48,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: GlobalProviders.location),
+        ChangeNotifierProvider.value(value: GlobalProviders.map),
         ChangeNotifierProvider.value(value: GlobalProviders.notification),
         ChangeNotifierProvider.value(value: GlobalProviders.ui),
       ],
