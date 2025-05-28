@@ -13,6 +13,13 @@
 
 ### 更改
 
+- Apple 裝置啟動畫面 icon 改為螢幕寬度的 30%。 (75800b3)
+- 重構 Apple 裝置型號對應邏輯。 (f784217)
+
+## [3.0.010] - 2025-05-23
+
+### 更改
+
 - 地圖圖標改使用 sprite (ff3977692fa354d00912d99474e755d512e70421)
 
 ### 修正
@@ -103,7 +110,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.009...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.010...HEAD
+[3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
 [3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
 [3.0.008]: https://github.com/exptechtw/dpip/compare/v3.0.007...v3.0.008
 [3.0.007]: https://github.com/exptechtw/dpip/compare/v3.0.006...v3.0.007
