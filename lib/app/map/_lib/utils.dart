@@ -1,7 +1,8 @@
-import 'package:dpip/widgets/map/map.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-enum MapLayer { monitor, radar, temperature, precipitation, wind }
+import 'package:dpip/widgets/map/map.dart';
+
+enum MapLayer { monitor, report, tsunami, radar, temperature, precipitation, wind }
 
 class MapSourceIds {
   static const radar = 'radar';

@@ -1,0 +1,378 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+
+import 'package:dpip/utils/extensions/build_context.dart';
+
+typedef MorphingSheetBuilder = Widget Function(BuildContext context, ScrollController controller);
+
+class MorphingSheet extends StatefulWidget {
+  final MorphingSheetBuilder? fullBuilder;
+  final MorphingSheetBuilder partialBuilder;
+  final double maxChildSize;
+  final double fullThreshold;
+  final Duration animationDuration;
+  final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final EdgeInsets floatingPadding;
+  final double elevation;
+  final String? title;
+  final bool showBackButton;
+
+  const MorphingSheet({
+    super.key,
+    this.fullBuilder,
+    required this.partialBuilder,
+    this.maxChildSize = 1.0,
+    this.fullThreshold = 0.8,
+    this.animationDuration = const Duration(milliseconds: 500),
+    this.backgroundColor,
+    this.borderRadius,
+    this.floatingPadding = const EdgeInsets.symmetric(horizontal: 16.0),
+    this.elevation = 8.0,
+    this.title,
+    this.showBackButton = true,
+  });
+
+  @override
+  State<MorphingSheet> createState() => _MorphingSheetState();
+}
+
+class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProviderStateMixin {
+  late DraggableScrollableController _controller;
+  late AnimationController _morphController;
+  bool _isSnapping = false;
+  final GlobalKey _contentKey = GlobalKey();
+  final GlobalKey _partialKey = GlobalKey();
+  bool _isOverflowing = false;
+  Size? _partialSize;
+
+  static const double _verticalPadding = 16.0;
+  static const double _bottomMargin = 16.0;
+  static const double _minHeightRatio = 0.15;
+  static const double _maxHeightRatio = 0.3;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = DraggableScrollableController();
+    _morphController = AnimationController(vsync: this, duration: widget.animationDuration);
+
+    _controller.addListener(_onSheetPositionChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _measureSizes();
+    });
+  }
+
+  void _measureSizes() {
+    final RenderBox? contentBox = _contentKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? partialBox = _partialKey.currentContext?.findRenderObject() as RenderBox?;
+
+    if (contentBox != null) {
+      final screenHeight = context.screen.height;
+      setState(() {
+        _isOverflowing = contentBox.size.height > screenHeight * 0.85;
+      });
+    }
+
+    if (partialBox != null) {
+      setState(() {
+        _partialSize = partialBox.size;
+      });
+    }
+  }
+
+  double get _minChildSize {
+    if (_partialSize == null) return _minHeightRatio;
+    final screenHeight = context.screen.height;
+
+    // 計算包括所有 padding 和 margin 的總高度
+    final totalHeight =
+        _partialSize!.height + // 內容高度
+        (_verticalPadding * 2) + // 上下 padding
+        context.padding.bottom + // 螢幕 padding
+        _bottomMargin + // 下 margin
+        widget.floatingPadding.vertical; // 浮動 padding
+
+    return (totalHeight / screenHeight).clamp(_minHeightRatio, _maxHeightRatio);
+  }
+
+  void _onSheetPositionChanged() {
+    if (_isSnapping) return;
+
+    final position = _controller.size;
+    final morphValue = (position - _minChildSize) / (widget.maxChildSize - _minChildSize);
+    _morphController.value = morphValue.clamp(0.0, 1.0);
+  }
+
+  Future<void> _snapToPosition(double targetPosition) async {
+    if (_isSnapping) return;
+    _isSnapping = true;
+
+    try {
+      final isExpanding = targetPosition > _controller.size;
+      final curve = isExpanding ? Easing.emphasizedDecelerate : Easing.emphasizedAccelerate;
+
+      await _controller.animateTo(targetPosition, duration: widget.animationDuration, curve: curve);
+    } finally {
+      _isSnapping = false;
+    }
+  }
+
+  void _onDragEnd(double position) {
+    if (position >= widget.fullThreshold) {
+      _snapToPosition(widget.maxChildSize);
+    } else {
+      _snapToPosition(_minChildSize);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.fullBuilder == null) {
+      final borderRadius = widget.borderRadius?.topLeft.y ?? 16.0;
+
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: widget.floatingPadding.horizontal,
+            right: widget.floatingPadding.horizontal,
+            bottom: _verticalPadding,
+          ),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: _bottomMargin),
+            child: PhysicalModel(
+              color: Colors.transparent,
+              elevation: widget.elevation,
+              shadowColor: context.colors.shadow.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(borderRadius),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  border: Border.all(
+                    color: context.colors.outline.withValues(
+                      alpha: Tween<double>(begin: 0.2, end: 0.0).transform(_morphController.value),
+                    ),
+                    width: Tween<double>(begin: 1.0, end: 0.0).transform(_morphController.value),
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(borderRadius),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
+                      sigmaY: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
+                    ),
+                    child: Material(
+                      color: (widget.backgroundColor ?? context.colors.surface).withValues(
+                        alpha: Tween<double>(begin: 0.6, end: 1.0).transform(_morphController.value),
+                      ),
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      clipBehavior: Clip.antiAlias,
+                      child: Stack(
+                        children: [
+                          // 漸層
+                          if (_morphController.value < 1.0)
+                            Positioned.fill(
+                              child: Opacity(
+                                opacity: 1.0 - _morphController.value,
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        context.colors.surface.withValues(alpha: 0.1),
+                                        context.colors.surface.withValues(alpha: 0.05),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          SizedBox(
+                            key: _partialKey,
+                            width: double.infinity,
+                            child: widget.partialBuilder(context, ScrollController()),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return NotificationListener<SizeChangedLayoutNotification>(
+      onNotification: (_) {
+        _measureSizes();
+        return true;
+      },
+      child: SizeChangedLayoutNotifier(
+        child: DraggableScrollableSheet(
+          initialChildSize: _minChildSize,
+          minChildSize: _minChildSize,
+          maxChildSize: widget.maxChildSize,
+          controller: _controller,
+          snap: true,
+          snapSizes: [_minChildSize, widget.maxChildSize],
+          builder: (context, scrollController) {
+            return GestureDetector(
+              onVerticalDragStart: (_) {},
+              onVerticalDragEnd: (_) => _onDragEnd(_controller.size),
+              child: AnimatedBuilder(
+                animation: _morphController,
+                builder: (context, child) {
+                  final horizontalPadding = Tween<double>(
+                    begin: widget.floatingPadding.horizontal,
+                    end: 0.0,
+                  ).transform(_morphController.value);
+
+                  final bottomPadding = Tween<double>(
+                    begin: _verticalPadding,
+                    end: 0.0,
+                  ).transform(_morphController.value);
+
+                  final isFullScreen = _morphController.value == 1.0 && _controller.size == widget.maxChildSize;
+
+                  final borderRadius =
+                      !isFullScreen
+                          ? Tween<double>(
+                            begin: widget.borderRadius?.topLeft.y ?? 16.0,
+                            end: _isOverflowing ? 0.0 : (widget.borderRadius?.topLeft.y ?? 16.0),
+                          ).transform(_morphController.value)
+                          : 0.0;
+
+                  final elevation = Tween<double>(
+                    begin: widget.elevation,
+                    end: _isOverflowing ? 0.0 : widget.elevation,
+                  ).transform(_morphController.value);
+
+                  final marginBottom = Tween<double>(begin: _bottomMargin, end: 0.0).transform(_morphController.value);
+
+                  return Padding(
+                    padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding, bottom: bottomPadding),
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: marginBottom),
+                      child: PhysicalModel(
+                        color: Colors.transparent,
+                        elevation: elevation,
+                        shadowColor: context.colors.shadow.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(borderRadius),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(borderRadius),
+                            border: Border.all(
+                              color: context.colors.outline.withValues(
+                                alpha: Tween<double>(begin: 0.2, end: 0.0).transform(_morphController.value),
+                              ),
+                              width: Tween<double>(begin: 1.0, end: 0.0).transform(_morphController.value),
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(borderRadius),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaX: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
+                                sigmaY: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
+                              ),
+                              child: Material(
+                                color: (widget.backgroundColor ?? context.colors.surface).withValues(
+                                  alpha: Tween<double>(begin: 0.6, end: 1.0).transform(_morphController.value),
+                                ),
+                                borderRadius: BorderRadius.circular(borderRadius),
+                                clipBehavior: Clip.antiAlias,
+                                child: Stack(
+                                  children: [
+                                    // 漸層
+                                    if (_morphController.value < 1.0)
+                                      Positioned.fill(
+                                        child: Opacity(
+                                          opacity: 1.0 - _morphController.value,
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  context.colors.surface.withValues(alpha: 0.1),
+                                                  context.colors.surface.withValues(alpha: 0.05),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    Stack(
+                                      children: [
+                                        Opacity(
+                                          opacity: 1 - _morphController.value,
+                                          child: SizedBox(
+                                            key: _partialKey,
+                                            width: double.infinity,
+                                            child: widget.partialBuilder(context, scrollController),
+                                          ),
+                                        ),
+                                        Opacity(
+                                          opacity: _morphController.value,
+                                          child: _buildFullContent(scrollController),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFullContent(ScrollController scrollController) {
+    final content = widget.fullBuilder!(context, scrollController);
+
+    if (!_isOverflowing) {
+      return Container(key: _contentKey, child: content);
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: widget.backgroundColor ?? Theme.of(context).cardColor,
+          elevation: 0,
+          leading:
+              widget.showBackButton
+                  ? IconButton(icon: const Icon(Symbols.arrow_back), onPressed: () => _snapToPosition(_minChildSize))
+                  : null,
+          title: widget.title != null ? Text(widget.title!) : null,
+        ),
+        body: content,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _morphController.dispose();
+    super.dispose();
+  }
+}

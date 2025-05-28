@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';

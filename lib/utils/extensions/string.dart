@@ -1,6 +1,6 @@
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/widgets.dart';
 
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/int.dart';
 
@@ -15,6 +15,7 @@ extension StringExtension on String {
 
   String toLocaleFullDateString(BuildContext context) => asInt.asTZDateTime.toLocaleFullDateString(context);
   String toLocaleTimeString(BuildContext context) => asInt.asTZDateTime.toLocaleTimeString(context);
+  String toSimpleDateTimeString(BuildContext context) => asInt.asTZDateTime.toSimpleDateTimeString(context);
 
   Text get asText => Text(this);
   TextSpan get asTextSpan => TextSpan(text: this);

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/toast.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 
 const check = Icon(Symbols.check_rounded);
 const loading = LoadingIcon();

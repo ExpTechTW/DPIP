@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:dpip/utils/extensions/build_context.dart';
 
-class LoadingIcon extends StatelessWidget {
-  const LoadingIcon({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2));
-  }
-}
-
 class SettingsListTile extends StatelessWidget {
   final Widget? leading;
   final IconData? icon;

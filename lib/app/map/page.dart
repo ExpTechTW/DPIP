@@ -1,17 +1,17 @@
 import 'dart:async';
 
-import 'package:dpip/app/map/_lib/manager.dart';
-import 'package:dpip/app/map/_widgets/layer_toggle_sheet.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
 
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/core/providers.dart';
-import 'package:dpip/widgets/map/map.dart';
-import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
+
+import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/managers/radar.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
+import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/map/map.dart';
 
 class MapPage extends StatefulWidget {
   final MapLayer? initialLayer;
@@ -24,7 +24,7 @@ class MapPage extends StatefulWidget {
   State<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   final _managers = <MapLayer, MapLayerManager>{};
 
   Timer? _ticker;
@@ -33,15 +33,13 @@ class _MapPageState extends State<MapPage> {
   void _setupTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(Duration(milliseconds: GlobalProviders.map.updateIntervalNotifier.value), (timer) {
-      _tick();
+      if (currentLayer != MapLayer.monitor) return;
+
+      final manager = _managers[currentLayer];
+      if (manager == null) return;
+
+      manager.tick();
     });
-  }
-
-  void _tick() {
-    if (_currentLayer != MapLayer.monitor) return;
-
-    final data = GlobalProviders.data.eew;
-    if (data.isEmpty) return;
   }
 
   /// 目前地圖顯示的圖層
@@ -51,10 +49,7 @@ class _MapPageState extends State<MapPage> {
   Future<void> setCurrentLayer(MapLayer? layer) async {
     if (!mounted) return;
 
-    if (layer == null) {
-      await _hideLayers();
-      return;
-    }
+    await _hideLayers();
 
     final manager = _managers[layer];
 
@@ -66,7 +61,7 @@ class _MapPageState extends State<MapPage> {
       await _hideLayers();
       await manager.show();
 
-      _currentLayer = layer;
+      setState(() => _currentLayer = layer);
     } catch (e, s) {
       TalkerManager.instance.error('_MapPageState._setCurrentLayer', e, s);
     }
@@ -84,7 +79,7 @@ class _MapPageState extends State<MapPage> {
       TalkerManager.instance.error('_MapPageState._hideLayers', e, s);
     }
 
-    _currentLayer = null;
+    setState(() => _currentLayer = null);
   }
 
   /// 釋放所有圖層
@@ -93,8 +88,8 @@ class _MapPageState extends State<MapPage> {
 
     try {
       for (final MapEntry(:key, :value) in _managers.entries) {
-        if (key == _currentLayer) _currentLayer = null;
-        await value.dispose();
+        if (key == currentLayer) setState(() => _currentLayer = null);
+        await value.remove();
         _managers.remove(key);
       }
     } catch (e, s) {
@@ -104,7 +99,7 @@ class _MapPageState extends State<MapPage> {
 
   void onMapCreated(MapLibreMapController controller) {
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
-    if (_currentLayer != null) setCurrentLayer(_currentLayer!);
+    setCurrentLayer(currentLayer);
   }
 
   @override
@@ -117,36 +112,14 @@ class _MapPageState extends State<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final manager = _managers[currentLayer];
+
     return Stack(
       children: [
         DpipMap(onMapCreated: onMapCreated),
-        Positioned(
-          top: 24,
-          right: 24,
-          child: SafeArea(
-            child: IconButton.filledTonal(
-              icon: const Icon(Symbols.layers_rounded),
-              onPressed:
-                  () => showModalBottomSheet(
-                    context: context,
-                    useRootNavigator: true,
-                    useSafeArea: true,
-                    isScrollControlled: true,
-                    constraints: context.bottomSheetConstraints,
-                    builder:
-                        (context) =>
-                            LayerToggleSheet(currentLayer: currentLayer, onChanged: (layer) => setCurrentLayer(layer)),
-                  ),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 24,
-          left: 24,
-          child: SafeArea(
-            child: IconButton.filledTonal(icon: const Icon(Symbols.arrow_back_rounded), onPressed: context.pop),
-          ),
-        ),
+        PositionedLayerButton(currentLayer: currentLayer, onChanged: (layer) => setCurrentLayer(layer)),
+        const PositionedBackButton(),
+        if (manager != null) manager.build(context),
       ],
     );
   }

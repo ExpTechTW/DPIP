@@ -11,6 +11,7 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class SettingsLocationSelectCityPage extends StatefulWidget {
   final String city;

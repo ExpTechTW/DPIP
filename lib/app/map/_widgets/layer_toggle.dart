@@ -14,13 +14,13 @@ class LayerToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: checked ? context.colors.primaryContainer : Colors.transparent,
+      color: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () => onChanged(!checked),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(6),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             spacing: 4,
@@ -36,15 +36,19 @@ class LayerToggle extends StatelessWidget {
                   child: Container(
                     height: 64,
                     width: 64,
-                    color: context.colors.secondaryContainer,
-                    child: const Icon(Symbols.layers_rounded),
+                    color: checked ? context.colors.primaryContainer : context.colors.surfaceContainerHighest,
+                    child: Icon(
+                      Symbols.layers_rounded,
+                      color: checked ? context.colors.onPrimaryContainer : context.colors.onSurface,
+                    ),
                   ),
                 ),
               ),
               Text(
                 label,
-                style: context.theme.textTheme.labelLarge!.copyWith(
-                  color: checked ? context.colors.primary : context.colors.onSurface,
+                style: context.theme.textTheme.labelMedium!.copyWith(
+                  color: checked ? context.colors.primary : context.colors.onSurfaceVariant,
+                  fontWeight: checked ? FontWeight.bold : null,
                 ),
               ),
             ],
