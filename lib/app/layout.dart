@@ -1,4 +1,6 @@
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -28,7 +30,10 @@ class AppLayout extends StatelessWidget {
             top: 24,
             left: 24,
             child: SafeArea(
-              child: BlurredIconButton(onPressed: () => context.push('/map/monitor'), icon: const Icon(Symbols.map_rounded)),
+              child: BlurredIconButton(
+                onPressed: () => context.push(MapPage.route(layer: MapLayer.radar)),
+                icon: const Icon(Symbols.map_rounded),
+              ),
             ),
           ),
           Positioned(

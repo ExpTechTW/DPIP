@@ -7,8 +7,9 @@ import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/layout.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/monitor/monitor.dart';
-import 'package:dpip/app/map/radar/page.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/layout.dart';
 import 'package:dpip/app/settings/locale/page.dart';
@@ -36,7 +37,6 @@ import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/welcome/layout.dart';
 import 'package:dpip/app_old/page/history/history.dart';
-import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/core/preference.dart';
@@ -88,9 +88,6 @@ final router = GoRouter(
           routes: [
             GoRoute(path: '/history', pageBuilder: (context, state) => const NoTransitionPage(child: HistoryPage())),
           ],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/map', pageBuilder: (context, state) => const NoTransitionPage(child: MapPage()))],
         ),
         StatefulShellBranch(
           routes: [GoRoute(path: '/more', pageBuilder: (context, state) => const NoTransitionPage(child: MorePage()))],
@@ -252,11 +249,19 @@ final router = GoRouter(
         ),
       ],
     ),
+    GoRoute(
+      path: MapPage.route(),
+      builder: (context, state) {
+        final layerString = state.uri.queryParameters['layer'];
+        final initialLayer = layerString != null ? MapLayer.values.byName(layerString) : null;
+
+        return MapPage(initialLayer: initialLayer);
+      },
+    ),
     GoRoute(path: '/announcement', builder: (context, state) => const AnnouncementPage()),
     GoRoute(path: ChangelogPage.route, builder: (context, state) => const ChangelogPage()),
     GoRoute(path: '/license', builder: (context, state) => const LicensePage()),
     GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => const AppDebugLogsPage()),
-    GoRoute(path: MapRadarPage.route, builder: (context, state) => const MapRadarPage()),
     GoRoute(path: MapMonitorPage.route, builder: (context, state) => const MapMonitorPage()),
   ],
   observers: [TalkerRouteObserver(TalkerManager.instance)],

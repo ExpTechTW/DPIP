@@ -1,14 +1,62 @@
-import 'package:dpip/app/map/monitor/monitor.dart';
-import 'package:dpip/models/settings/location.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/int.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-class EewCard extends StatelessWidget {
-  const EewCard({super.key});
+import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/app/map/monitor/monitor.dart';
+import 'package:dpip/core/eew.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/int.dart';
+
+class EewCard extends StatefulWidget {
+  final Eew data;
+
+  const EewCard(this.data, {super.key});
+
+  @override
+  State<EewCard> createState() => _EewCardState();
+}
+
+class _EewCardState extends State<EewCard> {
+  late int localIntensity;
+  late int localArrivalTime;
+  int countdown = 0;
+
+  Timer? _timer;
+
+  void calculateEarthquakeInfo() {}
+
+  void _updateCountdown() {
+    final remainingSeconds = ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
+
+    setState(() => countdown = remainingSeconds);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final info = eewLocationInfo(
+      widget.data.eq.magnitude,
+      widget.data.eq.depth,
+      widget.data.eq.latitude,
+      widget.data.eq.longitude,
+      GlobalProviders.location.coordinateNotifier.value.latitude,
+      GlobalProviders.location.coordinateNotifier.value.longitude,
+    );
+
+    localIntensity = intensityFloatToInt(info.i);
+    localArrivalTime = (widget.data.eq.time + sWaveTimeByDistance(widget.data.eq.depth, info.dist)).floor();
+
+    _updateCountdown();
+    Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +103,7 @@ class EewCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '第 2 報',
+                          '第 ${widget.data.serial} 報',
                           style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                         ),
                       ],
@@ -67,13 +115,19 @@ class EewCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 8),
                   child: RichText(
                     text: TextSpan(
-                      children: const [
-                        TextSpan(text: '04/25 06:10 左右 '),
-                        TextSpan(text: '嘉義縣大埔鄉', style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: ' 附近發生有感地震，預估規模 '),
-                        TextSpan(text: '4.5', style: TextStyle(fontWeight: FontWeight.bold)),
-                        TextSpan(text: '、最大震度 '),
-                        TextSpan(text: '4級', style: TextStyle(fontWeight: FontWeight.bold)),
+                      children: [
+                        TextSpan(text: '${widget.data.eq.time.toSimpleDateTimeString(context)} 左右 '),
+                        TextSpan(text: widget.data.eq.location, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        const TextSpan(text: ' 附近發生有感地震，預估規模 '),
+                        TextSpan(
+                          text: widget.data.eq.magnitude.toStringAsFixed(1),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const TextSpan(text: '、最大震度 '),
+                        TextSpan(
+                          text: context.i18n.intensity(localIntensity.toString()),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ],
                       style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                     ),
@@ -107,19 +161,18 @@ class EewCard extends StatelessWidget {
                                         color: context.colors.onErrorContainer.withValues(alpha: 0.6),
                                       ),
                                     ),
-
                                     RichText(
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: 2.asIntensityDisplayLabel,
+                                            text: context.i18n.intensity(localIntensity.toString())[0],
                                             style: context.textTheme.displayLarge!.copyWith(
                                               fontWeight: FontWeight.bold,
                                               color: context.colors.onErrorContainer,
                                             ),
                                           ),
                                           TextSpan(
-                                            text: ' 級',
+                                            text: ' ${context.i18n.intensity(localIntensity.toString())[1]}',
                                             style: context.textTheme.bodyLarge!.copyWith(
                                               color: context.colors.onErrorContainer,
                                             ),
@@ -156,7 +209,7 @@ class EewCard extends StatelessWidget {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: '8',
+                                            text: countdown.toString(),
                                             style: context.textTheme.displayLarge!.copyWith(
                                               fontWeight: FontWeight.bold,
                                               color: context.colors.onErrorContainer,
@@ -198,5 +251,11 @@ class EewCard extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }

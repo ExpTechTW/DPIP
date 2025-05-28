@@ -148,9 +148,14 @@ class _HomePageState extends State<HomePage> {
                 const Padding(padding: EdgeInsets.all(16), child: LocationNotSetCard()),
 
               // 即時資訊
-              if (!_isLoading && false)
-                // TODO(kamiya10): 將監視器地圖的地震資訊移至 ChangeNotifier
-                const Padding(padding: EdgeInsets.all(16), child: EewCard()),
+              if (!_isLoading && GlobalProviders.data.eew.isNotEmpty)
+                ListView.builder(
+                  itemCount: GlobalProviders.data.eew.length,
+                  itemBuilder: (context, index) {
+                    final data = GlobalProviders.data.eew[index];
+                    return Padding(padding: const EdgeInsets.all(16), child: EewCard(data));
+                  },
+                ),
               if (!_isLoading && _thunderstorm != null)
                 Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
 

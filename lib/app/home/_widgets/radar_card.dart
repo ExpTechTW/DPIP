@@ -1,3 +1,5 @@
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -6,7 +8,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/map/radar/page.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
@@ -123,7 +124,10 @@ class _RadarMapCardState extends State<RadarMapCard> {
         Positioned.fill(
           child: Material(
             color: Colors.transparent,
-            child: InkWell(onTap: () => context.push(MapRadarPage.route), borderRadius: BorderRadius.circular(16)),
+            child: InkWell(
+              onTap: () => context.push(MapPage.route(layer: MapLayer.radar)),
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
         ),
       ],

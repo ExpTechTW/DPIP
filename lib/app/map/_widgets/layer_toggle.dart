@@ -1,6 +1,8 @@
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
+
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+
+import 'package:dpip/utils/extensions/build_context.dart';
 
 class LayerToggle extends StatelessWidget {
   final bool checked;
@@ -12,14 +14,16 @@ class LayerToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: checked ? context.colors.primaryContainer : Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () => onChanged(!checked),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 4,
             children: [
               Container(
                 decoration: BoxDecoration(

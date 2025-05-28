@@ -47,6 +47,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: GlobalProviders.data),
         ChangeNotifierProvider.value(value: GlobalProviders.location),
         ChangeNotifierProvider.value(value: GlobalProviders.map),
         ChangeNotifierProvider.value(value: GlobalProviders.notification),

@@ -14,6 +14,22 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 
+class BaseMapLayerIds {
+  const BaseMapLayerIds._();
+
+  static const globalFill = 'global';
+  static const townFill = 'town';
+  static const countyFill = 'county';
+  static const countyOutline = 'county-outline';
+
+  static Iterable<String> values() sync* {
+    yield globalFill;
+    yield townFill;
+    yield countyFill;
+    yield countyOutline;
+  }
+}
+
 class DpipMap extends StatefulWidget {
   final CameraPosition initialCameraPosition;
   final void Function(MapLibreMapController controller)? onMapCreated;
@@ -84,28 +100,28 @@ class DpipMapState extends State<DpipMap> {
           'paint': {'background-color': colors.surface.toHexStringRGB()},
         },
         {
-          'id': 'county',
+          'id': BaseMapLayerIds.countyFill,
           'type': 'fill',
           'source': 'map',
           'source-layer': 'city',
           'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
         },
         {
-          'id': 'town',
+          'id': BaseMapLayerIds.townFill,
           'type': 'fill',
           'source': 'map',
           'source-layer': 'town',
           'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
         },
         {
-          'id': 'county-outline',
+          'id': BaseMapLayerIds.countyOutline,
           'source': 'map',
           'source-layer': 'city',
           'type': 'line',
           'paint': {'line-color': colors.outline.toHexStringRGB()},
         },
         {
-          'id': 'global',
+          'id': BaseMapLayerIds.globalFill,
           'type': 'fill',
           'source': 'map',
           'source-layer': 'global',

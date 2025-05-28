@@ -17,6 +17,7 @@ class PreferenceKeys {
   static const themeColor = 'pref:ui:color';
   static const locale = 'pref:ui:locale';
   static const useFahrenheit = 'pref:ui:fahrenheit';
+  static const mapUpdateInterval = 'pref:ui:mapUpdateInterval';
   // #endregion
 
   // #region Notification
@@ -85,6 +86,9 @@ class Preference {
 
   static bool? get useFahrenheit => instance.getBool(PreferenceKeys.useFahrenheit);
   static set useFahrenheit(bool? value) => instance.set(PreferenceKeys.useFahrenheit, value);
+
+  static int? get mapUpdateInterval => instance.getInt(PreferenceKeys.mapUpdateInterval);
+  static set mapUpdateInterval(int? value) => instance.set(PreferenceKeys.mapUpdateInterval, value);
   // #endregion
 
   // #region Notification
