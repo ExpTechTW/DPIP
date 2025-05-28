@@ -107,7 +107,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           permissions = [
             Permission.notification,
             Permission.locationAlways,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            if (androidInfo.version.sdkInt <= 28) Permission.storage,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
@@ -119,7 +119,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           permissions = [
             Permission.notification,
             Permission.location,
-            androidInfo.version.sdkInt <= 32 ? Permission.storage : Permission.photos,
+            if (androidInfo.version.sdkInt <= 28) Permission.storage,
             Permission.ignoreBatteryOptimizations,
           ];
         } else if (Platform.isIOS) {
@@ -166,7 +166,6 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
           color = Colors.greenAccent;
           break;
         case Permission.storage:
-        case Permission.photos:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
           text = context.i18n.permission_storage;
           description = context.i18n.data_visualization_storage;
