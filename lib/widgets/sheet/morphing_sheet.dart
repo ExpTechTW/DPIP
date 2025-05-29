@@ -152,24 +152,14 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(borderRadius),
-                  border: Border.all(
-                    color: context.colors.outline.withValues(
-                      alpha: Tween<double>(begin: 0.2, end: 0.0).transform(_morphController.value),
-                    ),
-                    width: Tween<double>(begin: 1.0, end: 0.0).transform(_morphController.value),
-                  ),
+                  border: Border.all(color: context.colors.outline.withValues(alpha: 0.2)),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(borderRadius),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
-                      sigmaY: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
-                    ),
+                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Material(
-                      color: (widget.backgroundColor ?? context.colors.surface).withValues(
-                        alpha: Tween<double>(begin: 0.6, end: 1.0).transform(_morphController.value),
-                      ),
+                      color: (widget.backgroundColor ?? context.colors.surface).withValues(alpha: 0.75),
                       borderRadius: BorderRadius.circular(borderRadius),
                       clipBehavior: Clip.antiAlias,
                       child: Stack(
@@ -177,18 +167,15 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                           // 漸層
                           if (_morphController.value < 1.0)
                             Positioned.fill(
-                              child: Opacity(
-                                opacity: 1.0 - _morphController.value,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        context.colors.surface.withValues(alpha: 0.1),
-                                        context.colors.surface.withValues(alpha: 0.05),
-                                      ],
-                                    ),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      context.colors.surface.withValues(alpha: 0.1),
+                                      context.colors.surface.withValues(alpha: 0.05),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -280,12 +267,12 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                             borderRadius: BorderRadius.circular(borderRadius),
                             child: BackdropFilter(
                               filter: ImageFilter.blur(
-                                sigmaX: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
-                                sigmaY: Tween<double>(begin: 10.0, end: 0.0).transform(_morphController.value),
+                                sigmaX: Tween<double>(begin: 16, end: 0).transform(_morphController.value),
+                                sigmaY: Tween<double>(begin: 16, end: 0).transform(_morphController.value),
                               ),
                               child: Material(
                                 color: (widget.backgroundColor ?? context.colors.surface).withValues(
-                                  alpha: Tween<double>(begin: 0.6, end: 1.0).transform(_morphController.value),
+                                  alpha: Tween<double>(begin: 0.75, end: 1.0).transform(_morphController.value),
                                 ),
                                 borderRadius: BorderRadius.circular(borderRadius),
                                 clipBehavior: Clip.antiAlias,
