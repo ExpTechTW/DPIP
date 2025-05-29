@@ -243,7 +243,7 @@ class _EewCardState extends State<EewCard> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => context.push(MapMonitorPage.route),
+              // onTap: () => context.push(MapMonitorPage.route),
               splashColor: context.colors.error.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),

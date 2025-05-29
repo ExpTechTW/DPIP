@@ -52,7 +52,7 @@ class TsunamiMapLayerManager extends MapLayerManager {
 
       didSetup = true;
     } catch (e, s) {
-      TalkerManager.instance.error('RadarMapLayerManager.setup', e, s);
+      TalkerManager.instance.error('TsunamiMapLayerManager.setup', e, s);
     }
   }
 

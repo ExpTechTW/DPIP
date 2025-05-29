@@ -10,6 +10,7 @@ class MapSourceIds {
   static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
   static String report([String? time]) => time == null ? 'report' : 'report-$time';
   static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
+  static String monitor([String? code]) => code == null ? 'monitor' : 'monitor-$code';
 }
 
 class MapLayerIds {
@@ -18,6 +19,7 @@ class MapLayerIds {
   static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
   static String report([String? time]) => time == null ? 'report' : 'report-$time';
   static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
+  static String monitor([String? code]) => code == null ? 'monitor' : 'monitor-$code';
 }
 
 Future<void> cleanupMap(MapLibreMapController controller) async {

@@ -17,6 +17,8 @@ import 'package:dpip/api/model/station_info.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle.dart';
 import 'package:dpip/app/map/_widgets/tos_sheet.dart';
 import 'package:dpip/app/map/monitor/eew_info.dart';
+import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/rts.dart';
@@ -33,16 +35,101 @@ import 'package:dpip/utils/map_utils.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
 
-class MapMonitorPage extends StatefulWidget {
-  const MapMonitorPage({super.key});
+class MonitorMapLayerManager extends MapLayerManager {
+  MonitorMapLayerManager(super.context, super.controller);
 
-  static const route = '/map/monitor';
+  final currentMonitor = ValueNotifier(null);
 
   @override
-  State<MapMonitorPage> createState() => _MapMonitorPageState();
+  Future<void> setup() async {
+    if (didSetup) return;
+
+    try {
+
+      final sourceId = MapSourceIds.monitor(currentMonitor.value);
+      final layerId = MapLayerIds.monitor(currentMonitor.value);
+
+      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isLayerExists = (await controller.getLayerIds()).contains(layerId);
+
+      if (isSourceExists && isLayerExists) return;
+
+      if (!isSourceExists) {
+
+        TalkerManager.instance.info('Added Source "$sourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      didSetup = true;
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
+    }
+  }
+
+  @override
+  Future<void> hide() async {
+    if (!visible) return;
+
+    final layerId = MapLayerIds.monitor(currentMonitor.value);
+
+    try {
+      await controller.setLayerVisibility(layerId, false);
+      TalkerManager.instance.info('Hiding Layer "$layerId"');
+
+      visible = false;
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager.hide', e, s);
+    }
+  }
+
+  @override
+  Future<void> show() async {
+    if (visible) return;
+
+    final layerId = MapLayerIds.monitor(currentMonitor.value);
+
+    try {
+      await controller.setLayerVisibility(layerId, true);
+      TalkerManager.instance.info('Showing Layer "$layerId"');
+
+      visible = true;
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager.show', e, s);
+    }
+  }
+
+  @override
+  Future<void> remove() async {
+    try {
+      final layerId = MapLayerIds.monitor(currentMonitor.value);
+      final sourceId = MapSourceIds.monitor(currentMonitor.value);
+
+      await controller.removeLayer(layerId);
+      TalkerManager.instance.info('Removed Layer "$layerId"');
+
+      await controller.removeSource(sourceId);
+      TalkerManager.instance.info('Removed Source "$sourceId"');
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager.dispose', e, s);
+    }
+    didSetup = false;
+  }
+
+  @override
+  Widget build(BuildContext context) => MonitorMapLayerSheet(manager: this);
 }
 
-class _MapMonitorPageState extends State<MapMonitorPage> with SingleTickerProviderStateMixin {
+class MonitorMapLayerSheet extends StatefulWidget {
+  final MonitorMapLayerManager manager;
+
+  const MonitorMapLayerSheet({super.key, required this.manager});
+
+  @override
+  State<MonitorMapLayerSheet> createState() => _MonitorMapLayerSheetState();
+}
+
+class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> with SingleTickerProviderStateMixin {
   late MapLibreMapController _mapController;
   late Map<String, Station> _stations;
 

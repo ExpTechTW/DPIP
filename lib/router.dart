@@ -262,7 +262,7 @@ final router = GoRouter(
     GoRoute(path: ChangelogPage.route, builder: (context, state) => const ChangelogPage()),
     GoRoute(path: '/license', builder: (context, state) => const LicensePage()),
     GoRoute(path: AppDebugLogsPage.route, builder: (context, state) => const AppDebugLogsPage()),
-    GoRoute(path: MapMonitorPage.route, builder: (context, state) => const MapMonitorPage()),
+    // GoRoute(path: MapMonitorPage.route, builder: (context, state) => const MapMonitorPage()),
   ],
   observers: [TalkerRouteObserver(TalkerManager.instance)],
   debugLogDiagnostics: true,
