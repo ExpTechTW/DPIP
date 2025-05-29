@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/app/map/_lib/managers/report.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -83,6 +84,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   void onMapCreated(MapLibreMapController controller) {
+    _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
     setCurrentLayer(currentLayer);
   }

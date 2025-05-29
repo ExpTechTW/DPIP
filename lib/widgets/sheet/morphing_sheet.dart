@@ -2,24 +2,24 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
 
-typedef MorphingSheetBuilder = Widget Function(BuildContext context, ScrollController controller);
+typedef MorphingSheetBuilder =
+    Widget Function(BuildContext context, ScrollController controller, MorphingSheetController sheetController);
 
 class MorphingSheet extends StatefulWidget {
   final MorphingSheetBuilder? fullBuilder;
   final MorphingSheetBuilder partialBuilder;
   final double maxChildSize;
   final double fullThreshold;
-  final Duration animationDuration;
   final Color? backgroundColor;
   final BorderRadius? borderRadius;
   final EdgeInsets floatingPadding;
   final double elevation;
   final String? title;
   final bool showBackButton;
+  final MorphingSheetController? controller;
 
   const MorphingSheet({
     super.key,
@@ -27,13 +27,13 @@ class MorphingSheet extends StatefulWidget {
     required this.partialBuilder,
     this.maxChildSize = 1.0,
     this.fullThreshold = 0.8,
-    this.animationDuration = const Duration(milliseconds: 500),
     this.backgroundColor,
     this.borderRadius,
     this.floatingPadding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.elevation = 8.0,
     this.title,
     this.showBackButton = true,
+    this.controller,
   });
 
   @override
@@ -58,12 +58,43 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
   void initState() {
     super.initState();
     _controller = DraggableScrollableController();
-    _morphController = AnimationController(vsync: this, duration: widget.animationDuration);
+    _morphController = AnimationController(
+      vsync: this,
+      duration: MorphingSheetController.enterDuration,
+      reverseDuration: MorphingSheetController.exitDuration,
+    );
 
     _controller.addListener(_onSheetPositionChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _measureSizes();
+      _attachController();
     });
+  }
+
+  @override
+  void didUpdateWidget(MorphingSheet oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      _detachController(oldWidget.controller);
+      _attachController();
+    }
+  }
+
+  void _attachController() {
+    if (widget.controller != null) {
+      widget.controller!.attach(
+        draggableController: _controller,
+        morphController: _morphController,
+        minChildSize: _minChildSize,
+        maxChildSize: widget.maxChildSize,
+      );
+    }
+  }
+
+  void _detachController(MorphingSheetController? oldController) {
+    if (oldController != null) {
+      oldController.detach();
+    }
   }
 
   void _measureSizes() {
@@ -114,8 +145,9 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
     try {
       final isExpanding = targetPosition > _controller.size;
       final curve = isExpanding ? Easing.emphasizedDecelerate : Easing.emphasizedAccelerate;
+      final duration = isExpanding ? MorphingSheetController.enterDuration : MorphingSheetController.exitDuration;
 
-      await _controller.animateTo(targetPosition, duration: widget.animationDuration, curve: curve);
+      await _controller.animateTo(targetPosition, duration: duration, curve: curve);
     } finally {
       _isSnapping = false;
     }
@@ -183,7 +215,11 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                           SizedBox(
                             key: _partialKey,
                             width: double.infinity,
-                            child: widget.partialBuilder(context, ScrollController()),
+                            child: widget.partialBuilder(
+                              context,
+                              ScrollController(),
+                              widget.controller ?? MorphingSheetController(),
+                            ),
                           ),
                         ],
                       ),
@@ -304,7 +340,11 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                           child: SizedBox(
                                             key: _partialKey,
                                             width: double.infinity,
-                                            child: widget.partialBuilder(context, scrollController),
+                                            child: widget.partialBuilder(
+                                              context,
+                                              scrollController,
+                                              widget.controller ?? MorphingSheetController(),
+                                            ),
                                           ),
                                         ),
                                         Opacity(
@@ -332,32 +372,18 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
   }
 
   Widget _buildFullContent(ScrollController scrollController) {
-    final content = widget.fullBuilder!(context, scrollController);
+    final content = widget.fullBuilder!(context, scrollController, widget.controller ?? MorphingSheetController());
 
     if (!_isOverflowing) {
       return Container(key: _contentKey, child: content);
     }
 
-    return Material(
-      color: Colors.transparent,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: widget.backgroundColor ?? Theme.of(context).cardColor,
-          elevation: 0,
-          leading:
-              widget.showBackButton
-                  ? IconButton(icon: const Icon(Symbols.arrow_back), onPressed: () => _snapToPosition(_minChildSize))
-                  : null,
-          title: widget.title != null ? Text(widget.title!) : null,
-        ),
-        body: content,
-      ),
-    );
+    return Material(color: Colors.transparent, child: content);
   }
 
   @override
   void dispose() {
+    _detachController(widget.controller);
     _controller.dispose();
     _morphController.dispose();
     super.dispose();

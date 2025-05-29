@@ -32,7 +32,7 @@ class AppLayout extends StatelessWidget {
             child: SafeArea(
               child: BlurredIconButton(
                 icon: const Icon(Symbols.map_rounded),
-                onPressed: () => context.push(MapPage.route(layer: MapLayer.radar)),
+                onPressed: () => context.push(MapPage.route(layer: MapLayer.report)),
                 elevation: 2,
               ),
             ),

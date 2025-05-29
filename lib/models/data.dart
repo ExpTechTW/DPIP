@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dpip/api/model/eew.dart';
@@ -9,6 +11,25 @@ class DpipDataModel extends ChangeNotifier {
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
   void setEew(List<Eew> eew) {
     _eew = eew;
+    notifyListeners();
+  }
+
+  List<PartialEarthquakeReport> _partialReport = [];
+  UnmodifiableListView<PartialEarthquakeReport> get partialReport => UnmodifiableListView(_partialReport);
+  void setPartialReport(List<PartialEarthquakeReport> partialReport) {
+    _partialReport = partialReport;
+    notifyListeners();
+  }
+
+  Map<String, EarthquakeReport> _report = {};
+  UnmodifiableMapView<String, EarthquakeReport> get report => UnmodifiableMapView(_report);
+  void setReport(String id, EarthquakeReport report) {
+    _report[id] = report;
+    notifyListeners();
+  }
+
+  void setReports(Map<String, EarthquakeReport> report) {
+    _report = report;
     notifyListeners();
   }
 

@@ -20,8 +20,8 @@ import 'package:dpip/widgets/ui/loading_icon.dart';
 class RadarMapLayerManager extends MapLayerManager {
   RadarMapLayerManager(super.context, super.controller);
 
-  final ValueNotifier<String?> currentRadarTime = ValueNotifier<String?>(GlobalProviders.data.radar.firstOrNull);
-  final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
+  final currentRadarTime = ValueNotifier<String?>(GlobalProviders.data.radar.firstOrNull);
+  final isLoading = ValueNotifier<bool>(false);
 
   Future<void> _updateRadarTileUrl(String time) async {
     if (currentRadarTime.value == time || isLoading.value) return;
@@ -56,12 +56,12 @@ class RadarMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.radar(currentRadarTime.value);
       final layerId = MapLayerIds.radar(currentRadarTime.value);
 
-      final isRadarSourceExists = (await controller.getSourceIds()).contains(sourceId);
-      final isRadarLayerExists = (await controller.getLayerIds()).contains(layerId);
+      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
-      if (isRadarSourceExists && isRadarLayerExists) return;
+      if (isSourceExists && isLayerExists) return;
 
-      if (!isRadarSourceExists) {
+      if (!isSourceExists) {
         final properties = RasterSourceProperties(
           tiles: ['https://api-1.exptech.dev/api/v1/tiles/radar/${currentRadarTime.value}/{z}/{x}/{y}.png'],
           tileSize: 256,
@@ -73,7 +73,7 @@ class RadarMapLayerManager extends MapLayerManager {
         if (!context.mounted) return;
       }
 
-      if (!isRadarLayerExists) {
+      if (!isLayerExists) {
         final properties = RasterLayerProperties(visibility: visible ? 'visible' : 'none');
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.countyOutline);
@@ -156,7 +156,7 @@ class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
       title: context.i18n.radar_monitor,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
-      partialBuilder: (context, controller) {
+      partialBuilder: (context, controller, sheetController) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Selector<DpipDataModel, List<String>>(
@@ -174,10 +174,10 @@ class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
+                      spacing: 8,
                       children: [
                         const Icon(Symbols.radar, size: 24),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium)),
+                        Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
                       ],
                     ),
                   ),

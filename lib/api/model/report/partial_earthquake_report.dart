@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
 
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/parser.dart';
 
 part 'partial_earthquake_report.g.dart';
@@ -159,5 +160,16 @@ class PartialEarthquakeReport {
       return Colors.yellow;
     }
     return Colors.green;
+  }
+
+  GeoJsonFeatureBuilder toGeoJsonFeature() {
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+        .setId(time.millisecondsSinceEpoch)
+        .setGeometry(latlng.toGeoJsonCoordinates())
+        .setProperty('icon', 'cross-$intensity')
+        .setProperty('magnitude', magnitude)
+        .setProperty('intensity', intensity)
+        .setProperty('time', time.millisecondsSinceEpoch)
+        .setProperty('depth', depth);
   }
 }

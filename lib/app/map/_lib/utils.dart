@@ -8,14 +8,14 @@ class MapSourceIds {
   const MapSourceIds._();
 
   static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
-  static String report([String? code]) => code == null ? 'report' : 'report-$code';
+  static String report([String? time]) => time == null ? 'report' : 'report-$time';
 }
 
 class MapLayerIds {
   const MapLayerIds._();
 
   static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
-  static String report([String? code]) => code == null ? 'report' : 'report-$code';
+  static String report([String? time]) => time == null ? 'report' : 'report-$time';
 }
 
 Future<void> cleanupMap(MapLibreMapController controller) async {

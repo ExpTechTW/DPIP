@@ -21,7 +21,6 @@ class IntensityBox extends StatelessWidget {
               ? BoxDecoration(
                 borderRadius: BorderRadius.circular(borderRadius),
                 border: Border.all(color: IntensityColor.intensity(intensity), width: 3.0),
-                color: context.colors.surface,
               )
               : BoxDecoration(
                 borderRadius: BorderRadius.circular(borderRadius),

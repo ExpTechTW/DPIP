@@ -3,6 +3,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/model/report/area_intensity.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/parser.dart';
 
 part 'earthquake_report.g.dart';
@@ -178,5 +179,18 @@ class EarthquakeReport {
       lonFormat = '東經 $lonTemp 度';
     }
     return '$latFormat　$lonFormat';
+  }
+
+  GeoJsonBuilder toGeoJson() {
+    final stations = list.values.expand((area) => area.town.values);
+    final features = stations.map((station) => station.toGeoJsonFeature()).toList();
+    final cross = GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+        .setGeometry(latlng.toGeoJsonCoordinates())
+        .setProperty('icon', 'cross-${getMaxIntensity()}')
+        .setProperty('magnitude', magnitude);
+
+    features.insert(0, cross);
+
+    return GeoJsonBuilder().setFeatures(features);
   }
 }

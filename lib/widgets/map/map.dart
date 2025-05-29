@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,18 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 
+class BaseMapSourceIds {
+  const BaseMapSourceIds._();
+
+  static const map = 'map';
+  static const userLocation = 'user-location';
+
+  static Iterable<String> values() sync* {
+    yield map;
+    yield userLocation;
+  }
+}
+
 class BaseMapLayerIds {
   const BaseMapLayerIds._();
 
@@ -21,12 +34,14 @@ class BaseMapLayerIds {
   static const townFill = 'town';
   static const countyFill = 'county';
   static const countyOutline = 'county-outline';
+  static const userLocation = 'user-location';
 
   static Iterable<String> values() sync* {
     yield globalFill;
     yield townFill;
     yield countyFill;
     yield countyOutline;
+    yield userLocation;
   }
 }
 
@@ -166,18 +181,21 @@ class DpipMapState extends State<DpipMap> {
 
       final location = GlobalProviders.location.coordinateNotifier.value;
 
-      final isSourceExists = (await controller.getSourceIds()).contains('user-location');
-      final isLayerExists = (await controller.getLayerIds()).contains('user-location');
+      final sourceId = BaseMapSourceIds.userLocation;
+      final layerId = BaseMapLayerIds.userLocation;
+
+      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (!location.isValid) {
         if (isLayerExists) {
-          await controller.removeLayer('user-location');
-          TalkerManager.instance.info('Removed Layer "user-location"');
+          await controller.removeLayer(layerId);
+          TalkerManager.instance.info('Removed Layer "$layerId"');
         }
 
         if (isSourceExists) {
-          await controller.removeSource('user-location');
-          TalkerManager.instance.info('Removed Source "user-location"');
+          await controller.removeSource(sourceId);
+          TalkerManager.instance.info('Removed Source "$sourceId"');
         }
 
         await controller.moveCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.2));
@@ -187,39 +205,28 @@ class DpipMapState extends State<DpipMap> {
 
       if (!isSourceExists) {
         await controller.addSource(
-          'user-location',
+          sourceId,
           GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build()),
         );
-        TalkerManager.instance.info('Added Source "user-location"');
+        TalkerManager.instance.info('Added Source "$sourceId"');
       } else {
-        await controller.setGeoJsonSource(
-          'user-location',
-          GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build(),
-        );
-        TalkerManager.instance.info('Updated Source "user-location"');
+        await controller.setGeoJsonSource(sourceId, GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build());
+        TalkerManager.instance.info('Updated Source "$sourceId"');
       }
 
       if (!isLayerExists) {
         await controller.addLayer(
-          'user-location',
-          'user-location',
+          sourceId,
+          layerId,
           const SymbolLayerProperties(
             symbolZOrder: 'source',
             iconImage: 'gps',
-            iconSize: [
-              Expressions.interpolate,
-              ['linear'],
-              [Expressions.zoom],
-              5,
-              0.1,
-              10,
-              0.6,
-            ],
+            iconSize: kSymbolIconSize,
             iconAllowOverlap: true,
             iconIgnorePlacement: true,
           ),
         );
-        TalkerManager.instance.info('Added Layer "user-location"');
+        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));

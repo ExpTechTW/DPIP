@@ -14,8 +14,8 @@ class GeoJsonBuilder {
 
   static Map<String, dynamic> get empty => GeoJsonBuilder().build();
 
-  GeoJsonBuilder setFeatures(List<GeoJsonFeatureBuilder> features) {
-    this.features = features;
+  GeoJsonBuilder setFeatures(Iterable<GeoJsonFeatureBuilder> features) {
+    this.features = features.toList();
     return this;
   }
 
@@ -48,6 +48,11 @@ class GeoJsonFeatureBuilder<T extends GeoJsonFeatureType> {
   }
 
   GeoJsonFeatureBuilder setGeometry(List<dynamic> coordinates) {
+    if (type == GeoJsonFeatureType.Point) {
+      this.coordinates = coordinates;
+      return this;
+    }
+
     if (coordinates.every((element) => element is List)) {
       this.coordinates = [coordinates];
     } else {

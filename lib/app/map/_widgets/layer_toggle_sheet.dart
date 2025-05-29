@@ -44,13 +44,13 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             children: [
               LayerToggle(
                 label: context.i18n.monitor,
-                checked: _currentLayer == MapLayer.report,
-                onChanged: (checked) => _changeLayer(checked ? MapLayer.report : null),
+                checked: _currentLayer == MapLayer.monitor,
+                onChanged: (checked) => _changeLayer(checked ? MapLayer.monitor : null),
               ),
               LayerToggle(
                 label: context.i18n.report,
-                checked: _currentLayer == MapLayer.monitor,
-                onChanged: (checked) => _changeLayer(checked ? MapLayer.monitor : null),
+                checked: _currentLayer == MapLayer.report,
+                onChanged: (checked) => _changeLayer(checked ? MapLayer.report : null),
               ),
               LayerToggle(
                 label: context.i18n.tsunami_info_monitor,
