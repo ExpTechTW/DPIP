@@ -82,21 +82,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _currentLayer = null);
   }
 
-  /// 釋放所有圖層
-  Future<void> _disposeLayers() async {
-    if (!mounted) return;
-
-    try {
-      for (final MapEntry(:key, :value) in _managers.entries) {
-        if (key == currentLayer) setState(() => _currentLayer = null);
-        await value.remove();
-        _managers.remove(key);
-      }
-    } catch (e, s) {
-      TalkerManager.instance.error('_MapPageState._disposeLayers', e, s);
-    }
-  }
-
   void onMapCreated(MapLibreMapController controller) {
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
     setCurrentLayer(currentLayer);
@@ -127,7 +112,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _ticker?.cancel();
-    _disposeLayers();
     super.dispose();
   }
 }
