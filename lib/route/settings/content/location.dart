@@ -221,7 +221,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     }
   }
 
-  Future<bool> androidCheckAutoStartPermission(int num) async {
+  /*Future<bool> androidCheckAutoStartPermission(int num) async {
     if (Platform.isIOS) return true;
     try {
       bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
@@ -268,7 +268,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     } catch (err) {
       return false;
     }
-  }
+  }*/
 
   Future<bool> androidCheckBatteryOptimizationPermission(int num) async {
     if (Platform.isIOS) return true;
@@ -340,10 +340,10 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
 
       await checkLocationAlwaysPermission();
 
-      bool autoStart = await androidCheckAutoStartPermission(0);
-      autoStartPermission = autoStart;
+      //bool autoStart = await androidCheckAutoStartPermission(0);
+      //autoStartPermission = autoStart;
 
-      if (!autoStart) return;
+      //if (!autoStart) return;
 
       bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
       batteryOptimizationPermission = batteryOptimization;
@@ -409,7 +409,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
     });
     if (Platform.isAndroid) {
       setState(() async {
-        autoStartPermission = await Autostarter.checkAutoStartState() ?? false;
+        //autoStartPermission = await Autostarter.checkAutoStartState() ?? false;
         batteryOptimizationPermission = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
       });
     }
@@ -521,7 +521,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
                 ),
               ),
             ),
-          if (autoStartPermission != null && Platform.isAndroid)
+          if (false && Platform.isAndroid)
             Visibility(
               visible: isAutoLocatingEnabled && !autoStartPermission!,
               maintainAnimation: true,
@@ -609,9 +609,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             subtitle: Text(city ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled,
             onTap: () async {
-              bool autoStart = await androidCheckAutoStartPermission(1);
+              //bool autoStart = await androidCheckAutoStartPermission(1);
 
-              if (!autoStart) return;
+              //if (!autoStart) return;
 
               bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
@@ -634,9 +634,9 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
             subtitle: Text(town ?? context.i18n.location_Not_set),
             enabled: !isAutoLocatingEnabled && city != null,
             onTap: () async {
-              bool autoStart = await androidCheckAutoStartPermission(1);
+              //bool autoStart = await androidCheckAutoStartPermission(1);
 
-              if (!autoStart) return;
+              //if (!autoStart) return;
 
               bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
 
@@ -653,7 +653,7 @@ class _SettingsLocationViewState extends State<SettingsLocationView> with Widget
               });
             },
           ),
-          if (autoStartPermission != null && Platform.isAndroid)
+          if (false && Platform.isAndroid)
             Visibility(
               visible: !isAutoLocatingEnabled && city != null && town != null && !autoStartPermission!,
               maintainAnimation: true,
