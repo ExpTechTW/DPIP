@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/list.dart';
 
-class SettingsListSection extends StatelessWidget {
+class ListSection extends StatelessWidget {
   final String? title;
   final List<Widget> children;
 
-  const SettingsListSection({super.key, this.title, required this.children});
+  const ListSection({super.key, this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {

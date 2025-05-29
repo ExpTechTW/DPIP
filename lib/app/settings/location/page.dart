@@ -11,8 +11,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/core/service.dart';
@@ -419,12 +419,12 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        SettingsListSection(
+        ListSection(
           children: [
             Selector<SettingsLocationModel, bool>(
               selector: (context, model) => model.auto,
               builder: (context, auto, child) {
-                return SettingsListTile(
+                return ListSectionTile(
                   title: context.i18n.settings_location_auto,
                   subtitle: const Text('自動更新所在地'),
                   icon: Symbols.my_location_rounded,
@@ -559,7 +559,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        SettingsListSection(
+        ListSection(
           title: context.i18n.settings_location,
           children: [
             Selector<SettingsLocationModel, ({bool auto, String? code})>(
@@ -568,7 +568,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 final (:auto, :code) = data;
                 final city = Global.location[code]?.city;
 
-                return SettingsListTile(
+                return ListSectionTile(
                   title: context.i18n.location_city,
                   subtitle: Text(city ?? context.i18n.location_Not_set),
                   icon: Symbols.location_city_rounded,
@@ -596,7 +596,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 final city = Global.location[code]?.city;
                 final town = Global.location[code]?.town;
 
-                return SettingsListTile(
+                return ListSectionTile(
                   title: context.i18n.location_town,
                   subtitle: Text(town ?? context.i18n.location_Not_set),
                   icon: Symbols.forest_rounded,

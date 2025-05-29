@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 
 class SettingsDonatePage extends StatefulWidget {
@@ -51,9 +51,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
     super.initState();
     _refreshIndicatorKey.currentState?.show();
 
-    subscription = InAppPurchase.instance.purchaseStream.listen(onPurchaseUpdate, onError: (error) {
-      setState(() => isPending = false);
-    });
+    subscription = InAppPurchase.instance.purchaseStream.listen(
+      onPurchaseUpdate,
+      onError: (error) {
+        setState(() => isPending = false);
+      },
+    );
     refresh();
   }
 
@@ -123,14 +126,15 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
           return ListView(
             children: [
               if (subscriptions.isNotEmpty)
-                SettingsListSection(
+                ListSection(
                   title: '訂閱制',
                   children: [
                     for (final product in subscriptions)
-                      SettingsListTile(
-                        title: product.title.contains('(')
-                            ? product.title.substring(0, product.title.indexOf('(')).trim()
-                            : product.title,
+                      ListSectionTile(
+                        title:
+                            product.title.contains('(')
+                                ? product.title.substring(0, product.title.indexOf('(')).trim()
+                                : product.title,
                         subtitle: Text(product.description),
                         trailing: Text('${product.price}/月'),
                         onTap: () {
@@ -143,14 +147,15 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                   ],
                 ),
               if (oneTime.isNotEmpty)
-                SettingsListSection(
+                ListSection(
                   title: '單次支援',
                   children: [
                     for (final product in oneTime)
-                      SettingsListTile(
-                        title: product.title.contains('(')
-                            ? product.title.substring(0, product.title.indexOf('(')).trim()
-                            : product.title,
+                      ListSectionTile(
+                        title:
+                            product.title.contains('(')
+                                ? product.title.substring(0, product.title.indexOf('(')).trim()
+                                : product.title,
                         subtitle: Text(product.description),
                         trailing: Text(product.price),
                         onTap: () {

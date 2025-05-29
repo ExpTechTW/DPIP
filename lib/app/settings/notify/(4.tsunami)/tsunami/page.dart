@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
+import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/_widgets/tsunami_notify_section.dart';
 import 'package:dpip/app/settings/notify/page.dart';
@@ -29,7 +29,7 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
             );
           },
         ),
-        SettingsListSection(
+        ListSection(
           title: context.i18n.notify_test,
           children: [
             SoundListTile(

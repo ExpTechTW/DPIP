@@ -5,8 +5,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/(1.eew)/eew/page.dart';
 import 'package:dpip/app/settings/notify/(2.earthquake)/intensity/page.dart';
@@ -115,13 +115,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       child: const Text('設定'),
                     ),
                   ),
-                SettingsListSection(
+                ListSection(
                   title: '地震速報',
                   children: [
                     Selector<SettingsNotificationModel, EewNotifyType>(
                       selector: (_, model) => model.eew,
                       builder: (context, eew, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_eew,
                           subtitle: Text(getEewNotifyTypeName(eew)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -133,13 +133,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                SettingsListSection(
+                ListSection(
                   title: '地震',
                   children: [
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.monitor,
                       builder: (context, monitor, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_monitor,
                           subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -152,7 +152,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.report,
                       builder: (context, report, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_report,
                           subtitle: Text(getEarthquakeNotifyTypeName(report)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -165,7 +165,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, EarthquakeNotifyType>(
                       selector: (_, model) => model.intensity,
                       builder: (context, intensity, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_intensity,
                           subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -177,13 +177,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                SettingsListSection(
+                ListSection(
                   title: '天氣',
                   children: [
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.thunderstorm,
                       builder: (context, thunderstorm, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_thunderstorm,
                           subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -196,7 +196,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.weatherAdvisory,
                       builder: (context, weatherAdvisory, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_advisory,
                           subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -209,7 +209,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     Selector<SettingsNotificationModel, WeatherNotifyType>(
                       selector: (_, model) => model.evacuation,
                       builder: (context, evacuation, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_evacuation,
                           subtitle: Text(getWeatherNotifyTypeName(evacuation)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -221,13 +221,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                SettingsListSection(
+                ListSection(
                   title: '海嘯',
                   children: [
                     Selector<SettingsNotificationModel, TsunamiNotifyType>(
                       selector: (_, model) => model.tsunami,
                       builder: (context, tsunami, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.notify_tsunami,
                           subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
@@ -239,13 +239,13 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                     ),
                   ],
                 ),
-                SettingsListSection(
+                ListSection(
                   title: '其他',
                   children: [
                     Selector<SettingsNotificationModel, BasicNotifyType>(
                       selector: (_, model) => model.announcement,
                       builder: (context, announcement, child) {
-                        return SettingsListTile(
+                        return ListSectionTile(
                           title: context.i18n.announcement,
                           subtitle: Text(getBasicNotifyTypeName(announcement)),
                           trailing: const Icon(Symbols.chevron_right_rounded),

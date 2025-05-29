@@ -203,7 +203,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Material(
-                      color: (widget.backgroundColor ?? context.colors.surface).withValues(alpha: 0.75),
+                      color: (widget.backgroundColor ?? context.colors.surface).withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(borderRadius),
                       clipBehavior: Clip.antiAlias,
                       child: Stack(
@@ -217,8 +217,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [
-                                      context.colors.surface.withValues(alpha: 0.1),
-                                      context.colors.surface.withValues(alpha: 0.05),
+                                      context.colors.surfaceTint.withValues(alpha: 0.04),
+                                      context.colors.surfaceTint.withValues(alpha: 0.12),
                                     ],
                                   ),
                                 ),
@@ -327,7 +327,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                               ),
                               child: Material(
                                 color: (widget.backgroundColor ?? context.colors.surface).withValues(
-                                  alpha: Tween<double>(begin: 0.75, end: 1.0).transform(_morphController.value),
+                                  alpha: Tween<double>(begin: 0.6, end: 1.0).transform(_morphController.value),
                                 ),
                                 borderRadius: BorderRadius.circular(borderRadius),
                                 clipBehavior: Clip.antiAlias,
@@ -344,8 +344,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
                                                 colors: [
-                                                  context.colors.surface.withValues(alpha: 0.1),
-                                                  context.colors.surface.withValues(alpha: 0.05),
+                                                  context.colors.surfaceTint.withValues(alpha: 0.04),
+                                                  context.colors.surfaceTint.withValues(alpha: 0.12),
                                                 ],
                                               ),
                                             ),

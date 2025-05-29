@@ -4,8 +4,8 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
@@ -34,14 +34,14 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        SettingsListSection(
+        ListSection(
           title: widget.city,
           children: [
             for (final town in towns)
               Selector<SettingsLocationModel, String?>(
                 selector: (context, model) => model.code,
                 builder:
-                    (context, code, child) => SettingsListTile(
+                    (context, code, child) => ListSectionTile(
                       title: '${town.value.city} ${town.value.town}',
                       subtitle: Text(
                         '${town.key}・${town.value.lng.toStringAsFixed(2)}°E・${town.value.lat.toStringAsFixed(2)}°N',

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/global.dart';
 
 class SoundListTile extends StatefulWidget {
@@ -47,7 +47,7 @@ class _SoundListTileState extends State<SoundListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsListTile(
+    return ListSectionTile(
       title: widget.title,
       subtitle: widget.subtitle,
       trailing: _enabled ? const Icon(Symbols.play_circle_rounded) : const LoadingIcon(),

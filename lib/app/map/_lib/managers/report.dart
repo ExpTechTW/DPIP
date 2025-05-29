@@ -13,8 +13,8 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -504,11 +504,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     itemCount: grouped.length,
                     itemBuilder: (context, index) {
                       final MapEntry(key: date, value: reports) = grouped[index];
-                      return SettingsListSection(
+                      return ListSection(
                         title: date,
                         children: [
                           for (final report in reports)
-                            SettingsListTile(
+                            ListSectionTile(
                               leading: IntensityBox(
                                 intensity: report.intensity,
                                 size: 36,

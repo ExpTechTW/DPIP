@@ -5,8 +5,8 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -22,12 +22,12 @@ class SettingsLocalePage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        SettingsListSection(
+        ListSection(
           title: context.i18n.settings_locale,
           children: [
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return SettingsListTile(
+                return ListSectionTile(
                   icon: Symbols.translate_rounded,
                   title: context.i18n.settings_display_locale,
                   subtitle: Text(model.locale?.nativeName ?? '系統語言'),
@@ -36,7 +36,7 @@ class SettingsLocalePage extends StatelessWidget {
                 );
               },
             ),
-            SettingsListTile(
+            ListSectionTile(
               icon: Symbols.groups_rounded,
               title: context.i18n.settings_locale_crowdin,
               subtitle: Text(context.i18n.settings_locale_crowdin_description),

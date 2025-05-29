@@ -7,8 +7,8 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/l10n/app_localizations.dart';
 import 'package:dpip/models/settings/ui.dart';
@@ -42,7 +42,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        SettingsListSection(
+        ListSection(
           title: '選擇語言',
           children: [
             for (final locale in localeList)
@@ -53,7 +53,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                   final translated = p != null ? NumberFormat('#.#%').format(p.translation / 100) : '...';
                   final approved = p != null ? NumberFormat('#.#%').format(p.approval / 100) : '...';
 
-                  return SettingsListTile(
+                  return ListSectionTile(
                     title: locale.nativeName,
                     subtitle:
                         (locale.toLanguageTag() != 'zh-TW')

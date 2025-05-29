@@ -21,7 +21,6 @@ class PositionedLayerButton extends StatelessWidget {
       child: SafeArea(
         child: BlurredIconButton(
           icon: const Icon(Symbols.layers_rounded),
-          backgroundColor: context.colors.surface.withValues(alpha: 0.75),
           elevation: 2,
           onPressed:
               () => showModalBottomSheet(

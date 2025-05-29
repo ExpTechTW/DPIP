@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:dpip/utils/extensions/build_context.dart';
 
-class SettingsListTile extends StatelessWidget {
+class ListSectionTile extends StatelessWidget {
   final Widget? leading;
   final IconData? icon;
   final String title;
@@ -13,7 +13,7 @@ class SettingsListTile extends StatelessWidget {
   final void Function()? onLongPress;
   final TextStyle? titleStyle;
 
-  const SettingsListTile({
+  const ListSectionTile({
     super.key,
     this.leading,
     this.icon,

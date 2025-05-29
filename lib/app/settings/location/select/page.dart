@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -23,14 +23,14 @@ class SettingsLocationSelectPage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        SettingsListSection(
+        ListSection(
           title: context.i18n.location_city,
           children: [
             for (final city in cities)
               Selector<SettingsLocationModel, String?>(
                 selector: (context, model) => model.code,
                 builder:
-                    (context, code, child) => SettingsListTile(
+                    (context, code, child) => ListSectionTile(
                       title: city,
                       trailing: const Icon(Symbols.chevron_right_rounded),
                       subtitle:

@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -21,12 +21,12 @@ class SettingsThemePage extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
-        SettingsListSection(
+        ListSection(
           title: '主題模式',
           children: [
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return SettingsListTile(
+                return ListSectionTile(
                   icon: Symbols.dark_mode_rounded,
                   title: '主題模式',
                   subtitle: Text(switch (model.themeMode) {
@@ -41,7 +41,7 @@ class SettingsThemePage extends StatelessWidget {
             ),
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
-                return SettingsListTile(
+                return ListSectionTile(
                   icon: Symbols.palette_rounded,
                   title: '主題色',
                   subtitle: Text(model.themeColor != null ? ColorTools.nameThatColor(model.themeColor!) : '系統色彩'),

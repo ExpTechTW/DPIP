@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
-import 'package:dpip/app/settings/_widgets/list_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/models/settings/notify.dart';
 
@@ -34,11 +34,11 @@ class _EarthquakeNotifySectionState extends State<EarthquakeNotifySection> {
       EarthquakeNotifyType.off: (title: '關閉', icon: Symbols.notifications_off_rounded),
     };
 
-    return SettingsListSection(
+    return ListSection(
       title: '接收類別',
       children: [
         for (final MapEntry(key: item, value: (:title, :icon)) in values.entries)
-          SettingsListTile(
+          ListSectionTile(
             title: title,
             icon: icon,
             trailing:

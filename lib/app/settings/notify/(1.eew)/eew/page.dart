@@ -3,7 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/_widgets/list_section.dart';
+import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/eew_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
@@ -29,7 +29,7 @@ class SettingsNotifyEewPage extends StatelessWidget {
             );
           },
         ),
-        SettingsListSection(
+        ListSection(
           title: context.i18n.notify_test,
           children: [
             SoundListTile(

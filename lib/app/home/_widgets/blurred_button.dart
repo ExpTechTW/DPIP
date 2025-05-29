@@ -40,7 +40,7 @@ class BlurredTextButton extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: context.colors.outlineVariant.withValues(alpha: 0.4)),
-              color: backgroundColor ?? context.colors.surfaceContainer.withValues(alpha: 0.6),
+              color: backgroundColor ?? context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
             ),
             child: TextButton(
               style: TextButton.styleFrom(
@@ -92,7 +92,7 @@ class BlurredIconButton extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: sigmaX, sigmaY: sigmaY),
           child: IconButton(
             style: IconButton.styleFrom(
-              backgroundColor: backgroundColor ?? context.colors.surfaceContainer.withValues(alpha: 0.6),
+              backgroundColor: backgroundColor ?? context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
               foregroundColor: context.colors.outline,
             ),
             onPressed: onPressed,
