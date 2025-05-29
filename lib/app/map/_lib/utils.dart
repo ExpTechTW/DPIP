@@ -5,17 +5,17 @@ import 'package:dpip/widgets/map/map.dart';
 enum MapLayer { monitor, report, tsunami, radar, temperature, precipitation, wind }
 
 class MapSourceIds {
-  static const radar = 'radar';
+  const MapSourceIds._();
+
+  static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
+  static String report([String? code]) => code == null ? 'report' : 'report-$code';
 }
 
 class MapLayerIds {
   const MapLayerIds._();
 
-  static const radar = 'radar';
-
-  static Iterable<String> values() sync* {
-    yield radar;
-  }
+  static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
+  static String report([String? code]) => code == null ? 'report' : 'report-$code';
 }
 
 Future<void> cleanupMap(MapLibreMapController controller) async {

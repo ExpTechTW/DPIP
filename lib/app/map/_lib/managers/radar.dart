@@ -20,16 +20,17 @@ import 'package:dpip/widgets/ui/loading_icon.dart';
 class RadarMapLayerManager extends MapLayerManager {
   RadarMapLayerManager(super.context, super.controller);
 
-  final ValueNotifier<String?> currentRadarTime = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> currentRadarTime = ValueNotifier<String?>(GlobalProviders.data.radar.firstOrNull);
   final ValueNotifier<bool> isLoading = ValueNotifier<bool>(false);
 
   Future<void> _updateRadarTileUrl(String time) async {
     if (currentRadarTime.value == time || isLoading.value) return;
 
     isLoading.value = true;
+
     try {
-      currentRadarTime.value = time; // Update the notifier
       await remove();
+      currentRadarTime.value = time;
       await setup();
 
       TalkerManager.instance.info('Updated Radar tiles to "$time"');
@@ -45,37 +46,38 @@ class RadarMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      final isRadarSourceExists = (await controller.getSourceIds()).contains(MapSourceIds.radar);
-      final isRadarLayerExists = (await controller.getLayerIds()).contains(MapLayerIds.radar);
+      if (GlobalProviders.data.radar.isEmpty) {
+        final radarList = (await ExpTech().getRadarList()).reversed.toList();
+        if (!context.mounted) return;
+
+        GlobalProviders.data.setRadar(radarList);
+      }
+
+      final sourceId = MapSourceIds.radar(currentRadarTime.value);
+      final layerId = MapLayerIds.radar(currentRadarTime.value);
+
+      final isRadarSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isRadarLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (isRadarSourceExists && isRadarLayerExists) return;
 
       if (!isRadarSourceExists) {
-        if (GlobalProviders.data.radar.isEmpty) {
-          final radarList = (await ExpTech().getRadarList()).reversed.toList();
-          if (!context.mounted) return;
+        final properties = RasterSourceProperties(
+          tiles: ['https://api-1.exptech.dev/api/v1/tiles/radar/${currentRadarTime.value}/{z}/{x}/{y}.png'],
+          tileSize: 256,
+        );
 
-          GlobalProviders.data.setRadar(radarList);
-        }
-
-        currentRadarTime.value ??= GlobalProviders.data.radar.first;
-
-        final tileUrl = 'https://api-1.exptech.dev/api/v1/tiles/radar/${currentRadarTime.value}/{z}/{x}/{y}.png';
-
-        await controller.addSource(MapSourceIds.radar, RasterSourceProperties(tiles: [tileUrl], tileSize: 256));
-        TalkerManager.instance.info('Added Source "${MapSourceIds.radar}"');
+        await controller.addSource(sourceId, properties);
+        TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
       }
 
       if (!isRadarLayerExists) {
-        await controller.addLayer(
-          MapSourceIds.radar,
-          MapLayerIds.radar,
-          RasterLayerProperties(visibility: visible ? 'visible' : 'none'),
-          belowLayerId: BaseMapLayerIds.countyOutline,
-        );
-        TalkerManager.instance.info('Added Layer "${MapLayerIds.radar}"');
+        final properties = RasterLayerProperties(visibility: visible ? 'visible' : 'none');
+
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.countyOutline);
+        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       didSetup = true;
@@ -88,9 +90,11 @@ class RadarMapLayerManager extends MapLayerManager {
   Future<void> hide() async {
     if (!visible) return;
 
+    final layerId = MapLayerIds.radar(currentRadarTime.value);
+
     try {
-      await controller.setLayerVisibility(MapLayerIds.radar, false);
-      TalkerManager.instance.info('Hiding Layer "${MapLayerIds.radar}"');
+      await controller.setLayerVisibility(layerId, false);
+      TalkerManager.instance.info('Hiding Layer "$layerId"');
 
       visible = false;
     } catch (e, s) {
@@ -102,9 +106,11 @@ class RadarMapLayerManager extends MapLayerManager {
   Future<void> show() async {
     if (visible) return;
 
+    final layerId = MapLayerIds.radar(currentRadarTime.value);
+
     try {
-      await controller.setLayerVisibility(MapLayerIds.radar, true);
-      TalkerManager.instance.info('Showing Layer "${MapLayerIds.radar}"');
+      await controller.setLayerVisibility(layerId, true);
+      TalkerManager.instance.info('Showing Layer "$layerId"');
 
       visible = true;
     } catch (e, s) {
@@ -115,11 +121,14 @@ class RadarMapLayerManager extends MapLayerManager {
   @override
   Future<void> remove() async {
     try {
-      await controller.removeLayer(MapLayerIds.radar);
-      TalkerManager.instance.info('Removed Layer "${MapLayerIds.radar}"');
+      final layerId = MapLayerIds.radar(currentRadarTime.value);
+      final sourceId = MapSourceIds.radar(currentRadarTime.value);
 
-      await controller.removeSource(MapSourceIds.radar);
-      TalkerManager.instance.info('Removed Source "${MapSourceIds.radar}"');
+      await controller.removeLayer(layerId);
+      TalkerManager.instance.info('Removed Layer "$layerId"');
+
+      await controller.removeSource(sourceId);
+      TalkerManager.instance.info('Removed Source "$sourceId"');
     } catch (e, s) {
       TalkerManager.instance.error('RadarMapLayerManager.dispose', e, s);
     }
@@ -215,17 +224,14 @@ class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
                               );
                             }
 
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 8,
-                              children:
-                                  children.followedBy([
-                                    const Padding(
-                                      padding: EdgeInsets.only(right: 8),
-                                      child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
-                                    ),
-                                  ]).toList(),
+                            children.add(
+                              const Padding(
+                                padding: EdgeInsets.only(right: 8),
+                                child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                              ),
                             );
+
+                            return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
                           },
                         );
                       },
