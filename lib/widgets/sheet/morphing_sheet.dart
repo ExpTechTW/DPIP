@@ -49,8 +49,8 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
   bool _isOverflowing = false;
   Size? _partialSize;
 
-  static const double _verticalPadding = 16.0;
-  static const double _bottomMargin = 16.0;
+  static const double _verticalPadding = 8.0;
+  static const double _bottomMargin = 28.0;
   static const double _minHeightRatio = 0.15;
   static const double _maxHeightRatio = 0.3;
 
@@ -103,15 +103,21 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
 
     if (contentBox != null) {
       final screenHeight = context.screen.height;
-      setState(() {
-        _isOverflowing = contentBox.size.height > screenHeight * 0.85;
-      });
+      final isOverflowing = contentBox.size.height > screenHeight * 0.85;
+      if (_isOverflowing != isOverflowing) {
+        setState(() {
+          _isOverflowing = isOverflowing;
+        });
+      }
     }
 
     if (partialBox != null) {
-      setState(() {
-        _partialSize = partialBox.size;
-      });
+      final newSize = partialBox.size;
+      if (_partialSize != newSize) {
+        setState(() {
+          _partialSize = newSize;
+        });
+      }
     }
   }
 
@@ -119,15 +125,21 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
     if (_partialSize == null) return _minHeightRatio;
     final screenHeight = context.screen.height;
 
-    // 計算包括所有 padding 和 margin 的總高度
+    // Calculate total height including all padding and margin
     final totalHeight =
-        _partialSize!.height + // 內容高度
-        (_verticalPadding * 2) + // 上下 padding
-        context.padding.bottom + // 螢幕 padding
-        _bottomMargin + // 下 margin
-        widget.floatingPadding.vertical; // 浮動 padding
+        _partialSize!.height + // Content height
+        (_verticalPadding * 2) + // Top and bottom padding
+        _bottomMargin + // Bottom margin
+        widget.floatingPadding.vertical; // Floating padding
 
-    return (totalHeight / screenHeight).clamp(_minHeightRatio, _maxHeightRatio);
+    // Ensure the height ratio is within bounds and responsive to content
+    final calculatedRatio = totalHeight / screenHeight;
+
+    // If the content is taller than the min ratio, use the content height
+    if (calculatedRatio > _minHeightRatio) {
+      return calculatedRatio.clamp(_minHeightRatio, _maxHeightRatio);
+    }
+    return _minHeightRatio;
   }
 
   void _onSheetPositionChanged() {
@@ -212,14 +224,21 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                 ),
                               ),
                             ),
-                          SizedBox(
-                            key: _partialKey,
-                            width: double.infinity,
-                            child: widget.partialBuilder(
-                              context,
-                              ScrollController(),
-                              widget.controller ?? MorphingSheetController(),
-                            ),
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              return SingleChildScrollView(
+                                physics: const NeverScrollableScrollPhysics(),
+                                child: SizedBox(
+                                  key: _partialKey,
+                                  width: constraints.maxWidth,
+                                  child: widget.partialBuilder(
+                                    context,
+                                    ScrollController(),
+                                    widget.controller ?? MorphingSheetController(),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -337,14 +356,22 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                                       children: [
                                         Opacity(
                                           opacity: 1 - _morphController.value,
-                                          child: SizedBox(
-                                            key: _partialKey,
-                                            width: double.infinity,
-                                            child: widget.partialBuilder(
-                                              context,
-                                              scrollController,
-                                              widget.controller ?? MorphingSheetController(),
-                                            ),
+                                          child: LayoutBuilder(
+                                            builder: (context, constraints) {
+                                              return SingleChildScrollView(
+                                                physics: const NeverScrollableScrollPhysics(),
+                                                padding: EdgeInsets.zero,
+                                                child: SizedBox(
+                                                  key: _partialKey,
+                                                  width: constraints.maxWidth,
+                                                  child: widget.partialBuilder(
+                                                    context,
+                                                    scrollController,
+                                                    widget.controller ?? MorphingSheetController(),
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                           ),
                                         ),
                                         Opacity(

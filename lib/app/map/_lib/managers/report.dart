@@ -1,3 +1,7 @@
+import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/extensions/list.dart';
+import 'package:dpip/utils/map_utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -28,18 +32,18 @@ class ReportMapLayerManager extends MapLayerManager {
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
 
-  Future<void> _setReport(PartialEarthquakeReport? report) async {
+  Future<void> _setReport(PartialEarthquakeReport? report, {bool focus = true}) async {
     if (isLoading.value) return;
 
     isLoading.value = true;
 
     try {
-      await _removeReport(currentReport.value);
+      await _removeReport(currentReport.value, focus: focus);
 
       currentReport.value = report;
 
       if (report != null) {
-        await _addReport(currentReport.value);
+        await _addReport(currentReport.value, focus: focus);
       }
 
       TalkerManager.instance.info('Updated report to "${report?.id}"');
@@ -48,6 +52,30 @@ class ReportMapLayerManager extends MapLayerManager {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> _focus([EarthquakeReport? report]) async {
+    if (report != null) {
+      await controller.animateCamera(
+        CameraUpdate.newLatLngBounds(report.bounds, left: 48, right: 48, top: 96, bottom: 192),
+      );
+      return;
+    }
+
+    final data = GlobalProviders.data.partialReport;
+    var bounds = <double>[];
+
+    for (final report in data) {
+      if (bounds.isEmpty) {
+        bounds = [report.latitude, report.longitude, report.latitude, report.longitude];
+      } else {
+        bounds = expandBounds(bounds, report.latlng);
+      }
+    }
+
+    await controller.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds.asLatLngBounds, left: 48, right: 48, top: 96, bottom: 192),
+    );
   }
 
   @override
@@ -73,7 +101,7 @@ class ReportMapLayerManager extends MapLayerManager {
       if (!isSourceExists) {
         final data =
             GeoJsonBuilder()
-                .setFeatures(GlobalProviders.data.partialReport.map((report) => report.toGeoJsonFeature()))
+                .setFeatures(GlobalProviders.data.partialReport.reversed.map((report) => report.toGeoJsonFeature()))
                 .build();
 
         final properties = GeojsonSourceProperties(data: data);
@@ -92,16 +120,27 @@ class ReportMapLayerManager extends MapLayerManager {
             ['linear'],
             [Expressions.get, 'magnitude'],
             1,
-            0.05,
+            0.1,
             10,
-            0.5,
+            0.6,
+          ],
+          iconOpacity: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.get, 'time'],
+            DateTime.now().millisecondsSinceEpoch - const Duration(days: 14).inMilliseconds,
+            0.2,
+            GlobalProviders.data.partialReport.first.time.millisecondsSinceEpoch,
+            1.0,
           ],
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
+          symbolZOrder: 'source',
           visibility: visible ? 'visible' : 'none',
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
@@ -116,7 +155,7 @@ class ReportMapLayerManager extends MapLayerManager {
     if (!visible) return;
 
     if (currentReport.value != null) {
-      await _setReport(null);
+      await _setReport(null, focus: false);
     }
 
     final layerId = MapLayerIds.report();
@@ -140,6 +179,8 @@ class ReportMapLayerManager extends MapLayerManager {
     try {
       await controller.setLayerVisibility(layerId, true);
       TalkerManager.instance.info('Showing Layer "$layerId"');
+
+      await _focus();
 
       visible = true;
     } catch (e, s) {
@@ -165,7 +206,14 @@ class ReportMapLayerManager extends MapLayerManager {
     didSetup = false;
   }
 
-  Future<void> _addReport(PartialEarthquakeReport? partial) async {
+  @override
+  void onPopInvoked() {
+    if (currentReport.value == null) return;
+
+    _setReport(null);
+  }
+
+  Future<void> _addReport(PartialEarthquakeReport? partial, {bool focus = true}) async {
     if (partial == null) return;
 
     var report = GlobalProviders.data.report[partial.id];
@@ -187,7 +235,7 @@ class ReportMapLayerManager extends MapLayerManager {
       if (isSourceExists && isLayerExists) return;
 
       if (!isSourceExists) {
-        final data = report.toGeoJson();
+        final data = report.toGeoJson().build();
         final properties = GeojsonSourceProperties(data: data);
 
         await controller.addSource(sourceId, properties);
@@ -197,24 +245,28 @@ class ReportMapLayerManager extends MapLayerManager {
       }
 
       if (!isLayerExists) {
-        final properties = SymbolLayerProperties(
-          iconImage: [
-            [Expressions.get, 'icon'],
-          ],
+        const properties = SymbolLayerProperties(
+          iconImage: [Expressions.get, 'icon'],
+          iconSize: kSymbolIconSize,
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
-          visibility: visible ? 'visible' : 'none',
+          symbolZOrder: 'source',
         );
 
         await controller.addLayer(sourceId, layerId, properties);
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
+
+      if (focus) await _focus(report);
+
+      await controller.setLayerVisibility(MapLayerIds.report(), false);
+      TalkerManager.instance.info('Hiding Layer "$layerId"');
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager._addReport', e, s);
     }
   }
 
-  Future<void> _removeReport(PartialEarthquakeReport? report) async {
+  Future<void> _removeReport(PartialEarthquakeReport? report, {bool focus = true}) async {
     if (report == null) return;
 
     try {
@@ -233,6 +285,11 @@ class ReportMapLayerManager extends MapLayerManager {
         await controller.removeSource(sourceId);
         TalkerManager.instance.info('Removed Source "$sourceId"');
       }
+
+      if (focus) await _focus();
+
+      await controller.setLayerVisibility(MapLayerIds.report(), true);
+      TalkerManager.instance.info('Showing Layer "$layerId"');
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager._removeReport', e, s);
     }
@@ -337,79 +394,170 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
             }
 
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Selector<DpipDataModel, List<String>>(
-                selector: (context, model) => model.radar,
-                builder: (context, radar, child) {
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 4,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 12,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Row(
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 2,
                           children: [
-                            const Icon(Symbols.docs_rounded, size: 24),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text(context.i18n.report, style: context.textTheme.titleMedium)),
+                            Text(
+                              currentReport.hasNumber
+                                  ? context.i18n.report_with_number(currentReport.number!)
+                                  : context.i18n.report_without_number,
+                              style: context.textTheme.labelMedium?.copyWith(color: context.colors.outline),
+                            ),
+                            Text(
+                              currentReport.extractLocation(),
+                              style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              currentReport.time.toLocaleDateTimeString(context),
+                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IntensityBox(
+                        intensity: currentReport.intensity,
+                        size: 56,
+                        borderRadius: 12,
+                        border: !currentReport.hasNumber,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    spacing: 16,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              context.i18n.report_magnitude,
+                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                            ),
+                            Text(
+                              'M ${currentReport.magnitude.toStringAsFixed(1)}',
+                              style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              context.i18n.report_depth,
+                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                            ),
+                            Text(
+                              '${currentReport.depth}km',
+                              style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
+                            ),
                           ],
                         ),
                       ),
                     ],
-                  );
-                },
+                  ),
+                ],
               ),
             );
           },
         );
       },
       fullBuilder: (context, controller, sheetController) {
-        final grouped =
-            GlobalProviders.data.partialReport
-                .groupListsBy((report) => report.time.toLocaleFullDateString(context))
-                .entries
-                .toList();
+        return ValueListenableBuilder(
+          valueListenable: widget.manager.currentReport,
+          builder: (context, currentReport, child) {
+            if (currentReport == null) {
+              final grouped =
+                  GlobalProviders.data.partialReport
+                      .groupListsBy((report) => report.time.toLocaleFullDateString(context))
+                      .entries
+                      .toList();
+              return CustomScrollView(
+                controller: controller,
+                slivers: [
+                  SliverAppBar(
+                    title: Text(context.i18n.report),
+                    leading: BackButton(
+                      onPressed: () {
+                        sheetController.collapse();
+                        controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
+                      },
+                    ),
+                    floating: true,
+                    snap: true,
+                    pinned: true,
+                  ),
+                  SliverList.builder(
+                    itemCount: grouped.length,
+                    itemBuilder: (context, index) {
+                      final MapEntry(key: date, value: reports) = grouped[index];
+                      return SettingsListSection(
+                        title: date,
+                        children: [
+                          for (final report in reports)
+                            SettingsListTile(
+                              leading: IntensityBox(
+                                intensity: report.intensity,
+                                size: 36,
+                                borderRadius: 8,
+                                border: !report.hasNumber,
+                              ),
+                              title: report.extractLocation(),
+                              subtitle: Text(
+                                '${report.hasNumber ? '${context.i18n.report_with_number(report.number!)}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
+                              ),
+                              trailing: Text(
+                                'M ${report.magnitude.toStringAsFixed(1)}',
+                                style: context.textTheme.labelLarge,
+                              ),
+                              onTap: () {
+                                widget.manager._setReport(report);
+                                sheetController.collapse();
+                              },
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              );
+            }
 
-        return CustomScrollView(
-          controller: controller,
-          slivers: [
-            SliverAppBar(
-              title: Text(context.i18n.report),
-              leading: BackButton(
-                onPressed: () {
-                  sheetController.collapse();
-                  controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
-                },
-              ),
-              floating: true,
-              snap: true,
-              pinned: true,
-            ),
-            SliverList.builder(
-              itemCount: grouped.length,
-              itemBuilder: (context, index) {
-                final MapEntry(key: date, value: reports) = grouped[index];
-                return SettingsListSection(
-                  title: date,
-                  children: [
-                    for (final report in reports)
-                      SettingsListTile(
-                        leading: IntensityBox(
-                          intensity: report.intensity,
-                          size: 36,
-                          borderRadius: 8,
-                          border: !report.hasNumber,
-                        ),
-                        title: report.extractLocation(),
-                        subtitle: Text(
-                          '${report.hasNumber ? '${context.i18n.report_with_number(report.number!)}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
-                        ),
-                        trailing: Text('M ${report.magnitude.toStringAsFixed(1)}', style: context.textTheme.labelLarge),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ],
+            return CustomScrollView(
+              controller: controller,
+              slivers: [
+                SliverAppBar(
+                  title: Text(
+                    currentReport.hasNumber
+                        ? context.i18n.report_with_number(currentReport.number!)
+                        : context.i18n.report_without_number,
+                  ),
+                  leading: BackButton(
+                    onPressed: () {
+                      widget.manager._setReport(null);
+                      controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
+                    },
+                  ),
+                  floating: true,
+                  snap: true,
+                  pinned: true,
+                ),
+              ],
+            );
+          },
         );
       },
     );

@@ -1,3 +1,4 @@
+import 'package:dpip/utils/map_utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
@@ -137,6 +138,18 @@ class EarthquakeReport {
 
   String? get pgvMapImageUrl => pgvMapImageName == null ? null : '$traceBaseUrl/$pgvMapImageName';
 
+  LatLngBounds get bounds {
+    final bounds = [latitude, longitude, latitude, longitude];
+
+    for (final area in list.values) {
+      for (final town in area.town.values) {
+        expandBounds(bounds, LatLng(town.lat, town.lon));
+      }
+    }
+
+    return LatLngBounds(southwest: LatLng(bounds[0], bounds[1]), northeast: LatLng(bounds[2], bounds[3]));
+  }
+
   int getMaxIntensity() {
     int max = 0;
 
@@ -184,10 +197,9 @@ class EarthquakeReport {
   GeoJsonBuilder toGeoJson() {
     final stations = list.values.expand((area) => area.town.values);
     final features = stations.map((station) => station.toGeoJsonFeature()).toList();
-    final cross = GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        .setGeometry(latlng.toGeoJsonCoordinates())
-        .setProperty('icon', 'cross-${getMaxIntensity()}')
-        .setProperty('magnitude', magnitude);
+    final cross = GeoJsonFeatureBuilder(
+      GeoJsonFeatureType.Point,
+    ).setGeometry(latlng.toGeoJsonCoordinates()).setProperty('icon', 'cross-7').setProperty('magnitude', magnitude);
 
     features.insert(0, cross);
 

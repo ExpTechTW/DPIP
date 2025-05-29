@@ -9,6 +9,9 @@ abstract class MapLayerManager {
   bool didSetup = false;
   bool visible = false;
 
+  /// 這個管理器是否允許頁面返回行為
+  bool get shouldPop => true;
+
   MapLayerManager(this.context, this.controller);
 
   /// 初始化圖層，並將 [didSetup] 設為 `true`
@@ -25,6 +28,9 @@ abstract class MapLayerManager {
 
   /// 將圖層從地圖移除
   Future<void> remove();
+
+  /// 當頁面返回時會呼叫這個方法
+  void onPopInvoked() {}
 
   /// 構建圖層的資訊顯示介面
   Widget build(BuildContext context) => const SizedBox.shrink();

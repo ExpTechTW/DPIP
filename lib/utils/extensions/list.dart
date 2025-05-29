@@ -22,6 +22,8 @@ extension ListExtension<T> on List<T> {
 
 extension ListExtension2 on List<double> {
   LatLng get asLatLng => LatLng(this[0], this[1]);
+  LatLngBounds get asLatLngBounds =>
+      LatLngBounds(southwest: LatLng(this[0], this[1]), northeast: LatLng(this[2], this[3]));
 }
 
 extension IterableExtension<T> on Iterable<T> {

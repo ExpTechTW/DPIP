@@ -26,6 +26,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
+  late final MapLibreMapController _controller;
   final _managers = <MapLayer, MapLayerManager>{};
 
   Timer? _ticker;
@@ -52,19 +53,24 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     await _hideLayers();
 
-    final manager = _managers[layer];
-
-    if (manager == null) throw UnimplementedError('Unknown layer: $layer');
-
     try {
+      if (layer == null) {
+        _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        return;
+      }
+
+      final manager = _managers[layer];
+
+      if (manager == null) throw UnimplementedError('Unknown layer: $layer');
+
       if (!manager.didSetup) await manager.setup();
 
       await _hideLayers();
       await manager.show();
-
-      setState(() => _currentLayer = layer);
     } catch (e, s) {
       TalkerManager.instance.error('_MapPageState._setCurrentLayer', e, s);
+    } finally {
+      setState(() => _currentLayer = layer);
     }
   }
 
@@ -84,8 +90,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   void onMapCreated(MapLibreMapController controller) {
+    setState(() => _controller = controller);
+
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
+
     setCurrentLayer(currentLayer);
   }
 

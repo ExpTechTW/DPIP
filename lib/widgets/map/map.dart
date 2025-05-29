@@ -65,11 +65,11 @@ class DpipMap extends StatefulWidget {
   /// Default is `false`.
   final bool focusUserLocationOnValueUpdate;
 
-  static const kTaiwanCenter = LatLng(23.10, 120.85);
+  static const kTaiwanCenter = LatLng(23.60, 120.85);
 
   const DpipMap({
     super.key,
-    this.initialCameraPosition = const CameraPosition(target: LatLng(23.10, 120.85), zoom: 6.2),
+    this.initialCameraPosition = const CameraPosition(target: kTaiwanCenter, zoom: 6.4),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
