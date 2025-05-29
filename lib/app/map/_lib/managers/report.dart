@@ -1,27 +1,35 @@
-import 'package:dpip/api/model/report/earthquake_report.dart';
-import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/extensions/list.dart';
-import 'package:dpip/utils/map_utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/depth_color.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
+import 'package:dpip/utils/extensions/int.dart';
+import 'package:dpip/utils/extensions/list.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/magnitude_color.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/widgets/list/detail_field_tile.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/report/enlargeable_image.dart';
 import 'package:dpip/widgets/report/intensity_box.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
@@ -485,6 +493,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                       .groupListsBy((report) => report.time.toLocaleFullDateString(context))
                       .entries
                       .toList();
+
               return CustomScrollView(
                 controller: controller,
                 slivers: [
@@ -500,51 +509,288 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     snap: true,
                     pinned: true,
                   ),
-                  SliverList.builder(
-                    itemCount: grouped.length,
-                    itemBuilder: (context, index) {
-                      final MapEntry(key: date, value: reports) = grouped[index];
-                      return ListSection(
-                        title: date,
-                        children: [
-                          for (final report in reports)
-                            ListSectionTile(
-                              leading: IntensityBox(
-                                intensity: report.intensity,
-                                size: 36,
-                                borderRadius: 8,
-                                border: !report.hasNumber,
+                  SliverPadding(
+                    padding: EdgeInsets.only(bottom: context.padding.bottom),
+                    sliver: SliverList.builder(
+                      itemCount: grouped.length,
+                      itemBuilder: (context, index) {
+                        final MapEntry(key: date, value: reports) = grouped[index];
+                        return ListSection(
+                          title: date,
+                          children: [
+                            for (final report in reports)
+                              ListSectionTile(
+                                leading: IntensityBox(
+                                  intensity: report.intensity,
+                                  size: 36,
+                                  borderRadius: 8,
+                                  border: !report.hasNumber,
+                                ),
+                                title: report.extractLocation(),
+                                subtitle: Text(
+                                  '${report.hasNumber ? '${context.i18n.report_with_number(report.number!)}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
+                                ),
+                                trailing: Text(
+                                  'M ${report.magnitude.toStringAsFixed(1)}',
+                                  style: context.textTheme.labelLarge,
+                                ),
+                                onTap: () {
+                                  widget.manager._setReport(report);
+                                  sheetController.collapse();
+                                },
                               ),
-                              title: report.extractLocation(),
-                              subtitle: Text(
-                                '${report.hasNumber ? '${context.i18n.report_with_number(report.number!)}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
-                              ),
-                              trailing: Text(
-                                'M ${report.magnitude.toStringAsFixed(1)}',
-                                style: context.textTheme.labelLarge,
-                              ),
-                              onTap: () {
-                                widget.manager._setReport(report);
-                                sheetController.collapse();
-                              },
-                            ),
-                        ],
-                      );
-                    },
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ],
               );
+            }
+
+            final report = GlobalProviders.data.report[currentReport.id];
+
+            late List<Widget> content;
+
+            if (report == null) {
+              content = [const Center(child: CircularProgressIndicator())];
+            } else {
+              content = [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      IntensityBox(intensity: report.getMaxIntensity()),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              report.hasNumber
+                                  ? context.i18n.report_with_number(report.number!)
+                                  : context.i18n.report_without_number,
+                              style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
+                            ),
+                            Text(
+                              report.getLocation(),
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    ActionChip(
+                      avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
+                      label: Text(context.i18n.open_report_url),
+                      backgroundColor: context.colors.primary,
+                      labelStyle: TextStyle(color: context.colors.onPrimary),
+                      side: BorderSide(color: context.colors.primary),
+                      onPressed: () {
+                        launchUrl(report.reportUrl);
+                      },
+                    ),
+                    /* ActionChip(
+                        avatar: const Icon(Symbols.replay),
+                        label: Text(context.i18n.report_replay),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapMonitorPage(data: report.time.millisecondsSinceEpoch - 5000),
+                            ),
+                          );
+                        },
+                      ), */
+                  ],
+                ),
+                const Divider(),
+                DetailFieldTile(
+                  label: context.i18n.report_event_time,
+                  child: Text(
+                    DateFormat(context.i18n.datetime_format).format(report.time),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                DetailFieldTile(
+                  label: context.i18n.report_location,
+                  child: Text(
+                    report.convertLatLon(),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DetailFieldTile(
+                        label: context.i18n.report_magnitude,
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 12,
+                              width: 12,
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: MagnitudeColor.magnitude(report.magnitude),
+                              ),
+                            ),
+                            Text(
+                              'M ${report.magnitude}',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: DetailFieldTile(
+                        label: context.i18n.report_depth,
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 12,
+                              width: 12,
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: DepthColor.depth(report.depth),
+                              ),
+                            ),
+                            Text(
+                              '${report.depth} km',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                DetailFieldTile(
+                  label: context.i18n.report_intensity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final MapEntry(key: areaName, value: area) in report.list.entries)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Column(
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text(areaName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Expanded(
+                                    child: Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        for (final MapEntry(key: townName, value: town) in area.town.entries)
+                                          ActionChip(
+                                            padding: const EdgeInsets.all(4),
+                                            side: BorderSide(color: IntensityColor.intensity(town.intensity)),
+                                            backgroundColor: IntensityColor.intensity(
+                                              town.intensity,
+                                            ).withValues(alpha: 0.16),
+                                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            avatar: AspectRatio(
+                                              aspectRatio: 1,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  color: IntensityColor.intensity(town.intensity),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    town.intensity.asIntensityDisplayLabel,
+                                                    style: TextStyle(
+                                                      height: 1,
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: IntensityColor.onIntensity(town.intensity),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            label: Text(townName),
+                                            onPressed: () {
+                                              sheetController.collapse();
+                                              widget.manager.controller.animateCamera(
+                                                CameraUpdate.newLatLng(LatLng(town.lat, town.lon)),
+                                              );
+                                            },
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                DetailFieldTile(
+                  label: context.i18n.report_image,
+                  child: EnlargeableImage(
+                    aspectRatio: 4 / 3,
+                    heroTag: 'report-image-${report.id}',
+                    imageUrl: report.reportImageUrl,
+                    imageName: report.reportImageName,
+                  ),
+                ),
+                if (report.hasNumber)
+                  DetailFieldTile(
+                    label: context.i18n.report_intensity_image,
+                    child: EnlargeableImage(
+                      aspectRatio: 2334 / 2977,
+                      heroTag: 'intensity-image-${report.id}',
+                      imageUrl: report.intensityMapImageUrl!,
+                      imageName: report.intensityMapImageName!,
+                    ),
+                  ),
+                if (report.hasNumber)
+                  DetailFieldTile(
+                    label: context.i18n.report_pga_image,
+                    child: EnlargeableImage(
+                      aspectRatio: 2334 / 2977,
+                      heroTag: 'pga-image-${report.id}',
+                      imageUrl: report.pgaMapImageUrl!,
+                      imageName: report.pgaMapImageName!,
+                    ),
+                  ),
+                if (report.hasNumber)
+                  DetailFieldTile(
+                    label: context.i18n.report_pgv_image,
+                    child: EnlargeableImage(
+                      aspectRatio: 2334 / 2977,
+                      heroTag: 'pgv-image-${report.id}',
+                      imageUrl: report.pgvMapImageUrl!,
+                      imageName: report.pgvMapImageName!,
+                    ),
+                  ),
+              ];
             }
 
             return CustomScrollView(
               controller: controller,
               slivers: [
                 SliverAppBar(
-                  title: Text(
-                    currentReport.hasNumber
-                        ? context.i18n.report_with_number(currentReport.number!)
-                        : context.i18n.report_without_number,
-                  ),
+                  title: Text(context.i18n.report),
                   leading: BackButton(
                     onPressed: () {
                       widget.manager._setReport(null);
@@ -554,6 +800,10 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   floating: true,
                   snap: true,
                   pinned: true,
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, context.padding.bottom),
+                  sliver: SliverList.list(children: content),
                 ),
               ],
             );
