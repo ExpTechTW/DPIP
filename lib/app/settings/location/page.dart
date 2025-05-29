@@ -505,7 +505,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        if (Platform.isAndroid && autoStartPermission != null)
+        if (Platform.isAndroid && false)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
             builder: (context, auto, child) {
@@ -620,7 +620,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             ),
           ],
         ),
-        if (autoStartPermission != null && Platform.isAndroid)
+        if (false && Platform.isAndroid)
           Selector<SettingsLocationModel, ({bool auto, String? code})>(
             selector: (context, model) => (auto: model.auto, code: model.code),
             builder: (context, data, child) {
