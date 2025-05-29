@@ -31,8 +31,9 @@ class AppLayout extends StatelessWidget {
             left: 24,
             child: SafeArea(
               child: BlurredIconButton(
-                onPressed: () => context.push(MapPage.route(layer: MapLayer.radar)),
                 icon: const Icon(Symbols.map_rounded),
+                onPressed: () => context.push(MapPage.route(layer: MapLayer.radar)),
+                elevation: 2,
               ),
             ),
           ),
@@ -41,8 +42,9 @@ class AppLayout extends StatelessWidget {
             right: 24,
             child: SafeArea(
               child: BlurredIconButton(
-                onPressed: () => context.push('/settings'),
                 icon: const Icon(Symbols.settings_rounded),
+                onPressed: () => context.push('/settings'),
+                elevation: 2,
               ),
             ),
           ),

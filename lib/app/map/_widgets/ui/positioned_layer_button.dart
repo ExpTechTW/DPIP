@@ -1,3 +1,4 @@
+import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -18,8 +19,10 @@ class PositionedLayerButton extends StatelessWidget {
       top: 24,
       right: 24,
       child: SafeArea(
-        child: IconButton.filledTonal(
+        child: BlurredIconButton(
           icon: const Icon(Symbols.layers_rounded),
+          backgroundColor: context.colors.surface.withValues(alpha: 0.75),
+          elevation: 2,
           onPressed:
               () => showModalBottomSheet(
                 context: context,

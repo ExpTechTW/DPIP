@@ -25,6 +25,7 @@ class LocationButton extends StatelessWidget {
           onPressed: () => context.push(SettingsLocationPage.route),
           text: content,
           textStyle: context.theme.textTheme.bodyLarge,
+          elevation: 2,
         );
       },
     );
