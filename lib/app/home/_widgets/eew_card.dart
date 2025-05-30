@@ -14,6 +14,9 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
 
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
+
 class EewCard extends StatefulWidget {
   final Eew data;
 
@@ -243,7 +246,7 @@ class _EewCardState extends State<EewCard> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              // onTap: () => context.push(MapMonitorPage.route),
+              onTap: () => context.push(MapPage.route(layer: MapLayer.monitor)),
               splashColor: context.colors.error.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
