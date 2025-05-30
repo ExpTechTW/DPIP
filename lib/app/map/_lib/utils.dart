@@ -11,6 +11,9 @@ class MapSourceIds {
   static String report([String? time]) => time == null ? 'report' : 'report-$time';
   static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
   static String monitor([String? code]) => code == null ? 'monitor' : 'monitor-$code';
+  static String temperature([String? time]) => time == null ? 'temperature' : 'temperature-$time';
+  static String precipitation([String? time]) => time == null ? 'precipitation' : 'precipitation-$time';
+  static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
 }
 
 class MapLayerIds {
@@ -20,6 +23,9 @@ class MapLayerIds {
   static String report([String? time]) => time == null ? 'report' : 'report-$time';
   static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
   static String monitor([String? code]) => code == null ? 'monitor' : 'monitor-$code';
+  static String temperature([String? time]) => time == null ? 'temperature' : 'temperature-$time';
+  static String precipitation([String? time]) => time == null ? 'precipitation' : 'precipitation-$time';
+  static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
 }
 
 Future<void> cleanupMap(MapLibreMapController controller) async {

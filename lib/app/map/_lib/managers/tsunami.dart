@@ -23,11 +23,13 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 
 class TsunamiMapLayerManager extends MapLayerManager {
   TsunamiMapLayerManager(super.context, super.controller);
 
   final currentTsunami = ValueNotifier(null);
+  final isLoading = ValueNotifier<bool>(false);
 
   @override
   Future<void> setup() async {

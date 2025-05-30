@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:dpip/app/map/_lib/managers/report.dart';
 import 'package:dpip/app/map/_lib/managers/tsunami.dart';
+import 'package:dpip/app/map/_lib/managers/temperature.dart';
+import 'package:dpip/app/map/_lib/managers/precipitation.dart';
+import 'package:dpip/app/map/_lib/managers/wind.dart';
 import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:flutter/material.dart';
 
@@ -98,6 +101,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
     _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
+    _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
+    _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
+    _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
 
     setCurrentLayer(currentLayer);
   }
