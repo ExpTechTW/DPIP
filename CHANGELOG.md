@@ -7,12 +7,16 @@
 
 ## [未發布]
 
+## [3.0.011] - 2025-05-31
+
 ### 新增
 
 - 新地圖架構 (e28c1bb7dca509cb5878af77c61faabcc34016e2) (4cc4c8f477d19aeb72b1fe274e34be2c0c0bc8a6)
+- 新增地震報告 (cf66e3f)
 
 ### 更改
 
+- 所在地頁面中隱藏所有 Android 的自啟動提示警告。
 - Apple 裝置啟動畫面 icon 改為螢幕寬度的 30%。 (75800b3)
 - 重構 Apple 裝置型號對應邏輯。 (f784217)
 
@@ -110,7 +114,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.010...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.011...HEAD
+[3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
 [3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
 [3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
 [3.0.008]: https://github.com/exptechtw/dpip/compare/v3.0.007...v3.0.008
