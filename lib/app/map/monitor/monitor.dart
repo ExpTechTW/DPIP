@@ -1192,7 +1192,9 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> with Single
                               color:
                                   (!_dataStatus())
                                       ? Colors.red
-                                      : (_ping > 1)
+                                      : _ping > 2
+                                      ? Colors.red
+                                      : _ping > 1
                                       ? Colors.orange
                                       : Colors.green,
                             ),
