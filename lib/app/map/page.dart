@@ -99,11 +99,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
-    // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
+    _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
-    // _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
-    // _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
-    // _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
+    _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
+    _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
+    _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
 
     setCurrentLayer(currentLayer);
   }

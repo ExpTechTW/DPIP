@@ -1,23 +1,23 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app_old/page/map/meteor.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/time_selector.dart';
-import 'package:dpip/widgets/map/legend.dart';
-import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class TemperatureData {
   final double latitude;
@@ -42,7 +42,7 @@ class TemperatureData {
 class TemperatureMapLayerManager extends MapLayerManager {
   TemperatureMapLayerManager(super.context, super.controller);
 
-  final currentTemperatureTime = ValueNotifier(null);
+  final currentTemperatureTime = ValueNotifier<String?>(GlobalProviders.data.temperature.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
   Future<void> _updateTemperatureTileUrl(String time) async {
@@ -52,6 +52,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
     try {
       await remove();
+      currentTemperatureTime.value = time;
       await setup();
 
       TalkerManager.instance.info('Updated Temperature tiles to "$time"');
@@ -67,12 +68,90 @@ class TemperatureMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
+      if (GlobalProviders.data.temperature.isEmpty) {
+        final temperatureList = (await ExpTech().getWeatherList()).reversed.toList();
+        if (!context.mounted) return;
 
-      final sourceId = MapSourceIds.temperature(currentTemperatureTime.value);
-      final layerId = MapLayerIds.temperature(currentTemperatureTime.value);
+        GlobalProviders.data.setTemperature(temperatureList);
+        currentTemperatureTime.value = temperatureList.first;
+      }
+
+      final time = currentTemperatureTime.value;
+
+      if (time == null) throw Exception('Time is null');
+
+      final sourceId = MapSourceIds.temperature(time);
+      final layerId = MapLayerIds.temperature(time);
 
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
+
+      if (!isSourceExists) {
+        late final List<WeatherStation> weatherData;
+
+        if (GlobalProviders.data.weatherData.containsKey(time)) {
+          weatherData = GlobalProviders.data.weatherData[time]!;
+        } else {
+          weatherData = await ExpTech().getWeather(time);
+          GlobalProviders.data.setWeatherData(time, weatherData);
+        }
+
+        final features =
+            weatherData
+                .where((station) => station.data.air.temperature != -99)
+                .map((station) => station.toFeatureBuilder())
+                .toList();
+
+        final data = GeoJsonBuilder().setFeatures(features).build();
+
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(sourceId, properties);
+        TalkerManager.instance.info('Added Source "$sourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isLayerExists) {
+        final properties = CircleLayerProperties(
+          circleRadius: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.zoom],
+            7,
+            5,
+            12,
+            15,
+          ],
+          circleColor: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.get, 'temperature'],
+            -20,
+            '#4d4e51',
+            -10,
+            '#0000FF',
+            0,
+            '#6495ED',
+            10,
+            '#95d07e',
+            20,
+            '#f6e78b',
+            30,
+            '#FF4500',
+            40,
+            '#8B0000',
+          ],
+          circleOpacity: 0.7,
+          circleStrokeWidth: 0.2,
+          circleStrokeColor: '#000000',
+          circleStrokeOpacity: 0.7,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$layerId"');
+      }
 
       if (isSourceExists && isLayerExists) return;
 
@@ -136,386 +215,104 @@ class TemperatureMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => TemperatureMapLayerSheet(manager: this);
 }
 
-class TemperatureMapLayerSheet extends StatefulWidget {
+class TemperatureMapLayerSheet extends StatelessWidget {
   final TemperatureMapLayerManager manager;
 
   const TemperatureMapLayerSheet({super.key, required this.manager});
 
   @override
-  State<TemperatureMapLayerSheet> createState() => _TemperatureMapLayerSheetState();
-}
-
-class _TemperatureMapLayerSheetState extends State<TemperatureMapLayerSheet> {
-  late MapLibreMapController _mapController;
-
-  List<String> weather_list = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
-  bool _showLegend = false;
-  String? _selectedStationId;
-
-  List<TemperatureData> temperatureDataList = [];
-
-  Future<void> _initMap(MapLibreMapController controller) async {
-    _mapController = controller;
-  }
-
-  Future<void> _loadMap() async {
-    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-      await getSavedLocation();
-    }
-
-    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
-    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
-
-    isUserLocationValid = (userLon == 0 || userLat == 0) ? false : true;
-
-    await _mapController.addSource(
-      'temperature-data',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-    );
-
-    weather_list = await ExpTech().getWeatherList();
-
-    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
-
-    temperatureDataList =
-        weatherData
-            .where((station) => station.data.air.temperature != -99)
-            .map(
-              (station) => TemperatureData(
-                id: station.id,
-                latitude: station.station.lat,
-                longitude: station.station.lng,
-                temperature: station.data.air.temperature,
-                stationName: station.station.name,
-                county: station.station.county,
-                town: station.station.town,
-              ),
-            )
-            .toList();
-
-    await addTemperatureCircles(temperatureDataList);
-
-    if (isUserLocationValid) {
-      await _mapController.addSource(
-        'markers-geojson',
-        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-      );
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
-    }
-
-    await _addUserLocationMarker();
-
-    setState(() {});
-  }
-
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
-  Future<void> addTemperatureCircles(List<TemperatureData> temperatureDataList) async {
-    final features =
-        temperatureDataList
-            .map(
-              (data) => {
-                'type': 'Feature',
-                'properties': {'id': data.id, 'temperature': data.temperature},
-                'geometry': {
-                  'type': 'Point',
-                  'coordinates': [data.longitude, data.latitude],
-                },
-              },
-            )
-            .toList();
-
-    await _mapController.setGeoJsonSource('temperature-data', {'type': 'FeatureCollection', 'features': features});
-
-    await _mapController.removeLayer('temperature-circles');
-    await _mapController.addLayer(
-      'temperature-data',
-      'temperature-circles',
-      const CircleLayerProperties(
-        circleRadius: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          7,
-          5,
-          12,
-          15,
-        ],
-        circleColor: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.get, 'temperature'],
-          -20,
-          '#4d4e51',
-          -10,
-          '#0000FF',
-          0,
-          '#6495ED',
-          10,
-          '#95d07e',
-          20,
-          '#f6e78b',
-          30,
-          '#FF4500',
-          40,
-          '#8B0000',
-        ],
-        circleOpacity: 0.7,
-        circleStrokeWidth: 0.2,
-        circleStrokeColor: '#000000',
-        circleStrokeOpacity: 0.7,
-      ),
-    );
-
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['temperature-circles'], null);
-
-      if (features.isNotEmpty) {
-        final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
-        setState(() {
-          _selectedStationId = stationId;
-        });
-      } else {
-        setState(() {
-          _selectedStationId = null;
-        });
-      }
-    });
-
-    await _mapController.removeLayer('temperature-labels');
-    await _mapController.addSymbolLayer(
-      'temperature-data',
-      'temperature-labels',
-      const SymbolLayerProperties(
-        textField: ['get', 'temperature'],
-        textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
-        textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
-        textOffset: [
-          Expressions.literal,
-          [0, 2],
-        ],
-      ),
-      minzoom: 9,
-    );
-  }
-
-  void _toggleLegend() {
-    setState(() {
-      _showLegend = !_showLegend;
-    });
-  }
-
-  Widget _buildLegend() {
-    return MapLegend(
-      children: [
-        _buildColorBar(),
-        const SizedBox(height: 8),
-        _buildColorBarLabels(),
-        const SizedBox(height: 12),
-        Text(context.i18n.unit_degrees_c, style: context.theme.textTheme.labelMedium),
-      ],
-    );
-  }
-
-  Widget _buildColorBar() {
-    return Container(
-      height: 20,
-      width: 300,
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(4)),
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF4d4e51),
-            Color(0xFF0000FF),
-            Color(0xFF6495ED),
-            Color(0xFF95d07e),
-            Color(0xFFf6e78b),
-            Color(0xFFFF4500),
-            Color(0xFF8B0000),
-          ],
-          stops: [0.0, 0.1667, 0.3333, 0.5, 0.6667, 0.8333, 1.0],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildColorBarLabels() {
-    final labels = ['-20', '-10', '0', '10', '20', '30', '40'];
-    return SizedBox(
-      width: 300,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 12))).toList(),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DpipMap(
-          onMapCreated: _initMap,
-          onStyleLoadedCallback: _loadMap,
-          minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
-        ),
-        Positioned(
-          left: 4,
-          bottom: 4,
-          child: Material(
-            color: context.colors.secondary,
-            elevation: 4.0,
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: _toggleLegend,
-              child: Tooltip(
-                message: context.i18n.map_legend,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    _showLegend ? Icons.close : Icons.info_outline,
-                    size: 20,
-                    color: context.colors.onSecondary,
+    return MorphingSheet(
+      title: context.i18n.temperature_monitor,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 4,
+      partialBuilder: (context, controller, sheetController) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Selector<DpipDataModel, UnmodifiableListView<String>>(
+            selector: (context, model) => model.temperature,
+            builder: (context, temperature, child) {
+              final times = temperature.map((time) {
+                final t = time.toSimpleDateTimeString(context).split(' ');
+                return (date: t[0], time: t[1], value: time);
+              });
+              final grouped = times.groupListsBy((time) => time.date).entries.toList();
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        const Icon(Symbols.thermostat_rounded, size: 24),
+                        Text(context.i18n.temperature_monitor, style: context.textTheme.titleMedium),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        if (_selectedStationId == null && weather_list.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 2,
-            child: TimeSelector(
-              timeList: weather_list,
-              onTimeExpanded: () {
-                _showLegend = false;
-                setState(() {});
-              },
-              onTimeSelected: (time) async {
-                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
+                  SizedBox(
+                    height: kMinInteractiveDimension,
+                    child: ValueListenableBuilder<String?>(
+                      valueListenable: manager.currentTemperatureTime,
+                      builder: (context, currentTemperatureTime, child) {
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          scrollDirection: Axis.horizontal,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: grouped.length,
+                          itemBuilder: (context, index) {
+                            final MapEntry(key: date, value: group) = grouped[index];
 
-                temperatureDataList = [];
+                            final children = <Widget>[Text(date)];
 
-                temperatureDataList =
-                    weatherData
-                        .where((station) => station.data.air.temperature != -99)
-                        .map(
-                          (station) => TemperatureData(
-                            id: station.id,
-                            latitude: station.station.lat,
-                            longitude: station.station.lng,
-                            temperature: station.data.air.temperature,
-                            stationName: station.station.name,
-                            county: station.station.county,
-                            town: station.station.town,
-                          ),
-                        )
-                        .toList();
+                            for (final time in group) {
+                              final isSelected = time.value == currentTemperatureTime;
 
-                await addTemperatureCircles(temperatureDataList);
+                              children.add(
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: manager.isLoading,
+                                  builder: (context, isLoading, child) {
+                                    return FilterChip(
+                                      selected: isSelected,
+                                      showCheckmark: !isLoading,
+                                      label: Text(time.time),
+                                      side: BorderSide(
+                                        color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                      ),
+                                      avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                      onSelected:
+                                          isLoading
+                                              ? null
+                                              : (selected) {
+                                                if (!selected) return;
+                                                manager._updateTemperatureTileUrl(time.value);
+                                              },
+                                    );
+                                  },
+                                ),
+                              );
+                            }
 
-                await _addUserLocationMarker();
+                            children.add(
+                              const Padding(
+                                padding: EdgeInsets.only(right: 8),
+                                child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                              ),
+                            );
 
-                setState(() {});
-              },
-            ),
-          ),
-        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
-        if (_selectedStationId != null)
-          DraggableScrollableSheet(
-            initialChildSize: 0.3,
-            minChildSize: 0.1,
-            snap: true,
-            snapSizes: const [0.1, 0.3, 0.7, 1],
-            builder: (BuildContext context, ScrollController scrollController) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -5)),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 4,
-                        width: 40,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-                      ),
-                      AdvancedWeatherChart(
-                        stationId: _selectedStationId!,
-                        onClose: () {
-                          setState(() {
-                            _selectedStationId = null;
-                          });
-                        },
-                      ),
-                    ],
+                            return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
+                ],
               );
             },
           ),
-      ],
+        );
+      },
     );
   }
 }

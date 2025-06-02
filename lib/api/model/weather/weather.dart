@@ -1,10 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/utils/geojson.dart';
 
 part 'weather.g.dart';
 
 @JsonSerializable()
 class WeatherStation {
-  final String type = 'weather_station';
+  String get type => 'weather_station';
 
   final String id;
 
@@ -19,6 +22,19 @@ class WeatherStation {
   factory WeatherStation.fromJson(Map<String, dynamic> json) => _$WeatherStationFromJson(json);
 
   Map<String, dynamic> toJson() => _$WeatherStationToJson(this);
+
+  GeoJsonFeatureBuilder toFeatureBuilder() {
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+        .setGeometry(station.latlng.toGeoJsonCoordinates())
+        .setProperty('id', id)
+        .setProperty('name', station.name)
+        .setProperty('county', station.county)
+        .setProperty('town', station.town)
+        .setProperty('temperature', data.air.temperature)
+        .setProperty('relative_humidity', data.air.relativeHumidity)
+        .setProperty('wind_direction', data.wind.direction)
+        .setProperty('wind_speed', data.wind.speed);
+  }
 }
 
 @JsonSerializable()
@@ -42,6 +58,8 @@ class StationInfo {
   factory StationInfo.fromJson(Map<String, dynamic> json) => _$StationInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
+
+  LatLng get latlng => LatLng(lat, lng);
 }
 
 @JsonSerializable()

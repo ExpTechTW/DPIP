@@ -1,10 +1,11 @@
 import 'dart:collection';
 
-import 'package:dpip/api/model/report/earthquake_report.dart';
-import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/api/model/report/earthquake_report.dart';
+import 'package:dpip/api/model/report/partial_earthquake_report.dart';
+import 'package:dpip/api/model/weather/weather.dart';
 
 class DpipDataModel extends ChangeNotifier {
   List<Eew> _eew = [];
@@ -37,6 +38,20 @@ class DpipDataModel extends ChangeNotifier {
   UnmodifiableListView<String> get radar => UnmodifiableListView(_radar);
   void setRadar(List<String> radar) {
     _radar = radar;
+    notifyListeners();
+  }
+
+  List<String> _temperature = [];
+  UnmodifiableListView<String> get temperature => UnmodifiableListView(_temperature);
+  void setTemperature(List<String> temperature) {
+    _temperature = temperature;
+    notifyListeners();
+  }
+
+  final Map<String, List<WeatherStation>> _weatherData = {};
+  UnmodifiableMapView<String, List<WeatherStation>> get weatherData => UnmodifiableMapView(_weatherData);
+  void setWeatherData(String time, List<WeatherStation> weather) {
+    _weatherData[time] = weather;
     notifyListeners();
   }
 
