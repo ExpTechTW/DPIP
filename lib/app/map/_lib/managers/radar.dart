@@ -11,6 +11,7 @@ import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -35,9 +36,25 @@ class RadarMapLayerManager extends MapLayerManager {
 
       TalkerManager.instance.info('Updated Radar tiles to "$time"');
     } catch (e, s) {
-      TalkerManager.instance.error('Failed to update Radar tiles', e, s);
+      TalkerManager.instance.error('RadarMapLayerManager._updateRadarTileUrl', e, s);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _focus() async {
+    try {
+      final location = GlobalProviders.location.coordinateNotifier.value;
+
+      if (location.isValid) {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+        TalkerManager.instance.info('Moved Camera to $location');
+      } else {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('RadarMapLayerManager._focus', e, s);
     }
   }
 
@@ -112,6 +129,8 @@ class RadarMapLayerManager extends MapLayerManager {
     try {
       await controller.setLayerVisibility(layerId, true);
       TalkerManager.instance.info('Showing Layer "$layerId"');
+
+      await _focus();
 
       visible = true;
     } catch (e, s) {
