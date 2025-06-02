@@ -7,16 +7,16 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/rain.dart';
-import 'package:dpip/app_old/page/map/meteor.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app_old/page/map/meteor.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/list/rain_time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 
 class RainData {
@@ -67,7 +67,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-
       final sourceId = MapSourceIds.precipitation(currentPrecipitationTime.value);
       final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
 
