@@ -140,16 +140,11 @@ class RadarMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => RadarMapLayerSheet(manager: this);
 }
 
-class RadarMapLayerSheet extends StatefulWidget {
+class RadarMapLayerSheet extends StatelessWidget {
   final RadarMapLayerManager manager;
 
   const RadarMapLayerSheet({super.key, required this.manager});
 
-  @override
-  State<RadarMapLayerSheet> createState() => _RadarMapLayerSheetState();
-}
-
-class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
   @override
   Widget build(BuildContext context) {
     return MorphingSheet(
@@ -184,7 +179,7 @@ class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
                   SizedBox(
                     height: kMinInteractiveDimension,
                     child: ValueListenableBuilder<String?>(
-                      valueListenable: widget.manager.currentRadarTime,
+                      valueListenable: manager.currentRadarTime,
                       builder: (context, currentTime, child) {
                         return ListView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -201,7 +196,7 @@ class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
 
                               children.add(
                                 ValueListenableBuilder<bool>(
-                                  valueListenable: widget.manager.isLoading,
+                                  valueListenable: manager.isLoading,
                                   builder: (context, isLoading, child) {
                                     return FilterChip(
                                       selected: isSelected,
@@ -216,7 +211,7 @@ class _RadarMapLayerSheetState extends State<RadarMapLayerSheet> {
                                               ? null
                                               : (selected) {
                                                 if (!selected) return;
-                                                widget.manager._updateRadarTileUrl(time.value);
+                                                manager._updateRadarTileUrl(time.value);
                                               },
                                     );
                                   },
