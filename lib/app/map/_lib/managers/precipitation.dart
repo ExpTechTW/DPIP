@@ -1,23 +1,26 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app_old/page/map/meteor.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/list/rain_time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class RainData {
   final double latitude;
@@ -42,7 +45,7 @@ class RainData {
 class PrecipitationMapLayerManager extends MapLayerManager {
   PrecipitationMapLayerManager(super.context, super.controller);
 
-  final currentPrecipitationTime = ValueNotifier(null);
+  final currentPrecipitationTime = ValueNotifier<String?>(GlobalProviders.data.precipitation.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
   Future<void> _updatePrecipitationTileUrl(String time) async {
@@ -52,6 +55,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     try {
       await remove();
+      currentPrecipitationTime.value = time;
       await setup();
 
       TalkerManager.instance.info('Updated Precipitation tiles to "$time"');
@@ -59,6 +63,22 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       TalkerManager.instance.error('Failed to update Precipitation tiles', e, s);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _focus() async {
+    try {
+      final location = GlobalProviders.location.coordinateNotifier.value;
+
+      if (location.isValid) {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+        TalkerManager.instance.info('Moved Camera to $location');
+      } else {
+        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('PrecipitationMapLayerManager._focus', e, s);
     }
   }
 
@@ -107,6 +127,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       await controller.setLayerVisibility(layerId, true);
       TalkerManager.instance.info('Showing Layer "$layerId"');
 
+      await _focus();
+
       visible = true;
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.show', e, s);
@@ -135,16 +157,12 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => PrecipitationMapLayerSheet(manager: this);
 }
 
-class PrecipitationMapLayerSheet extends StatefulWidget {
+class PrecipitationMapLayerSheet extends StatelessWidget {
   final PrecipitationMapLayerManager manager;
 
   const PrecipitationMapLayerSheet({super.key, required this.manager});
 
-  @override
-  State<PrecipitationMapLayerSheet> createState() => _PrecipitationMapLayerSheetState();
-}
-
-class _PrecipitationMapLayerSheetState extends State<PrecipitationMapLayerSheet> {
+  /*class _PrecipitationMapLayerSheetState extends State<PrecipitationMapLayerSheet> {
   late MapLibreMapController _mapController;
 
   List<String> rainTimeList = [];
@@ -495,50 +513,102 @@ class _PrecipitationMapLayerSheetState extends State<PrecipitationMapLayerSheet>
         children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 10))).toList(),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DpipMap(
-          onMapCreated: _initMap,
-          onStyleLoadedCallback: _loadMap,
-          minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
-        ),
-        Positioned(
-          left: 4,
-          bottom: 4,
-          child: Material(
-            color: context.colors.secondary,
-            elevation: 4.0,
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: _toggleLegend,
-              child: Tooltip(
-                message: context.i18n.map_legend,
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    _showLegend ? Icons.close : Icons.info_outline,
-                    size: 20,
-                    color: context.colors.onSecondary,
+    return MorphingSheet(
+      title: context.i18n.precipitation_monitor,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 4,
+      partialBuilder: (context, controller, sheetController) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Selector<DpipDataModel, UnmodifiableListView<String>>(
+            selector: (context, model) => model.precipitation,
+            builder: (context, precipitation, child) {
+              final times = precipitation.map((time) {
+                final t = time.toSimpleDateTimeString(context).split(' ');
+                return (date: t[0], time: t[1], value: time);
+              });
+              final grouped = times.groupListsBy((time) => time.date).entries.toList();
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        const Icon(Symbols.humidity_percentage_rounded, size: 24),
+                        Text(context.i18n.precipitation_monitor, style: context.textTheme.titleMedium),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ),
+                  SizedBox(
+                    height: kMinInteractiveDimension,
+                    child: ValueListenableBuilder<String?>(
+                      valueListenable: manager.currentPrecipitationTime,
+                      builder: (context, currentPrecipitationTime, child) {
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          scrollDirection: Axis.horizontal,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: grouped.length,
+                          itemBuilder: (context, index) {
+                            final MapEntry(key: date, value: group) = grouped[index];
+
+                            final children = <Widget>[Text(date)];
+
+                            for (final time in group) {
+                              final isSelected = time.value == currentPrecipitationTime;
+
+                              children.add(
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: manager.isLoading,
+                                  builder: (context, isLoading, child) {
+                                    return FilterChip(
+                                      selected: isSelected,
+                                      showCheckmark: !isLoading,
+                                      label: Text(time.time),
+                                      side: BorderSide(
+                                        color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                      ),
+                                      avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                      onSelected:
+                                          isLoading
+                                              ? null
+                                              : (selected) {
+                                                if (!selected) return;
+                                                manager._updatePrecipitationTileUrl(time.value);
+                                              },
+                                    );
+                                  },
+                                ),
+                              );
+                            }
+
+                            children.add(
+                              const Padding(
+                                padding: EdgeInsets.only(right: 8),
+                                child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                              ),
+                            );
+
+                            return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-        ),
-        if (_selectedStationId == null && rainTimeList.isNotEmpty)
+        );
+      },
+      /*if (_selectedStationId == null && rainTimeList.isNotEmpty)
           Positioned(
             left: 0,
             right: 0,
@@ -598,8 +668,7 @@ class _PrecipitationMapLayerSheetState extends State<PrecipitationMapLayerSheet>
                 ),
               );
             },
-          ),
-      ],
+    ),*/
     );
   }
 }

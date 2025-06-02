@@ -1,23 +1,26 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app_old/page/map/meteor.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/time_selector.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/list/rain_time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 
 class WindData {
   final double latitude;
@@ -38,7 +41,7 @@ class WindData {
 class WindMapLayerManager extends MapLayerManager {
   WindMapLayerManager(super.context, super.controller);
 
-  final currentWindTime = ValueNotifier(null);
+  final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
   Future<void> _updateWindTileUrl(String time) async {
@@ -48,6 +51,7 @@ class WindMapLayerManager extends MapLayerManager {
 
     try {
       await remove();
+      currentWindTime.value = time;
       await setup();
 
       TalkerManager.instance.info('Updated Wind tiles to "$time"');
@@ -132,16 +136,12 @@ class WindMapLayerManager extends MapLayerManager {
   Widget build(BuildContext context) => WindMapLayerSheet(manager: this);
 }
 
-class WindMapLayerSheet extends StatefulWidget {
+class WindMapLayerSheet extends StatelessWidget {
   final WindMapLayerManager manager;
 
   const WindMapLayerSheet({super.key, required this.manager});
 
-  @override
-  State<WindMapLayerSheet> createState() => _WindMapLayerSheetState();
-}
-
-class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
+/*class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
   late MapLibreMapController _mapController;
 
   List<String> weather_list = [];
@@ -428,50 +428,102 @@ class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DpipMap(
-          onMapCreated: _initMap,
-          onStyleLoadedCallback: _loadMap,
-          minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
-        ),
-        Positioned(
-          left: 4,
-          bottom: 4,
-          child: Material(
-            color: context.colors.secondary,
-            elevation: 4.0,
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: _toggleLegend,
-              child: Tooltip(
-                message: '圖例',
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    _showLegend ? Icons.close : Icons.info_outline,
-                    size: 20,
-                    color: context.colors.onSecondary,
+    return MorphingSheet(
+      title: context.i18n.wind_direction_and_speed_monitor,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 4,
+      partialBuilder: (context, controller, sheetController) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Selector<DpipDataModel, UnmodifiableListView<String>>(
+            selector: (context, model) => model.wind,
+            builder: (context, wind, child) {
+              final times = wind.map((time) {
+                final t = time.toSimpleDateTimeString(context).split(' ');
+                return (date: t[0], time: t[1], value: time);
+              });
+              final grouped = times.groupListsBy((time) => time.date).entries.toList();
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Row(
+                      spacing: 8,
+                      children: [
+                        const Icon(Symbols.wind_power_rounded, size: 24),
+                        Text(context.i18n.wind_direction_and_speed_monitor, style: context.textTheme.titleMedium),
+                      ],
+                    ),
                   ),
-                ),
-              ),
-            ),
+                  SizedBox(
+                    height: kMinInteractiveDimension,
+                    child: ValueListenableBuilder<String?>(
+                      valueListenable: manager.currentWindTime,
+                      builder: (context, currentWindTime, child) {
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          scrollDirection: Axis.horizontal,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: grouped.length,
+                          itemBuilder: (context, index) {
+                            final MapEntry(key: date, value: group) = grouped[index];
+
+                            final children = <Widget>[Text(date)];
+
+                            for (final time in group) {
+                              final isSelected = time.value == currentWindTime;
+
+                              children.add(
+                                ValueListenableBuilder<bool>(
+                                  valueListenable: manager.isLoading,
+                                  builder: (context, isLoading, child) {
+                                    return FilterChip(
+                                      selected: isSelected,
+                                      showCheckmark: !isLoading,
+                                      label: Text(time.time),
+                                      side: BorderSide(
+                                        color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                      ),
+                                      avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                      onSelected:
+                                      isLoading
+                                          ? null
+                                          : (selected) {
+                                        if (!selected) return;
+                                        manager._updateWindTileUrl(time.value);
+                                      },
+                                    );
+                                  },
+                                ),
+                              );
+                            }
+
+                            children.add(
+                              const Padding(
+                                padding: EdgeInsets.only(right: 8),
+                                child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                              ),
+                            );
+
+                            return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-        ),
-        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
+        );
+      },
+        /*if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
         if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
@@ -529,8 +581,7 @@ class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
                 ),
               );
             },
-          ),
-      ],
+          ),*/
     );
   }
 }

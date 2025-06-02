@@ -76,7 +76,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
         TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
       }
     } catch (e, s) {
-      TalkerManager.instance.error('RadarMapLayerManager._focus', e, s);
+      TalkerManager.instance.error('TemperatureMapLayerManager._focus', e, s);
     }
   }
 

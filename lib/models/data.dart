@@ -6,6 +6,7 @@ import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/api/model/weather/rain.dart';
 
 class DpipDataModel extends ChangeNotifier {
   List<Eew> _eew = [];
@@ -52,6 +53,27 @@ class DpipDataModel extends ChangeNotifier {
   UnmodifiableMapView<String, List<WeatherStation>> get weatherData => UnmodifiableMapView(_weatherData);
   void setWeatherData(String time, List<WeatherStation> weather) {
     _weatherData[time] = weather;
+    notifyListeners();
+  }
+
+  List<String> _precipitation = [];
+  UnmodifiableListView<String> get precipitation => UnmodifiableListView(_precipitation);
+  void setPrecipitation(List<String> precipitation) {
+    _precipitation = precipitation;
+    notifyListeners();
+  }
+
+  final Map<String, List<RainStation>> _rainData = {};
+  UnmodifiableMapView<String, List<RainStation>> get rainData => UnmodifiableMapView(_rainData);
+  void setRainData(String time, List<RainStation> rain) {
+    _rainData[time] = rain;
+    notifyListeners();
+  }
+
+  List<String> _wind = [];
+  UnmodifiableListView<String> get wind => UnmodifiableListView(_wind);
+  void setWind(List<String> wind) {
+    _wind = wind;
     notifyListeners();
   }
 
