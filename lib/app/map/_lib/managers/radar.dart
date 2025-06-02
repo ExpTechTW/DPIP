@@ -51,6 +51,7 @@ class RadarMapLayerManager extends MapLayerManager {
         if (!context.mounted) return;
 
         GlobalProviders.data.setRadar(radarList);
+        currentRadarTime.value = radarList.first;
       }
 
       final sourceId = MapSourceIds.radar(currentRadarTime.value);
@@ -154,7 +155,7 @@ class RadarMapLayerSheet extends StatelessWidget {
       partialBuilder: (context, controller, sheetController) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Selector<DpipDataModel, List<String>>(
+          child: Selector<DpipDataModel, UnmodifiableListView<String>>(
             selector: (context, model) => model.radar,
             builder: (context, radar, child) {
               final times = radar.map((time) {
