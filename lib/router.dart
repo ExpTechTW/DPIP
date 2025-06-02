@@ -8,7 +8,6 @@ import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/layout.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/layout.dart';

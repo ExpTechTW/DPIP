@@ -1,22 +1,23 @@
 import 'dart:async';
 
-import 'package:dpip/app/map/_lib/managers/report.dart';
-import 'package:dpip/app/map/_lib/managers/tsunami.dart';
-import 'package:dpip/app/map/_lib/managers/temperature.dart';
-import 'package:dpip/app/map/_lib/managers/precipitation.dart';
-import 'package:dpip/app/map/_lib/managers/wind.dart';
-import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/managers/precipitation.dart';
 import 'package:dpip/app/map/_lib/managers/radar.dart';
+import 'package:dpip/app/map/_lib/managers/report.dart';
+import 'package:dpip/app/map/_lib/managers/temperature.dart';
+// import 'package:dpip/app/map/_lib/managers/tsunami.dart';
+import 'package:dpip/app/map/_lib/managers/wind.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
+// import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/unimplemented.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 class MapPage extends StatefulWidget {
@@ -57,6 +58,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     if (!mounted) return;
 
     await _hideLayers();
+    if (!mounted) return;
 
     try {
       if (layer == null) {
@@ -66,7 +68,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
       final manager = _managers[layer];
 
-      if (manager == null) throw UnimplementedError('Unknown layer: $layer');
+      if (manager == null) {
+        showUnimplementedSnackBar(context);
+        throw UnimplementedError('Unknown layer: $layer');
+      }
 
       if (!manager.didSetup) await manager.setup();
 
@@ -99,8 +104,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
-    _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
-    _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
+    // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
+    // _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
     _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
@@ -120,13 +125,15 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final manager = _managers[currentLayer];
 
-    return Stack(
-      children: [
-        DpipMap(onMapCreated: onMapCreated),
-        PositionedLayerButton(currentLayer: currentLayer, onChanged: (layer) => setCurrentLayer(layer)),
-        const PositionedBackButton(),
-        if (manager != null) manager.build(context),
-      ],
+    return Scaffold(
+      body: Stack(
+        children: [
+          DpipMap(onMapCreated: onMapCreated),
+          PositionedLayerButton(currentLayer: currentLayer, onChanged: (layer) => setCurrentLayer(layer)),
+          const PositionedBackButton(),
+          if (manager != null) manager.build(context),
+        ],
+      ),
     );
   }
 
