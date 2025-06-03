@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:dpip/utils/extensions/int.dart';
 import 'package:flutter/material.dart';
 
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:timezone/timezone.dart' as tz;
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/tsunami/tsunami.dart';
@@ -18,12 +17,11 @@ import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app_old/page/map/tsunami/tsunami_estimate_list.dart';
 import 'package:dpip/app_old/page/map/tsunami/tsunami_observed_list.dart';
 import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/core/providers.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
-import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 
 class TsunamiMapLayerManager extends MapLayerManager {
   TsunamiMapLayerManager(super.context, super.controller);
@@ -36,7 +34,6 @@ class TsunamiMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-
       final sourceId = MapSourceIds.tsunami(currentTsunami.value);
       final layerId = MapLayerIds.tsunami(currentTsunami.value);
 
@@ -46,7 +43,6 @@ class TsunamiMapLayerManager extends MapLayerManager {
       if (isSourceExists && isLayerExists) return;
 
       if (!isSourceExists) {
-        
         TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
@@ -137,8 +133,6 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
   }
 
   Future<void> _loadMap() async {
-    final isDark = context.theme.brightness == Brightness.dark;
-
     await refreshTsunami();
     await _mapController.addSource(
       'tsunami-data',
@@ -369,15 +363,6 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
     return tsunami;
   }
 
-  String convertTimestamp(int timestamp) {
-    final location = tz.getLocation('Asia/Taipei');
-    final DateTime dateTime = tz.TZDateTime.fromMillisecondsSinceEpoch(location, timestamp);
-
-    final DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
-    final String formattedDate = formatter.format(dateTime);
-    return formattedDate;
-  }
-
   String getTime() {
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy/MM/dd HH:mm');
@@ -502,7 +487,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                             const SizedBox(height: 4),
                                             Text(
                                               tsunami != null
-                                                  ? '${convertTimestamp(tsunami!.time)} $tsunamiStatus'
+                                                  ? '${tsunami!.time.toLocaleDateTimeString(context)} $tsunamiStatus'
                                                   : '${getTime()} 更新',
                                               style: TextStyle(fontSize: 14, color: context.colors.onSurfaceVariant),
                                             ),
@@ -622,7 +607,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              convertTimestamp(tsunami!.eq.time),
+                                              tsunami!.eq.time.toLocaleDateTimeString(context),
                                               style: TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,

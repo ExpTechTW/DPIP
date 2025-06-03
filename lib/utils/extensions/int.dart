@@ -12,5 +12,6 @@ extension CommonContext on int {
   TZDateTime get asTZDateTime => parseDateTime(this);
   String toSimpleDateTimeString(BuildContext context) => asTZDateTime.toSimpleDateTimeString(context);
   String toLocaleFullDateString(BuildContext context) => asTZDateTime.toLocaleFullDateString(context);
+  String toLocaleDateTimeString(BuildContext context) => asTZDateTime.toLocaleDateTimeString(context);
   String toLocaleTimeString(BuildContext context) => asTZDateTime.toLocaleTimeString(context);
 }

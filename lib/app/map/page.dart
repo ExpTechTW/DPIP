@@ -62,7 +62,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     try {
       if (layer == null) {
-        _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
         return;
       }
 
@@ -102,10 +102,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   void onMapCreated(MapLibreMapController controller) {
     setState(() => _controller = controller);
 
-    _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
-    _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
-    // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     // _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
+    _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
+    // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
+    _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
     _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);

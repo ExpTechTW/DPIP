@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
-import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/list/rain_time_selector.dart';
-import 'package:dpip/widgets/map/legend.dart';
-import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 
@@ -67,7 +59,6 @@ class WindMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-
       final sourceId = MapSourceIds.wind(currentWindTime.value);
       final layerId = MapLayerIds.wind(currentWindTime.value);
 
@@ -141,7 +132,7 @@ class WindMapLayerSheet extends StatelessWidget {
 
   const WindMapLayerSheet({super.key, required this.manager});
 
-/*class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
+  /*class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
   late MapLibreMapController _mapController;
 
   List<String> weather_list = [];
@@ -492,12 +483,12 @@ class WindMapLayerSheet extends StatelessWidget {
                                       ),
                                       avatar: isSelected && isLoading ? const LoadingIcon() : null,
                                       onSelected:
-                                      isLoading
-                                          ? null
-                                          : (selected) {
-                                        if (!selected) return;
-                                        manager._updateWindTileUrl(time.value);
-                                      },
+                                          isLoading
+                                              ? null
+                                              : (selected) {
+                                                if (!selected) return;
+                                                manager._updateWindTileUrl(time.value);
+                                              },
                                     );
                                   },
                                 ),
@@ -523,7 +514,7 @@ class WindMapLayerSheet extends StatelessWidget {
           ),
         );
       },
-        /*if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
+      /*if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
         if (_selectedStationId == null && weather_list.isNotEmpty)
           Positioned(
             left: 0,
