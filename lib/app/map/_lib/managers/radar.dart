@@ -191,8 +191,11 @@ class RadarMapLayerSheet extends StatelessWidget {
                     child: Row(
                       spacing: 8,
                       children: [
-                        const Icon(Symbols.radar, size: 24),
-                        Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
+                        Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
+                        Text(
+                          context.i18n.radar_monitor,
+                          style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                        ),
                       ],
                     ),
                   ),

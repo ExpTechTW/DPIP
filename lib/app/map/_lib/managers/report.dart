@@ -351,8 +351,13 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           child: Row(
                             spacing: 8,
                             children: [
-                              const Icon(Symbols.docs_rounded, size: 24),
-                              Expanded(child: Text('近期的地震報告', style: context.textTheme.titleMedium)),
+                              Icon(Symbols.docs_rounded, size: 24, color: context.colors.onSurface),
+                              Expanded(
+                                child: Text(
+                                  '近期的地震報告',
+                                  style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                                ),
+                              ),
                               Text(
                                 context.i18n.more,
                                 style: context.textTheme.labelSmall?.copyWith(color: context.colors.outline),
