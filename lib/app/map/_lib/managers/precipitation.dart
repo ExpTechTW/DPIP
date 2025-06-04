@@ -5,6 +5,8 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
@@ -12,6 +14,7 @@ import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
@@ -82,11 +85,96 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      final sourceId = MapSourceIds.precipitation(currentPrecipitationTime.value);
-      final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
+      if (GlobalProviders.data.temperature.isEmpty) {
+        final precipitationList = (await ExpTech().getRainList()).reversed.toList();
+        if (!context.mounted) return;
+
+        GlobalProviders.data.setPrecipitation(precipitationList);
+        currentPrecipitationTime.value = precipitationList.first;
+      }
+
+      final time = currentPrecipitationTime.value;
+
+      if (time == null) throw Exception('Time is null');
+
+      final sourceId = MapSourceIds.precipitation(time);
+      final layerId = MapLayerIds.precipitation(time);
 
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
+
+      if (!isSourceExists) {
+        late final List<RainStation> rainData;
+
+        if (GlobalProviders.data.rainData.containsKey(time)) {
+          rainData = GlobalProviders.data.rainData[time]!;
+        } else {
+          rainData = await ExpTech().getRain(time);
+          GlobalProviders.data.setRainData(time, rainData);
+        }
+
+        /*final features =
+        rainData
+            .where((station) => station.data.air.temperature != -99)
+            .map((station) => station.toFeatureBuilder())
+            .toList();
+
+        final data = GeoJsonBuilder().setFeatures(features).build();
+
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(sourceId, properties);*/
+        TalkerManager.instance.info('Added Source "$sourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isLayerExists) {
+        final properties = CircleLayerProperties(
+          circleRadius: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.zoom],
+            7,
+            5,
+            12,
+            15,
+          ],
+          circleColor: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.get, 'rainfall'],
+            0,
+            '#c2c2c2',
+            10,
+            '#9cfcff',
+            30,
+            '#059bff',
+            50,
+            '#39ff03',
+            100,
+            '#fffb03',
+            200,
+            '#ff9500',
+            300,
+            '#ff0000',
+            500,
+            '#fb00ff',
+            1000,
+            '#960099',
+            2000,
+            '#000000',
+          ],
+          circleOpacity: 0.7,
+          circleStrokeWidth: 0.2,
+          circleStrokeColor: '#000000',
+          circleStrokeOpacity: 0.7,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$layerId"');
+      }
 
       if (isSourceExists && isLayerExists) return;
 
@@ -455,59 +543,6 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
       ],
       minzoom: 9,
     );
-  }
-
-  void _toggleLegend() {
-    setState(() {
-      _showLegend = !_showLegend;
-    });
-  }
-
-  Widget _buildLegend() {
-    return MapLegend(
-      children: [
-        _buildColorBar(),
-        const SizedBox(height: 8),
-        _buildColorBarLabels(),
-        const SizedBox(height: 12),
-        Text(context.i18n.unit_mm, style: context.theme.textTheme.labelMedium),
-      ],
-    );
-  }
-
-  Widget _buildColorBar() {
-    return Container(
-      height: 20,
-      width: 300,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFFC2C2C2),
-            Color(0xFF9CFCFF),
-            Color(0xFF059BFF),
-            Color(0xFF39FF03),
-            Color(0xFFFFFB03),
-            Color(0xFFFF9500),
-            Color(0xFFFF0000),
-            Color(0xFFFB00FF),
-            Color(0xFF960099),
-            Color(0xFF000000),
-          ],
-          stops: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildColorBarLabels() {
-    final labels = ['0', '10', '30', '50', '100', '200', '300', '500', '1000', '2000+'];
-    return SizedBox(
-      width: 300,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 10))).toList(),
-      ),
-    );
   }*/
 
   @override
@@ -603,67 +638,6 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
           ),
         );
       },
-      /*if (_selectedStationId == null && rainTimeList.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 2,
-            child: RainTimeSelector(
-              timeList: rainTimeList,
-              onTimeExpanded: () {
-                _showLegend = false;
-                setState(() {});
-              },
-              onSelectionChanged: (timestamp, interval) async {
-                selectedTimestamp = timestamp;
-                selectedInterval = interval;
-                await updateRainData(timestamp, interval);
-                await _addUserLocationMarker();
-                setState(() {});
-              },
-            ),
-          ),
-        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
-        if (_selectedStationId != null)
-          DraggableScrollableSheet(
-            initialChildSize: 0.3,
-            minChildSize: 0.1,
-            snap: true,
-            snapSizes: const [0.1, 0.3, 0.7, 1],
-            builder: (BuildContext context, ScrollController scrollController) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -5)),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 4,
-                        width: 40,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-                      ),
-                      AdvancedWeatherChart(
-                        type: 'precipitation',
-                        stationId: _selectedStationId!,
-                        onClose: () {
-                          setState(() {
-                            _selectedStationId = null;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-    ),*/
     );
   }
 }

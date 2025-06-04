@@ -7,7 +7,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/model/eew.dart';
-import 'package:dpip/app/map/monitor/monitor.dart';
+// import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
