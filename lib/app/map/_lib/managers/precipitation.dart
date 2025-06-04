@@ -85,7 +85,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      if (GlobalProviders.data.temperature.isEmpty) {
+      if (GlobalProviders.data.precipitation.isEmpty) {
         final precipitationList = (await ExpTech().getRainList()).reversed.toList();
         if (!context.mounted) return;
 

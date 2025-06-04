@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 
@@ -59,11 +66,75 @@ class WindMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      final sourceId = MapSourceIds.wind(currentWindTime.value);
-      final layerId = MapLayerIds.wind(currentWindTime.value);
+      if (GlobalProviders.data.wind.isEmpty) {
+        final windList = (await ExpTech().getWeatherList()).reversed.toList();
+        if (!context.mounted) return;
+
+        GlobalProviders.data.setWind(windList);
+        currentWindTime.value = windList.first;
+      }
+
+      final time = currentWindTime.value;
+
+      if (time == null) throw Exception('Time is null');
+
+      final sourceId = MapSourceIds.wind(time);
+      final layerId = MapLayerIds.wind(time);
 
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
+
+      if (!isSourceExists) {
+        late final List<WeatherStation> weatherData;
+
+        if (GlobalProviders.data.weatherData.containsKey(time)) {
+          weatherData = GlobalProviders.data.weatherData[time]!;
+        } else {
+          weatherData = await ExpTech().getWeather(time);
+          GlobalProviders.data.setWeatherData(time, weatherData);
+        }
+
+        // final features =
+        // weatherData
+        //     .where((station) => station.data.wind.speed != -99)
+        //     .map((station) => station.toFeatureBuilder())
+        //     .toList();
+        //
+        // final data = GeoJsonBuilder().setFeatures(features).build();
+        //
+        // final properties = GeojsonSourceProperties(data: data);
+        //
+        // await controller.addSource(sourceId, properties);
+        // TalkerManager.instance.info('Added Source "$sourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isLayerExists) {
+        final properties = SymbolLayerProperties(
+          iconImage: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.get, 'wind_speed'],
+            'wind-1',
+            3.4,
+            'wind-2',
+            8,
+            'wind-3',
+            13.9,
+            'wind-4',
+            32.7,
+            'wind-5',
+          ],
+          iconSize: 1.0,
+          textAllowOverlap: true,
+          iconAllowOverlap: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$layerId"');
+      }
 
       if (isSourceExists && isLayerExists) return;
 
@@ -388,37 +459,6 @@ class WindMapLayerSheet extends StatelessWidget {
       ],
       minzoom: 9,
     );
-  }
-
-  void _toggleLegend() {
-    setState(() {
-      _showLegend = !_showLegend;
-    });
-  }
-
-  Widget _buildLegend() {
-    return MapLegend(
-      children: [
-        _legendItem('wind-1', '0.1 - 3.3 m/s'),
-        _legendItem('wind-2', '3.4 - 7.9 m/s'),
-        _legendItem('wind-3', '8.0 - 13.8 m/s'),
-        _legendItem('wind-4', '13.9 - 32.6 m/s'),
-        _legendItem('wind-5', '≥ 32.7 m/s'),
-      ],
-    );
-  }
-
-  Widget _legendItem(String imageName, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
-          const SizedBox(width: 8),
-          Text(label),
-        ],
-      ),
-    );
   }*/
 
   @override
@@ -483,12 +523,12 @@ class WindMapLayerSheet extends StatelessWidget {
                                       ),
                                       avatar: isSelected && isLoading ? const LoadingIcon() : null,
                                       onSelected:
-                                          isLoading
-                                              ? null
-                                              : (selected) {
-                                                if (!selected) return;
-                                                manager._updateWindTileUrl(time.value);
-                                              },
+                                      isLoading
+                                          ? null
+                                          : (selected) {
+                                        if (!selected) return;
+                                        manager._updateWindTileUrl(time.value);
+                                      },
                                     );
                                   },
                                 ),
@@ -514,65 +554,6 @@ class WindMapLayerSheet extends StatelessWidget {
           ),
         );
       },
-      /*if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
-        if (_selectedStationId == null && weather_list.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 2,
-            child: TimeSelector(
-              timeList: weather_list,
-              onTimeExpanded: () {
-                setState(() {
-                  _showLegend = false;
-                });
-              },
-              onTimeSelected: (time) async {
-                final List<WeatherStation> weatherData = await ExpTech().getWeather(time);
-                await _updateWindData(weatherData);
-              },
-            ),
-          ),
-        if (_selectedStationId != null)
-          DraggableScrollableSheet(
-            initialChildSize: 0.3,
-            minChildSize: 0.1,
-            snap: true,
-            snapSizes: const [0.1, 0.3, 0.7, 1],
-            builder: (BuildContext context, ScrollController scrollController) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: context.theme.cardColor,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, -5)),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 4,
-                        width: 40,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-                      ),
-                      AdvancedWeatherChart(
-                        type: 'wind_speed',
-                        stationId: _selectedStationId!,
-                        onClose: () {
-                          setState(() {
-                            _selectedStationId = null;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),*/
     );
   }
 }
