@@ -94,45 +94,46 @@ class WindMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setWeatherData(time, weatherData);
         }
 
-        // final features =
-        // weatherData
-        //     .where((station) => station.data.wind.speed != -99)
-        //     .map((station) => station.toFeatureBuilder())
-        //     .toList();
-        //
-        // final data = GeoJsonBuilder().setFeatures(features).build();
-        //
-        // final properties = GeojsonSourceProperties(data: data);
-        //
-        // await controller.addSource(sourceId, properties);
-        // TalkerManager.instance.info('Added Source "$sourceId"');
+        final features =
+        weatherData
+            .where((station) => station.data.wind.speed != -99)
+            .map((station) => station.toFeatureBuilder())
+            .toList();
+
+        final data = GeoJsonBuilder().setFeatures(features).build();
+
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(sourceId, properties);
+        TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
       }
 
       if (!isLayerExists) {
-        final properties = SymbolLayerProperties(
-          iconImage: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.get, 'wind_speed'],
-            'wind-1',
-            3.4,
-            'wind-2',
-            8,
-            'wind-3',
-            13.9,
-            'wind-4',
-            32.7,
-            'wind-5',
-          ],
-          iconSize: 1.0,
-          textAllowOverlap: true,
-          iconAllowOverlap: true,
-          visibility: visible ? 'visible' : 'none',
-        );
-
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        // final properties = SymbolLayerProperties(
+        //   iconImage: [
+        //     Expressions.interpolate,
+        //     ['linear'],
+        //     [Expressions.get, 'speed'],
+        //     'wind-1',
+        //     3.4,
+        //     'wind-2',
+        //     8,
+        //     'wind-3',
+        //     13.9,
+        //     'wind-4',
+        //     32.7,
+        //     'wind-5',
+        //   ],
+        //   iconRotate: [Expressions.get, 'direction'],
+        //   iconSize: 1.0,
+        //   textAllowOverlap: true,
+        //   iconAllowOverlap: true,
+        //   visibility: visible ? 'visible' : 'none',
+        // );
+        //
+        // await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
@@ -415,51 +416,7 @@ class WindMapLayerSheet extends StatelessWidget {
         ['get', 'speed'],
         0,
       ],
-    );
-
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['wind-arrows', 'wind-circles'], null);
-
-      if (features.isNotEmpty) {
-        final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
-        setState(() {
-          _selectedStationId = stationId;
-        });
-      } else {
-        setState(() {
-          _selectedStationId = null;
-        });
-      }
-    });
-
-    await _mapController.removeLayer('wind-speed-labels');
-    await _mapController.addSymbolLayer(
-      'wind-data',
-      'wind-speed-labels',
-      const SymbolLayerProperties(
-        textField: [
-          Expressions.format,
-          ['get', 'speed'],
-        ],
-        textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
-        textHaloWidth: 2,
-        textFont: ['Noto Sans Regular'],
-        textOffset: [
-          Expressions.literal,
-          [0, 2],
-        ],
-      ),
-      filter: [
-        '!=',
-        ['get', 'speed'],
-        0,
-      ],
-      minzoom: 9,
-    );
-  }*/
+    );*/
 
   @override
   Widget build(BuildContext context) {
