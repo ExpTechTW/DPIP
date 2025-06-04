@@ -96,7 +96,7 @@ class WindMapLayerManager extends MapLayerManager {
 
         final features =
         weatherData
-            .where((station) => station.data.wind.speed != -99)
+            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
             .map((station) => station.toFeatureBuilder())
             .toList();
 
@@ -128,8 +128,8 @@ class WindMapLayerManager extends MapLayerManager {
         //   ],
         //   iconRotate: [Expressions.get, 'direction'],
         //   iconSize: 1.0,
-        //   textAllowOverlap: true,
         //   iconAllowOverlap: true,
+        //   iconIgnorePlacement: true,
         //   visibility: visible ? 'visible' : 'none',
         // );
         //
