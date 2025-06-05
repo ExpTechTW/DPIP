@@ -24,6 +24,7 @@ class WeatherStation {
   Map<String, dynamic> toJson() => _$WeatherStationToJson(this);
 
   GeoJsonFeatureBuilder toFeatureBuilder() {
+    final direction = (data.wind.direction + 180) % 360;
     return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
         .setGeometry(station.latlng.toGeoJsonCoordinates())
         .setProperty('id', id)
@@ -32,8 +33,8 @@ class WeatherStation {
         .setProperty('town', station.town)
         .setProperty('temperature', data.air.temperature)
         .setProperty('relative_humidity', data.air.relativeHumidity)
-        .setProperty('wind_direction', data.wind.direction)
         .setProperty('wind_speed', data.wind.speed)
+        .setProperty('wind_direction', direction)
         .setProperty('icon', windIcon(data.wind.speed));
   }
   String windIcon(double speed) {
