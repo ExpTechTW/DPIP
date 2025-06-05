@@ -4,19 +4,17 @@ import 'package:collection/collection.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
@@ -111,29 +109,16 @@ class WindMapLayerManager extends MapLayerManager {
       }
 
       if (!isLayerExists) {
-        // final properties = SymbolLayerProperties(
-        //   iconImage: [
-        //     Expressions.interpolate,
-        //     ['linear'],
-        //     [Expressions.get, 'speed'],
-        //     'wind-1',
-        //     3.4,
-        //     'wind-2',
-        //     8,
-        //     'wind-3',
-        //     13.9,
-        //     'wind-4',
-        //     32.7,
-        //     'wind-5',
-        //   ],
-        //   iconRotate: [Expressions.get, 'direction'],
-        //   iconSize: 1.0,
-        //   iconAllowOverlap: true,
-        //   iconIgnorePlacement: true,
-        //   visibility: visible ? 'visible' : 'none',
-        // );
-        //
-        // await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        final properties = SymbolLayerProperties(
+          iconImage: [Expressions.get, 'icon'],
+          iconSize: kSymbolIconSize,
+          iconRotate: [Expressions.get, 'wind_direction'],
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
@@ -203,220 +188,6 @@ class WindMapLayerSheet extends StatelessWidget {
   final WindMapLayerManager manager;
 
   const WindMapLayerSheet({super.key, required this.manager});
-
-  /*class _WindMapLayerSheetState extends State<WindMapLayerSheet> {
-  late MapLibreMapController _mapController;
-
-  List<String> weather_list = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
-  bool _showLegend = false;
-  String? _selectedStationId;
-
-  List<WindData> windDataList = [];
-  Future<void> _initMap(MapLibreMapController controller) async {
-    _mapController = controller;
-  }
-
-  Future<void> _updateWindData(List<WeatherStation> weatherData) async {
-    windDataList =
-        weatherData
-            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-            .map(
-              (station) => WindData(
-                id: station.id,
-                latitude: station.station.lat,
-                longitude: station.station.lng,
-                direction: (station.data.wind.direction + 180) % 360,
-                speed: station.data.wind.speed,
-              ),
-            )
-            .toList();
-
-    await addDynamicWindArrows(windDataList);
-    setState(() {});
-  }
-
-  Future<void> _loadMap() async {
-    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-      await getSavedLocation();
-    }
-    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
-    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
-
-    isUserLocationValid = userLon != 0 && userLat != 0;
-
-    await _mapController.addSource(
-      'wind-data',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-    );
-
-    weather_list = await ExpTech().getWeatherList();
-
-    final List<WeatherStation> weatherData = await ExpTech().getWeather(weather_list.last);
-
-    _updateWindData(weatherData);
-
-    if (isUserLocationValid) {
-      await _mapController.addSource(
-        'markers-geojson',
-        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-      );
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
-    }
-
-    await _addUserLocationMarker();
-
-    setState(() {});
-  }
-
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
-  Future<void> addDynamicWindArrows(List<WindData> windDataList) async {
-    final features =
-        windDataList
-            .map(
-              (data) => {
-                'type': 'Feature',
-                'properties': {'id': data.id, 'direction': data.direction, 'speed': data.speed},
-                'geometry': {
-                  'type': 'Point',
-                  'coordinates': [data.longitude, data.latitude],
-                },
-              },
-            )
-            .toList();
-
-    await _mapController.setGeoJsonSource('wind-data', {'type': 'FeatureCollection', 'features': features});
-
-    await _mapController.removeLayer('wind-circles');
-    await _mapController.addLayer(
-      'wind-data',
-      'wind-circles',
-      const CircleLayerProperties(
-        circleRadius: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          5,
-          3,
-          10,
-          6,
-        ],
-        circleColor: '#808080',
-        circleStrokeWidth: 0.8,
-        circleStrokeColor: '#FFFFFF',
-      ),
-      filter: [
-        '==',
-        ['get', 'speed'],
-        0,
-      ],
-      minzoom: 10,
-    );
-
-    await _mapController.removeLayer('wind-speed-0-labels');
-    await _mapController.addSymbolLayer(
-      'wind-data',
-      'wind-speed-0-labels',
-      const SymbolLayerProperties(
-        textField: [
-          Expressions.format,
-          ['get', 'speed'],
-        ],
-        textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
-        textHaloWidth: 2,
-        textFont: ['Noto Sans Regular'],
-        textOffset: [
-          Expressions.literal,
-          [0, 2],
-        ],
-      ),
-      filter: [
-        '==',
-        ['get', 'speed'],
-        0,
-      ],
-      minzoom: 10,
-    );
-
-    await _mapController.removeLayer('wind-arrows');
-    await _mapController.addLayer(
-      'wind-data',
-      'wind-arrows',
-      const SymbolLayerProperties(
-        iconSize: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          5,
-          0.4,
-          10,
-          1.2,
-        ],
-        iconImage: [
-          Expressions.step,
-          [Expressions.get, 'speed'],
-          'wind-1',
-          3.4,
-          'wind-2',
-          8,
-          'wind-3',
-          13.9,
-          'wind-4',
-          32.7,
-          'wind-5',
-        ],
-        iconRotate: [Expressions.get, 'direction'],
-        textAllowOverlap: true,
-        iconAllowOverlap: true,
-      ),
-      filter: [
-        '!=',
-        ['get', 'speed'],
-        0,
-      ],
-    );*/
 
   @override
   Widget build(BuildContext context) {

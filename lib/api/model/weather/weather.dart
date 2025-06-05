@@ -33,7 +33,15 @@ class WeatherStation {
         .setProperty('temperature', data.air.temperature)
         .setProperty('relative_humidity', data.air.relativeHumidity)
         .setProperty('wind_direction', data.wind.direction)
-        .setProperty('wind_speed', data.wind.speed);
+        .setProperty('wind_speed', data.wind.speed)
+        .setProperty('icon', windIcon(data.wind.speed));
+  }
+  String windIcon(double speed) {
+    if (speed < 3.4) return 'wind-1';
+    if (speed < 8.0) return 'wind-2';
+    if (speed < 13.9) return 'wind-3';
+    if (speed < 32.7) return 'wind-4';
+    return 'wind-5';
   }
 }
 
