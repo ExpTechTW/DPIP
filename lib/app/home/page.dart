@@ -118,8 +118,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    _checkVersion();
-
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
     GlobalProviders.location.codeNotifier.addListener(_refresh);
     _refresh();
   }
