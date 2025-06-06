@@ -26,11 +26,9 @@ final stateSettingsLocationView = _SettingsLocationPageState();
 typedef PositionUpdateCallback = void Function();
 
 class SettingsLocationPage extends StatefulWidget {
-  final Function(String?, String?)? onPositionUpdate;
-
   static const route = '/settings/location';
 
-  const SettingsLocationPage({super.key, this.onPositionUpdate});
+  const SettingsLocationPage({super.key});
 
   @override
   State<SettingsLocationPage> createState() => _SettingsLocationPageState();
@@ -403,13 +401,6 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       checkAutoStart();
       checkBatteryOptimization();
     }
-  }
-
-  void updateLocation(String? code) {
-    final city = Global.location[code.toString()]?.city;
-    final town = Global.location[code.toString()]?.town;
-
-    widget.onPositionUpdate?.call(city, town);
   }
 
   @override
