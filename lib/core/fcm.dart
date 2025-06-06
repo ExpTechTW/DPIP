@@ -10,17 +10,19 @@ import 'package:dpip/utils/log.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
-  await AwesomeNotificationsFcm().initialize(
-    onFcmTokenHandle: onFcmTokenHandle,
-    onNativeTokenHandle: onNativeTokenHandle,
-    onFcmSilentDataHandle: onFcmSilentDataHandle,
-    licenseKeys: [
-      '2024-08-26==N0LtVWu49ox9yV8eaDrh8rGyji/iKzLaB6anluLFIPESM/rUtf0OTUDyExMB+hp8YqnfA9UMcwvT5i5lTcsB73WKbh2+cYbYwtSZoxjuSUUbNxzhnlH2uiD7CNYvtniORC69TStgEfXnYZ1dEfWe5p6Nwi4wDS7vTfyTOH2NqCW+5293ypcu6+7se2PxLGOF1s8YKbM3HU8nYk8juChbFNoxX/Y0pHOH+MvXi070o1+3SPL98BS9bPQQ0e9a9MgYpxRqthP/mT1Yx2AX4+d+Qb6NNiz8ub+rl1HhZc7vmy5bntJSwcculDhXG3YOP3uXeYYyc2L+NKqkHPYpflblOg==',
-    ],
-    debug: true,
-  );
-  await AwesomeNotificationsFcm().requestFirebaseAppToken();
 
+  if (Platform.isAndroid) {
+    await AwesomeNotificationsFcm().initialize(
+      onFcmTokenHandle: onFcmTokenHandle,
+      onNativeTokenHandle: onNativeTokenHandle,
+      onFcmSilentDataHandle: onFcmSilentDataHandle,
+      licenseKeys: [
+        '2024-08-26==N0LtVWu49ox9yV8eaDrh8rGyji/iKzLaB6anluLFIPESM/rUtf0OTUDyExMB+hp8YqnfA9UMcwvT5i5lTcsB73WKbh2+cYbYwtSZoxjuSUUbNxzhnlH2uiD7CNYvtniORC69TStgEfXnYZ1dEfWe5p6Nwi4wDS7vTfyTOH2NqCW+5293ypcu6+7se2PxLGOF1s8YKbM3HU8nYk8juChbFNoxX/Y0pHOH+MvXi070o1+3SPL98BS9bPQQ0e9a9MgYpxRqthP/mT1Yx2AX4+d+Qb6NNiz8ub+rl1HhZc7vmy5bntJSwcculDhXG3YOP3uXeYYyc2L+NKqkHPYpflblOg==',
+      ],
+      debug: true,
+    );
+    await AwesomeNotificationsFcm().requestFirebaseAppToken();
+  }
   if (Platform.isIOS) {
     Preference.notifyToken = await FirebaseMessaging.instance.getAPNSToken();
   }
