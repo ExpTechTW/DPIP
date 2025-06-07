@@ -113,9 +113,24 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setRainData(time, rainData);
         }
 
-        /*final features =
+        final interval = 'now';
+
+        final features =
         rainData
-            .where((station) => station.data.air.temperature != -99)
+            .where((station) {
+          final rain = switch (interval) {
+            '10m' => station.data.tenMinutes,
+            '1h' => station.data.oneHour,
+            '3h' => station.data.threeHours,
+            '6h' => station.data.sixHours,
+            '12h' => station.data.twelveHours,
+            '24h' => station.data.twentyFourHours,
+            '2d' => station.data.twoDays,
+            '3d' => station.data.threeDays,
+            _ => station.data.now,
+          };
+          return rain != -99 && rain > 0;
+        })
             .map((station) => station.toFeatureBuilder())
             .toList();
 
@@ -123,7 +138,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
         final properties = GeojsonSourceProperties(data: data);
 
-        await controller.addSource(sourceId, properties);*/
+        await controller.addSource(sourceId, properties);
         TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
@@ -143,7 +158,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           circleColor: [
             Expressions.interpolate,
             ['linear'],
-            [Expressions.get, 'rainfall'],
+            [Expressions.get, 'rain_now'],
             0,
             '#c2c2c2',
             10,
@@ -502,48 +517,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
         ['get', 'rainfall'],
         0,
       ],
-    );
-
-    _mapController.onFeatureTapped.add((dynamic feature, Point<double> point, LatLng latLng, String layerId) async {
-      final features = await _mapController.queryRenderedFeatures(point, ['rain-circles', 'rain-0-circles'], null);
-
-      if (features.isNotEmpty) {
-        final stationId = features[0]['properties']['id'] as String;
-        if (_selectedStationId != null) AdvancedWeatherChart.updateStationId(stationId);
-        setState(() {
-          _selectedStationId = stationId;
-        });
-      } else {
-        setState(() {
-          _selectedStationId = null;
-        });
-      }
-    });
-
-    await _mapController.removeLayer('rain-labels');
-    await _mapController.addSymbolLayer(
-      'rain-data',
-      'rain-labels',
-      const SymbolLayerProperties(
-        textField: ['get', 'rainfall'],
-        textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
-        textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
-        textOffset: [
-          Expressions.literal,
-          [0, 2],
-        ],
-      ),
-      filter: [
-        '!=',
-        ['get', 'rainfall'],
-        0,
-      ],
-      minzoom: 9,
-    );
-  }*/
+    );*/
 
   @override
   Widget build(BuildContext context) {
@@ -576,7 +550,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  /*SizedBox(
                     height: kMinInteractiveDimension,
                     child: ValueListenableBuilder<String?>(
                       valueListenable: manager.currentPrecipitationTime,
@@ -631,7 +605,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                         );
                       },
                     ),
-                  ),
+                  ),*/
                 ],
               );
             },

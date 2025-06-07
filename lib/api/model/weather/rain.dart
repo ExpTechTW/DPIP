@@ -1,10 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/utils/geojson.dart';
 
 part 'rain.g.dart';
 
 @JsonSerializable()
 class RainStation {
-  final String type = 'rain_station';
+  String get type => 'rain_station';
 
   final String id;
 
@@ -17,6 +20,24 @@ class RainStation {
   factory RainStation.fromJson(Map<String, dynamic> json) => _$RainStationFromJson(json);
 
   Map<String, dynamic> toJson() => _$RainStationToJson(this);
+
+  GeoJsonFeatureBuilder toFeatureBuilder() {
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+        .setGeometry(station.latlng.toGeoJsonCoordinates())
+        .setProperty('id', id)
+        .setProperty('name', station.name)
+        .setProperty('county', station.county)
+        .setProperty('town', station.town)
+        .setProperty('rain_now', data.now)
+        .setProperty('rain_10m', data.tenMinutes)
+        .setProperty('rain_1h', data.oneHour)
+        .setProperty('rain_3h', data.threeHours)
+        .setProperty('rain_6h', data.sixHours)
+        .setProperty('rain_12h', data.twelveHours)
+        .setProperty('rain_24h', data.twentyFourHours)
+        .setProperty('rain_2d', data.twoDays)
+        .setProperty('rain_3d', data.threeDays);
+  }
 }
 
 @JsonSerializable()
@@ -40,6 +61,8 @@ class StationInfo {
   factory StationInfo.fromJson(Map<String, dynamic> json) => _$StationInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
+
+  LatLng get latlng => LatLng(lat, lng);
 }
 
 @JsonSerializable()
