@@ -113,22 +113,10 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setRainData(time, rainData);
         }
 
-        final interval = 'now';
-
         final features =
         rainData
             .where((station) {
-          final rain = switch (interval) {
-            '10m' => station.data.tenMinutes,
-            '1h' => station.data.oneHour,
-            '3h' => station.data.threeHours,
-            '6h' => station.data.sixHours,
-            '12h' => station.data.twelveHours,
-            '24h' => station.data.twentyFourHours,
-            '2d' => station.data.twoDays,
-            '3d' => station.data.threeDays,
-            _ => station.data.now,
-          };
+          final rain = station.data.now;
           return rain != -99 && rain > 0;
         })
             .map((station) => station.toFeatureBuilder())
