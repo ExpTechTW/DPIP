@@ -1,3 +1,4 @@
+import 'package:dpip/app/settings/map/page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:clipboard/clipboard.dart';
@@ -68,6 +69,12 @@ class SettingsIndexPage extends StatelessWidget {
           title: '單位',
           subtitle: const Text('調整 DPIP 顯示數值時使用的單位'),
           onTap: () => context.push(SettingsUnitPage.route),
+        ),
+        ListSectionTile(
+          icon: Symbols.map_rounded,
+          title: '地圖',
+          subtitle: const Text('調整 DPIP 地圖的設定'),
+          onTap: () => context.push(SettingsMapPage.route),
         ),
       ],
     );

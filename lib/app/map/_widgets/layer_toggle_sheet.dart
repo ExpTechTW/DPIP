@@ -1,3 +1,4 @@
+import 'package:dpip/widgets/map/map.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -10,9 +11,17 @@ import 'package:dpip/widgets/ui/labeled_divider.dart';
 
 class LayerToggleSheet extends StatefulWidget {
   final MapLayer? currentLayer;
+  final BaseMapType currentBaseMap;
   final void Function(MapLayer? layer) onChanged;
+  final void Function(BaseMapType baseMap) onBaseMapChanged;
 
-  const LayerToggleSheet({super.key, required this.currentLayer, required this.onChanged});
+  const LayerToggleSheet({
+    super.key,
+    required this.currentLayer,
+    required this.currentBaseMap,
+    required this.onChanged,
+    required this.onBaseMapChanged,
+  });
 
   @override
   State<LayerToggleSheet> createState() => _LayerToggleSheetState();
@@ -20,10 +29,16 @@ class LayerToggleSheet extends StatefulWidget {
 
 class _LayerToggleSheetState extends State<LayerToggleSheet> {
   late MapLayer? _currentLayer = widget.currentLayer;
+  late BaseMapType? _currentBaseMap = widget.currentBaseMap;
 
   void _changeLayer(MapLayer? layer) {
     setState(() => _currentLayer = layer);
     widget.onChanged(layer);
+  }
+
+  void _changeBaseMap(BaseMapType baseMap) {
+    setState(() => _currentBaseMap = baseMap);
+    widget.onBaseMapChanged(baseMap);
   }
 
   @override
@@ -37,6 +52,28 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
+          const LabeledDivider(label: '底圖'),
+          Wrap(
+            spacing: 4,
+            runSpacing: 8,
+            children: [
+              LayerToggle(
+                label: '線條',
+                checked: _currentBaseMap == BaseMapType.exptech,
+                onChanged: (checked) => _changeBaseMap(BaseMapType.exptech),
+              ),
+              LayerToggle(
+                label: 'OpenStreetMap',
+                checked: _currentBaseMap == BaseMapType.osm,
+                onChanged: (checked) => _changeBaseMap(BaseMapType.osm),
+              ),
+              LayerToggle(
+                label: 'Google',
+                checked: _currentBaseMap == BaseMapType.google,
+                onChanged: (checked) => _changeBaseMap(BaseMapType.google),
+              ),
+            ],
+          ),
           const LabeledDivider(label: '地震'),
           Wrap(
             spacing: 4,

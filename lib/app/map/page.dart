@@ -36,7 +36,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   final _managers = <MapLayer, MapLayerManager>{};
 
   Timer? _ticker;
-  late MapLayer? _currentLayer = widget.initialLayer;
+  late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
+  late MapLayer? _currentLayer = widget.initialLayer ?? GlobalProviders.map.layer;
 
   void _setupTicker() {
     _ticker?.cancel();
@@ -84,6 +85,28 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> setBaseMapType(BaseMapType baseMapType) async {
+    if (!mounted) return;
+
+    _hideBaseMapLayers();
+
+    switch (baseMapType) {
+      case BaseMapType.exptech:
+        await _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, true);
+        await _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, true);
+        await _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, true);
+        await _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyOutline, true);
+
+      case BaseMapType.osm:
+        await _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, true);
+
+      case BaseMapType.google:
+        await _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, true);
+    }
+
+    setState(() => _baseMapType = baseMapType);
+  }
+
   /// 隱藏所有圖層
   Future<void> _hideLayers() async {
     if (!mounted) return;
@@ -99,6 +122,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _currentLayer = null);
   }
 
+  /// 隱藏所有地圖底圖圖層
+  void _hideBaseMapLayers() {
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyOutline, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
+  }
+
   void onMapCreated(MapLibreMapController controller) {
     setState(() => _controller = controller);
 
@@ -110,6 +143,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
 
+    setBaseMapType(_baseMapType);
     setCurrentLayer(currentLayer);
   }
 
@@ -128,8 +162,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          DpipMap(onMapCreated: onMapCreated),
-          PositionedLayerButton(currentLayer: currentLayer, onChanged: (layer) => setCurrentLayer(layer)),
+          DpipMap(onMapCreated: onMapCreated, tiltGesturesEnabled: true),
+          PositionedLayerButton(
+            currentLayer: currentLayer,
+            currentBaseMap: _baseMapType,
+            onChanged: (layer) => setCurrentLayer(layer),
+            onBaseMapChanged: (baseMap) => setBaseMapType(baseMap),
+          ),
           const PositionedBackButton(),
           if (manager != null) manager.build(context),
         ],

@@ -16,6 +16,7 @@ import 'package:dpip/app/settings/locale/select/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
+import 'package:dpip/app/settings/map/page.dart';
 import 'package:dpip/app/settings/notify/(1.eew)/eew/page.dart';
 import 'package:dpip/app/settings/notify/(2.earthquake)/intensity/page.dart';
 import 'package:dpip/app/settings/notify/(2.earthquake)/monitor/page.dart';
@@ -179,6 +180,11 @@ final router = GoRouter(
           path: SettingsUnitPage.route,
           pageBuilder:
               (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage()),
+        ),
+        GoRoute(
+          path: SettingsMapPage.route,
+          pageBuilder:
+              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsMapPage()),
         ),
         GoRoute(
           path: SettingsNotifyPage.route,

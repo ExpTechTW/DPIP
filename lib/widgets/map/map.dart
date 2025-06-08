@@ -15,6 +15,8 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 
+enum BaseMapType { exptech, osm, google }
+
 class BaseMapSourceIds {
   const BaseMapSourceIds._();
 
@@ -30,22 +32,27 @@ class BaseMapSourceIds {
 class BaseMapLayerIds {
   const BaseMapLayerIds._();
 
-  static const globalFill = 'global';
-  static const townFill = 'town';
-  static const countyFill = 'county';
-  static const countyOutline = 'county-outline';
+  static const exptechGlobalFill = 'exptech-global';
+  static const exptechTownFill = 'exptech-town';
+  static const exptechCountyFill = 'exptech-county';
+  static const exptechCountyOutline = 'exptech-county-outline';
+
+  static const osmGlobalRaster = 'osm-global';
+  static const googleGlobalRaster = 'google-global';
+
   static const userLocation = 'user-location';
 
   static Iterable<String> values() sync* {
-    yield globalFill;
-    yield townFill;
-    yield countyFill;
-    yield countyOutline;
+    yield exptechGlobalFill;
+    yield exptechTownFill;
+    yield exptechCountyFill;
+    yield exptechCountyOutline;
     yield userLocation;
   }
 }
 
 class DpipMap extends StatefulWidget {
+  final BaseMapType baseMapType;
   final CameraPosition initialCameraPosition;
   final void Function(MapLibreMapController controller)? onMapCreated;
   final void Function(Point<double>, LatLng)? onMapClick;
@@ -69,6 +76,7 @@ class DpipMap extends StatefulWidget {
 
   const DpipMap({
     super.key,
+    this.baseMapType = BaseMapType.exptech,
     this.initialCameraPosition = const CameraPosition(target: kTaiwanCenter, zoom: 6.4),
     this.onMapCreated,
     this.onMapClick,
@@ -105,6 +113,20 @@ class DpipMapState extends State<DpipMap> {
           'tileSize': 512,
           'buffer': 64,
         },
+        'osm': {
+          'type': 'raster',
+          'tiles': ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          'tileSize': 256,
+          'attribution': '&copy; OpenStreetMap Contributors',
+          'maxzoom': 19,
+        },
+        'google': {
+          'type': 'raster',
+          'tiles': ['https://mts1.google.com/vt/lyrs=p&hl=zh-TW&x={x}&y={y}&z={z}'],
+          'tileSize': 256,
+          'attribution': '&copy; Google Maps',
+          'maxzoom': 19,
+        },
       },
       'sprite': spritePath,
       'glyphs': 'https://glyphs.geolonia.com/{fontstack}/{range}.pbf',
@@ -115,32 +137,48 @@ class DpipMapState extends State<DpipMap> {
           'paint': {'background-color': colors.surface.toHexStringRGB()},
         },
         {
-          'id': BaseMapLayerIds.countyFill,
+          'id': BaseMapLayerIds.exptechCountyFill,
           'type': 'fill',
           'source': 'map',
           'source-layer': 'city',
           'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
+          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
         },
         {
-          'id': BaseMapLayerIds.townFill,
+          'id': BaseMapLayerIds.exptechTownFill,
           'type': 'fill',
           'source': 'map',
           'source-layer': 'town',
           'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
+          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
         },
         {
-          'id': BaseMapLayerIds.countyOutline,
+          'id': BaseMapLayerIds.exptechCountyOutline,
           'source': 'map',
           'source-layer': 'city',
           'type': 'line',
           'paint': {'line-color': colors.outline.toHexStringRGB()},
+          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
         },
         {
-          'id': BaseMapLayerIds.globalFill,
+          'id': BaseMapLayerIds.exptechGlobalFill,
           'type': 'fill',
           'source': 'map',
           'source-layer': 'global',
           'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
+          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
+        },
+        {
+          'id': BaseMapLayerIds.osmGlobalRaster,
+          'type': 'raster',
+          'source': 'osm',
+          'layout': {'visibility': widget.baseMapType == BaseMapType.osm ? 'visible' : 'none'},
+        },
+        {
+          'id': BaseMapLayerIds.googleGlobalRaster,
+          'type': 'raster',
+          'source': 'google',
+          'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
         },
         {
           'id': 'tsunami',
@@ -181,8 +219,8 @@ class DpipMapState extends State<DpipMap> {
 
       final location = GlobalProviders.location.coordinateNotifier.value;
 
-      final sourceId = BaseMapSourceIds.userLocation;
-      final layerId = BaseMapLayerIds.userLocation;
+      const sourceId = BaseMapSourceIds.userLocation;
+      const layerId = BaseMapLayerIds.userLocation;
 
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
