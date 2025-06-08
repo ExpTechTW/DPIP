@@ -46,7 +46,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
   final currentTemperatureTime = ValueNotifier<String?>(GlobalProviders.data.temperature.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
-  Future<void> _updateTemperatureTileUrl(String time) async {
+  Future<void> setTemperatureTime(String time) async {
     if (currentTemperatureTime.value == time || isLoading.value) return;
 
     isLoading.value = true;
@@ -224,7 +224,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
       await controller.removeSource(sourceId);
       TalkerManager.instance.info('Removed Source "$sourceId"');
     } catch (e, s) {
-      TalkerManager.instance.error('TemperatureMapLayerManager.dispose', e, s);
+      TalkerManager.instance.error('TemperatureMapLayerManager.remove', e, s);
     }
 
     didSetup = false;
@@ -250,7 +250,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Selector<DpipDataModel, UnmodifiableListView<String>>(
             selector: (context, model) => model.temperature,
-            builder: (context, temperature, child) {
+            builder: (context, temperature, header) {
               final times = temperature.map((time) {
                 final t = time.toSimpleDateTimeString(context).split(' ');
                 return (date: t[0], time: t[1], value: time);
@@ -260,16 +260,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      spacing: 8,
-                      children: [
-                        const Icon(Symbols.thermostat_rounded, size: 24),
-                        Text(context.i18n.temperature_monitor, style: context.textTheme.titleMedium),
-                      ],
-                    ),
-                  ),
+                  header!,
                   SizedBox(
                     height: kMinInteractiveDimension,
                     child: ValueListenableBuilder<String?>(
@@ -305,7 +296,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                                               ? null
                                               : (selected) {
                                                 if (!selected) return;
-                                                manager._updateTemperatureTileUrl(time.value);
+                                                manager.setTemperatureTime(time.value);
                                               },
                                     );
                                   },
@@ -329,6 +320,16 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                 ],
               );
             },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                spacing: 8,
+                children: [
+                  const Icon(Symbols.thermostat_rounded, size: 24),
+                  Text(context.i18n.temperature_monitor, style: context.textTheme.titleMedium),
+                ],
+              ),
+            ),
           ),
         );
       },

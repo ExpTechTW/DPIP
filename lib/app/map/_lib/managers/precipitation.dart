@@ -43,10 +43,13 @@ class RainData {
 class PrecipitationMapLayerManager extends MapLayerManager {
   PrecipitationMapLayerManager(super.context, super.controller);
 
+  static const precipitationIntervals = ['now', '10m', '1h', '3h', '6h', '12h', '24h', '2d', '3d'];
+
   final currentPrecipitationTime = ValueNotifier<String?>(GlobalProviders.data.precipitation.firstOrNull);
+  final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
 
-  Future<void> _updatePrecipitationTileUrl(String time) async {
+  Future<void> setPrecipitationTime(String time) async {
     if (currentPrecipitationTime.value == time || isLoading.value) return;
 
     isLoading.value = true;
@@ -61,6 +64,26 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       TalkerManager.instance.error('Failed to update Precipitation tiles', e, s);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> setPrecipitationInterval(String interval) async {
+    if (currentPrecipitationInterval.value == interval) return;
+
+    try {
+      final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
+      final showLayerId = '$layerId-$interval';
+      final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
+
+      await controller.setLayerVisibility(showLayerId, true);
+      TalkerManager.instance.info('Showing Layer "$showLayerId"');
+
+      await controller.setLayerVisibility(hideLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$hideLayerId"');
+
+      currentPrecipitationInterval.value = interval;
+    } catch (e, s) {
+      TalkerManager.instance.error('PrecipitationMapLayerManager.setPrecipitationInterval', e, s);
     }
   }
 
@@ -113,14 +136,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setRainData(time, rainData);
         }
 
-        final features =
-        rainData
-            .where((station) {
-          final rain = station.data.now;
-          return rain != -99 && rain > 0;
-        })
-            .map((station) => station.toFeatureBuilder())
-            .toList();
+        final features = rainData.map((station) => station.toFeatureBuilder());
 
         final data = GeoJsonBuilder().setFeatures(features).build();
 
@@ -133,50 +149,78 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       }
 
       if (!isLayerExists) {
-        final properties = CircleLayerProperties(
-          circleRadius: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            7,
-            5,
-            12,
-            15,
-          ],
-          circleColor: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.get, 'rain_now'],
-            0,
-            '#c2c2c2',
-            10,
-            '#9cfcff',
-            30,
-            '#059bff',
-            50,
-            '#39ff03',
-            100,
-            '#fffb03',
-            200,
-            '#ff9500',
-            300,
-            '#ff0000',
-            500,
-            '#fb00ff',
-            1000,
-            '#960099',
-            2000,
-            '#000000',
-          ],
-          circleOpacity: 0.7,
-          circleStrokeWidth: 0.2,
-          circleStrokeColor: '#000000',
-          circleStrokeOpacity: 0.7,
-          visibility: visible ? 'visible' : 'none',
-        );
+        final properties = {
+          for (final interval in precipitationIntervals)
+            interval: CircleLayerProperties(
+              circleRadius: [
+                Expressions.interpolate,
+                ['linear'],
+                [Expressions.zoom],
+                7,
+                5,
+                12,
+                15,
+              ],
+              circleColor: [
+                Expressions.interpolate,
+                ['linear'],
+                [Expressions.get, interval],
+                0,
+                '#c2c2c2',
+                10,
+                '#9cfcff',
+                30,
+                '#059bff',
+                50,
+                '#39ff03',
+                100,
+                '#fffb03',
+                200,
+                '#ff9500',
+                300,
+                '#ff0000',
+                500,
+                '#fb00ff',
+                1000,
+                '#960099',
+                2000,
+                '#000000',
+              ],
+              circleOpacity: [
+                'case',
+                [
+                  '<',
+                  [Expressions.get, interval],
+                  0,
+                ],
+                0,
+                0.7,
+              ],
+              circleStrokeWidth: 0.2,
+              circleStrokeColor: '#000000',
+              circleStrokeOpacity: [
+                'case',
+                [
+                  '<',
+                  [Expressions.get, interval],
+                  0,
+                ],
+                0,
+                0.7,
+              ],
+              visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+            ),
+        };
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$layerId"');
+        await Future.wait(
+          properties.entries.map(
+            (entry) => controller
+                .addLayer(sourceId, '$layerId-${entry.key}', entry.value, belowLayerId: BaseMapLayerIds.userLocation)
+                .then((value) {
+                  TalkerManager.instance.info('Added Layer "$layerId-${entry.key}"');
+                }),
+          ),
+        );
       }
 
       if (isSourceExists && isLayerExists) return;
@@ -210,8 +254,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
 
     try {
-      await controller.setLayerVisibility(layerId, true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
+      await controller.setLayerVisibility('$layerId-${currentPrecipitationInterval.value}', true);
+      TalkerManager.instance.info('Showing Layer "$layerId-${currentPrecipitationInterval.value}"');
 
       await _focus();
 
@@ -227,13 +271,15 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
       final sourceId = MapSourceIds.precipitation(currentPrecipitationTime.value);
 
-      await controller.removeLayer(layerId);
-      TalkerManager.instance.info('Removed Layer "$layerId"');
+      for (final interval in precipitationIntervals) {
+        await controller.removeLayer('$layerId-$interval');
+        TalkerManager.instance.info('Removed Layer "$layerId-$interval"');
+      }
 
       await controller.removeSource(sourceId);
       TalkerManager.instance.info('Removed Source "$sourceId"');
     } catch (e, s) {
-      TalkerManager.instance.error('PrecipitationMapLayerManager.dispose', e, s);
+      TalkerManager.instance.error('PrecipitationMapLayerManager.remove', e, s);
     }
 
     didSetup = false;
@@ -248,269 +294,23 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
 
   const PrecipitationMapLayerSheet({super.key, required this.manager});
 
-  /*class _PrecipitationMapLayerSheetState extends State<PrecipitationMapLayerSheet> {
-  late MapLibreMapController _mapController;
-
-  List<String> rainTimeList = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
-  bool _showLegend = false;
-  String? _selectedStationId;
-
-  List<RainData> rainDataList = [];
-  String selectedTimestamp = '';
-  String selectedInterval = 'now'; // 默認選擇 "now"
-
-  Future<void> _initMap(MapLibreMapController controller) async {
-    _mapController = controller;
-  }
-
-  Future<void> _loadMap() async {
-    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-      await getSavedLocation();
-    }
-    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
-    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
-
-    isUserLocationValid = !(userLon == 0 || userLat == 0);
-
-    await _mapController.addSource(
-      'rain-data',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-    );
-
-    rainTimeList = await ExpTech().getRainList();
-
-    if (rainTimeList.isNotEmpty) {
-      selectedTimestamp = rainTimeList.last;
-      await updateRainData(selectedTimestamp, selectedInterval);
-    }
-
-    if (isUserLocationValid) {
-      await _mapController.addSource(
-        'markers-geojson',
-        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-      );
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
-    }
-
-    await _addUserLocationMarker();
-
-    setState(() {});
-  }
-
-  Future<void> updateRainData(String timestamp, String interval) async {
-    final List<RainStation> rainData = await ExpTech().getRain(timestamp);
-
-    rainDataList =
-        rainData
-            .map((station) {
-              double rainfall;
-              switch (interval) {
-                case 'now':
-                  rainfall = station.data.now;
-                case '10m':
-                  rainfall = station.data.tenMinutes;
-                case '1h':
-                  rainfall = station.data.oneHour;
-                case '3h':
-                  rainfall = station.data.threeHours;
-                case '6h':
-                  rainfall = station.data.sixHours;
-                case '12h':
-                  rainfall = station.data.twelveHours;
-                case '24h':
-                  rainfall = station.data.twentyFourHours;
-                case '2d':
-                  rainfall = station.data.twoDays;
-                case '3d':
-                  rainfall = station.data.threeDays;
-                default:
-                  rainfall = station.data.now;
-              }
-
-              if (rainfall == -99) {
-                return null;
-              }
-
-              return RainData(
-                id: station.id,
-                latitude: station.station.lat,
-                longitude: station.station.lng,
-                rainfall: rainfall,
-                stationName: station.station.name,
-                county: station.station.county,
-                town: station.station.town,
-              );
-            })
-            .whereType<RainData>()
-            .toList();
-
-    await addRainCircles(rainDataList);
-  }
-
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
-  Future<void> addRainCircles(List<RainData> rainDataList) async {
-    final features =
-        rainDataList
-            .map(
-              (data) => {
-                'type': 'Feature',
-                'properties': {'id': data.id, 'rainfall': data.rainfall},
-                'geometry': {
-                  'type': 'Point',
-                  'coordinates': [data.longitude, data.latitude],
-                },
-              },
-            )
-            .toList();
-
-    await _mapController.setGeoJsonSource('rain-data', {'type': 'FeatureCollection', 'features': features});
-
-    await _mapController.removeLayer('rain-0-circles');
-    await _mapController.addLayer(
-      'rain-data',
-      'rain-0-circles',
-      const CircleLayerProperties(
-        circleRadius: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          5,
-          3,
-          10,
-          6,
-        ],
-        circleColor: '#808080',
-        circleStrokeWidth: 0.8,
-        circleStrokeColor: '#FFFFFF',
-      ),
-      filter: [
-        '==',
-        ['get', 'rainfall'],
-        0,
-      ],
-      minzoom: 10,
-    );
-
-    await _mapController.removeLayer('rain-0-labels');
-    await _mapController.addSymbolLayer(
-      'rain-data',
-      'rain-0-labels',
-      const SymbolLayerProperties(
-        textField: ['get', 'rainfall'],
-        textSize: 12,
-        textColor: '#ffffff',
-        textHaloColor: '#000000',
-        textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
-        textOffset: [
-          Expressions.literal,
-          [0, 2],
-        ],
-      ),
-      filter: [
-        '==',
-        ['get', 'rainfall'],
-        0,
-      ],
-      minzoom: 10,
-    );
-
-    await _mapController.removeLayer('rain-circles');
-    await _mapController.addLayer(
-      'rain-data',
-      'rain-circles',
-      const CircleLayerProperties(
-        circleRadius: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          7,
-          5,
-          12,
-          15,
-        ],
-        circleColor: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.get, 'rainfall'],
-          0,
-          '#c2c2c2',
-          10,
-          '#9cfcff',
-          30,
-          '#059bff',
-          50,
-          '#39ff03',
-          100,
-          '#fffb03',
-          200,
-          '#ff9500',
-          300,
-          '#ff0000',
-          500,
-          '#fb00ff',
-          1000,
-          '#960099',
-          2000,
-          '#000000',
-        ],
-        circleOpacity: 0.7,
-        circleStrokeWidth: 0.2,
-        circleStrokeColor: '#000000',
-        circleStrokeOpacity: 0.7,
-      ),
-      filter: [
-        '!=',
-        ['get', 'rainfall'],
-        0,
-      ],
-    );*/
-
   @override
   Widget build(BuildContext context) {
+    String getIntervalLabel(String interval) => switch (interval) {
+      'now' => context.i18n.interval_now,
+      '10m' => context.i18n.interval_10_minutes,
+      '1h' => context.i18n.interval_1_hour,
+      '3h' => context.i18n.interval_3_hours,
+      '6h' => context.i18n.interval_6_hours,
+      '12h' => context.i18n.interval_12_hours,
+      '24h' => context.i18n.interval_24_hours,
+      '2d' => context.i18n.interval_2_days,
+      '3d' => context.i18n.interval_3_days,
+      _ => interval,
+    };
+
     return MorphingSheet(
-      title: context.i18n.precipitation_monitor,
+      title: context.i18n.temperature_monitor,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -518,7 +318,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Selector<DpipDataModel, UnmodifiableListView<String>>(
             selector: (context, model) => model.precipitation,
-            builder: (context, precipitation, child) {
+            builder: (context, precipitation, header) {
               final times = precipitation.map((time) {
                 final t = time.toSimpleDateTimeString(context).split(' ');
                 return (date: t[0], time: t[1], value: time);
@@ -528,17 +328,51 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      spacing: 8,
-                      children: [
-                        const Icon(Symbols.humidity_percentage_rounded, size: 24),
-                        Text(context.i18n.precipitation_monitor, style: context.textTheme.titleMedium),
-                      ],
+                  header!,
+                  SizedBox(
+                    height: kMinInteractiveDimension,
+                    child: ValueListenableBuilder<String?>(
+                      valueListenable: manager.currentPrecipitationInterval,
+                      builder: (context, currentPrecipitationInterval, child) {
+                        const intervals = PrecipitationMapLayerManager.precipitationIntervals;
+
+                        return ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          scrollDirection: Axis.horizontal,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: intervals.length,
+                          itemBuilder: (context, index) {
+                            final interval = intervals[index];
+                            final isSelected = interval == currentPrecipitationInterval;
+
+                            return ValueListenableBuilder<bool>(
+                              valueListenable: manager.isLoading,
+                              builder: (context, isLoading, child) {
+                                return FilterChip(
+                                  selected: isSelected,
+                                  showCheckmark: !isLoading,
+                                  label: Text(getIntervalLabel(interval)),
+                                  side: BorderSide(
+                                    color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                  ),
+                                  avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                  onSelected:
+                                      isLoading
+                                          ? null
+                                          : (selected) {
+                                            if (!selected) return;
+                                            manager.setPrecipitationInterval(interval);
+                                          },
+                                );
+                              },
+                            );
+                          },
+                          separatorBuilder: (context, index) => const SizedBox(width: 8),
+                        );
+                      },
                     ),
                   ),
-                  /*SizedBox(
+                  SizedBox(
                     height: kMinInteractiveDimension,
                     child: ValueListenableBuilder<String?>(
                       valueListenable: manager.currentPrecipitationTime,
@@ -573,7 +407,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                                               ? null
                                               : (selected) {
                                                 if (!selected) return;
-                                                manager._updatePrecipitationTileUrl(time.value);
+                                                manager.setPrecipitationTime(time.value);
                                               },
                                     );
                                   },
@@ -593,10 +427,20 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                         );
                       },
                     ),
-                  ),*/
+                  ),
                 ],
               );
             },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                spacing: 8,
+                children: [
+                  const Icon(Symbols.water_drop_rounded, size: 24),
+                  Text(context.i18n.precipitation_monitor, style: context.textTheme.titleMedium),
+                ],
+              ),
+            ),
           ),
         );
       },

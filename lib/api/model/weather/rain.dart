@@ -1,14 +1,12 @@
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/widgets/map/latlng_altitude.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
-import 'package:dpip/utils/geojson.dart';
 
 part 'rain.g.dart';
 
 @JsonSerializable()
 class RainStation {
-  String get type => 'rain_station';
-
   final String id;
 
   final StationInfo station;
@@ -21,23 +19,23 @@ class RainStation {
 
   Map<String, dynamic> toJson() => _$RainStationToJson(this);
 
-  GeoJsonFeatureBuilder toFeatureBuilder() {
-    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        .setGeometry(station.latlng.toGeoJsonCoordinates())
-        .setProperty('id', id)
-        .setProperty('name', station.name)
-        .setProperty('county', station.county)
-        .setProperty('town', station.town)
-        .setProperty('rain_now', data.now)
-        .setProperty('rain_10m', data.tenMinutes)
-        .setProperty('rain_1h', data.oneHour)
-        .setProperty('rain_3h', data.threeHours)
-        .setProperty('rain_6h', data.sixHours)
-        .setProperty('rain_12h', data.twelveHours)
-        .setProperty('rain_24h', data.twentyFourHours)
-        .setProperty('rain_2d', data.twoDays)
-        .setProperty('rain_3d', data.threeDays);
-  }
+  GeoJsonFeatureBuilder toFeatureBuilder() =>
+      GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+        ..setGeometry(station.latlng.toGeoJsonCoordinates())
+        ..setProperty('id', id)
+        ..setProperty('name', station.name)
+        ..setProperty('county', station.county)
+        ..setProperty('town', station.town)
+        ..setProperty('altitude', station.altitude)
+        ..setProperty('now', data.now)
+        ..setProperty('10m', data.tenMinutes)
+        ..setProperty('1h', data.oneHour)
+        ..setProperty('3h', data.threeHours)
+        ..setProperty('6h', data.sixHours)
+        ..setProperty('12h', data.twelveHours)
+        ..setProperty('24h', data.twentyFourHours)
+        ..setProperty('2d', data.twoDays)
+        ..setProperty('3d', data.threeDays);
 }
 
 @JsonSerializable()
@@ -63,6 +61,7 @@ class StationInfo {
   Map<String, dynamic> toJson() => _$StationInfoToJson(this);
 
   LatLng get latlng => LatLng(lat, lng);
+  LatLngAltitude get latlngAltitude => LatLngAltitude(lat, lng, altitude);
 }
 
 @JsonSerializable()

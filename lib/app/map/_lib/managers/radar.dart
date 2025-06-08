@@ -94,7 +94,7 @@ class RadarMapLayerManager extends MapLayerManager {
       if (!isLayerExists) {
         final properties = RasterLayerProperties(visibility: visible ? 'visible' : 'none');
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.countyOutline);
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.exptechCountyOutline);
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
