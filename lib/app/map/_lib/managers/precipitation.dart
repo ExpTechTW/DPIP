@@ -310,7 +310,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
     };
 
     return MorphingSheet(
-      title: context.i18n.temperature_monitor,
+      title: context.i18n.precipitation_monitor,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
