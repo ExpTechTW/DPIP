@@ -7,6 +7,21 @@
 
 ## [未發布]
 
+## [3.0.013] - 2025-06-09
+
+### 新增
+
+- 新增地圖底圖。
+- 新增氣象相關圖層。
+
+### 更改
+
+- 改善 Apple 平台啟動效能，跳過不必要的 FCM 初始化流程。
+
+### 修正
+
+- 修正一部分問題。
+
 ## [3.0.011] - 2025-05-31
 
 ### 新增
@@ -114,7 +129,9 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.011...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.013...HEAD
+[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012...v3.0.013
+[3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012
 [3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
 [3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
 [3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
