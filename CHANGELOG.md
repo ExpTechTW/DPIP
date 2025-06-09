@@ -7,8 +7,6 @@
 
 ## [未發布]
 
-## [3.0.013] - 2025-06-09
-
 ### 新增
 
 - 新增地圖底圖。
@@ -129,8 +127,7 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.013...HEAD
-[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012...v3.0.013
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.012...HEAD
 [3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012
 [3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
 [3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
