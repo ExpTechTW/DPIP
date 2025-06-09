@@ -236,10 +236,11 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     if (!visible) return;
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
+    final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
 
     try {
-      await controller.setLayerVisibility(layerId, false);
-      TalkerManager.instance.info('Hiding Layer "$layerId"');
+      await controller.setLayerVisibility(hideLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$hideLayerId"');
 
       visible = false;
     } catch (e, s) {
@@ -252,10 +253,11 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     if (visible) return;
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
+    final showLayerId = '$layerId-${currentPrecipitationInterval.value}';
 
     try {
-      await controller.setLayerVisibility('$layerId-${currentPrecipitationInterval.value}', true);
-      TalkerManager.instance.info('Showing Layer "$layerId-${currentPrecipitationInterval.value}"');
+      await controller.setLayerVisibility(showLayerId, true);
+      TalkerManager.instance.info('Showing Layer "$showLayerId"');
 
       await _focus();
 
