@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dpip/app/settings/map/page.dart';
 import 'package:flutter/material.dart';
 
@@ -176,7 +178,9 @@ class SettingsIndexPage extends StatelessWidget {
         ),
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: context.i18n.settings_fcm,
+          title: Platform.isAndroid
+              ? context.i18n.settings_fcm
+              : '複製 ANPs Token', // TODO(liangliang): 加入 i18n: settings_anps
           trailing: const Icon(Symbols.content_copy_rounded),
           onTap: () => FlutterClipboard.copy(Preference.notifyToken),
         ),
