@@ -11,10 +11,10 @@ class RegionOutOfService extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Text(context.i18n.out_of_service_only_taiwan, style: context.theme.textTheme.titleMedium),
+          Text('服務區域外，僅在臺灣各地可用', style: context.theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           FilledButton(
-            child: Text(context.i18n.settings),
+            child: const Text('設定'),
             onPressed: () {
               context.push('/settings');
               context.push('/settings/location');

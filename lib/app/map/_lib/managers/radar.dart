@@ -168,7 +168,7 @@ class RadarMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MorphingSheet(
-      title: context.i18n.radar_monitor,
+      title: '雷達回波',
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -193,7 +193,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                       children: [
                         Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
                         Text(
-                          context.i18n.radar_monitor,
+                          '雷達回波',
                           style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
                         ),
                       ],

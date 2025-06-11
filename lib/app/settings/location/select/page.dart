@@ -24,7 +24,7 @@ class SettingsLocationSelectPage extends StatelessWidget {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: context.i18n.location_city,
+          title: '縣市',
           children: [
             for (final city in cities)
               Selector<SettingsLocationModel, String?>(

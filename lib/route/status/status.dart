@@ -43,7 +43,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.i18n.server_status, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('伺服器狀態', style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -67,15 +67,15 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                      '${context.i18n.error_prefix} ${snapshot.error}',
+                      '錯誤: ${snapshot.error}',
                       style: TextStyle(color: context.colors.error, fontSize: 16),
                     ),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
+                  return const Center(
                     child: Text(
-                      context.i18n.no_data_available,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      '沒有可用的資料',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   );
                 }
@@ -117,7 +117,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
           const SizedBox(width: 16),
           Expanded(
             child: Text(
-              context.i18n.server_status_overview,
+              '此頁面呈現伺服器各時段狀態概覽。原始資料每5秒更新一次，此處顯示精簡版本以最佳化網路用量。請注意，此資訊僅供參考，實際狀況應以公告為準。',
               style: TextStyle(fontSize: 14, color: isDarkMode ? Colors.white70 : Colors.black87),
             ),
           ),
@@ -138,15 +138,15 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     if (abnormalServices == 0) {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
-      statusText = context.i18n.all_normal;
+      statusText = '全部正常';
     } else if (abnormalServices == allServices.length) {
       statusColor = Colors.red;
       statusIcon = Icons.error;
-      statusText = context.i18n.all_abnormal;
+      statusText = '全部異常';
     } else {
       statusColor = Colors.orange;
       statusIcon = Icons.warning;
-      statusText = context.i18n.partially_abnormal;
+      statusText = '部分異常';
     }
 
     final cardId = status.formattedTime;
@@ -240,13 +240,13 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
     String getStatusText(int status) {
       switch (status) {
         case 1:
-          return context.i18n.normal;
+          return '正常';
         case 2:
-          return context.i18n.unstable;
+          return '不穩定';
         case -1:
-          return context.i18n.no_data;
+          return '無資料';
         default:
-          return context.i18n.abnormal;
+          return '異常';
       }
     }
 
@@ -259,7 +259,7 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
         style: TextStyle(fontWeight: FontWeight.w500, color: isDarkMode ? Colors.white : Colors.black87),
       ),
       subtitle: Text(
-        context.i18n.delay(serviceStatus.count.toString()),
+        '延遲: ${serviceStatus.count} ms',
         style: TextStyle(color: isDarkMode ? Colors.white70 : Colors.black54),
       ),
       trailing: Container(

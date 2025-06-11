@@ -29,17 +29,17 @@ class SettingsNotifyReportPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.sound_report_minor,
-              subtitle: Text(context.i18n.report_description_sound),
+              title: '地震報告(一般)',
+              subtitle: Text('所在地(縣市)實測震度 3 以上'),
               type: 'report-general',
             ),
             SoundListTile(
-              title: context.i18n.sound_report_silent,
-              subtitle: Text(context.i18n.sound_report_silent_h2),
+              title: '地震報告(無聲通知)',
+              subtitle: Text('所在地(縣市)實測震度 1 以上'),
               type: 'report-silence',
             ),
           ],

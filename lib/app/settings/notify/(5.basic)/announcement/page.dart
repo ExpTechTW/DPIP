@@ -29,12 +29,12 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.announcement,
-              subtitle: Text(context.i18n.server_announcement_description_sound),
+              title: '公告',
+              subtitle: Text('發送公告時'),
               type: 'announcement-general',
             ),
           ],

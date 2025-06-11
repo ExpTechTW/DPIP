@@ -22,7 +22,7 @@ class LocationOutOfServiceCard extends StatelessWidget {
         children: [
           Icon(Symbols.wrong_location_rounded, color: context.colors.onSecondaryContainer, weight: 500),
           Text(
-            context.i18n.out_of_service_only_taiwan,
+            '服務區域外，僅在臺灣各地可用',
             style: context.textTheme.bodyMedium!.copyWith(color: context.colors.onSecondaryContainer),
           ),
         ],

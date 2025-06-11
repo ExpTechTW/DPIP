@@ -260,7 +260,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
       await _mapController.addSymbolLayer(
         'tsunami-data',
         'tsunami-actual-labels',
-        SymbolLayerProperties(
+        const SymbolLayerProperties(
           textField: [
             Expressions.concat,
             ['get', 'name'],
@@ -268,7 +268,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
             ['get', 'arrivalTime'],
             '\n',
             ['get', 'waveHeight'],
-            'cm\n${context.i18n.monitor_arrival}',
+            'cm\n抵達',
           ],
           textSize: 12,
           textColor: '#ffffff',
@@ -350,10 +350,10 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
       _tsunami_serial = int.parse(id.split('-')[1]);
       tsunami = await ExpTech().getTsunami(id);
       (tsunami?.status == 0)
-          ? tsunamiStatus = context.i18n.tsunami_publish
+          ? tsunamiStatus = '發布'
           : (tsunami?.status == 1)
-          ? tsunamiStatus = context.i18n.tsunami_renew
-          : tsunamiStatus = context.i18n.tsunami_relieve;
+          ? tsunamiStatus = '更新'
+          : tsunamiStatus = '解除';
 
       final List<String> options = generateTsunamiOptions();
       if (options.isNotEmpty && _selectedOption == null) {
@@ -381,15 +381,15 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
     if (longitude > 180) lat = latitude - 360;
 
     if (lat < 0) {
-      latFormat = context.i18n.south_latitude(lat.abs().toString());
+      latFormat = '南緯 ${lat.abs} 度';
     } else {
-      latFormat = context.i18n.north_latitude(lat.toString());
+      latFormat = '北緯 $lat 度';
     }
 
     if (lon < 0) {
-      lonFormat = context.i18n.west_longitude(lon.abs().toString());
+      lonFormat = '西經 ${lon.abs} 度';
     } else {
-      lonFormat = context.i18n.east_longitude(lon.toString());
+      lonFormat = '東經 $lon 度';
     }
 
     return '$latFormat　$lonFormat';
@@ -463,8 +463,8 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           children: [
                                             Text(
                                               tsunami == null
-                                                  ? context.i18n.no_tsunami_information
-                                                  : context.i18n.tsunami_warning,
+                                                  ? '近期無海嘯資訊'
+                                                  : '海嘯警報',
                                               style: TextStyle(
                                                 fontSize: 28,
                                                 fontWeight: FontWeight.bold,
@@ -473,11 +473,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                             ),
                                             const SizedBox(height: 8),
                                             if (tsunami != null)
-                                              Text(
-                                                context.i18n.tsunami_number(
-                                                  tsunami?.id.toString() ?? '',
-                                                  tsunami?.serial.toString() ?? '',
-                                                ),
+                                              Text('${tsunami!.id}號 第${tsunami!.serial}報',
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500,
@@ -517,10 +513,10 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                               tsunami = await ExpTech().getTsunami(newValue);
                                               tsunamiStatus =
                                                   tsunami?.status == 0
-                                                      ? context.i18n.tsunami_publish
+                                                      ? '發布'
                                                       : tsunami?.status == 1
-                                                      ? context.i18n.tsunami_renew
-                                                      : context.i18n.tsunami_relieve;
+                                                      ? '更新'
+                                                      : '解除';
                                               if (tsunami != null) {
                                                 await addTsunamiObservationPoints(tsunami!);
                                               }
@@ -557,7 +553,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                context.i18n.estimated_time_wave,
+                                                '預估海嘯到達時間及波高',
                                                 style: TextStyle(
                                                   fontSize: 22,
                                                   fontWeight: FontWeight.bold,
@@ -573,7 +569,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                context.i18n.observing_tsunamis,
+                                                '各地觀測到的海嘯',
                                                 style: TextStyle(
                                                   fontSize: 22,
                                                   fontWeight: FontWeight.bold,
@@ -586,7 +582,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           ),
                                         const SizedBox(height: 15),
                                         Text(
-                                          context.i18n.eew_info_sound_title,
+                                          '地震資訊',
                                           style: TextStyle(
                                             fontSize: 22,
                                             fontWeight: FontWeight.bold,
@@ -598,7 +594,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              context.i18n.occurrence_time,
+                                              '發生時間',
                                               style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                             ),
                                           ],
@@ -621,7 +617,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              context.i18n.report_location,
+                                              '位於',
                                               style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                             ),
                                           ],
@@ -660,7 +656,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text(
-                                                    context.i18n.scale,
+                                                    '規模',
                                                     style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                                   ),
                                                   Text(
@@ -680,7 +676,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Text(
-                                                    context.i18n.depth,
+                                                    '深度',
                                                     style: TextStyle(fontSize: 18, color: context.colors.onSurface),
                                                   ),
                                                   Text(

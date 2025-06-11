@@ -35,7 +35,7 @@ class UpdateRequiredPage extends StatelessWidget {
                 Icon(Icons.system_update, size: 120, color: context.colors.onPrimary),
                 const SizedBox(height: 32),
                 Text(
-                  context.i18n.discover_new_version,
+                  '發現新版本',
                   style: context.theme.textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: context.colors.onPrimary,
@@ -44,7 +44,7 @@ class UpdateRequiredPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  context.i18n.update_to_latest_version,
+                  '更新至最新版本以獲得最佳體驗',
                   style: context.theme.textTheme.bodyLarge?.copyWith(color: context.colors.onPrimary),
                   textAlign: TextAlign.center,
                 ),
@@ -57,12 +57,12 @@ class UpdateRequiredPage extends StatelessWidget {
                     child: Column(
                       children: [
                         _buildVersionInfo(
-                          context.i18n.current_version,
+                          '目前版本',
                           Global.packageInfo.version,
                           Colors.red.shade400,
                         ),
                         const SizedBox(height: 12),
-                        _buildVersionInfo(context.i18n.latest_version, lastVersion, Colors.green.shade400),
+                        _buildVersionInfo('最新版本', lastVersion, Colors.green.shade400),
                       ],
                     ),
                   ),
@@ -87,9 +87,9 @@ class UpdateRequiredPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 4,
                   ),
-                  child: Text(
-                    context.i18n.update_now,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  child: const Text(
+                    '立即更新',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 if (showSkipButton) ...[
@@ -104,7 +104,7 @@ class UpdateRequiredPage extends StatelessWidget {
                       );
                     },
                     style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-                    child: Text(context.i18n.skip_for_now, style: TextStyle(fontSize: 16, color: Colors.blue.shade700)),
+                    child: Text('暫時略過', style: TextStyle(fontSize: 16, color: Colors.blue.shade700)),
                   ),
                 ],
               ],

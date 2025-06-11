@@ -29,37 +29,37 @@ class SettingsNotifyEewPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.sound_eew_alert_major,
-              subtitle: Text(context.i18n.eew_alert_description_sound),
+              title: '緊急地震速報(重大)',
+              subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上'),
               type: 'eew_alert-important',
             ),
             SoundListTile(
-              title: context.i18n.sound_eew_minor,
-              subtitle: Text(context.i18n.eew_description_sound),
+              title: '緊急地震速報(一般)',
+              subtitle: Text( '最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上'),
               type: 'eew_alert-general',
             ),
             SoundListTile(
-              title: context.i18n.sound_eew_silent,
-              subtitle: Text(context.i18n.sound_eew_silent_h2),
+              title: '緊急地震速報(無聲)',
+              subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上'),
               type: 'eew_alert-silent',
             ),
             SoundListTile(
-              title: context.i18n.sound_earthquake_eew_major,
-              subtitle: Text(context.i18n.sound_earthquake_eew_major_h2),
+              title: '地震速報(重大)',
+              subtitle: Text('所在地(鄉鎮)預估震度 4 以上'),
               type: 'eew-important',
             ),
             SoundListTile(
-              title: context.i18n.sound_earthquake_eew_minor,
-              subtitle: Text(context.i18n.sound_earthquake_eew_minor_h2),
+              title: '地震速報(一般)',
+              subtitle: Text('所在地(鄉鎮)預估震度 2 以上'),
               type: 'eew-general',
             ),
             SoundListTile(
-              title: context.i18n.sound_earthquake_eew_silent,
-              subtitle: Text(context.i18n.sound_earthquake_eew_silent_h2),
+              title: '地震速報(無聲)',
+              subtitle: Text('所在地(鄉鎮)預估震度 1 以上'),
               type: 'eew-silence',
             ),
           ],

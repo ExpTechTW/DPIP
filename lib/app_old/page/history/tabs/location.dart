@@ -70,7 +70,7 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
+    final grouped = groupBy(historyList, (e) => DateFormat('yyyy/MM/dd (EEEE)', locale).format(e.time.send));
 
     return Selector<SettingsLocationModel, String?>(
       selector: (context, model) => model.code,
@@ -89,7 +89,7 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
               if (grouped.isEmpty) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 24),
-                  child: Center(child: Text(context.i18n.home_safety)),
+                  child: Center(child: Text('一切平安，無事件發生。')),
                 );
               }
 

@@ -29,17 +29,17 @@ class SettingsNotifyEvacuationPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.sound_major,
-              subtitle: Text(context.i18n.sound_evacuation_major_h2),
+              title: '重大',
+              subtitle: Text('所在地(鄉鎮)發布避難警訊時'),
               type: 'evacuation_major-important',
             ),
             SoundListTile(
               title: '一般',
-              subtitle: Text(context.i18n.sound_evacuation_minor_h2),
+              subtitle: Text('所在地(鄉鎮)發布避難資訊時'),
               type: 'evacuation_minor-general',
             ),
           ],

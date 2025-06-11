@@ -192,7 +192,7 @@ class WindMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MorphingSheet(
-      title: context.i18n.wind_direction_and_speed_monitor,
+      title: '風向/風速',
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -216,7 +216,7 @@ class WindMapLayerSheet extends StatelessWidget {
                       spacing: 8,
                       children: [
                         const Icon(Symbols.wind_power_rounded, size: 24),
-                        Text(context.i18n.wind_direction_and_speed_monitor, style: context.textTheme.titleMedium),
+                        Text('風向/風速', style: context.textTheme.titleMedium),
                       ],
                     ),
                   ),

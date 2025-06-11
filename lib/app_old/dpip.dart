@@ -145,12 +145,12 @@ class _DpipState extends State<Dpip> {
       builder: (context) {
         return AlertDialog(
           icon: const Icon(Symbols.signal_disconnected_rounded),
-          title: Text(context.i18n.abnormal),
-          content: Text(context.i18n.network_or_server_error, textAlign: TextAlign.center),
+          title: const Text('異常'),
+          content: const Text('網路連線或伺服器異常。', textAlign: TextAlign.center),
           actionsAlignment: MainAxisAlignment.spaceAround,
           actions: [
             TextButton(
-              child: Text(context.i18n.retry),
+              child: const Text('重試'),
               onPressed: () {
                 Navigator.pop(context);
                 _restartApp();

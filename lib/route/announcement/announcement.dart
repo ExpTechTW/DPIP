@@ -69,7 +69,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = '${context.i18n.error_fetching_announcement} $e';
+        errorMessage = '獲取公告時發生錯誤: $e';
         isLoading = false;
       });
     }
@@ -78,7 +78,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.i18n.announcement), elevation: 0),
+      appBar: AppBar(title: const Text('公告'), elevation: 0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -99,7 +99,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       return Center(child: Text(errorMessage!));
     }
     if (announcements.isEmpty) {
-      return Center(child: Text(context.i18n.no_announcements));
+      return const Center(child: Text('目前沒有公告'));
     }
     return RefreshIndicator(
       onRefresh: _fetchAnnouncements,
@@ -219,7 +219,7 @@ class AnnouncementDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.i18n.announcement_details), elevation: 0),
+      appBar: AppBar(title: const Text('公告詳情'), elevation: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),

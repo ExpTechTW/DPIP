@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dpip/app/settings/map/page.dart';
 import 'package:flutter/material.dart';
 
@@ -34,12 +32,12 @@ class SettingsIndexPage extends StatelessWidget {
     final deviceInfo = '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
     final location = ListSection(
-      title: context.i18n.settings_position,
+      title: '位置',
       children: [
         ListSectionTile(
           icon: Symbols.pin_drop_rounded,
-          title: context.i18n.settings_location,
-          subtitle: Text(context.i18n.settings_location_description),
+          title: '所在地',
+          subtitle: const Text('調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等'),
           onTap: () {
             context.push(SettingsLocationPage.route);
           },
@@ -52,16 +50,16 @@ class SettingsIndexPage extends StatelessWidget {
       children: [
         ListSectionTile(
           icon: Symbols.brush_rounded,
-          title: context.i18n.settings_theme,
-          subtitle: Text(context.i18n.settings_theme_description),
+          title: '主題色',
+          subtitle: const Text('調整 DPIP 整體的外觀與顏色'),
           onTap: () {
             context.push(SettingsThemePage.route);
           },
         ),
         ListSectionTile(
           icon: Symbols.translate_rounded,
-          title: context.i18n.settings_locale,
-          subtitle: Text(context.i18n.settings_locale_description),
+          title: '語言',
+          subtitle: const Text('調整 DPIP 的顯示語言'),
           onTap: () {
             context.push(SettingsLocalePage.route);
           },
@@ -98,28 +96,28 @@ class SettingsIndexPage extends StatelessWidget {
       children: [
         ListSectionTile(
           icon: Symbols.newspaper_rounded,
-          title: context.i18n.announcement,
+          title: '公告',
           subtitle: const Text('掌握 ExpTech Studio 的最新公告與資訊'),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/announcement'),
         ),
         ListSectionTile(
           icon: Symbols.update_rounded,
-          title: context.i18n.update_log,
+          title: '更新日誌',
           subtitle: const Text('瀏覽 DPIP 的歷次更新紀錄'),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/changelog'),
         ),
         ListSectionTile(
           icon: Symbols.volunteer_activism_rounded,
-          title: context.i18n.donate,
-          subtitle: Text(context.i18n.donate_h2),
+          title: '贊助我們',
+          subtitle: const Text('幫助我們維護伺服器的穩定和長久發展'),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push(SettingsDonatePage.route),
         ),
         ListSectionTile(
           icon: Symbols.book_rounded,
-          title: context.i18n.third_party_libraries,
+          title: '第三方套件授權',
           subtitle: const Text('DPIP 的實現歸功於開放源始碼'),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/license'),
@@ -162,7 +160,7 @@ class SettingsIndexPage extends StatelessWidget {
     );
 
     final debug = ListSection(
-      title: context.i18n.me_debug,
+      title: '除錯',
       children: [
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
@@ -178,15 +176,13 @@ class SettingsIndexPage extends StatelessWidget {
         ),
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: Platform.isAndroid
-              ? context.i18n.settings_fcm
-              : '複製 ANPs Token', // TODO(liangliang): 加入 i18n: settings_anps
+          title: '複製通知 Token',
           trailing: const Icon(Symbols.content_copy_rounded),
           onTap: () => FlutterClipboard.copy(Preference.notifyToken),
         ),
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: context.i18n.app_logs,
+          title: 'App 日誌',
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push(AppDebugLogsPage.route),
         ),
@@ -196,7 +192,7 @@ class SettingsIndexPage extends StatelessWidget {
     final footer = SettingsListTextSection(
       content:
           'ExpTech Studio © 2025\n'
-          '${context.i18n.official_info}',
+          '任何資訊應以中央氣象署發布之內容為準。',
       contentColor: context.theme.colorScheme.outline,
     );
 

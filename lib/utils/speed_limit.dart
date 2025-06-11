@@ -11,12 +11,12 @@ Future<void> showLimitDialog(BuildContext context) async {
     builder: (context) {
       return AlertDialog(
         icon: const Icon(Symbols.error),
-        title: Text(context.i18n.invalid_operation),
-        content: Text(context.i18n.operation_interval_too_short),
+        title: const Text('無效操作'),
+        content: const Text('操作間隔過短，請稍後再嘗試。'),
         actionsAlignment: MainAxisAlignment.end,
         actions: [
           TextButton(
-            child: Text(context.i18n.got_it),
+            child: const Text('知道了'),
             onPressed: () {
               Navigator.pop(context);
             },

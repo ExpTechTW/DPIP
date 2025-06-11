@@ -12,18 +12,18 @@ class WelcomeAnnouncementDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       icon: const Icon(Symbols.announcement),
-      title: Text(context.i18n.announcement),
-      content: Text(context.i18n.new_announcement_prompt),
+      title: const Text('公告'),
+      content: const Text('有新的公告，要前往查看嗎？'),
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: [
         TextButton(
-          child: Text(context.i18n.remind_later),
+          child: const Text('稍後再說'),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(context.i18n.go_to_view),
+          child: const Text('前往查看'),
           onPressed: () {
             Navigator.pop(context);
             context.push('/announcement');

@@ -19,7 +19,7 @@ class LocationButton extends StatelessWidget {
       builder: (context, code, child) {
         final location = Global.location[code];
 
-        final content = location == null ? context.i18n.location_Not_set : '${location.city} ${location.town}';
+        final content = location == null ? '尚未設定' : '${location.city} ${location.town}';
 
         return BlurredTextButton(
           onPressed: () => context.push(SettingsLocationPage.route),

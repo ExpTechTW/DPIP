@@ -29,22 +29,22 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.sound_major,
-              subtitle: Text(context.i18n.tsunami_alert_description_sound),
+              title: '重大',
+              subtitle: Text('海嘯警報發布時\n沿海地區鄉鎮'),
               type: 'tsunami-important',
             ),
             SoundListTile(
-              title: context.i18n.me_general,
-              subtitle: Text(context.i18n.tsunami_alert2_description_sound),
+              title: '一般',
+              subtitle: Text('海嘯警報發布時\n上述除外地區'),
               type: 'tsunami-general',
             ),
             SoundListTile(
-              title: context.i18n.sound_tsunami_silent,
-              subtitle: Text(context.i18n.sound_tsunami_silent_h2),
+              title: '太平洋海嘯消息(無聲通知)',
+              subtitle: Text('太平洋海嘯消息發布時'),
               type: 'tsunami-silent',
             ),
           ],

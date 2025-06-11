@@ -18,7 +18,7 @@ class WelcomeNoticePage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            child: Text(context.i18n.next_step),
+            child: const Text('下一步'),
             onPressed: () => context.push(WelcomePermissionPage.route),
           ),
         ),
@@ -39,7 +39,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      context.i18n.notice,
+                      '注意事項',
                       style: context.theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.colors.primary,
@@ -59,7 +59,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  context.i18n.official_info,
+                  '任何資訊應以中央氣象署發布之內容為準。',
                   style: context.theme.textTheme.bodyLarge!.copyWith(
                     color: context.colors.onErrorContainer,
                     fontWeight: FontWeight.bold,
@@ -75,7 +75,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(context.i18n.information_reliability, style: context.theme.textTheme.bodyLarge),
+                child: Text('根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。', style: context.theme.textTheme.bodyLarge),
               ),
             ),
             Padding(
@@ -86,7 +86,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(context.i18n.strong_shake_warning, style: context.theme.textTheme.bodyLarge),
+                child: Text('強烈搖晃有機率比通知早抵達使用者所在地。', style: context.theme.textTheme.bodyLarge),
               ),
             ),
             Padding(
@@ -97,7 +97,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(context.i18n.earthquake_alert_warning, style: context.theme.textTheme.bodyLarge),
+                child: Text('地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。', style: context.theme.textTheme.bodyLarge),
               ),
             ),
             Padding(
@@ -108,7 +108,7 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text(context.i18n.legal_risks, style: context.theme.textTheme.bodyLarge),
+                child: Text('任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。', style: context.theme.textTheme.bodyLarge),
               ),
             ),
           ],

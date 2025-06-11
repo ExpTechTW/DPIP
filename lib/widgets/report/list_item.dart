@@ -43,7 +43,7 @@ class ReportListItem extends StatelessWidget {
                   children: [
                     if (showDate)
                       Text(
-                        DateFormat(context.i18n.date_format).format(report.time),
+                        DateFormat('yyyy/MM/dd').format(report.time),
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           color: context.colors.onSurfaceVariant,
@@ -52,7 +52,7 @@ class ReportListItem extends StatelessWidget {
                         ),
                       ),
                     Text(
-                      DateFormat(context.i18n.time_format).format(report.time),
+                      DateFormat('HH:mm:ss').format(report.time),
                       textAlign: TextAlign.right,
                       style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 12),
                     ),
@@ -103,11 +103,7 @@ class ReportListItem extends StatelessWidget {
                     /**
                      * 規模、深度
                      */
-                    Text(
-                      context.i18n.report_list_item_subtitle(
-                        report.magnitude.toStringAsFixed(1),
-                        report.depth.toString(),
-                      ),
+                    Text('M ${report.magnitude}　深度 ${report.depth} km',
                       style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
                   ],

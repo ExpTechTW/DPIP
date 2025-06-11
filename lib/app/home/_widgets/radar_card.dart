@@ -104,7 +104,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
                           spacing: 8,
                           children: [
                             const Icon(Symbols.radar, size: 24),
-                            Text(context.i18n.radar_monitor, style: context.textTheme.titleMedium),
+                            Text('雷達回波', style: context.textTheme.titleMedium),
                             if (radarList.isNotEmpty)
                               Text(
                                 radarList.last.toLocaleTimeString(context),

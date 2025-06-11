@@ -42,8 +42,8 @@ class ReportSheetContent extends StatelessWidget {
                   children: [
                     Text(
                       report.hasNumber
-                          ? context.i18n.report_with_number(report.number!)
-                          : context.i18n.report_without_number,
+                          ? '編號 ${report.number} 顯著有感地震'
+                          : '小區域有感地震',
                       style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                     ),
                     Text(report.getLocation(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -58,7 +58,7 @@ class ReportSheetContent extends StatelessWidget {
           children: [
             ActionChip(
               avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
-              label: Text(context.i18n.open_report_url),
+              label: const Text('報告頁面'),
               backgroundColor: context.colors.primary,
               labelStyle: TextStyle(color: context.colors.onPrimary),
               side: BorderSide(color: context.colors.primary),
@@ -68,7 +68,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
             /* ActionChip(
               avatar: const Icon(Symbols.replay),
-              label: Text(context.i18n.report_replay),
+              label: Text('重播'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -82,21 +82,21 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         DetailFieldTile(
-          label: context.i18n.report_event_time,
+          label: '發震時間',
           child: Text(
-            DateFormat(context.i18n.datetime_format).format(report.time),
+            DateFormat('yyyy/MM/dd HH:mm:ss').format(report.time),
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
         DetailFieldTile(
-          label: context.i18n.report_location,
+          label: '位於',
           child: Text(report.convertLatLon(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ),
         Row(
           children: [
             Expanded(
               child: DetailFieldTile(
-                label: context.i18n.report_magnitude,
+                label: '地震規模',
                 child: Row(
                   children: [
                     Container(
@@ -115,7 +115,7 @@ class ReportSheetContent extends StatelessWidget {
             ),
             Expanded(
               child: DetailFieldTile(
-                label: context.i18n.report_depth,
+                label: '震源深度',
                 child: Row(
                   children: [
                     Container(
@@ -136,7 +136,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         DetailFieldTile(
-          label: context.i18n.report_intensity,
+          label: '各地震度',
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -200,7 +200,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         const Divider(),
         DetailFieldTile(
-          label: context.i18n.report_image,
+          label: '地震報告圖',
           child: EnlargeableImage(
             aspectRatio: 4 / 3,
             heroTag: 'report-image-${report.id}',
@@ -210,7 +210,7 @@ class ReportSheetContent extends StatelessWidget {
         ),
         if (report.hasNumber)
           DetailFieldTile(
-            label: context.i18n.report_intensity_image,
+            label: '震度圖',
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: 'intensity-image-${report.id}',
@@ -220,7 +220,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         if (report.hasNumber)
           DetailFieldTile(
-            label: context.i18n.report_pga_image,
+            label: '最大地動加速度圖',
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: 'pga-image-${report.id}',
@@ -230,7 +230,7 @@ class ReportSheetContent extends StatelessWidget {
           ),
         if (report.hasNumber)
           DetailFieldTile(
-            label: context.i18n.report_pgv_image,
+            label: '最大地動速度圖',
             child: EnlargeableImage(
               aspectRatio: 2334 / 2977,
               heroTag: 'pgv-image-${report.id}',

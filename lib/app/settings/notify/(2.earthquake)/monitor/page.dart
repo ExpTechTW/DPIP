@@ -29,12 +29,12 @@ class SettingsNotifyMonitorPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.sound_monitor_minor,
-              subtitle: Text(context.i18n.eq_description_sound),
+              title: '強震監視器(一般)',
+              subtitle: Text('偵測到晃動'),
               type: 'eq',
             ),
           ],

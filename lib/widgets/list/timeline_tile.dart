@@ -41,7 +41,7 @@ class TimeLineTile extends StatelessWidget {
                 children: [
                   if (showDate)
                     Text(
-                      DateFormat(context.i18n.date_format).format(time),
+                      DateFormat('yyyy/MM/dd').format(time),
                       textAlign: TextAlign.right,
                       style: TextStyle(
                         color: context.colors.onSurfaceVariant,
@@ -50,7 +50,7 @@ class TimeLineTile extends StatelessWidget {
                       ),
                     ),
                   Text(
-                    DateFormat(context.i18n.time_format).format(time),
+                    DateFormat('HH:mm:ss').format(time),
                     textAlign: TextAlign.right,
                     style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 12),
                   ),

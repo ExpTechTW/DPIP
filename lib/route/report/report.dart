@@ -249,7 +249,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    final appBar = AppBar(elevation: 4, title: Text(context.i18n.report));
+    final appBar = AppBar(elevation: 4, title: const Text('地震報告'));
 
     return Scaffold(
       body: Stack(
@@ -277,7 +277,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.theme.extendedColors.blue),
                       label: Text(
-                        context.i18n.report_offing,
+                        '此地震可能引起若干海面變動',
                         style: TextStyle(color: context.theme.extendedColors.blue),
                       ),
                       backgroundColor: Colors.blue.withValues(alpha: 0.16),
@@ -290,7 +290,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       (report!.getLocation().endsWith('近海') || report!.getLocation().endsWith('海域')))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.colors.error),
-                      label: Text(context.i18n.report_tsunami_attention, style: TextStyle(color: context.colors.error)),
+                      label: Text('此地震可能引起海嘯 注意後續資訊', style: TextStyle(color: context.colors.error)),
                       backgroundColor: Colors.red.withValues(alpha: 0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.colors.error),
@@ -331,9 +331,9 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                             padding: const EdgeInsets.all(20),
                             child: Row(
                               children: [
-                                Flexible(
+                                const Flexible(
                                   flex: 8,
-                                  child: Text(context.i18n.report_error, style: const TextStyle(fontSize: 16)),
+                                  child: Text('取得地震報告時發生錯誤，請檢查網路狀況後再試一次。', style: TextStyle(fontSize: 16)),
                                 ),
                                 const SizedBox(width: 10),
                                 Flexible(

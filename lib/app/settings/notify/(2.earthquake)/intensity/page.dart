@@ -29,17 +29,17 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
             SoundListTile(
-              title: context.i18n.sound_int_report_minor,
-              subtitle: Text(context.i18n.sound_int_report_minor_h2),
+              title: '震度速報(一般)',
+              subtitle: Text('所在地(鄉鎮)實測震度 3 以上'),
               type: 'int_report-general',
             ),
             SoundListTile(
-              title: context.i18n.sound_int_report_silent,
-              subtitle: Text(context.i18n.sound_int_report_silent_h2),
+              title: '震度速報(無聲通知)',
+              subtitle: Text('所在地(鄉鎮)實測震度 1 以上'),
               type: 'int_report-silence',
             ),
           ],

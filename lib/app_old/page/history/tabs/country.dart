@@ -51,7 +51,7 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = groupBy(historyList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
+    final grouped = groupBy(historyList, (e) => DateFormat('yyyy/MM/dd (EEEE)', locale).format(e.time.send));
 
     return RefreshIndicator(
       key: list,
@@ -61,9 +61,9 @@ class _HistoryCountryTabState extends State<HistoryCountryTab> {
         itemCount: grouped.isEmpty ? 1 : grouped.length,
         itemBuilder: (context, index) {
           if (grouped.isEmpty) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 24),
-              child: Center(child: Text(context.i18n.home_safety)),
+            return const Padding(
+              padding: EdgeInsets.only(top: 24),
+              child: Center(child: Text('一切平安，無事件發生。')),
             );
           }
 

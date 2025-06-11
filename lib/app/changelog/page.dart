@@ -41,7 +41,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_ChangelogPageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.unable_to_load_changelog)));
+      context.scaffoldMessenger.showSnackBar(const SnackBar(content: Text('無法載入更新日誌，請稍後再試。')));
     }
 
     if (!mounted) return;
@@ -52,7 +52,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.i18n.update_log), elevation: 0),
+      appBar: AppBar(title: const Text('更新日誌'), elevation: 0),
       body: Stack(
         children: [
           Positioned(
@@ -107,11 +107,11 @@ class _ChangelogPageState extends State<ChangelogPage> {
             Center(
               child: Column(
                 children: [
-                  Text(context.i18n.unable_to_load_changelog),
+                  const Text('無法載入更新日誌，請稍後再試。'),
                   FilledButton.tonalIcon(
                     onPressed: _refresh,
                     icon: const Icon(Symbols.refresh_rounded),
-                    label: Text(context.i18n.retry),
+                    label: const Text('重試'),
                   ),
                 ],
               ),

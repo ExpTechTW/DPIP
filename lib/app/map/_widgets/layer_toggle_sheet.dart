@@ -80,17 +80,17 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             runSpacing: 8,
             children: [
               LayerToggle(
-                label: context.i18n.monitor,
+                label: '強震監視器',
                 checked: _currentLayer == MapLayer.monitor,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.monitor : null),
               ),
               LayerToggle(
-                label: context.i18n.report,
+                label: '地震報告',
                 checked: _currentLayer == MapLayer.report,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.report : null),
               ),
               LayerToggle(
-                label: context.i18n.tsunami_info_monitor,
+                label: '海嘯資訊',
                 checked: _currentLayer == MapLayer.tsunami,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.tsunami : null),
               ),
@@ -102,22 +102,22 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             runSpacing: 8,
             children: [
               LayerToggle(
-                label: context.i18n.radar_monitor,
+                label: '雷達回波',
                 checked: _currentLayer == MapLayer.radar,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.radar : null),
               ),
               LayerToggle(
-                label: context.i18n.temperature_monitor,
+                label: '氣溫',
                 checked: _currentLayer == MapLayer.temperature,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.temperature : null),
               ),
               LayerToggle(
-                label: context.i18n.precipitation_monitor,
+                label: '降水',
                 checked: _currentLayer == MapLayer.precipitation,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.precipitation : null),
               ),
               LayerToggle(
-                label: context.i18n.wind_direction_and_speed_monitor,
+                label: '風向/風速',
                 checked: _currentLayer == MapLayer.wind,
                 onChanged: (checked) => _changeLayer(checked ? MapLayer.wind : null),
               ),

@@ -23,13 +23,13 @@ class SettingsLocalePage extends StatelessWidget {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: context.i18n.settings_locale,
+          title: '語言',
           children: [
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
                 return ListSectionTile(
                   icon: Symbols.translate_rounded,
-                  title: context.i18n.settings_display_locale,
+                  title: '顯示語言',
                   subtitle: Text(model.locale?.nativeName ?? '系統語言'),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => context.push(SettingsLocaleSelectPage.route),
@@ -38,8 +38,8 @@ class SettingsLocalePage extends StatelessWidget {
             ),
             ListSectionTile(
               icon: Symbols.groups_rounded,
-              title: context.i18n.settings_locale_crowdin,
-              subtitle: Text(context.i18n.settings_locale_crowdin_description),
+              title: '協助翻譯',
+              subtitle: const Text('點擊這裡來幫助我們改進 DPIP 的翻譯'),
               trailing: const Icon(Symbols.arrow_outward_rounded),
               onTap: () {
                 launchUrl(Uri.parse('https://crowdin.com/project/dpip'));

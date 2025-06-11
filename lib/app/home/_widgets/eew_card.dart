@@ -96,7 +96,7 @@ class _EewCardState extends State<EewCard> {
                             children: [
                               Icon(Symbols.crisis_alert_rounded, color: context.colors.onError, weight: 700, size: 22),
                               Text(
-                                context.i18n.emergency_earthquake_warning,
+                                '緊急地震速報',
                                 style: context.textTheme.labelLarge!.copyWith(
                                   color: context.colors.onError,
                                   fontWeight: FontWeight.bold,
@@ -159,7 +159,7 @@ class _EewCardState extends State<EewCard> {
                                   spacing: 16,
                                   children: [
                                     Text(
-                                      context.i18n.location_estimate,
+                                      '所在地預估',
                                       style: context.textTheme.labelLarge!.copyWith(
                                         color: context.colors.onErrorContainer.withValues(alpha: 0.6),
                                       ),
@@ -203,7 +203,7 @@ class _EewCardState extends State<EewCard> {
                                   spacing: 16,
                                   children: [
                                     Text(
-                                      context.i18n.seismic_waves,
+                                      '震波',
                                       style: context.textTheme.labelLarge!.copyWith(
                                         color: context.colors.onErrorContainer.withValues(alpha: 0.6),
                                       ),

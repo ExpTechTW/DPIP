@@ -13,7 +13,7 @@ class LogViewerPage extends StatelessWidget {
     return Scaffold(
       body: TalkerScreen(
         talker: TalkerManager.instance,
-        appBarTitle: context.i18n.app_logs,
+        appBarTitle: 'App 日誌',
         theme: TalkerScreenTheme(
           backgroundColor: context.colors.surface,
           textColor: context.colors.onSurface,

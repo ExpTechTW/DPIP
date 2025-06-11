@@ -29,7 +29,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       final records = await ExpTech().getNotificationHistory();
       notificationRecords = records.reversed.toList();
     } catch (e) {
-      errorMessage = '${context.i18n.error_fetching_notifications} $e';
+      errorMessage = '獲取通知紀錄時發生錯誤 $e';
     } finally {
       isLoading = false;
       setState(() {});
@@ -39,7 +39,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.i18n.notification_record), elevation: 0),
+      appBar: AppBar(title: const Text('行動通知推播紀錄'), elevation: 0),
       body: SafeArea(child: _buildNotificationList()),
     );
   }
@@ -52,7 +52,7 @@ class _NotificationHistoryPageState extends State<NotificationHistoryPage> {
       return Center(child: Text(errorMessage!));
     }
     if (notificationRecords.isEmpty) {
-      return Center(child: Text(context.i18n.no_notification_history));
+      return const Center(child: Text('沒有通知紀錄'));
     }
     return RefreshIndicator(
       onRefresh: _fetchNotificationRecords,
@@ -141,7 +141,7 @@ class NotificationCard extends StatelessWidget {
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
       label: Text(
-        record.critical ? context.i18n.emergency : context.i18n.me_general,
+        record.critical ? '緊急' : '一般',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
@@ -210,7 +210,7 @@ class NotificationDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(context.i18n.notification_details), elevation: 0),
+      appBar: AppBar(title: const Text('通知詳細資訊'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -224,7 +224,7 @@ class NotificationDetailPage extends StatelessWidget {
             const SizedBox(height: 16),
             Text(record.body, style: context.theme.textTheme.titleMedium),
             const SizedBox(height: 24),
-            Text(context.i18n.notification_area, style: context.theme.textTheme.bodyMedium),
+            Text('通知發送區域', style: context.theme.textTheme.bodyMedium),
             const SizedBox(height: 8),
             _buildAreasList(context),
           ],
@@ -255,7 +255,7 @@ class NotificationDetailPage extends StatelessWidget {
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
       label: Text(
-        record.critical ? context.i18n.emergency_notification : context.i18n.general_notification,
+        record.critical ? '緊急通知' : '一般通知',
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),

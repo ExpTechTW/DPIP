@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
     context.scaffoldMessenger.showSnackBar(
       SnackBar(
         content: Text('已更新至 v${Global.packageInfo.version}'),
-        action: SnackBarAction(label: context.i18n.update_log, onPressed: () => context.push(ChangelogPage.route)),
+        action: SnackBarAction(label: '更新日誌', onPressed: () => context.push(ChangelogPage.route)),
         duration: kPersistSnackBar,
       ),
     );
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_HomePageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.get_weather_abnormal)));
+      context.scaffoldMessenger.showSnackBar(const SnackBar(content: Text('取得天氣異常')));
     }
 
     try {
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_HomePageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text(context.i18n.get_weather_abnormal)));
+      context.scaffoldMessenger.showSnackBar(const SnackBar(content: Text('取得天氣異常')));
     }
 
     if (!mounted) return;

@@ -153,29 +153,29 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       switch (permission) {
         case Permission.notification:
           icon = Icons.notifications;
-          text = context.i18n.notification;
-          description = context.i18n.notification_service_description;
+          text = '通知';
+          description = '在重大災害發生時以通知來傳遞即時防災資訊';
           color = Colors.orange;
           isHighlighted = true;
 
         case Permission.locationAlways:
         case Permission.location:
           icon = Icons.location_on;
-          text = context.i18n.settings_position;
-          description = context.i18n.location_based_service;
+          text = '位置';
+          description = '使用定位來自動更新所在地設定，提供當地的即時防災資訊';
           color = Colors.blue;
 
         case Permission.ignoreBatteryOptimizations:
           icon = Icons.battery_full;
-          text = context.i18n.power_saving_position;
-          description = context.i18n.power_saving_position_text;
+          text = '省電策略';
+          description = '允許 DPIP 在背景中持續運行，以便即時防災通知資訊。';
           color = Colors.greenAccent;
 
         case Permission.storage:
         case Permission.photosAddOnly:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
-          text = context.i18n.permission_storage;
-          description = context.i18n.data_visualization_storage;
+          text = '儲存';
+          description = '用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片';
           color = Colors.green;
 
         default:
@@ -342,12 +342,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: Text(context.i18n.permission_request),
-            content: Text(context.i18n.manual_permission_enablement),
+            title: const Text('權限請求'),
+            content: const Text('需要使用者手動到設定開啟相關權限。'),
             actions: [
-              TextButton(child: Text(context.i18n.cancel), onPressed: () => Navigator.of(context).pop()),
+              TextButton(child: const Text('取消'), onPressed: () => Navigator.of(context).pop()),
               TextButton(
-                child: Text(context.i18n.confirm),
+                child: const Text('確定'),
                 onPressed: () {
                   openAppSettings();
                   Navigator.of(context).pop();
@@ -364,7 +364,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(onPressed: getNotify, child: Text(context.i18n.next_step)),
+          child: FilledButton(onPressed: getNotify, child: const Text('下一步')),
         ),
       ),
       body: SingleChildScrollView(
@@ -383,7 +383,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      context.i18n.permission,
+                      '權限',
                       style: context.theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.colors.primary,
@@ -396,14 +396,14 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                     child: Column(
                       children: [
                         Text(
-                          context.i18n.privacy_commitment,
+                          '我們一直和使用者站在一起，為使用者的隱私而不斷努力。',
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(alpha: 0.7),
                           ),
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          context.i18n.disaster_info_platform,
+                          '防災資訊平台',
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(alpha: 0.7),
                           ),

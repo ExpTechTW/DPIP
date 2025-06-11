@@ -17,7 +17,7 @@ class WelcomeExpTechPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            child: Text(context.i18n.next_step),
+            child: const Text('下一步'),
             onPressed: () => context.push(WelcomeNoticePage.route),
           ),
         ),
@@ -61,7 +61,7 @@ class WelcomeExpTechPage extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          context.i18n.disaster_info_platform,
+                          '防災資訊平台',
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(alpha: 0.7),
                           ),
@@ -84,18 +84,18 @@ class WelcomeExpTechPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      context.i18n.who_we_are,
+                      '我們是誰？',
                       style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Text(context.i18n.exptech_studio_description, style: context.theme.textTheme.bodyMedium),
+                    Text('ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。', style: context.theme.textTheme.bodyMedium),
                     const SizedBox(height: 16),
                     Text(
-                      context.i18n.our_mission,
+                      '我們的初衷',
                       style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Text(context.i18n.founding_mission, style: context.theme.textTheme.bodyMedium),
+                    Text('成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。', style: context.theme.textTheme.bodyMedium),
                   ],
                 ),
               ),

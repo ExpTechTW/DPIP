@@ -299,20 +299,20 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String getIntervalLabel(String interval) => switch (interval) {
-      'now' => context.i18n.interval_now,
-      '10m' => context.i18n.interval_10_minutes,
-      '1h' => context.i18n.interval_1_hour,
-      '3h' => context.i18n.interval_3_hours,
-      '6h' => context.i18n.interval_6_hours,
-      '12h' => context.i18n.interval_12_hours,
-      '24h' => context.i18n.interval_24_hours,
-      '2d' => context.i18n.interval_2_days,
-      '3d' => context.i18n.interval_3_days,
+      'now' => '今日',
+      '10m' => '10 分鐘',
+      '1h' => '1 小時',
+      '3h' => '3 小時',
+      '6h' => '6 小時',
+      '12h' => '12 小時',
+      '24h' => '24 小時',
+      '2d' => '2 天',
+      '3d' => '3 天',
       _ => interval,
     };
 
     return MorphingSheet(
-      title: context.i18n.precipitation_monitor,
+      title: '降水',
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -439,7 +439,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                 spacing: 8,
                 children: [
                   const Icon(Symbols.water_drop_rounded, size: 24),
-                  Text(context.i18n.precipitation_monitor, style: context.textTheme.titleMedium),
+                  Text('降水', style: context.textTheme.titleMedium),
                 ],
               ),
             ),

@@ -86,7 +86,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                 ),
                               ],
                             )
-                            : Text(context.i18n.source_language),
+                            : const Text('來源語言'),
                     leading: locale.flag,
                     trailing: Icon(locale == model.locale ? Symbols.check_rounded : null),
                     onTap: () {

@@ -29,10 +29,10 @@ class SettingsNotifyThunderstormPage extends StatelessWidget {
             );
           },
         ),
-        ListSection(
-          title: context.i18n.notify_test,
+        const ListSection(
+          title: '音效測試',
           children: [
-            SoundListTile(title: '一般', subtitle: Text(context.i18n.sound_rain_minor_h2), type: 'thunderstorm-general'),
+            SoundListTile(title: '一般', subtitle: Text('所在地(鄉鎮)發布雷雨即時訊息或\n山區暴雨時'), type: 'thunderstorm-general'),
           ],
         ),
         const SettingsListTextSection(

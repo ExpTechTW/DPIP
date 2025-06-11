@@ -34,17 +34,17 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
             pinned: true,
             floating: true,
             snap: true,
-            title: Text(context.i18n.history),
+            title: Text('歷史'),
             bottom: TabBar(
               controller: controller,
               tabs: [
                 Tab(
                   icon: Icon(Symbols.globe_asia_rounded, fill: controller.index == 0 ? 1 : 0),
-                  text: context.i18n.history_nationwide,
+                  text: '全國',
                 ),
                 Tab(
                   icon: Icon(Symbols.home_rounded, fill: controller.index == 1 ? 1 : 0),
-                  text: context.i18n.settings_location,
+                  text: '所在地',
                 ),
               ],
             ),

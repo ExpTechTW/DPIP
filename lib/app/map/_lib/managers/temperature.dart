@@ -242,7 +242,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MorphingSheet(
-      title: context.i18n.temperature_monitor,
+      title: '氣溫',
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -326,7 +326,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                 spacing: 8,
                 children: [
                   const Icon(Symbols.thermostat_rounded, size: 24),
-                  Text(context.i18n.temperature_monitor, style: context.textTheme.titleMedium),
+                  Text('氣溫', style: context.textTheme.titleMedium),
                 ],
               ),
             ),

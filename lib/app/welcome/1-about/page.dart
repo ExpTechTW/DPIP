@@ -17,7 +17,7 @@ class WelcomeAboutPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            child: Text(context.i18n.next_step),
+            child: const Text('下一步'),
             onPressed: () => context.push(WelcomeExpTechPage.route),
           ),
         ),
@@ -41,7 +41,7 @@ class WelcomeAboutPage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      context.i18n.welcome_message,
+                      '歡迎使用 DPIP',
                       style: context.theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.colors.primary,
@@ -61,7 +61,7 @@ class WelcomeAboutPage extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          context.i18n.disaster_info_platform,
+                          '防災資訊平台',
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(alpha: 0.7),
                           ),
@@ -82,7 +82,7 @@ class WelcomeAboutPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  context.i18n.dpip_description,
+                  'DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。',
                   style: context.theme.textTheme.bodyLarge,
                   textAlign: TextAlign.left,
                 ),

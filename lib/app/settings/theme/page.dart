@@ -30,9 +30,9 @@ class SettingsThemePage extends StatelessWidget {
                   icon: Symbols.dark_mode_rounded,
                   title: '主題模式',
                   subtitle: Text(switch (model.themeMode) {
-                    ThemeMode.light => context.i18n.theme_light,
-                    ThemeMode.dark => context.i18n.theme_dark,
-                    ThemeMode.system => context.i18n.theme_system,
+                    ThemeMode.light => '淺色',
+                    ThemeMode.dark => '深色',
+                    ThemeMode.system => '跟隨系統主題',
                   }),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => context.push(SettingsThemeSelectPage.route),
@@ -97,13 +97,13 @@ class SettingsThemePage extends StatelessWidget {
                                   spacing: 8,
                                   children: [
                                     TextButton(
-                                      child: Text(context.i18n.cancel),
+                                      child: const Text('取消'),
                                       onPressed: () {
                                         Navigator.of(context).pop(model.themeColor);
                                       },
                                     ),
                                     FilledButton(
-                                      child: Text(context.i18n.confirm),
+                                      child: const Text('確定'),
                                       onPressed: () {
                                         Navigator.of(context).pop(pickerColor);
                                       },

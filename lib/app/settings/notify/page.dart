@@ -122,7 +122,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.eew,
                       builder: (context, eew, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_eew,
+                          title: '緊急地震速報',
                           subtitle: Text(getEewNotifyTypeName(eew)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.crisis_alert_rounded,
@@ -140,7 +140,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.monitor,
                       builder: (context, monitor, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_monitor,
+                          title: '強震監視器',
                           subtitle: Text(getEarthquakeNotifyTypeName(monitor)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.monitor_heart_rounded,
@@ -153,7 +153,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.report,
                       builder: (context, report, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_report,
+                          title: '地震報告',
                           subtitle: Text(getEarthquakeNotifyTypeName(report)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.docs_rounded,
@@ -166,7 +166,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.intensity,
                       builder: (context, intensity, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_intensity,
+                          title: '震度速報',
                           subtitle: Text(getEarthquakeNotifyTypeName(intensity)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.summarize_rounded,
@@ -184,7 +184,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.thunderstorm,
                       builder: (context, thunderstorm, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_thunderstorm,
+                          title: '雷雨即時訊息',
                           subtitle: Text(getWeatherNotifyTypeName(thunderstorm)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.thunderstorm_rounded,
@@ -197,7 +197,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.weatherAdvisory,
                       builder: (context, weatherAdvisory, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_advisory,
+                          title: '天氣警特報',
                           subtitle: Text(getWeatherNotifyTypeName(weatherAdvisory)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.warning_rounded,
@@ -210,7 +210,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.evacuation,
                       builder: (context, evacuation, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_evacuation,
+                          title: '避難資訊',
                           subtitle: Text(getWeatherNotifyTypeName(evacuation)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.directions_run_rounded,
@@ -228,7 +228,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.tsunami,
                       builder: (context, tsunami, child) {
                         return ListSectionTile(
-                          title: context.i18n.notify_tsunami,
+                          title: '海嘯資訊',
                           subtitle: Text(getTsunamiNotifyTypeName(tsunami)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.tsunami_rounded,
@@ -246,7 +246,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.announcement,
                       builder: (context, announcement, child) {
                         return ListSectionTile(
-                          title: context.i18n.announcement,
+                          title: '公告',
                           subtitle: Text(getBasicNotifyTypeName(announcement)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.campaign_rounded,

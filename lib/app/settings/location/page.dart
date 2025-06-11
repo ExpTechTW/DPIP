@@ -69,21 +69,21 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
         builder: (context) {
           return AlertDialog(
             icon: const Icon(Symbols.error),
-            title: Text(context.i18n.unable_notification),
+            title: const Text('無法取得通知權限'),
             content: Text(
-              "${context.i18n.auto_location_permission_required}${status.isPermanentlyDenied ? context.i18n.please_allow_notification_permission : ""}",
+              "'自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。'${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「通知」權限後再試一次。' : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: Text(context.i18n.cancel),
+                child: const Text('取消'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               if (status.isPermanentlyDenied)
                 FilledButton(
-                  child: Text(context.i18n.settings),
+                  child: const Text('設定'),
                   onPressed: () {
                     openAppSettings();
                     Navigator.pop(context);
@@ -91,7 +91,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 )
               else
                 FilledButton(
-                  child: Text(context.i18n.again),
+                  child: const Text('再試一次'),
                   onPressed: () {
                     checkNotificationPermission();
                     Navigator.pop(context);
@@ -120,21 +120,21 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
         builder: (context) {
           return AlertDialog(
             icon: const Icon(Symbols.error),
-            title: Text(context.i18n.unable_location),
+            title: const Text('無法取得位置權限'),
             content: Text(
-              "${context.i18n.location_permission_needed}${status.isPermanentlyDenied ? context.i18n.please_allow_location_permission : ""}",
+              "'自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。'${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「位置」權限後再試一次。' : ""}",
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               TextButton(
-                child: Text(context.i18n.cancel),
+                child: const Text('取消'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
               ),
               if (status.isPermanentlyDenied)
                 FilledButton(
-                  child: Text(context.i18n.settings),
+                  child: const Text('設定'),
                   onPressed: () {
                     openAppSettings();
                     Navigator.pop(context);
@@ -142,7 +142,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 )
               else
                 FilledButton(
-                  child: Text(context.i18n.again),
+                  child: const Text('再試一次'),
                   onPressed: () {
                     checkLocationPermission();
                     Navigator.pop(context);
@@ -168,7 +168,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       return true;
     } else {
       if (!mounted) return false;
-      final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
+      final permissionType = Platform.isAndroid ? '一律允許' : '永遠';
 
       final status =
           await showDialog<bool>(
@@ -176,18 +176,18 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: Text('$permissionType${context.i18n.location_permission}'),
-                content: Text(context.i18n.improve_auto_location_experience(permissionType)),
+                title: Text('$permissionType 位置權限'),
+                content: Text('為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以便讓 DPIP 在背景自動設定所在地資訊。'),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
-                    child: Text(context.i18n.cancel),
+                    child: const Text('取消'),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
                   ),
                   FilledButton(
-                    child: Text(context.i18n.confirm),
+                    child: const Text('確定'),
                     onPressed: () async {
                       final status = await Permission.locationAlways.request();
 
@@ -225,25 +225,25 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       if (!mounted) return true;
 
       final String contentText =
-          (num == 0) ? context.i18n.auto_start_permission_info : context.i18n.auto_start_permission_experience;
+          (num == 0) ? '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。' : '為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。';
 
       return await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: Text(context.i18n.auto_start_permission),
+                title: const Text('自啟動權限'),
                 content: Text(contentText),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
-                    child: Text(context.i18n.cancel),
+                    child: const Text('取消'),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
                   ),
                   FilledButton(
-                    child: Text(context.i18n.confirm),
+                    child: const Text('確定'),
                     onPressed: () async {
                       await Autostarter.getAutoStartPermission(newTask: true);
 
@@ -272,25 +272,25 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       if (!mounted) return true;
 
       final String contentText =
-          (num == 0) ? context.i18n.auto_location_experience_info : context.i18n.unlimited_permission_experience_info;
+          (num == 0) ? '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。' : '為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。';
 
       return await showDialog<bool>(
             context: context,
             builder: (context) {
               return AlertDialog(
                 icon: const Icon(Symbols.my_location),
-                title: Text(context.i18n.power_saving_strategy),
+                title: const Text('省電策略'),
                 content: Text(contentText),
                 actionsAlignment: MainAxisAlignment.spaceBetween,
                 actions: [
                   TextButton(
-                    child: Text(context.i18n.cancel),
+                    child: const Text('取消'),
                     onPressed: () {
                       Navigator.pop(context, false);
                     },
                   ),
                   FilledButton(
-                    child: Text(context.i18n.confirm),
+                    child: const Text('確定'),
                     onPressed: () {
                       DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                       Navigator.pop(context, false);
@@ -405,7 +405,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
   @override
   Widget build(BuildContext context) {
-    final permissionType = Platform.isAndroid ? context.i18n.always_allow : context.i18n.always;
+    final permissionType = Platform.isAndroid ? '一律允許' : '永遠';
 
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
@@ -416,7 +416,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               selector: (context, model) => model.auto,
               builder: (context, auto, child) {
                 return ListSectionTile(
-                  title: context.i18n.settings_location_auto,
+                  title: '自動定位',
                   subtitle: const Text('自動更新所在地'),
                   icon: Symbols.my_location_rounded,
                   trailing: Switch(value: auto, onChanged: (value) => toggleAutoLocation()),
@@ -425,7 +425,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             ),
           ],
         ),
-        SettingsListTextSection(icon: Symbols.info_rounded, content: context.i18n.settings_location_auto_description),
+        const SettingsListTextSection(icon: Symbols.info_rounded, content: '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'),
         if (locationAlwaysPermission != null)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
@@ -449,11 +449,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            context.i18n.auto_location_permission_upgrade_needed(permissionType),
+                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。',
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
-                        TextButton(child: Text(context.i18n.settings), onPressed: () => openAppSettings()),
+                        TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
                       ],
                     ),
                   ),
@@ -484,11 +484,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            context.i18n.notification_permission_denied,
+                            '通知功能已被拒絕，請移至設定允許權限。',
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
-                        TextButton(child: Text(context.i18n.settings), onPressed: () => openAppSettings()),
+                        TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
                       ],
                     ),
                   ),
@@ -511,10 +511,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: context.i18n.autoStart_permission_denied,
+                    content: '自啟動權限已被拒絕，請移至設定允許權限。',
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: Text(context.i18n.settings),
+                      child: const Text('設定'),
                       onPressed: () => Autostarter.getAutoStartPermission(newTask: true),
                     ),
                   ),
@@ -537,10 +537,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: context.i18n.batteryOptimization_permission_denied,
+                    content: '省電策略已被拒絕，請移至設定允許權限。',
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: Text(context.i18n.settings),
+                      child: const Text('設定'),
                       onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                       },
@@ -551,7 +551,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             },
           ),
         ListSection(
-          title: context.i18n.settings_location,
+          title: '所在地',
           children: [
             Selector<SettingsLocationModel, ({bool auto, String? code})>(
               selector: (context, model) => (auto: model.auto, code: model.code),
@@ -560,8 +560,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 final city = Global.location[code]?.city;
 
                 return ListSectionTile(
-                  title: context.i18n.location_city,
-                  subtitle: Text(city ?? context.i18n.location_Not_set),
+                  title: '縣市',
+                  subtitle: Text(city ?? '尚未設定'),
                   icon: Symbols.location_city_rounded,
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   enabled: !auto,
@@ -588,8 +588,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 final town = Global.location[code]?.town;
 
                 return ListSectionTile(
-                  title: context.i18n.location_town,
-                  subtitle: Text(town ?? context.i18n.location_Not_set),
+                  title: '鄉鎮',
+                  subtitle: Text(town ?? '尚未設定'),
                   icon: Symbols.forest_rounded,
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   enabled: !auto && city != null,
@@ -628,10 +628,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: context.i18n.autoStart_permission_denied,
+                    content: '自啟動權限已被拒絕，請移至設定允許權限。',
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: Text(context.i18n.settings),
+                      child: const Text('設定'),
                       onPressed: () async {
                         await Autostarter.getAutoStartPermission(newTask: true);
                       },
@@ -658,10 +658,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: context.i18n.batteryOptimization_permission_denied,
+                    content: '省電策略已被拒絕，請移至設定允許權限。',
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: Text(context.i18n.settings),
+                      child: const Text('設定'),
                       onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                         Navigator.pop(context);

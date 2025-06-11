@@ -20,14 +20,14 @@ class SettingsThemeSelectPage extends StatelessWidget {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: context.i18n.settings_theme,
+          title: '主題色',
           children: [
             Selector<SettingsUserInterfaceModel, ThemeMode>(
               selector: (context, model) => model.themeMode,
               builder:
                   (context, themeMode, child) => ListSectionTile(
                     icon: Symbols.light_mode_rounded,
-                    title: context.i18n.theme_light,
+                    title: '淺色',
                     trailing: Icon(themeMode == ThemeMode.light ? Symbols.check : null),
                     onTap: () {
                       context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.light);
@@ -40,7 +40,7 @@ class SettingsThemeSelectPage extends StatelessWidget {
               builder:
                   (context, themeMode, child) => ListSectionTile(
                     icon: Symbols.dark_mode_rounded,
-                    title: context.i18n.theme_dark,
+                    title: '深色',
                     trailing: Icon(themeMode == ThemeMode.dark ? Symbols.check : null),
                     onTap: () {
                       context.read<SettingsUserInterfaceModel>().setThemeMode(ThemeMode.dark);
@@ -53,10 +53,10 @@ class SettingsThemeSelectPage extends StatelessWidget {
               builder:
                   (context, themeMode, child) => ListSectionTile(
                     icon: Symbols.devices_rounded,
-                    title: context.i18n.theme_system,
+                    title: '跟隨系統主題',
                     subtitle: Text(switch (MediaQuery.of(context).platformBrightness) {
-                      Brightness.light => context.i18n.theme_light,
-                      Brightness.dark => context.i18n.theme_dark,
+                      Brightness.light => '淺色',
+                      Brightness.dark => '深色',
                     }),
                     trailing: Icon(themeMode == ThemeMode.system ? Symbols.check : null),
                     onTap: () {
