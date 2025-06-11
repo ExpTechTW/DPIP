@@ -41,7 +41,7 @@ class WindMapLayerManager extends MapLayerManager {
   final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
-  Future<void> _updateWindTileUrl(String time) async {
+  Future<void> setWindTime(String time) async {
     if (currentWindTime.value == time || isLoading.value) return;
 
     isLoading.value = true;
@@ -51,9 +51,9 @@ class WindMapLayerManager extends MapLayerManager {
       currentWindTime.value = time;
       await setup();
 
-      TalkerManager.instance.info('Updated Wind tiles to "$time"');
+      TalkerManager.instance.info('Updated Wind data time to "$time"');
     } catch (e, s) {
-      TalkerManager.instance.error('Failed to update Wind tiles', e, s);
+      TalkerManager.instance.error('WindMapLayerManager.setWindTime', e, s);
     } finally {
       isLoading.value = false;
     }
@@ -93,10 +93,10 @@ class WindMapLayerManager extends MapLayerManager {
         }
 
         final features =
-        weatherData
-            .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
-            .map((station) => station.toFeatureBuilder())
-            .toList();
+            weatherData
+                .where((station) => station.data.wind.direction != -99 && station.data.wind.speed != -99)
+                .map((station) => station.toFeatureBuilder())
+                .toList();
 
         final data = GeoJsonBuilder().setFeatures(features).build();
 
@@ -251,12 +251,12 @@ class WindMapLayerSheet extends StatelessWidget {
                                       ),
                                       avatar: isSelected && isLoading ? const LoadingIcon() : null,
                                       onSelected:
-                                      isLoading
-                                          ? null
-                                          : (selected) {
-                                        if (!selected) return;
-                                        manager._updateWindTileUrl(time.value);
-                                      },
+                                          isLoading
+                                              ? null
+                                              : (selected) {
+                                                if (!selected) return;
+                                                manager.setWindTime(time.value);
+                                              },
                                     );
                                   },
                                 ),

@@ -56,9 +56,9 @@ class TemperatureMapLayerManager extends MapLayerManager {
       currentTemperatureTime.value = time;
       await setup();
 
-      TalkerManager.instance.info('Updated Temperature tiles to "$time"');
+      TalkerManager.instance.info('Updated Temperature data time to "$time"');
     } catch (e, s) {
-      TalkerManager.instance.error('Failed to update Temperature tiles', e, s);
+      TalkerManager.instance.error('TemperatureMapLayerManager.setTemperatureTime', e, s);
     } finally {
       isLoading.value = false;
     }

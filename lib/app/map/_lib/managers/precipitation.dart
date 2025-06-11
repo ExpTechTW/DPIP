@@ -59,9 +59,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       currentPrecipitationTime.value = time;
       await setup();
 
-      TalkerManager.instance.info('Updated Precipitation tiles to "$time"');
+      TalkerManager.instance.info('Updated Precipitation data to "$time"');
     } catch (e, s) {
-      TalkerManager.instance.error('Failed to update Precipitation tiles', e, s);
+      TalkerManager.instance.error('PrecipitationMapLayerManager.setPrecipitationTime', e, s);
     } finally {
       isLoading.value = false;
     }
