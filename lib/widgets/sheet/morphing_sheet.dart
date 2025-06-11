@@ -50,7 +50,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
   Size? _partialSize;
 
   static const double _verticalPadding = 8.0;
-  static const double _bottomMargin = 28.0;
+  static const double _bottomMargin = 16.0;
   static const double _minHeightRatio = 0.15;
   static const double _maxHeightRatio = 0.3;
 
@@ -130,6 +130,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
         _partialSize!.height + // Content height
         (_verticalPadding * 2) + // Top and bottom padding
         _bottomMargin + // Bottom margin
+        context.padding.bottom + // Bottom padding
         widget.floatingPadding.vertical; // Floating padding
 
     // Ensure the height ratio is within bounds and responsive to content
@@ -297,7 +298,10 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
                     end: _isOverflowing ? 0.0 : widget.elevation,
                   ).transform(_morphController.value);
 
-                  final marginBottom = Tween<double>(begin: _bottomMargin, end: 0.0).transform(_morphController.value);
+                  final marginBottom = Tween<double>(
+                    begin: _bottomMargin + context.padding.bottom,
+                    end: 0.0,
+                  ).transform(_morphController.value);
 
                   return Padding(
                     padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding, bottom: bottomPadding),
