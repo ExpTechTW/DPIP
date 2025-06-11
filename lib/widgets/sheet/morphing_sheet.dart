@@ -188,7 +188,7 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
             bottom: _verticalPadding,
           ),
           child: Container(
-            margin: const EdgeInsets.only(bottom: _bottomMargin),
+            margin: EdgeInsets.only(bottom: _bottomMargin + context.padding.bottom),
             child: PhysicalModel(
               color: Colors.transparent,
               elevation: widget.elevation,
