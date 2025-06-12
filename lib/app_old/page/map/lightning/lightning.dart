@@ -214,16 +214,16 @@ class _LightningMapState extends State<LightningMap> {
 
   Widget _buildLegend() {
     return MapLegend(
-      label: context.i18n.map_legend,
+      label: '圖例',
       children: [
-        _legendItem('lightning-1-5', context.i18n.lightning_1_5),
-        _legendItem('lightning-1-10', context.i18n.lightning_1_10),
-        _legendItem('lightning-1-30', context.i18n.lightning_1_30),
-        _legendItem('lightning-1-60', context.i18n.lightning_1_60),
-        _legendItem('lightning-0-5', context.i18n.lightning_0_5),
-        _legendItem('lightning-0-10', context.i18n.lightning_0_10),
-        _legendItem('lightning-0-30', context.i18n.lightning_0_30),
-        _legendItem('lightning-0-60', context.i18n.lightning_0_60),
+        _legendItem('lightning-1-5', '5 分鐘內對地閃電'),
+        _legendItem('lightning-1-10', '10 分鐘內對地閃電'),
+        _legendItem('lightning-1-30', '30 分鐘內對地閃電'),
+        _legendItem('lightning-1-60', '60 分鐘內對地閃電'),
+        _legendItem('lightning-0-5', '5 分鐘內雲間閃電'),
+        _legendItem('lightning-0-10', '10 分鐘內雲間閃電'),
+        _legendItem('lightning-0-30', '30 分鐘內雲間閃電'),
+        _legendItem('lightning-0-60', '60 分鐘內雲間閃電'),
       ],
     );
   }
@@ -267,7 +267,7 @@ class _LightningMapState extends State<LightningMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: context.i18n.map_legend,
+                message: '圖例',
                 child: Container(
                   width: 30,
                   height: 30,

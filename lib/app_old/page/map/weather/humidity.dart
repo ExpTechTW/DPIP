@@ -244,7 +244,7 @@ class _HumidityMapState extends State<HumidityMap> {
         const SizedBox(height: 8),
         _buildColorBarLabels(),
         const SizedBox(height: 12),
-        Text(context.i18n.unit_relative_humidity, style: context.theme.textTheme.labelMedium),
+        Text('單位：相對濕度 (%)', style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -303,7 +303,7 @@ class _HumidityMapState extends State<HumidityMap> {
             child: InkWell(
               onTap: _toggleLegend,
               child: Tooltip(
-                message: context.i18n.map_legend,
+                message: '圖例',
                 child: Container(
                   width: 30,
                   height: 30,

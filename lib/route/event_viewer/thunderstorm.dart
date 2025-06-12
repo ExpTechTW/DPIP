@@ -190,7 +190,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         const SizedBox(height: 8),
         _buildColorBarLabels(),
         const SizedBox(height: 12),
-        Text(context.i18n.unit_dbz, style: context.theme.textTheme.labelMedium),
+        Text('單位：dBZ', style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -234,7 +234,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               child: InkWell(
                 onTap: _toggleLegend,
                 child: Tooltip(
-                  message: context.i18n.map_legend,
+                  message: '雷達合成回波',
                   child: Container(
                     width: 30,
                     height: 30,
@@ -286,7 +286,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(color: context.colors.surface.withValues(alpha: 0.5)),
                     child: Text(
-                      context.i18n.radar_synthetic_echo,
+                      '雷達合成回波',
                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: context.colors.onSurface),
                     ),
                   ),
@@ -354,13 +354,13 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
               const SizedBox(width: 8),
               if (isExpired)
                 LabelChip(
-                  label: context.i18n.completed,
+                  label: '已結束',
                   backgroundColor: context.colors.surfaceContainer,
                   foregroundColor: context.colors.onSurfaceVariant,
                 )
               else
                 LabelChip(
-                  label: context.i18n.active,
+                  label: '生效中',
                   backgroundColor: context.colors.secondaryContainer,
                   foregroundColor: context.colors.onSecondaryContainer,
                   outlineColor: context.colors.secondaryContainer,
@@ -405,9 +405,9 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTimeInfo(context, Symbols.schedule_rounded, context.i18n.history_send_time, sendTime),
+          _buildTimeInfo(context, Symbols.schedule_rounded, '發送時間', sendTime),
           const SizedBox(height: 12),
-          _buildTimeInfo(context, Symbols.flag_rounded, context.i18n.history_valid_until, expireTime),
+          _buildTimeInfo(context, Symbols.flag_rounded, '有效至', expireTime),
           const SizedBox(height: 16),
           Stack(
             children: [
@@ -490,6 +490,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       );
     }
 
-    return DetailFieldTile(label: context.i18n.history_affected_area, child: Column(children: areas));
+    return DetailFieldTile(label: '影響區域', child: Column(children: areas));
   }
 }

@@ -21,20 +21,10 @@ class _MePageState extends State<MePage> {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ListTileGroupHeader(title: context.i18n.me_general),
-        /**
-         * 設定
-         */
-        ListTile(
-          leading: const Icon(Symbols.tune),
-          title: Text(context.i18n.settings),
-          subtitle: Text(context.i18n.settingsDescription),
-          onTap: () => context.push('/settings'),
-        ),
-        ListTileGroupHeader(title: context.i18n.me_about),
+        const ListTileGroupHeader(title: '關於'),
         ListTile(
           leading: const Icon(Symbols.forum_rounded),
-          title: Text(context.i18n.me_developer),
+          title: const Text('開發者想說的話'),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => const DPIPInfoPage()));
           },
@@ -45,7 +35,7 @@ class _MePageState extends State<MePage> {
          */
         ListTile(
           leading: const Icon(Icons.visibility),
-          title: Text(context.i18n.me_welcome),
+          title: const Text('歡迎頁面'),
           onTap: () => context.push('/welcome'),
         ),
       ],

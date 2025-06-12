@@ -106,17 +106,17 @@ class _ReportListPageState extends State<ReportListPage> {
 
     if (_intensityRange.start > 0 || _intensityRange.end < 8) {
       summaries.add(
-        '${context.i18n.max_earthquake_intensity}: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}',
+        '最大震度: ${_intensityLevels[_intensityRange.start.round()]}-${_intensityLevels[_intensityRange.end.round()]}',
       );
     }
     if (_magnitudeRange.start > 0 || (_magnitudeRange.end > 0 && _magnitudeRange.end < 10)) {
-      summaries.add('${context.i18n.scale}: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
+      summaries.add('規模: ${_magnitudeRange.start.round()}-${_magnitudeRange.end.round()}');
     }
     if (_depthRange.start > 0 || (_depthRange.end > 0 && _depthRange.end < 700)) {
-      summaries.add('${context.i18n.depth}: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
+      summaries.add('深度: ${_depthRange.start.round()}-${_depthRange.end.round()}km');
     }
 
-    return summaries.isEmpty ? context.i18n.report_all : summaries.join(', ');
+    return summaries.isEmpty ? '全部' : summaries.join(', ');
   }
 
   @override
@@ -136,7 +136,7 @@ class _ReportListPageState extends State<ReportListPage> {
           SliverAppBar(
             pinned: true,
             floating: true,
-            title: Text(context.i18n.report),
+            title: const Text('地震報告'),
             bottom: PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: Container(
@@ -146,11 +146,11 @@ class _ReportListPageState extends State<ReportListPage> {
                   children: [
                     FilterChip(
                       label: Text(
-                        _getFilterSummary() == context.i18n.report_all
-                            ? context.i18n.report_filter
+                        _getFilterSummary() == '全部'
+                            ? '篩選器'
                             : _getFilterSummary(),
                       ),
-                      selected: _getFilterSummary() != context.i18n.report_all,
+                      selected: _getFilterSummary() != '全部',
                       onSelected: (_) => _showFilterDialog(),
                     ),
                   ],
@@ -185,9 +185,9 @@ class _ReportListPageState extends State<ReportListPage> {
                         } else if (isLoading) {
                           isLoadingEnd = false;
                         }
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(child: Text(context.i18n.report_end)),
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(child: Text('到底了')),
                         );
                       }
 
@@ -227,12 +227,12 @@ class _ReportListPageState extends State<ReportListPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(context.i18n.report_filter),
+              title: const Text('篩選器'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(context.i18n.max_earthquake_intensity),
+                    const Text('最大震度'),
                     RangeSlider(
                       values: _intensityRange,
                       max: 8,
@@ -247,7 +247,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         });
                       },
                     ),
-                    Text(context.i18n.scale),
+                    const Text('規模'),
                     RangeSlider(
                       values: _magnitudeRange,
                       max: 10,
@@ -262,7 +262,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         });
                       },
                     ),
-                    Text(context.i18n.depth),
+                    const Text('深度'),
                     RangeSlider(
                       values: _depthRange,
                       max: 700,
@@ -279,7 +279,7 @@ class _ReportListPageState extends State<ReportListPage> {
               ),
               actions: [
                 TextButton(
-                  child: Text(context.i18n.report_filter_reset),
+                  child: const Text('重置'),
                   onPressed: () {
                     setState(() {
                       _intensityRange = const RangeValues(0, 8);
@@ -289,7 +289,7 @@ class _ReportListPageState extends State<ReportListPage> {
                   },
                 ),
                 TextButton(
-                  child: Text(context.i18n.report_filter_apply),
+                  child: const Text('套用'),
                   onPressed: () {
                     Navigator.of(context).pop();
                     this.setState(() {

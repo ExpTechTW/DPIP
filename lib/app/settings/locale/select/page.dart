@@ -61,7 +61,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${context.i18n.settings_locale_translated(translated)}・${context.i18n.settings_locale_approved(approved)}',
+                                  '已翻譯 $translated・已校對 $approved',
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 4),

@@ -219,7 +219,7 @@ class _EewCardState extends State<EewCard> {
                                             ),
                                           ),
                                           TextSpan(
-                                            text: ' ${context.i18n.monitor_after_seconds}',
+                                            text: ' 秒後抵達',
                                             style: context.textTheme.bodyLarge!.copyWith(
                                               color: context.colors.onErrorContainer,
                                             ),

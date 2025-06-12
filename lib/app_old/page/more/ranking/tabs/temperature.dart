@@ -33,7 +33,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
     if (!mounted) return;
 
     data = latestWeatherData.where((station) => station.data.air.temperature != -99).toList();
-    time = DateFormat(context.i18n.datetime_format).format(parseDateTime(weatherList.last));
+    time = DateFormat('yyyy/MM/dd HH:mm:ss').format(parseDateTime(weatherList.last));
     rank();
   }
 
@@ -98,29 +98,29 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
                 runAlignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Padding(padding: const EdgeInsets.symmetric(horizontal: 4), child: Text(context.i18n.according)),
+                  const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Text('依')),
                   ChoiceChip(
-                    label: Text(context.i18n.highest),
+                    label: const Text('最高'),
                     selected: !reversed,
                     onSelected: (value) => setReversed(false),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.lowest),
+                    label: const Text('最低'),
                     selected: reversed,
                     onSelected: (value) => setReversed(true),
                   ),
                   const SizedBox(height: kToolbarHeight - 16, child: VerticalDivider()),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Text(context.i18n.ranking_merge_into),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('合併至'),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.location_town),
+                    label: const Text('鄉鎮'),
                     selected: merge == MergeType.town,
                     onSelected: (value) => setMerge(MergeType.town),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.location_city),
+                    label: const Text('縣市'),
                     selected: merge == MergeType.county,
                     onSelected: (value) => setMerge(MergeType.county),
                   ),
@@ -130,8 +130,7 @@ class _RankingTemperatureTabState extends State<RankingTemperatureTab> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              context.i18n.ranking_time(time, ranked.length.toString()),
+            child: Text('資料時間：$time\n共 ${ranked.length} 觀測點',
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),

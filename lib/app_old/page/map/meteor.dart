@@ -88,11 +88,11 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
 
   Map<String, String> get dataTypeToChineseMap {
     return {
-      'temperature': context.i18n.temperature_monitor,
-      'wind_speed': context.i18n.wind_direction_and_speed_monitor,
-      'precipitation': context.i18n.precipitation_monitor,
-      'humidity': context.i18n.humidity_monitor,
-      'pressure': context.i18n.pressure_monitor,
+      'temperature': '氣溫',
+      'wind_speed': '風向/風速',
+      'precipitation': '降水',
+      'humidity': '濕度',
+      'pressure': '氣壓',
     };
   }
 
@@ -171,7 +171,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     final String displayValue =
         touchedIndex != -1
             ? '${DateFormat('MM/dd HH時').format(DateTime.fromMillisecondsSinceEpoch(weatherData['time']![touchedIndex].toInt()))}   ${weatherData[selectedDataType]![touchedIndex]}${units[selectedDataType]}'
-            : '${context.i18n.map_average}   ${_calculate24HourAverage()}${units[selectedDataType]}';
+            : '平均  ${_calculate24HourAverage()}${units[selectedDataType]}';
 
     return Card(
       elevation: 4,
@@ -183,8 +183,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  context.i18n.hours_24_trend(dataTypeToChineseMap[selectedDataType].toString()),
+                Text('24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
                   style: context.theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
@@ -246,7 +245,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     final bool invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (invalid) {
-      return Center(child: Text(context.i18n.map_no_data));
+      return const Center(child: Text('沒有有效資料可顯示'));
     }
 
     for (int i = 0; i < weatherData[selectedDataType]!.length; i++) {
@@ -300,7 +299,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 if (index >= 0 && index < weatherData['time']!.length) {
                   final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
                   return Text(
-                    DateFormat(context.i18n.map_hh_time).format(dateTime),
+                    DateFormat('HH時').format(dateTime),
                     style: const TextStyle(fontSize: 10),
                   );
                 } else {
@@ -397,7 +396,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
     final bool invalid = weatherData[selectedDataType]?.every((value) => value == -99) ?? true;
 
     if (invalid) {
-      return Center(child: Text(context.i18n.map_no_data));
+      return const Center(child: Text('沒有有效資料可顯示'));
     }
 
     final double maxRainfall = weatherData[selectedDataType]!
@@ -431,7 +430,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            DateFormat(context.i18n.map_hh_time).format(dateTime),
+                            DateFormat('HH時').format(dateTime),
                             style: const TextStyle(fontSize: 10),
                           ),
                         );
@@ -575,7 +574,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey))),
             ),
             const SizedBox(width: 8),
-            Text(context.i18n.map_average),
+            const Text('平均'),
           ],
         ),
       ],

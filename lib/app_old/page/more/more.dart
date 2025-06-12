@@ -19,15 +19,15 @@ class _MorePageState extends State<MorePage> {
   int currentIndex = 0;
 
   late final destinations = [
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.summarize),
-      selectedIcon: const Icon(Symbols.summarize, fill: 1),
-      label: Text(context.i18n.report),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.summarize),
+      selectedIcon: Icon(Symbols.summarize, fill: 1),
+      label: Text('地震報告'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.leaderboard_rounded),
-      selectedIcon: const Icon(Symbols.leaderboard_rounded, fill: 1),
-      label: Text(context.i18n.ranking),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.leaderboard_rounded),
+      selectedIcon: Icon(Symbols.leaderboard_rounded, fill: 1),
+      label: Text('排行榜'),
     ),
   ];
 
@@ -36,7 +36,7 @@ class _MorePageState extends State<MorePage> {
     return Scaffold(
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
-        children: [ListTileGroupHeader(title: context.i18n.more_features), ...destinations],
+        children: [const ListTileGroupHeader(title: '更多功能列表'), ...destinations],
         onDestinationSelected: (value) {
           setState(() => currentIndex = value);
           controller.jumpToPage(value);

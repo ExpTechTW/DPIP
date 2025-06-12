@@ -12,18 +12,18 @@ class WelcomeChangelogDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       icon: const Icon(Symbols.update_rounded),
-      title: Text(context.i18n.update_complete),
-      content: Text(context.i18n.update_complete_prompt),
+      title: const Text('更新完成'),
+      content: const Text('DPIP 更新完成，要前往查看更新日誌嗎？'),
       actionsAlignment: MainAxisAlignment.spaceBetween,
       actions: [
         TextButton(
-          child: Text(context.i18n.remind_later),
+          child: const Text('稍後再說'),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: Text(context.i18n.go_to_view),
+          child: const Text('前往查看'),
           onPressed: () {
             Navigator.pop(context);
             context.push('/changelog');

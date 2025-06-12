@@ -70,7 +70,7 @@ class HistoryTimelineItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      DateFormat(context.i18n.time_format).format(history.time.send),
+                      DateFormat('HH:mm:ss').format(history.time.send),
                       style: context.theme.textTheme.labelMedium?.copyWith(
                         color: context.colors.outline.withValues(alpha: expired ? 0.6 : 1),
                       ),

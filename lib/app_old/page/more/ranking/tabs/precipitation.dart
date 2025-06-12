@@ -31,7 +31,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
     if (!mounted) return;
 
     data = rainData.asMap().map((_, e) => MapEntry(e.station, e.data));
-    time = DateFormat(context.i18n.datetime_format).format(parseDateTime(rainTimeList.last));
+    time = DateFormat('yyyy/MM/dd HH:mm:ss').format(parseDateTime(rainTimeList.last));
     rank();
   }
 
@@ -96,47 +96,47 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   ChoiceChip(
-                    label: Text(context.i18n.interval_now),
+                    label: const Text('今日'),
                     selected: interval == Intervals.now,
                     onSelected: (value) => setInterval(Intervals.now),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_10_minutes),
+                    label: const Text('10 分鐘'),
                     selected: interval == Intervals.tenMinutes,
                     onSelected: (value) => setInterval(Intervals.tenMinutes),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_1_hour),
+                    label: const Text('1 小時'),
                     selected: interval == Intervals.oneHour,
                     onSelected: (value) => setInterval(Intervals.oneHour),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_3_hours),
+                    label: const Text('3 小時'),
                     selected: interval == Intervals.threeHours,
                     onSelected: (value) => setInterval(Intervals.threeHours),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_6_hours),
+                    label: const Text('6 小時'),
                     selected: interval == Intervals.sixHours,
                     onSelected: (value) => setInterval(Intervals.sixHours),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_12_hours),
+                    label: const Text('12 小時'),
                     selected: interval == Intervals.twelveHours,
                     onSelected: (value) => setInterval(Intervals.twelveHours),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_24_hours),
+                    label: const Text('24 小時'),
                     selected: interval == Intervals.twentyFourHours,
                     onSelected: (value) => setInterval(Intervals.twentyFourHours),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_2_days),
+                    label: const Text('2 天'),
                     selected: interval == Intervals.twoDays,
                     onSelected: (value) => setInterval(Intervals.twoDays),
                   ),
                   ChoiceChip(
-                    label: Text(context.i18n.interval_3_days),
+                    label: const Text('3 天'),
                     selected: interval == Intervals.threeDays,
                     onSelected: (value) => setInterval(Intervals.threeDays),
                   ),
@@ -146,8 +146,7 @@ class _RankingPrecipitationTabState extends State<RankingPrecipitationTab> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              context.i18n.ranking_time(time, ranked.length.toString()),
+            child: Text('資料時間：$time\n共 ${ranked.length} 觀測點',
               style: TextStyle(color: context.colors.onSurfaceVariant),
             ),
           ),

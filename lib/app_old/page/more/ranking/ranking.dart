@@ -53,14 +53,14 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             pinned: true,
             floating: true,
             snap: true,
-            title: Text(context.i18n.ranking),
+            title: const Text('排行榜'),
             bottom: TabBar(
               controller: controller,
               isScrollable: true,
-              tabs: [
-                Tab(text: context.i18n.precipitation_monitor),
-                Tab(text: context.i18n.temperature_monitor),
-                Tab(text: context.i18n.wind_direction_and_speed_monitor),
+              tabs: const [
+                Tab(text: '降水'),
+                Tab(text: '氣溫'),
+                Tab(text: '風向/風速'),
               ],
             ),
           ),

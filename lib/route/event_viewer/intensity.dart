@@ -179,12 +179,12 @@ class _IntensityPageState extends State<IntensityPage> {
 
   Widget _buildLegend() {
     return MapLegend(
-      label: context.i18n.history_earthquake_intensity,
+      label: 'TREM 觀測網實測震度',
       children: [
         _buildColorBar(),
         const SizedBox(height: 8),
         _buildColorBarLabels(),
-        Text(context.i18n.history_earthquake_intensity_h2, style: context.theme.textTheme.labelMedium),
+        Text('使用 JMA 震度標準 (0.3秒三分量合成加速度)', style: context.theme.textTheme.labelMedium),
       ],
     );
   }
@@ -239,7 +239,7 @@ class _IntensityPageState extends State<IntensityPage> {
               child: InkWell(
                 onTap: _toggleLegend,
                 child: Tooltip(
-                  message: context.i18n.map_legend,
+                  message: '圖例',
                   child: Container(
                     width: 30,
                     height: 30,
@@ -290,7 +290,7 @@ class _IntensityPageState extends State<IntensityPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 4, 0, 0),
                 child: Text(
-                  context.i18n.history_seismic_intensity_reference,
+                  '本資料係由 TREM-Net 觀測網自動觀測結果所得，尚未經人為檢視確認，僅供應變之初步參考。實際應以中央氣象署發布之資訊為準。',
                   style: TextStyle(color: context.colors.error),
                 ),
               ),
@@ -325,7 +325,7 @@ class _IntensityPageState extends State<IntensityPage> {
               const SizedBox(width: 8),
               LabelChip(
                 label:
-                    "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? context.i18n.history_final : ""}",
+                    "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? '(最終)' : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
@@ -365,7 +365,7 @@ class _IntensityPageState extends State<IntensityPage> {
       decoration: BoxDecoration(color: context.colors.surfaceContainerHigh, borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [_buildTimeInfo(context, Symbols.schedule_rounded, context.i18n.history_send_time, sendTime)],
+        children: [_buildTimeInfo(context, Symbols.schedule_rounded, '發送時間', sendTime)],
       ),
     );
   }
@@ -428,6 +428,6 @@ class _IntensityPageState extends State<IntensityPage> {
       );
     }
 
-    return DetailFieldTile(label: context.i18n.history_affected_area, child: Column(children: areas));
+    return DetailFieldTile(label: '影響區域', child: Column(children: areas));
   }
 }
