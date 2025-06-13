@@ -8,6 +8,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
@@ -104,7 +105,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
                           spacing: 8,
                           children: [
                             const Icon(Symbols.radar, size: 24),
-                            Text('雷達回波', style: context.textTheme.titleMedium),
+                            Text('雷達回波'.i18n, style: context.textTheme.titleMedium),
                             if (radarList.isNotEmpty)
                               Text(
                                 radarList.last.toLocaleTimeString(context),

@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:dpip/api/model/weather_schema.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -124,7 +126,9 @@ class WeatherHeader extends StatelessWidget {
                 selector: (context, model) => model.useFahrenheit,
                 builder: (context, useFahrenheit, child) {
                   return Text(
-                    '體感約 ${(useFahrenheit ? feelsLike.asFahrenheit : feelsLike).round()}°',
+                    '體感約 {useFahrenheit}°'.i18n.args({
+                      'useFahrenheit': (useFahrenheit ? feelsLike.asFahrenheit : feelsLike).round(),
+                    }),
                     style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onSurfaceVariant),
                   );
                 },

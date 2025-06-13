@@ -1,9 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class ThunderstormCard extends StatelessWidget {
   final History history;
@@ -50,7 +51,7 @@ class ThunderstormCard extends StatelessWidget {
                                 size: 22,
                               ),
                               Text(
-                                '雷雨即時訊息',
+                                '雷雨即時訊息'.i18n,
                                 style: context.textTheme.labelLarge!.copyWith(
                                   color: context.theme.extendedColors.onBlue,
                                   fontWeight: FontWeight.bold,
@@ -69,7 +70,7 @@ class ThunderstormCard extends StatelessWidget {
                   child: RichText(
                     text: TextSpan(
                       children: [
-                        const TextSpan(text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 '),
+                        TextSpan(text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 '.i18n),
                         TextSpan(
                           text: history.time.expiresAt.toSimpleDateTimeString(context),
                           style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),

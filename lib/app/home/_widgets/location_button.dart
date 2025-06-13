@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/app/settings/location/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -19,7 +20,7 @@ class LocationButton extends StatelessWidget {
       builder: (context, code, child) {
         final location = Global.location[code];
 
-        final content = location == null ? '尚未設定' : '${location.city} ${location.town}';
+        final content = location == null ? '尚未設定'.i18n : '${location.city} ${location.town}';
 
         return BlurredTextButton(
           onPressed: () => context.push(SettingsLocationPage.route),

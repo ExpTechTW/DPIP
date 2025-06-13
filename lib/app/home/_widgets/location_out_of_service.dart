@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
 class LocationOutOfServiceCard extends StatelessWidget {
@@ -22,7 +23,7 @@ class LocationOutOfServiceCard extends StatelessWidget {
         children: [
           Icon(Symbols.wrong_location_rounded, color: context.colors.onSecondaryContainer, weight: 500),
           Text(
-            '服務區域外，僅在臺灣各地可用',
+            '服務區域外，僅在臺灣各地可用'.i18n,
             style: context.textTheme.bodyMedium!.copyWith(color: context.colors.onSecondaryContainer),
           ),
         ],

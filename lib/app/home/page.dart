@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -17,6 +18,7 @@ import 'package:dpip/app/home/_widgets/thunderstorm_card.dart';
 import 'package:dpip/app/home/_widgets/weather_header.dart';
 import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
 import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
@@ -50,8 +52,8 @@ class _HomePageState extends State<HomePage> {
     Preference.version = Global.packageInfo.version;
     context.scaffoldMessenger.showSnackBar(
       SnackBar(
-        content: Text('已更新至 v${Global.packageInfo.version}'),
-        action: SnackBarAction(label: '更新日誌', onPressed: () => context.push(ChangelogPage.route)),
+        content: Text('已更新至 v{version}'.i18n.args({'version': Global.packageInfo.version})),
+        action: SnackBarAction(label: '更新日誌'.i18n, onPressed: () => context.push(ChangelogPage.route)),
         duration: kPersistSnackBar,
       ),
     );
@@ -84,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_HomePageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(const SnackBar(content: Text('取得天氣異常')));
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得天氣異常'.i18n)));
     }
 
     try {
@@ -96,7 +98,7 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_HomePageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(const SnackBar(content: Text('取得天氣異常')));
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('取得天氣異常'.i18n)));
     }
 
     if (!mounted) return;

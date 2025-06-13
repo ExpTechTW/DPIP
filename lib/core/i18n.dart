@@ -144,13 +144,94 @@ Translations<dynamic, Map<String, String>, Map<dynamic, String>, dynamic> get _t
       'zh-TW': '已翻譯 {translated}・已校對 {approved}',
     } +
     {
-      'en': 'Source Language',
-      'ja': 'ソース言語',
-      'ko': '소스 언어',
-      'ru': 'Язык источника',
-      'vi': 'Ngôn ngữ nguồn',
-      'zh-CN': '来源语言',
-      'zh-TW': '來源語言',
+      'en': '已更新至 v{version}',
+      'ja': '已更新至 v{version}',
+      'ko': '已更新至 v{version}',
+      'ru': '已更新至 v{version}',
+      'vi': '已更新至 v{version}',
+      'zh-CN': '已更新至 v{version}',
+      'zh-TW': '已更新至 v{version}',
+    } +
+    {
+      'en': 'Change log',
+      'ja': '更新履歴',
+      'ko': '업데이트 로그',
+      'ru': '更新日誌',
+      'vi': 'Nhật ký thay đổi',
+      'zh-CN': '更新日志',
+      'zh-TW': '更新日誌',
+    } +
+    {
+      'en': 'Error in retrieving weather data',
+      'ja': '天気の取得に失敗しました',
+      'ko': '날씨 이상징후 확인',
+      'ru': '取得天氣異常',
+      'vi': '取得天氣異常',
+      'zh-CN': '取得天气异常',
+      'zh-TW': '取得天氣異常',
+    } +
+    {
+      'en': 'Location not set',
+      'ja': '現在地が設定されていません',
+      'ko': '위치가 설정되지 않았습니다',
+      'ru': '尚未設定所在地',
+      'vi': 'Bạn chưa thiết lập vị trí của mình',
+      'zh-CN': '尚未设定所在地',
+      'zh-TW': '尚未設定所在地',
+    } +
+    {
+      'en': 'Outside the service area, only available in Taiwan',
+      'ja': '台湾以外ではご利用いただけません',
+      'ko': '서비스 불가 지역, 대만 국내에서만 이용 가능합니다.',
+      'ru': '服務區域外，僅在臺灣各地可用',
+      'vi': 'Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm khác nhau trên khắp Đài Loan.',
+      'zh-CN': '服务区域外，仅在台湾各地可用',
+      'zh-TW': '服務區域外，僅在臺灣各地可用',
+    } +
+    {
+      'en': 'Radar',
+      'ja': 'レーダー',
+      'ko': '레이더',
+      'ru': '雷達回波',
+      'vi': 'Hình ảnh radar',
+      'zh-CN': '雷达拼图',
+      'zh-TW': '雷達回波',
+    } +
+    {
+      'en': 'Heavy Rain Advisory',
+      'ja': 'リアルタイムの雷雨情報',
+      'ko': '뇌우 재난 문자',
+      'ru': '雷雨即時訊息',
+      'vi': '雷雨即時訊息',
+      'zh-CN': '雷雨即时信息',
+      'zh-TW': '雷雨即時訊息',
+    } +
+    {
+      'en': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+      'ja': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+      'ko': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+      'ru': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+      'vi': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+      'zh-CN': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+      'zh-TW': '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 ',
+    } +
+    {
+      'en': '體感約 {useFahrenheit}°',
+      'ja': '體感約 {useFahrenheit}°',
+      'ko': '體感約 {useFahrenheit}°',
+      'ru': '體感約 {useFahrenheit}°',
+      'vi': '體感約 {useFahrenheit}°',
+      'zh-CN': '體感約 {useFahrenheit}°',
+      'zh-TW': '體感約 {useFahrenheit}°',
+    } +
+    {
+      'en': 'App Log',
+      'ja': 'アプリログ',
+      'ko': '앱 로그',
+      'ru': 'App 日誌',
+      'vi': 'Nhật ký ứng dụng',
+      'zh-CN': 'App 日志',
+      'zh-TW': 'App 日誌',
     };
 
 extension Localization on String {
