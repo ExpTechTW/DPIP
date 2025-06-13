@@ -25,7 +25,11 @@ class _ReportListPageState extends State<ReportListPage> {
   RangeValues _magnitudeRange = const RangeValues(0, 10);
   RangeValues _depthRange = const RangeValues(0, 700);
 
-  List<String> get _intensityLevels => List.generate(9, (i) => context.i18n.intensity('${i + 1}'));
+  List<String> get _intensityLevels => List.generate(9, (i) {
+    final count = i + 1;
+    const map = {5: '5弱', 6: '5強', 7: '6弱', 8: '6強', 9: '7級'};
+    return map[count] ?? '$count級';
+  });
 
   Future<void> refreshReportList() async {
     if (lastFetchTime != null && DateTime.now().difference(lastFetchTime!).inMinutes < 1) {
@@ -145,11 +149,7 @@ class _ReportListPageState extends State<ReportListPage> {
                 child: Wrap(
                   children: [
                     FilterChip(
-                      label: Text(
-                        _getFilterSummary() == '全部'
-                            ? '篩選器'
-                            : _getFilterSummary(),
-                      ),
+                      label: Text(_getFilterSummary() == '全部' ? '篩選器' : _getFilterSummary()),
                       selected: _getFilterSummary() != '全部',
                       onSelected: (_) => _showFilterDialog(),
                     ),
@@ -185,10 +185,7 @@ class _ReportListPageState extends State<ReportListPage> {
                         } else if (isLoading) {
                           isLoadingEnd = false;
                         }
-                        return const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Center(child: Text('到底了')),
-                        );
+                        return const Padding(padding: EdgeInsets.all(8.0), child: Center(child: Text('到底了')));
                       }
 
                       var showDate = false;

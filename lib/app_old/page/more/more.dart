@@ -4,7 +4,6 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:dpip/app_old/page/more/ranking/ranking.dart';
 import 'package:dpip/app_old/page/more/report_list/report_list.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/tile_group_header.dart';
 
 class MorePage extends StatefulWidget {

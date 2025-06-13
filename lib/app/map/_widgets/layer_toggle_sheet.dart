@@ -5,7 +5,6 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/sheet/sheet_container.dart';
 import 'package:dpip/widgets/ui/labeled_divider.dart';
 

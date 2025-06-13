@@ -4,7 +4,6 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:dpip/app_old/page/history/tabs/country.dart';
 import 'package:dpip/app_old/page/history/tabs/location.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -34,7 +33,7 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
             pinned: true,
             floating: true,
             snap: true,
-            title: Text('歷史'),
+            title: const Text('歷史'),
             bottom: TabBar(
               controller: controller,
               tabs: [

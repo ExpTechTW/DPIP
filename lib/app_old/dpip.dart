@@ -18,7 +18,6 @@ import 'package:dpip/dialog/welcome/announcement.dart';
 import 'package:dpip/dialog/welcome/changelog.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/update_required/update_required.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 
 class Dpip extends StatefulWidget {
@@ -181,31 +180,31 @@ class _DpipState extends State<Dpip> {
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentActivePage,
-        destinations: [
+        destinations: const [
           NavigationDestination(
-            icon: const Icon(Symbols.home),
-            selectedIcon: const Icon(Symbols.home, fill: 1),
-            label: context.i18n.home,
+            icon: Icon(Symbols.home),
+            selectedIcon: Icon(Symbols.home, fill: 1),
+            label: '首頁',
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.clock_loader_10_rounded),
-            selectedIcon: const Icon(Symbols.clock_loader_10_rounded, fill: 1),
-            label: context.i18n.history,
+            icon: Icon(Symbols.clock_loader_10_rounded),
+            selectedIcon: Icon(Symbols.clock_loader_10_rounded, fill: 1),
+            label: '歷史',
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.map),
-            selectedIcon: const Icon(Symbols.map, fill: 1),
-            label: context.i18n.map,
+            icon: Icon(Symbols.map),
+            selectedIcon: Icon(Symbols.map, fill: 1),
+            label: '地圖',
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.note_stack_add_rounded),
-            selectedIcon: const Icon(Symbols.note_stack_add_rounded, fill: 1),
-            label: context.i18n.more,
+            icon: Icon(Symbols.note_stack_add_rounded),
+            selectedIcon: Icon(Symbols.note_stack_add_rounded, fill: 1),
+            label: '更多',
           ),
           NavigationDestination(
-            icon: const Icon(Symbols.person),
-            selectedIcon: const Icon(Symbols.person, fill: 1),
-            label: context.i18n.me,
+            icon: Icon(Symbols.person),
+            selectedIcon: Icon(Symbols.person, fill: 1),
+            label: '我',
           ),
         ],
         onDestinationSelected: (value) {

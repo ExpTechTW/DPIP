@@ -8,7 +8,6 @@ import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/_widgets/tsunami_notify_section.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/models/settings/notify.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 
 class SettingsNotifyTsunamiPage extends StatelessWidget {
   const SettingsNotifyTsunamiPage({super.key});

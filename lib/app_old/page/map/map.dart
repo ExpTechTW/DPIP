@@ -3,16 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:dpip/app_old/page/map/lightning/lightning.dart';
-import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
-import 'package:dpip/app_old/page/map/rain/rain.dart';
 import 'package:dpip/app_old/page/map/tsunami/tsunami.dart';
 import 'package:dpip/app_old/page/map/typhoon/typhoon.dart';
 import 'package:dpip/app_old/page/map/weather/humidity.dart';
 import 'package:dpip/app_old/page/map/weather/pressure.dart';
-import 'package:dpip/app_old/page/map/weather/temperature.dart';
-import 'package:dpip/app_old/page/map/weather/wind.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/tile_group_header.dart';
 
 class MapPage extends StatefulWidget {
@@ -27,55 +22,55 @@ class _MapPageState extends State<MapPage> {
   int currentIndex = 0;
 
   late final destinations = [
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.monitor_heart),
-      selectedIcon: const Icon(Symbols.monitor_heart, fill: 1),
-      label: Text(context.i18n.monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.monitor_heart),
+      selectedIcon: Icon(Symbols.monitor_heart, fill: 1),
+      label: Text('強震監視器'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.radar_rounded),
-      selectedIcon: const Icon(Symbols.radar_rounded, fill: 1),
-      label: Text(context.i18n.radar_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.radar_rounded),
+      selectedIcon: Icon(Symbols.radar_rounded, fill: 1),
+      label: Text('雷達回波'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.rainy_heavy_rounded),
-      selectedIcon: const Icon(Symbols.rainy_heavy_rounded, fill: 1),
-      label: Text(context.i18n.precipitation_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.rainy_heavy_rounded),
+      selectedIcon: Icon(Symbols.rainy_heavy_rounded, fill: 1),
+      label: Text('降水'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.thermometer_rounded),
-      selectedIcon: const Icon(Symbols.thermometer_rounded, fill: 1),
-      label: Text(context.i18n.temperature_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.thermometer_rounded),
+      selectedIcon: Icon(Symbols.thermometer_rounded, fill: 1),
+      label: Text('氣溫'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.humidity_percentage_rounded),
-      selectedIcon: const Icon(Symbols.humidity_percentage_rounded, fill: 1),
-      label: Text(context.i18n.humidity_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.humidity_percentage_rounded),
+      selectedIcon: Icon(Symbols.humidity_percentage_rounded, fill: 1),
+      label: Text('濕度'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.blood_pressure_rounded),
-      selectedIcon: const Icon(Symbols.blood_pressure_rounded, fill: 1),
-      label: Text(context.i18n.pressure_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.blood_pressure_rounded),
+      selectedIcon: Icon(Symbols.blood_pressure_rounded, fill: 1),
+      label: Text('氣壓'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.wind_power_rounded),
-      selectedIcon: const Icon(Symbols.wind_power_rounded, fill: 1),
-      label: Text(context.i18n.wind_direction_and_speed_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.wind_power_rounded),
+      selectedIcon: Icon(Symbols.wind_power_rounded, fill: 1),
+      label: Text('風向/風速'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.bolt_rounded),
-      selectedIcon: const Icon(Symbols.bolt_rounded, fill: 1),
-      label: Text(context.i18n.lightning),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.bolt_rounded),
+      selectedIcon: Icon(Symbols.bolt_rounded, fill: 1),
+      label: Text('閃電'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.cyclone_rounded),
-      selectedIcon: const Icon(Symbols.cyclone_rounded, fill: 1),
-      label: Text(context.i18n.typhoon_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.cyclone_rounded),
+      selectedIcon: Icon(Symbols.cyclone_rounded, fill: 1),
+      label: Text('颱風'),
     ),
-    NavigationDrawerDestination(
-      icon: const Icon(Symbols.tsunami),
-      selectedIcon: const Icon(Symbols.tsunami, fill: 1),
-      label: Text(context.i18n.tsunami_info_monitor),
+    const NavigationDrawerDestination(
+      icon: Icon(Symbols.tsunami),
+      selectedIcon: Icon(Symbols.tsunami, fill: 1),
+      label: Text('海嘯資訊'),
     ),
   ];
 
@@ -85,7 +80,7 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(title: destinations[currentIndex].label),
       drawer: NavigationDrawer(
         selectedIndex: currentIndex,
-        children: [ListTileGroupHeader(title: context.i18n.monitor_list), ...destinations],
+        children: [const ListTileGroupHeader(title: '地圖列表'), ...destinations],
         onDestinationSelected: (value) {
           setState(() => currentIndex = value);
           controller.jumpToPage(value);
@@ -96,13 +91,9 @@ class _MapPageState extends State<MapPage> {
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          MapMonitorPage(),
           RadarMap(),
-          RainMap(),
-          TemperatureMap(),
           HumidityMap(),
           PressureMap(),
-          WindMap(),
           LightningMap(),
           TyphoonMap(),
           TsunamiMap(),

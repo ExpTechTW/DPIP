@@ -14,7 +14,6 @@ import 'package:dpip/app_old/page/history/widgets/history_timeline_item.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/time_convert.dart';
 import 'package:dpip/widgets/error/region_out_of_service.dart';
@@ -87,8 +86,8 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
             itemCount: grouped.isEmpty ? 1 : grouped.length,
             itemBuilder: (context, index) {
               if (grouped.isEmpty) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 24),
+                return const Padding(
+                  padding: EdgeInsets.only(top: 24),
                   child: Center(child: Text('一切平安，無事件發生。')),
                 );
               }

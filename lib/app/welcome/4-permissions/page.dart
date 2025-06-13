@@ -445,8 +445,8 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
             //             backgroundColor: Colors.orange.withValues(alpha: 0.1),
             //             child: const Icon(Icons.start, color: Colors.orange),
             //           ),
-            //           title: Text(context.i18n.automatic_start_position),
-            //           subtitle: Text(context.i18n.automatic_start_position_text),
+            //           title: const Text('自動化啟動'),
+            //           subtitle: const Text('允許 DPIP 在設備重新啟動或關閉後自動啟動，以持續提供防災通知服務。'),
             //           trailing: FutureBuilder<bool>(
             //             future: _autoStartPermission,
             //             builder: (context, snapshot) {

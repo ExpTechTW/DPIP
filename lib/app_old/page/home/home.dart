@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             },
             icon: const Icon(Symbols.pin_drop_rounded),
             label: Text(
-              region != null ? '$city$town' : context.i18n.home_click_settings,
+              region != null ? '$city$town' : '點擊設定所在地',
               style: const TextStyle(fontSize: 20),
             ),
           ),
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 Expanded(
                   child: Text(
-                    context.i18n.current_events,
+                    '目前的事件資訊',
                     style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
                   ),
                 ),
@@ -201,13 +201,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: SegmentedButton(
         showSelectedIcon: false,
-        segments: [
+        segments: const [
           ButtonSegment(
-            icon: const Icon(Symbols.public_rounded),
-            tooltip: context.i18n.history_nationwide,
+            icon: Icon(Symbols.public_rounded),
+            tooltip: '全國',
             value: true,
           ),
-          ButtonSegment(icon: const Icon(Symbols.home_rounded), tooltip: context.i18n.settings_location, value: false),
+          ButtonSegment(icon: Icon(Symbols.home_rounded), tooltip: '所在地', value: false),
         ],
         selected: {country},
         onSelectionChanged:
@@ -229,10 +229,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
 
     if (realtimeList.isEmpty) {
-      return Center(child: Text(context.i18n.home_safety));
+      return const Center(child: Text('一切平安，無事件發生。'));
     }
 
-    final grouped = groupBy(realtimeList, (e) => DateFormat(context.i18n.full_date_format, locale).format(e.time.send));
+    final grouped = groupBy(realtimeList, (e) => DateFormat('yyyy/MM/dd (EEEE)', locale).format(e.time.send));
 
     return Column(
       children:
@@ -336,9 +336,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildWeatherDetailItem(context.i18n.home_precipitation, '${weatherData?.rain.data.oneHour ?? '- -'} mm/h'),
+          _buildWeatherDetailItem('降水量', '${weatherData?.rain.data.oneHour ?? '- -'} mm/h'),
           _buildWeatherDetailItem(
-            context.i18n.humidity_monitor,
+            '濕度',
             '${weatherData?.weather.data.air.relativeHumidity ?? '- -'} %',
           ),
         ],
@@ -362,7 +362,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         visible: isAppBarVisible,
         child: FadeTransition(
           opacity: animController.drive(Tween(begin: 0.0, end: 1.0)),
-          child: AppBar(elevation: 4, title: Text(context.i18n.home)),
+          child: AppBar(elevation: 4, title: const Text('首頁')),
         ),
       ),
     );

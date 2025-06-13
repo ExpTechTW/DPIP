@@ -61,6 +61,11 @@ class _EewCardState extends State<EewCard> {
     Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
   }
 
+  String intensityLabel(int count) {
+    const map = {5: '5弱', 6: '5強', 7: '6弱', 8: '6強', 9: '7級'};
+    return map[count] ?? '$count級';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -128,7 +133,7 @@ class _EewCardState extends State<EewCard> {
                         ),
                         const TextSpan(text: '、最大震度 '),
                         TextSpan(
-                          text: context.i18n.intensity(localIntensity.toString()),
+                          text: intensityLabel(localIntensity),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -168,14 +173,14 @@ class _EewCardState extends State<EewCard> {
                                       text: TextSpan(
                                         children: [
                                           TextSpan(
-                                            text: context.i18n.intensity(localIntensity.toString())[0],
+                                            text: intensityLabel(localIntensity)[0],
                                             style: context.textTheme.displayLarge!.copyWith(
                                               fontWeight: FontWeight.bold,
                                               color: context.colors.onErrorContainer,
                                             ),
                                           ),
                                           TextSpan(
-                                            text: ' ${context.i18n.intensity(localIntensity.toString())[1]}',
+                                            text: ' ${intensityLabel(localIntensity)[1]}',
                                             style: context.textTheme.bodyLarge!.copyWith(
                                               color: context.colors.onErrorContainer,
                                             ),

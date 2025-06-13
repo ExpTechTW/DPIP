@@ -204,7 +204,11 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildColorBarLabels() {
-    final labels = List.generate(9, (i) => context.i18n.intensity('${i + 1}'));
+    final labels = List.generate(9, (i) {
+      final count = i + 1;
+      const map = {5: '5弱', 6: '5強', 7: '6弱', 8: '6強', 9: '7級'};
+      return map[count] ?? '$count級';
+    });
 
     return SizedBox(
       width: 300,
@@ -324,8 +328,7 @@ class _IntensityPageState extends State<IntensityPage> {
               Text(subtitle, style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               LabelChip(
-                label:
-                    "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? '(最終)' : ""}",
+                label: "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? '(最終)' : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
