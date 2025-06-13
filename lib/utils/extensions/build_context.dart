@@ -14,7 +14,6 @@ extension CommonContext on BuildContext {
   Size get dimension => MediaQuery.sizeOf(this);
   EdgeInsets get padding => MediaQuery.paddingOf(this);
   TextTheme get textTheme => theme.textTheme;
-  Locale get locale => Localizations.localeOf(this);
   Size get screen => MediaQuery.sizeOf(this);
 }
 

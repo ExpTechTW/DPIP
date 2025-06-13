@@ -658,6 +658,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.5"
+  gettext_parser:
+    dependency: transitive
+    description:
+      name: gettext_parser
+      sha256: "9565c9dd1033ec125e1fbc7ccba6c0d2d753dd356122ba1a17e6aa7dc868f34a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   glob:
     dependency: transitive
     description:
@@ -714,6 +722,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.2"
+  i18n_extension:
+    dependency: "direct main"
+    description:
+      name: i18n_extension
+      sha256: "53d243a640460f494456dd6a9fd312d654d871312e79eb2b73a937d38473e438"
+      url: "https://pub.dev"
+    source: hosted
+    version: "15.0.5"
+  i18n_extension_core:
+    dependency: transitive
+    description:
+      name: i18n_extension_core
+      sha256: "7923af27a4f643a21d5aea5203bed4859d42c9d38c08939e22d6d10f1fa4afb5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.1"
   image:
     dependency: transitive
     description:

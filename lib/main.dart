@@ -1,19 +1,21 @@
 import 'dart:io';
 
-import 'package:dpip/app.dart';
-import 'package:dpip/core/fcm.dart';
-import 'package:dpip/core/notify.dart';
-import 'package:dpip/core/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart';
 
+import 'package:dpip/app.dart';
 import 'package:dpip/core/device_info.dart';
+import 'package:dpip/core/fcm.dart';
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
 
@@ -45,15 +47,33 @@ void main() async {
   initBackgroundService();
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: GlobalProviders.data),
-        ChangeNotifierProvider.value(value: GlobalProviders.location),
-        ChangeNotifierProvider.value(value: GlobalProviders.map),
-        ChangeNotifierProvider.value(value: GlobalProviders.notification),
-        ChangeNotifierProvider.value(value: GlobalProviders.ui),
+    I18n(
+      initialLocale: GlobalProviders.ui.locale,
+      supportedLocales: [
+        'en'.asLocale,
+        'ja'.asLocale,
+        'ko'.asLocale,
+        'ru'.asLocale,
+        'vi'.asLocale,
+        'zh'.asLocale,
+        'zh-CN'.asLocale,
+        'zh-TW'.asLocale,
       ],
-      child: const DpipApp(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: GlobalProviders.data),
+          ChangeNotifierProvider.value(value: GlobalProviders.location),
+          ChangeNotifierProvider.value(value: GlobalProviders.map),
+          ChangeNotifierProvider.value(value: GlobalProviders.notification),
+          ChangeNotifierProvider.value(value: GlobalProviders.ui),
+        ],
+        child: const DpipApp(),
+      ),
     ),
   );
 }

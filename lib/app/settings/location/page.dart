@@ -11,15 +11,16 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 
 final stateSettingsLocationView = _SettingsLocationPageState();
 
@@ -225,7 +226,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       if (!mounted) return true;
 
       final String contentText =
-          (num == 0) ? '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。' : '為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。';
+          (num == 0)
+              ? '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'
+              : '為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。';
 
       return await showDialog<bool>(
             context: context,
@@ -272,7 +275,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       if (!mounted) return true;
 
       final String contentText =
-          (num == 0) ? '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。' : '為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。';
+          (num == 0)
+              ? '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'
+              : '為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。';
 
       return await showDialog<bool>(
             context: context,
@@ -416,8 +421,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               selector: (context, model) => model.auto,
               builder: (context, auto, child) {
                 return ListSectionTile(
-                  title: '自動定位',
-                  subtitle: const Text('自動更新所在地'),
+                  title: '自動更新'.i18n,
+                  subtitle: Text('定期更新目前的所在地'.i18n),
                   icon: Symbols.my_location_rounded,
                   trailing: Switch(value: auto, onChanged: (value) => toggleAutoLocation()),
                 );
@@ -425,7 +430,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             ),
           ],
         ),
-        const SettingsListTextSection(icon: Symbols.info_rounded, content: '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'),
+        SettingsListTextSection(
+          icon: Symbols.info_rounded,
+          content: '自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。'.i18n,
+        ),
         if (locationAlwaysPermission != null)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
@@ -482,12 +490,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                           child: Icon(Symbols.warning_rounded, color: context.colors.error),
                         ),
                         const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '通知功能已被拒絕，請移至設定允許權限。',
-                            style: TextStyle(color: context.colors.error),
-                          ),
-                        ),
+                        Expanded(child: Text('通知功能已被拒絕，請移至設定允許權限。', style: TextStyle(color: context.colors.error))),
                         TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
                       ],
                     ),
@@ -551,7 +554,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
             },
           ),
         ListSection(
-          title: '所在地',
+          title: '所在地'.i18n,
           children: [
             Selector<SettingsLocationModel, ({bool auto, String? code})>(
               selector: (context, model) => (auto: model.auto, code: model.code),
@@ -560,8 +563,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 final city = Global.location[code]?.city;
 
                 return ListSectionTile(
-                  title: '縣市',
-                  subtitle: Text(city ?? '尚未設定'),
+                  title: '直轄市/縣市'.i18n,
+                  subtitle: Text(city ?? '尚未設定'.i18n),
                   icon: Symbols.location_city_rounded,
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   enabled: !auto,
@@ -588,8 +591,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 final town = Global.location[code]?.town;
 
                 return ListSectionTile(
-                  title: '鄉鎮',
-                  subtitle: Text(town ?? '尚未設定'),
+                  title: '鄉鎮市區'.i18n,
+                  subtitle: Text(town ?? '尚未設定'.i18n),
                   icon: Symbols.forest_rounded,
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   enabled: !auto && city != null,

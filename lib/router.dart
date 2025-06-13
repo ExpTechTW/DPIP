@@ -39,9 +39,9 @@ import 'package:dpip/app/welcome/layout.dart';
 import 'package:dpip/app_old/page/history/history.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
 
@@ -105,13 +105,13 @@ final router = GoRouter(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
         final title = switch (state.fullPath) {
-          SettingsLocationPage.route => '所在地',
-          SettingsLocationSelectPage.route => '所在地',
-          final p when p == SettingsLocationSelectCityPage.route() => '所在地',
+          SettingsLocationPage.route => '所在地'.i18n,
+          SettingsLocationSelectPage.route => '所在地'.i18n,
+          final p when p == SettingsLocationSelectCityPage.route() => '所在地'.i18n,
           SettingsThemePage.route => '主題色',
           SettingsThemeSelectPage.route => '主題色',
-          SettingsLocalePage.route => '語言',
-          SettingsLocaleSelectPage.route => '語言',
+          SettingsLocalePage.route => '語言'.i18n,
+          SettingsLocaleSelectPage.route => '語言'.i18n,
           SettingsUnitPage.route => '單位',
 
           SettingsNotifyPage.route => '通知',
@@ -126,7 +126,7 @@ final router = GoRouter(
           SettingsNotifyAnnouncementPage.route => '公告',
 
           SettingsDonatePage.route => '贊助我們',
-          _ => '設定',
+          _ => '設定'.i18n,
         };
         return SettingsLayout(title: title, child: child);
       },

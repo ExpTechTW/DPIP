@@ -1,4 +1,5 @@
 import 'package:dpip/app/settings/map/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'package:clipboard/clipboard.dart';
@@ -32,12 +33,12 @@ class SettingsIndexPage extends StatelessWidget {
     final deviceInfo = '${DeviceInfo.model}${DeviceInfo.serial != null ? '' : ''}(${DeviceInfo.version})';
 
     final location = ListSection(
-      title: '位置',
+      title: '位置'.i18n,
       children: [
         ListSectionTile(
           icon: Symbols.pin_drop_rounded,
-          title: '所在地',
-          subtitle: const Text('調整所在地來接收即時天氣資訊、地震預估震度以及地震波預估抵達秒數等'),
+          title: '所在地'.i18n,
+          subtitle: Text('設定你的所在地來接收當地的即時資訊'.i18n),
           onTap: () {
             context.push(SettingsLocationPage.route);
           },
@@ -58,8 +59,8 @@ class SettingsIndexPage extends StatelessWidget {
         ),
         ListSectionTile(
           icon: Symbols.translate_rounded,
-          title: '語言',
-          subtitle: const Text('調整 DPIP 的顯示語言'),
+          title: '語言'.i18n,
+          subtitle: Text('調整 DPIP 的顯示語言'.i18n),
           onTap: () {
             context.push(SettingsLocalePage.route);
           },

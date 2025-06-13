@@ -1,7 +1,9 @@
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
 import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,6 @@ import 'package:dpip/api/model/crowdin/localization_progress.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/l10n/app_localizations.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/locale.dart';
@@ -26,8 +27,7 @@ class SettingsLocaleSelectPage extends StatefulWidget {
 
 class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
   List<CrowdinLocalizationProgress> progress = [];
-  List<Locale> localeList =
-      AppLocalizations.supportedLocales.where((e) => !['zh'].contains(e.toLanguageTag())).toList();
+  List<Locale> localeList = I18n.supportedLocales.where((e) => !['zh'].contains(e.toLanguageTag())).toList();
 
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: '選擇語言',
+          title: '選擇語言'.i18n,
           children: [
             for (final locale in localeList)
               Consumer<SettingsUserInterfaceModel>(
@@ -61,7 +61,10 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '已翻譯 $translated・已校對 $approved',
+                                  '已翻譯 {translated}・已校對 {approved}'.i18n.args({
+                                    'translated': translated,
+                                    'approved': approved,
+                                  }),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 4),
@@ -86,10 +89,11 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                 ),
                               ],
                             )
-                            : const Text('來源語言'),
+                            : Text('來源語言'.i18n),
                     leading: locale.flag,
                     trailing: Icon(locale == model.locale ? Symbols.check_rounded : null),
                     onTap: () {
+                      context.locale = locale;
                       model.setLocale(locale);
                       context.pop();
                     },

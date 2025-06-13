@@ -1,9 +1,8 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart';
-
-import 'package:dpip/utils/extensions/build_context.dart';
 
 extension TZDateTimeExtension on TZDateTime {
   String toSimpleDateTimeString(BuildContext context) =>

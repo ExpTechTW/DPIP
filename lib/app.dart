@@ -4,13 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:dynamic_system_colors/dynamic_system_colors.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/providers.dart';
-import 'package:dpip/l10n/app_localizations.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
@@ -102,14 +101,9 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
               theme: lightTheme,
               darkTheme: darkTheme,
               themeMode: model.themeMode,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: model.locale,
+              localizationsDelegates: I18n.localizationsDelegates,
+              supportedLocales: I18n.supportedLocales,
+              locale: I18n.locale,
               routerConfig: router,
             );
           },
