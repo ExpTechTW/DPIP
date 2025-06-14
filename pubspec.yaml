@@ -82,7 +82,6 @@ flutter:
   assets:
   - assets/flags/
   - assets/map/
-  - assets/map/icons/
   - assets/DPIP.png
   - assets/ExpTech.png
   - assets/location.json
