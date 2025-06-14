@@ -1,3 +1,4 @@
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'package:talker_flutter/talker_flutter.dart';
@@ -14,7 +15,7 @@ class AppDebugLogsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return TalkerScreen(
       talker: TalkerManager.instance,
-      appBarTitle: 'App 日誌',
+      appBarTitle: 'App 日誌'.i18n,
       theme: TalkerScreenTheme(
         backgroundColor: context.colors.surface,
         textColor: context.colors.onSurface,

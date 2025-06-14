@@ -144,6 +144,15 @@ Translations<dynamic, Map<String, String>, Map<dynamic, String>, dynamic> get _t
       'zh-TW': '已翻譯 {translated}・已校對 {approved}',
     } +
     {
+      'en': 'Source Language',
+      'ja': '元言語',
+      'ko': '출처 언어',
+      'ru': '來源語言',
+      'vi': 'Ngôn ngữ nguồn',
+      'zh-CN': '来源语言',
+      'zh-TW': '來源語言',
+    } +
+    {
       'en': '已更新至 v{version}',
       'ja': '已更新至 v{version}',
       'ko': '已更新至 v{version}',
@@ -232,6 +241,123 @@ Translations<dynamic, Map<String, String>, Map<dynamic, String>, dynamic> get _t
       'vi': 'Nhật ký ứng dụng',
       'zh-CN': 'App 日志',
       'zh-TW': 'App 日誌',
+    } +
+    {
+      'en': 'Unable to load the Change Log, Please Retry Later.',
+      'ja': '変更履歴を読み込めませんでした。',
+      'ko': '업데이트 로그를 불러올 수 없습니다. 나중에 다시 시도해 주세요.',
+      'ru': '無法載入更新日誌，請稍後再試。',
+      'vi': 'Không thể tải nhật ký thay đổi, vui lòng thử lại sau.',
+      'zh-CN': '无法载入更新日志，请稍后再试。',
+      'zh-TW': '無法載入更新日誌，請稍後再試。',
+    } +
+    {
+      'en': 'Retry',
+      'ja': '再試行',
+      'ko': '다시 시도',
+      'ru': '重試',
+      'vi': 'Thử lại',
+      'zh-CN': '重试',
+      'zh-TW': '重試',
+    } +
+    {
+      'en': 'Heavy Rain Advisory',
+      'ja': 'リアルタイムの雷雨情報',
+      'ko': '뇌우 재난 문자',
+      'ru': '雷雨即時訊息',
+      'vi': '雷雨即時訊息',
+      'zh-CN': '雷雨即时信息',
+      'zh-TW': '雷雨即時訊息',
+    } +
+    {
+      'en': 'Precipitation',
+      'ja': '降水量',
+      'ko': '강우',
+      'ru': '降水',
+      'vi': 'Lượng mưa',
+      'zh-CN': '降水',
+      'zh-TW': '降水',
+    } +
+    {
+      'en': 'Today',
+      'ja': '今日',
+      'ko': '오늘',
+      'ru': '今日',
+      'vi': 'Hôm nay',
+      'zh-CN': '今天',
+      'zh-TW': '今日',
+    } +
+    {
+      'en': '10 Minutes',
+      'ja': '10分間',
+      'ko': '10분',
+      'ru': '10 分鐘',
+      'vi': '10 phút',
+      'zh-CN': '10 分钟',
+      'zh-TW': '10 分鐘',
+    } +
+    {
+      'en': '1 Hours',
+      'ja': '1時間',
+      'ko': '1시간',
+      'ru': '1 小時',
+      'vi': '1 giờ',
+      'zh-CN': '1 小时',
+      'zh-TW': '1 小時',
+    } +
+    {
+      'en': '3 Hours',
+      'ja': '3時間',
+      'ko': '3시간',
+      'ru': '3 小時',
+      'vi': '3 giờ',
+      'zh-CN': '3 小时',
+      'zh-TW': '3 小時',
+    } +
+    {
+      'en': '6 Hours',
+      'ja': '6時間',
+      'ko': '6시간',
+      'ru': '6 小時',
+      'vi': '6 giờ',
+      'zh-CN': '6 小时',
+      'zh-TW': '6 小時',
+    } +
+    {
+      'en': '12 Hours',
+      'ja': '12時間',
+      'ko': '12시간',
+      'ru': '12 小時',
+      'vi': '12 giờ',
+      'zh-CN': '12 小时',
+      'zh-TW': '12 小時',
+    } +
+    {
+      'en': '24 Hours',
+      'ja': '24時間',
+      'ko': '24시간',
+      'ru': '24 小時',
+      'vi': '24 giờ',
+      'zh-CN': '24 小时',
+      'zh-TW': '24 小時',
+    } +
+    {
+      'en': '2 Days',
+      'ja': '2日間',
+      'ko': '2일',
+      'ru': '2 天',
+      'vi': '2 ngày',
+      'zh-CN': '2 天',
+      'zh-TW': '2 天',
+    } +
+    {
+      'en': '3 Days',
+      'ja': '3日間',
+      'ko': '3일',
+      'ru': '3 天',
+      'vi': '3 ngày',
+      'zh-CN': '3 天',
+      'zh-TW': '3 天',
     };
 
 extension Localization on String {

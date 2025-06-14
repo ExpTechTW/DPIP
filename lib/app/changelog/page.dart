@@ -1,3 +1,4 @@
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -41,7 +42,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
       if (!mounted) return;
 
       TalkerManager.instance.error('_ChangelogPageState._refresh', e, s);
-      context.scaffoldMessenger.showSnackBar(const SnackBar(content: Text('無法載入更新日誌，請稍後再試。')));
+      context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('無法載入更新日誌，請稍後再試。'.i18n)));
     }
 
     if (!mounted) return;
@@ -52,7 +53,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('更新日誌'), elevation: 0),
+      appBar: AppBar(title: Text('更新日誌'.i18n), elevation: 0),
       body: Stack(
         children: [
           Positioned(
@@ -107,11 +108,11 @@ class _ChangelogPageState extends State<ChangelogPage> {
             Center(
               child: Column(
                 children: [
-                  const Text('無法載入更新日誌，請稍後再試。'),
+                  Text('無法載入更新日誌，請稍後再試。'.i18n),
                   FilledButton.tonalIcon(
                     onPressed: _refresh,
                     icon: const Icon(Symbols.refresh_rounded),
-                    label: const Text('重試'),
+                    label: Text('重試'.i18n),
                   ),
                 ],
               ),

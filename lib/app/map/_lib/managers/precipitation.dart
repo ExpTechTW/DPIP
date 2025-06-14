@@ -1,3 +1,4 @@
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -299,20 +300,20 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String getIntervalLabel(String interval) => switch (interval) {
-      'now' => '今日',
-      '10m' => '10 分鐘',
-      '1h' => '1 小時',
-      '3h' => '3 小時',
-      '6h' => '6 小時',
-      '12h' => '12 小時',
-      '24h' => '24 小時',
-      '2d' => '2 天',
-      '3d' => '3 天',
+      'now' => '今日'.i18n,
+      '10m' => '10 分鐘'.i18n,
+      '1h' => '1 小時'.i18n,
+      '3h' => '3 小時'.i18n,
+      '6h' => '6 小時'.i18n,
+      '12h' => '12 小時'.i18n,
+      '24h' => '24 小時'.i18n,
+      '2d' => '2 天'.i18n,
+      '3d' => '3 天'.i18n,
       _ => interval,
     };
 
     return MorphingSheet(
-      title: '降水',
+      title: '降水'.i18n,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -439,7 +440,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                 spacing: 8,
                 children: [
                   const Icon(Symbols.water_drop_rounded, size: 24),
-                  Text('降水', style: context.textTheme.titleMedium),
+                  Text('降水'.i18n, style: context.textTheme.titleMedium),
                 ],
               ),
             ),
