@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:dpip/core/i18n.dart';
+import 'package:styled_text/styled_text.dart';
+
 import 'package:dpip/api/model/history.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
@@ -67,18 +71,14 @@ class ThunderstormCard extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 '.i18n),
-                        TextSpan(
-                          text: history.time.expiresAt.toSimpleDateTimeString(context),
-                          style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const TextSpan(text: ' 。'),
-                      ],
-                      style: context.textTheme.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
-                    ),
+                  child: StyledText(
+                    text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。'.i18n.args({
+                      'time': history.time.expiresAt.toSimpleDateTimeString(context),
+                    }),
+                    style: context.textTheme.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
+                    tags: {
+                      'bold': StyledTextTag(style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+                    },
                   ),
                 ),
               ],

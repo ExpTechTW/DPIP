@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
     Preference.version = Global.packageInfo.version;
     context.scaffoldMessenger.showSnackBar(
       SnackBar(
-        content: Text('已更新至 v{version}'.i18n.args({'version': Global.packageInfo.version})),
+        content: Text('已更新至 {version}'.i18n.args({'version': 'v${Global.packageInfo.version}'})),
         action: SnackBarAction(label: '更新日誌'.i18n, onPressed: () => context.push(ChangelogPage.route)),
         duration: kPersistSnackBar,
       ),

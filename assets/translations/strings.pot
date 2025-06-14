@@ -1,0 +1,393 @@
+#: ./lib/app/settings/location/page.dart:557
+msgid "所在地"
+msgstr ""
+
+#: ./lib/app/settings/page.dart:62
+msgid "語言"
+msgstr ""
+
+#: ./lib/app/home/_widgets/location_not_set_card.dart:37
+msgid "設定"
+msgstr ""
+
+#: ./lib/app/settings/locale/page.dart:33
+msgid "顯示語言"
+msgstr ""
+
+#: ./lib/app/settings/locale/page.dart:34
+msgid "系統語言"
+msgstr ""
+
+#: ./lib/app/settings/locale/page.dart:42
+msgid "協助翻譯"
+msgstr ""
+
+#: ./lib/app/settings/locale/page.dart:43
+msgid "點擊這裡來幫助我們改進 DPIP 的翻譯"
+msgstr ""
+
+#: ./lib/app/settings/locale/select/page.dart:46
+msgid "選擇語言"
+msgstr ""
+
+#: ./lib/app/settings/locale/select/page.dart:64
+msgid "已翻譯 {translated}・已校對 {approved}"
+msgstr ""
+
+#: ./lib/app/settings/locale/select/page.dart:92
+msgid "來源語言"
+msgstr ""
+
+#: ./lib/app/settings/page.dart:36
+msgid "位置"
+msgstr ""
+
+#: ./lib/app/settings/page.dart:41
+msgid "設定你的所在地來接收當地的即時資訊"
+msgstr ""
+
+#: ./lib/app/settings/page.dart:63
+msgid "調整 DPIP 的顯示語言"
+msgstr ""
+
+#: ./lib/app/settings/location/page.dart:424
+msgid "自動更新"
+msgstr ""
+
+#: ./lib/app/settings/location/page.dart:425
+msgid "定期更新目前的所在地"
+msgstr ""
+
+#: ./lib/app/settings/location/page.dart:435
+msgid ""
+"自動定位功能將使用您的裝置上的 GPS，即使 DPIP "
+"關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
+msgstr ""
+
+#: ./lib/app/settings/location/page.dart:566
+msgid "直轄市/縣市"
+msgstr ""
+
+#: ./lib/app/home/_widgets/location_button.dart:23
+msgid "尚未設定"
+msgstr ""
+
+#: ./lib/app/settings/location/page.dart:594
+msgid "鄉鎮市區"
+msgstr ""
+
+#: ./lib/app/home/_widgets/thunderstorm_card.dart:58
+msgid "雷雨即時訊息"
+msgstr ""
+
+#: ./lib/app/home/_widgets/thunderstorm_card.dart:75
+msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
+msgstr ""
+
+#: ./lib/app/home/_widgets/location_out_of_service.dart:26
+msgid "服務區域外，僅在臺灣各地可用"
+msgstr ""
+
+#: ./lib/app/home/_widgets/radar_card.dart:108
+msgid "雷達回波"
+msgstr ""
+
+#: ./lib/app/home/_widgets/weather_header.dart:129
+msgid "體感約 {apparent}°"
+msgstr ""
+
+#: ./lib/app/home/_widgets/location_not_set_card.dart:32
+msgid "尚未設定所在地"
+msgstr ""
+
+#: ./lib/app/home/page.dart:55
+msgid "已更新至 {version}"
+msgstr ""
+
+#: ./lib/app/changelog/page.dart:56
+msgid "更新日誌"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:284
+msgid "取得天氣異常"
+msgstr ""
+
+#: ./lib/app/changelog/page.dart:111
+msgid "無法載入更新日誌，請稍後再試。"
+msgstr ""
+
+#: ./lib/app/changelog/page.dart:115
+msgid "重試"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:303
+msgid "今日"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:304
+msgid "10 分鐘"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:305
+msgid "1 小時"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:306
+msgid "3 小時"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:307
+msgid "6 小時"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:308
+msgid "12 小時"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:309
+msgid "24 小時"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:310
+msgid "2 天"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:311
+msgid "3 天"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/precipitation.dart:443
+msgid "降水"
+msgstr ""
+
+#: ./lib/app/debug/logs/page.dart:18
+msgid "App 日誌"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:285
+msgid "晴"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:286
+msgid "晴有霾"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:287
+msgid "晴有靄"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:288
+msgid "晴有閃電"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:304
+msgid "晴天伴有雷"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:290
+msgid "晴有霧"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:291
+msgid "晴有雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:292
+msgid "晴有雨雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:293
+msgid "晴有大雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:294
+msgid "晴有雪珠"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:295
+msgid "晴有冰珠"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:296
+msgid "晴有陣雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:297
+msgid "晴陣雨雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:298
+msgid "晴有雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:299
+msgid "晴有雷雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:300
+msgid "晴有雷雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:301
+msgid "晴有雷雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:302
+msgid "晴大雷雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:303
+msgid "晴大雷雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:305
+msgid "多雲"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:306
+msgid "多雲有霾"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:307
+msgid "多雲有靄"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:308
+msgid "多雲有閃電"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:324
+msgid "多雲伴有雷"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:310
+msgid "多雲有霧"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:311
+msgid "多雲有雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:312
+msgid "多雲有雨雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:313
+msgid "多雲有大雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:314
+msgid "多雲有雪珠"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:315
+msgid "多雲有冰珠"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:316
+msgid "多雲有陣雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:317
+msgid "多雲陣雨雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:318
+msgid "多雲有雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:319
+msgid "多雲有雷雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:320
+msgid "多雲有雷雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:321
+msgid "多雲有雷雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:322
+msgid "多雲大雷雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:323
+msgid "多雲大雷雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:325
+msgid "陰"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:326
+msgid "陰有霾"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:327
+msgid "陰有靄"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:328
+msgid "陰有閃電"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:344
+msgid "陰天伴有雷"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:330
+msgid "陰有霧"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:331
+msgid "陰有雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:332
+msgid "陰有雨雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:333
+msgid "陰有大雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:334
+msgid "陰有雪珠"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:335
+msgid "陰有冰珠"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:336
+msgid "陰有陣雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:337
+msgid "陰陣雨雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:338
+msgid "陰有雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:339
+msgid "陰有雷雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:340
+msgid "陰有雷雪"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:341
+msgid "陰有雷雹"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:342
+msgid "陰大雷雨"
+msgstr ""
+
+#: ./lib/utils/weather_icon.dart:343
+msgid "陰大雷雹"
+msgstr ""

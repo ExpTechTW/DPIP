@@ -12,6 +12,7 @@ import 'package:timezone/data/latest.dart';
 import 'package:dpip/app.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/fcm.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -39,6 +40,7 @@ void main() async {
   await DeviceInfo.init();
   await Preference.init();
   GlobalProviders.init();
+  await AppLocalizations.load();
 
   initializeTimeZones();
 
