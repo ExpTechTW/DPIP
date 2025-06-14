@@ -51,7 +51,7 @@ class SettingsIndexPage extends StatelessWidget {
       children: [
         ListSectionTile(
           icon: Symbols.brush_rounded,
-          title: '主題色'.i18n,
+          title: '主題'.i18n,
           subtitle: Text('調整 DPIP 整體的外觀與顏色'.i18n),
           onTap: () {
             context.push(SettingsThemePage.route);

@@ -25,7 +25,7 @@ msgstr "Language"
 
 #: lib/app/settings/page.dart:70
 msgid "單位"
-msgstr "Units"
+msgstr "Unit"
 
 #: lib/app/settings/map/page.dart:25
 msgid "地圖"
@@ -223,11 +223,11 @@ msgstr ""
 
 #: lib/app/settings/notify/_lib/utils.dart:19
 msgid "更新通知設定失敗"
-msgstr ""
+msgstr "Notification settings updated successfully"
 
 #: lib/app/settings/notify/(1.eew)/eew/page.dart:36
 msgid "緊急地震速報(重大)"
-msgstr ""
+msgstr "Failed to update notification settings"
 
 #: lib/app/settings/notify/(1.eew)/eew/page.dart:37
 msgid ""
@@ -374,6 +374,9 @@ msgid ""
 "感謝您的支持！❤️\n"
 "您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。"
 msgstr ""
+"Thank you for your support! ❤️\n"
+"Your donation will be used for server maintenance. If you have any "
+"questions, feel free to contact us before making the payment."
 
 #: lib/app/settings/page.dart:36
 msgid "位置"
@@ -413,7 +416,7 @@ msgstr ""
 
 #: lib/app/settings/page.dart:96
 msgid "資訊"
-msgstr ""
+msgstr "Information"
 
 #: lib/app/settings/page.dart:101
 msgid "掌握 ExpTech Studio 的最新公告與資訊"
@@ -421,7 +424,7 @@ msgstr ""
 
 #: lib/app/changelog/page.dart:56
 msgid "更新日誌"
-msgstr "Changelog"
+msgstr "Release Notes"
 
 #: lib/app/settings/page.dart:108
 msgid "瀏覽 DPIP 的歷次更新紀錄"
@@ -433,11 +436,11 @@ msgstr ""
 
 #: lib/app/settings/page.dart:121
 msgid "第三方套件授權"
-msgstr ""
+msgstr "Third Party Libraries"
 
 #: lib/app/settings/page.dart:122
 msgid "DPIP 的實現歸功於開放源始碼"
-msgstr ""
+msgstr "DPIP was made possible by open source"
 
 #: lib/app/settings/page.dart:164
 msgid "除錯"
@@ -518,7 +521,7 @@ msgstr "Dark"
 
 #: lib/app/settings/theme/select/page.dart:57
 msgid "跟隨系統主題"
-msgstr "Follow System Defaults"
+msgstr "System"
 
 #: lib/app/settings/theme/page.dart:48
 msgid "系統色彩"
