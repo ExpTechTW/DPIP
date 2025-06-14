@@ -29,7 +29,7 @@ class SettingsMapPage extends StatelessWidget {
               builder: (context, baseMapType, child) {
                 return ListSectionTile(
                   icon: Symbols.layers_rounded,
-                  title: '地圖底圖'.i18n,
+                  title: '底圖'.i18n,
                   subtitle: Text(baseMapType.name),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                 );

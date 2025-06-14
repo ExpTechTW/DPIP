@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -12,6 +13,7 @@ import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/constants.dart';
@@ -323,7 +325,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
   Widget build(BuildContext context) {
     return MorphingSheet(
       controller: morphingSheetController,
-      title: '地震報告',
+      title: '地震報告'.i18n,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -354,12 +356,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               Icon(Symbols.docs_rounded, size: 24, color: context.colors.onSurface),
                               Expanded(
                                 child: Text(
-                                  '近期的地震報告',
+                                  '近期的地震報告'.i18n,
                                   style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
                                 ),
                               ),
                               Text(
-                                '更多',
+                                '更多'.i18n,
                                 style: context.textTheme.labelSmall?.copyWith(color: context.colors.outline),
                               ),
                               Icon(Symbols.swipe_up_rounded, size: 16, color: context.colors.outline),
@@ -383,7 +385,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      report.hasNumber ? '第 ${report.number} 有感地震報告' : report.extractLocation(),
+                                      report.hasNumber
+                                          ? '編號 {number} 顯著有感地震'.i18n.args({'number': report.number})
+                                          : report.extractLocation(),
                                       style: context.textTheme.titleMedium,
                                     ),
                                     Text(
@@ -424,8 +428,8 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             Text(
                               currentReport.hasNumber
-                                  ? '編號 ${currentReport.number} 顯著有感地震'
-                                  : '小區域有感地震',
+                                  ? '編號 {number} 顯著有感地震'.i18n.args({'number': currentReport.number})
+                                  : '小區域有感地震'.i18n,
                               style: context.textTheme.labelMedium?.copyWith(color: context.colors.outline),
                             ),
                             Text(
@@ -455,7 +459,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '地震規模',
+                              '地震規模'.i18n,
                               style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                             Text(
@@ -470,7 +474,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '震源深度',
+                              '震源深度'.i18n,
                               style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                             Text(
@@ -503,7 +507,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 controller: controller,
                 slivers: [
                   SliverAppBar(
-                    title: const Text('地震報告'),
+                    title: Text('地震報告'.i18n),
                     leading: BackButton(
                       onPressed: () {
                         sheetController.collapse();
@@ -533,7 +537,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                 ),
                                 title: report.extractLocation(),
                                 subtitle: Text(
-                                  '${report.hasNumber ? '編號 ${report.number} 顯著有感地震\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
+                                  '${report.hasNumber ? '${'編號 {number} 顯著有感地震'.i18n.args({'number': report.number})}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
                                 ),
                                 trailing: Text(
                                   'M ${report.magnitude.toStringAsFixed(1)}',
@@ -573,8 +577,8 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                           children: [
                             Text(
                               report.hasNumber
-                                  ? '編號 ${report.number} 顯著有感地震'
-                                  : '小區域有感地震',
+                                  ? '編號 {number} 顯著有感地震'.i18n.args({'number': report.number})
+                                  : '小區域有感地震'.i18n,
                               style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                             ),
                             Text(
@@ -592,7 +596,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   children: [
                     ActionChip(
                       avatar: Icon(Symbols.open_in_new, color: context.colors.onPrimary),
-                      label: const Text('報告頁面'),
+                      label: Text('報告頁面'.i18n),
                       backgroundColor: context.colors.primary,
                       labelStyle: TextStyle(color: context.colors.onPrimary),
                       side: BorderSide(color: context.colors.primary),
@@ -616,14 +620,14 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 ),
                 const Divider(),
                 DetailFieldTile(
-                  label: '發震時間',
+                  label: '發震時間'.i18n,
                   child: Text(
                     DateFormat('yyyy/MM/dd HH:mm:ss').format(report.time),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 DetailFieldTile(
-                  label: '位於',
+                  label: '位於'.i18n,
                   child: Text(
                     report.convertLatLon(),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -633,7 +637,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   children: [
                     Expanded(
                       child: DetailFieldTile(
-                        label: '地震規模',
+                        label: '地震規模'.i18n,
                         child: Row(
                           children: [
                             Container(
@@ -655,7 +659,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                     ),
                     Expanded(
                       child: DetailFieldTile(
-                        label: '震源深度',
+                        label: '震源深度'.i18n,
                         child: Row(
                           children: [
                             Container(
@@ -679,7 +683,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 ),
                 const Divider(),
                 DetailFieldTile(
-                  label: '各地震度',
+                  label: '各地震度'.i18n,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -750,7 +754,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 ),
                 const Divider(),
                 DetailFieldTile(
-                  label: '地震報告圖',
+                  label: '地震報告圖'.i18n,
                   child: EnlargeableImage(
                     aspectRatio: 4 / 3,
                     heroTag: 'report-image-${report.id}',
@@ -760,7 +764,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 ),
                 if (report.hasNumber)
                   DetailFieldTile(
-                    label: '震度圖',
+                    label: '震度圖'.i18n,
                     child: EnlargeableImage(
                       aspectRatio: 2334 / 2977,
                       heroTag: 'intensity-image-${report.id}',
@@ -770,7 +774,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   ),
                 if (report.hasNumber)
                   DetailFieldTile(
-                    label: '最大地動加速度圖',
+                    label: '最大地動加速度圖'.i18n,
                     child: EnlargeableImage(
                       aspectRatio: 2334 / 2977,
                       heroTag: 'pga-image-${report.id}',
@@ -780,7 +784,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   ),
                 if (report.hasNumber)
                   DetailFieldTile(
-                    label: '最大地動速度圖',
+                    label: '最大地動速度圖'.i18n,
                     child: EnlargeableImage(
                       aspectRatio: 2334 / 2977,
                       heroTag: 'pgv-image-${report.id}',
@@ -795,7 +799,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
               controller: controller,
               slivers: [
                 SliverAppBar(
-                  title: const Text('地震報告'),
+                  title: Text('地震報告'.i18n),
                   leading: BackButton(
                     onPressed: () {
                       widget.manager._setReport(null);
