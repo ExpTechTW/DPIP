@@ -1,9 +1,10 @@
-import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/list_section.dart';
@@ -21,14 +22,14 @@ class SettingsMapPage extends StatelessWidget {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: '地圖',
+          title: '地圖'.i18n,
           children: [
             Selector<SettingsMapModel, BaseMapType>(
               selector: (context, model) => model.baseMap,
               builder: (context, baseMapType, child) {
                 return ListSectionTile(
                   icon: Symbols.layers_rounded,
-                  title: '地圖底圖',
+                  title: '地圖底圖'.i18n,
                   subtitle: Text(baseMapType.name),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                 );
@@ -39,7 +40,7 @@ class SettingsMapPage extends StatelessWidget {
               builder: (context, layer, child) {
                 return ListSectionTile(
                   icon: Symbols.layers_rounded,
-                  title: '初始圖層',
+                  title: '初始圖層'.i18n,
                   subtitle: Text(layer.name),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                 );

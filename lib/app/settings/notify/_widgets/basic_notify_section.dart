@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import 'package:dpip/app/settings/notify/_lib/utils.dart';
+import 'package:dpip/core/i18n.dart';
+import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:dpip/app/settings/notify/_lib/utils.dart';
-import 'package:dpip/models/settings/notify.dart';
 
 class BasicNotifySection extends StatefulWidget {
   final BasicNotifyType value;
@@ -29,12 +30,12 @@ class _BasicNotifySectionState extends State<BasicNotifySection> {
   @override
   Widget build(BuildContext context) {
     final values = {
-      BasicNotifyType.all: (title: '接收全部', icon: Symbols.notifications_rounded),
-      BasicNotifyType.off: (title: '關閉', icon: Symbols.notifications_off_rounded),
+      BasicNotifyType.all: (title: '接收全部'.i18n, icon: Symbols.notifications_rounded),
+      BasicNotifyType.off: (title: '關閉'.i18n, icon: Symbols.notifications_off_rounded),
     };
 
     return ListSection(
-      title: '接收類別',
+      title: '接收類別'.i18n,
       children: [
         for (final MapEntry(key: item, value: (:title, :icon)) in values.entries)
           ListSectionTile(

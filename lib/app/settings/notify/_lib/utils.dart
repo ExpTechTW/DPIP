@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/toast.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
@@ -11,11 +12,11 @@ const loading = LoadingIcon();
 const empty = Icon(null);
 
 void showSuccessToast(BuildContext context) {
-  showToast(context, ToastWidget.text('已更新通知設定', icon: const Icon(Symbols.check_rounded)));
+  showToast(context, ToastWidget.text('已更新通知設定'.i18n, icon: const Icon(Symbols.check_rounded)));
 }
 
 void showErrorToast(BuildContext context) {
-  showToast(context, ToastWidget.text('更新通知設定失敗', icon: const Icon(Symbols.error_rounded)));
+  showToast(context, ToastWidget.text('更新通知設定失敗'.i18n, icon: const Icon(Symbols.error_rounded)));
 }
 
 Future setEewNotifyType(BuildContext context, EewNotifyType value, Future Function(EewNotifyType value) setter) async {

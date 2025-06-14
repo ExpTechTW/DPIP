@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/_widgets/tsunami_notify_section.dart';
 import 'package:dpip/app/settings/notify/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
+import 'package:dpip/widgets/list/list_section.dart';
 
 class SettingsNotifyTsunamiPage extends StatelessWidget {
   const SettingsNotifyTsunamiPage({super.key});
@@ -28,29 +29,17 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
             );
           },
         ),
-        const ListSection(
-          title: '音效測試',
+        ListSection(
+          title: '音效測試'.i18n,
           children: [
-            SoundListTile(
-              title: '重大',
-              subtitle: Text('海嘯警報發布時\n沿海地區鄉鎮'),
-              type: 'tsunami-important',
-            ),
-            SoundListTile(
-              title: '一般',
-              subtitle: Text('海嘯警報發布時\n上述除外地區'),
-              type: 'tsunami-general',
-            ),
-            SoundListTile(
-              title: '太平洋海嘯消息(無聲通知)',
-              subtitle: Text('太平洋海嘯消息發布時'),
-              type: 'tsunami-silent',
-            ),
+            SoundListTile(title: '重大'.i18n, subtitle: Text('海嘯警報發布時\n沿海地區鄉鎮'.i18n), type: 'tsunami-important'),
+            SoundListTile(title: '一般'.i18n, subtitle: Text('海嘯警報發布時\n上述除外地區'.i18n), type: 'tsunami-general'),
+            SoundListTile(title: '太平洋海嘯消息(無聲通知)'.i18n, subtitle: Text('太平洋海嘯消息發布時'.i18n), type: 'tsunami-silent'),
           ],
         ),
-        const SettingsListTextSection(
+        SettingsListTextSection(
           icon: Symbols.info_rounded,
-          content: '音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求',
+          content: '音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求'.i18n,
         ),
       ],
     );

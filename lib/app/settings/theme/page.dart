@@ -5,11 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/theme/select/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
 
 class SettingsThemePage extends StatelessWidget {
   const SettingsThemePage({super.key});
@@ -22,17 +23,17 @@ class SettingsThemePage extends StatelessWidget {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: '主題模式',
+          title: '主題模式'.i18n,
           children: [
             Consumer<SettingsUserInterfaceModel>(
               builder: (context, model, child) {
                 return ListSectionTile(
                   icon: Symbols.dark_mode_rounded,
-                  title: '主題模式',
+                  title: '主題模式'.i18n,
                   subtitle: Text(switch (model.themeMode) {
-                    ThemeMode.light => '淺色',
-                    ThemeMode.dark => '深色',
-                    ThemeMode.system => '跟隨系統主題',
+                    ThemeMode.light => '淺色'.i18n,
+                    ThemeMode.dark => '深色'.i18n,
+                    ThemeMode.system => '跟隨系統主題'.i18n,
                   }),
                   trailing: const Icon(Symbols.chevron_right_rounded),
                   onTap: () => context.push(SettingsThemeSelectPage.route),
@@ -43,8 +44,8 @@ class SettingsThemePage extends StatelessWidget {
               builder: (context, model, child) {
                 return ListSectionTile(
                   icon: Symbols.palette_rounded,
-                  title: '主題色',
-                  subtitle: Text(model.themeColor != null ? ColorTools.nameThatColor(model.themeColor!) : '系統色彩'),
+                  title: '主題色'.i18n,
+                  subtitle: Text(model.themeColor != null ? ColorTools.nameThatColor(model.themeColor!) : '系統色彩'.i18n),
                   trailing: ColorIndicator(color: model.themeColor ?? context.colors.primary),
                   onTap: () async {
                     final result = await showDialog<Color>(
@@ -86,7 +87,7 @@ class SettingsThemePage extends StatelessWidget {
                               actionsOverflowButtonSpacing: 8,
                               actions: [
                                 TextButton(
-                                  child: const Text('使用系統顏色'),
+                                  child: Text('使用系統顏色'.i18n),
                                   onPressed: () {
                                     model.setThemeColor(null);
                                     Navigator.of(context).pop();
@@ -97,13 +98,13 @@ class SettingsThemePage extends StatelessWidget {
                                   spacing: 8,
                                   children: [
                                     TextButton(
-                                      child: const Text('取消'),
+                                      child: Text('取消'.i18n),
                                       onPressed: () {
                                         Navigator.of(context).pop(model.themeColor);
                                       },
                                     ),
                                     FilledButton(
-                                      child: const Text('確定'),
+                                      child: Text('確定'.i18n),
                                       onPressed: () {
                                         Navigator.of(context).pop(pickerColor);
                                       },

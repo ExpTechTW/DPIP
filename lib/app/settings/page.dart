@@ -47,12 +47,12 @@ class SettingsIndexPage extends StatelessWidget {
     );
 
     final userInterface = ListSection(
-      title: 'User Interface',
+      title: '介面'.i18n,
       children: [
         ListSectionTile(
           icon: Symbols.brush_rounded,
-          title: '主題色',
-          subtitle: const Text('調整 DPIP 整體的外觀與顏色'),
+          title: '主題色'.i18n,
+          subtitle: Text('調整 DPIP 整體的外觀與顏色'.i18n),
           onTap: () {
             context.push(SettingsThemePage.route);
           },
@@ -67,59 +67,59 @@ class SettingsIndexPage extends StatelessWidget {
         ),
         ListSectionTile(
           icon: Symbols.percent_rounded,
-          title: '單位',
-          subtitle: const Text('調整 DPIP 顯示數值時使用的單位'),
+          title: '單位'.i18n,
+          subtitle: Text('調整 DPIP 顯示數值時使用的單位'.i18n),
           onTap: () => context.push(SettingsUnitPage.route),
         ),
         ListSectionTile(
           icon: Symbols.map_rounded,
-          title: '地圖',
-          subtitle: const Text('調整 DPIP 地圖的設定'),
+          title: '地圖'.i18n,
+          subtitle: Text('調整 DPIP 地圖的設定'.i18n),
           onTap: () => context.push(SettingsMapPage.route),
         ),
       ],
     );
 
     final notification = ListSection(
-      title: '通知',
+      title: '通知'.i18n,
       children: [
         ListSectionTile(
           icon: Symbols.notification_settings_rounded,
-          title: '通知',
-          subtitle: const Text('推播通知設定與通知音效測試'),
+          title: '通知'.i18n,
+          subtitle: Text('推播通知設定與通知音效測試'.i18n),
           onTap: () => context.push(SettingsNotifyPage.route),
         ),
       ],
     );
 
     final information = ListSection(
-      title: 'Information',
+      title: '資訊'.i18n,
       children: [
         ListSectionTile(
           icon: Symbols.newspaper_rounded,
-          title: '公告',
-          subtitle: const Text('掌握 ExpTech Studio 的最新公告與資訊'),
+          title: '公告'.i18n,
+          subtitle: Text('掌握 ExpTech Studio 的最新公告與資訊'.i18n),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/announcement'),
         ),
         ListSectionTile(
           icon: Symbols.update_rounded,
-          title: '更新日誌',
-          subtitle: const Text('瀏覽 DPIP 的歷次更新紀錄'),
+          title: '更新日誌'.i18n,
+          subtitle: Text('瀏覽 DPIP 的歷次更新紀錄'.i18n),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/changelog'),
         ),
         ListSectionTile(
           icon: Symbols.volunteer_activism_rounded,
-          title: '贊助我們',
-          subtitle: const Text('幫助我們維護伺服器的穩定和長久發展'),
+          title: '贊助我們'.i18n,
+          subtitle: Text('幫助我們維護伺服器的穩定和長久發展'.i18n),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push(SettingsDonatePage.route),
         ),
         ListSectionTile(
           icon: Symbols.book_rounded,
-          title: '第三方套件授權',
-          subtitle: const Text('DPIP 的實現歸功於開放源始碼'),
+          title: '第三方套件授權'.i18n,
+          subtitle: Text('DPIP 的實現歸功於開放源始碼'.i18n),
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push('/license'),
         ),
@@ -161,29 +161,29 @@ class SettingsIndexPage extends StatelessWidget {
     );
 
     final debug = ListSection(
-      title: '除錯',
+      title: '除錯'.i18n,
       children: [
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: 'App Version',
+          title: '應用程式版本'.i18n,
           trailing: Text(appInfo),
           onLongPress: () => FlutterClipboard.copy(appInfo),
         ),
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: 'Device Info',
+          title: '裝置資訊'.i18n,
           trailing: Text(deviceInfo),
           onLongPress: () => FlutterClipboard.copy(deviceInfo),
         ),
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: '複製通知 Token',
+          title: '複製通知 Token'.i18n,
           trailing: const Icon(Symbols.content_copy_rounded),
           onTap: () => FlutterClipboard.copy(Preference.notifyToken),
         ),
         ListSectionTile(
           icon: Symbols.bug_report_rounded,
-          title: 'App 日誌',
+          title: 'App 日誌'.i18n,
           trailing: const Icon(Symbols.chevron_right_rounded),
           onTap: () => context.push(AppDebugLogsPage.route),
         ),
@@ -191,9 +191,7 @@ class SettingsIndexPage extends StatelessWidget {
     );
 
     final footer = SettingsListTextSection(
-      content:
-          'ExpTech Studio © 2025\n'
-          '任何資訊應以中央氣象署發布之內容為準。',
+      content: 'ExpTech Studio © 2025\n${'任何資訊應以中央氣象署發布之內容為準。'.i18n}',
       contentColor: context.theme.colorScheme.outline,
     );
 

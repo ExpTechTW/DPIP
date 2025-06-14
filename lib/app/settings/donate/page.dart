@@ -1,14 +1,16 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
-import 'package:dpip/utils/functions.dart';
 import 'package:flutter/material.dart';
 
+import 'package:collection/collection.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
+import 'package:dpip/core/i18n.dart';
+import 'package:dpip/utils/extensions/product_detail.dart';
+import 'package:dpip/utils/functions.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:dpip/utils/extensions/product_detail.dart';
 
 class SettingsDonatePage extends StatefulWidget {
   const SettingsDonatePage({super.key});
@@ -25,7 +27,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   Completer<List<ProductDetails>> products = Completer();
 
   final Set<String> _kIds = <String>{'s_donation75', 'donation100', 'donation300', 'donation1000'};
-  late final StreamSubscription<List<PurchaseDetails>> subscription;
+  StreamSubscription<List<PurchaseDetails>>? subscription;
 
   Future<void> refresh() async {
     setState(() => products = Completer<List<ProductDetails>>());
@@ -33,13 +35,13 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
     final isAvailable = await InAppPurchase.instance.isAvailable();
 
     if (!isAvailable) {
-      products.completeError('無法連線至商店，請稍後再試');
+      products.completeError('無法連線至商店，請稍後再試'.i18n);
       return;
     }
 
     final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
     if (response.notFoundIDs.isNotEmpty) {
-      products.completeError('找不到商品，請稍候再試');
+      products.completeError('找不到商品，請稍候再試'.i18n);
       return;
     }
 
@@ -51,6 +53,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
     super.initState();
     _refreshIndicatorKey.currentState?.show();
 
+    subscription?.cancel();
     subscription = InAppPurchase.instance.purchaseStream.listen(
       onPurchaseUpdate,
       onError: (error) {
@@ -69,7 +72,6 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
             InAppPurchase.instance.completePurchase(purchaseDetails);
           }
           setState(() => isPending = false);
-          break;
 
         case PurchaseStatus.error:
         case PurchaseStatus.canceled:
@@ -77,7 +79,6 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
             InAppPurchase.instance.completePurchase(purchaseDetails);
           }
           setState(() => isPending = false);
-          break;
 
         case PurchaseStatus.pending:
           break;
@@ -101,17 +102,17 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 16,
-                children: [Text(error.toString()), FilledButton.tonal(onPressed: refresh, child: const Text('重新載入'))],
+                children: [Text(error.toString()), FilledButton.tonal(onPressed: refresh, child: Text('重新載入'.i18n))],
               ),
             );
           }
 
           if (data == null) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 16,
-                children: [CircularProgressIndicator(), Text('正在載入商店物品中')],
+                children: [const CircularProgressIndicator(), Text('正在載入商店物品中'.i18n)],
               ),
             );
           }
@@ -127,7 +128,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
             children: [
               if (subscriptions.isNotEmpty)
                 ListSection(
-                  title: '訂閱制',
+                  title: '訂閱制'.i18n,
                   children: [
                     for (final product in subscriptions)
                       ListSectionTile(
@@ -136,7 +137,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                 ? product.title.substring(0, product.title.indexOf('(')).trim()
                                 : product.title,
                         subtitle: Text(product.description),
-                        trailing: Text('${product.price}/月'),
+                        trailing: Text('{price}/月'.i18n.args({'price': product.price})),
                         onTap: () {
                           if (isPending) return;
                           setState(() => isPending = true);
@@ -148,7 +149,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 ),
               if (oneTime.isNotEmpty)
                 ListSection(
-                  title: '單次支援',
+                  title: '單次支援'.i18n,
                   children: [
                     for (final product in oneTime)
                       ListSectionTile(
@@ -167,8 +168,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                       ),
                   ],
                 ),
-              const SettingsListTextSection(
-                content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。',
+              SettingsListTextSection(
+                content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
                 contentAlignment: TextAlign.justify,
               ),
               // FilledButton.tonalIcon(
