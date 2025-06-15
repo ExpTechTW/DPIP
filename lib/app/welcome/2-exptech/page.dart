@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:dpip/app/welcome/3-notice/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
 class WelcomeExpTechPage extends StatelessWidget {
@@ -17,7 +18,7 @@ class WelcomeExpTechPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: FilledButton(
-            child: const Text('下一步'),
+            child: Text('下一步'.i18n),
             onPressed: () => context.push(WelcomeNoticePage.route),
           ),
         ),
@@ -61,7 +62,7 @@ class WelcomeExpTechPage extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         Text(
-                          '防災資訊平台',
+                          '防災資訊平台'.i18n,
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(alpha: 0.7),
                           ),
@@ -84,18 +85,18 @@ class WelcomeExpTechPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '我們是誰？',
+                      '我們是誰？'.i18n,
                       style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Text('ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。', style: context.theme.textTheme.bodyMedium),
+                    Text('ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。'.i18n, style: context.theme.textTheme.bodyMedium),
                     const SizedBox(height: 16),
                     Text(
-                      '我們的初衷',
+                      '我們的初衷'.i18n,
                       style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
-                    Text('成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。', style: context.theme.textTheme.bodyMedium),
+                    Text('成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。'.i18n, style: context.theme.textTheme.bodyMedium),
                   ],
                 ),
               ),

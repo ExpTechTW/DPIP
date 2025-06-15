@@ -1,4 +1,3 @@
-import 'package:dpip/core/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -10,6 +9,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';

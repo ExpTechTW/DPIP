@@ -9,6 +9,7 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -242,7 +243,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MorphingSheet(
-      title: '氣溫',
+      title: '氣溫'.i18n,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -326,7 +327,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                 spacing: 8,
                 children: [
                   const Icon(Symbols.thermostat_rounded, size: 24),
-                  Text('氣溫', style: context.textTheme.titleMedium),
+                  Text('氣溫'.i18n, style: context.textTheme.titleMedium),
                 ],
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/global.dart';
@@ -24,7 +25,7 @@ class SettingsLocationSelectPage extends StatelessWidget {
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
       children: [
         ListSection(
-          title: '縣市',
+          title: '縣市'.i18n,
           children: [
             for (final city in cities)
               Selector<SettingsLocationModel, String?>(
@@ -36,7 +37,7 @@ class SettingsLocationSelectPage extends StatelessWidget {
                       subtitle:
                           code != null &&
                                   Global.location.entries.containsWhere((e) => e.value.city == city && e.key == code)
-                              ? const Text('目前所在地')
+                              ? Text('目前所在地'.i18n)
                               : null,
                       onTap: () => context.push('/settings/location/select/$city'),
                     ),

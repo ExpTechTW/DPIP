@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -168,7 +169,7 @@ class RadarMapLayerSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MorphingSheet(
-      title: '雷達回波',
+      title: '雷達回波'.i18n,
       borderRadius: BorderRadius.circular(16),
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
@@ -193,7 +194,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                       children: [
                         Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
                         Text(
-                          '雷達回波',
+                          '雷達回波'.i18n,
                           style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
                         ),
                       ],

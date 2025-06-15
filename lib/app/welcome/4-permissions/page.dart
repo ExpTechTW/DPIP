@@ -11,6 +11,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:dpip/app/home/page.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
@@ -153,29 +154,29 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       switch (permission) {
         case Permission.notification:
           icon = Icons.notifications;
-          text = '通知';
-          description = '在重大災害發生時以通知來傳遞即時防災資訊';
+          text = '通知'.i18n;
+          description = '在重大災害發生時以通知來傳遞即時防災資訊'.i18n;
           color = Colors.orange;
           isHighlighted = true;
 
         case Permission.locationAlways:
         case Permission.location:
           icon = Icons.location_on;
-          text = '位置';
-          description = '使用定位來自動更新所在地設定，提供當地的即時防災資訊';
+          text = '位置'.i18n;
+          description = '使用定位來自動更新所在地設定，提供當地的即時防災資訊'.i18n;
           color = Colors.blue;
 
         case Permission.ignoreBatteryOptimizations:
           icon = Icons.battery_full;
-          text = '省電策略';
-          description = '允許 DPIP 在背景中持續運行，以便即時防災通知資訊。';
+          text = '省電策略'.i18n;
+          description = '允許 DPIP 在背景中持續運行，以便即時防災通知資訊。'.i18n;
           color = Colors.greenAccent;
 
         case Permission.storage:
         case Permission.photosAddOnly:
           icon = Platform.isAndroid ? Icons.storage : Icons.photo_library;
-          text = '儲存';
-          description = '用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片';
+          text = '儲存'.i18n;
+          description = '用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片'.i18n;
           color = Colors.green;
 
         default:
@@ -342,12 +343,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       context: context,
       builder:
           (BuildContext context) => AlertDialog(
-            title: const Text('權限請求'),
-            content: const Text('需要使用者手動到設定開啟相關權限。'),
+            title: Text('權限請求'.i18n),
+            content: Text('需要使用者手動到設定開啟相關權限。'.i18n),
             actions: [
-              TextButton(child: const Text('取消'), onPressed: () => Navigator.of(context).pop()),
+              TextButton(child: Text('取消'.i18n), onPressed: () => Navigator.of(context).pop()),
               TextButton(
-                child: const Text('確定'),
+                child: Text('確定'.i18n),
                 onPressed: () {
                   openAppSettings();
                   Navigator.of(context).pop();
@@ -364,7 +365,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(onPressed: getNotify, child: const Text('下一步')),
+          child: FilledButton(onPressed: getNotify, child: Text('下一步'.i18n)),
         ),
       ),
       body: SingleChildScrollView(
@@ -383,7 +384,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
-                      '權限',
+                      '權限'.i18n,
                       style: context.theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.colors.primary,
@@ -396,7 +397,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
                     child: Column(
                       children: [
                         Text(
-                          '我們一直和使用者站在一起，為使用者的隱私而不斷努力。',
+                          '我們一直和使用者站在一起，為使用者的隱私而不斷努力。'.i18n,
                           style: context.theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.primary.withValues(alpha: 0.7),
                           ),
