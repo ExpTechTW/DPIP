@@ -2,7 +2,7 @@
 msgid "所在地"
 msgstr ""
 
-#: ./lib/router.dart:112
+#: ./lib/app/settings/page.dart:54
 msgid "主題"
 msgstr ""
 
@@ -18,7 +18,7 @@ msgstr ""
 msgid "地圖"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:88
+#: ./lib/app/welcome/4-permissions/page.dart:157
 msgid "通知"
 msgstr ""
 
@@ -360,7 +360,7 @@ msgid ""
 "您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:36
+#: ./lib/app/welcome/4-permissions/page.dart:165
 msgid "位置"
 msgstr ""
 
@@ -370,10 +370,6 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:50
 msgid "介面"
-msgstr ""
-
-#: ./lib/app/settings/theme/select/page.dart:24
-msgid "主題色"
 msgstr ""
 
 #: ./lib/app/settings/page.dart:55
@@ -444,7 +440,7 @@ msgstr ""
 msgid "App 日誌"
 msgstr ""
 
-#: ./lib/app/settings/page.dart:194
+#: ./lib/app/welcome/3-notice/page.dart:63
 msgid "任何資訊應以中央氣象署發布之內容為準。"
 msgstr ""
 
@@ -474,6 +470,14 @@ msgstr ""
 msgid "鄉鎮市區"
 msgstr ""
 
+#: ./lib/app/settings/location/select/page.dart:28
+msgid "縣市"
+msgstr ""
+
+#: ./lib/app/settings/location/select/page.dart:40
+msgid "目前所在地"
+msgstr ""
+
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:55
 msgid "底圖"
 msgstr ""
@@ -498,6 +502,10 @@ msgstr ""
 msgid "跟隨系統主題"
 msgstr ""
 
+#: ./lib/app/settings/theme/select/page.dart:24
+msgid "主題色"
+msgstr ""
+
 #: ./lib/app/settings/theme/page.dart:48
 msgid "系統色彩"
 msgstr ""
@@ -506,11 +514,11 @@ msgstr ""
 msgid "使用系統顏色"
 msgstr ""
 
-#: ./lib/app/settings/theme/page.dart:101
+#: ./lib/app/welcome/4-permissions/page.dart:349
 msgid "取消"
 msgstr ""
 
-#: ./lib/app/settings/theme/page.dart:107
+#: ./lib/app/welcome/4-permissions/page.dart:351
 msgid "確定"
 msgstr ""
 
@@ -522,7 +530,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr ""
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:105
+#: ./lib/app/map/_lib/managers/radar.dart:197
 msgid "雷達回波"
 msgstr ""
 
@@ -550,6 +558,100 @@ msgstr ""
 msgid "重試"
 msgstr ""
 
+#: ./lib/app/welcome/4-permissions/page.dart:368
+msgid "下一步"
+msgstr ""
+
+#: ./lib/app/welcome/1-about/page.dart:65
+msgid "防災資訊平台"
+msgstr ""
+
+#: ./lib/app/welcome/2-exptech/page.dart:88
+msgid "我們是誰？"
+msgstr ""
+
+#: ./lib/app/welcome/2-exptech/page.dart:92
+msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
+msgstr ""
+
+#: ./lib/app/welcome/2-exptech/page.dart:95
+msgid "我們的初衷"
+msgstr ""
+
+#: ./lib/app/welcome/2-exptech/page.dart:99
+msgid "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
+msgstr ""
+
+#: ./lib/app/welcome/3-notice/page.dart:43
+msgid "注意事項"
+msgstr ""
+
+#: ./lib/app/welcome/3-notice/page.dart:79
+msgid "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
+msgstr ""
+
+#: ./lib/app/welcome/3-notice/page.dart:90
+msgid "強烈搖晃有機率比通知早抵達使用者所在地。"
+msgstr ""
+
+#: ./lib/app/welcome/3-notice/page.dart:101
+msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
+msgstr ""
+
+#: ./lib/app/welcome/3-notice/page.dart:112
+msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
+msgstr ""
+
+#: ./lib/app/welcome/1-about/page.dart:45
+msgid "歡迎使用 DPIP"
+msgstr ""
+
+#: ./lib/app/welcome/1-about/page.dart:86
+msgid ""
+"DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) "
+"之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:158
+msgid "在重大災害發生時以通知來傳遞即時防災資訊"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:166
+msgid "使用定位來自動更新所在地設定，提供當地的即時防災資訊"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:171
+msgid "省電策略"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:172
+msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:178
+msgid "儲存"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:179
+msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:346
+msgid "權限請求"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:347
+msgid "需要使用者手動到設定開啟相關權限。"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:387
+msgid "權限"
+msgstr ""
+
+#: ./lib/app/welcome/4-permissions/page.dart:400
+msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
+msgstr ""
+
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:48
 msgid "地圖圖層"
 msgstr ""
@@ -566,7 +668,7 @@ msgstr ""
 msgid "氣象"
 msgstr ""
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:110
+#: ./lib/app/map/_lib/managers/temperature.dart:330
 msgid "氣溫"
 msgstr ""
 
@@ -574,7 +676,7 @@ msgstr ""
 msgid "降水"
 msgstr ""
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:120
+#: ./lib/app/map/_lib/managers/wind.dart:220
 msgid "風向/風速"
 msgstr ""
 
