@@ -3,7 +3,8 @@
 <div align="center">
 <a href="https://github.com/ExpTechTW/DPIP/tree/main"><img alt="status" src="https://img.shields.io/badge/status-stable-blue.svg"></a>
 <a href="https://github.com/ExpTechTW/DPIP/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/exptechtw/dpip"></a>
-<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/github_actions.yml"><img alt="GitHub Workflow Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/github_actions.yml/badge.svg"></a>
+<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/android.yml"><img alt="Android Build Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/android.yml/badge.svg"></a>
+<a href="https://github.com/ExpTechTW/DPIP/actions/workflows/ios.yml"><img alt="iOS Build Status" src="https://github.com/ExpTechTW/DPIP/actions/workflows/ios.yml/badge.svg"></a>
 <a title="Crowdin" target="_blank" href="https://crowdin.com/project/dpip"><img alt="Crowdin Localization" src="https://badges.crowdin.net/dpip/localized.svg"></a>
 <a href="https://good-labs.github.io/greater-good-affirmation"><img alt="Greater Good" src="https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg"></a>
 <img alt="GitHub License" src="https://img.shields.io/github/license/exptechtw/dpip">
