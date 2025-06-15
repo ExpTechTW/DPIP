@@ -1,0 +1,66 @@
+name: Build Android
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "lib/**"
+      - "android/**"
+      - "pubspec.yaml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "lib/**"
+      - "android/**"
+      - "pubspec.yaml"
+
+jobs:
+  Android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+
+    - name: Cache Pub Packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.pub-cache
+        key: ubuntu-pub-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ubuntu-pub-
+
+    - name: Cache build_runner (Optional)
+      uses: actions/cache@v3
+      with:
+        path: .dart_tool/build
+        key: ubuntu-build-runner-${{ hashFiles('**/*.dart') }}
+        restore-keys: |
+          ubuntu-build-runner-
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Prebuild with build_runner
+      run: dart run build_runner build --delete-conflicting-outputs
+
+    - name: Build apk
+      run: |
+        flutter build apk --debug
+        # flutter build aab --debug
+
+    - name: Upload (apk) Artifacts
+      uses: actions/upload-artifact@main
+      with:
+        name: "DPIP.apk"
+        path: build/app/outputs/flutter-apk/*.apk
+
+    - name: Upload (aab) Artifacts
+      uses: actions/upload-artifact@main
+      with:
+        name: "DPIP.aab"
+        path: build/app/outputs/bundle/release/*.aab

@@ -1,0 +1,87 @@
+name: Build iOS
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "lib/**"
+      - "android/**"
+      - "pubspec.yaml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "lib/**"
+      - "android/**"
+      - "pubspec.yaml"
+
+jobs:
+  iOS:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache Flutter SDK
+      uses: actions/cache@v3
+      with:
+        path: ~/.pub-cache
+        key: macos-pub-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          macos-pub-
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+
+    - name: Cache build_runner (Optional)
+      uses: actions/cache@v3
+      with:
+        path: .dart_tool/build
+        key: macos-build-runner-${{ hashFiles('**/*.dart') }}
+        restore-keys: |
+          macos-build-runner-
+
+    - name: Cache CocoaPods Pods
+      uses: actions/cache@v3
+      with:
+        path: ios/Pods
+        key: ios-pods-${{ hashFiles('ios/Podfile.lock') }}
+        restore-keys: ios-pods-
+
+    - name: Cache CocoaPods Repo
+      uses: actions/cache@v3
+      with:
+        path: ~/.cocoapods
+        key: cocoapods-repo-${{ hashFiles('ios/Podfile.lock') }}
+        restore-keys: cocoapods-repo-
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Install iOS Pods
+      run: |
+        cd ios
+        pod install
+
+    - name: Prebuild with build_runner
+      run: dart run build_runner build --delete-conflicting-outputs
+
+    - name: Build iOS App and IPA
+      run: |
+        flutter build ios --debug --no-codesign
+        mkdir -p Payload
+        cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
+        zip -r DPIP.ipa Payload
+
+    - name: Upload (app) Artifacts
+      uses: actions/upload-artifact@main
+      with:
+        name: DPIP.app
+        path: build/ios/iphoneos/Runner.app
+
+    - name: Upload (ipa) Artifacts
+      uses: actions/upload-artifact@main
+      with:
+        name: DPIP.ipa
+        path: DPIP.ipa
