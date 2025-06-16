@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-06-16 14:46\n"
+"PO-Revision-Date: 2025-06-16 16:30\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -663,7 +663,7 @@ msgstr "地図レイヤー"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:49
 msgid "選擇要顯示的地圖圖層"
-msgstr "表示する地図のレイヤーを選んでください"
+msgstr "表示する地図のレイヤーを選択してください"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:61
 msgid "線條"
@@ -735,7 +735,7 @@ msgstr "ID #{number} の顕著な地震"
 
 #: ./lib/app/map/_lib/managers/report.dart:581
 msgid "小區域有感地震"
-msgstr "局地地震"
+msgstr "局地的地震"
 
 #: ./lib/app/map/_lib/managers/report.dart:640
 msgid "地震規模"
@@ -743,7 +743,7 @@ msgstr "マグニチュード"
 
 #: ./lib/app/map/_lib/managers/report.dart:662
 msgid "震源深度"
-msgstr "震源深さ"
+msgstr "震源の深さ"
 
 #: ./lib/app/map/_lib/managers/report.dart:599
 msgid "報告頁面"
@@ -787,15 +787,15 @@ msgstr "晴れ・煙霧"
 
 #: ./lib/utils/weather_icon.dart:287
 msgid "晴有靄"
-msgstr "晴れ・もや"
+msgstr "晴れ時々霧"
 
 #: ./lib/utils/weather_icon.dart:288
 msgid "晴有閃電"
-msgstr "晴れ・雷"
+msgstr "晴れ時々雷"
 
 #: ./lib/utils/weather_icon.dart:304
 msgid "晴天伴有雷"
-msgstr "晴れ・雷"
+msgstr "晴れ時々雷"
 
 #: ./lib/utils/weather_icon.dart:290
 msgid "晴有霧"
@@ -803,19 +803,19 @@ msgstr "晴れ・霧"
 
 #: ./lib/utils/weather_icon.dart:291
 msgid "晴有雨"
-msgstr "晴れ・雨"
+msgstr "晴れ時々雨"
 
 #: ./lib/utils/weather_icon.dart:292
 msgid "晴有雨雪"
-msgstr "晴れ・雨雪"
+msgstr "晴れ時々雨雪"
 
 #: ./lib/utils/weather_icon.dart:293
 msgid "晴有大雪"
-msgstr "晴れ・大雪"
+msgstr "晴れ時々大雪"
 
 #: ./lib/utils/weather_icon.dart:294
 msgid "晴有雪珠"
-msgstr "晴れ・霧雪"
+msgstr "晴れ時々霧雪"
 
 #: ./lib/utils/weather_icon.dart:295
 msgid "晴有冰珠"
