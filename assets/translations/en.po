@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-06-16 14:47\n"
+"PO-Revision-Date: 2025-06-17 08:59\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -62,11 +62,11 @@ msgstr "Weather Advisory"
 
 #: ./lib/app/settings/notify/page.dart:214
 msgid "避難資訊"
-msgstr "Evacuation Information"
+msgstr "Evacuation"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:93
 msgid "海嘯資訊"
-msgstr "Tsunami Information"
+msgstr "Tsunami"
 
 #: ./lib/app/settings/page.dart:100
 msgid "公告"
@@ -90,7 +90,7 @@ msgstr "Off"
 
 #: ./lib/app/settings/notify/_widgets/eew_notify_section.dart:39
 msgid "接收類別"
-msgstr ""
+msgstr "Category"
 
 #: ./lib/app/settings/notify/page.dart:46
 msgid "所在地震度1以上"
@@ -326,7 +326,7 @@ msgstr "Select Language"
 
 #: ./lib/app/settings/locale/select/page.dart:64
 msgid "已翻譯 {translated}・已校對 {approved}"
-msgstr "Translated {translated}・Approved {approved}"
+msgstr "Translated {translated} ・ Approved {approved}"
 
 #: ./lib/app/settings/locale/select/page.dart:92
 msgid "來源語言"
