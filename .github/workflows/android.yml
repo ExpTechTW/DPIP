@@ -3,19 +3,28 @@ name: Build Android
 on:
   push:
     branches: ["main"]
-    paths:
-      - "lib/**"
-      - "android/**"
-      - "pubspec.yaml"
   pull_request:
     branches: ["main"]
-    paths:
-      - "lib/**"
-      - "android/**"
-      - "pubspec.yaml"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      android: ${{ steps.filter.outputs.android }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            android:
+              - 'android/**'
+              - 'assets/**'
+              - 'lib/**'
+              - 'pubspec.yaml'
+
   Android:
+    needs: changes
+    if: ${{ needs.changes.outputs.android == 'true' }}
     runs-on: ubuntu-latest
 
     steps:
