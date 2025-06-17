@@ -3,19 +3,28 @@ name: Build iOS
 on:
   push:
     branches: ["main"]
-    paths:
-      - "lib/**"
-      - "android/**"
-      - "pubspec.yaml"
   pull_request:
     branches: ["main"]
-    paths:
-      - "lib/**"
-      - "android/**"
-      - "pubspec.yaml"
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ios: ${{ steps.filter.outputs.ios }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            ios:
+              - 'ios/**'
+              - 'assets/**'
+              - 'lib/**'
+              - 'pubspec.yaml'
+
   iOS:
+    needs: changes
+    if: ${{ needs.changes.outputs.ios == 'true' }}
     runs-on: macos-latest
 
     steps:
