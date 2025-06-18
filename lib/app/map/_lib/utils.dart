@@ -10,7 +10,8 @@ class MapSourceIds {
   static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
   static String report([String? time]) => time == null ? 'report' : 'report-$time';
   static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
-  static String monitor([String? code]) => code == null ? 'monitor' : 'monitor-$code';
+  static String rts([String? time]) => time == null ? 'rts' : 'rts-$time';
+  static String eew([String? code]) => code == null ? 'eew' : 'eew-$code';
   static String temperature([String? time]) => time == null ? 'temperature' : 'temperature-$time';
   static String precipitation([String? time]) => time == null ? 'precipitation' : 'precipitation-$time';
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
@@ -22,7 +23,8 @@ class MapLayerIds {
   static String radar([String? time]) => time == null ? 'radar' : 'radar-$time';
   static String report([String? time]) => time == null ? 'report' : 'report-$time';
   static String tsunami([String? code]) => code == null ? 'tsunami' : 'tsunami-$code';
-  static String monitor([String? code]) => code == null ? 'monitor' : 'monitor-$code';
+  static String rts([String? time]) => time == null ? 'rts' : 'rts-$time';
+  static String eew([String? code]) => code == null ? 'eew' : 'eew-$code';
   static String temperature([String? time]) => time == null ? 'temperature' : 'temperature-$time';
   static String precipitation([String? time]) => time == null ? 'precipitation' : 'precipitation-$time';
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';

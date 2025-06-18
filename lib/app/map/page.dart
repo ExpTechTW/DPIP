@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/managers/monitor.dart';
 import 'package:dpip/app/map/_lib/managers/precipitation.dart';
 import 'package:dpip/app/map/_lib/managers/radar.dart';
 import 'package:dpip/app/map/_lib/managers/report.dart';
@@ -14,7 +15,6 @@ import 'package:dpip/app/map/_lib/managers/wind.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
-// import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/unimplemented.dart';
@@ -135,7 +135,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   void onMapCreated(MapLibreMapController controller) {
     setState(() => _controller = controller);
 
-    // _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
+    _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
     // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);

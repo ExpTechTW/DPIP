@@ -1,14 +1,37 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
-import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/api/model/rts/rts.dart';
+import 'package:dpip/api/model/station.dart';
 import 'package:dpip/api/model/weather/rain.dart';
+import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/utils/log.dart';
 
 class DpipDataModel extends ChangeNotifier {
+  Timer? _secondTimer;
+  Timer? _minuteTimer;
+  bool _isInForeground = true;
+
+  Map<String, Station> _station = {};
+  UnmodifiableMapView<String, Station> get station => UnmodifiableMapView(_station);
+  void setStation(Map<String, Station> station) {
+    _station = station;
+    notifyListeners();
+  }
+
+  Rts? _rts;
+  Rts? get rts => _rts;
+  void setRts(Rts rts) {
+    _rts = rts;
+    notifyListeners();
+  }
+
   List<Eew> _eew = [];
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
   void setEew(List<Eew> eew) {
@@ -85,4 +108,83 @@ class DpipDataModel extends ChangeNotifier {
   }
 
   int get currentTime => DateTime.now().millisecondsSinceEpoch + timeOffset;
+
+  void startFetching() {
+    if (_secondTimer != null) return;
+
+    Future<void> everySecondCallback() async {
+      if (!_isInForeground) return;
+
+      try {
+        final data = await Future.wait(
+          [ExpTech().getRts(), ExpTech().getEew()],
+          cleanUp: (successValue) {
+            switch (successValue) {
+              case Rts():
+                setRts(successValue);
+              case List<Eew>():
+                setEew(successValue);
+            }
+          },
+        );
+
+        final [rts as Rts, eew as List<Eew>] = data;
+        setRts(rts);
+        setEew(eew);
+      } catch (e, s) {
+        TalkerManager.instance.error('everySecondCallback', e, s);
+      }
+    }
+
+    _secondTimer = Timer.periodic(const Duration(seconds: 1), (_) => everySecondCallback());
+
+    Future<void> everyMinuteCallback() async {
+      if (!_isInForeground) return;
+
+      try {
+        final data = await Future.wait(
+          [ExpTech().getNtp(), ExpTech().getStations()],
+          cleanUp: (successValue) {
+            switch (successValue) {
+              case int():
+                setTimeOffset(DateTime.now().millisecondsSinceEpoch - successValue);
+              case Map<String, Station>():
+                setStation(successValue);
+            }
+          },
+        );
+
+        final [ntp as int, stations as Map<String, Station>] = data;
+        setTimeOffset(DateTime.now().millisecondsSinceEpoch - ntp);
+        setStation(stations);
+      } catch (e, s) {
+        TalkerManager.instance.error('everyMinuteCallback', e, s);
+      }
+    }
+
+    everyMinuteCallback();
+    _minuteTimer = Timer.periodic(const Duration(minutes: 1), (_) => everyMinuteCallback());
+  }
+
+  void stopFetching() {
+    _secondTimer?.cancel();
+    _secondTimer = null;
+    _minuteTimer?.cancel();
+    _minuteTimer = null;
+  }
+
+  void onAppLifecycleStateChanged(AppLifecycleState state) {
+    _isInForeground = state == AppLifecycleState.resumed;
+    if (_isInForeground) {
+      startFetching();
+    } else {
+      stopFetching();
+    }
+  }
+
+  @override
+  void dispose() {
+    stopFetching();
+    super.dispose();
+  }
 }

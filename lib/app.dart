@@ -8,7 +8,6 @@ import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
@@ -22,10 +21,6 @@ class DpipApp extends StatefulWidget {
 }
 
 class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
-  AppLifecycleState? _lifecycleState;
-  late Timer _timer;
-  late Timer _timer2;
-
   Future<void> _checkUpdate() async {
     try {
       if (Platform.isAndroid) {
@@ -50,7 +45,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    setState(() => _lifecycleState = state);
+    GlobalProviders.data.onAppLifecycleStateChanged(state);
   }
 
   @override
@@ -58,18 +53,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     super.initState();
     _checkUpdate();
     WidgetsBinding.instance.addObserver(this);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      if (_lifecycleState != AppLifecycleState.resumed) return;
-
-      final eew = await ExpTech().getEew();
-      GlobalProviders.data.setEew(eew);
-    });
-    _timer2 = Timer.periodic(const Duration(minutes: 1), (timer) async {
-      if (_lifecycleState != AppLifecycleState.resumed) return;
-
-      final data = await ExpTech().getNtp();
-      GlobalProviders.data.setTimeOffset(DateTime.now().millisecondsSinceEpoch - data);
-    });
+    GlobalProviders.data.startFetching();
   }
 
   @override
@@ -115,8 +99,6 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _timer.cancel();
-    _timer2.cancel();
     super.dispose();
   }
 }

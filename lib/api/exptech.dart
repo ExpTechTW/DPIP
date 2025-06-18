@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dpip/api/model/changelog/changelog.dart';
-import 'package:dpip/utils/extensions/string.dart';
 import 'package:http/http.dart';
 
 import 'package:dpip/api/model/announcement.dart';
+import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/history.dart';
@@ -25,6 +24,7 @@ import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/api/route.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
+import 'package:dpip/utils/extensions/string.dart';
 
 class ExpTech {
   String? apikey;
@@ -77,10 +77,10 @@ class ExpTech {
     return jsonData.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<Rts> getRts(int time) async {
+  Future<Rts> getRts([int? time]) async {
     var requestUrl = Route.rts();
 
-    if (time != 0) {
+    if (time != null) {
       requestUrl = Uri.parse(
         requestUrl
             .toString()
