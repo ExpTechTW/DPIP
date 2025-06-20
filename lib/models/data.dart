@@ -196,6 +196,7 @@ class DpipDataModel extends _DpipDataModel {
     final builder = GeoJsonBuilder();
 
     for (final MapEntry(key: id, value: s) in station.entries) {
+      if (s.work == false) continue;
       final feature =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
             ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates())
