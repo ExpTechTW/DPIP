@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:dpip/utils/geojson.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -13,11 +14,7 @@ import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/utils/log.dart';
 
-class DpipDataModel extends ChangeNotifier {
-  Timer? _secondTimer;
-  Timer? _minuteTimer;
-  bool _isInForeground = true;
-
+class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
   UnmodifiableMapView<String, Station> get station => UnmodifiableMapView(_station);
   void setStation(Map<String, Station> station) {
@@ -106,6 +103,12 @@ class DpipDataModel extends ChangeNotifier {
     _timeOffset = timeOffset;
     notifyListeners();
   }
+}
+
+class DpipDataModel extends _DpipDataModel {
+  Timer? _secondTimer;
+  Timer? _minuteTimer;
+  bool _isInForeground = true;
 
   int get currentTime => DateTime.now().millisecondsSinceEpoch + timeOffset;
 
@@ -186,5 +189,35 @@ class DpipDataModel extends ChangeNotifier {
   void dispose() {
     stopFetching();
     super.dispose();
+  }
+
+  Map<String, dynamic> getRtsGeoJson() {
+    final rts = this.rts;
+    final builder = GeoJsonBuilder();
+
+    for (final MapEntry(key: id, value: s) in station.entries) {
+      final feature =
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates())
+            ..setId(int.parse(id))
+            ..setProperty('net', s.net)
+            ..setProperty('code', s.info.last.code);
+
+      if (rts != null) {
+        final data = rts.station[id];
+
+        if (data != null) {
+          feature
+            ..setProperty('i', data.i)
+            ..setProperty('I', data.I)
+            ..setProperty('pga', data.pga)
+            ..setProperty('pgv', data.pgv);
+        }
+      }
+
+      builder.addFeature(feature);
+    }
+
+    return builder.build();
   }
 }

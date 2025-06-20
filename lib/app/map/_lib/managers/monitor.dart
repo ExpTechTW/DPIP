@@ -1,9 +1,10 @@
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/app/map/_lib/manager.dart';
-import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
@@ -75,18 +76,17 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      final rts = GlobalProviders.data.rts;
-
-      final sourceId = MapSourceIds.rts(currentRtsTime.value);
-      final layerId = MapLayerIds.rts(currentRtsTime.value);
+      final sourceId = MapSourceIds.rts();
+      final layerId = MapLayerIds.rts();
 
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
       if (isSourceExists && isLayerExists) return;
+      if (!context.mounted) return;
 
       if (!isSourceExists) {
-        final data = rts?.toGeoJsonBuilder().build();
+        final data = GlobalProviders.data.getRtsGeoJson();
         final properties = GeojsonSourceProperties(data: data);
 
         await controller.addSource(sourceId, properties);
@@ -99,6 +99,19 @@ class MonitorMapLayerManager extends MapLayerManager {
         final properties = CircleLayerProperties(
           circleColor: kRtsCircleColor,
           circleRadius: kRtsCircleRadius,
+          circleOpacity: [
+            Expressions.caseExpression,
+            [Expressions.has, 'i'],
+            1,
+            0,
+          ],
+          circleStrokeColor: context.colors.outlineVariant.toHexStringRGB(),
+          circleStrokeWidth: 1,
+          circleSortKey: [
+            Expressions.coalesce,
+            [Expressions.get, 'i'],
+            -5,
+          ],
           visibility: visible ? 'visible' : 'none',
         );
 
@@ -107,8 +120,42 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
 
       didSetup = true;
+
+      GlobalProviders.data.addListener(_onRtsDataChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
+    }
+  }
+
+  void _onRtsDataChanged() {
+    final newRts = GlobalProviders.data.rts;
+    final newTime = newRts?.time.toString();
+
+    if (newTime != currentRtsTime.value) {
+      currentRtsTime.value = newTime;
+      _updateRtsSource();
+    }
+  }
+
+  Future<void> _updateRtsSource() async {
+    if (!didSetup || isLoading.value) return;
+
+    isLoading.value = true;
+
+    try {
+      final sourceId = MapSourceIds.rts();
+
+      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+
+      if (isSourceExists) {
+        final data = GlobalProviders.data.getRtsGeoJson();
+        await controller.setGeoJsonSource(sourceId, data);
+        TalkerManager.instance.info('Updated RTS source data for time: ${currentRtsTime.value}');
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager._updateRtsSource', e, s);
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -116,7 +163,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> hide() async {
     if (!visible) return;
 
-    final layerId = MapLayerIds.rts(currentRtsTime.value);
+    final layerId = MapLayerIds.rts();
 
     try {
       await controller.setLayerVisibility(layerId, false);
@@ -132,7 +179,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> show() async {
     if (visible) return;
 
-    final layerId = MapLayerIds.rts(currentRtsTime.value);
+    final layerId = MapLayerIds.rts();
 
     try {
       await controller.setLayerVisibility(layerId, true);
@@ -148,10 +195,10 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> remove() async {
-    try {
-      final layerId = MapLayerIds.rts(currentRtsTime.value);
-      final sourceId = MapSourceIds.rts(currentRtsTime.value);
+    final sourceId = MapSourceIds.rts();
+    final layerId = MapLayerIds.rts();
 
+    try {
       await controller.removeLayer(layerId);
       TalkerManager.instance.info('Removed Layer "$layerId"');
 
@@ -162,6 +209,11 @@ class MonitorMapLayerManager extends MapLayerManager {
     }
 
     didSetup = false;
+  }
+
+  @override
+  void dispose() {
+    GlobalProviders.data.removeListener(_onRtsDataChanged);
   }
 
   @override

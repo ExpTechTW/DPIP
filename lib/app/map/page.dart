@@ -179,6 +179,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _ticker?.cancel();
+
+    for (final manager in _managers.values) {
+      manager.dispose();
+    }
+
     super.dispose();
   }
 }

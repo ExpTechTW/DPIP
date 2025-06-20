@@ -29,6 +29,9 @@ abstract class MapLayerManager {
   /// 將圖層從地圖移除
   Future<void> remove();
 
+  /// 釋放資源
+  void dispose() {}
+
   /// 當頁面返回時會呼叫這個方法
   void onPopInvoked() {}
 
