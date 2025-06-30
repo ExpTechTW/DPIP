@@ -12,6 +12,7 @@ jobs:
     outputs:
       android: ${{ steps.filter.outputs.android }}
     steps:
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
