@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-06-17 15:33\n"
+"PO-Revision-Date: 2025-07-01 01:27\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -18,7 +18,7 @@ msgstr "所在地"
 
 #: ./lib/app/settings/page.dart:54
 msgid "主題"
-msgstr ""
+msgstr "主题配色"
 
 #: ./lib/app/settings/page.dart:62
 msgid "語言"
@@ -26,7 +26,7 @@ msgstr "语言"
 
 #: ./lib/app/settings/page.dart:70
 msgid "單位"
-msgstr ""
+msgstr "单位"
 
 #: ./lib/app/settings/map/page.dart:25
 msgid "地圖"
@@ -42,15 +42,15 @@ msgstr "紧急地震预警"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:83
 msgid "強震監視器"
-msgstr ""
+msgstr "强震监视器"
 
 #: ./lib/app/map/_lib/managers/report.dart:802
 msgid "地震報告"
-msgstr ""
+msgstr "地震报告"
 
 #: ./lib/app/settings/notify/page.dart:170
 msgid "震度速報"
-msgstr ""
+msgstr "震度速报"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:58
 msgid "雷雨即時訊息"
@@ -82,35 +82,35 @@ msgstr "设置"
 
 #: ./lib/app/settings/notify/page.dart:62
 msgid "接收全部"
-msgstr ""
+msgstr "接收全部"
 
 #: ./lib/app/settings/notify/page.dart:61
 msgid "關閉"
-msgstr ""
+msgstr "关闭"
 
 #: ./lib/app/settings/notify/_widgets/eew_notify_section.dart:39
 msgid "接收類別"
-msgstr ""
+msgstr "接收类别"
 
 #: ./lib/app/settings/notify/page.dart:46
 msgid "所在地震度1以上"
-msgstr ""
+msgstr "所在地震度1以上"
 
 #: ./lib/app/settings/notify/page.dart:57
 msgid "海嘯消息、海嘯警報"
-msgstr ""
+msgstr "海啸信息、海啸警报"
 
 #: ./lib/app/settings/notify/page.dart:56
 msgid "只接收海嘯警報"
-msgstr ""
+msgstr "只接收海啸警报"
 
 #: ./lib/app/settings/notify/page.dart:52
 msgid "接收所在地"
-msgstr ""
+msgstr "接收所在地"
 
 #: ./lib/app/settings/notify/page.dart:39
 msgid "所在地震度4以上"
-msgstr ""
+msgstr "所在地震度4以上"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:33
 msgid "音效測試"
@@ -122,11 +122,11 @@ msgstr "发送公告时"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:44
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
-msgstr ""
+msgstr "音效测试是在设备上执行的本地通知，仅用于确认设备在接收通知时是否能正常播放音效。此测试不会向服务器发送任何请求"
 
 #: ./lib/app/settings/notify/page.dart:113
 msgid "請先設定所在地來使用通知功能"
-msgstr ""
+msgstr "请先设置所在地以使用通知功能"
 
 #: ./lib/app/settings/notify/page.dart:120
 msgid "地震速報"
@@ -155,7 +155,8 @@ msgstr "重大"
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "海嘯警報發布時\n"
 "沿海地區鄉鎮"
-msgstr ""
+msgstr "海啸警报发布时\n"
+"沿海地区乡镇"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:36
 msgid "一般"
@@ -164,11 +165,12 @@ msgstr "常规​​​​​"
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:36
 msgid "海嘯警報發布時\n"
 "上述除外地區"
-msgstr ""
+msgstr "海啸警报发布时\n"
+"上述除外地区"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:37
 msgid "太平洋海嘯消息(無聲通知)"
-msgstr ""
+msgstr "太平洋海啸消息(无声通知)"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:37
 msgid "太平洋海嘯消息發布時"
@@ -184,7 +186,7 @@ msgstr "检测到晃动"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "震度速報(一般)"
-msgstr ""
+msgstr "震度速報(一般)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "所在地(鄉鎮)實測震度 3 以上"
@@ -192,15 +194,15 @@ msgstr "所在地(乡镇)实测震度 3 以上"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:37
 msgid "震度速報(無聲通知)"
-msgstr ""
+msgstr "震度速報(无声通知)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:38
 msgid "所在地(鄉鎮)實測震度 1 以上"
-msgstr ""
+msgstr "所在地(乡镇)实测震度 1 以上"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:35
 msgid "地震報告(一般)"
-msgstr ""
+msgstr "地震报告(一般)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:35
 msgid "所在地(縣市)實測震度 3 以上"
@@ -208,7 +210,7 @@ msgstr "所在地(县市)实测震度 3 以上"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "地震報告(無聲通知)"
-msgstr ""
+msgstr "地震报告(无声通知)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "所在地(縣市)實測震度 1 以上"
@@ -216,11 +218,11 @@ msgstr "所在地(县市)实测震度 1 以上"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:15
 msgid "已更新通知設定"
-msgstr ""
+msgstr "已更新通知设定"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:19
 msgid "更新通知設定失敗"
-msgstr ""
+msgstr "更新通知设定失败"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:36
 msgid "緊急地震速報(重大)"
@@ -304,11 +306,11 @@ msgstr "所在地(乡镇)发布雷雨即时信息或\n"
 
 #: ./lib/app/settings/unit/page.dart:30
 msgid "使用華氏度"
-msgstr ""
+msgstr "使用华氏度"
 
 #: ./lib/app/settings/unit/page.dart:31
 msgid "切換溫度顯示單位為華氏度 (℉)"
-msgstr ""
+msgstr "切换温度显示单位为华氏度 (℉)"
 
 #: ./lib/app/settings/locale/page.dart:33
 msgid "顯示語言"
@@ -340,48 +342,49 @@ msgstr "来源语言"
 
 #: ./lib/app/settings/donate/page.dart:38
 msgid "無法連線至商店，請稍後再試"
-msgstr ""
+msgstr "无法连接到商店，请稍后再试"
 
 #: ./lib/app/settings/donate/page.dart:44
 msgid "找不到商品，請稍候再試"
-msgstr ""
+msgstr "找不到商品，请稍后再试"
 
 #: ./lib/app/settings/donate/page.dart:105
 msgid "重新載入"
-msgstr ""
+msgstr "重新加载"
 
 #: ./lib/app/settings/donate/page.dart:115
 msgid "正在載入商店物品中"
-msgstr ""
+msgstr "正在加载商店商品中"
 
 #: ./lib/app/settings/donate/page.dart:131
 msgid "訂閱制"
-msgstr ""
+msgstr "订阅制"
 
 #: ./lib/app/settings/donate/page.dart:140
 msgid "{price}/月"
-msgstr ""
+msgstr "{price}/月"
 
 #: ./lib/app/settings/donate/page.dart:152
 msgid "單次支援"
-msgstr ""
+msgstr "单次支持"
 
 #: ./lib/app/settings/donate/page.dart:172
 msgid "感謝您的支持！❤️\n"
 "您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。"
-msgstr ""
+msgstr "感谢您的支持！❤️\n"
+"您支付的款项将用于服务器维护用途。如有任何问题，欢迎在付款前联系我们。"
 
 #: ./lib/app/welcome/4-permissions/page.dart:165
 msgid "位置"
-msgstr ""
+msgstr "位置"
 
 #: ./lib/app/settings/page.dart:41
 msgid "設定你的所在地來接收當地的即時資訊"
-msgstr ""
+msgstr "设置您的所在地，以接收本地的实时信息"
 
 #: ./lib/app/settings/page.dart:50
 msgid "介面"
-msgstr ""
+msgstr "界面"
 
 #: ./lib/app/settings/page.dart:55
 msgid "調整 DPIP 整體的外觀與顏色"
@@ -393,23 +396,23 @@ msgstr "更改 DPIP 的显示语言"
 
 #: ./lib/app/settings/page.dart:71
 msgid "調整 DPIP 顯示數值時使用的單位"
-msgstr ""
+msgstr "调整 DPIP 显示数值所使用的单位"
 
 #: ./lib/app/settings/page.dart:77
 msgid "調整 DPIP 地圖的設定"
-msgstr ""
+msgstr "调整 DPIP 地图的设置"
 
 #: ./lib/app/settings/page.dart:89
 msgid "推播通知設定與通知音效測試"
-msgstr ""
+msgstr "设置推送通知及测试通知音效"
 
 #: ./lib/app/settings/page.dart:96
 msgid "資訊"
-msgstr ""
+msgstr "信息"
 
 #: ./lib/app/settings/page.dart:101
 msgid "掌握 ExpTech Studio 的最新公告與資訊"
-msgstr ""
+msgstr "掌握 ExpTech Studio 的最新公告与资讯"
 
 #: ./lib/app/changelog/page.dart:56
 msgid "更新日誌"
@@ -417,7 +420,7 @@ msgstr "更新日志"
 
 #: ./lib/app/settings/page.dart:108
 msgid "瀏覽 DPIP 的歷次更新紀錄"
-msgstr ""
+msgstr "查看 DPIP 的更新记录"
 
 #: ./lib/app/settings/page.dart:115
 msgid "幫助我們維護伺服器的穩定和長久發展"
@@ -437,7 +440,7 @@ msgstr "调试"
 
 #: ./lib/app/settings/page.dart:168
 msgid "應用程式版本"
-msgstr ""
+msgstr "应用程序版本"
 
 #: ./lib/app/settings/page.dart:174
 msgid "裝置資訊"
