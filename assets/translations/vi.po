@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
-"PO-Revision-Date: 2025-07-01 02:56\n"
+"PO-Revision-Date: 2025-07-01 04:00\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -34,7 +34,7 @@ msgstr "Bản đồ"
 
 #: ./lib/app/welcome/4-permissions/page.dart:157
 msgid "通知"
-msgstr "Thông báo"
+msgstr "Thông báo đẩy"
 
 #: ./lib/app/settings/notify/page.dart:126
 msgid "緊急地震速報"
@@ -46,7 +46,7 @@ msgstr "giám sát động đất"
 
 #: ./lib/app/map/_lib/managers/report.dart:802
 msgid "地震報告"
-msgstr "Thông báo tin động đất"
+msgstr "Báo cáo động đất"
 
 #: ./lib/app/settings/notify/page.dart:170
 msgid "震度速報"
@@ -70,7 +70,7 @@ msgstr "Thông tin sóng thần"
 
 #: ./lib/app/settings/page.dart:100
 msgid "公告"
-msgstr ""
+msgstr "Thông báo"
 
 #: ./lib/app/settings/page.dart:114
 msgid "贊助我們"
@@ -94,7 +94,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:46
 msgid "所在地震度1以上"
-msgstr ""
+msgstr "Cường độ tại địa phương từ 1 trở lên"
 
 #: ./lib/app/settings/notify/page.dart:57
 msgid "海嘯消息、海嘯警報"
@@ -110,7 +110,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:39
 msgid "所在地震度4以上"
-msgstr ""
+msgstr "Cường độ tại địa phương từ 4 trở lên"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:33
 msgid "音效測試"
@@ -118,7 +118,7 @@ msgstr "Kiểm tra âm thanh"
 
 #: ./lib/app/settings/notify/(5.basic)/announcement/page.dart:34
 msgid "發送公告時"
-msgstr ""
+msgstr "Khi gửi thông báo"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:44
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
@@ -155,7 +155,8 @@ msgstr ""
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "海嘯警報發布時\n"
 "沿海地區鄉鎮"
-msgstr ""
+msgstr "Khi phát hành cảnh báo sóng thần\n"
+"các xã, thị trấn ven biển"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:36
 msgid "一般"
@@ -189,7 +190,7 @@ msgstr "Báo cáo chớp nhoáng cường độ địa chấn (Chung)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "所在地(鄉鎮)實測震度 3 以上"
-msgstr "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 3"
+msgstr "Cường độ thực đo tại địa phương (thị trấn) từ 3 trở lên"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:37
 msgid "震度速報(無聲通知)"
@@ -197,7 +198,7 @@ msgstr "Báo cáo chớp nhoáng cường độ địa chấn (Thông báo im l�
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:38
 msgid "所在地(鄉鎮)實測震度 1 以上"
-msgstr "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 1"
+msgstr "Cường độ thực đo tại địa phương (thị trấn) từ 1 trở lên"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:35
 msgid "地震報告(一般)"
@@ -205,7 +206,7 @@ msgstr "Báo cáo động đất (Chung)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:35
 msgid "所在地(縣市)實測震度 3 以上"
-msgstr "Cường độ động đất tại địa điểm (quận hoặc thành phố) ở mức trên 3"
+msgstr "Cường độ thực đo tại địa phương (Quận và thành phố) từ 3 trở lên"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "地震報告(無聲通知)"
@@ -213,7 +214,7 @@ msgstr "Báo cáo động đất (Thông báo im lặng)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "所在地(縣市)實測震度 1 以上"
-msgstr "Cường độ động đất tại địa điểm (Quận và thành phố) ở mức trên 1"
+msgstr "Cường độ thực đo tại địa phương (Quận và thành phố) từ 1 trở lên"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:15
 msgid "已更新通知設定"
@@ -443,7 +444,7 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:180
 msgid "複製通知 Token"
-msgstr ""
+msgstr "Đã sao chép Token thông báo"
 
 #: ./lib/app/debug/logs/page.dart:18
 msgid "App 日誌"
