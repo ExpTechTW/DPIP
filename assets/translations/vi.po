@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
-"PO-Revision-Date: 2025-06-16 13:05\n"
+"PO-Revision-Date: 2025-07-01 02:56\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -30,27 +30,27 @@ msgstr ""
 
 #: ./lib/app/settings/map/page.dart:25
 msgid "地圖"
-msgstr ""
+msgstr "Bản đồ"
 
 #: ./lib/app/welcome/4-permissions/page.dart:157
 msgid "通知"
-msgstr ""
+msgstr "Thông báo"
 
 #: ./lib/app/settings/notify/page.dart:126
 msgid "緊急地震速報"
-msgstr ""
+msgstr "Cảnh báo động đất sớm"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:83
 msgid "強震監視器"
-msgstr ""
+msgstr "giám sát động đất"
 
 #: ./lib/app/map/_lib/managers/report.dart:802
 msgid "地震報告"
-msgstr ""
+msgstr "Thông báo tin động đất"
 
 #: ./lib/app/settings/notify/page.dart:170
 msgid "震度速報"
-msgstr ""
+msgstr "Cảnh báo nhanh về cường độ địa chấn"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:58
 msgid "雷雨即時訊息"
@@ -58,15 +58,15 @@ msgstr "Thông báo giông sét"
 
 #: ./lib/app/settings/notify/page.dart:201
 msgid "天氣警特報"
-msgstr ""
+msgstr "Cảnh báo thời tiết"
 
 #: ./lib/app/settings/notify/page.dart:214
 msgid "避難資訊"
-msgstr ""
+msgstr "Thông tin di tản"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:93
 msgid "海嘯資訊"
-msgstr ""
+msgstr "Thông tin sóng thần"
 
 #: ./lib/app/settings/page.dart:100
 msgid "公告"
@@ -74,7 +74,7 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:114
 msgid "贊助我們"
-msgstr ""
+msgstr "quyên tặng"
 
 #: ./lib/app/home/_widgets/location_not_set_card.dart:37
 msgid "設定"
@@ -114,7 +114,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:33
 msgid "音效測試"
-msgstr ""
+msgstr "Kiểm tra âm thanh"
 
 #: ./lib/app/settings/notify/(5.basic)/announcement/page.dart:34
 msgid "發送公告時"
@@ -130,7 +130,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:120
 msgid "地震速報"
-msgstr ""
+msgstr "Cảnh báo động đất sớm"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:77
 msgid "地震"
@@ -146,7 +146,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:244
 msgid "其他"
-msgstr ""
+msgstr "Khác"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:36
 msgid "重大"
@@ -159,60 +159,61 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:36
 msgid "一般"
-msgstr ""
+msgstr "Nói chung"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:36
 msgid "海嘯警報發布時\n"
 "上述除外地區"
-msgstr ""
+msgstr "Khi cảnh báo sóng thần được ban hành.\n"
+"Các khu vực bị loại trừ khỏi các mục trên."
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:37
 msgid "太平洋海嘯消息(無聲通知)"
-msgstr ""
+msgstr "Tin tức về sóng thần Thái Bình Dương (Thông báo im lặng)"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:37
 msgid "太平洋海嘯消息發布時"
-msgstr ""
+msgstr "Khi tin tức về sóng thần Thái Bình Dương được công bố"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:34
 msgid "強震監視器(一般)"
-msgstr ""
+msgstr "Giám sát động đất mạnh(Chung)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:34
 msgid "偵測到晃動"
-msgstr ""
+msgstr "Phát hiện rung chuyển"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "震度速報(一般)"
-msgstr ""
+msgstr "Báo cáo chớp nhoáng cường độ địa chấn (Chung)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "所在地(鄉鎮)實測震度 3 以上"
-msgstr ""
+msgstr "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 3"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:37
 msgid "震度速報(無聲通知)"
-msgstr ""
+msgstr "Báo cáo chớp nhoáng cường độ địa chấn (Thông báo im lặng)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:38
 msgid "所在地(鄉鎮)實測震度 1 以上"
-msgstr ""
+msgstr "Cường độ động đất tại địa điểm (thị trấn) ở mức trên 1"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:35
 msgid "地震報告(一般)"
-msgstr ""
+msgstr "Báo cáo động đất (Chung)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:35
 msgid "所在地(縣市)實測震度 3 以上"
-msgstr ""
+msgstr "Cường độ động đất tại địa điểm (quận hoặc thành phố) ở mức trên 3"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "地震報告(無聲通知)"
-msgstr ""
+msgstr "Báo cáo động đất (Thông báo im lặng)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "所在地(縣市)實測震度 1 以上"
-msgstr ""
+msgstr "Cường độ động đất tại địa điểm (Quận và thành phố) ở mức trên 1"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:15
 msgid "已更新通知設定"
@@ -224,72 +225,75 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:36
 msgid "緊急地震速報(重大)"
-msgstr ""
+msgstr "Cảnh báo động đất khẩn cấp (Lớn)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:37
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 4 以上"
-msgstr ""
+msgstr "Cường độ tối đa từ 5 yếu trở lên\n"
+"và dự đoán tại địa phương (thị trấn) từ 4 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:41
 msgid "緊急地震速報(一般)"
-msgstr ""
+msgstr "Cảnh báo động đất (Nhỏ)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:42
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 2 以上"
-msgstr ""
+msgstr "Cường độ tối đa từ 5 yếu trở lên\n"
+"và dự đoán tại địa phương (thị trấn) từ 2 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:46
 msgid "緊急地震速報(無聲)"
-msgstr ""
+msgstr "Cảnn báo động đất (Im Lặng)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:47
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 1 以上"
-msgstr ""
+msgstr "Cường độ tối đa từ 5 yếu trở lên\n"
+"và dự đoán tại địa phương (thị trấn) từ 1 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "地震速報(重大)"
-msgstr ""
+msgstr "Báo cáo chớp nhoáng động đất (Lớn)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "所在地(鄉鎮)預估震度 4 以上"
-msgstr ""
+msgstr "Dự đoán cường độ tại địa phương (thị trấn) từ 4 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:51
 msgid "地震速報(一般)"
-msgstr ""
+msgstr "Cảnh báo sớm về động đất (Chung)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:51
 msgid "所在地(鄉鎮)預估震度 2 以上"
-msgstr ""
+msgstr "Dự đoán cường độ tại địa phương (thị trấn) từ 2 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:52
 msgid "地震速報(無聲)"
-msgstr ""
+msgstr "Báo cáo nhanh về động đất (im lặng)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:52
 msgid "所在地(鄉鎮)預估震度 1 以上"
-msgstr ""
+msgstr "Dự đoán cường độ tại địa phương (thị trấn) từ 1 trở lên"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:35
 msgid "所在地(鄉鎮)發布避難警訊時"
-msgstr ""
+msgstr "Khi khu vực địa phương (thị trấn) ban hành cảnh báo sơ tán"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:36
 msgid "所在地(鄉鎮)發布避難資訊時"
-msgstr ""
+msgstr "Khi khu vực địa phương (thị trấn) thông báo thông tin sơ tán"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:37
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu đỏ"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:42
 msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:37
 msgid "所在地(鄉鎮)發布雷雨即時訊息或\n"
@@ -415,11 +419,11 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:115
 msgid "幫助我們維護伺服器的穩定和長久發展"
-msgstr ""
+msgstr "Hỗ trợ chúng tôi duy trì sự ổn định và phát triển lâu dài của các máy chủ của chúng tôi"
 
 #: ./lib/app/settings/page.dart:121
 msgid "第三方套件授權"
-msgstr ""
+msgstr "Giấy phép gói phần mềm của bên thứ ba"
 
 #: ./lib/app/settings/page.dart:122
 msgid "DPIP 的實現歸功於開放源始碼"
@@ -427,7 +431,7 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:164
 msgid "除錯"
-msgstr ""
+msgstr "Gỡ lỗi"
 
 #: ./lib/app/settings/page.dart:168
 msgid "應用程式版本"
@@ -443,11 +447,11 @@ msgstr ""
 
 #: ./lib/app/debug/logs/page.dart:18
 msgid "App 日誌"
-msgstr ""
+msgstr "Nhật ký ứng dụng"
 
 #: ./lib/app/welcome/3-notice/page.dart:63
 msgid "任何資訊應以中央氣象署發布之內容為準。"
-msgstr ""
+msgstr "Tất cả thông tin phải tuân theo nội dung do Đài Loan Cơ quan Thời tiết Trung ương (CWA) công bố."
 
 #: ./lib/app/settings/location/page.dart:424
 msgid "自動更新"
@@ -475,7 +479,7 @@ msgstr "Quận/Phường/Xã"
 
 #: ./lib/app/settings/location/select/page.dart:28
 msgid "縣市"
-msgstr ""
+msgstr "Quận"
 
 #: ./lib/app/settings/location/select/page.dart:40
 msgid "目前所在地"
@@ -495,19 +499,19 @@ msgstr ""
 
 #: ./lib/app/settings/theme/select/page.dart:59
 msgid "淺色"
-msgstr ""
+msgstr "Sáng"
 
 #: ./lib/app/settings/theme/select/page.dart:60
 msgid "深色"
-msgstr ""
+msgstr "Tối"
 
 #: ./lib/app/settings/theme/select/page.dart:57
 msgid "跟隨系統主題"
-msgstr ""
+msgstr "Theo chủ đề hệ thống"
 
 #: ./lib/app/settings/theme/select/page.dart:24
 msgid "主題色"
-msgstr ""
+msgstr "Chủ đề"
 
 #: ./lib/app/settings/theme/page.dart:48
 msgid "系統色彩"
@@ -519,11 +523,11 @@ msgstr ""
 
 #: ./lib/app/welcome/4-permissions/page.dart:349
 msgid "取消"
-msgstr ""
+msgstr "Hủy bỏ"
 
 #: ./lib/app/welcome/4-permissions/page.dart:351
 msgid "確定"
-msgstr ""
+msgstr "Xác nhận"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:75
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
@@ -535,7 +539,7 @@ msgstr "Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm kh
 
 #: ./lib/app/map/_lib/managers/radar.dart:197
 msgid "雷達回波"
-msgstr ""
+msgstr "Hình ảnh radar"
 
 #: ./lib/app/home/_widgets/weather_header.dart:129
 msgid "體感約 {apparent}°"
@@ -551,7 +555,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:284
 msgid "取得天氣異常"
-msgstr ""
+msgstr "Ngoại lệ xảy ra khi thu thập thông tin thời tiết"
 
 #: ./lib/app/changelog/page.dart:111
 msgid "無法載入更新日誌，請稍後再試。"
@@ -559,99 +563,99 @@ msgstr "Không thể tải nhật ký thay đổi, vui lòng thử lại sau."
 
 #: ./lib/app/changelog/page.dart:115
 msgid "重試"
-msgstr ""
+msgstr "Thử lại"
 
 #: ./lib/app/welcome/4-permissions/page.dart:368
 msgid "下一步"
-msgstr ""
+msgstr "Tiếp theo"
 
 #: ./lib/app/welcome/1-about/page.dart:65
 msgid "防災資訊平台"
-msgstr ""
+msgstr "Cổng thông tin phòng chống thiên tai"
 
 #: ./lib/app/welcome/2-exptech/page.dart:88
 msgid "我們是誰？"
-msgstr ""
+msgstr "Chúng tôi là ai?"
 
 #: ./lib/app/welcome/2-exptech/page.dart:92
 msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
-msgstr ""
+msgstr "ExpTech Studio là một nhóm gồm hơn 15 Học sinh, phần lớn là những người có độ tuổi trung bình dưới 20. Các thành viên đến từ Đài Loan (Bắc, Trung và Nam), Nhật Bản, Hàn Quốc và Trung Quốc."
 
 #: ./lib/app/welcome/2-exptech/page.dart:95
 msgid "我們的初衷"
-msgstr ""
+msgstr "Chúng tôi đã bắt đầu với những gì"
 
 #: ./lib/app/welcome/2-exptech/page.dart:99
 msgid "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
-msgstr ""
+msgstr "Nhóm ban đầu được thành lập bằng cách tuyển dụng một nhóm học sinh có sở thích và năng khiếu về máy tính và công nghệ, sau đó đã phát triển vượt ra ngoài phạm vi trường học và trở thành nhóm như hiện nay."
 
 #: ./lib/app/welcome/3-notice/page.dart:43
 msgid "注意事項"
-msgstr ""
+msgstr "Những điều cần lưu ý"
 
 #: ./lib/app/welcome/3-notice/page.dart:79
 msgid "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
-msgstr ""
+msgstr "Tùy thuộc vào trạng thái mạng, trạng thái máy chủ, trạng thái ứng dụng, trạng thái nguồn dữ liệu ngược dòng, v.v., sự cố không nhận được thông tin có thể xảy ra và chúng tôi sẽ cố gắng hết sức để tránh những tình huống như vậy, nhưng chúng tôi không đảm bảo rằng chúng sẽ không xảy ra."
 
 #: ./lib/app/welcome/3-notice/page.dart:90
 msgid "強烈搖晃有機率比通知早抵達使用者所在地。"
-msgstr ""
+msgstr "Rung lắc mạnh có xu hướng xảy ra ở vị trí của người dùng sớm hơn thông báo."
 
 #: ./lib/app/welcome/3-notice/page.dart:101
 msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
-msgstr ""
+msgstr "Báo cáo động đất nhanh là những tính toán nhanh và có thể chứa nhiều lỗi, do đó cần phải thận trọng và hiểu rõ."
 
 #: ./lib/app/welcome/3-notice/page.dart:112
 msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
-msgstr ""
+msgstr "Bất kỳ hành vi nào không được chính thức cho phép đều có thể bị coi là vi phạm pháp luật của Trung Hoa Dân Quốc (Đài Loan), vì vậy hãy đảm bảo tuân thủ các quy định có liên quan."
 
 #: ./lib/app/welcome/1-about/page.dart:45
 msgid "歡迎使用 DPIP"
-msgstr ""
+msgstr "Chào mừng đến với DPIP"
 
 #: ./lib/app/welcome/1-about/page.dart:86
 msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
-msgstr ""
+msgstr "DPIP là ứng dụng được thiết kế bởi một nhóm địa phương tại Đài Loan, tích hợp thông tin từ TREM-Net (Mạng quan sát động đất thời gian thực Đài Loan) và dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) để cung cấp một ứng dụng thông tin phòng chống thiên tai tích hợp, duy nhất và tiện lợi."
 
 #: ./lib/app/welcome/4-permissions/page.dart:158
 msgid "在重大災害發生時以通知來傳遞即時防災資訊"
-msgstr ""
+msgstr "Dịch vụ được sử dụng để gửi thông báo cảnh báo thiên tai khẩn cấp"
 
 #: ./lib/app/welcome/4-permissions/page.dart:166
 msgid "使用定位來自動更新所在地設定，提供當地的即時防災資訊"
-msgstr ""
+msgstr "Dịch vụ được sử dụng để cập nhật vị trí và cung cấp thông tin cảnh báo tại khu vực hiện tại"
 
 #: ./lib/app/welcome/4-permissions/page.dart:171
 msgid "省電策略"
-msgstr ""
+msgstr "Chế độ nguồn điện thấp"
 
 #: ./lib/app/welcome/4-permissions/page.dart:172
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
-msgstr ""
+msgstr "Cho phép DPIP tiếp tục hoạt động ở chế độ nền để thông báo phòng ngừa thảm họa ngay lập tức."
 
 #: ./lib/app/welcome/4-permissions/page.dart:178
 msgid "儲存"
-msgstr ""
+msgstr "Lưu trữ hình"
 
 #: ./lib/app/welcome/4-permissions/page.dart:179
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
-msgstr ""
+msgstr "Để lưu trữ hình ảnh trực quan dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) hoặc ExpTech."
 
 #: ./lib/app/welcome/4-permissions/page.dart:346
 msgid "權限請求"
-msgstr ""
+msgstr "Yêu cầu để xin phép"
 
 #: ./lib/app/welcome/4-permissions/page.dart:347
 msgid "需要使用者手動到設定開啟相關權限。"
-msgstr ""
+msgstr "Người dùng cần phải tự tay vào trang cài đặt để mở các quyền có liên quan."
 
 #: ./lib/app/welcome/4-permissions/page.dart:387
 msgid "權限"
-msgstr ""
+msgstr "Sự cho phép"
 
 #: ./lib/app/welcome/4-permissions/page.dart:400
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-msgstr ""
+msgstr "Chúng tôi luôn ủng hộ người dùng và nỗ lực không ngừng vì quyền riêng tư của họ."
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:48
 msgid "地圖圖層"
@@ -671,51 +675,51 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/temperature.dart:330
 msgid "氣溫"
-msgstr ""
+msgstr "Nhiệt độ"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:443
 msgid "降水"
-msgstr ""
+msgstr "Lượng mưa"
 
 #: ./lib/app/map/_lib/managers/wind.dart:220
 msgid "風向/風速"
-msgstr ""
+msgstr "Hướng gió/Tốc độ gió"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:303
 msgid "今日"
-msgstr ""
+msgstr "Hôm nay"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:304
 msgid "10 分鐘"
-msgstr ""
+msgstr "10 phút"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:305
 msgid "1 小時"
-msgstr ""
+msgstr "1 giờ"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:306
 msgid "3 小時"
-msgstr ""
+msgstr "3 giờ"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:307
 msgid "6 小時"
-msgstr ""
+msgstr "6 giờ"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:308
 msgid "12 小時"
-msgstr ""
+msgstr "12 giờ"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:309
 msgid "24 小時"
-msgstr ""
+msgstr "24 giờ"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:310
 msgid "2 天"
-msgstr ""
+msgstr "2 ngày"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:311
 msgid "3 天"
-msgstr ""
+msgstr "3 ngày"
 
 #: ./lib/app/map/_lib/managers/report.dart:359
 msgid "近期的地震報告"
@@ -723,7 +727,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/report.dart:364
 msgid "更多"
-msgstr ""
+msgstr "Thêm"
 
 #: ./lib/app/map/_lib/managers/report.dart:580
 msgid "編號 {number} 顯著有感地震"
@@ -731,51 +735,51 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/report.dart:581
 msgid "小區域有感地震"
-msgstr ""
+msgstr "Động đất nhẹ, cảm nhận được ở khu vực nhỏ"
 
 #: ./lib/app/map/_lib/managers/report.dart:640
 msgid "地震規模"
-msgstr ""
+msgstr "Cường độ"
 
 #: ./lib/app/map/_lib/managers/report.dart:662
 msgid "震源深度"
-msgstr ""
+msgstr "Độ sâu chấn tiêu"
 
 #: ./lib/app/map/_lib/managers/report.dart:599
 msgid "報告頁面"
-msgstr ""
+msgstr "Trang báo cáo"
 
 #: ./lib/app/map/_lib/managers/report.dart:623
 msgid "發震時間"
-msgstr ""
+msgstr "Ngày giờ nhận biết động đất"
 
 #: ./lib/app/map/_lib/managers/report.dart:630
 msgid "位於"
-msgstr ""
+msgstr "nằm ở"
 
 #: ./lib/app/map/_lib/managers/report.dart:686
 msgid "各地震度"
-msgstr ""
+msgstr "Cường độ địa chấn tại các khu vực"
 
 #: ./lib/app/map/_lib/managers/report.dart:757
 msgid "地震報告圖"
-msgstr ""
+msgstr "Bản đồ báo cáo động đất"
 
 #: ./lib/app/map/_lib/managers/report.dart:767
 msgid "震度圖"
-msgstr ""
+msgstr "Bản đồ cường độ địa chấn"
 
 #: ./lib/app/map/_lib/managers/report.dart:777
 msgid "最大地動加速度圖"
-msgstr ""
+msgstr "Bản đồ gia tốc mặt đất tối đa"
 
 #: ./lib/app/map/_lib/managers/report.dart:787
 msgid "最大地動速度圖"
-msgstr ""
+msgstr "Bản đồ vận tốc mặt đất tối đa"
 
 #: ./lib/utils/weather_icon.dart:285
 msgid "晴"
-msgstr ""
+msgstr "Mùa hè"
 
 #: ./lib/utils/weather_icon.dart:286
 msgid "晴有霾"
@@ -851,7 +855,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:305
 msgid "多雲"
-msgstr ""
+msgstr "Đám mây"
 
 #: ./lib/utils/weather_icon.dart:306
 msgid "多雲有霾"
@@ -927,7 +931,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:325
 msgid "陰"
-msgstr ""
+msgstr "Ngày nhiều mây"
 
 #: ./lib/utils/weather_icon.dart:326
 msgid "陰有霾"
