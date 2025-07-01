@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-07-01 04:00\n"
+"PO-Revision-Date: 2025-07-01 05:13\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -212,7 +212,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:36
 msgid "所在地(縣市)實測震度 1 以上"
-msgstr ""
+msgstr "소재지(현ㆍ시) 실측 진도 1 이상"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:15
 msgid "已更新通知設定"
@@ -275,26 +275,26 @@ msgstr "소재지(향ㆍ진) 예상 진도 1 이상"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:35
 msgid "所在地(鄉鎮)發布避難警訊時"
-msgstr ""
+msgstr "소재지(향ㆍ진)에 피난 경보가 발령된 경우"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:36
 msgid "所在地(鄉鎮)發布避難資訊時"
-msgstr ""
+msgstr "소재지(향ㆍ진)에 피난 정보가 발령된 경우"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:37
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "소재지(향ㆍ진)에서 적색 기상 경보 특보를 발령"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:42
 msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "소재지(향ㆍ진)에서 기상 경보를 발령"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:37
 msgid "所在地(鄉鎮)發布雷雨即時訊息或\n"
 "山區暴雨時"
-msgstr ""
+msgstr "소재지(향ㆍ진)으로 뇌우 실시간 정보 또는 산간지역 호우 시 전송합니다."
 
 #: ./lib/app/settings/unit/page.dart:30
 msgid "使用華氏度"
