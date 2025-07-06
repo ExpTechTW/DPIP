@@ -51,6 +51,6 @@ fi
 for po_file in "$PO_DIR"/*.po; do
     if [ -f "$po_file" ]; then
         echo -e -n "${BLUE}更新 $(basename "$po_file") ${RESET}"
-        msgmerge --update "$po_file" "$POT_FILE"
+        msgmerge --update --backup=off "$po_file" "$POT_FILE"
     fi
 done 
