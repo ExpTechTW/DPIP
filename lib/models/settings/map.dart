@@ -9,7 +9,7 @@ class SettingsMapModel extends ChangeNotifier {
 
   final updateIntervalNotifier = ValueNotifier(200);
   final baseMapNotifier = ValueNotifier(BaseMapType.exptech);
-  final layerNotifier = ValueNotifier(MapLayer.report);
+  final layerNotifier = ValueNotifier(MapLayer.monitor);
 
   int get updateInterval => Preference.mapUpdateInterval ?? 200;
   void setUpdateInterval(int value) {

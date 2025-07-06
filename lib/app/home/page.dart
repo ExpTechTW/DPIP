@@ -151,6 +151,8 @@ class _HomePageState extends State<HomePage> {
               // 即時資訊
               if (!_isLoading && GlobalProviders.data.eew.isNotEmpty)
                 ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: GlobalProviders.data.eew.length,
                   itemBuilder: (context, index) {
                     final data = GlobalProviders.data.eew[index];

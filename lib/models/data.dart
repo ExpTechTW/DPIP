@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:dpip/utils/geojson.dart';
 import 'package:flutter/material.dart';
 
 import 'package:dpip/api/exptech.dart';
@@ -12,7 +11,10 @@ import 'package:dpip/api/model/rts/rts.dart';
 import 'package:dpip/api/model/station.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
+import 'package:dpip/core/eew.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/map_utils.dart';
 
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
@@ -29,7 +31,25 @@ class _DpipDataModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Eew> _eew = [];
+  List<Eew> _eew = [
+    // dummy data
+    /* Eew(
+      agency: 'cwa',
+      id: '1140907',
+      serial: 4,
+      status: 0,
+      isFinal: false,
+      info: EewInfo(
+        time: DateTime.now().millisecondsSinceEpoch,
+        longitude: 120.48,
+        latitude: 23.22,
+        depth: 10,
+        magnitude: 4.7,
+        location: '臺南市楠西區',
+        max: 4,
+      ),
+    ), */
+  ];
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
   void setEew(List<Eew> eew) {
     _eew = eew;
@@ -111,6 +131,13 @@ class DpipDataModel extends _DpipDataModel {
   bool _isInForeground = true;
 
   int get currentTime => DateTime.now().millisecondsSinceEpoch + timeOffset;
+
+  /// Returns only active EEWs (within 3 minutes of current app time)
+  UnmodifiableListView<Eew> get activeEew {
+    final threeMinutesAgo = currentTime - (3 * 60 * 1000);
+
+    return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
+  }
 
   void startFetching() {
     if (_secondTimer != null) return;
@@ -217,6 +244,33 @@ class DpipDataModel extends _DpipDataModel {
       }
 
       builder.addFeature(feature);
+    }
+
+    return builder.build();
+  }
+
+  Map<String, dynamic> getEewGeoJson() {
+    final eew = activeEew;
+    final builder = GeoJsonBuilder();
+
+    for (final e in eew) {
+      final radius = calcWaveRadius(e.info.depth, e.info.time, currentTime);
+
+      if (radius.p > 0) {
+        final pWave = circleFeature(center: e.info.latlng, radius: radius.p)..setProperty('type', 'p');
+        builder.addFeature(pWave);
+      }
+
+      if (radius.s > 0) {
+        final sWave = circleFeature(center: e.info.latlng, radius: radius.s)..setProperty('type', 's');
+        builder.addFeature(sWave);
+      }
+
+      final epicenter =
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+            ..setGeometry(e.info.latlng.toGeoJsonCoordinates())
+            ..setProperty('type', 'x');
+      builder.addFeature(epicenter);
     }
 
     return builder.build();

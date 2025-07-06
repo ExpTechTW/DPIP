@@ -120,15 +120,15 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
       final waves = GeoJsonBuilder();
 
       for (var i = 0; i < 10; i++) {
-        final distance = psWaveDist(
+        final distance = calcWaveRadius(
           data.depth,
           data.time.millisecondsSinceEpoch,
           data.time.millisecondsSinceEpoch + i * 5000,
         );
 
-        if (distance['s_dist'] == null || distance['s_dist']! < 0) continue;
+        if (distance.s < 0) continue;
 
-        waves.addFeature(circleFeature(center: LatLng(data.latitude, data.longitude), radius: distance['s_dist']!));
+        waves.addFeature(circleFeature(center: LatLng(data.latitude, data.longitude), radius: distance.s));
       }
 
       await controller.addGeoJsonSource('waves-geojson', waves.build());
@@ -276,10 +276,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
                       (report!.getLocation().endsWith('近海') || report!.getLocation().endsWith('海域')))
                     Chip(
                       avatar: Icon(Symbols.tsunami_rounded, color: context.theme.extendedColors.blue),
-                      label: Text(
-                        '此地震可能引起若干海面變動',
-                        style: TextStyle(color: context.theme.extendedColors.blue),
-                      ),
+                      label: Text('此地震可能引起若干海面變動', style: TextStyle(color: context.theme.extendedColors.blue)),
                       backgroundColor: Colors.blue.withValues(alpha: 0.16),
                       labelStyle: const TextStyle(fontWeight: FontWeight.w900),
                       side: BorderSide(color: context.theme.extendedColors.blue),

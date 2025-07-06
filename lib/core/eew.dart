@@ -8,7 +8,7 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/list.dart';
 
-Map<String, double> psWaveDist(double depth, int time, int now) {
+({double p, double s, double sT}) calcWaveRadius(double depth, int time, int now) {
   double pDist = 0;
   double sDist = 0;
   double sT = 0;
@@ -48,7 +48,7 @@ Map<String, double> psWaveDist(double depth, int time, int now) {
     prevTable = table;
   }
 
-  return {'p_dist': pDist, 's_dist': sDist, 's_t': sT};
+  return (p: pDist, s: sDist, sT: sT);
 }
 
 int findClosest(List<int> arr, double target) {

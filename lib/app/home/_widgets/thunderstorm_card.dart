@@ -76,9 +76,7 @@ class ThunderstormCard extends StatelessWidget {
                       'time': history.time.expiresAt.toSimpleDateTimeString(context),
                     }),
                     style: context.textTheme.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
-                    tags: {
-                      'bold': StyledTextTag(style: context.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
-                    },
+                    tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
                   ),
                 ),
               ],

@@ -1,11 +1,12 @@
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
@@ -15,7 +16,6 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(super.context, super.controller);
 
   final currentRtsTime = ValueNotifier<String?>(GlobalProviders.data.rts?.time.toString());
-  final isLoading = ValueNotifier<bool>(false);
 
   static final kRtsCircleColor = [
     Expressions.interpolate,
@@ -76,26 +76,36 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (didSetup) return;
 
     try {
-      final sourceId = MapSourceIds.rts();
-      final layerId = MapLayerIds.rts();
+      final sources = await controller.getSourceIds();
+      final layers = await controller.getLayerIds();
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
-      final isLayerExists = (await controller.getLayerIds()).contains(layerId);
+      final rtsSourceId = MapSourceIds.rts();
+      final rtsLayerId = MapLayerIds.rts();
 
-      if (isSourceExists && isLayerExists) return;
+      final eewSourceId = MapSourceIds.eew();
+      final epicenterLayerId = MapLayerIds.eew('epicenter');
+      final pWaveLayerId = MapLayerIds.eew('p');
+      final sWaveLayerId = MapLayerIds.eew('s');
+
+      final isRtsSourceExists = sources.contains(rtsSourceId);
+      final isRtsLayerExists = layers.contains(rtsLayerId);
+      final isEewSourceExists = sources.contains(eewSourceId);
+      final isEewLayerExists =
+          layers.contains(epicenterLayerId) && layers.contains(pWaveLayerId) && layers.contains(sWaveLayerId);
+
       if (!context.mounted) return;
 
-      if (!isSourceExists) {
+      if (!isRtsSourceExists) {
         final data = GlobalProviders.data.getRtsGeoJson();
         final properties = GeojsonSourceProperties(data: data);
 
-        await controller.addSource(sourceId, properties);
-        TalkerManager.instance.info('Added Source "$sourceId"');
+        await controller.addSource(rtsSourceId, properties);
+        TalkerManager.instance.info('Added Source "$rtsSourceId"');
 
         if (!context.mounted) return;
       }
 
-      if (!isLayerExists) {
+      if (!isRtsLayerExists) {
         final properties = CircleLayerProperties(
           circleColor: kRtsCircleColor,
           circleRadius: kRtsCircleRadius,
@@ -115,32 +125,111 @@ class MonitorMapLayerManager extends MapLayerManager {
           visibility: visible ? 'visible' : 'none',
         );
 
-        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$layerId"');
+        await controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$rtsLayerId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isEewSourceExists) {
+        final data = GlobalProviders.data.getEewGeoJson();
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(eewSourceId, properties);
+        TalkerManager.instance.info('Added Source "$eewSourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (isEewLayerExists) {
+        final epicenterProperties = SymbolLayerProperties(
+          iconImage: 'cross-7',
+          iconSize: kSymbolIconSize,
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+          symbolZOrder: 'source',
+          visibility: visible ? 'visible' : 'none',
+        );
+        final pWaveProperties = LineLayerProperties(
+          lineColor: Colors.cyan.toHexStringRGB(),
+          lineWidth: 2,
+          visibility: visible ? 'visible' : 'none',
+        );
+        final sWaveProperties = LineLayerProperties(
+          lineColor: Colors.red.toHexStringRGB(),
+          lineWidth: 2,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        await controller.addLayer(
+          eewSourceId,
+          pWaveLayerId,
+          pWaveProperties,
+          enableInteraction: false,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          filter: [
+            Expressions.equal,
+            [Expressions.get, 'type'],
+            'p',
+          ],
+        );
+        TalkerManager.instance.info('Added Layer "$pWaveLayerId"');
+
+        await controller.addLayer(
+          eewSourceId,
+          sWaveLayerId,
+          sWaveProperties,
+          enableInteraction: false,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          filter: [
+            Expressions.equal,
+            [Expressions.get, 'type'],
+            's',
+          ],
+        );
+        TalkerManager.instance.info('Added Layer "$sWaveLayerId"');
+
+        await controller.addLayer(
+          eewSourceId,
+          epicenterLayerId,
+          epicenterProperties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          filter: [
+            Expressions.equal,
+            [Expressions.get, 'type'],
+            'x',
+          ],
+        );
+        TalkerManager.instance.info('Added Layer "$epicenterLayerId"');
       }
 
       didSetup = true;
 
-      GlobalProviders.data.addListener(_onRtsDataChanged);
+      GlobalProviders.data.addListener(_onDataChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
     }
   }
 
-  void _onRtsDataChanged() {
-    final newRts = GlobalProviders.data.rts;
-    final newTime = newRts?.time.toString();
+  @override
+  void tick() {
+    if (!didSetup) return;
 
-    if (newTime != currentRtsTime.value) {
-      currentRtsTime.value = newTime;
+    _updateEewSource();
+  }
+
+  void _onDataChanged() {
+    final newRts = GlobalProviders.data.rts;
+    final newRtsTime = newRts?.time.toString();
+
+    if (newRtsTime != currentRtsTime.value) {
+      currentRtsTime.value = newRtsTime;
       _updateRtsSource();
     }
   }
 
   Future<void> _updateRtsSource() async {
-    if (!didSetup || isLoading.value) return;
-
-    isLoading.value = true;
+    if (!didSetup) return;
 
     try {
       final sourceId = MapSourceIds.rts();
@@ -154,8 +243,21 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateRtsSource', e, s);
-    } finally {
-      isLoading.value = false;
+    }
+  }
+
+  Future<void> _updateEewSource() async {
+    if (!didSetup) return;
+
+    try {
+      final sourceId = MapSourceIds.eew();
+
+      final data = GlobalProviders.data.getEewGeoJson();
+
+      // TODO(kamiya4047): needs further optimization
+      await controller.setGeoJsonSource(sourceId, data);
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager._updateEewSource', e, s);
     }
   }
 
@@ -163,11 +265,24 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> hide() async {
     if (!visible) return;
 
-    final layerId = MapLayerIds.rts();
+    final rtsLayerId = MapLayerIds.rts();
+
+    final epicenterLayerId = MapLayerIds.eew('epicenter');
+    final pWaveLayerId = MapLayerIds.eew('p');
+    final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
-      await controller.setLayerVisibility(layerId, false);
-      TalkerManager.instance.info('Hiding Layer "$layerId"');
+      // rts
+      await controller.setLayerVisibility(rtsLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$rtsLayerId"');
+
+      // eew
+      await controller.setLayerVisibility(epicenterLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$epicenterLayerId"');
+      await controller.setLayerVisibility(pWaveLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$pWaveLayerId"');
+      await controller.setLayerVisibility(sWaveLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$sWaveLayerId"');
 
       visible = false;
     } catch (e, s) {
@@ -179,11 +294,21 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> show() async {
     if (visible) return;
 
-    final layerId = MapLayerIds.rts();
+    final rtsLayerId = MapLayerIds.rts();
+    final epicenterLayerId = MapLayerIds.eew('epicenter');
+    final pWaveLayerId = MapLayerIds.eew('p');
+    final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
-      await controller.setLayerVisibility(layerId, true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
+      await controller.setLayerVisibility(rtsLayerId, true);
+      TalkerManager.instance.info('Showing Layer "$rtsLayerId"');
+
+      await controller.setLayerVisibility(epicenterLayerId, true);
+      TalkerManager.instance.info('Showing Layer "$epicenterLayerId"');
+      await controller.setLayerVisibility(pWaveLayerId, true);
+      TalkerManager.instance.info('Showing Layer "$pWaveLayerId"');
+      await controller.setLayerVisibility(sWaveLayerId, true);
+      TalkerManager.instance.info('Showing Layer "$sWaveLayerId"');
 
       await _focus();
 
@@ -195,17 +320,32 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   @override
   Future<void> remove() async {
-    final sourceId = MapSourceIds.rts();
-    final layerId = MapLayerIds.rts();
+    final rtsSourceId = MapSourceIds.rts();
+    final rtsLayerId = MapLayerIds.rts();
+
+    final eewSourceId = MapSourceIds.eew();
+    final epicenterLayerId = MapLayerIds.eew('epicenter');
+    final pWaveLayerId = MapLayerIds.eew('p');
+    final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
-      await controller.removeLayer(layerId);
-      TalkerManager.instance.info('Removed Layer "$layerId"');
+      // rts
+      await controller.removeLayer(rtsLayerId);
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId"');
+      await controller.removeSource(rtsSourceId);
+      TalkerManager.instance.info('Removed Source "$rtsSourceId"');
 
-      await controller.removeSource(sourceId);
-      TalkerManager.instance.info('Removed Source "$sourceId"');
+      // eew
+      await controller.removeLayer(epicenterLayerId);
+      TalkerManager.instance.info('Removed Layer "$epicenterLayerId"');
+      await controller.removeLayer(pWaveLayerId);
+      TalkerManager.instance.info('Removed Layer "$pWaveLayerId"');
+      await controller.removeLayer(sWaveLayerId);
+      TalkerManager.instance.info('Removed Layer "$sWaveLayerId"');
+      await controller.removeSource(eewSourceId);
+      TalkerManager.instance.info('Removed Source "$eewSourceId"');
     } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager.dispose', e, s);
+      TalkerManager.instance.error('MonitorMapLayerManager.remove', e, s);
     }
 
     didSetup = false;
@@ -213,7 +353,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   @override
   void dispose() {
-    GlobalProviders.data.removeListener(_onRtsDataChanged);
+    GlobalProviders.data.removeListener(_onDataChanged);
   }
 
   @override
