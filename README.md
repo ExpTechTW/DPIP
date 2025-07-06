@@ -38,7 +38,7 @@ TREM-Net 是一個自 2022 年 6 月起開始在全臺各地部署的觀測網�
 <h3>
   <a href="https://www.twds.com.tw/">
     台灣數位串流有限公司
-    <img src="https://github.com/user-attachments/assets/e4b793c8-58b3-4058-a246-24f646b4b3d7" alt="台灣數位串流有限公司" width="auto" height="28" align="right">
+    <img src="https://branding.twds.com.tw/assets/twds_text_standard.svg" alt="台灣數位串流有限公司" width="auto" height="28" align="right">
   </a>
 </h3>
 
