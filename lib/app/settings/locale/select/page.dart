@@ -56,7 +56,7 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                   return ListSectionTile(
                     title: locale.nativeName,
                     subtitle:
-                        (locale.toLanguageTag() != 'zh-TW')
+                        (locale.toLanguageTag() != 'zh-Hant')
                             ? Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
