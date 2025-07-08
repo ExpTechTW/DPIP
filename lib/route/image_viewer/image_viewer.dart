@@ -6,9 +6,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:gal/gal.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:dpip/utils/extensions/build_context.dart';
 
@@ -84,16 +85,22 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
       }
 
       final res = await get(Uri.parse(widget.imageUrl));
+      
+      // 保存图片到临时目录
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/${widget.imageName}');
+      await tempFile.writeAsBytes(res.bodyBytes);
 
-      final result = await ImageGallerySaver.saveImage(res.bodyBytes, name: widget.imageName);
-
-      if (!mounted) return;
-
-      if (!result['isSuccess']) {
-        throw Exception(result['errorMessage']);
+      try {
+        // 保存到相册
+        await Gal.putImage(tempFile.path, album: 'DPIP');
+        Fluttertoast.showToast(msg: '已儲存圖片');
+      } finally {
+        // 清理临时文件
+        if (await tempFile.exists()) {
+          await tempFile.delete();
+        }
       }
-
-      Fluttertoast.showToast(msg: '已儲存圖片');
     } catch (e) {
       if (!mounted) return;
 
