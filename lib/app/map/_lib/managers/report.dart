@@ -94,10 +94,10 @@ class ReportMapLayerManager extends MapLayerManager {
 
     try {
       if (GlobalProviders.data.partialReport.isEmpty) {
-        final radarList = await ExpTech().getReportList();
+        final reportList = await ExpTech().getReportList();
         if (!context.mounted) return;
 
-        GlobalProviders.data.setPartialReport(radarList);
+        GlobalProviders.data.setPartialReport(reportList);
       }
 
       final sourceId = MapSourceIds.report();
