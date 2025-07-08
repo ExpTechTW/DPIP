@@ -141,7 +141,7 @@ class MonitorMapLayerManager extends MapLayerManager {
         if (!context.mounted) return;
       }
 
-      if (isEewLayerExists) {
+      if (!isEewLayerExists) {
         final epicenterProperties = SymbolLayerProperties(
           iconImage: 'cross-7',
           iconSize: kSymbolIconSize,
