@@ -239,9 +239,9 @@ class MonitorMapLayerManager extends MapLayerManager {
             ['linear'],
             [Expressions.zoom],
             5,
-            0.5,
+            0.2,
             10,
-            1.5,
+            0.8,
           ],
           iconImage: [
             Expressions.match,
