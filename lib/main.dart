@@ -58,8 +58,8 @@ void main() async {
         'ru'.asLocale,
         'vi'.asLocale,
         'zh'.asLocale,
-        'zh-CN'.asLocale,
-        'zh-TW'.asLocale,
+        'zh-Hans'.asLocale,
+        'zh-Hant'.asLocale,
       ],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

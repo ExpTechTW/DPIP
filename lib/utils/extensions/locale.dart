@@ -3,10 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 extension NativeLocale on Locale {
   String get nativeName {
-    switch (toString()) {
-      case 'zh_TW':
+    switch (toLanguageTag()) {
+      case 'zh-Hant':
         return '繁體中文';
-      case 'zh_CN':
+      case 'zh-Hans':
         return '簡體中文';
       case 'zh':
         return '簡體中文';
@@ -26,10 +26,10 @@ extension NativeLocale on Locale {
   }
 
   String? flagCodeFromLocale(Locale locale) {
-    switch (locale.toString()) {
-      case 'zh_TW':
+    switch (locale.toLanguageTag()) {
+      case 'zh-Hant':
         return 'tw';
-      case 'zh_CN':
+      case 'zh-Hans':
       case 'zh':
         return 'cn';
       case 'en':
@@ -51,9 +51,6 @@ extension NativeLocale on Locale {
     final code = flagCodeFromLocale(this);
     if (code == null) return const SizedBox.shrink();
 
-    return SvgPicture.asset(
-      'assets/flags/$code.svg',
-      height: 24,
-    );
+    return SvgPicture.asset('assets/flags/$code.svg', height: 24);
   }
 }

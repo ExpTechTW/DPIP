@@ -51,6 +51,84 @@ fi
 for po_file in "$PO_DIR"/*.po; do
     if [ -f "$po_file" ]; then
         echo -e -n "${BLUE}更新 $(basename "$po_file") ${RESET}"
-        msgmerge --update "$po_file" "$POT_FILE"
+        msgmerge --update --backup=off "$po_file" "$POT_FILE"
     fi
 done 
+
+# 更新 zh-Hant.po
+ZH_HANT_PO="$PO_DIR/zh-Hant.po"
+if [ -f "$ZH_HANT_PO" ]; then
+    echo -e "${BLUE}自動填入 zh-Hant.po 的 msgstr...${RESET}"
+    awk '
+    BEGIN {
+        in_msgid = 0
+        in_msgstr = 0
+        msgid_content = ""
+        msgstr_buffer = ""
+        collecting_msgid = 0
+        collecting_msgstr = 0
+    }
+    
+    # 開始新的 msgid
+    /^msgid / {
+        # 處理前一個完整的 msgid/msgstr 對
+        if (in_msgid && in_msgstr) {
+            print "msgid " msgid_content
+            print "msgstr " msgid_content
+        }
+        
+        # 開始新的 msgid
+        in_msgid = 1
+        in_msgstr = 0
+        msgid_content = substr($0, 7)  # 提取 msgid 後面的內容
+        msgstr_buffer = ""
+        collecting_msgid = 1
+        collecting_msgstr = 0
+        next
+    }
+    
+    # 開始 msgstr
+    /^msgstr / {
+        collecting_msgid = 0
+        collecting_msgstr = 1
+        in_msgstr = 1
+        msgstr_buffer = $0
+        next
+    }
+    
+    # 收集 msgid 或 msgstr 的內容行
+    /^"/ {
+        if (collecting_msgid) {
+            msgid_content = msgid_content "\n" $0
+        } else if (collecting_msgstr) {
+            msgstr_buffer = msgstr_buffer "\n" $0
+        }
+        next
+    }
+    
+    # 其他行（註解、空行等）
+    {
+        if (in_msgid && in_msgstr) {
+            print "msgid " msgid_content
+            print "msgstr " msgid_content
+        }
+        
+        # 重置狀態
+        in_msgid = 0
+        in_msgstr = 0
+        msgid_content = ""
+        msgstr_buffer = ""
+        collecting_msgid = 0
+        collecting_msgstr = 0
+        print
+    }
+    
+    END {
+        # 處理最後一個 msgid/msgstr 對
+        if (in_msgid && in_msgstr) {
+            print "msgid " msgid_content
+            print "msgstr " msgid_content
+        }
+    }
+    ' "$ZH_HANT_PO" > "$ZH_HANT_PO.tmp" && mv "$ZH_HANT_PO.tmp" "$ZH_HANT_PO"
+fi
