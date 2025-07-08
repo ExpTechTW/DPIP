@@ -13,7 +13,21 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 class MonitorMapLayerManager extends MapLayerManager {
-  MonitorMapLayerManager(super.context, super.controller);
+  final bool isReplayMode;
+  final int? replayTimestamp;
+
+  MonitorMapLayerManager(
+    super.context,
+    super.controller, {
+    this.isReplayMode = true,
+    this.replayTimestamp = 1751918230855,
+  }) {
+    if (isReplayMode) {
+      GlobalProviders.data.setReplayMode(true, replayTimestamp);
+    } else {
+      GlobalProviders.data.setReplayMode(false);
+    }
+  }
 
   final currentRtsTime = ValueNotifier<String?>(GlobalProviders.data.rts?.time.toString());
 
@@ -353,6 +367,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   @override
   void dispose() {
+    GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
   }
 

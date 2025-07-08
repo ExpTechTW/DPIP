@@ -18,14 +18,18 @@ import 'package:dpip/utils/map_utils.dart';
 
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
+
   UnmodifiableMapView<String, Station> get station => UnmodifiableMapView(_station);
+
   void setStation(Map<String, Station> station) {
     _station = station;
     notifyListeners();
   }
 
   Rts? _rts;
+
   Rts? get rts => _rts;
+
   void setRts(Rts rts) {
     _rts = rts;
     notifyListeners();
@@ -50,21 +54,27 @@ class _DpipDataModel extends ChangeNotifier {
       ),
     ), */
   ];
+
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
+
   void setEew(List<Eew> eew) {
     _eew = eew;
     notifyListeners();
   }
 
   List<PartialEarthquakeReport> _partialReport = [];
+
   UnmodifiableListView<PartialEarthquakeReport> get partialReport => UnmodifiableListView(_partialReport);
+
   void setPartialReport(List<PartialEarthquakeReport> partialReport) {
     _partialReport = partialReport;
     notifyListeners();
   }
 
   Map<String, EarthquakeReport> _report = {};
+
   UnmodifiableMapView<String, EarthquakeReport> get report => UnmodifiableMapView(_report);
+
   void setReport(String id, EarthquakeReport report) {
     _report[id] = report;
     notifyListeners();
@@ -76,49 +86,63 @@ class _DpipDataModel extends ChangeNotifier {
   }
 
   List<String> _radar = [];
+
   UnmodifiableListView<String> get radar => UnmodifiableListView(_radar);
+
   void setRadar(List<String> radar) {
     _radar = radar;
     notifyListeners();
   }
 
   List<String> _temperature = [];
+
   UnmodifiableListView<String> get temperature => UnmodifiableListView(_temperature);
+
   void setTemperature(List<String> temperature) {
     _temperature = temperature;
     notifyListeners();
   }
 
   final Map<String, List<WeatherStation>> _weatherData = {};
+
   UnmodifiableMapView<String, List<WeatherStation>> get weatherData => UnmodifiableMapView(_weatherData);
+
   void setWeatherData(String time, List<WeatherStation> weather) {
     _weatherData[time] = weather;
     notifyListeners();
   }
 
   List<String> _precipitation = [];
+
   UnmodifiableListView<String> get precipitation => UnmodifiableListView(_precipitation);
+
   void setPrecipitation(List<String> precipitation) {
     _precipitation = precipitation;
     notifyListeners();
   }
 
   final Map<String, List<RainStation>> _rainData = {};
+
   UnmodifiableMapView<String, List<RainStation>> get rainData => UnmodifiableMapView(_rainData);
+
   void setRainData(String time, List<RainStation> rain) {
     _rainData[time] = rain;
     notifyListeners();
   }
 
   List<String> _wind = [];
+
   UnmodifiableListView<String> get wind => UnmodifiableListView(_wind);
+
   void setWind(List<String> wind) {
     _wind = wind;
     notifyListeners();
   }
 
   int _timeOffset = 0;
+
   int get timeOffset => _timeOffset;
+
   void setTimeOffset(int timeOffset) {
     _timeOffset = timeOffset;
     notifyListeners();
@@ -129,14 +153,24 @@ class DpipDataModel extends _DpipDataModel {
   Timer? _secondTimer;
   Timer? _minuteTimer;
   bool _isInForeground = true;
+  bool _isReplayMode = false;
+  int? _replayTimestamp;
 
-  int get currentTime => DateTime.now().millisecondsSinceEpoch + timeOffset;
+  int get currentTime =>
+      _isReplayMode
+          ? (_replayTimestamp ?? DateTime.now().millisecondsSinceEpoch)
+          : DateTime.now().millisecondsSinceEpoch + timeOffset;
 
   /// Returns only active EEWs (within 3 minutes of current app time)
   UnmodifiableListView<Eew> get activeEew {
     final threeMinutesAgo = currentTime - (3 * 60 * 1000);
 
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
+  }
+
+  void setReplayMode(bool isReplay, [int? timestamp]) {
+    _isReplayMode = isReplay;
+    _replayTimestamp = timestamp;
   }
 
   void startFetching() {
@@ -146,21 +180,38 @@ class DpipDataModel extends _DpipDataModel {
       if (!_isInForeground) return;
 
       try {
-        final data = await Future.wait(
-          [ExpTech().getRts(), ExpTech().getEew()],
-          cleanUp: (successValue) {
-            switch (successValue) {
-              case Rts():
-                setRts(successValue);
-              case List<Eew>():
-                setEew(successValue);
-            }
-          },
-        );
+        final data =
+            (_isReplayMode)
+                ? await Future.wait(
+                  [ExpTech().getRts(_replayTimestamp), ExpTech().getEew(_replayTimestamp)],
+                  cleanUp: (successValue) {
+                    switch (successValue) {
+                      case Rts():
+                        setRts(successValue);
+                      case List<Eew>():
+                        setEew(successValue);
+                    }
+                  },
+                )
+                : await Future.wait(
+                  [ExpTech().getRts(), ExpTech().getEew()],
+                  cleanUp: (successValue) {
+                    switch (successValue) {
+                      case Rts():
+                        setRts(successValue);
+                      case List<Eew>():
+                        setEew(successValue);
+                    }
+                  },
+                );
 
         final [rts as Rts, eew as List<Eew>] = data;
         setRts(rts);
         setEew(eew);
+
+        if (_isReplayMode && _replayTimestamp != null) {
+          _replayTimestamp = _replayTimestamp! + 1000;
+        }
       } catch (e, s) {
         TalkerManager.instance.error('everySecondCallback', e, s);
       }
