@@ -83,7 +83,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       final rtsLayerId = MapLayerIds.rts();
 
       final eewSourceId = MapSourceIds.eew();
-      final epicenterLayerId = MapLayerIds.eew('epicenter');
+      final epicenterLayerId = MapLayerIds.eew('x');
       final pWaveLayerId = MapLayerIds.eew('p');
       final sWaveLayerId = MapLayerIds.eew('s');
 
@@ -267,7 +267,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     final rtsLayerId = MapLayerIds.rts();
 
-    final epicenterLayerId = MapLayerIds.eew('epicenter');
+    final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
     final sWaveLayerId = MapLayerIds.eew('s');
 
@@ -295,7 +295,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (visible) return;
 
     final rtsLayerId = MapLayerIds.rts();
-    final epicenterLayerId = MapLayerIds.eew('epicenter');
+    final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
     final sWaveLayerId = MapLayerIds.eew('s');
 
@@ -324,7 +324,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     final rtsLayerId = MapLayerIds.rts();
 
     final eewSourceId = MapSourceIds.eew();
-    final epicenterLayerId = MapLayerIds.eew('epicenter');
+    final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
     final sWaveLayerId = MapLayerIds.eew('s');
 
