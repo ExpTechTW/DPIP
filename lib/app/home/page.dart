@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
 
                   return Column(
                     children:
-                        grouped.entries.mapIndexed((index, entry) {
+                        grouped.entries.sorted((a, b) => b.key.compareTo(a.key)).mapIndexed((index, entry) {
                           final date = entry.key;
                           final historyGroup = entry.value;
                           return Column(

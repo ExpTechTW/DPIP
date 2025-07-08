@@ -76,12 +76,13 @@ PODS:
   - Flutter (1.0.0)
   - flutter_background_service_ios (0.0.3):
     - Flutter
-  - flutter_image_gallery_saver (0.0.1):
-    - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
+  - gal (1.0.0):
+    - Flutter
+    - FlutterMacOS
   - geolocator_apple (1.2.0):
     - Flutter
     - FlutterMacOS
@@ -128,8 +129,6 @@ PODS:
   - GoogleUtilities/UserDefaults (8.1.0):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - image_gallery_saver (2.0.2):
-    - Flutter
   - in_app_purchase_storekit (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -179,11 +178,10 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
-  - flutter_image_gallery_saver (from `.symlinks/plugins/flutter_image_gallery_saver/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - gal (from `.symlinks/plugins/gal/darwin`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
-  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/darwin`)
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -233,16 +231,14 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_background_service_ios:
     :path: ".symlinks/plugins/flutter_background_service_ios/ios"
-  flutter_image_gallery_saver:
-    :path: ".symlinks/plugins/flutter_image_gallery_saver/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  gal:
+    :path: ".symlinks/plugins/gal/darwin"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/darwin"
-  image_gallery_saver:
-    :path: ".symlinks/plugins/image_gallery_saver/ios"
   in_app_purchase_storekit:
     :path: ".symlinks/plugins/in_app_purchase_storekit/darwin"
   maplibre_gl:
@@ -281,13 +277,12 @@ SPEC CHECKSUMS:
   FirebaseSessions: 9b3b30947b97a15370e0902ee7a90f50ef60ead6
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_background_service_ios: 00d31bdff7b4bfe06d32375df358abe0329cf87e
-  flutter_image_gallery_saver: 0453c83412e9691abef94c04c8d180724f5083a8
   flutter_local_notifications: a5a732f069baa862e728d839dd2ebb904737effb
   fluttertoast: 2c67e14dce98bbdb200df9e1acf610d7a6264ea1
+  gal: baecd024ebfd13c441269ca7404792a7152fde89
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  image_gallery_saver: 14711d79da40581063e8842a11acf1969d781ed7
   in_app_purchase_storekit: d1a48cb0f8b29dbf5f85f782f5dd79b21b90a5e6
   IosAwnCore: 653786a911089012092ce831f2945cd339855a89
   IosAwnFcmCore: 1bdb9054b2e00187d00f1ffcfbb1855949a7b82f
