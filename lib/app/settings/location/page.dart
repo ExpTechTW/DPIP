@@ -315,6 +315,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   Future toggleAutoLocation() async {
     final isAuto = context.read<SettingsLocationModel>().auto;
 
+    stopAndroidBackgroundService();
+
     if (!isAuto) {
       final notification = await checkNotificationPermission();
       if (!notification) return;
@@ -331,8 +333,6 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
       batteryOptimizationPermission = batteryOptimization;
       if (!batteryOptimization) return;
-
-      stopAndroidBackgroundService();
 
       if (!isAuto) {
         startAndroidBackgroundService(shouldInitialize: false);
