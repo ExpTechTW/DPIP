@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
@@ -216,6 +217,10 @@ class DpipMapState extends State<DpipMap> {
     try {
       final controller = _controller;
       if (controller == null) return;
+
+      if (Platform.isIOS && GlobalProviders.location.auto) {
+        await getSavedLocation();
+      }
 
       final location = GlobalProviders.location.coordinateNotifier.value;
 

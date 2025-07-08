@@ -51,7 +51,7 @@ dependencies:
   in_app_update: 4.2.3
   intl: any
   json_annotation: 4.9.0
-  maplibre_gl: 0.21.0
+  maplibre_gl: 0.22.0
   material_symbols_icons: ^4.2815.0
   package_info_plus: ^8.3.0
   path_provider: ^2.1.5
