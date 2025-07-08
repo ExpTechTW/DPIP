@@ -29,10 +29,14 @@ class _DpipDataModel extends ChangeNotifier {
   Rts? _rts;
 
   Rts? get rts => _rts;
+  int _RtsTime = 0;
 
   void setRts(Rts rts) {
-    _rts = rts;
-    notifyListeners();
+    if (rts.time > _RtsTime) {
+      _RtsTime = rts.time;
+      _rts = rts;
+      notifyListeners();
+    }
   }
 
   List<Eew> _eew = [
@@ -171,6 +175,9 @@ class DpipDataModel extends _DpipDataModel {
   void setReplayMode(bool isReplay, [int? timestamp]) {
     _isReplayMode = isReplay;
     _replayTimestamp = timestamp;
+    if (isReplay) {
+      _RtsTime = timestamp!;
+    }
   }
 
   void startFetching() {
@@ -322,6 +329,34 @@ class DpipDataModel extends _DpipDataModel {
             ..setGeometry(e.info.latlng.toGeoJsonCoordinates())
             ..setProperty('type', 'x');
       builder.addFeature(epicenter);
+    }
+
+    return builder.build();
+  }
+
+  Map<String, dynamic> getIntensityGeoJson() {
+    final rts = this.rts;
+    final builder = GeoJsonBuilder();
+
+    for (final MapEntry(key: id, value: s) in station.entries) {
+      if (s.work == false) continue;
+      final feature =
+          GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates())
+            ..setId(int.parse(id))
+            ..setProperty('net', s.net)
+            ..setProperty('code', s.info.last.code);
+
+      if (rts != null) {
+        final data = rts.station[id];
+
+        if (data != null) {
+          feature.setProperty('intensity', intensityFloatToInt(data.alert! ? data.I : data.i));
+          feature.setProperty('alert', data.alert! ? 1 : 0);
+        }
+      }
+
+      builder.addFeature(feature);
     }
 
     return builder.build();

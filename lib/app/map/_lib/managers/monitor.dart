@@ -95,6 +95,10 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       final rtsSourceId = MapSourceIds.rts();
       final rtsLayerId = MapLayerIds.rts();
+      final intensitySourceId = MapSourceIds.intensity();
+      final intensityLayerId = MapLayerIds.intensity();
+      final intensity0SourceId = MapSourceIds.intensity0();
+      final intensity0LayerId = MapLayerIds.intensity0();
 
       final eewSourceId = MapSourceIds.eew();
       final epicenterLayerId = MapLayerIds.eew('x');
@@ -103,6 +107,10 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       final isRtsSourceExists = sources.contains(rtsSourceId);
       final isRtsLayerExists = layers.contains(rtsLayerId);
+      final isIntensitySourceExists = sources.contains(intensitySourceId);
+      final isIntensityLayerExists = layers.contains(intensityLayerId);
+      final isIntensity0SourceExists = sources.contains(intensity0SourceId);
+      final isIntensity0LayerExists = layers.contains(intensity0LayerId);
       final isEewSourceExists = sources.contains(eewSourceId);
       final isEewLayerExists =
           layers.contains(epicenterLayerId) && layers.contains(pWaveLayerId) && layers.contains(sWaveLayerId);
@@ -141,6 +149,101 @@ class MonitorMapLayerManager extends MapLayerManager {
 
         await controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$rtsLayerId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isIntensity0SourceExists) {
+        final data = GlobalProviders.data.getIntensityGeoJson();
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(intensity0SourceId, properties);
+        TalkerManager.instance.info('Added Source "$intensity0SourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isIntensity0LayerExists) {
+        final properties = CircleLayerProperties(
+          circleColor: Colors.grey.toHexStringRGB(),
+          circleRadius: kRtsCircleRadius,
+          circleOpacity: [
+            Expressions.caseExpression,
+            [Expressions.has, 'intensity'],
+            [
+              Expressions.caseExpression,
+              [
+                Expressions.all,
+                [Expressions.equal, [Expressions.get, 'intensity'], 0],
+                [Expressions.equal, [Expressions.get, 'alert'], 1],
+              ],
+              1,
+              0,
+            ],
+            0,
+          ],
+          visibility: 'none',
+        );
+
+        await controller.addLayer(intensity0SourceId, intensity0LayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$intensity0LayerId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isIntensitySourceExists) {
+        final data = GlobalProviders.data.getIntensityGeoJson();
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(intensitySourceId, properties);
+        TalkerManager.instance.info('Added Source "$intensitySourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isIntensityLayerExists) {
+        const properties = SymbolLayerProperties(
+          symbolSortKey: [Expressions.get, 'intensity'],
+          symbolZOrder: 'source',
+          iconSize: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.5,
+          ],
+          iconImage: [
+            Expressions.match,
+            [Expressions.get, 'intensity'],
+            1,
+            'intensity-1',
+            2,
+            'intensity-2',
+            3,
+            'intensity-3',
+            4,
+            'intensity-4',
+            5,
+            'intensity-5',
+            6,
+            'intensity-6',
+            7,
+            'intensity-7',
+            8,
+            'intensity-8',
+            9,
+            'intensity-9',
+            ''
+          ],
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+          visibility: 'none',
+        );
+
+        await controller.addLayer(intensitySourceId, intensityLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$intensityLayerId"');
 
         if (!context.mounted) return;
       }
@@ -239,6 +342,24 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
       _updateRtsSource();
+      _updateLayerVisibility();
+    }
+  }
+
+  Future<void> _updateLayerVisibility() async {
+    if (!didSetup) return;
+
+    try {
+      final rtsLayerId = MapLayerIds.rts();
+      final intensityLayerId = MapLayerIds.intensity();
+      final intensity0LayerId = MapLayerIds.intensity0();
+      final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+
+      await controller.setLayerVisibility(rtsLayerId, !hasBox);
+      await controller.setLayerVisibility(intensityLayerId, hasBox);
+      await controller.setLayerVisibility(intensity0LayerId, hasBox);
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager._updateLayerVisibility', e, s);
     }
   }
 
@@ -246,14 +367,30 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (!didSetup) return;
 
     try {
-      final sourceId = MapSourceIds.rts();
+      final rtsSourceId = MapSourceIds.rts();
+      final intensitySourceId = MapSourceIds.intensity();
+      final intensity0SourceId = MapSourceIds.intensity0();
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isRtsSourceExists = (await controller.getSourceIds()).contains(rtsSourceId);
+      final isIntensitySourceExists = (await controller.getSourceIds()).contains(intensitySourceId);
+      final isIntensity0SourceExists = (await controller.getSourceIds()).contains(intensity0SourceId);
 
-      if (isSourceExists) {
+      if (isRtsSourceExists) {
         final data = GlobalProviders.data.getRtsGeoJson();
-        await controller.setGeoJsonSource(sourceId, data);
+        await controller.setGeoJsonSource(rtsSourceId, data);
         TalkerManager.instance.info('Updated RTS source data for time: ${currentRtsTime.value}');
+      }
+
+      if (isIntensitySourceExists) {
+        final data = GlobalProviders.data.getIntensityGeoJson();
+        await controller.setGeoJsonSource(intensitySourceId, data);
+        TalkerManager.instance.info('Updated Intensity source data for time: ${currentRtsTime.value}');
+      }
+
+      if (isIntensity0SourceExists) {
+        final data = GlobalProviders.data.getIntensityGeoJson();
+        await controller.setGeoJsonSource(intensity0SourceId, data);
+        TalkerManager.instance.info('Updated Intensity0 source data for time: ${currentRtsTime.value}');
       }
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateRtsSource', e, s);
@@ -280,6 +417,8 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (!visible) return;
 
     final rtsLayerId = MapLayerIds.rts();
+    final intensityLayerId = MapLayerIds.intensity();
+    final intensity0LayerId = MapLayerIds.intensity0();
 
     final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
@@ -289,6 +428,12 @@ class MonitorMapLayerManager extends MapLayerManager {
       // rts
       await controller.setLayerVisibility(rtsLayerId, false);
       TalkerManager.instance.info('Hiding Layer "$rtsLayerId"');
+
+      // intensity
+      await controller.setLayerVisibility(intensityLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$intensityLayerId"');
+      await controller.setLayerVisibility(intensity0LayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$intensity0LayerId"');
 
       // eew
       await controller.setLayerVisibility(epicenterLayerId, false);
@@ -309,13 +454,22 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (visible) return;
 
     final rtsLayerId = MapLayerIds.rts();
+    final intensityLayerId = MapLayerIds.intensity();
+    final intensity0LayerId = MapLayerIds.intensity0();
     final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
     final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
-      await controller.setLayerVisibility(rtsLayerId, true);
+      final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+
+      await controller.setLayerVisibility(rtsLayerId, !hasBox);
       TalkerManager.instance.info('Showing Layer "$rtsLayerId"');
+
+      await controller.setLayerVisibility(intensityLayerId, hasBox);
+      TalkerManager.instance.info('Showing Layer "$intensityLayerId"');
+      await controller.setLayerVisibility(intensity0LayerId, hasBox);
+      TalkerManager.instance.info('Showing Layer "$intensity0LayerId"');
 
       await controller.setLayerVisibility(epicenterLayerId, true);
       TalkerManager.instance.info('Showing Layer "$epicenterLayerId"');
@@ -336,6 +490,10 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> remove() async {
     final rtsSourceId = MapSourceIds.rts();
     final rtsLayerId = MapLayerIds.rts();
+    final intensitySourceId = MapSourceIds.intensity();
+    final intensityLayerId = MapLayerIds.intensity();
+    final intensity0SourceId = MapSourceIds.intensity0();
+    final intensity0LayerId = MapLayerIds.intensity0();
 
     final eewSourceId = MapSourceIds.eew();
     final epicenterLayerId = MapLayerIds.eew('x');
@@ -348,6 +506,18 @@ class MonitorMapLayerManager extends MapLayerManager {
       TalkerManager.instance.info('Removed Layer "$rtsLayerId"');
       await controller.removeSource(rtsSourceId);
       TalkerManager.instance.info('Removed Source "$rtsSourceId"');
+
+      // intensity
+      await controller.removeLayer(intensityLayerId);
+      TalkerManager.instance.info('Removed Layer "$intensityLayerId"');
+      await controller.removeSource(intensitySourceId);
+      TalkerManager.instance.info('Removed Source "$intensitySourceId"');
+
+      // intensity0
+      await controller.removeLayer(intensity0LayerId);
+      TalkerManager.instance.info('Removed Layer "$intensity0LayerId"');
+      await controller.removeSource(intensity0SourceId);
+      TalkerManager.instance.info('Removed Source "$intensity0SourceId"');
 
       // eew
       await controller.removeLayer(epicenterLayerId);
