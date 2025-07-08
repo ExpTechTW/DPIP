@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/eew.dart';
@@ -15,6 +17,14 @@ import 'package:dpip/core/eew.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/global.dart';
+import 'package:dpip/api/model/announcement.dart';
+import 'package:dpip/api/model/changelog/changelog.dart';
+import 'package:dpip/api/model/crowdin/localization_progress.dart';
+import 'package:dpip/api/model/tsunami/tsunami_actual.dart';
+import 'package:dpip/api/model/tsunami/tsunami_earthquake.dart';
+import 'package:dpip/api/model/tsunami/tsunami_estimate.dart';
+import 'package:dpip/api/model/weather/lightning.dart';
 
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
@@ -357,6 +367,38 @@ class DpipDataModel extends _DpipDataModel {
       }
 
       builder.addFeature(feature);
+    }
+
+    return builder.build();
+  }
+
+  Map<String, dynamic> getBoxGeoJson() {
+    final rts = this.rts;
+    final builder = GeoJsonBuilder();
+
+    if (rts != null && rts.box.isNotEmpty) {
+      for (final area in Global.box['features']) {
+        final id = area['properties']['ID'].toString();
+        if (!rts.box.containsKey(id)) continue;
+
+        final coordinates = (area['geometry']['coordinates'][0] as List).map((e) => (e as List).map((n) => n as double).toList()).toList();
+        
+        if (eew?.isNotEmpty == true) {
+          final eewMap = {for (var e in eew) e.id: e};
+          final eewDistMap = {
+            for (var e in eew) 
+            e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s
+          };
+          
+          if (checkBoxSkip(eewMap, eewDistMap, coordinates)) continue;
+        }
+
+        final feature = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon)
+          ..setGeometry(coordinates)
+          ..setProperty('i', rts.box[id]);
+
+        builder.addFeature(feature);
+      }
     }
 
     return builder.build();

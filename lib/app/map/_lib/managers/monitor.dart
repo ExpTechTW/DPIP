@@ -99,6 +99,8 @@ class MonitorMapLayerManager extends MapLayerManager {
       final intensityLayerId = MapLayerIds.intensity();
       final intensity0SourceId = MapSourceIds.intensity0();
       final intensity0LayerId = MapLayerIds.intensity0();
+      final boxSourceId = MapSourceIds.box();
+      final boxLayerId = MapLayerIds.box();
 
       final eewSourceId = MapSourceIds.eew();
       final epicenterLayerId = MapLayerIds.eew('x');
@@ -111,11 +113,58 @@ class MonitorMapLayerManager extends MapLayerManager {
       final isIntensityLayerExists = layers.contains(intensityLayerId);
       final isIntensity0SourceExists = sources.contains(intensity0SourceId);
       final isIntensity0LayerExists = layers.contains(intensity0LayerId);
+      final isBoxSourceExists = sources.contains(boxSourceId);
+      final isBoxLayerExists = layers.contains(boxLayerId);
       final isEewSourceExists = sources.contains(eewSourceId);
       final isEewLayerExists =
           layers.contains(epicenterLayerId) && layers.contains(pWaveLayerId) && layers.contains(sWaveLayerId);
 
       if (!context.mounted) return;
+
+      if (!isBoxSourceExists) {
+        final data = GlobalProviders.data.getBoxGeoJson();
+        final properties = GeojsonSourceProperties(data: data);
+
+        await controller.addSource(boxSourceId, properties);
+        TalkerManager.instance.info('Added Source "$boxSourceId"');
+
+        if (!context.mounted) return;
+      }
+
+      if (!isBoxLayerExists) {
+        final properties = LineLayerProperties(
+          lineWidth: 2,
+          lineColor: [
+            Expressions.match,
+            [Expressions.get, 'i'],
+            9,
+            '#FF0000',
+            8,
+            '#FF0000',
+            7,
+            '#FF0000',
+            6,
+            '#FF0000',
+            5,
+            '#FF0000',
+            4,
+            '#FF0000',
+            3,
+            '#EAC100',
+            2,
+            '#EAC100',
+            1,
+            '#00DB00',
+            '#00DB00',
+          ],
+          visibility: 'none',
+        );
+
+        await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$boxLayerId"');
+
+        if (!context.mounted) return;
+      }
 
       if (!isRtsSourceExists) {
         final data = GlobalProviders.data.getRtsGeoJson();
@@ -353,11 +402,13 @@ class MonitorMapLayerManager extends MapLayerManager {
       final rtsLayerId = MapLayerIds.rts();
       final intensityLayerId = MapLayerIds.intensity();
       final intensity0LayerId = MapLayerIds.intensity0();
+      final boxLayerId = MapLayerIds.box();
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await controller.setLayerVisibility(rtsLayerId, !hasBox);
       await controller.setLayerVisibility(intensityLayerId, hasBox);
       await controller.setLayerVisibility(intensity0LayerId, hasBox);
+      await controller.setLayerVisibility(boxLayerId, hasBox);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateLayerVisibility', e, s);
     }
@@ -370,10 +421,12 @@ class MonitorMapLayerManager extends MapLayerManager {
       final rtsSourceId = MapSourceIds.rts();
       final intensitySourceId = MapSourceIds.intensity();
       final intensity0SourceId = MapSourceIds.intensity0();
+      final boxSourceId = MapSourceIds.box();
 
       final isRtsSourceExists = (await controller.getSourceIds()).contains(rtsSourceId);
       final isIntensitySourceExists = (await controller.getSourceIds()).contains(intensitySourceId);
       final isIntensity0SourceExists = (await controller.getSourceIds()).contains(intensity0SourceId);
+      final isBoxSourceExists = (await controller.getSourceIds()).contains(boxSourceId);
 
       if (isRtsSourceExists) {
         final data = GlobalProviders.data.getRtsGeoJson();
@@ -391,6 +444,12 @@ class MonitorMapLayerManager extends MapLayerManager {
         final data = GlobalProviders.data.getIntensityGeoJson();
         await controller.setGeoJsonSource(intensity0SourceId, data);
         TalkerManager.instance.info('Updated Intensity0 source data for time: ${currentRtsTime.value}');
+      }
+
+      if (isBoxSourceExists) {
+        final data = GlobalProviders.data.getBoxGeoJson();
+        await controller.setGeoJsonSource(boxSourceId, data);
+        TalkerManager.instance.info('Updated Box source data for time: ${currentRtsTime.value}');
       }
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateRtsSource', e, s);
@@ -419,6 +478,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     final rtsLayerId = MapLayerIds.rts();
     final intensityLayerId = MapLayerIds.intensity();
     final intensity0LayerId = MapLayerIds.intensity0();
+    final boxLayerId = MapLayerIds.box();
 
     final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
@@ -434,6 +494,8 @@ class MonitorMapLayerManager extends MapLayerManager {
       TalkerManager.instance.info('Hiding Layer "$intensityLayerId"');
       await controller.setLayerVisibility(intensity0LayerId, false);
       TalkerManager.instance.info('Hiding Layer "$intensity0LayerId"');
+      await controller.setLayerVisibility(boxLayerId, false);
+      TalkerManager.instance.info('Hiding Layer "$boxLayerId"');
 
       // eew
       await controller.setLayerVisibility(epicenterLayerId, false);
@@ -456,6 +518,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     final rtsLayerId = MapLayerIds.rts();
     final intensityLayerId = MapLayerIds.intensity();
     final intensity0LayerId = MapLayerIds.intensity0();
+    final boxLayerId = MapLayerIds.box();
     final epicenterLayerId = MapLayerIds.eew('x');
     final pWaveLayerId = MapLayerIds.eew('p');
     final sWaveLayerId = MapLayerIds.eew('s');
@@ -470,6 +533,8 @@ class MonitorMapLayerManager extends MapLayerManager {
       TalkerManager.instance.info('Showing Layer "$intensityLayerId"');
       await controller.setLayerVisibility(intensity0LayerId, hasBox);
       TalkerManager.instance.info('Showing Layer "$intensity0LayerId"');
+      await controller.setLayerVisibility(boxLayerId, hasBox);
+      TalkerManager.instance.info('Showing Layer "$boxLayerId"');
 
       await controller.setLayerVisibility(epicenterLayerId, true);
       TalkerManager.instance.info('Showing Layer "$epicenterLayerId"');
@@ -494,6 +559,8 @@ class MonitorMapLayerManager extends MapLayerManager {
     final intensityLayerId = MapLayerIds.intensity();
     final intensity0SourceId = MapSourceIds.intensity0();
     final intensity0LayerId = MapLayerIds.intensity0();
+    final boxSourceId = MapSourceIds.box();
+    final boxLayerId = MapLayerIds.box();
 
     final eewSourceId = MapSourceIds.eew();
     final epicenterLayerId = MapLayerIds.eew('x');
@@ -518,6 +585,12 @@ class MonitorMapLayerManager extends MapLayerManager {
       TalkerManager.instance.info('Removed Layer "$intensity0LayerId"');
       await controller.removeSource(intensity0SourceId);
       TalkerManager.instance.info('Removed Source "$intensity0SourceId"');
+
+      // box
+      await controller.removeLayer(boxLayerId);
+      TalkerManager.instance.info('Removed Layer "$boxLayerId"');
+      await controller.removeSource(boxSourceId);
+      TalkerManager.instance.info('Removed Source "$boxSourceId"');
 
       // eew
       await controller.removeLayer(epicenterLayerId);

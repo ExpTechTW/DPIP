@@ -17,6 +17,7 @@ class MapSourceIds {
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
   static String intensity() => 'intensity';
   static String intensity0() => 'intensity0';
+  static String box() => 'box';
 }
 
 class MapLayerIds {
@@ -32,6 +33,7 @@ class MapLayerIds {
   static String wind([String? time]) => time == null ? 'wind' : 'wind-$time';
   static String intensity() => 'intensity';
   static String intensity0() => 'intensity0';
+  static String box() => 'box';
 }
 
 Future<void> cleanupMap(MapLibreMapController controller) async {
