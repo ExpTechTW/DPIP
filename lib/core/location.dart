@@ -51,7 +51,7 @@ class LocationService {
 
     if (!isLocationServiceEnabled) {
       TalkerManager.instance.warning('位置服務未啟用');
-      return GetLocationResult(change: false, code: null, lat: 0, lng: 0);
+      return GetLocationResult(change: false, lat: 0, lng: 0);
     }
 
     bool hasLocationChanged = false;

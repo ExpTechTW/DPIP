@@ -22,9 +22,9 @@ Future<void> getSavedLocation() async {
     final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getSavedLocation');
     final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
 
-    GlobalProviders.location.setLatLng(latitude: data?['lat'], longitude: data?['lon']);
+    GlobalProviders.location.setLatLng(latitude: data!['lat'], longitude: data['lon']);
 
-    final GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data?['lat'], data?['lon']);
+    final GeoJsonProperties? location = GeoJsonHelper.checkPointInPolygons(data['lat'], data['lon']);
 
     GlobalProviders.location.setCode(location?.code.toString());
 

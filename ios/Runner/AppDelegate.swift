@@ -9,163 +9,167 @@ import UIKit
 class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     MessagingDelegate
 {
-    var locationManager: CLLocationManager!
-    var lastSentLocation: CLLocation?
-    var fcmToken: String?
-    var locationChannel: FlutterMethodChannel?
-    var methodChannel: FlutterMethodChannel?
-    var isLocationEnabled: Bool = false
-    var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    // MARK: - Properties
+    
+    private var locationChannel: FlutterMethodChannel?
+    private var methodChannel: FlutterMethodChannel?
+    private var locationManager: CLLocationManager!
+    private var lastSentLocation: CLLocation?
+    private var isLocationEnabled: Bool = false
+    private var fcmToken: String?
+    private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
+    // MARK: - Application Lifecycle
+    
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]?
     ) -> Bool {
-        FirebaseApp.configure()
+        setupFirebase()
         GeneratedPluginRegistrant.register(with: self)
-
-        let controller = window?.rootViewController as! FlutterViewController
-        locationChannel = FlutterMethodChannel(
-            name: "com.exptech.dpip/location",
-            binaryMessenger: controller.binaryMessenger)
-
-        locationChannel?.setMethodCallHandler { [weak self] (call, result) in
-            guard let self = self else { return }
-            if call.method == "toggleLocation" {
-                if let args = call.arguments as? [String: Any],
-                    let isEnabled = args["isEnabled"] as? Bool
-                {
-                    self.toggleLocation(isEnabled: isEnabled)
-                    result("Location toggled")
-                } else {
-                    result(
-                        FlutterError(
-                            code: "INVALID_ARGUMENT",
-                            message: "Invalid argument", details: nil))
-                }
-            } else {
-                result(FlutterMethodNotImplemented)
-            }
-        }
-
-        methodChannel = FlutterMethodChannel(
-            name: "com.exptech.dpip/data",
-            binaryMessenger: controller.binaryMessenger)
-
-        methodChannel?.setMethodCallHandler({
-            (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void
-            in
-            if call.method == "getSavedLocation" {
-                self.handleGetSavedLocation(result: result)
-            } else {
-                result(FlutterMethodNotImplemented)
-            }
-        })
-
-        locationManager = CLLocationManager()
-        locationManager.delegate = self
-        locationManager.allowsBackgroundLocationUpdates = true
-        locationManager.pausesLocationUpdatesAutomatically = false
-
-        Messaging.messaging().delegate = self
-
-        Messaging.messaging().token { token, error in
-            if let error = error {
-                print("Error fetching FCM token: \(error)")
-            } else if let token = token {
-                print("FCM token: \(token)")
-                self.fcmToken = token
-            }
-        }
-
-        isLocationEnabled = UserDefaults.standard.bool(
-            forKey: "locationSendingEnabled")
-
+        setupFlutterChannels()
+        setupLocationManager()
+        
         if let locationKey = launchOptions?[
             UIApplication.LaunchOptionsKey.location] as? NSNumber,
             locationKey.boolValue
         {
-            print("App launched due to location update")
             startLocationUpdates()
-        } else {
-            if isLocationEnabled {
-                startLocationUpdates()
-            }
+        } else if isLocationEnabled {
+            startLocationUpdates()
         }
-
+        
         return super.application(
             application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    private func handleGetSavedLocation(result: FlutterResult) {
-        let latitude = UserDefaults.standard.double(forKey: "user-lat")
-        let longitude = UserDefaults.standard.double(forKey: "user-lon")
-        if latitude != 0 && longitude != 0 {
-            result(["lat": latitude, "lon": longitude])
-        } else {
-            result(nil)
-        }
+    override func applicationDidEnterBackground(_ application: UIApplication) {
+        startBackgroundTask()
     }
 
-    func toggleLocation(isEnabled: Bool) {
+    // MARK: - Setup Methods
+    
+    private func setupFirebase() {
+        FirebaseApp.configure()
+        Messaging.messaging().delegate = self
+        
+        Messaging.messaging().token { [weak self] token, error in
+            if let error = error {
+                print("Error fetching FCM token: \(error)")
+                return
+            }
+            if let token = token {
+                print("FCM token: \(token)")
+                self?.fcmToken = token
+            }
+        }
+    }
+    
+    private func setupFlutterChannels() {
+        guard let controller = window?.rootViewController as? FlutterViewController else { return }
+        
+        locationChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/location",
+            binaryMessenger: controller.binaryMessenger)
+        
+        locationChannel?.setMethodCallHandler { [weak self] (call, result) in
+            self?.handleLocationChannelCall(call, result: result)
+        }
+        
+        methodChannel = FlutterMethodChannel(
+            name: "com.exptech.dpip/data",
+            binaryMessenger: controller.binaryMessenger)
+        
+        methodChannel?.setMethodCallHandler { [weak self] (call, result) in
+            self?.handleMethodChannelCall(call, result: result)
+        }
+    }
+    
+    private func setupLocationManager() {
+        locationManager = CLLocationManager()
+        locationManager.delegate = self
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
+        isLocationEnabled = UserDefaults.standard.bool(
+            forKey: "locationSendingEnabled")
+    }
+    
+    // MARK: - Channel Handlers
+    
+    private func handleLocationChannelCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard call.method == "toggleLocation",
+              let args = call.arguments as? [String: Any],
+              let isEnabled = args["isEnabled"] as? Bool else {
+            result(FlutterError(code: "INVALID_ARGUMENT", message: "Invalid argument", details: nil))
+            return
+        }
+        
+        toggleLocation(isEnabled: isEnabled)
+        result("Location toggled")
+    }
+    
+    private func handleMethodChannelCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if call.method == "getSavedLocation" {
+            handleGetSavedLocation(result: result)
+        } else {
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    // MARK: - Location Management
+    
+    private func toggleLocation(isEnabled: Bool) {
         isLocationEnabled = isEnabled
         UserDefaults.standard.set(isEnabled, forKey: "locationSendingEnabled")
-        startLocationUpdates()
-
+        
         if isEnabled {
-            if lastSentLocation == nil {
-                if let currentLocation = locationManager.location {
-                    sendLocationToServer(location: currentLocation)
-                }
+            startLocationUpdates()
+            if lastSentLocation == nil, let currentLocation = locationManager.location {
+                sendLocationToServer(location: currentLocation)
             }
         } else {
             stopLocationUpdates()
         }
     }
-
-    func startLocationUpdates() {
-        if CLLocationManager.significantLocationChangeMonitoringAvailable() {
-            locationManager.startMonitoringSignificantLocationChanges()
-            print("Started monitoring significant location changes")
-
-            if let lastLocation = locationManager.location {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3){
-                    self.updateRegionMonitoring(for: lastLocation)
-                }
-            }
-        } else {
+    
+    private func startLocationUpdates() {
+        guard CLLocationManager.significantLocationChangeMonitoringAvailable() else {
             print("Significant location change monitoring is not available")
+            return
+        }
+        
+        locationManager.startMonitoringSignificantLocationChanges()
+        
+        if let lastLocation = locationManager.location {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.updateRegionMonitoring(for: lastLocation)
+            }
         }
     }
-
-    func stopLocationUpdates() {
+    
+    private func stopLocationUpdates() {
         locationManager.stopMonitoringSignificantLocationChanges()
         locationManager.stopUpdatingLocation()
-        for region in locationManager.monitoredRegions {
-            locationManager.stopMonitoring(for: region)
-        }
-        print("Stopped all location updates")
+        locationManager.monitoredRegions.forEach { locationManager.stopMonitoring(for: $0) }
     }
-
-    func updateRegionMonitoring(for location: CLLocation) {
-        for region in locationManager.monitoredRegions {
-            locationManager.stopMonitoring(for: region)
-        }
-
+    
+    private func updateRegionMonitoring(for location: CLLocation) {
+        locationManager.monitoredRegions.forEach { locationManager.stopMonitoring(for: $0) }
+        
         let region = CLCircularRegion(
-            center: location.coordinate, radius: 250,
-            identifier: "currentRegion")
+            center: location.coordinate,
+            radius: 250,
+            identifier: "currentRegion"
+        )
         region.notifyOnEntry = false
         region.notifyOnExit = true
-
+        
         locationManager.startMonitoring(for: region)
-
-        print(
-            "Updated region monitoring for location: \(location.coordinate.latitude), \(location.coordinate.longitude)"
-        )
     }
-
+    
+    // MARK: - Location Delegate Methods
+    
     func locationManager(
         _ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]
     ) {
@@ -177,23 +181,17 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     func locationManager(
         _ manager: CLLocationManager, didExitRegion region: CLRegion
     ) {
-        print("Exited region: \(region.identifier)")
         if let location = manager.location {
             sendLocationToServer(location: location)
         }
     }
-
-    func sendLocationToServer(location: CLLocation) {
-        guard isLocationEnabled else {
-            print("Location services are disabled, skipping location update")
-            return
-        }
-
-        guard let token = fcmToken else {
-            print("FCM token not available")
-            return
-        }
-
+    
+    // MARK: - Network
+    
+    private func sendLocationToServer(location: CLLocation) {
+        guard isLocationEnabled else { return }
+        guard let token = fcmToken else { return }
+        
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
         let appVersion =
@@ -203,7 +201,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
 
         let urlString =
             "https://api-1.exptech.dev/api/v2/location/1/\(token)/\(appVersion)/\(latitude),\(longitude)"
-        print(urlString)
         guard let url = URL(string: urlString) else { return }
         UserDefaults.standard.set(latitude, forKey: "user-lat")
         UserDefaults.standard.set(longitude, forKey: "user-lon")
@@ -213,18 +210,12 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
 
         let task = URLSession.shared.dataTask(with: request) {
             [weak self] data, response, error in
-            guard let self = self, self.isLocationEnabled else {
-                print(
-                    "Location services were disabled during the request, discarding result"
-                )
-                return
-            }
+            guard let self = self, self.isLocationEnabled else { return }
 
             if let error = error {
                 print("Error sending location: \(error)")
                 return
             }
-            print("Location sent successfully")
 
             DispatchQueue.main.async {
                 self.updateRegionMonitoring(for: location)
@@ -233,46 +224,60 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
 
         task.resume()
     }
-
+    
+    // MARK: - Background Task Management
+    
+    private func startBackgroundTask() {
+        backgroundTask = UIApplication.shared.beginBackgroundTask { [weak self] in
+            self?.endBackgroundTask()
+        }
+        
+        DispatchQueue.global().async { [weak self] in
+            self?.performExtendedBackgroundTasks()
+            self?.endBackgroundTask()
+        }
+    }
+    
+    private func performExtendedBackgroundTasks() {
+        if let location = locationManager.location {
+            sendLocationToServer(location: location)
+        }
+    }
+    
+    private func endBackgroundTask() {
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func handleGetSavedLocation(result: FlutterResult) {
+        let latitude = UserDefaults.standard.double(forKey: "user-lat")
+        let longitude = UserDefaults.standard.double(forKey: "user-lon")
+        if latitude != 0 && longitude != 0 {
+            result(["lat": latitude, "lon": longitude])
+        } else {
+            result(nil)
+        }
+    }
+    
+    // MARK: - Messaging Delegate
+    
     func messaging(
         _ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?
     ) {
         self.fcmToken = fcmToken
-        print("FCM token received: \(String(describing: fcmToken))")
     }
-
+    
+    // MARK: - URL Session Handling
+    
     override func application(
         _ application: UIApplication,
         handleEventsForBackgroundURLSession identifier: String,
         completionHandler: @escaping () -> Void
     ) {
-        print("Handling background URL session events")
         completionHandler()
-    }
-
-    override func applicationDidEnterBackground(_ application: UIApplication) {
-        let backgroundTask = application.beginBackgroundTask { [weak self] in
-            self?.endBackgroundTask()
-        }
-
-        self.backgroundTask = backgroundTask
-
-        DispatchQueue.global().async {
-            self.performExtendedBackgroundTasks()
-            self.endBackgroundTask()
-        }
-    }
-
-    func performExtendedBackgroundTasks() {
-        if let location = locationManager.location {
-            sendLocationToServer(location: location)
-        }
-    }
-
-    func endBackgroundTask() {
-        if backgroundTask != .invalid {
-            UIApplication.shared.endBackgroundTask(backgroundTask)
-            backgroundTask = .invalid
-        }
     }
 }
