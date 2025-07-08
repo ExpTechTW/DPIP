@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -15,6 +17,8 @@ import 'package:dpip/widgets/map/map.dart';
 class MonitorMapLayerManager extends MapLayerManager {
   final bool isReplayMode;
   final int? replayTimestamp;
+  Timer? _blinkTimer;
+  bool _isBoxVisible = true;
 
   MonitorMapLayerManager(
     super.context,
@@ -27,6 +31,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     } else {
       GlobalProviders.data.setReplayMode(false);
     }
+    _setupBlinkTimer();
   }
 
   final currentRtsTime = ValueNotifier<String?>(GlobalProviders.data.rts?.time.toString());
@@ -68,6 +73,23 @@ class MonitorMapLayerManager extends MapLayerManager {
     12,
     8,
   ];
+
+  void _setupBlinkTimer() {
+    _blinkTimer?.cancel();
+    _blinkTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      try {
+        final boxLayerId = MapLayerIds.box();
+        final epicenterLayerId = MapLayerIds.eew('x');
+        
+        await controller.setLayerVisibility(boxLayerId, _isBoxVisible);
+        await controller.setLayerVisibility(epicenterLayerId, _isBoxVisible);
+        
+        _isBoxVisible = !_isBoxVisible;
+      } catch (e, s) {
+        TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
+      }
+    });
+  }
 
   Future<void> _focus() async {
     try {
@@ -610,6 +632,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   @override
   void dispose() {
+    _blinkTimer?.cancel();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
   }
