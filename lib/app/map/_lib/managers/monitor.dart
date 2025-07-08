@@ -123,12 +123,12 @@ class MonitorMapLayerManager extends MapLayerManager {
       final intensity0LayerId = MapLayerIds.intensity0();
       final boxSourceId = MapSourceIds.box();
       final boxLayerId = MapLayerIds.box();
-
       final eewSourceId = MapSourceIds.eew();
       final epicenterLayerId = MapLayerIds.eew('x');
       final pWaveLayerId = MapLayerIds.eew('p');
       final sWaveLayerId = MapLayerIds.eew('s');
 
+      // 检查所有源和图层是否存在
       final isRtsSourceExists = sources.contains(rtsSourceId);
       final isRtsLayerExists = layers.contains(rtsLayerId);
       final isIntensitySourceExists = sources.contains(intensitySourceId);
@@ -143,61 +143,41 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       if (!context.mounted) return;
 
-      if (!isBoxSourceExists) {
-        final data = GlobalProviders.data.getBoxGeoJson();
-        final properties = GeojsonSourceProperties(data: data);
-
-        await controller.addSource(boxSourceId, properties);
-        TalkerManager.instance.info('Added Source "$boxSourceId"');
-
-        if (!context.mounted) return;
-      }
-
-      if (!isBoxLayerExists) {
-        final properties = LineLayerProperties(
-          lineWidth: 2,
-          lineColor: [
-            Expressions.match,
-            [Expressions.get, 'i'],
-            9,
-            '#FF0000',
-            8,
-            '#FF0000',
-            7,
-            '#FF0000',
-            6,
-            '#FF0000',
-            5,
-            '#FF0000',
-            4,
-            '#FF0000',
-            3,
-            '#EAC100',
-            2,
-            '#EAC100',
-            1,
-            '#00DB00',
-            '#00DB00',
-          ],
-          visibility: 'none',
-        );
-
-        await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$boxLayerId"');
-
-        if (!context.mounted) return;
-      }
-
+      // 按顺序添加所有数据源
       if (!isRtsSourceExists) {
         final data = GlobalProviders.data.getRtsGeoJson();
-        final properties = GeojsonSourceProperties(data: data);
-
-        await controller.addSource(rtsSourceId, properties);
+        await controller.addSource(rtsSourceId, GeojsonSourceProperties(data: data));
         TalkerManager.instance.info('Added Source "$rtsSourceId"');
-
-        if (!context.mounted) return;
       }
 
+      if (!isIntensity0SourceExists) {
+        final data = GlobalProviders.data.getIntensityGeoJson();
+        await controller.addSource(intensity0SourceId, GeojsonSourceProperties(data: data));
+        TalkerManager.instance.info('Added Source "$intensity0SourceId"');
+      }
+
+      if (!isIntensitySourceExists) {
+        final data = GlobalProviders.data.getIntensityGeoJson();
+        await controller.addSource(intensitySourceId, GeojsonSourceProperties(data: data));
+        TalkerManager.instance.info('Added Source "$intensitySourceId"');
+      }
+
+      if (!isBoxSourceExists) {
+        final data = GlobalProviders.data.getBoxGeoJson();
+        await controller.addSource(boxSourceId, GeojsonSourceProperties(data: data));
+        TalkerManager.instance.info('Added Source "$boxSourceId"');
+      }
+
+      if (!isEewSourceExists) {
+        final data = GlobalProviders.data.getEewGeoJson();
+        await controller.addSource(eewSourceId, GeojsonSourceProperties(data: data));
+        TalkerManager.instance.info('Added Source "$eewSourceId"');
+      }
+
+      if (!context.mounted) return;
+
+      // 按顺序从下到上添加图层
+      // 1. RTS 图层（最底层）
       if (!isRtsLayerExists) {
         final properties = CircleLayerProperties(
           circleColor: kRtsCircleColor,
@@ -220,20 +200,9 @@ class MonitorMapLayerManager extends MapLayerManager {
 
         await controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$rtsLayerId"');
-
-        if (!context.mounted) return;
       }
 
-      if (!isIntensity0SourceExists) {
-        final data = GlobalProviders.data.getIntensityGeoJson();
-        final properties = GeojsonSourceProperties(data: data);
-
-        await controller.addSource(intensity0SourceId, properties);
-        TalkerManager.instance.info('Added Source "$intensity0SourceId"');
-
-        if (!context.mounted) return;
-      }
-
+      // 2. Intensity0 图层
       if (!isIntensity0LayerExists) {
         final properties = CircleLayerProperties(
           circleColor: Colors.grey.toHexStringRGB(),
@@ -258,20 +227,9 @@ class MonitorMapLayerManager extends MapLayerManager {
 
         await controller.addLayer(intensity0SourceId, intensity0LayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$intensity0LayerId"');
-
-        if (!context.mounted) return;
       }
 
-      if (!isIntensitySourceExists) {
-        final data = GlobalProviders.data.getIntensityGeoJson();
-        final properties = GeojsonSourceProperties(data: data);
-
-        await controller.addSource(intensitySourceId, properties);
-        TalkerManager.instance.info('Added Source "$intensitySourceId"');
-
-        if (!context.mounted) return;
-      }
-
+      // 3. Intensity 图层
       if (!isIntensityLayerExists) {
         const properties = SymbolLayerProperties(
           symbolSortKey: [Expressions.get, 'intensity'],
@@ -315,40 +273,50 @@ class MonitorMapLayerManager extends MapLayerManager {
 
         await controller.addLayer(intensitySourceId, intensityLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$intensityLayerId"');
-
-        if (!context.mounted) return;
       }
 
-      if (!isEewSourceExists) {
-        final data = GlobalProviders.data.getEewGeoJson();
-        final properties = GeojsonSourceProperties(data: data);
-
-        await controller.addSource(eewSourceId, properties);
-        TalkerManager.instance.info('Added Source "$eewSourceId"');
-
-        if (!context.mounted) return;
-      }
-
-      if (!isEewLayerExists) {
-        final epicenterProperties = SymbolLayerProperties(
-          iconImage: 'cross-7',
-          iconSize: kSymbolIconSize,
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-          symbolZOrder: 'source',
-          visibility: visible ? 'visible' : 'none',
+      // 4. Box 图层
+      if (!isBoxLayerExists) {
+        final properties = LineLayerProperties(
+          lineWidth: 2,
+          lineColor: [
+            Expressions.match,
+            [Expressions.get, 'i'],
+            9,
+            '#FF0000',
+            8,
+            '#FF0000',
+            7,
+            '#FF0000',
+            6,
+            '#FF0000',
+            5,
+            '#FF0000',
+            4,
+            '#FF0000',
+            3,
+            '#EAC100',
+            2,
+            '#EAC100',
+            1,
+            '#00DB00',
+            '#00DB00',
+          ],
+          visibility: 'none',
         );
+
+        await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        TalkerManager.instance.info('Added Layer "$boxLayerId"');
+      }
+
+      // 5. EEW 图层（P波、S波、震央标记）
+      if (!isEewLayerExists) {
+        // 5.1 P波圈
         final pWaveProperties = LineLayerProperties(
           lineColor: Colors.cyan.toHexStringRGB(),
           lineWidth: 2,
           visibility: visible ? 'visible' : 'none',
         );
-        final sWaveProperties = LineLayerProperties(
-          lineColor: Colors.red.toHexStringRGB(),
-          lineWidth: 2,
-          visibility: visible ? 'visible' : 'none',
-        );
-
         await controller.addLayer(
           eewSourceId,
           pWaveLayerId,
@@ -363,6 +331,12 @@ class MonitorMapLayerManager extends MapLayerManager {
         );
         TalkerManager.instance.info('Added Layer "$pWaveLayerId"');
 
+        // 5.2 S波圈
+        final sWaveProperties = LineLayerProperties(
+          lineColor: Colors.red.toHexStringRGB(),
+          lineWidth: 2,
+          visibility: visible ? 'visible' : 'none',
+        );
         await controller.addLayer(
           eewSourceId,
           sWaveLayerId,
@@ -377,6 +351,15 @@ class MonitorMapLayerManager extends MapLayerManager {
         );
         TalkerManager.instance.info('Added Layer "$sWaveLayerId"');
 
+        // 5.3 震央标记（最顶层）
+        final epicenterProperties = SymbolLayerProperties(
+          iconImage: 'cross-7',
+          iconSize: kSymbolIconSize,
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+          symbolZOrder: 'source',
+          visibility: visible ? 'visible' : 'none',
+        );
         await controller.addLayer(
           eewSourceId,
           epicenterLayerId,
@@ -392,7 +375,6 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
 
       didSetup = true;
-
       GlobalProviders.data.addListener(_onDataChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
