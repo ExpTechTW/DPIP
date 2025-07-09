@@ -2,6 +2,8 @@ import 'package:dpip/utils/extensions/preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferenceKeys {
+  static const lastUpdateToServerTime='lastUpdateToServerTime';
+
   // #region Location
   static const locationAuto = 'location:auto';
   static const locationCode = 'location:code';
@@ -45,6 +47,9 @@ class Preference {
 
   static String? get version => instance.getString('app-version');
   static set version(String? value) => instance.set('app-version', value);
+
+  static int? get lastUpdateToServerTime => instance.getInt(PreferenceKeys.lastUpdateToServerTime);
+  static set lastUpdateToServerTime(int? value) => instance.set(PreferenceKeys.lastUpdateToServerTime, value);
 
   static bool get isTosAccepted => instance.getInt('accepted-tos-version') == 1;
   static set isTosAccepted(bool value) => instance.set('accepted-tos-version', value ? 1 : null);
