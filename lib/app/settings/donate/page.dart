@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -170,16 +171,21 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
                 contentAlignment: TextAlign.justify,
               ),
-              // FilledButton.tonalIcon(
-              //   icon: const Icon(Icons.restore),
-              //   label: const Text('恢復購買'),
-              //   onPressed: () {
-              //     InAppPurchase.instance.restorePurchases();
-              //     ScaffoldMessenger.of(context).showSnackBar(
-              //       const SnackBar(content: Text('已開始恢復先前的購買項目（不包含單次支援的購買）')),
-              //     );
-              //   },
-              // ),
+              FilledButton.tonalIcon(
+                icon: const Icon(Icons.restore),
+                label: Text('恢復購買'.i18n),
+                onPressed: () async {
+                  final bool available = await InAppPurchase.instance.isAvailable();
+                  if (!available) {
+                    final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 $storeName，請稍後再試。')));
+                    return;
+                  }
+                  InAppPurchase.instance.restorePurchases();
+
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在恢復您的購買的訂閱')));
+                },
+              ),
             ],
           );
         },
