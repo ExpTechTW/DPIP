@@ -84,7 +84,6 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
           })
           .catchError((error) {
             if (error.toString().contains('401')) {
-              print('401 Unauthorized: $error');
               if (GlobalProviders.location.latitude != null && GlobalProviders.location.longitude != null) {
                 Future.delayed(const Duration(seconds: 2), () {
                   ExpTech()
@@ -276,6 +275,29 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           icon: Symbols.campaign_rounded,
                           enabled: !isLoading && enabled,
                           onTap: () => context.push(SettingsNotifyAnnouncementPage.route),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                ListSection(
+                  title: '除錯'.i18n,
+                  children: [
+                    Selector<SettingsNotificationModel, BasicNotifyType>(
+                      selector: (_, model) => model.announcement,
+                      builder: (context, announcement, child) {
+                        return ListSectionTile(
+                          title: '同步通知設定'.i18n,
+                          subtitle: const Text('套用伺服器上的通知設定紀錄'),
+                          trailing: const Icon(Symbols.chevron_right_rounded),
+                          icon: Symbols.sync_alt_rounded,
+                          enabled: !isLoading && enabled,
+                          onTap: () {
+                            Preference.notifyAnnouncement = null;
+                            if (mounted) {
+                              context.pop();
+                            }
+                          },
                         );
                       },
                     ),
