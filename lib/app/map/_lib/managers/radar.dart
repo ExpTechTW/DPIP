@@ -486,32 +486,46 @@ class RadarMapLayerSheet extends StatelessWidget {
                               final time = timeData.length > 1 ? timeData[1] : timeData[0];
 
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+                                  color: context.colors.surfaceContainerHighest.withValues(alpha: 0.7),
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: context.colors.outline.withValues(alpha: 0.15), width: 0.5),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.schedule_rounded, size: 12, color: context.colors.onSurfaceVariant),
-                                    const SizedBox(width: 3),
+                                    Icon(
+                                      Icons.schedule_rounded,
+                                      size: 12,
+                                      color: context.colors.primary.withValues(alpha: 0.8),
+                                    ),
+                                    const SizedBox(width: 4),
                                     if (date.isNotEmpty) ...[
                                       Text(
                                         date,
                                         style: context.textTheme.bodySmall?.copyWith(
-                                          color: context.colors.onSurfaceVariant,
+                                          color: context.colors.onSurface.withValues(alpha: 0.6),
                                           fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.2,
                                         ),
                                       ),
-                                      const SizedBox(width: 3),
+                                      Container(
+                                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                                        width: 1,
+                                        height: 10,
+                                        color: context.colors.outline.withValues(alpha: 0.3),
+                                      ),
                                     ],
                                     Text(
                                       time,
                                       style: context.textTheme.bodySmall?.copyWith(
                                         color: context.colors.onSurface,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                        height: 1.2,
                                       ),
                                     ),
                                   ],
@@ -644,6 +658,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                   currentTime: currentTime,
                                   startTime: startTime,
                                   manager: manager,
+                                  shouldFocusOnShow: true,
                                 );
                               },
                             );
@@ -688,12 +703,14 @@ class _AutoScrollingTimeList extends StatefulWidget {
   final String? currentTime;
   final String? startTime;
   final RadarMapLayerManager manager;
+  final bool shouldFocusOnShow;
 
   const _AutoScrollingTimeList({
     required this.grouped,
     required this.currentTime,
     required this.startTime,
     required this.manager,
+    this.shouldFocusOnShow = false,
   });
 
   @override
@@ -712,6 +729,16 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
       for (final time in group.value) {
         _chipKeys[time.value] = GlobalKey();
       }
+    }
+
+    if (widget.shouldFocusOnShow && widget.currentTime != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            _scrollToCurrentTime();
+          }
+        });
+      });
     }
   }
 
