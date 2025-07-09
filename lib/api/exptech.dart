@@ -20,6 +20,7 @@ import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/api/route.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
@@ -491,6 +492,8 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode == 200) {
+      Preference.lastUpdateToServerTime = DateTime.now().millisecondsSinceEpoch;
+
       return res.body;
     } else if (res.statusCode == 202) {
       return '${res.statusCode} $requestUrl';
