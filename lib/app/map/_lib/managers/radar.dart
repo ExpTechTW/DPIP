@@ -38,6 +38,29 @@ class RadarMapLayerManager extends MapLayerManager {
       TalkerManager.instance.info('Auto-play stopped due to external control');
     }
 
+    if (playStartTime.value != null) {
+      final radarList = GlobalProviders.data.radar;
+      final startIndex = radarList.indexOf(playStartTime.value!);
+      final newCurrentIndex = radarList.indexOf(time);
+
+      if (startIndex != -1 && newCurrentIndex != -1 && newCurrentIndex > startIndex) {
+        final newStartIndex = newCurrentIndex + 1;
+        if (newStartIndex < radarList.length) {
+          playStartTime.value = radarList[newStartIndex];
+          TalkerManager.instance.info('Moved start time to right of current time: ${radarList[newStartIndex]}');
+
+          final nextIndex = newStartIndex + 1;
+          if (nextIndex < radarList.length) {
+            playEndTime.value = radarList[nextIndex];
+            TalkerManager.instance.info('Set end time to next item: ${playEndTime.value}');
+          } else {
+            playEndTime.value = null;
+            TalkerManager.instance.info('Cleared end time because start time is at the end');
+          }
+        }
+      }
+    }
+
     await _updateRadarTileUrl(time);
     await _preloadAdjacentLayers(time);
   }
@@ -48,16 +71,28 @@ class RadarMapLayerManager extends MapLayerManager {
       return;
     }
 
+    final radarList = GlobalProviders.data.radar;
+    final startIndex = radarList.indexOf(time);
+    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
+
+    if (startIndex != -1 && currentIndex != -1 && startIndex < currentIndex) {
+      final newCurrentIndex = startIndex - 1;
+      if (newCurrentIndex >= 0) {
+        updateRadarTime(radarList[newCurrentIndex]);
+        TalkerManager.instance.info('Moved current time to left of start time: ${radarList[newCurrentIndex]}');
+      }
+    }
+
     playStartTime.value = time;
 
-    if (playEndTime.value != null) {
-      final radarList = GlobalProviders.data.radar;
-      final startIndex = radarList.indexOf(time);
-      final endIndex = radarList.indexOf(playEndTime.value!);
-
-      if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+    if (startIndex != -1) {
+      final nextIndex = startIndex + 1;
+      if (nextIndex < radarList.length) {
+        playEndTime.value = radarList[nextIndex];
+        TalkerManager.instance.info('Set end time to next item: ${playEndTime.value}');
+      } else {
         playEndTime.value = null;
-        TalkerManager.instance.info('Cleared end time because start time is after end time');
+        TalkerManager.instance.info('Cleared end time because start time is at the end');
       }
     }
 
@@ -69,15 +104,9 @@ class RadarMapLayerManager extends MapLayerManager {
 
     final radarList = GlobalProviders.data.radar;
     final startIndex = radarList.indexOf(playStartTime.value!);
+    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
 
-    if (playEndTime.value == null) {
-      final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
-      return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
-    }
-
-    final endIndex = radarList.indexOf(playEndTime.value!);
-
-    return startIndex != -1 && endIndex != -1 && startIndex > endIndex;
+    return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
   }
 
   bool get isMultiLayerMode {
@@ -89,19 +118,6 @@ class RadarMapLayerManager extends MapLayerManager {
     }
 
     return isMulti;
-  }
-
-  bool isFrameAfterPlayback(String time) {
-    if (playEndTime.value == null || playStartTime.value == null) return false;
-
-    final radarList = GlobalProviders.data.radar;
-    final startIndex = radarList.indexOf(playStartTime.value!);
-    final endIndex = radarList.indexOf(playEndTime.value!);
-    final timeIndex = radarList.indexOf(time);
-
-    if (startIndex == -1 || endIndex == -1 || timeIndex == -1) return false;
-
-    return timeIndex < startIndex && timeIndex > endIndex;
   }
 
   Future<void> _updateRadarTileUrl(String time) async {
@@ -207,13 +223,23 @@ class RadarMapLayerManager extends MapLayerManager {
   void startAutoPlay() {
     if (isPlaying.value) return;
 
-    playEndTime.value = currentRadarTime.value;
-
     if (playStartTime.value == null) {
       final radarList = GlobalProviders.data.radar;
       if (radarList.isNotEmpty) {
         playStartTime.value = radarList.last;
       }
+    }
+
+    if (playStartTime.value != null && playEndTime.value != null) {
+      final radarList = GlobalProviders.data.radar;
+      final startIndex = radarList.indexOf(playStartTime.value!);
+      final endIndex = radarList.indexOf(playEndTime.value!);
+
+      if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+        playEndTime.value = currentRadarTime.value;
+      }
+    } else if (playEndTime.value == null) {
+      playEndTime.value = currentRadarTime.value;
     }
 
     if (playStartTime.value == null || playEndTime.value == null) {
@@ -444,20 +470,71 @@ class RadarMapLayerSheet extends StatelessWidget {
                         const Spacer(),
                         AnimatedBuilder(
                           animation: Listenable.merge([
+                            manager.currentRadarTime,
+                            manager.playStartTime,
+                            manager.isPlaying,
+                          ]),
+                          builder: (context, child) {
+                            final currentTime = manager.currentRadarTime.value;
+
+                            if (currentTime == null) return const SizedBox.shrink();
+
+                            try {
+                              final timeFormatted = currentTime.toSimpleDateTimeString(context);
+                              final timeData = timeFormatted.split(' ');
+                              final date = timeData.length > 1 ? timeData[0] : '';
+                              final time = timeData.length > 1 ? timeData[1] : timeData[0];
+
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.schedule_rounded, size: 12, color: context.colors.onSurfaceVariant),
+                                    const SizedBox(width: 3),
+                                    if (date.isNotEmpty) ...[
+                                      Text(
+                                        date,
+                                        style: context.textTheme.bodySmall?.copyWith(
+                                          color: context.colors.onSurfaceVariant,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 3),
+                                    ],
+                                    Text(
+                                      time,
+                                      style: context.textTheme.bodySmall?.copyWith(
+                                        color: context.colors.onSurface,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } catch (e) {
+                              return const SizedBox.shrink();
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        AnimatedBuilder(
+                          animation: Listenable.merge([
                             manager.isPlaying,
                             manager.playStartTime,
-                            manager.playEndTime,
                             manager.currentRadarTime,
                           ]),
                           builder: (context, child) {
                             final isPlaying = manager.isPlaying.value;
                             final startTime = manager.playStartTime.value;
-                            final endTime = manager.playEndTime.value;
                             final canPlay = manager.canPlay;
 
-                            final shouldHide =
-                                (startTime == null && !isPlaying) ||
-                                (startTime != null && endTime != null && !canPlay && !isPlaying);
+                            final shouldHide = (startTime == null && !isPlaying);
 
                             if (shouldHide) {
                               return const SizedBox(width: 24, height: 24);
@@ -483,66 +560,14 @@ class RadarMapLayerSheet extends StatelessWidget {
                     ),
                   ),
                   AnimatedBuilder(
-                    animation: Listenable.merge([manager.currentRadarTime, manager.playStartTime, manager.isPlaying]),
-                    builder: (context, child) {
-                      final currentTime = manager.currentRadarTime.value;
-
-                      if (currentTime == null) return const SizedBox.shrink();
-
-                      try {
-                        final timeFormatted = currentTime.toSimpleDateTimeString(context);
-                        final timeData = timeFormatted.split(' ');
-                        final date = timeData.length > 1 ? timeData[0] : '';
-                        final time = timeData.length > 1 ? timeData[1] : timeData[0];
-
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.schedule_rounded, size: 12, color: context.colors.onSurfaceVariant),
-                                  const SizedBox(width: 3),
-                                  if (date.isNotEmpty) ...[
-                                    Text(
-                                      date,
-                                      style: context.textTheme.bodySmall?.copyWith(
-                                        color: context.colors.onSurfaceVariant,
-                                        fontSize: 10,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 3),
-                                  ],
-                                  Text(
-                                    time,
-                                    style: context.textTheme.bodySmall?.copyWith(
-                                      color: context.colors.onSurface,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      } catch (e) {
-                        return const SizedBox.shrink();
-                      }
-                    },
-                  ),
-                  AnimatedBuilder(
                     animation: Listenable.merge([manager.playStartTime, manager.isPlaying]),
                     builder: (context, child) {
                       final startTime = manager.playStartTime.value;
                       final isPlaying = manager.isPlaying.value;
+
+                      if (isPlaying) {
+                        return const SizedBox.shrink();
+                      }
 
                       if (startTime == null && !isPlaying) {
                         return const SizedBox.shrink();
@@ -556,11 +581,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                               children: [
                                 _buildLegendItem(context, '目前播放', context.colors.primary),
                                 const SizedBox(width: 12),
-                                _buildLegendItem(context, '播放起點', Colors.orange),
-                                const SizedBox(width: 12),
-                                _buildLegendItem(context, '播放結束', Colors.red),
-                                const SizedBox(width: 12),
-                                _buildLegendItem(context, '播放範圍', Colors.green),
+                                _buildLegendItem(context, '播放起點', context.colors.secondary),
                               ],
                             ),
                             if (startTime == null && !isPlaying) ...[
@@ -581,27 +602,12 @@ class RadarMapLayerSheet extends StatelessWidget {
                     },
                   ),
                   AnimatedBuilder(
-                    animation: Listenable.merge([
-                      manager.playStartTime,
-                      manager.isPlaying,
-                      manager.playEndTime,
-                      manager.currentRadarTime,
-                    ]),
+                    animation: Listenable.merge([manager.playStartTime, manager.isPlaying, manager.currentRadarTime]),
                     builder: (context, child) {
                       final startTime = manager.playStartTime.value;
                       final isPlaying = manager.isPlaying.value;
-                      final endTime = manager.playEndTime.value;
-                      final canPlay = manager.canPlay;
 
-                      bool shouldShowButton = true;
-                      if (startTime == null && !isPlaying) {
-                        shouldShowButton = false;
-                      }
-                      if (startTime != null && endTime != null && !canPlay && !isPlaying) {
-                        shouldShowButton = false;
-                      }
-
-                      if (!isPlaying && !shouldShowButton) {
+                      if (!isPlaying && startTime == null) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                           child: Align(
@@ -618,30 +624,33 @@ class RadarMapLayerSheet extends StatelessWidget {
                       return const SizedBox.shrink();
                     },
                   ),
-                  SizedBox(
-                    height: kMinInteractiveDimension,
-                    child: ValueListenableBuilder<String?>(
-                      valueListenable: manager.currentRadarTime,
-                      builder: (context, currentTime, child) {
-                        return ValueListenableBuilder<String?>(
-                          valueListenable: manager.playStartTime,
-                          builder: (context, startTime, child) {
+                  ValueListenableBuilder<bool>(
+                    valueListenable: manager.isPlaying,
+                    builder: (context, isPlaying, child) {
+                      if (isPlaying) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return SizedBox(
+                        height: kMinInteractiveDimension,
+                        child: ValueListenableBuilder<String?>(
+                          valueListenable: manager.currentRadarTime,
+                          builder: (context, currentTime, child) {
                             return ValueListenableBuilder<String?>(
-                              valueListenable: manager.playEndTime,
-                              builder: (context, endTime, child) {
+                              valueListenable: manager.playStartTime,
+                              builder: (context, startTime, child) {
                                 return _AutoScrollingTimeList(
                                   grouped: grouped,
                                   currentTime: currentTime,
                                   startTime: startTime,
-                                  endTime: endTime,
                                   manager: manager,
                                 );
                               },
                             );
                           },
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               );
@@ -678,14 +687,12 @@ class _AutoScrollingTimeList extends StatefulWidget {
   final List<MapEntry<String, List<({String date, String time, String value})>>> grouped;
   final String? currentTime;
   final String? startTime;
-  final String? endTime;
   final RadarMapLayerManager manager;
 
   const _AutoScrollingTimeList({
     required this.grouped,
     required this.currentTime,
     required this.startTime,
-    required this.endTime,
     required this.manager,
   });
 
@@ -773,8 +780,6 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
         for (final time in group) {
           final isSelected = time.value == widget.currentTime;
           final isStartTime = time.value == widget.startTime;
-          final isEndTime = time.value == widget.endTime;
-          final isInPlayRange = widget.manager.isFrameAfterPlayback(time.value);
 
           children.add(
             ValueListenableBuilder<bool>(
@@ -791,17 +796,9 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
                       chipColor = context.colors.primary;
                       borderColor = context.colors.primary;
                       isHighlighted = true;
-                    } else if (isStartTime) {
-                      chipColor = Colors.orange;
-                      borderColor = Colors.orange;
-                      isHighlighted = true;
-                    } else if (isEndTime) {
-                      chipColor = Colors.red;
-                      borderColor = Colors.red;
-                      isHighlighted = true;
-                    } else if (isInPlayRange) {
-                      chipColor = Colors.green;
-                      borderColor = Colors.green;
+                    } else if (isStartTime && !isPlaying) {
+                      chipColor = context.colors.secondary;
+                      borderColor = context.colors.secondary;
                       isHighlighted = true;
                     } else {
                       chipColor = context.colors.surfaceContainerHighest;
