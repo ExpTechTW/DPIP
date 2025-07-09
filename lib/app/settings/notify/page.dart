@@ -76,10 +76,35 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
         Preference.notifyTsunami == null ||
         Preference.notifyAnnouncement == null) {
       setState(() => isLoading = true);
-      ExpTech().getNotify(token: Preference.notifyToken).then((value) {
-        GlobalProviders.notification.apply(value);
-        setState(() => isLoading = false);
-      });
+      ExpTech()
+          .getNotify(token: Preference.notifyToken)
+          .then((value) {
+            GlobalProviders.notification.apply(value);
+            setState(() => isLoading = false);
+          })
+          .catchError((error) {
+            if (error.toString().contains('401')) {
+              print('401 Unauthorized: $error');
+              if (GlobalProviders.location.latitude != null && GlobalProviders.location.longitude != null) {
+                Future.delayed(const Duration(seconds: 2), () {
+                  ExpTech()
+                      .updateDeviceLocation(
+                        token: Preference.notifyToken,
+                        lat: GlobalProviders.location.latitude.toString(),
+                        lng: GlobalProviders.location.longitude.toString(),
+                      )
+                      .then((_) {
+                        if (mounted) {
+                          context.pop();
+                        }
+                      })
+                      .catchError((updateError) {
+                        print('Failed to update location: $updateError');
+                      });
+                });
+              }
+            }
+          });
     }
   }
 

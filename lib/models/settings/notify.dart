@@ -100,15 +100,18 @@ class SettingsNotificationModel extends ChangeNotifier {
   String get _announcement => Preference.notifyAnnouncement ?? BasicNotifyType.all.name;
 
   void apply(NotifySettings settings) {
-    setEew(settings.eew);
-    setMonitor(settings.monitor);
-    setReport(settings.report);
-    setIntensity(settings.intensity);
-    setThunderstorm(settings.thunderstorm);
-    setWeatherAdvisory(settings.weatherAdvisory);
-    setEvacuation(settings.evacuation);
-    setTsunami(settings.tsunami);
-    setAnnouncement(settings.announcement);
+    Preference.notifyEew = settings.eew.name;
+    Preference.notifyMonitor = settings.monitor.name;
+    Preference.notifyReport = settings.report.name;
+    Preference.notifyIntensity = settings.intensity.name;
+    Preference.notifyThunderstorm = settings.thunderstorm.name;
+    Preference.notifyWeatherAdvisory = settings.weatherAdvisory.name;
+    Preference.notifyEvacuation = settings.evacuation.name;
+    Preference.notifyTsunami = settings.tsunami.name;
+    Preference.notifyAnnouncement = settings.announcement.name;
+
+    _log('Applied notification settings from server');
+    notifyListeners();
   }
 
   /// 地震速報通知設定
