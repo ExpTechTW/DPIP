@@ -1,18 +1,31 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:styled_text/styled_text.dart';
+import 'package:styled_text/widgets/styled_text.dart';
 
+import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/core/eew.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/models/data.dart';
+import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/int.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 
 class MonitorMapLayerManager extends MapLayerManager {
   final bool isReplayMode;
@@ -80,10 +93,10 @@ class MonitorMapLayerManager extends MapLayerManager {
       try {
         final boxLayerId = MapLayerIds.box();
         final epicenterLayerId = MapLayerIds.eew('x');
-        
+
         await controller.setLayerVisibility(boxLayerId, _isBoxVisible);
         await controller.setLayerVisibility(epicenterLayerId, _isBoxVisible);
-        
+
         _isBoxVisible = !_isBoxVisible;
       } catch (e, s) {
         TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
@@ -214,8 +227,16 @@ class MonitorMapLayerManager extends MapLayerManager {
               Expressions.caseExpression,
               [
                 Expressions.all,
-                [Expressions.equal, [Expressions.get, 'intensity'], 0],
-                [Expressions.equal, [Expressions.get, 'alert'], 1],
+                [
+                  Expressions.equal,
+                  [Expressions.get, 'intensity'],
+                  0,
+                ],
+                [
+                  Expressions.equal,
+                  [Expressions.get, 'alert'],
+                  1,
+                ],
               ],
               1,
               0,
@@ -225,7 +246,12 @@ class MonitorMapLayerManager extends MapLayerManager {
           visibility: 'none',
         );
 
-        await controller.addLayer(intensity0SourceId, intensity0LayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          intensity0SourceId,
+          intensity0LayerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
         TalkerManager.instance.info('Added Layer "$intensity0LayerId"');
       }
 
@@ -264,14 +290,19 @@ class MonitorMapLayerManager extends MapLayerManager {
             'intensity-8',
             9,
             'intensity-9',
-            ''
+            '',
           ],
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
           visibility: 'none',
         );
 
-        await controller.addLayer(intensitySourceId, intensityLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          intensitySourceId,
+          intensityLayerId,
+          properties,
+          belowLayerId: BaseMapLayerIds.userLocation,
+        );
         TalkerManager.instance.info('Added Layer "$intensityLayerId"');
       }
 
@@ -620,5 +651,365 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
+  Widget build(BuildContext context) => MonitorMapLayerSheet(manager: this);
+}
+
+class MonitorMapLayerSheet extends StatefulWidget {
+  final MonitorMapLayerManager manager;
+
+  const MonitorMapLayerSheet({super.key, required this.manager});
+
+  @override
+  State<MonitorMapLayerSheet> createState() => _MonitorMapLayerSheetState();
+}
+
+class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
+  late int localIntensity;
+  late int localArrivalTime;
+  Timer? _timer;
+  int countdown = 0;
+
+  bool _isCollapsed = true;
+
+  void _toggleCollapse() {
+    setState(() => _isCollapsed = !_isCollapsed);
+  }
+
+  void _updateCountdown() {
+    final remainingSeconds = ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
+    if (remainingSeconds < -1) return;
+
+    setState(() => countdown = remainingSeconds);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<DpipDataModel, UnmodifiableListView<Eew>>(
+      selector: (_, data) => data.eew,
+      builder: (context, activeEew, child) {
+        return MorphingSheet(
+          title: '強震監視器'.i18n,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 4,
+          borderWidth: activeEew.isNotEmpty ? 2 : null,
+          borderColor: activeEew.isNotEmpty ? context.colors.error : null,
+          backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
+          partialBuilder: (context, controller, sheetController) {
+            if (activeEew.isEmpty) {
+              return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
+            } else {
+              final data = activeEew.first;
+
+              final info = eewLocationInfo(
+                data.info.magnitude,
+                data.info.depth,
+                data.info.latitude,
+                data.info.longitude,
+                GlobalProviders.location.coordinateNotifier.value.latitude,
+                GlobalProviders.location.coordinateNotifier.value.longitude,
+              );
+
+              localIntensity = intensityFloatToInt(info.i);
+              localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
+
+              _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+
+              return InkWell(
+                onTap: () => _toggleCollapse(),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child:
+                      _isCollapsed
+                          ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    spacing: 8,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: context.colors.error,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        padding:
+                                            activeEew.length > 1
+                                                ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
+                                                : const EdgeInsets.fromLTRB(8, 6, 8, 6),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          spacing: 4,
+                                          children: [
+                                            Icon(
+                                              Symbols.crisis_alert_rounded,
+                                              color: context.colors.onError,
+                                              weight: 700,
+                                              size: 16,
+                                            ),
+                                            if (activeEew.length > 1)
+                                              RichText(
+                                                text: TextSpan(
+                                                  children: [
+                                                    TextSpan(
+                                                      text: '1',
+                                                      style: context.textTheme.labelMedium!.copyWith(
+                                                        color: context.colors.onError,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '/${activeEew.length}',
+                                                      style: context.textTheme.labelMedium!.copyWith(
+                                                        color: context.colors.onError.withValues(alpha: 0.6),
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        '#${data.serial} ${data.info.time.toSimpleDateTimeString(context)} ${data.info.location}',
+                                        style: context.textTheme.bodyMedium!.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: context.colors.onErrorContainer,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    StyledText(
+                                      text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
+                                        'time': data.info.time.toSimpleDateTimeString(context),
+                                        'location': data.info.location,
+                                        'magnitude': data.info.magnitude.toStringAsFixed(1),
+                                        'intensity': localIntensity.asIntensityLabel,
+                                      }),
+                                      style: context.textTheme.bodyMedium!.copyWith(
+                                        color: context.colors.onErrorContainer,
+                                      ),
+                                      tags: {
+                                        'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      },
+                                    ),
+
+                                    Text(
+                                      countdown >= 0
+                                          ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown})
+                                          : '已抵達'.i18n,
+                                      style: context.textTheme.bodyMedium!.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: context.colors.onErrorContainer,
+                                        height: 1,
+                                        leadingDistribution: TextLeadingDistribution.even,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                          : Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    spacing: 8,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: context.colors.error,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          spacing: 4,
+                                          children: [
+                                            Icon(
+                                              Symbols.crisis_alert_rounded,
+                                              color: context.colors.onError,
+                                              weight: 700,
+                                              size: 22,
+                                            ),
+                                            Text(
+                                              '緊急地震速報'.i18n,
+                                              style: context.textTheme.labelLarge!.copyWith(
+                                                color: context.colors.onError,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        '第 {serial} 報'.i18n.args({'serial': activeEew.first.serial}),
+                                        style: context.textTheme.bodyLarge!.copyWith(
+                                          color: context.colors.onErrorContainer,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24),
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: StyledText(
+                                  text:
+                                      '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
+                                          .i18n
+                                          .args({
+                                            'time': data.info.time.toSimpleDateTimeString(context),
+                                            'location': data.info.location,
+                                            'magnitude': data.info.magnitude.toStringAsFixed(1),
+                                            'intensity': localIntensity.asIntensityLabel,
+                                          }),
+                                  style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                                  tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                                ),
+                              ),
+                              Selector<SettingsLocationModel, String?>(
+                                selector: (context, model) => model.code,
+                                builder: (context, code, child) {
+                                  if (code == null) {
+                                    return const SizedBox.shrink();
+                                  }
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 8, bottom: 4),
+                                    child: IntrinsicHeight(
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(4),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                children: [
+                                                  Text(
+                                                    '所在地預估'.i18n,
+                                                    style: context.textTheme.labelLarge!.copyWith(
+                                                      color: context.colors.onErrorContainer.withValues(alpha: 0.6),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 12, bottom: 8),
+                                                    child: Text(
+                                                      localIntensity.asIntensityLabel,
+                                                      style: context.textTheme.displayMedium!.copyWith(
+                                                        fontWeight: FontWeight.bold,
+                                                        color: context.colors.onErrorContainer,
+                                                        height: 1,
+                                                        leadingDistribution: TextLeadingDistribution.even,
+                                                      ),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          VerticalDivider(
+                                            color: context.colors.onErrorContainer.withValues(alpha: 0.4),
+                                            width: 24,
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(4),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                children: [
+                                                  Text(
+                                                    '震波',
+                                                    style: context.textTheme.labelLarge!.copyWith(
+                                                      color: context.colors.onErrorContainer.withValues(alpha: 0.6),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(top: 12, bottom: 8),
+                                                    child:
+                                                        (countdown >= 0)
+                                                            ? RichText(
+                                                              text: TextSpan(
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text: countdown.toString(),
+                                                                    style: TextStyle(
+                                                                      fontSize:
+                                                                          context.textTheme.displayMedium!.fontSize! *
+                                                                          1.15,
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: ' 秒',
+                                                                    style: TextStyle(
+                                                                      fontSize: context.textTheme.labelLarge!.fontSize,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                                style: context.textTheme.displayMedium!.copyWith(
+                                                                  fontWeight: FontWeight.bold,
+                                                                  color: context.colors.onErrorContainer,
+                                                                  height: 1,
+                                                                  leadingDistribution: TextLeadingDistribution.even,
+                                                                ),
+                                                              ),
+                                                              textAlign: TextAlign.center,
+                                                            )
+                                                            : Text(
+                                                              '抵達'.i18n,
+                                                              style: context.textTheme.displayMedium!.copyWith(
+                                                                fontWeight: FontWeight.bold,
+                                                                color: context.colors.onErrorContainer,
+                                                                height: 1,
+                                                                leadingDistribution: TextLeadingDistribution.even,
+                                                              ),
+                                                              textAlign: TextAlign.center,
+                                                            ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                ),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 }
