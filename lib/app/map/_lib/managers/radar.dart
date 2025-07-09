@@ -20,25 +20,70 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 class RadarMapLayerManager extends MapLayerManager {
-  RadarMapLayerManager(super.context, super.controller);
+  RadarMapLayerManager(super.context, super.controller, {this.getActiveLayerCount});
 
   final currentRadarTime = ValueNotifier<String?>(GlobalProviders.data.radar.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
   final isPlaying = ValueNotifier<bool>(false);
   final playStartTime = ValueNotifier<String?>(null);
   final playEndTime = ValueNotifier<String?>(null);
-
+  
   Timer? _playTimer;
   final Set<String> _preloadedLayers = {};
+  final int Function()? getActiveLayerCount;
 
   Future<void> updateRadarTime(String time) async {
+    if (isPlaying.value) {
+      stopAutoPlay();
+      TalkerManager.instance.info('Auto-play stopped due to external control');
+    }
+    
     await _updateRadarTileUrl(time);
     await _preloadAdjacentLayers(time);
   }
 
   void setPlayStartTime(String time) {
     playStartTime.value = time;
+    
+    if (playEndTime.value != null) {
+      final radarList = GlobalProviders.data.radar;
+      final startIndex = radarList.indexOf(time);
+      final endIndex = radarList.indexOf(playEndTime.value!);
+      
+      if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
+        playEndTime.value = null;
+        TalkerManager.instance.info('Cleared end time because start time is after end time');
+      }
+    }
+    
     TalkerManager.instance.info('Set play start time to: $time');
+  }
+
+  bool get canPlay {
+    if (playStartTime.value == null) return true;
+    
+    final radarList = GlobalProviders.data.radar;
+    final startIndex = radarList.indexOf(playStartTime.value!);
+    
+    if (playEndTime.value == null) {
+      final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
+      return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
+    }
+    
+    final endIndex = radarList.indexOf(playEndTime.value!);
+    
+    return startIndex != -1 && endIndex != -1 && startIndex > endIndex;
+  }
+
+  bool get isMultiLayerMode {
+    final count = getActiveLayerCount?.call() ?? 1;
+    final isMulti = count > 1;
+    
+    if (isMulti && isPlaying.value) {
+      stopAutoPlay();
+    }
+    
+    return isMulti;
   }
 
   bool isFrameAfterPlayback(String time) {
@@ -179,14 +224,17 @@ class RadarMapLayerManager extends MapLayerManager {
     TalkerManager.instance.info('Started radar auto-play from: ${playStartTime.value} to: ${playEndTime.value}');
   }
 
-  void stopAutoPlay() {
+    void stopAutoPlay() {
     if (!isPlaying.value) return;
-
+    
     isPlaying.value = false;
     _playTimer?.cancel();
     _playTimer = null;
     _isWaitingForRestart = false;
-
+    
+    playStartTime.value = null;
+    playEndTime.value = null;
+    
     TalkerManager.instance.info('Stopped radar auto-play');
   }
 
@@ -342,7 +390,12 @@ class RadarMapLayerManager extends MapLayerManager {
   }
 
   @override
-  Widget build(BuildContext context) => RadarMapLayerSheet(manager: this);
+  Widget build(BuildContext context) {
+    if (isMultiLayerMode) {
+      return const SizedBox.shrink();
+    }
+    return RadarMapLayerSheet(manager: this);
+  }
 }
 
 class RadarMapLayerSheet extends StatelessWidget {
@@ -385,13 +438,34 @@ class RadarMapLayerSheet extends StatelessWidget {
                         ValueListenableBuilder<bool>(
                           valueListenable: manager.isPlaying,
                           builder: (context, isPlaying, child) {
-                            return IconButton(
-                              icon: Icon(
-                                isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
-                                color: context.colors.primary,
-                              ),
-                              onPressed: manager.toggleAutoPlay,
-                              tooltip: isPlaying ? '暫停播放'.i18n : '開始播放'.i18n,
+                            return ValueListenableBuilder<String?>(
+                              valueListenable: manager.playStartTime,
+                              builder: (context, startTime, child) {
+                                return ValueListenableBuilder<String?>(
+                                  valueListenable: manager.playEndTime,
+                                  builder: (context, endTime, child) {
+                                    return ValueListenableBuilder<String?>(
+                                      valueListenable: manager.currentRadarTime,
+                                      builder: (context, currentTime, child) {
+                                        final canPlay = manager.canPlay;
+                                        
+                                        if (!canPlay && !isPlaying) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        
+                                        return IconButton(
+                                          icon: Icon(
+                                            isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
+                                            color: context.colors.primary,
+                                          ),
+                                          onPressed: manager.toggleAutoPlay,
+                                          tooltip: isPlaying ? '暫停播放'.i18n : '開始播放'.i18n,
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
+                              },
                             );
                           },
                         ),
@@ -414,14 +488,22 @@ class RadarMapLayerSheet extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '長按設定播放起點'.i18n,
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: context.colors.onSurface.withValues(alpha: 0.6),
-                            ),
-                          ),
+                        ValueListenableBuilder<bool>(
+                          valueListenable: manager.isPlaying,
+                          builder: (context, isPlaying, child) {
+                            if (isPlaying) {
+                              return const SizedBox.shrink();
+                            }
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '長按設定播放起點'.i18n,
+                                style: context.textTheme.bodySmall?.copyWith(
+                                  color: context.colors.onSurface.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -605,12 +687,12 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
                     }
 
                     return GestureDetector(
-                      onLongPress:
-                          isLoading || isPlaying
-                              ? null
-                              : () {
-                                widget.manager.setPlayStartTime(time.value);
-                              },
+                                             onLongPress:
+                           isLoading || isPlaying
+                               ? null
+                               : () {
+                                 widget.manager.setPlayStartTime(time.value);
+                               },
                       child: FilterChip(
                         key: _chipKeys[time.value],
                         selected: isHighlighted,

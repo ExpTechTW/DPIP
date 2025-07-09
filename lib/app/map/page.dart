@@ -283,7 +283,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
-    _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
+    _managers[MapLayer.radar] = RadarMapLayerManager(context, controller, getActiveLayerCount: () => _activeLayers.length);
     _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
