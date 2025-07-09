@@ -791,7 +791,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                       ),
                                     ],
                                   ),
-                                  Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
+                                  Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24),
                                 ],
                               ),
                               Padding(
@@ -874,7 +874,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                     ],
                                   ),
 
-                                  Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24),
+                                  Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
                                 ],
                               ),
                               Padding(
