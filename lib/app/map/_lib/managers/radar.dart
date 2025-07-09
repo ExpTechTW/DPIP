@@ -486,8 +486,6 @@ class RadarMapLayerSheet extends StatelessWidget {
                     animation: Listenable.merge([manager.currentRadarTime, manager.playStartTime, manager.isPlaying]),
                     builder: (context, child) {
                       final currentTime = manager.currentRadarTime.value;
-                      final hasStartTime = manager.playStartTime.value != null;
-                      final isPlaying = manager.isPlaying.value;
 
                       if (currentTime == null) return const SizedBox.shrink();
 
@@ -498,7 +496,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                         final time = timeData.length > 1 ? timeData[1] : timeData[0];
 
                         return Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Container(
