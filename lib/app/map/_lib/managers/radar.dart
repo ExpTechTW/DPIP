@@ -43,6 +43,11 @@ class RadarMapLayerManager extends MapLayerManager {
   }
 
   void setPlayStartTime(String time) {
+    if (time == currentRadarTime.value) {
+      TalkerManager.instance.info('Cannot set current time as play start time');
+      return;
+    }
+    
     playStartTime.value = time;
     
     if (playEndTime.value != null) {
@@ -169,11 +174,13 @@ class RadarMapLayerManager extends MapLayerManager {
 
     final layersToPreload = <String>[];
 
-    if (currentIndex > 0) {
-      layersToPreload.add(radarList[currentIndex - 1]);
-    }
-    if (currentIndex < radarList.length - 1) {
-      layersToPreload.add(radarList[currentIndex + 1]);
+    for (int i = 1; i <= 3; i++) {
+      if (currentIndex - i >= 0) {
+        layersToPreload.add(radarList[currentIndex - i]);
+      }
+      if (currentIndex + i < radarList.length) {
+        layersToPreload.add(radarList[currentIndex + i]);
+      }
     }
 
     for (final time in layersToPreload) {
@@ -427,79 +434,45 @@ class RadarMapLayerSheet extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Row(
-                      spacing: 8,
                       children: [
                         Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
+                        const SizedBox(width: 8),
                         Text(
                           '雷達回波'.i18n,
                           style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
                         ),
                         const Spacer(),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: manager.isPlaying,
-                          builder: (context, isPlaying, child) {
-                            return ValueListenableBuilder<String?>(
-                              valueListenable: manager.playStartTime,
-                              builder: (context, startTime, child) {
-                                return ValueListenableBuilder<String?>(
-                                  valueListenable: manager.playEndTime,
-                                  builder: (context, endTime, child) {
-                                    return ValueListenableBuilder<String?>(
-                                      valueListenable: manager.currentRadarTime,
-                                      builder: (context, currentTime, child) {
-                                        final canPlay = manager.canPlay;
-                                        
-                                        if (!canPlay && !isPlaying) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        
-                                        return IconButton(
-                                          icon: Icon(
-                                            isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
-                                            color: context.colors.primary,
-                                          ),
-                                          onPressed: manager.toggleAutoPlay,
-                                          tooltip: isPlaying ? '暫停播放'.i18n : '開始播放'.i18n,
-                                        );
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            _buildLegendItem(context, '目前播放', context.colors.primary),
-                            const SizedBox(width: 12),
-                            _buildLegendItem(context, '播放起點', Colors.orange),
-                            const SizedBox(width: 12),
-                            _buildLegendItem(context, '播放結束', Colors.red),
-                            const SizedBox(width: 12),
-                            _buildLegendItem(context, '播放範圍', Colors.green),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: manager.isPlaying,
-                          builder: (context, isPlaying, child) {
-                            if (isPlaying) {
-                              return const SizedBox.shrink();
+                        AnimatedBuilder(
+                          animation: Listenable.merge([
+                            manager.isPlaying,
+                            manager.playStartTime,
+                            manager.playEndTime,
+                            manager.currentRadarTime,
+                          ]),
+                          builder: (context, child) {
+                            final isPlaying = manager.isPlaying.value;
+                            final startTime = manager.playStartTime.value;
+                            final endTime = manager.playEndTime.value;
+                            final canPlay = manager.canPlay;
+                            
+                            final shouldHide = (startTime == null && !isPlaying) ||
+                                (startTime != null && endTime != null && !canPlay && !isPlaying);
+                            
+                            if (shouldHide) {
+                              return const SizedBox(width: 24, height: 24);
                             }
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                '長按設定播放起點'.i18n,
-                                style: context.textTheme.bodySmall?.copyWith(
-                                  color: context.colors.onSurface.withValues(alpha: 0.6),
+                            
+                            return InkWell(
+                              onTap: canPlay || isPlaying ? manager.toggleAutoPlay : null,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
+                                  size: 24,
+                                  color: context.colors.primary,
                                 ),
                               ),
                             );
@@ -507,6 +480,155 @@ class RadarMapLayerSheet extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+                  AnimatedBuilder(
+                    animation: Listenable.merge([
+                      manager.currentRadarTime,
+                      manager.playStartTime,
+                      manager.isPlaying,
+                    ]),
+                    builder: (context, child) {
+                      final currentTime = manager.currentRadarTime.value;
+                      final hasStartTime = manager.playStartTime.value != null;
+                      final isPlaying = manager.isPlaying.value;
+                      
+                      if (currentTime == null) return const SizedBox.shrink();
+                                            
+                      try {
+                        final timeFormatted = currentTime.toSimpleDateTimeString(context);
+                        final timeData = timeFormatted.split(' ');
+                        final date = timeData.length > 1 ? timeData[0] : '';
+                        final time = timeData.length > 1 ? timeData[1] : timeData[0];
+                        
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: context.colors.surfaceContainerHighest.withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.schedule_rounded,
+                                    size: 12,
+                                    color: context.colors.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  if (date.isNotEmpty) ...[
+                                    Text(
+                                      date,
+                                      style: context.textTheme.bodySmall?.copyWith(
+                                        color: context.colors.onSurfaceVariant,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 3),
+                                  ],
+                                  Text(
+                                    time,
+                                    style: context.textTheme.bodySmall?.copyWith(
+                                      color: context.colors.onSurface,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                  AnimatedBuilder(
+                    animation: Listenable.merge([
+                      manager.playStartTime,
+                      manager.isPlaying,
+                    ]),
+                    builder: (context, child) {
+                      final startTime = manager.playStartTime.value;
+                      final isPlaying = manager.isPlaying.value;
+                      
+                      if (startTime == null && !isPlaying) {
+                        return const SizedBox.shrink();
+                      }
+                      
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                _buildLegendItem(context, '目前播放', context.colors.primary),
+                                const SizedBox(width: 12),
+                                _buildLegendItem(context, '播放起點', Colors.orange),
+                                const SizedBox(width: 12),
+                                _buildLegendItem(context, '播放結束', Colors.red),
+                                const SizedBox(width: 12),
+                                _buildLegendItem(context, '播放範圍', Colors.green),
+                              ],
+                            ),
+                            if (startTime == null && !isPlaying) ...[
+                              const SizedBox(height: 2),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '長按設定播放起點'.i18n,
+                                  style: context.textTheme.bodySmall?.copyWith(
+                                    color: context.colors.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  AnimatedBuilder(
+                    animation: Listenable.merge([
+                      manager.playStartTime,
+                      manager.isPlaying,
+                      manager.playEndTime,
+                      manager.currentRadarTime,
+                    ]),
+                    builder: (context, child) {
+                      final startTime = manager.playStartTime.value;
+                      final isPlaying = manager.isPlaying.value;
+                      final endTime = manager.playEndTime.value;
+                      final canPlay = manager.canPlay;
+                      
+                      bool shouldShowButton = true;
+                      if (startTime == null && !isPlaying) {
+                        shouldShowButton = false;
+                      }
+                      if (startTime != null && endTime != null && !canPlay && !isPlaying) {
+                        shouldShowButton = false;
+                      }
+                      
+                      if (!isPlaying && !shouldShowButton) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              '長按設定播放起點'.i18n,
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: context.colors.onSurface.withValues(alpha: 0.6),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
                   ),
                   SizedBox(
                     height: kMinInteractiveDimension,
@@ -616,22 +738,34 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     final key = _chipKeys[widget.currentTime];
     if (key?.currentContext == null) return;
 
-    final RenderBox? renderBox = key!.currentContext!.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
+    try {
+      final RenderBox? renderBox = key!.currentContext!.findRenderObject() as RenderBox?;
+      if (renderBox == null) return;
 
-    final position = renderBox.localToGlobal(Offset.zero);
-    final scrollViewBox = _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
-    if (scrollViewBox == null) return;
+      final RenderBox? scrollViewBox = _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
+      if (scrollViewBox == null) return;
 
-    final localPosition = scrollViewBox.globalToLocal(position);
-    final targetOffset =
-        _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
+      if (!renderBox.attached) return;
 
-    _scrollController.animateTo(
-      targetOffset.clamp(_scrollController.position.minScrollExtent, _scrollController.position.maxScrollExtent),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
+      final position = renderBox.localToGlobal(Offset.zero);
+      final localPosition = scrollViewBox.globalToLocal(position);
+      
+      final targetOffset = _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
+      
+      final clampedOffset = targetOffset.clamp(
+        _scrollController.position.minScrollExtent,
+        _scrollController.position.maxScrollExtent,
+      );
+      
+      if ((clampedOffset - _scrollController.offset).abs() > 20) {
+        _scrollController.animateTo(
+          clampedOffset,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    } catch (e) {
+    }
   }
 
   @override
@@ -733,3 +867,4 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     super.dispose();
   }
 }
+

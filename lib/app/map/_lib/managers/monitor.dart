@@ -91,8 +91,13 @@ class MonitorMapLayerManager extends MapLayerManager {
         final boxLayerId = MapLayerIds.box();
         final epicenterLayerId = MapLayerIds.eew('x');
 
-        await controller.setLayerVisibility(boxLayerId, _isBoxVisible);
-        await controller.setLayerVisibility(epicenterLayerId, _isBoxVisible);
+        final layers = await controller.getLayerIds();
+        if (layers.contains(boxLayerId)) {
+          await controller.setLayerVisibility(boxLayerId, _isBoxVisible);
+        }
+        if (layers.contains(epicenterLayerId)) {
+          await controller.setLayerVisibility(epicenterLayerId, _isBoxVisible);
+        }
 
         _isBoxVisible = !_isBoxVisible;
       } catch (e, s) {
