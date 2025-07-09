@@ -31,7 +31,6 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
   late Set<MapLayer> _activeLayers = Set.from(widget.activeLayers);
   late BaseMapType _currentBaseMap = widget.currentBaseMap;
 
-  // 定義地震類和氣象類圖層
   static const Set<MapLayer> _earthquakeLayers = {
     MapLayer.monitor,
     MapLayer.report,
@@ -45,10 +44,15 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
     MapLayer.wind,
   };
 
+  static const Map<MapLayer, Set<MapLayer>> _allowedRadarCombinations = {
+    MapLayer.temperature: {MapLayer.radar, MapLayer.temperature},
+    MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
+    MapLayer.wind: {MapLayer.radar, MapLayer.wind},
+  };
+
   @override
   void didUpdateWidget(LayerToggleSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 同步父組件的狀態變化
     if (oldWidget.activeLayers != widget.activeLayers) {
       setState(() {
         _activeLayers = Set.from(widget.activeLayers);
@@ -61,8 +65,26 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
     }
   }
 
+  bool _isAllowedCombination(Set<MapLayer> layers) {
+    final earthquakeCount = layers.where((l) => _earthquakeLayers.contains(l)).length;
+    if (earthquakeCount > 1) return false;
+
+    final weatherLayers = layers.where((l) => _weatherLayers.contains(l)).toSet();
+    if (weatherLayers.isEmpty) return true;
+
+    if (weatherLayers.length == 1) return true;
+
+    if (weatherLayers.length == 2) {
+      if (weatherLayers.contains(MapLayer.radar)) {
+        final otherLayer = weatherLayers.where((l) => l != MapLayer.radar).first;
+        return _allowedRadarCombinations.containsKey(otherLayer);
+      }
+    }
+
+    return false;
+  }
+
   void _toggleLayer(MapLayer layer, bool checked) {
-    // 如果是強震監視器且沒有其他圖層，不允許取消選中
     if (!checked && layer == MapLayer.monitor && _activeLayers.length == 1) {
       return;
     }
@@ -70,28 +92,33 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
     widget.onLayerToggled(layer);
     setState(() {
       if (checked) {
-        // 檢查互斥性
+        final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
+        
         if (_earthquakeLayers.contains(layer)) {
-          // 地震類圖層互斥，清除所有其他地震類圖層
           _activeLayers.removeAll(_earthquakeLayers);
-          // 同時清除氣象類圖層
           _activeLayers.removeAll(_weatherLayers);
         } else if (_weatherLayers.contains(layer)) {
-          // 氣象類圖層可以複選，但要清除地震類圖層
+          final weatherLayersInNew = newLayers.where((l) => _weatherLayers.contains(l)).toSet();
+          if (!_isAllowedCombination(weatherLayersInNew)) {
+            if (weatherLayersInNew.contains(MapLayer.radar)) {
+              final nonRadarWeatherLayers = _weatherLayers.where((l) => l != MapLayer.radar).toSet();
+              _activeLayers.removeAll(nonRadarWeatherLayers);
+            } else {
+              _activeLayers.removeAll(_weatherLayers);
+            }
+          }
           _activeLayers.removeAll(_earthquakeLayers);
         }
         _activeLayers.add(layer);
       } else {
         _activeLayers.remove(layer);
         
-        // 只有在氣象類圖層取消且沒有其他氣象類圖層時，才回到強震監視器
         if (_weatherLayers.contains(layer)) {
           final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
           if (!hasOtherWeatherLayers) {
             _activeLayers.add(MapLayer.monitor);
           }
         }
-        // 如果取消的是地震類圖層（非強震監視器），回到強震監視器
         else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
           _activeLayers.add(MapLayer.monitor);
         }

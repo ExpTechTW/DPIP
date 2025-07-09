@@ -47,6 +47,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
   final currentTemperatureTime = ValueNotifier<String?>(GlobalProviders.data.temperature.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
+  Function(String)? onTimeChanged;
+
   Future<void> setTemperatureTime(String time) async {
     if (currentTemperatureTime.value == time || isLoading.value) return;
 
@@ -56,6 +58,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
       await remove();
       currentTemperatureTime.value = time;
       await setup();
+
+      onTimeChanged?.call(time);
 
       TalkerManager.instance.info('Updated Temperature data time to "$time"');
     } catch (e, s) {

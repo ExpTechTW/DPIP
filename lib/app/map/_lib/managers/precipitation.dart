@@ -50,6 +50,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
 
+  Function(String)? onTimeChanged;
+
   Future<void> setPrecipitationTime(String time) async {
     if (currentPrecipitationTime.value == time || isLoading.value) return;
 
@@ -59,6 +61,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       await remove();
       currentPrecipitationTime.value = time;
       await setup();
+
+      onTimeChanged?.call(time);
 
       TalkerManager.instance.info('Updated Precipitation data to "$time"');
     } catch (e, s) {

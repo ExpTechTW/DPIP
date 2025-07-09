@@ -25,6 +25,10 @@ class RadarMapLayerManager extends MapLayerManager {
   final currentRadarTime = ValueNotifier<String?>(GlobalProviders.data.radar.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
+  Future<void> updateRadarTime(String time) async {
+    await _updateRadarTileUrl(time);
+  }
+
   Future<void> _updateRadarTileUrl(String time) async {
     if (currentRadarTime.value == time || isLoading.value) return;
 

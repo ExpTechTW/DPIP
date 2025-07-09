@@ -42,6 +42,8 @@ class WindMapLayerManager extends MapLayerManager {
   final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
+  Function(String)? onTimeChanged;
+
   Future<void> setWindTime(String time) async {
     if (currentWindTime.value == time || isLoading.value) return;
 
@@ -51,6 +53,8 @@ class WindMapLayerManager extends MapLayerManager {
       await remove();
       currentWindTime.value = time;
       await setup();
+
+      onTimeChanged?.call(time);
 
       TalkerManager.instance.info('Updated Wind data time to "$time"');
     } catch (e, s) {

@@ -38,10 +38,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
   
-  // 改為使用Set來存儲多個活動圖層
   final Set<MapLayer> _activeLayers = {};
 
-  // 定義地震類和氣象類圖層
   static const Set<MapLayer> _earthquakeLayers = {
     MapLayer.monitor,
     MapLayer.report,
@@ -55,10 +53,15 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     MapLayer.wind,
   };
 
+  static const Map<MapLayer, Set<MapLayer>> _allowedRadarCombinations = {
+    MapLayer.temperature: {MapLayer.radar, MapLayer.temperature},
+    MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
+    MapLayer.wind: {MapLayer.radar, MapLayer.wind},
+  };
+
   void _setupTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(Duration(milliseconds: GlobalProviders.map.updateIntervalNotifier.value), (timer) {
-      // 只有當強震監視器圖層活動時才進行更新
       if (_activeLayers.contains(MapLayer.monitor)) {
         final manager = _managers[MapLayer.monitor];
         if (manager != null) {
@@ -68,10 +71,96 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     });
   }
 
-  /// 獲取當前活動的圖層
   Set<MapLayer> get activeLayers => _activeLayers;
 
-  /// 切換圖層的顯示狀態
+  MapLayer? get primaryLayer {
+    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind]) {
+      if (_activeLayers.contains(layer)) {
+        return layer;
+      }
+    }
+    return _activeLayers.isNotEmpty ? _activeLayers.first : null;
+  }
+
+  Future<void> syncTimeToRadar(String time) async {
+    if (!_activeLayers.contains(MapLayer.radar)) return;
+    
+    final radarManager = getLayerManager<RadarMapLayerManager>(MapLayer.radar);
+    if (radarManager != null) {
+      try {
+        await radarManager.updateRadarTime(time);
+        TalkerManager.instance.info('Synced radar time to: $time');
+      } catch (e, s) {
+        TalkerManager.instance.error('Failed to sync radar time', e, s);
+      }
+    }
+  }
+
+  void _setupWeatherLayerTimeSync() {
+    final temperatureManager = getLayerManager<TemperatureMapLayerManager>(MapLayer.temperature);
+    temperatureManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
+
+    final precipitationManager = getLayerManager<PrecipitationMapLayerManager>(MapLayer.precipitation);
+    precipitationManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
+
+    final windManager = getLayerManager<WindMapLayerManager>(MapLayer.wind);
+    windManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
+  }
+
+  Future<void> _syncRadarTimeOnCombination(MapLayer newLayer) async {
+    if (!_activeLayers.contains(MapLayer.radar) || !_weatherLayers.contains(newLayer) || newLayer == MapLayer.radar) {
+      return;
+    }
+
+    String? newTime;
+    switch (newLayer) {
+      case MapLayer.temperature:
+        final manager = getLayerManager<TemperatureMapLayerManager>(MapLayer.temperature);
+        newTime = manager?.currentTemperatureTime.value;
+      case MapLayer.precipitation:
+        final manager = getLayerManager<PrecipitationMapLayerManager>(MapLayer.precipitation);
+        newTime = manager?.currentPrecipitationTime.value;
+      case MapLayer.wind:
+        final manager = getLayerManager<WindMapLayerManager>(MapLayer.wind);
+        newTime = manager?.currentWindTime.value;
+      default:
+    }
+
+    if (newTime != null) {
+      await syncTimeToRadar(newTime);
+    }
+  }
+
+  T? getLayerManager<T extends MapLayerManager>(MapLayer layer) {
+    final manager = _managers[layer];
+    return manager is T ? manager : null;
+  }
+
+  bool _isAllowedCombination(Set<MapLayer> layers) {
+    final earthquakeCount = layers.where((l) => _earthquakeLayers.contains(l)).length;
+    if (earthquakeCount > 1) return false;
+
+    final weatherLayers = layers.where((l) => _weatherLayers.contains(l)).toSet();
+    if (weatherLayers.isEmpty) return true;
+
+    if (weatherLayers.length == 1) return true;
+
+    if (weatherLayers.length == 2) {
+      if (weatherLayers.contains(MapLayer.radar)) {
+        final otherLayer = weatherLayers.where((l) => l != MapLayer.radar).first;
+        return _allowedRadarCombinations.containsKey(otherLayer);
+      }
+    }
+
+    return false;
+  }
+
   Future<void> toggleLayer(MapLayer layer) async {
     if (!mounted) return;
 
@@ -83,49 +172,52 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       }
 
       if (_activeLayers.contains(layer)) {
-        // 如果是強震監視器且沒有其他圖層，不允許取消選中
         if (layer == MapLayer.monitor && _activeLayers.length == 1) {
           return;
         }
         
-        // 如果圖層已經活動，則隱藏它
         await manager.hide();
         setState(() {
           _activeLayers.remove(layer);
         });
         
-        // 只有在氣象類圖層取消且沒有其他氣象類圖層時，才回到強震監視器
         if (_weatherLayers.contains(layer)) {
           final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
           if (!hasOtherWeatherLayers) {
             await _showMonitorLayer();
           }
         }
-        // 如果取消的是地震類圖層（非強震監視器），回到強震監視器
         else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
           await _showMonitorLayer();
         }
       } else {
-        // 檢查互斥性
+        final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
+        
         if (_earthquakeLayers.contains(layer)) {
-          // 地震類圖層互斥，清除所有其他地震類圖層
           await _clearLayerGroup(_earthquakeLayers);
-          // 同時清除氣象類圖層
           await _clearLayerGroup(_weatherLayers);
         } else if (_weatherLayers.contains(layer)) {
-          // 氣象類圖層可以複選，但要清除地震類圖層
+          final weatherLayersInNew = newLayers.where((l) => _weatherLayers.contains(l)).toSet();
+          if (!_isAllowedCombination(weatherLayersInNew)) {
+            if (weatherLayersInNew.contains(MapLayer.radar)) {
+              final nonRadarWeatherLayers = _weatherLayers.where((l) => l != MapLayer.radar).toSet();
+              await _clearLayerGroup(nonRadarWeatherLayers);
+            } else {
+              await _clearLayerGroup(_weatherLayers);
+            }
+          }
           await _clearLayerGroup(_earthquakeLayers);
         }
 
-        // 顯示選中的圖層
         if (!manager.didSetup) await manager.setup();
         await manager.show();
         setState(() {
           _activeLayers.add(layer);
         });
+
+        await _syncRadarTimeOnCombination(layer);
       }
 
-      // 如果沒有活動圖層，重置地圖視角並顯示強震監視器
       if (_activeLayers.isEmpty) {
         await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
         await _showMonitorLayer();
@@ -135,7 +227,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
   }
 
-  /// 顯示強震監視器圖層
   Future<void> _showMonitorLayer() async {
     if (_activeLayers.contains(MapLayer.monitor)) return;
     
@@ -149,7 +240,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
   }
 
-  /// 清除指定圖層組
   Future<void> _clearLayerGroup(Set<MapLayer> layers) async {
     for (final layer in layers) {
       if (_activeLayers.contains(layer)) {
@@ -186,7 +276,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _baseMapType = baseMapType);
   }
 
-  /// 隱藏所有地圖底圖圖層
   void _hideBaseMapLayers() {
     _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
     _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
@@ -201,15 +290,15 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
-    // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
     _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
 
+    _setupWeatherLayerTimeSync();
+
     setBaseMapType(_baseMapType);
     
-    // 如果有初始圖層，則顯示它；否則預設顯示強震監視器
     if (widget.initialLayer != null) {
       toggleLayer(widget.initialLayer!);
     } else {
@@ -244,7 +333,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               return manager.build(context);
             }
             return const SizedBox.shrink();
-          }).toList(),
+          }),
         ],
       ),
     );
