@@ -181,7 +181,7 @@ class _EewCardState extends State<EewCard> {
                                   crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     Text(
-                                      '震波',
+                                      '震波'.i18n,
                                       style: context.textTheme.labelLarge!.copyWith(
                                         color: context.colors.onErrorContainer.withValues(alpha: 0.6),
                                       ),
@@ -200,7 +200,7 @@ class _EewCardState extends State<EewCard> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: ' 秒',
+                                                      text: ' 秒'.i18n,
                                                       style: TextStyle(
                                                         fontSize: context.textTheme.labelLarge!.fontSize,
                                                       ),

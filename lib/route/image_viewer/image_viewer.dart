@@ -11,6 +11,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
 class ImageViewerRoute extends StatefulWidget {
@@ -53,20 +54,20 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           builder: (context) {
             return AlertDialog(
               icon: const Icon(Symbols.error),
-              title: const Text('無法取得權限'),
+              title: Text('無法取得權限'.i18n),
               content: Text(
-                "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。' : ""}",
+                "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。'.i18n : ""}",
               ),
               actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
                 TextButton(
-                  child: const Text('取消'),
+                  child: Text('取消'.i18n),
                   onPressed: () {
                     Navigator.pop(context);
                   },
                 ),
                 FilledButton(
-                  child: Text(status.isPermanentlyDenied ? '設定' : '再試一次'),
+                  child: Text(status.isPermanentlyDenied ? '設定'.i18n : '再試一次'.i18n),
                   onPressed: () {
                     if (status.isPermanentlyDenied) {
                       openAppSettings();
@@ -106,7 +107,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
             }
           }
         }
-        Fluttertoast.showToast(msg: '已儲存圖片');
+        Fluttertoast.showToast(msg: '已儲存圖片'.i18n);
       } finally {
         // 清理临时文件
         if (await tempFile.exists()) {
@@ -122,11 +123,11 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           builder: (context) {
             return AlertDialog(
               icon: const Icon(Symbols.error),
-              title: const Text('儲存圖片時發生錯誤'),
+              title: Text('儲存圖片時發生錯誤'.i18n),
               content: Text(e.toString()),
               actions: [
                 TextButton(
-                  child: const Text('確定'),
+                  child: Text('確定'.i18n),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -136,7 +137,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
           },
         );
       } else {
-        context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('儲存圖片時發生錯誤: $e')));
+        context.scaffoldMessenger.showSnackBar(SnackBar(content: Text('儲存圖片時發生錯誤: $e'.i18n)));
       }
     }
   }
@@ -224,7 +225,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
                                 ),
                               )
                               : const Icon(Symbols.save_rounded),
-                      label: const Text('儲存'),
+                      label: Text('儲存'.i18n),
                       style: ButtonStyle(
                         foregroundColor: WidgetStatePropertyAll(context.colors.onSurfaceVariant),
                         backgroundColor: WidgetStatePropertyAll(context.colors.surfaceContainerHighest),

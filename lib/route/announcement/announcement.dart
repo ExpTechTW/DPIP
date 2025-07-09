@@ -5,27 +5,28 @@ import 'package:intl/intl.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/announcement.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 
 final List<TagType> tagTypes = [
-  TagType(id: 0, text: '錯誤', color: Colors.red),
-  TagType(id: 1, text: '已解決', color: Colors.green),
-  TagType(id: 2, text: '影響：小', color: Colors.grey.shade600),
-  TagType(id: 3, text: '影響：中', color: Colors.orange.shade700),
-  TagType(id: 4, text: '影響：大', color: Colors.purple),
-  TagType(id: 5, text: '公告', color: Colors.blue.shade900),
-  TagType(id: 6, text: '維修', color: Colors.teal.shade700),
-  TagType(id: 7, text: '測試', color: Colors.cyan.shade700),
-  TagType(id: 8, text: '變更', color: Colors.pink.shade600),
-  TagType(id: 9, text: '完成', color: Colors.lightGreen.shade700),
-  TagType(id: 10, text: '地震相關', color: Colors.deepOrange.shade600),
-  TagType(id: 11, text: '氣象相關', color: Colors.indigo.shade600),
+  TagType(id: 0, text: '錯誤'.i18n, color: Colors.red),
+  TagType(id: 1, text: '已解決'.i18n, color: Colors.green),
+  TagType(id: 2, text: '影響：小'.i18n, color: Colors.grey.shade600),
+  TagType(id: 3, text: '影響：中'.i18n, color: Colors.orange.shade700),
+  TagType(id: 4, text: '影響：大'.i18n, color: Colors.purple),
+  TagType(id: 5, text: '公告'.i18n, color: Colors.blue.shade900),
+  TagType(id: 6, text: '維修'.i18n, color: Colors.teal.shade700),
+  TagType(id: 7, text: '測試'.i18n, color: Colors.cyan.shade700),
+  TagType(id: 8, text: '變更'.i18n, color: Colors.pink.shade600),
+  TagType(id: 9, text: '完成'.i18n, color: Colors.lightGreen.shade700),
+  TagType(id: 10, text: '地震相關'.i18n, color: Colors.deepOrange.shade600),
+  TagType(id: 11, text: '氣象相關'.i18n, color: Colors.indigo.shade600),
 ];
 
 TagType _getTagTypeById(int id) {
   return tagTypes.firstWhere(
     (tagType) => tagType.id == id,
-    orElse: () => TagType(id: -1, text: '未知', color: Colors.grey),
+    orElse: () => TagType(id: -1, text: '未知'.i18n, color: Colors.grey),
   );
 }
 
@@ -69,7 +70,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = '獲取公告時發生錯誤: $e';
+        errorMessage = '獲取公告時發生錯誤: $e'.i18n;
         isLoading = false;
       });
     }
@@ -78,7 +79,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('公告'), elevation: 0),
+      appBar: AppBar(title: Text('公告'.i18n), elevation: 0),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -99,7 +100,7 @@ class _AnnouncementPageState extends State<AnnouncementPage> {
       return Center(child: Text(errorMessage!));
     }
     if (announcements.isEmpty) {
-      return const Center(child: Text('目前沒有公告'));
+      return Center(child: Text('目前沒有公告'.i18n));
     }
     return RefreshIndicator(
       onRefresh: _fetchAnnouncements,
@@ -219,7 +220,7 @@ class AnnouncementDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('公告詳情'), elevation: 0),
+      appBar: AppBar(title: Text('公告詳情'.i18n), elevation: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
