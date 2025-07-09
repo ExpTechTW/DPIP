@@ -6,6 +6,7 @@ import 'package:styled_text/styled_text.dart';
 
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
@@ -87,8 +88,11 @@ class ThunderstormCard extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
-              splashColor: context.colors.error.withValues(alpha: 0.2),
+              onTap:
+                  () => Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (context) => ThunderstormPage(item: history))),
+              splashColor: context.theme.extendedColors.blue.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(16),
             ),
           ),
