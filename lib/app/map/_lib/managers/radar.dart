@@ -27,7 +27,7 @@ class RadarMapLayerManager extends MapLayerManager {
   final isPlaying = ValueNotifier<bool>(false);
   final playStartTime = ValueNotifier<String?>(null);
   final playEndTime = ValueNotifier<String?>(null);
-  
+
   Timer? _playTimer;
   final Set<String> _preloadedLayers = {};
   final int Function()? getActiveLayerCount;
@@ -37,7 +37,7 @@ class RadarMapLayerManager extends MapLayerManager {
       stopAutoPlay();
       TalkerManager.instance.info('Auto-play stopped due to external control');
     }
-    
+
     await _updateRadarTileUrl(time);
     await _preloadAdjacentLayers(time);
   }
@@ -47,47 +47,47 @@ class RadarMapLayerManager extends MapLayerManager {
       TalkerManager.instance.info('Cannot set current time as play start time');
       return;
     }
-    
+
     playStartTime.value = time;
-    
+
     if (playEndTime.value != null) {
       final radarList = GlobalProviders.data.radar;
       final startIndex = radarList.indexOf(time);
       final endIndex = radarList.indexOf(playEndTime.value!);
-      
+
       if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
         playEndTime.value = null;
         TalkerManager.instance.info('Cleared end time because start time is after end time');
       }
     }
-    
+
     TalkerManager.instance.info('Set play start time to: $time');
   }
 
   bool get canPlay {
     if (playStartTime.value == null) return true;
-    
+
     final radarList = GlobalProviders.data.radar;
     final startIndex = radarList.indexOf(playStartTime.value!);
-    
+
     if (playEndTime.value == null) {
       final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
       return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
     }
-    
+
     final endIndex = radarList.indexOf(playEndTime.value!);
-    
+
     return startIndex != -1 && endIndex != -1 && startIndex > endIndex;
   }
 
   bool get isMultiLayerMode {
     final count = getActiveLayerCount?.call() ?? 1;
     final isMulti = count > 1;
-    
+
     if (isMulti && isPlaying.value) {
       stopAutoPlay();
     }
-    
+
     return isMulti;
   }
 
@@ -231,17 +231,17 @@ class RadarMapLayerManager extends MapLayerManager {
     TalkerManager.instance.info('Started radar auto-play from: ${playStartTime.value} to: ${playEndTime.value}');
   }
 
-    void stopAutoPlay() {
+  void stopAutoPlay() {
     if (!isPlaying.value) return;
-    
+
     isPlaying.value = false;
     _playTimer?.cancel();
     _playTimer = null;
     _isWaitingForRestart = false;
-    
+
     playStartTime.value = null;
     playEndTime.value = null;
-    
+
     TalkerManager.instance.info('Stopped radar auto-play');
   }
 
@@ -454,14 +454,15 @@ class RadarMapLayerSheet extends StatelessWidget {
                             final startTime = manager.playStartTime.value;
                             final endTime = manager.playEndTime.value;
                             final canPlay = manager.canPlay;
-                            
-                            final shouldHide = (startTime == null && !isPlaying) ||
+
+                            final shouldHide =
+                                (startTime == null && !isPlaying) ||
                                 (startTime != null && endTime != null && !canPlay && !isPlaying);
-                            
+
                             if (shouldHide) {
                               return const SizedBox(width: 24, height: 24);
                             }
-                            
+
                             return InkWell(
                               onTap: canPlay || isPlaying ? manager.toggleAutoPlay : null,
                               borderRadius: BorderRadius.circular(12),
@@ -482,24 +483,20 @@ class RadarMapLayerSheet extends StatelessWidget {
                     ),
                   ),
                   AnimatedBuilder(
-                    animation: Listenable.merge([
-                      manager.currentRadarTime,
-                      manager.playStartTime,
-                      manager.isPlaying,
-                    ]),
+                    animation: Listenable.merge([manager.currentRadarTime, manager.playStartTime, manager.isPlaying]),
                     builder: (context, child) {
                       final currentTime = manager.currentRadarTime.value;
                       final hasStartTime = manager.playStartTime.value != null;
                       final isPlaying = manager.isPlaying.value;
-                      
+
                       if (currentTime == null) return const SizedBox.shrink();
-                                            
+
                       try {
                         final timeFormatted = currentTime.toSimpleDateTimeString(context);
                         final timeData = timeFormatted.split(' ');
                         final date = timeData.length > 1 ? timeData[0] : '';
                         final time = timeData.length > 1 ? timeData[1] : timeData[0];
-                        
+
                         return Padding(
                           padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
                           child: Align(
@@ -513,11 +510,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.schedule_rounded,
-                                    size: 12,
-                                    color: context.colors.onSurfaceVariant,
-                                  ),
+                                  Icon(Icons.schedule_rounded, size: 12, color: context.colors.onSurfaceVariant),
                                   const SizedBox(width: 3),
                                   if (date.isNotEmpty) ...[
                                     Text(
@@ -548,18 +541,15 @@ class RadarMapLayerSheet extends StatelessWidget {
                     },
                   ),
                   AnimatedBuilder(
-                    animation: Listenable.merge([
-                      manager.playStartTime,
-                      manager.isPlaying,
-                    ]),
+                    animation: Listenable.merge([manager.playStartTime, manager.isPlaying]),
                     builder: (context, child) {
                       final startTime = manager.playStartTime.value;
                       final isPlaying = manager.isPlaying.value;
-                      
+
                       if (startTime == null && !isPlaying) {
                         return const SizedBox.shrink();
                       }
-                      
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                         child: Column(
@@ -604,7 +594,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                       final isPlaying = manager.isPlaying.value;
                       final endTime = manager.playEndTime.value;
                       final canPlay = manager.canPlay;
-                      
+
                       bool shouldShowButton = true;
                       if (startTime == null && !isPlaying) {
                         shouldShowButton = false;
@@ -612,7 +602,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                       if (startTime != null && endTime != null && !canPlay && !isPlaying) {
                         shouldShowButton = false;
                       }
-                      
+
                       if (!isPlaying && !shouldShowButton) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
@@ -742,21 +732,23 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
       final RenderBox? renderBox = key!.currentContext!.findRenderObject() as RenderBox?;
       if (renderBox == null) return;
 
-      final RenderBox? scrollViewBox = _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
+      final RenderBox? scrollViewBox =
+          _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
       if (scrollViewBox == null) return;
 
       if (!renderBox.attached) return;
 
       final position = renderBox.localToGlobal(Offset.zero);
       final localPosition = scrollViewBox.globalToLocal(position);
-      
-      final targetOffset = _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
-      
+
+      final targetOffset =
+          _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
+
       final clampedOffset = targetOffset.clamp(
         _scrollController.position.minScrollExtent,
         _scrollController.position.maxScrollExtent,
       );
-      
+
       if ((clampedOffset - _scrollController.offset).abs() > 20) {
         _scrollController.animateTo(
           clampedOffset,
@@ -764,8 +756,7 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
           curve: Curves.easeInOut,
         );
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   @override
@@ -821,12 +812,12 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
                     }
 
                     return GestureDetector(
-                                             onLongPress:
-                           isLoading || isPlaying
-                               ? null
-                               : () {
-                                 widget.manager.setPlayStartTime(time.value);
-                               },
+                      onLongPress:
+                          isLoading || isPlaying
+                              ? null
+                              : () {
+                                widget.manager.setPlayStartTime(time.value);
+                              },
                       child: FilterChip(
                         key: _chipKeys[time.value],
                         selected: isHighlighted,
@@ -867,4 +858,3 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     super.dispose();
   }
 }
-
