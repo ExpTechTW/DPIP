@@ -93,7 +93,19 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
 
       try {
         // 保存到相册
-        await Gal.putImage(tempFile.path, album: 'DPIP');
+        if (Platform.isAndroid) {
+          await Gal.putImage(tempFile.path, album: 'DPIP');
+        } else {
+          await Permission.photosAddOnly.request();
+          try {
+            await Gal.putImage(tempFile.path);
+          } catch (_) {
+            final upgrade = await Permission.photos.request();
+            if (upgrade.isGranted) {
+              await Gal.putImage(tempFile.path, album: 'DPIP');
+            }
+          }
+        }
         Fluttertoast.showToast(msg: '已儲存圖片');
       } finally {
         // 清理临时文件
