@@ -55,7 +55,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
               icon: const Icon(Symbols.error),
               title: const Text('無法取得權限'),
               content: Text(
-                "'儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。'${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。' : ""}",
+                "儲存圖片需要您允許 DPIP 使用相片和媒體權限才能正常運作。${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。' : ""}",
               ),
               actionsAlignment: MainAxisAlignment.spaceBetween,
               actions: [
