@@ -642,7 +642,20 @@ class RadarMapLayerSheet extends StatelessWidget {
                     valueListenable: manager.isPlaying,
                     builder: (context, isPlaying, child) {
                       if (isPlaying) {
-                        return const SizedBox.shrink();
+                        return Container(
+                          height: 32,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          child: AnimatedBuilder(
+                            animation: Listenable.merge([
+                              manager.currentRadarTime,
+                              manager.playStartTime,
+                              manager.playEndTime,
+                            ]),
+                            builder: (context, child) {
+                              return _RadarProgressBar(manager: manager);
+                            },
+                          ),
+                        );
                       }
 
                       return SizedBox(
@@ -878,5 +891,72 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+}
+
+class _RadarProgressBar extends StatelessWidget {
+  final RadarMapLayerManager manager;
+
+  const _RadarProgressBar({required this.manager});
+
+  @override
+  Widget build(BuildContext context) {
+    final currentTime = manager.currentRadarTime.value;
+    final startTime = manager.playStartTime.value;
+    final endTime = manager.playEndTime.value;
+
+    if (currentTime == null || startTime == null || endTime == null) {
+      return const SizedBox.shrink();
+    }
+
+    final radarList = GlobalProviders.data.radar;
+    final currentIndex = radarList.indexOf(currentTime);
+    final startIndex = radarList.indexOf(startTime);
+    final endIndex = radarList.indexOf(endTime);
+
+    if (currentIndex == -1 || startIndex == -1 || endIndex == -1) {
+      return const SizedBox.shrink();
+    }
+
+    double progress = 0.0;
+    if (startIndex != endIndex) {
+      progress = (startIndex - currentIndex) / (startIndex - endIndex);
+      progress = progress.clamp(0.0, 1.0);
+    }
+
+    return Row(
+      children: [
+        Icon(Icons.play_circle_rounded, size: 14, color: context.colors.primary),
+        const SizedBox(width: 6),
+        Text(
+          '播放進度',
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.onSurface.withValues(alpha: 0.7),
+            fontSize: 10,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: context.colors.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(context.colors.primary),
+              minHeight: 4,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          '${(progress * 100).round()}%',
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.primary,
+            fontWeight: FontWeight.w600,
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
   }
 }
