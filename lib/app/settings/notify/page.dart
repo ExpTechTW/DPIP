@@ -289,7 +289,6 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         return ListSectionTile(
                           title: '同步通知設定'.i18n,
                           subtitle: const Text('套用伺服器上的通知設定紀錄'),
-                          trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.sync_alt_rounded,
                           enabled: !isLoading && enabled,
                           onTap: () {
