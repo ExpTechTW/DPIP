@@ -37,52 +37,131 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
-  late MapLayer? _currentLayer = widget.initialLayer ?? GlobalProviders.map.layer;
+  
+  // 改為使用Set來存儲多個活動圖層
+  final Set<MapLayer> _activeLayers = {};
+
+  // 定義地震類和氣象類圖層
+  static const Set<MapLayer> _earthquakeLayers = {
+    MapLayer.monitor,
+    MapLayer.report,
+    MapLayer.tsunami,
+  };
+
+  static const Set<MapLayer> _weatherLayers = {
+    MapLayer.radar,
+    MapLayer.temperature,
+    MapLayer.precipitation,
+    MapLayer.wind,
+  };
 
   void _setupTicker() {
     _ticker?.cancel();
     _ticker = Timer.periodic(Duration(milliseconds: GlobalProviders.map.updateIntervalNotifier.value), (timer) {
-      if (currentLayer != MapLayer.monitor) return;
-
-      final manager = _managers[currentLayer];
-      if (manager == null) return;
-
-      manager.tick();
+      // 只有當強震監視器圖層活動時才進行更新
+      if (_activeLayers.contains(MapLayer.monitor)) {
+        final manager = _managers[MapLayer.monitor];
+        if (manager != null) {
+          manager.tick();
+        }
+      }
     });
   }
 
-  /// 目前地圖顯示的圖層
-  MapLayer? get currentLayer => _currentLayer;
+  /// 獲取當前活動的圖層
+  Set<MapLayer> get activeLayers => _activeLayers;
 
-  /// 設定地圖顯示的圖層
-  Future<void> setCurrentLayer(MapLayer? layer) async {
-    if (!mounted) return;
-
-    await _hideLayers();
+  /// 切換圖層的顯示狀態
+  Future<void> toggleLayer(MapLayer layer) async {
     if (!mounted) return;
 
     try {
-      if (layer == null) {
-        await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        return;
-      }
-
       final manager = _managers[layer];
-
       if (manager == null) {
         showUnimplementedSnackBar(context);
         throw UnimplementedError('Unknown layer: $layer');
       }
 
-      if (!manager.didSetup) await manager.setup();
+      if (_activeLayers.contains(layer)) {
+        // 如果是強震監視器且沒有其他圖層，不允許取消選中
+        if (layer == MapLayer.monitor && _activeLayers.length == 1) {
+          return;
+        }
+        
+        // 如果圖層已經活動，則隱藏它
+        await manager.hide();
+        setState(() {
+          _activeLayers.remove(layer);
+        });
+        
+        // 只有在氣象類圖層取消且沒有其他氣象類圖層時，才回到強震監視器
+        if (_weatherLayers.contains(layer)) {
+          final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
+          if (!hasOtherWeatherLayers) {
+            await _showMonitorLayer();
+          }
+        }
+        // 如果取消的是地震類圖層（非強震監視器），回到強震監視器
+        else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
+          await _showMonitorLayer();
+        }
+      } else {
+        // 檢查互斥性
+        if (_earthquakeLayers.contains(layer)) {
+          // 地震類圖層互斥，清除所有其他地震類圖層
+          await _clearLayerGroup(_earthquakeLayers);
+          // 同時清除氣象類圖層
+          await _clearLayerGroup(_weatherLayers);
+        } else if (_weatherLayers.contains(layer)) {
+          // 氣象類圖層可以複選，但要清除地震類圖層
+          await _clearLayerGroup(_earthquakeLayers);
+        }
 
-      await _hideLayers();
-      await manager.show();
+        // 顯示選中的圖層
+        if (!manager.didSetup) await manager.setup();
+        await manager.show();
+        setState(() {
+          _activeLayers.add(layer);
+        });
+      }
+
+      // 如果沒有活動圖層，重置地圖視角並顯示強震監視器
+      if (_activeLayers.isEmpty) {
+        await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+        await _showMonitorLayer();
+      }
     } catch (e, s) {
-      TalkerManager.instance.error('_MapPageState._setCurrentLayer', e, s);
-    } finally {
-      setState(() => _currentLayer = layer);
+      TalkerManager.instance.error('_MapPageState.toggleLayer', e, s);
     }
+  }
+
+  /// 顯示強震監視器圖層
+  Future<void> _showMonitorLayer() async {
+    if (_activeLayers.contains(MapLayer.monitor)) return;
+    
+    final manager = _managers[MapLayer.monitor];
+    if (manager != null) {
+      if (!manager.didSetup) await manager.setup();
+      await manager.show();
+      setState(() {
+        _activeLayers.add(MapLayer.monitor);
+      });
+    }
+  }
+
+  /// 清除指定圖層組
+  Future<void> _clearLayerGroup(Set<MapLayer> layers) async {
+    for (final layer in layers) {
+      if (_activeLayers.contains(layer)) {
+        final manager = _managers[layer];
+        if (manager != null) {
+          await manager.hide();
+        }
+      }
+    }
+    setState(() {
+      _activeLayers.removeAll(layers);
+    });
   }
 
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
@@ -107,21 +186,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _baseMapType = baseMapType);
   }
 
-  /// 隱藏所有圖層
-  Future<void> _hideLayers() async {
-    if (!mounted) return;
-
-    try {
-      for (final manager in _managers.values) {
-        await manager.hide();
-      }
-    } catch (e, s) {
-      TalkerManager.instance.error('_MapPageState._hideLayers', e, s);
-    }
-
-    setState(() => _currentLayer = null);
-  }
-
   /// 隱藏所有地圖底圖圖層
   void _hideBaseMapLayers() {
     _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
@@ -144,7 +208,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
 
     setBaseMapType(_baseMapType);
-    setCurrentLayer(currentLayer);
+    
+    // 如果有初始圖層，則顯示它；否則預設顯示強震監視器
+    if (widget.initialLayer != null) {
+      toggleLayer(widget.initialLayer!);
+    } else {
+      _showMonitorLayer();
+    }
   }
 
   @override
@@ -157,20 +227,24 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final manager = _managers[currentLayer];
-
     return Scaffold(
       body: Stack(
         children: [
           DpipMap(onMapCreated: onMapCreated, tiltGesturesEnabled: true),
           PositionedLayerButton(
-            currentLayer: currentLayer,
+            activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,
-            onChanged: (layer) => setCurrentLayer(layer),
-            onBaseMapChanged: (baseMap) => setBaseMapType(baseMap),
+            onLayerToggled: toggleLayer,
+            onBaseMapChanged: setBaseMapType,
           ),
           const PositionedBackButton(),
-          if (manager != null) manager.build(context),
+          ..._activeLayers.map((layer) {
+            final manager = _managers[layer];
+            if (manager != null) {
+              return manager.build(context);
+            }
+            return const SizedBox.shrink();
+          }).toList(),
         ],
       ),
     );

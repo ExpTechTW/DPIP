@@ -426,7 +426,11 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
       _updateRtsSource();
-      _updateLayerVisibility();
+      
+      // 只有在圖層可見時才更新圖層可見性
+      if (visible) {
+        _updateLayerVisibility();
+      }
     }
   }
 
@@ -520,6 +524,10 @@ class MonitorMapLayerManager extends MapLayerManager {
     final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
+      // 停止閃爍定時器
+      _blinkTimer?.cancel();
+      _blinkTimer = null;
+      
       // rts
       await controller.setLayerVisibility(rtsLayerId, false);
       TalkerManager.instance.info('Hiding Layer "$rtsLayerId"');
@@ -559,6 +567,9 @@ class MonitorMapLayerManager extends MapLayerManager {
     final sWaveLayerId = MapLayerIds.eew('s');
 
     try {
+      // 重新啟動閃爍定時器
+      _setupBlinkTimer();
+      
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await controller.setLayerVisibility(rtsLayerId, !hasBox);
@@ -646,8 +657,10 @@ class MonitorMapLayerManager extends MapLayerManager {
   @override
   void dispose() {
     _blinkTimer?.cancel();
+    _blinkTimer = null;
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
+    super.dispose();
   }
 
   @override
