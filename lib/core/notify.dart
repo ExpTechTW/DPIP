@@ -3,6 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:go_router/go_router.dart';
+
+import 'package:dpip/app/map/page.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/route/event_viewer/intensity.dart';
+import 'package:dpip/route/event_viewer/thunderstorm.dart';
+import 'package:dpip/route/report/report.dart';
+import 'package:dpip/router.dart';
+import 'package:dpip/utils/log.dart';
 
 Future<void> notifyInit() async {
   await AwesomeNotifications().initialize(
@@ -311,4 +320,23 @@ Future<void> notifyInit() async {
     ],
     debug: true,
   );
+
+  AwesomeNotifications().setListeners(
+    onActionReceivedMethod: onActionReceivedMethod,
+  );
+}
+
+@pragma('vm:entry-point')
+Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+  final context = router.routerDelegate.navigatorKey.currentContext;
+  if (context == null) return;
+
+  final channelKey = receivedAction.channelKey;
+  
+  TalkerManager.instance.debug('Notification clicked: channelKey=$channelKey');
+
+  if (channelKey?.startsWith('eq') == true) {
+    context.push(MapPage.route(layer: MapLayer.monitor));
+    return;
+  }
 }
