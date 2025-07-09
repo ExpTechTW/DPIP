@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/_widgets/weather_notify_section.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyEvacuationPage extends StatelessWidget {
   const SettingsNotifyEvacuationPage({super.key});

@@ -1,10 +1,9 @@
 import 'dart:developer';
 
-import 'package:dpip/api/model/notify/notify_settings.dart';
-import 'package:flutter/material.dart';
-
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/notify/notify_settings.dart';
 import 'package:dpip/core/preference.dart';
+import 'package:flutter/material.dart';
 
 /// 通知類型
 enum NotifyChannel {

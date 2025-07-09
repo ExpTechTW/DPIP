@@ -1,13 +1,4 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
@@ -35,6 +26,13 @@ import 'package:dpip/widgets/report/enlargeable_image.dart';
 import 'package:dpip/widgets/report/intensity_box.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ReportMapLayerManager extends MapLayerManager {
   ReportMapLayerManager(super.context, super.controller);

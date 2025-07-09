@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/models/settings/map.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class NavigationLocation extends NavigationDrawerDestination {
   NavigationLocation({super.key, required Icon super.icon, required super.label})

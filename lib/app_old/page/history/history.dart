@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/app_old/page/history/tabs/country.dart';
 import 'package:dpip/app_old/page/history/tabs/location.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -37,14 +35,8 @@ class _HistoryPageState extends State<HistoryPage> with TickerProviderStateMixin
             bottom: TabBar(
               controller: controller,
               tabs: [
-                Tab(
-                  icon: Icon(Symbols.globe_asia_rounded, fill: controller.index == 0 ? 1 : 0),
-                  text: '全國',
-                ),
-                Tab(
-                  icon: Icon(Symbols.home_rounded, fill: controller.index == 1 ? 1 : 0),
-                  text: '所在地',
-                ),
+                Tab(icon: Icon(Symbols.globe_asia_rounded, fill: controller.index == 0 ? 1 : 0), text: '全國'),
+                Tab(icon: Icon(Symbols.home_rounded, fill: controller.index == 1 ? 1 : 0), text: '所在地'),
               ],
             ),
           ),

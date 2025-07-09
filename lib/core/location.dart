@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:geolocator/geolocator.dart';
-
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/location_to_code.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 StreamSubscription<Position>? positionStreamSubscription;

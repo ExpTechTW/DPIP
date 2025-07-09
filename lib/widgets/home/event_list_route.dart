@@ -21,10 +21,7 @@ bool shouldShowArrow(History item) {
 void handleEventList(BuildContext context, History current) {
   final build = typeConfigs[current.type];
   if (build != null) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => build(current)),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) => build(current)));
   } else {
     print('Unknown type: ${current.type}');
   }

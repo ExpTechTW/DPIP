@@ -1,9 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/managers/monitor.dart';
 import 'package:dpip/app/map/_lib/managers/precipitation.dart';
@@ -19,6 +15,8 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/unimplemented.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class MapPage extends StatefulWidget {
   final MapLayer? initialLayer;
@@ -37,14 +35,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
-  
+
   final Set<MapLayer> _activeLayers = {};
 
-  static const Set<MapLayer> _earthquakeLayers = {
-    MapLayer.monitor,
-    MapLayer.report,
-    MapLayer.tsunami,
-  };
+  static const Set<MapLayer> _earthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
 
   static const Set<MapLayer> _weatherLayers = {
     MapLayer.radar,
@@ -84,7 +78,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   Future<void> syncTimeToRadar(String time) async {
     if (!_activeLayers.contains(MapLayer.radar)) return;
-    
+
     final radarManager = getLayerManager<RadarMapLayerManager>(MapLayer.radar);
     if (radarManager != null) {
       try {
@@ -175,24 +169,23 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         if (layer == MapLayer.monitor && _activeLayers.length == 1) {
           return;
         }
-        
+
         await manager.hide();
         setState(() {
           _activeLayers.remove(layer);
         });
-        
+
         if (_weatherLayers.contains(layer)) {
           final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
           if (!hasOtherWeatherLayers) {
             await _showMonitorLayer();
           }
-        }
-        else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
+        } else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
           await _showMonitorLayer();
         }
       } else {
         final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
-        
+
         if (_earthquakeLayers.contains(layer)) {
           await _clearLayerGroup(_earthquakeLayers);
           await _clearLayerGroup(_weatherLayers);
@@ -229,7 +222,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   Future<void> _showMonitorLayer() async {
     if (_activeLayers.contains(MapLayer.monitor)) return;
-    
+
     final manager = _managers[MapLayer.monitor];
     if (manager != null) {
       if (!manager.didSetup) await manager.setup();
@@ -298,7 +291,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _setupWeatherLayerTimeSync();
 
     setBaseMapType(_baseMapType);
-    
+
     if (widget.initialLayer != null) {
       toggleLayer(widget.initialLayer!);
     } else {

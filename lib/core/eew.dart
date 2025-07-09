@@ -1,12 +1,11 @@
 import 'dart:math';
 
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/wave_time.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/list.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 ({double p, double s, double sT}) calcWaveRadius(double depth, int time, int now) {
   double pDist = 0;

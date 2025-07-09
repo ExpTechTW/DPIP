@@ -30,17 +30,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
   int _select_index = 8;
 
   final List<String> _intervals = ['3d', '2d', '24h', '12h', '6h', '3h', '1h', '10m', 'now'];
-  List<String> get _intervalTranslations => [
-    '3 天',
-    '3 天',
-    '24 小時',
-    '12 小時',
-    '6 小時',
-    '3 小時',
-    '1 小時',
-    '10 分鐘',
-    '今日',
-  ];
+  List<String> get _intervalTranslations => ['3 天', '3 天', '24 小時', '12 小時', '6 小時', '3 小時', '1 小時', '10 分鐘', '今日'];
 
   @override
   void initState() {

@@ -1,13 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:timezone/timezone.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
@@ -19,6 +12,11 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/time_convert.dart';
 import 'package:dpip/utils/weather_icon.dart';
 import 'package:dpip/widgets/error/region_out_of_service.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:timezone/timezone.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -150,10 +148,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               context.push('/settings/location');
             },
             icon: const Icon(Symbols.pin_drop_rounded),
-            label: Text(
-              region != null ? '$city$town' : '點擊設定所在地',
-              style: const TextStyle(fontSize: 20),
-            ),
+            label: Text(region != null ? '$city$town' : '點擊設定所在地', style: const TextStyle(fontSize: 20)),
           ),
         );
       },
@@ -181,10 +176,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    '目前的事件資訊',
-                    style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant),
-                  ),
+                  child: Text('目前的事件資訊', style: TextStyle(fontSize: 20, color: context.colors.onSurfaceVariant)),
                 ),
                 _buildLocationToggle(),
               ],
@@ -202,11 +194,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       child: SegmentedButton(
         showSelectedIcon: false,
         segments: const [
-          ButtonSegment(
-            icon: Icon(Symbols.public_rounded),
-            tooltip: '全國',
-            value: true,
-          ),
+          ButtonSegment(icon: Icon(Symbols.public_rounded), tooltip: '全國', value: true),
           ButtonSegment(icon: Icon(Symbols.home_rounded), tooltip: '所在地', value: false),
         ],
         selected: {country},
@@ -337,10 +325,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildWeatherDetailItem('降水量', '${weatherData?.rain.data.oneHour ?? '- -'} mm/h'),
-          _buildWeatherDetailItem(
-            '濕度',
-            '${weatherData?.weather.data.air.relativeHumidity ?? '- -'} %',
-          ),
+          _buildWeatherDetailItem('濕度', '${weatherData?.weather.data.air.relativeHumidity ?? '- -'} %'),
         ],
       ),
     );

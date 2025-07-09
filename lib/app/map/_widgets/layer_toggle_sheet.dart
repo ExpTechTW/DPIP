@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/sheet_container.dart';
 import 'package:dpip/widgets/ui/labeled_divider.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class LayerToggleSheet extends StatefulWidget {
   final Set<MapLayer> activeLayers;
@@ -31,11 +29,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
   late Set<MapLayer> _activeLayers = Set.from(widget.activeLayers);
   late BaseMapType _currentBaseMap = widget.currentBaseMap;
 
-  static const Set<MapLayer> _earthquakeLayers = {
-    MapLayer.monitor,
-    MapLayer.report,
-    MapLayer.tsunami,
-  };
+  static const Set<MapLayer> _earthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
 
   static const Set<MapLayer> _weatherLayers = {
     MapLayer.radar,
@@ -88,12 +82,12 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
     if (!checked && layer == MapLayer.monitor && _activeLayers.length == 1) {
       return;
     }
-    
+
     widget.onLayerToggled(layer);
     setState(() {
       if (checked) {
         final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
-        
+
         if (_earthquakeLayers.contains(layer)) {
           _activeLayers.removeAll(_earthquakeLayers);
           _activeLayers.removeAll(_weatherLayers);
@@ -112,14 +106,13 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
         _activeLayers.add(layer);
       } else {
         _activeLayers.remove(layer);
-        
+
         if (_weatherLayers.contains(layer)) {
           final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
           if (!hasOtherWeatherLayers) {
             _activeLayers.add(MapLayer.monitor);
           }
-        }
-        else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
+        } else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
           _activeLayers.add(MapLayer.monitor);
         }
       }

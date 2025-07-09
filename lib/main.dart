@@ -1,14 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:provider/provider.dart';
-import 'package:timezone/data/latest.dart';
-
 import 'package:dpip/app.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/fcm.dart';
@@ -19,6 +10,13 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:provider/provider.dart';
+import 'package:timezone/data/latest.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class LayerToggle extends StatelessWidget {
   final bool checked;

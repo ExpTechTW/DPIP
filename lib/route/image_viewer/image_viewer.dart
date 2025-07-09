@@ -85,7 +85,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
       }
 
       final res = await get(Uri.parse(widget.imageUrl));
-      
+
       // 保存图片到临时目录
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/${widget.imageName}');

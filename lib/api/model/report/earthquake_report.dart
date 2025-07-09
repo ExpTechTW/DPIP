@@ -1,11 +1,10 @@
+import 'package:dpip/api/model/report/area_intensity.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/utils/parser.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
-
-import 'package:dpip/api/model/report/area_intensity.dart';
-import 'package:dpip/utils/geojson.dart';
-import 'package:dpip/utils/parser.dart';
 
 part 'earthquake_report.g.dart';
 

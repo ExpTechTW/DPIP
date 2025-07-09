@@ -1,19 +1,17 @@
+import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
-
-import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 typedef PositionUpdateCallback = void Function();
 

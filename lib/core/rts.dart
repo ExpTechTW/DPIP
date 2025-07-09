@@ -1,8 +1,7 @@
-import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:intl/intl.dart';
-
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/station_info.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 StationInfo findAppropriateItem(List<StationInfo> infos, int date) {

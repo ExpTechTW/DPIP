@@ -1,17 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
-import 'package:dynamic_system_colors/dynamic_system_colors.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:provider/provider.dart';
-
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dynamic_system_colors/dynamic_system_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:provider/provider.dart';
 
 class DpipApp extends StatefulWidget {
   const DpipApp({super.key});
@@ -21,6 +20,8 @@ class DpipApp extends StatefulWidget {
 }
 
 class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
+  bool _hasHandledPendingNotification = false;
+
   Future<void> _checkUpdate() async {
     try {
       if (Platform.isAndroid) {
@@ -43,6 +44,16 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     }
   }
 
+  void _handlePendingNotificationWhenReady() {
+    if (_hasHandledPendingNotification) return;
+
+    final context = router.routerDelegate.navigatorKey.currentContext;
+    if (context != null) {
+      _hasHandledPendingNotification = true;
+      handlePendingNotificationNavigation(context);
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     GlobalProviders.data.onAppLifecycleStateChanged(state);
@@ -54,6 +65,14 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     _checkUpdate();
     WidgetsBinding.instance.addObserver(this);
     GlobalProviders.data.startFetching();
+
+    router.routerDelegate.addListener(_handlePendingNotificationWhenReady);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _handlePendingNotificationWhenReady();
+      });
+    });
   }
 
   @override
@@ -98,6 +117,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    router.routerDelegate.removeListener(_handlePendingNotificationWhenReady);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

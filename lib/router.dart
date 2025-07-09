@@ -1,8 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:talker_flutter/talker_flutter.dart';
-
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/page.dart';
@@ -44,6 +39,9 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:talker_flutter/talker_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();

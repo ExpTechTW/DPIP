@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:dpip/api/model/eew_info.dart';
-import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
@@ -14,10 +11,11 @@ import 'package:dpip/api/model/station.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/core/eew.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
-import 'package:dpip/global.dart';
+import 'package:flutter/material.dart';
 
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};

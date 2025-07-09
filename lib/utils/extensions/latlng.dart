@@ -19,9 +19,9 @@ extension GeoJsonLatLng on LatLng {
 
     final dlon = lon2 - lon1;
     final dlat = lat2 - lat1;
-    final a = sin(dlat/2) * sin(dlat/2) + cos(lat1) * cos(lat2) * sin(dlon/2) * sin(dlon/2);
-    final c = 2 * atan2(sqrt(a), sqrt(1-a));
-    
+    final a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
     return 6371.0 * c;
   }
 }

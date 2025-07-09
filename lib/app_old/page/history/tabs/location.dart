@@ -1,12 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:timezone/timezone.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/app_old/page/history/widgets/date_timeline_item.dart';
@@ -17,6 +11,10 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/time_convert.dart';
 import 'package:dpip/widgets/error/region_out_of_service.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:timezone/timezone.dart';
 
 class HistoryLocationTab extends StatefulWidget {
   const HistoryLocationTab({super.key});
@@ -86,10 +84,7 @@ class _HistoryLocationTabState extends State<HistoryLocationTab> {
             itemCount: grouped.isEmpty ? 1 : grouped.length,
             itemBuilder: (context, index) {
               if (grouped.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.only(top: 24),
-                  child: Center(child: Text('一切平安，無事件發生。')),
-                );
+                return const Padding(padding: EdgeInsets.only(top: 24), child: Center(child: Text('一切平安，無事件發生。')));
               }
 
               final key = grouped.keys.elementAt(index);

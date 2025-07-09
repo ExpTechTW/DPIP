@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:go_router/go_router.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:timezone/timezone.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history.dart';
 import 'package:dpip/api/model/weather_schema.dart';
@@ -27,6 +21,10 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/time_convert.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:timezone/timezone.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/location_to_code.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/services.dart';
 
 const _channel = MethodChannel('com.exptech.dpip/data');
 Completer<void>? _completer;
@@ -22,7 +21,7 @@ Future<void> getSavedLocation() async {
 
     final latitude = data?['lat'] as double?;
     final longitude = data?['lon'] as double?;
-    
+
     GlobalProviders.location.setLatLng(latitude: latitude, longitude: longitude);
 
     if (latitude != null && longitude != null) {
@@ -30,7 +29,6 @@ Future<void> getSavedLocation() async {
       print(location);
       GlobalProviders.location.setCode(location?.code.toString());
     }
-
   } catch (e) {
     TalkerManager.instance.error('Error in getSavedLocation: $e');
   } finally {

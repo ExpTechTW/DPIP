@@ -1,17 +1,14 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:go_router/go_router.dart';
-
-import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/route/event_viewer/intensity.dart';
-import 'package:dpip/route/event_viewer/thunderstorm.dart';
-import 'package:dpip/route/report/report.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+String? _pendingChannelKey;
 
 Future<void> notifyInit() async {
   await AwesomeNotifications().initialize(
@@ -321,18 +318,37 @@ Future<void> notifyInit() async {
     debug: true,
   );
 
-  AwesomeNotifications().setListeners(
-    onActionReceivedMethod: onActionReceivedMethod,
-  );
+  AwesomeNotifications().setListeners(onActionReceivedMethod: onActionReceivedMethod);
+
+  final receivedAction = await AwesomeNotifications().getInitialNotificationAction();
+  if (receivedAction != null) {
+    _pendingChannelKey = receivedAction.channelKey;
+    TalkerManager.instance.debug('Stored pending notification: channelKey=$_pendingChannelKey');
+  }
+}
+
+void handlePendingNotificationNavigation(BuildContext context) {
+  if (_pendingChannelKey == null) return;
+
+  TalkerManager.instance.debug('Handling pending notification: channelKey=$_pendingChannelKey');
+
+  if (_pendingChannelKey?.startsWith('eq') == true) {
+    context.push(MapPage.route(layer: MapLayer.monitor));
+  }
+
+  _pendingChannelKey = null;
 }
 
 @pragma('vm:entry-point')
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   final context = router.routerDelegate.navigatorKey.currentContext;
-  if (context == null) return;
+  if (context == null) {
+    _pendingChannelKey = receivedAction.channelKey;
+    TalkerManager.instance.debug('Context not available, stored pending notification: channelKey=$_pendingChannelKey');
+    return;
+  }
 
   final channelKey = receivedAction.channelKey;
-  
   TalkerManager.instance.debug('Notification clicked: channelKey=$channelKey');
 
   if (channelKey?.startsWith('eq') == true) {

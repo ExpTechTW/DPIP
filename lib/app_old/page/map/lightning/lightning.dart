@@ -1,19 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/lightning.dart';
+import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
-
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class LightningData {
   final double latitude;

@@ -1,22 +1,19 @@
 import 'dart:async';
 
-import 'package:dpip/core/i18n.dart';
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/eew.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
-
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 import 'package:styled_text/styled_text.dart';
 
 class EewCard extends StatefulWidget {

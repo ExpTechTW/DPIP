@@ -1,16 +1,14 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 class SettingsDonatePage extends StatefulWidget {
   const SettingsDonatePage({super.key});

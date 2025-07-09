@@ -1,9 +1,8 @@
-import 'package:json_annotation/json_annotation.dart';
-
 import 'package:dpip/api/model/rts/rts_intensity.dart';
 import 'package:dpip/api/model/rts/rts_station.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'rts.g.dart';
 

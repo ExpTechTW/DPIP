@@ -2,15 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:flutter/cupertino.dart';
-
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app_old/page/home/home.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
@@ -18,8 +9,15 @@ import 'package:dpip/core/location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/location_to_code.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Timer? _locationUpdateTimer;
 final _backgroundService = FlutterBackgroundService();
