@@ -1,14 +1,11 @@
 import CoreLocation
-import Firebase
-import FirebaseMessaging
 import Flutter
 import UIKit
+import UserNotifications
 
 @UIApplicationMain
 @objc
-class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
-    MessagingDelegate
-{
+class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     // MARK: - Properties
     
     private var locationChannel: FlutterMethodChannel?
@@ -16,7 +13,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     private var locationManager: CLLocationManager!
     private var lastSentLocation: CLLocation?
     private var isLocationEnabled: Bool = false
-    private var fcmToken: String?
+    private var apnsToken: String?
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     // MARK: - Application Lifecycle
@@ -26,10 +23,11 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
         didFinishLaunchingWithOptions launchOptions: [UIApplication
             .LaunchOptionsKey: Any]?
     ) -> Bool {
-        setupFirebase()
         GeneratedPluginRegistrant.register(with: self)
         setupFlutterChannels()
         setupLocationManager()
+        
+        requestNotificationPermission()
         
         if let locationKey = launchOptions?[
             UIApplication.LaunchOptionsKey.location] as? NSNumber,
@@ -47,21 +45,28 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     override func applicationDidEnterBackground(_ application: UIApplication) {
         startBackgroundTask()
     }
+    
+    override func applicationDidBecomeActive(_ application: UIApplication) {
+        super.applicationDidBecomeActive(application)
+        requestNotificationPermission()
+    }
 
     // MARK: - Setup Methods
     
-    private func setupFirebase() {
-        FirebaseApp.configure()
-        Messaging.messaging().delegate = self
-        
-        Messaging.messaging().token { [weak self] token, error in
+    private func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { [weak self] granted, error in
             if let error = error {
-                print("Error fetching FCM token: \(error)")
+                print("Error requesting notification permission: \(error)")
                 return
             }
-            if let token = token {
-                print("FCM token: \(token)")
-                self?.fcmToken = token
+            
+            if granted {
+                print("Notification permission granted")
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            } else {
+                print("Notification permission denied")
             }
         }
     }
@@ -93,6 +98,24 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
         locationManager.pausesLocationUpdatesAutomatically = false
         isLocationEnabled = UserDefaults.standard.bool(
             forKey: "locationSendingEnabled")
+    }
+    
+    // MARK: - APNS Token Handling
+    
+    override func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        apnsToken = tokenString
+        print("APNS token: \(tokenString)")
+    }
+    
+    override func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+        print("Failed to register for remote notifications: \(error)")
     }
     
     // MARK: - Channel Handlers
@@ -190,7 +213,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
     
     private func sendLocationToServer(location: CLLocation) {
         guard isLocationEnabled else { return }
-        guard let token = fcmToken else { return }
+        guard let token = apnsToken else { return }
         
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
@@ -261,14 +284,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate,
         } else {
             result(nil)
         }
-    }
-    
-    // MARK: - Messaging Delegate
-    
-    func messaging(
-        _ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?
-    ) {
-        self.fcmToken = fcmToken
     }
     
     // MARK: - URL Session Handling
