@@ -36,8 +36,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
     super.context,
     super.controller, {
-    this.isReplayMode = true,
-    this.replayTimestamp = 1751918230855,
+    this.isReplayMode = false,
+    this.replayTimestamp = 0, //1751918230855,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -426,7 +426,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
       _updateRtsSource();
-      
+
       // 只有在圖層可見時才更新圖層可見性
       if (visible) {
         _updateLayerVisibility();
@@ -527,7 +527,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       // 停止閃爍定時器
       _blinkTimer?.cancel();
       _blinkTimer = null;
-      
+
       // rts
       await controller.setLayerVisibility(rtsLayerId, false);
       TalkerManager.instance.info('Hiding Layer "$rtsLayerId"');
@@ -569,7 +569,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       // 重新啟動閃爍定時器
       _setupBlinkTimer();
-      
+
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await controller.setLayerVisibility(rtsLayerId, !hasBox);
