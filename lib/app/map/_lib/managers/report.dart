@@ -1,4 +1,13 @@
+import 'package:flutter/material.dart';
+
 import 'package:collection/collection.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
@@ -26,13 +35,6 @@ import 'package:dpip/widgets/report/enlargeable_image.dart';
 import 'package:dpip/widgets/report/intensity_box.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
-import 'package:flutter/material.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ReportMapLayerManager extends MapLayerManager {
   ReportMapLayerManager(super.context, super.controller);
@@ -40,7 +42,7 @@ class ReportMapLayerManager extends MapLayerManager {
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
 
-  Future<void> _setReport(PartialEarthquakeReport? report, {bool focus = true}) async {
+  Future<void> setReport(String? reportId, {bool focus = true}) async {
     if (isLoading.value) return;
 
     isLoading.value = true;
@@ -48,15 +50,20 @@ class ReportMapLayerManager extends MapLayerManager {
     try {
       await _removeReport(currentReport.value, focus: focus);
 
+      PartialEarthquakeReport? report;
+      if (reportId != null) {
+        report = GlobalProviders.data.partialReport.firstWhereOrNull((r) => r.id == reportId);
+      }
+
       currentReport.value = report;
 
       if (report != null) {
         await _addReport(currentReport.value, focus: focus);
       }
 
-      TalkerManager.instance.info('Updated report to "${report?.id}"');
+      TalkerManager.instance.info('Updated report to "$reportId"');
     } catch (e, s) {
-      TalkerManager.instance.error('Failed to update report', e, s);
+      TalkerManager.instance.error('ReportMapLayerManager.setReport', e, s);
     } finally {
       isLoading.value = false;
     }
@@ -163,7 +170,7 @@ class ReportMapLayerManager extends MapLayerManager {
     if (!visible) return;
 
     if (currentReport.value != null) {
-      await _setReport(null, focus: false);
+      await setReport(null, focus: false);
     }
 
     final layerId = MapLayerIds.report();
@@ -218,7 +225,7 @@ class ReportMapLayerManager extends MapLayerManager {
   void onPopInvoked() {
     if (currentReport.value == null) return;
 
-    _setReport(null);
+    setReport(null);
   }
 
   Future<void> _addReport(PartialEarthquakeReport? partial, {bool focus = true}) async {
@@ -542,7 +549,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   style: context.textTheme.labelLarge,
                                 ),
                                 onTap: () {
-                                  widget.manager._setReport(report);
+                                  widget.manager.setReport(report.id);
                                   sheetController.collapse();
                                 },
                               ),
@@ -800,7 +807,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   title: Text('地震報告'.i18n),
                   leading: BackButton(
                     onPressed: () {
-                      widget.manager._setReport(null);
+                      widget.manager.setReport(null);
                       controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
                     },
                   ),
