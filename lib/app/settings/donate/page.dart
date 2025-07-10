@@ -182,12 +182,12 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
 
                       if (!available) {
                         final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 $storeName，請稍後再試。')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 {store}，請稍後再試。'.i18n.args({'store': storeName}))));
                         return;
                       }
                       InAppPurchase.instance.restorePurchases();
 
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在恢復您購買的訂閱')));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)));
                     },
                     child: Text(
                       '恢復購買'.i18n,
