@@ -191,7 +191,9 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                     },
                     child: Text(
                       '恢復購買'.i18n,
-                      style: const TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                 ),
