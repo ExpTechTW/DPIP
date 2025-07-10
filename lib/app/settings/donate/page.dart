@@ -10,6 +10,7 @@ import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsDonatePage extends StatefulWidget {
   const SettingsDonatePage({super.key});
@@ -171,31 +172,47 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
                 contentAlignment: TextAlign.justify,
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: InkWell(
-                    onTap: () async {
-                      final bool available = await InAppPurchase.instance.isAvailable();
-                      if (!context.mounted) return;
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        final bool available = await InAppPurchase.instance.isAvailable();
+                        if (!context.mounted) return;
 
-                      if (!available) {
-                        final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 {store}，請稍後再試。'.i18n.args({'store': storeName}))));
-                        return;
-                      }
-                      InAppPurchase.instance.restorePurchases();
+                        if (!available) {
+                          final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 {store}，請稍後再試。'.i18n.args({'store': storeName}))));
+                          return;
+                        }
+                        InAppPurchase.instance.restorePurchases();
 
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)));
-                    },
-                    child: Text(
-                      '恢復購買'.i18n,
-                      style: const TextStyle(
-                        decoration: TextDecoration.underline,
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)));
+                      },
+                      child: Text(
+                        '恢復購買'.i18n,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    InkWell(
+                      onTap: () {
+                        launchUrl(Uri.parse('https://exptech.dev/tos')); // 替換為你的 Terms URL
+                      },
+                      child: Text('使用條款'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                    ),
+                    const SizedBox(height: 4),
+                    InkWell(
+                      onTap: () {
+                        launchUrl(Uri.parse('https://exptech.dev/privacy')); // 替換為你的 Privacy URL
+                      },
+                      child: Text('隱私權政策'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                    ),
+                  ],
                 ),
               ),
             ],
