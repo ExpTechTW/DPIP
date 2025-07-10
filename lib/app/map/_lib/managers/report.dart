@@ -37,7 +37,9 @@ import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
 
 class ReportMapLayerManager extends MapLayerManager {
-  ReportMapLayerManager(super.context, super.controller);
+  String? initialReportId;
+
+  ReportMapLayerManager(super.context, super.controller, {this.initialReportId});
 
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
@@ -151,7 +153,7 @@ class ReportMapLayerManager extends MapLayerManager {
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
           symbolZOrder: 'source',
-          visibility: visible ? 'visible' : 'none',
+          visibility: visible && initialReportId == null ? 'visible' : 'none',
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
@@ -192,10 +194,15 @@ class ReportMapLayerManager extends MapLayerManager {
     final layerId = MapLayerIds.report();
 
     try {
-      await controller.setLayerVisibility(layerId, true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
+      if (initialReportId != null) {
+        await setReport(initialReportId);
+        initialReportId = null;
+      } else {
+        await controller.setLayerVisibility(layerId, true);
+        TalkerManager.instance.info('Showing Layer "$layerId"');
 
-      await _focus();
+        await _focus();
+      }
 
       visible = true;
     } catch (e, s) {
@@ -268,7 +275,7 @@ class ReportMapLayerManager extends MapLayerManager {
           symbolZOrder: 'source',
         );
 
-        await controller.addLayer(sourceId, layerId, properties);
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
 

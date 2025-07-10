@@ -36,7 +36,7 @@ class AppLayout extends StatelessWidget {
                 builder: (context, layer, child) {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
-                    onPressed: () => context.push(MapPage.route(layer: layer)),
+                    onPressed: () => context.push(MapPage.route(options: MapPageOptions(initialLayer: layer))),
                     elevation: 2,
                   );
                 },

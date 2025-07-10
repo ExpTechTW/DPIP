@@ -5,7 +5,7 @@ import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
 import 'package:dpip/api/model/eew.dart';
-import 'package:dpip/api/model/history.dart';
+import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/meteor_station.dart';
 import 'package:dpip/api/model/notification_record.dart';
 import 'package:dpip/api/model/notify/notify_settings.dart';

@@ -1,8 +1,12 @@
+import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+
 import 'package:dpip/app/changelog/page.dart';
 import 'package:dpip/app/debug/logs/page.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/app/layout.dart';
-import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/layout.dart';
@@ -31,7 +35,6 @@ import 'package:dpip/app/welcome/2-exptech/page.dart';
 import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/welcome/layout.dart';
-import 'package:dpip/app_old/page/history/history.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/core/i18n.dart';
@@ -39,9 +42,6 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:talker_flutter/talker_flutter.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();
@@ -81,11 +81,6 @@ final router = GoRouter(
       branches: [
         StatefulShellBranch(
           routes: [GoRoute(path: '/home', pageBuilder: (context, state) => const NoTransitionPage(child: HomePage()))],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(path: '/history', pageBuilder: (context, state) => const NoTransitionPage(child: HistoryPage())),
-          ],
         ),
         StatefulShellBranch(
           routes: [GoRoute(path: '/more', pageBuilder: (context, state) => const NoTransitionPage(child: MorePage()))],
@@ -255,12 +250,7 @@ final router = GoRouter(
     ),
     GoRoute(
       path: MapPage.route(),
-      builder: (context, state) {
-        final layerString = state.uri.queryParameters['layer'];
-        final initialLayer = layerString != null ? MapLayer.values.byName(layerString) : null;
-
-        return MapPage(initialLayer: initialLayer);
-      },
+      builder: (context, state) => MapPage(options: MapPageOptions.fromQueryParameters(state.uri.queryParameters)),
     ),
     GoRoute(path: '/announcement', builder: (context, state) => const AnnouncementPage()),
     GoRoute(path: ChangelogPage.route, builder: (context, state) => const ChangelogPage()),

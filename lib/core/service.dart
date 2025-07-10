@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app_old/page/home/home.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/preference.dart';
@@ -85,7 +84,6 @@ void _setupPositionListener() {
     GlobalProviders.location.setCode(location?.code.toString());
     GlobalProviders.location.setLatLng(latitude: latitude, longitude: longitude);
 
-    HomePage.updatePosition();
     RadarMap.updatePosition();
   });
 

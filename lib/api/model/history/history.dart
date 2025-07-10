@@ -1,21 +1,46 @@
-import 'package:dpip/utils/parser.dart';
-import 'package:dpip/utils/time_convert.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timezone/timezone.dart';
 
+import 'package:dpip/api/model/history/intensity_history.dart';
+import 'package:dpip/api/model/history/report_history.dart';
+import 'package:dpip/utils/parser.dart';
+import 'package:dpip/utils/time_convert.dart';
+
 part 'history.g.dart';
+
+enum HistoryType {
+  @JsonValue('earthquake')
+  earthquake,
+
+  @JsonValue('intensity')
+  intensity,
+
+  @JsonValue('thunderstorm')
+  thunderstorm,
+
+  @JsonValue('heavy-rain')
+  heavyRain,
+
+  @JsonValue('extremely-heavy-rain')
+  extremelyHeavyRain,
+
+  @JsonValue('torrential-rain')
+  torrentialRain,
+
+  @JsonValue('extremely-torrential-rain')
+  extremelyTorrentialRain,
+}
 
 @JsonSerializable()
 class History {
   final String id;
   final int status;
-  final String type;
+  final HistoryType type;
   final String icon;
   final String author;
   final InfoTime time;
   final InfoText text;
   final List<int> area;
-  final Map<String, dynamic>? addition;
 
   History({
     required this.id,
@@ -26,16 +51,26 @@ class History {
     required this.time,
     required this.text,
     required this.area,
-    this.addition,
   });
-
-  factory History.fromJson(Map<String, dynamic> json) => _$HistoryFromJson(json);
 
   bool get isExpired {
     final int? expireTimestamp = time.expires['all'];
     final TZDateTime expireTimeUTC = convertToTZDateTime(expireTimestamp ?? 0);
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     return isExpired;
+  }
+
+  factory History.fromJson(Map<String, dynamic> json) {
+    final type = $enumDecode(_$HistoryTypeEnumMap, json['type']);
+
+    switch (type) {
+      case HistoryType.earthquake:
+        return ReportHistory.fromJson(json);
+      case HistoryType.intensity:
+        return IntensityHistory.fromJson(json);
+      default:
+        return _$HistoryFromJson(json);
+    }
   }
 
   Map<String, dynamic> toJson() => _$HistoryToJson(this);
@@ -49,12 +84,12 @@ class InfoTime {
 
   InfoTime({required this.send, required this.expires});
 
-  factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
-
   TZDateTime get expiresAt {
     final int expireTimestamp = expires['all']!;
     return convertToTZDateTime(expireTimestamp);
   }
+
+  factory InfoTime.fromJson(Map<String, dynamic> json) => _$InfoTimeFromJson(json);
 
   Map<String, dynamic> toJson() => _$InfoTimeToJson(this);
 }

@@ -1,3 +1,10 @@
+import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
@@ -7,11 +14,6 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -124,7 +126,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => context.push(MapPage.route(layer: MapLayer.radar)),
+              onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayer: MapLayer.radar))),
               borderRadius: BorderRadius.circular(16),
             ),
           ),

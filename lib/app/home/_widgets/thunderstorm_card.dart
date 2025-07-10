@@ -1,13 +1,15 @@
-import 'package:dpip/api/model/history.dart';
+import 'package:flutter/material.dart';
+
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:styled_text/styled_text.dart';
+
+import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/route/event_viewer/thunderstorm.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
-import 'package:flutter/material.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:styled_text/styled_text.dart';
 
 class ThunderstormCard extends StatelessWidget {
   final History history;

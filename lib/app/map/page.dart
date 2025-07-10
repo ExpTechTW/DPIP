@@ -18,12 +18,35 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
-class MapPage extends StatefulWidget {
+class MapPageOptions {
   final MapLayer? initialLayer;
+  final String? reportId;
 
-  const MapPage({super.key, this.initialLayer});
+  MapPageOptions({this.initialLayer, this.reportId});
 
-  static String route({MapLayer? layer}) => "/map${layer != null ? '?layer=${layer.name}' : ''}";
+  factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
+    final layer = queryParameters['layer'];
+    final report = queryParameters['report'];
+
+    return MapPageOptions(initialLayer: layer != null ? MapLayer.values.byName(layer) : null, reportId: report);
+  }
+}
+
+class MapPage extends StatefulWidget {
+  final MapPageOptions? options;
+
+  const MapPage({super.key, this.options});
+
+  static String route({MapPageOptions? options}) {
+    if (options == null) return '/map';
+
+    final parameters = [];
+
+    if (options.initialLayer != null) parameters.add('layer=${options.initialLayer!.name}');
+    if (options.reportId != null) parameters.add('report=${options.reportId}');
+
+    return "/map?${parameters.join('&')}";
+  }
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -282,8 +305,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _controller = controller);
 
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
-    _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
-    _managers[MapLayer.radar] = RadarMapLayerManager(context, controller, getActiveLayerCount: () => _activeLayers.length);
+    _managers[MapLayer.report] = ReportMapLayerManager(context, controller, initialReportId: widget.options?.reportId);
+    _managers[MapLayer.radar] = RadarMapLayerManager(
+      context,
+      controller,
+      getActiveLayerCount: () => _activeLayers.length,
+    );
     _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
@@ -292,8 +319,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     setBaseMapType(_baseMapType);
 
-    if (widget.initialLayer != null) {
-      toggleLayer(widget.initialLayer!);
+    if (widget.options?.initialLayer != null) {
+      toggleLayer(widget.options!.initialLayer!);
     } else {
       _showMonitorLayer();
     }
