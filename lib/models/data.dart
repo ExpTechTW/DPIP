@@ -30,11 +30,11 @@ class _DpipDataModel extends ChangeNotifier {
   Rts? _rts;
 
   Rts? get rts => _rts;
-  int _RtsTime = 0;
+  int _rtsTime = 0;
 
   void setRts(Rts rts) {
-    if (rts.time > _RtsTime) {
-      _RtsTime = rts.time;
+    if (rts.time > _rtsTime) {
+      _rtsTime = rts.time;
       _rts = rts;
       notifyListeners();
     }
@@ -177,7 +177,7 @@ class DpipDataModel extends _DpipDataModel {
     _isReplayMode = isReplay;
     _replayTimestamp = timestamp;
     if (isReplay) {
-      _RtsTime = timestamp!;
+      _rtsTime = timestamp!;
     }
   }
 
@@ -189,7 +189,7 @@ class DpipDataModel extends _DpipDataModel {
 
       try {
         final data =
-            (_isReplayMode)
+            _isReplayMode
                 ? await Future.wait(
                   [ExpTech().getRts(_replayTimestamp), ExpTech().getEew(_replayTimestamp)],
                   cleanUp: (successValue) {
@@ -285,7 +285,7 @@ class DpipDataModel extends _DpipDataModel {
       if (s.work == false) continue;
       final feature =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates())
+            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates() as List<dynamic>)
             ..setId(int.parse(id))
             ..setProperty('net', s.net)
             ..setProperty('code', s.info.last.code);
@@ -327,7 +327,7 @@ class DpipDataModel extends _DpipDataModel {
 
       final epicenter =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-            ..setGeometry(e.info.latlng.toGeoJsonCoordinates())
+            ..setGeometry(e.info.latlng.toGeoJsonCoordinates() as List<dynamic>)
             ..setProperty('type', 'x');
       builder.addFeature(epicenter);
     }
@@ -343,7 +343,7 @@ class DpipDataModel extends _DpipDataModel {
       if (s.work == false) continue;
       final feature =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates())
+            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates() as List<dynamic>)
             ..setId(int.parse(id))
             ..setProperty('net', s.net)
             ..setProperty('code', s.info.last.code);
@@ -377,9 +377,9 @@ class DpipDataModel extends _DpipDataModel {
                 .map((e) => (e as List).map((n) => n as double).toList())
                 .toList();
 
-        if (eew?.isNotEmpty == true) {
-          final eewMap = {for (var e in eew) e.id: e};
-          final eewDistMap = {for (var e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s};
+        if (eew.isNotEmpty == true) {
+          final eewMap = {for (final e in eew) e.id: e};
+          final eewDistMap = {for (final e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s};
 
           if (checkBoxSkip(eewMap, eewDistMap, coordinates)) continue;
         }
