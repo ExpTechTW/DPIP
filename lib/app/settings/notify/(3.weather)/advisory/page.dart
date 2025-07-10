@@ -33,12 +33,12 @@ class SettingsNotifyAdvisoryPage extends StatelessWidget {
             SoundListTile(
               title: '重大'.i18n,
               subtitle: Text('所在地(鄉鎮)發布紅色燈號之\n天氣警特報'.i18n),
-              type: 'weather_major-important',
+              type: 'weather_major-important-v2',
             ),
             SoundListTile(
               title: '一般'.i18n,
               subtitle: Text('所在地(鄉鎮)發布上述除外燈號之\n天氣警特報'.i18n),
-              type: 'weather_minor-general',
+              type: 'weather_minor-general-v2',
             ),
           ],
         ),

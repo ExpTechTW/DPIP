@@ -29,7 +29,7 @@ class SettingsNotifyMonitorPage extends StatelessWidget {
         ),
         ListSection(
           title: '音效測試'.i18n,
-          children: [SoundListTile(title: '強震監視器(一般)'.i18n, subtitle: Text('偵測到晃動'.i18n), type: 'eq')],
+          children: [SoundListTile(title: '強震監視器(一般)'.i18n, subtitle: Text('偵測到晃動'.i18n), type: 'eq-v2')],
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,

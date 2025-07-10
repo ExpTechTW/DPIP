@@ -34,7 +34,7 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
             SoundListTile(
               title: '震度速報(無聲通知)'.i18n,
               subtitle: Text('所在地(鄉鎮)實測震度 1 以上'.i18n),
-              type: 'int_report-silence',
+              type: 'int_report-silence-v2',
             ),
           ],
         ),

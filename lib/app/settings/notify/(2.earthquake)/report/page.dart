@@ -30,8 +30,8 @@ class SettingsNotifyReportPage extends StatelessWidget {
         ListSection(
           title: '音效測試'.i18n,
           children: [
-            SoundListTile(title: '地震報告(一般)'.i18n, subtitle: Text('所在地(縣市)實測震度 3 以上'.i18n), type: 'report-general'),
-            SoundListTile(title: '地震報告(無聲通知)'.i18n, subtitle: Text('所在地(縣市)實測震度 1 以上'.i18n), type: 'report-silence'),
+            SoundListTile(title: '地震報告(一般)'.i18n, subtitle: Text('所在地(縣市)實測震度 3 以上'.i18n), type: 'report-general-v2'),
+            SoundListTile(title: '地震報告(無聲通知)'.i18n, subtitle: Text('所在地(縣市)實測震度 1 以上'.i18n), type: 'report-silence-v2'),
           ],
         ),
         SettingsListTextSection(

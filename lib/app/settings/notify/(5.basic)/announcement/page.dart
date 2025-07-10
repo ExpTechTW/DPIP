@@ -29,7 +29,7 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
         ),
         ListSection(
           title: '音效測試'.i18n,
-          children: [SoundListTile(title: '公告'.i18n, subtitle: Text('發送公告時'.i18n), type: 'announcement-general')],
+          children: [SoundListTile(title: '公告'.i18n, subtitle: Text('發送公告時'.i18n), type: 'announcement-general-v2')],
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,

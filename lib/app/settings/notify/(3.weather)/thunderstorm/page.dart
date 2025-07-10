@@ -33,7 +33,7 @@ class SettingsNotifyThunderstormPage extends StatelessWidget {
             SoundListTile(
               title: '一般'.i18n,
               subtitle: Text('所在地(鄉鎮)發布雷雨即時訊息或\n山區暴雨時'.i18n),
-              type: 'thunderstorm-general',
+              type: 'thunderstorm-general-v2',
             ),
           ],
         ),
