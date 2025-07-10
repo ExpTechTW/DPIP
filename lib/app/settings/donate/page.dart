@@ -171,20 +171,30 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
                 contentAlignment: TextAlign.justify,
               ),
-              FilledButton.tonalIcon(
-                icon: const Icon(Icons.restore),
-                label: Text('恢復購買'.i18n),
-                onPressed: () async {
-                  final bool available = await InAppPurchase.instance.isAvailable();
-                  if (!available) {
-                    final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 $storeName，請稍後再試。')));
-                    return;
-                  }
-                  InAppPurchase.instance.restorePurchases();
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: InkWell(
+                    onTap: () async {
+                      final bool available = await InAppPurchase.instance.isAvailable();
+                      if (!context.mounted) return;
 
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在恢復您的購買的訂閱')));
-                },
+                      if (!available) {
+                        final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 $storeName，請稍後再試。')));
+                        return;
+                      }
+                      InAppPurchase.instance.restorePurchases();
+
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('正在恢復您購買的訂閱')));
+                    },
+                    child: Text(
+                      '恢復購買'.i18n,
+                      style: const TextStyle(decoration: TextDecoration.underline, color: Colors.blue),
+                    ),
+                  ),
+                ),
               ),
             ],
           );
