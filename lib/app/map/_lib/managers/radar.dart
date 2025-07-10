@@ -40,7 +40,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
     if (playStartTime.value != null) {
       final radarList = GlobalProviders.data.radar;
-      final startIndex = radarList.indexOf(playStartTime.value!);
+      final startIndex = radarList.indexOf(playStartTime.value);
       final newCurrentIndex = radarList.indexOf(time);
 
       if (startIndex != -1 && newCurrentIndex != -1 && newCurrentIndex > startIndex) {
@@ -73,7 +73,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
     final radarList = GlobalProviders.data.radar;
     final startIndex = radarList.indexOf(time);
-    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
+    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value) : -1;
 
     if (startIndex != -1 && currentIndex != -1 && startIndex < currentIndex) {
       final newCurrentIndex = startIndex - 1;
@@ -103,8 +103,8 @@ class RadarMapLayerManager extends MapLayerManager {
     if (playStartTime.value == null) return true;
 
     final radarList = GlobalProviders.data.radar;
-    final startIndex = radarList.indexOf(playStartTime.value!);
-    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value!) : -1;
+    final startIndex = radarList.indexOf(playStartTime.value);
+    final currentIndex = currentRadarTime.value != null ? radarList.indexOf(currentRadarTime.value) : -1;
 
     return startIndex != -1 && currentIndex != -1 && startIndex > currentIndex;
   }
@@ -232,8 +232,8 @@ class RadarMapLayerManager extends MapLayerManager {
 
     if (playStartTime.value != null && playEndTime.value != null) {
       final radarList = GlobalProviders.data.radar;
-      final startIndex = radarList.indexOf(playStartTime.value!);
-      final endIndex = radarList.indexOf(playEndTime.value!);
+      final startIndex = radarList.indexOf(playStartTime.value);
+      final endIndex = radarList.indexOf(playEndTime.value);
 
       if (startIndex != -1 && endIndex != -1 && startIndex <= endIndex) {
         playEndTime.value = currentRadarTime.value;
@@ -277,11 +277,11 @@ class RadarMapLayerManager extends MapLayerManager {
     final radarList = GlobalProviders.data.radar;
     if (radarList.isEmpty || currentRadarTime.value == null || _isWaitingForRestart) return;
 
-    final currentIndex = radarList.indexOf(currentRadarTime.value!);
+    final currentIndex = radarList.indexOf(currentRadarTime.value);
     if (currentIndex == -1) return;
 
-    final startIndex = playStartTime.value != null ? radarList.indexOf(playStartTime.value!) : -1;
-    final endIndex = playEndTime.value != null ? radarList.indexOf(playEndTime.value!) : -1;
+    final startIndex = playStartTime.value != null ? radarList.indexOf(playStartTime.value) : -1;
+    final endIndex = playEndTime.value != null ? radarList.indexOf(playEndTime.value) : -1;
 
     if (startIndex == -1 || endIndex == -1) {
       if (playStartTime.value != null) {
@@ -374,7 +374,7 @@ class RadarMapLayerManager extends MapLayerManager {
 
     try {
       if (currentRadarTime.value != null) {
-        final layerId = MapLayerIds.radar(currentRadarTime.value!);
+        final layerId = MapLayerIds.radar(currentRadarTime.value);
         await controller.setLayerVisibility(layerId, true);
         TalkerManager.instance.info('Showing Layer "$layerId"');
       }
@@ -396,11 +396,9 @@ class RadarMapLayerManager extends MapLayerManager {
         final layerId = MapLayerIds.radar(time);
         final sourceId = MapSourceIds.radar(time);
 
-        try {
-          await controller.removeLayer(layerId);
-          await controller.removeSource(sourceId);
-          TalkerManager.instance.info('Removed radar layer and source for "$time"');
-        } catch (e) {}
+        await controller.removeLayer(layerId).catchError((_) {});
+        await controller.removeSource(sourceId).catchError((_) {});
+        TalkerManager.instance.info('Removed radar layer and source for "$time"');
       }
 
       _preloadedLayers.clear();
@@ -431,6 +429,34 @@ class RadarMapLayerManager extends MapLayerManager {
   }
 }
 
+class _LegendItem extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color borderColor;
+
+  const _LegendItem({required this.label, required this.color, required this.borderColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 4,
+      children: [
+        Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: borderColor),
+          ),
+        ),
+        Text(label, style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant, height: 1)),
+      ],
+    );
+  }
+}
+
 class RadarMapLayerSheet extends StatelessWidget {
   final RadarMapLayerManager manager;
 
@@ -444,7 +470,7 @@ class RadarMapLayerSheet extends StatelessWidget {
       elevation: 4,
       partialBuilder: (context, controller, sheetController) {
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.only(top: 4, bottom: 8),
           child: Selector<DpipDataModel, UnmodifiableListView<String>>(
             selector: (context, model) => model.radar,
             builder: (context, radar, child) {
@@ -456,121 +482,118 @@ class RadarMapLayerSheet extends StatelessWidget {
 
               return Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
-                        const SizedBox(width: 8),
-                        Text(
-                          '雷達回波'.i18n,
-                          style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
-                        ),
-                        const Spacer(),
-                        AnimatedBuilder(
-                          animation: Listenable.merge([
-                            manager.currentRadarTime,
-                            manager.playStartTime,
-                            manager.isPlaying,
-                          ]),
-                          builder: (context, child) {
-                            final currentTime = manager.currentRadarTime.value;
+                    padding: const EdgeInsets.only(left: 16, right: 4),
+                    child: SizedBox(
+                      height: 48,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            spacing: 8,
+                            children: [
+                              Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
+                              Text(
+                                '雷達回波'.i18n,
+                                style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                              ),
+                              AnimatedBuilder(
+                                animation: Listenable.merge([
+                                  manager.currentRadarTime,
+                                  manager.playStartTime,
+                                  manager.isPlaying,
+                                ]),
+                                builder: (context, child) {
+                                  final currentTime = manager.currentRadarTime.value;
 
-                            if (currentTime == null) return const SizedBox.shrink();
+                                  if (currentTime == null) return const SizedBox.shrink();
 
-                            try {
-                              final timeFormatted = currentTime.toSimpleDateTimeString(context);
-                              final timeData = timeFormatted.split(' ');
-                              final date = timeData.length > 1 ? timeData[0] : '';
-                              final time = timeData.length > 1 ? timeData[1] : timeData[0];
+                                  try {
+                                    final timeFormatted = currentTime.toSimpleDateTimeString(context);
+                                    final timeData = timeFormatted.split(' ');
+                                    final date = timeData.length > 1 ? timeData[0] : '';
+                                    final time = timeData.length > 1 ? timeData[1] : timeData[0];
 
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: context.colors.surfaceContainerHighest.withValues(alpha: 0.7),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: context.colors.outline.withValues(alpha: 0.15), width: 0.5),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.schedule_rounded,
-                                      size: 12,
-                                      color: context.colors.primary.withValues(alpha: 0.8),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    if (date.isNotEmpty) ...[
-                                      Text(
-                                        date,
-                                        style: context.textTheme.bodySmall?.copyWith(
-                                          color: context.colors.onSurface.withValues(alpha: 0.6),
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400,
-                                          height: 1.2,
-                                        ),
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: context.colors.surfaceContainer.withValues(alpha: 0.6),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: context.colors.outline),
                                       ),
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                                        width: 1,
-                                        height: 10,
-                                        color: context.colors.outline.withValues(alpha: 0.3),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        spacing: 4,
+                                        children: [
+                                          Icon(
+                                            Icons.schedule_rounded,
+                                            size: 12,
+                                            color: context.colors.onSurfaceVariant,
+                                          ),
+                                          if (date.isNotEmpty) ...[
+                                            Text(
+                                              date,
+                                              style: context.textTheme.labelSmall?.copyWith(
+                                                color: context.colors.onSurfaceVariant,
+                                                height: 1,
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 0.5,
+                                              height: 14,
+                                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                                              color: context.colors.outline,
+                                            ),
+                                          ],
+                                          Text(
+                                            time,
+                                            style: context.textTheme.bodySmall?.copyWith(
+                                              color: context.colors.onSurface,
+                                              fontWeight: FontWeight.bold,
+                                              height: 1,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                    Text(
-                                      time,
-                                      style: context.textTheme.bodySmall?.copyWith(
-                                        color: context.colors.onSurface,
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
-                                        height: 1.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            } catch (e) {
-                              return const SizedBox.shrink();
-                            }
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        AnimatedBuilder(
-                          animation: Listenable.merge([
-                            manager.isPlaying,
-                            manager.playStartTime,
-                            manager.currentRadarTime,
-                          ]),
-                          builder: (context, child) {
-                            final isPlaying = manager.isPlaying.value;
-                            final startTime = manager.playStartTime.value;
-                            final canPlay = manager.canPlay;
+                                    );
+                                  } catch (e) {
+                                    return const SizedBox.shrink();
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                          AnimatedBuilder(
+                            animation: Listenable.merge([
+                              manager.isPlaying,
+                              manager.playStartTime,
+                              manager.currentRadarTime,
+                            ]),
+                            builder: (context, child) {
+                              final isPlaying = manager.isPlaying.value;
+                              final startTime = manager.playStartTime.value;
+                              final canPlay = manager.canPlay;
 
-                            final shouldHide = (startTime == null && !isPlaying);
+                              final shouldHide = startTime == null && !isPlaying;
 
-                            if (shouldHide) {
-                              return const SizedBox(width: 24, height: 24);
-                            }
+                              if (shouldHide) {
+                                return const SizedBox.shrink();
+                              }
 
-                            return InkWell(
-                              onTap: canPlay || isPlaying ? manager.toggleAutoPlay : null,
-                              borderRadius: BorderRadius.circular(12),
-                              child: Container(
-                                width: 24,
-                                height: 24,
-                                alignment: Alignment.center,
-                                child: Icon(
+                              return IconButton(
+                                onPressed: canPlay || isPlaying ? manager.toggleAutoPlay : null,
+                                icon: Icon(
                                   isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
                                   size: 24,
                                   color: context.colors.primary,
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   AnimatedBuilder(
@@ -584,58 +607,37 @@ class RadarMapLayerSheet extends StatelessWidget {
                       }
 
                       if (startTime == null && !isPlaying) {
-                        return const SizedBox.shrink();
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                _buildLegendItem(context, '目前播放', context.colors.primary),
-                                const SizedBox(width: 12),
-                                _buildLegendItem(context, '播放起點', context.colors.secondary),
-                              ],
-                            ),
-                            if (startTime == null && !isPlaying) ...[
-                              const SizedBox(height: 2),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  '長按設定播放起點'.i18n,
-                                  style: context.textTheme.bodySmall?.copyWith(
-                                    color: context.colors.onSurface.withValues(alpha: 0.6),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  AnimatedBuilder(
-                    animation: Listenable.merge([manager.playStartTime, manager.isPlaying, manager.currentRadarTime]),
-                    builder: (context, child) {
-                      final startTime = manager.playStartTime.value;
-                      final isPlaying = manager.isPlaying.value;
-
-                      if (!isPlaying && startTime == null) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              '長按設定播放起點'.i18n,
-                              style: context.textTheme.bodySmall?.copyWith(
-                                color: context.colors.onSurface.withValues(alpha: 0.6),
-                              ),
-                            ),
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                          child: Text(
+                            '長按設定播放起點'.i18n,
+                            style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
                           ),
                         );
                       }
-                      return const SizedBox.shrink();
+
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                        child: Column(
+                          children: [
+                            Row(
+                              spacing: 8,
+                              children: [
+                                _LegendItem(
+                                  label: '目前時間',
+                                  color: context.colors.primaryContainer,
+                                  borderColor: context.colors.primary,
+                                ),
+                                _LegendItem(
+                                  label: '播放起點',
+                                  color: context.colors.tertiaryContainer,
+                                  borderColor: context.colors.tertiary,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                   ValueListenableBuilder<bool>(
@@ -686,27 +688,6 @@ class RadarMapLayerSheet extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildLegendItem(BuildContext context, String label, Color color) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
-        ),
-        const SizedBox(width: 3),
-        Text(
-          label,
-          style: context.textTheme.bodySmall?.copyWith(
-            color: context.colors.onSurface.withValues(alpha: 0.8),
-            fontSize: 11,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -825,53 +806,47 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
             ValueListenableBuilder<bool>(
               valueListenable: widget.manager.isLoading,
               builder: (context, isLoading, child) {
-                return ValueListenableBuilder<bool>(
-                  valueListenable: widget.manager.isPlaying,
-                  builder: (context, isPlaying, child) {
-                    Color chipColor;
-                    Color borderColor;
-                    bool isHighlighted = false;
+                Color chipColor;
+                Color borderColor;
+                Color textColor;
 
-                    if (isSelected) {
-                      chipColor = context.colors.primary;
-                      borderColor = context.colors.primary;
-                      isHighlighted = true;
-                    } else if (isStartTime && !isPlaying) {
-                      chipColor = context.colors.secondary;
-                      borderColor = context.colors.secondary;
-                      isHighlighted = true;
-                    } else {
-                      chipColor = context.colors.surfaceContainerHighest;
-                      borderColor = context.colors.outlineVariant;
-                      isHighlighted = false;
-                    }
+                if (isSelected) {
+                  chipColor = context.colors.primaryContainer;
+                  borderColor = context.colors.primary;
+                  textColor = context.colors.onPrimaryContainer;
+                } else if (isStartTime) {
+                  chipColor = context.colors.tertiaryContainer;
+                  borderColor = context.colors.tertiary;
+                  textColor = context.colors.onTertiaryContainer;
+                } else {
+                  chipColor = context.colors.surface.withValues(alpha: 0.6);
+                  borderColor = context.colors.outlineVariant;
+                  textColor = context.colors.onSurfaceVariant;
+                }
 
-                    return GestureDetector(
-                      onLongPress:
-                          isLoading || isPlaying
-                              ? null
-                              : () {
-                                widget.manager.setPlayStartTime(time.value);
-                              },
-                      child: FilterChip(
-                        key: _chipKeys[time.value],
-                        selected: isHighlighted,
-                        showCheckmark: !isLoading,
-                        label: Text(time.time, style: TextStyle(color: isHighlighted ? Colors.white : null)),
-                        backgroundColor: isHighlighted ? chipColor.withValues(alpha: 0.2) : chipColor,
-                        selectedColor: chipColor,
-                        side: BorderSide(color: borderColor),
-                        avatar: isSelected && isLoading ? const LoadingIcon() : null,
-                        onSelected:
-                            isLoading || isPlaying
-                                ? null
-                                : (selected) {
-                                  if (!selected) return;
-                                  widget.manager.updateRadarTime(time.value);
-                                },
-                      ),
-                    );
-                  },
+                return GestureDetector(
+                  onLongPress:
+                      isLoading
+                          ? null
+                          : () {
+                            widget.manager.setPlayStartTime(time.value);
+                          },
+                  child: FilterChip(
+                    key: _chipKeys[time.value],
+                    selected: isSelected,
+                    showCheckmark: !isLoading,
+                    label: Text(time.time, style: TextStyle(color: textColor)),
+                    backgroundColor: chipColor,
+                    side: BorderSide(color: borderColor),
+                    avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                    onSelected:
+                        isLoading
+                            ? null
+                            : (selected) {
+                              if (!selected) return;
+                              widget.manager.updateRadarTime(time.value);
+                            },
+                  ),
                 );
               },
             ),
@@ -925,36 +900,14 @@ class _RadarProgressBar extends StatelessWidget {
     }
 
     return Row(
+      spacing: 8,
       children: [
-        Icon(Icons.play_circle_rounded, size: 14, color: context.colors.primary),
-        const SizedBox(width: 6),
-        Text(
-          '播放進度',
-          style: context.textTheme.bodySmall?.copyWith(
-            color: context.colors.onSurface.withValues(alpha: 0.7),
-            fontSize: 10,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: context.colors.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(context.colors.primary),
-              minHeight: 4,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
+        Icon(Icons.play_circle_rounded, size: 16, color: context.colors.primary),
+        Text('播放進度', style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
+        Expanded(child: LinearProgressIndicator(value: progress, year2023: false)),
         Text(
           '${(progress * 100).round()}%',
-          style: context.textTheme.bodySmall?.copyWith(
-            color: context.colors.primary,
-            fontWeight: FontWeight.w600,
-            fontSize: 10,
-          ),
+          style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
         ),
       ],
     );
