@@ -7,6 +7,25 @@
 
 ## [未發布]
 
+## [3.0.013] - 2025-07-11
+
+### 新增
+
+- 新增雷達迴波倒帶播放功能。
+- 地圖設定頁新增動畫播放 FPS 調整功能。
+
+### 更改
+
+- 地區語系選擇改為使用圖示代替國旗。
+
+### 修正
+
+- 修正震度顯示文字錯誤。
+- 修正繁體中文語系選擇未顯示勾選狀態。
+- 修正其他小問題。
+
+## [3.0.012] - 2025-07-09
+
 ### 新增
 
 - 新增地圖基礎選擇器功能。
@@ -135,8 +154,9 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.012...HEAD
-[3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.013...HEAD
+[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012...v3.0.013(1)
+[3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012(1)
 [3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
 [3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
 [3.0.009]: https://github.com/exptechtw/dpip/compare/v3.0.008...v3.0.009
