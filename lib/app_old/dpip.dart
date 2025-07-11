@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app_old/page/history/history.dart';
-import 'package:dpip/app_old/page/home/home.dart';
 import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
@@ -203,7 +201,7 @@ class _DpipState extends State<Dpip> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [HomePage(), HistoryPage(), MapPage(), MorePage(), MePage()],
+        children: const [MapPage(), MorePage(), MePage()],
       ),
     );
   }

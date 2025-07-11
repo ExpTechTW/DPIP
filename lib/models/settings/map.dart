@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/log.dart';
@@ -9,9 +11,9 @@ class SettingsMapModel extends ChangeNotifier {
 
   final updateIntervalNotifier = ValueNotifier(200);
   final baseMapNotifier = ValueNotifier(BaseMapType.exptech);
-  final layerNotifier = ValueNotifier(MapLayer.monitor);
+  final layersNotifier = ValueNotifier([MapLayer.monitor]);
 
-  int get updateInterval => Preference.mapUpdateInterval ?? 200;
+  int get updateInterval => Preference.mapUpdateInterval ?? 10;
   void setUpdateInterval(int value) {
     Preference.mapUpdateInterval = value;
     updateIntervalNotifier.value = value;
@@ -26,9 +28,9 @@ class SettingsMapModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  MapLayer get layer => layerNotifier.value;
-  void setLayer(MapLayer value) {
-    layerNotifier.value = value;
+  UnmodifiableListView<MapLayer> get layers => UnmodifiableListView(layersNotifier.value);
+  void setLayer(List<MapLayer> value) {
+    layersNotifier.value = value;
     _log('Changed ${PreferenceKeys.mapLayer} to $value');
     notifyListeners();
   }

@@ -33,14 +33,55 @@ class SettingsMapPage extends StatelessWidget {
                 );
               },
             ),
-            Selector<SettingsMapModel, MapLayer>(
-              selector: (context, model) => model.layer,
-              builder: (context, layer, child) {
+            Selector<SettingsMapModel, List<MapLayer>>(
+              selector: (context, model) => model.layers,
+              builder: (context, layers, child) {
                 return ListSectionTile(
                   icon: Symbols.layers_rounded,
                   title: '初始圖層'.i18n,
-                  subtitle: Text(layer.name),
+                  subtitle: Text(layers.map((e) => e.name).join(', ')),
                   trailing: const Icon(Symbols.chevron_right_rounded),
+                );
+              },
+            ),
+            Selector<SettingsMapModel, int>(
+              selector: (context, model) => model.updateInterval,
+              builder: (context, updateInterval, child) {
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    spacing: 8,
+                    children: [
+                      Row(
+                        spacing: 16,
+                        children: [
+                          Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
+                          Text(
+                            '動畫更新幀率'.i18n,
+                            style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        spacing: 4,
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: updateInterval.toDouble(),
+                              min: 1,
+                              max: 60,
+                              divisions: 59,
+                              onChanged: (value) {
+                                context.read<SettingsMapModel>().setUpdateInterval(value.floor());
+                              },
+                              year2023: false,
+                            ),
+                          ),
+                          SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),
+                        ],
+                      ),
+                    ],
+                  ),
                 );
               },
             ),

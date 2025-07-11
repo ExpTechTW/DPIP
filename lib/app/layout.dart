@@ -31,12 +31,12 @@ class AppLayout extends StatelessWidget {
             top: 24,
             left: 24,
             child: SafeArea(
-              child: Selector<SettingsMapModel, MapLayer>(
-                selector: (context, model) => model.layer,
-                builder: (context, layer, child) {
+              child: Selector<SettingsMapModel, List<MapLayer>>(
+                selector: (context, model) => model.layers,
+                builder: (context, layers, child) {
                   return BlurredIconButton(
                     icon: const Icon(Symbols.map_rounded),
-                    onPressed: () => context.push(MapPage.route(options: MapPageOptions(initialLayer: layer))),
+                    onPressed: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: layers))),
                     elevation: 2,
                   );
                 },

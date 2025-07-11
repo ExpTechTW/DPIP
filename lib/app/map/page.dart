@@ -19,16 +19,19 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class MapPageOptions {
-  final MapLayer? initialLayer;
+  final List<MapLayer>? initialLayers;
   final String? reportId;
 
-  MapPageOptions({this.initialLayer, this.reportId});
+  MapPageOptions({this.initialLayers, this.reportId});
 
   factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
-    final layer = queryParameters['layer'];
+    final layers = queryParameters['layers']?.split(',');
     final report = queryParameters['report'];
 
-    return MapPageOptions(initialLayer: layer != null ? MapLayer.values.byName(layer) : null, reportId: report);
+    return MapPageOptions(
+      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toList(),
+      reportId: report,
+    );
   }
 }
 
@@ -42,7 +45,7 @@ class MapPage extends StatefulWidget {
 
     final parameters = [];
 
-    if (options.initialLayer != null) parameters.add('layer=${options.initialLayer!.name}');
+    if (options.initialLayers != null) parameters.add('layers=${options.initialLayers!.map((e) => e.name).join(',')}');
     if (options.reportId != null) parameters.add('report=${options.reportId}');
 
     return "/map?${parameters.join('&')}";
@@ -78,12 +81,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   void _setupTicker() {
     _ticker?.cancel();
-    _ticker = Timer.periodic(Duration(milliseconds: GlobalProviders.map.updateIntervalNotifier.value), (timer) {
-      if (_activeLayers.contains(MapLayer.monitor)) {
-        final manager = _managers[MapLayer.monitor];
-        if (manager != null) {
-          manager.tick();
-        }
+    _ticker = Timer.periodic(Duration(milliseconds: 1000 ~/ GlobalProviders.map.updateIntervalNotifier.value), (timer) {
+      for (final layer in _activeLayers) {
+        _managers[layer]?.tick();
       }
     });
   }
@@ -319,8 +319,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     setBaseMapType(_baseMapType);
 
-    if (widget.options?.initialLayer != null) {
-      toggleLayer(widget.options!.initialLayer!);
+    if (widget.options?.initialLayers != null) {
+      for (final layer in widget.options!.initialLayers!) {
+        toggleLayer(layer);
+      }
     } else {
       _showMonitorLayer();
     }

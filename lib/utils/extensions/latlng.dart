@@ -8,7 +8,7 @@ extension GeoJsonLatLng on LatLng {
   bool get isValid => latitude != 0 && longitude != 0;
 
   GeoJsonFeatureBuilder toFeatureBuilder() {
-    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point).setGeometry(toGeoJsonCoordinates());
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(toGeoJsonCoordinates() as List<dynamic>);
   }
 
   double to(LatLng other) {

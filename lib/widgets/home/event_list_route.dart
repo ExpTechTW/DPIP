@@ -44,7 +44,7 @@ void handleEventList(BuildContext context, History history) {
     case HistoryType.earthquake:
       context.push(
         MapPage.route(
-          options: MapPageOptions(initialLayer: MapLayer.report, reportId: (history as ReportHistory).addition.id),
+          options: MapPageOptions(initialLayers: [MapLayer.report], reportId: (history as ReportHistory).addition.id),
         ),
       );
 
