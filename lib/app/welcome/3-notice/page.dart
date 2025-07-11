@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class WelcomeNoticePage extends StatelessWidget {
   const WelcomeNoticePage({super.key});
@@ -18,10 +16,7 @@ class WelcomeNoticePage extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-          child: FilledButton(
-            child: Text('下一步'.i18n),
-            onPressed: () => context.push(WelcomePermissionPage.route),
-          ),
+          child: FilledButton(child: Text('下一步'.i18n), onPressed: () => context.push(WelcomePermissionPage.route)),
         ),
       ),
       body: SingleChildScrollView(
@@ -76,7 +71,10 @@ class WelcomeNoticePage extends StatelessWidget {
                   color: context.colors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Text('根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。'.i18n, style: context.theme.textTheme.bodyLarge),
+                child: Text(
+                  '根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。'.i18n,
+                  style: context.theme.textTheme.bodyLarge,
+                ),
               ),
             ),
             Padding(

@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
@@ -19,6 +14,10 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class WindData {
   final double latitude;
@@ -42,6 +41,8 @@ class WindMapLayerManager extends MapLayerManager {
   final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
+  Function(String)? onTimeChanged;
+
   Future<void> setWindTime(String time) async {
     if (currentWindTime.value == time || isLoading.value) return;
 
@@ -51,6 +52,8 @@ class WindMapLayerManager extends MapLayerManager {
       await remove();
       currentWindTime.value = time;
       await setup();
+
+      onTimeChanged?.call(time);
 
       TalkerManager.instance.info('Updated Wind data time to "$time"');
     } catch (e, s) {

@@ -103,7 +103,8 @@ class ReportListItem extends StatelessWidget {
                     /**
                      * 規模、深度
                      */
-                    Text('M ${report.magnitude}　深度 ${report.depth} km',
+                    Text(
+                      'M ${report.magnitude}　深度 ${report.depth} km',
                       style: TextStyle(color: context.colors.onSurfaceVariant),
                     ),
                   ],

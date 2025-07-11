@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/core/i18n.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class WeatherIcons {
   WeatherIcons._();

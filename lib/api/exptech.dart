@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dpip/api/model/changelog/changelog.dart';
-import 'package:dpip/utils/extensions/string.dart';
-import 'package:http/http.dart';
-
 import 'package:dpip/api/model/announcement.dart';
+import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
 import 'package:dpip/api/model/eew.dart';
-import 'package:dpip/api/model/history.dart';
+import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/api/model/meteor_station.dart';
 import 'package:dpip/api/model/notification_record.dart';
 import 'package:dpip/api/model/notify/notify_settings.dart';
@@ -23,8 +20,11 @@ import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/api/route.dart';
+import 'package:dpip/core/preference.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:http/http.dart';
 
 class ExpTech {
   String? apikey;
@@ -77,10 +77,10 @@ class ExpTech {
     return jsonData.map((e) => PartialEarthquakeReport.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<Rts> getRts(int time) async {
+  Future<Rts> getRts([int? time]) async {
     var requestUrl = Route.rts();
 
-    if (time != 0) {
+    if (time != null) {
       requestUrl = Uri.parse(
         requestUrl
             .toString()
@@ -492,6 +492,8 @@ class ExpTech {
     final res = await get(requestUrl);
 
     if (res.statusCode == 200) {
+      Preference.lastUpdateToServerTime = DateTime.now().millisecondsSinceEpoch;
+
       return res.body;
     } else if (res.statusCode == 202) {
       return '${res.statusCode} $requestUrl';
@@ -516,13 +518,17 @@ class ExpTech {
   }
 
   /// 設定通知
-  Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
+  Future<NotifySettings> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
     final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
 
     final res = await get(requestUrl);
 
-    if (res.statusCode != 202) {
+    if (!res.ok) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
+
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+
+    return NotifySettings.fromJson(jsonData.map((e) => e as int).toList());
   }
 }

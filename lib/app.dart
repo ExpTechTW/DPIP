@@ -1,18 +1,16 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
-import 'package:dynamic_system_colors/dynamic_system_colors.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:provider/provider.dart';
-
-import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dynamic_system_colors/dynamic_system_colors.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:provider/provider.dart';
 
 class DpipApp extends StatefulWidget {
   const DpipApp({super.key});
@@ -22,9 +20,7 @@ class DpipApp extends StatefulWidget {
 }
 
 class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
-  AppLifecycleState? _lifecycleState;
-  late Timer _timer;
-  late Timer _timer2;
+  bool _hasHandledPendingNotification = false;
 
   Future<void> _checkUpdate() async {
     try {
@@ -48,9 +44,19 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     }
   }
 
+  void _handlePendingNotificationWhenReady() {
+    if (_hasHandledPendingNotification) return;
+
+    final context = router.routerDelegate.navigatorKey.currentContext;
+    if (context != null) {
+      _hasHandledPendingNotification = true;
+      handlePendingNotificationNavigation(context);
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    setState(() => _lifecycleState = state);
+    GlobalProviders.data.onAppLifecycleStateChanged(state);
   }
 
   @override
@@ -58,17 +64,14 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
     super.initState();
     _checkUpdate();
     WidgetsBinding.instance.addObserver(this);
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      if (_lifecycleState != AppLifecycleState.resumed) return;
+    GlobalProviders.data.startFetching();
 
-      final eew = await ExpTech().getEew();
-      GlobalProviders.data.setEew(eew);
-    });
-    _timer2 = Timer.periodic(const Duration(minutes: 1), (timer) async {
-      if (_lifecycleState != AppLifecycleState.resumed) return;
+    router.routerDelegate.addListener(_handlePendingNotificationWhenReady);
 
-      final data = await ExpTech().getNtp();
-      GlobalProviders.data.setTimeOffset(DateTime.now().millisecondsSinceEpoch - data);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _handlePendingNotificationWhenReady();
+      });
     });
   }
 
@@ -114,9 +117,8 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    router.routerDelegate.removeListener(_handlePendingNotificationWhenReady);
     WidgetsBinding.instance.removeObserver(this);
-    _timer.cancel();
-    _timer2.cancel();
     super.dispose();
   }
 }

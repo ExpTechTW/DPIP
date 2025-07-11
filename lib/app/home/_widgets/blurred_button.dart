@@ -1,8 +1,7 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
 
 class BlurredTextButton extends StatelessWidget {
   final String text;

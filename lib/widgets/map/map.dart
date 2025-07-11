@@ -2,18 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/log.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:path_provider/path_provider.dart';
-
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:path_provider/path_provider.dart';
 
 enum BaseMapType { exptech, osm, google }
 
@@ -216,6 +215,10 @@ class DpipMapState extends State<DpipMap> {
     try {
       final controller = _controller;
       if (controller == null) return;
+
+      if (Platform.isIOS && GlobalProviders.location.auto) {
+        await getSavedLocation();
+      }
 
       final location = GlobalProviders.location.coordinateNotifier.value;
 

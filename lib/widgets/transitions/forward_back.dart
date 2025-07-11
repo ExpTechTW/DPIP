@@ -29,7 +29,7 @@ class ForwardBackTransitionPage extends CustomTransitionPage {
               position: backwardSlide.animate(secondaryAnimation),
               child: FadeTransition(
                 opacity: fadeIn.animate(animation),
-                child: FadeTransition(opacity: fadeOut.animate(secondaryAnimation), child: child),
+                child: FadeTransition(opacity: fadeOut.animate(secondaryAnimation), child: Material(child: child)),
               ),
             ),
           );

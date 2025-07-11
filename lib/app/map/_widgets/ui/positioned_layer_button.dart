@@ -1,24 +1,22 @@
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
-import 'package:dpip/widgets/map/map.dart';
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle_sheet.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class PositionedLayerButton extends StatelessWidget {
-  final MapLayer? currentLayer;
+  final Set<MapLayer> activeLayers;
   final BaseMapType currentBaseMap;
-  final void Function(MapLayer? layer) onChanged;
+  final void Function(MapLayer layer) onLayerToggled;
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
   const PositionedLayerButton({
     super.key,
-    required this.currentLayer,
+    required this.activeLayers,
     required this.currentBaseMap,
-    required this.onChanged,
+    required this.onLayerToggled,
     required this.onBaseMapChanged,
   });
 
@@ -40,9 +38,9 @@ class PositionedLayerButton extends StatelessWidget {
                 constraints: context.bottomSheetConstraints,
                 builder:
                     (context) => LayerToggleSheet(
-                      currentLayer: currentLayer,
+                      activeLayers: activeLayers,
                       currentBaseMap: currentBaseMap,
-                      onChanged: onChanged,
+                      onLayerToggled: onLayerToggled,
                       onBaseMapChanged: onBaseMapChanged,
                     ),
               ),

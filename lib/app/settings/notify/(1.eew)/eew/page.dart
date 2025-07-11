@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/settings/notify/_widgets/eew_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyEewPage extends StatelessWidget {
   const SettingsNotifyEewPage({super.key});
@@ -47,9 +45,9 @@ class SettingsNotifyEewPage extends StatelessWidget {
               subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上'.i18n),
               type: 'eew_alert-silent',
             ),
-            SoundListTile(title: '地震速報(重大)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 4 以上'.i18n), type: 'eew-important'),
-            SoundListTile(title: '地震速報(一般)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 2 以上'.i18n), type: 'eew-general'),
-            SoundListTile(title: '地震速報(無聲)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 1 以上'.i18n), type: 'eew-silence'),
+            SoundListTile(title: '地震速報(重大)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 4 以上'.i18n), type: 'eew-important-v2'),
+            SoundListTile(title: '地震速報(一般)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 2 以上'.i18n), type: 'eew-general-v2'),
+            SoundListTile(title: '地震速報(無聲)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 1 以上'.i18n), type: 'eew-silence-v2'),
           ],
         ),
         SettingsListTextSection(

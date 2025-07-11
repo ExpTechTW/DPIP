@@ -45,4 +45,22 @@ class EewInfo {
   factory EewInfo.fromJson(Map<String, dynamic> json) => _$EewInfoFromJson(json);
 
   Map<String, dynamic> toJson() => _$EewInfoToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is EewInfo &&
+        other.time == time &&
+        other.longitude == longitude &&
+        other.latitude == latitude &&
+        other.depth == depth &&
+        other.magnitude == magnitude &&
+        other.location == location &&
+        other.max == max;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(time, longitude, latitude, depth, magnitude, location, max);
+  }
 }

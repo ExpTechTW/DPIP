@@ -66,17 +66,11 @@ class _ServerStatusPageState extends State<ServerStatusPage> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
-                    child: Text(
-                      '錯誤: ${snapshot.error}',
-                      style: TextStyle(color: context.colors.error, fontSize: 16),
-                    ),
+                    child: Text('錯誤: ${snapshot.error}', style: TextStyle(color: context.colors.error, fontSize: 16)),
                   );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
-                    child: Text(
-                      '沒有可用的資料',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                    ),
+                    child: Text('沒有可用的資料', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                   );
                 }
 

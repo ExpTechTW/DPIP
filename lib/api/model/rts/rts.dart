@@ -1,7 +1,8 @@
-import 'package:json_annotation/json_annotation.dart';
-
 import 'package:dpip/api/model/rts/rts_intensity.dart';
 import 'package:dpip/api/model/rts/rts_station.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'rts.g.dart';
 
@@ -25,4 +26,24 @@ class Rts {
   factory Rts.fromJson(Map<String, dynamic> json) => _$RtsFromJson(json);
 
   Map<String, dynamic> toJson() => _$RtsToJson(this);
+
+  GeoJsonBuilder toGeoJsonBuilder() => GeoJsonBuilder().setFeatures(
+    station.entries.map((e) {
+      final MapEntry(key: id, value: s) = e;
+
+      final latlng = GlobalProviders.data.station[id]?.info.last.latlng;
+
+      if (latlng == null) {
+        throw Exception('Station info for "$id" not found');
+      }
+
+      return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+        ..setGeometry(latlng.toGeoJsonCoordinates())
+        ..setProperty('id', id)
+        ..setProperty('I', s.I)
+        ..setProperty('i', s.i)
+        ..setProperty('pga', s.pga)
+        ..setProperty('pgv', s.pgv);
+    }),
+  );
 }

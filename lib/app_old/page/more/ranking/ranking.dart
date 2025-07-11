@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/app_old/page/more/ranking/tabs/precipitation.dart';
 import 'package:dpip/app_old/page/more/ranking/tabs/temperature.dart';
 import 'package:dpip/app_old/page/more/ranking/tabs/wind.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
@@ -56,11 +54,7 @@ class _RankingPageState extends State<RankingPage> with TickerProviderStateMixin
             bottom: TabBar(
               controller: controller,
               isScrollable: true,
-              tabs: const [
-                Tab(text: '降水'),
-                Tab(text: '氣溫'),
-                Tab(text: '風向/風速'),
-              ],
+              tabs: const [Tab(text: '降水'), Tab(text: '氣溫'), Tab(text: '風向/風速')],
             ),
           ),
         ];

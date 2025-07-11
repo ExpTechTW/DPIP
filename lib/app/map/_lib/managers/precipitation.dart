@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
@@ -20,6 +14,10 @@ import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
+import 'package:flutter/material.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class RainData {
   final double latitude;
@@ -50,6 +48,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
 
+  Function(String)? onTimeChanged;
+
   Future<void> setPrecipitationTime(String time) async {
     if (currentPrecipitationTime.value == time || isLoading.value) return;
 
@@ -59,6 +59,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       await remove();
       currentPrecipitationTime.value = time;
       await setup();
+
+      onTimeChanged?.call(time);
 
       TalkerManager.instance.info('Updated Precipitation data to "$time"');
     } catch (e, s) {

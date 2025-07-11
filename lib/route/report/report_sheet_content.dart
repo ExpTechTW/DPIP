@@ -41,9 +41,7 @@ class ReportSheetContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      report.hasNumber
-                          ? '編號 ${report.number} 顯著有感地震'
-                          : '小區域有感地震',
+                      report.hasNumber ? '編號 ${report.number} 顯著有感地震' : '小區域有感地震',
                       style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                     ),
                     Text(report.getLocation(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),

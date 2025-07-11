@@ -1,13 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dpip/utils/extensions/int.dart';
-import 'package:flutter/material.dart';
-
-import 'package:flex_color_picker/flex_color_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/tsunami/tsunami.dart';
 import 'package:dpip/api/model/tsunami/tsunami_actual.dart';
@@ -19,9 +12,14 @@ import 'package:dpip/app_old/page/map/tsunami/tsunami_observed_list.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/int.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 class TsunamiMapLayerManager extends MapLayerManager {
   TsunamiMapLayerManager(super.context, super.controller);
@@ -462,9 +460,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              tsunami == null
-                                                  ? '近期無海嘯資訊'
-                                                  : '海嘯警報',
+                                              tsunami == null ? '近期無海嘯資訊' : '海嘯警報',
                                               style: TextStyle(
                                                 fontSize: 28,
                                                 fontWeight: FontWeight.bold,
@@ -473,7 +469,8 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                             ),
                                             const SizedBox(height: 8),
                                             if (tsunami != null)
-                                              Text('${tsunami!.id}號 第${tsunami!.serial}報',
+                                              Text(
+                                                '${tsunami!.id}號 第${tsunami!.serial}報',
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500,
@@ -616,10 +613,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              '位於',
-                                              style: TextStyle(fontSize: 18, color: context.colors.onSurface),
-                                            ),
+                                            Text('位於', style: TextStyle(fontSize: 18, color: context.colors.onSurface)),
                                           ],
                                         ),
                                         Row(

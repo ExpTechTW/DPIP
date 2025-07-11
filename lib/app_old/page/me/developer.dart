@@ -1,8 +1,6 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class DPIPInfoPage extends StatelessWidget {
   const DPIPInfoPage({super.key});
@@ -38,7 +36,9 @@ class DPIPInfoPage extends StatelessWidget {
             _buildInfoCard(context, '營利真的太難了', [
               '我們調查了一般民眾的付費意願，發現大部分人普遍防災意識不足，更不會花錢在這件事情上。後台的數據能側面證實這個說法，據統計，熱心贊助的民眾大約是整體使用者的10萬分之1，這使得植入廣告似乎成為了最好的解決方法。',
             ], Symbols.trending_down_rounded),
-            _buildInfoCard(context, '為什麼不採用廣告？', ['當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。'], Symbols.block_rounded),
+            _buildInfoCard(context, '為什麼不採用廣告？', [
+              '當災害發生時，大家一定不會想要看廣告吧？這是我們不植入廣告的第一個理由。防災導向的軟體，快速正確地傳遞防災資訊是首要任務。如果因為廣告而導致無法正確掌握防災資訊，這反而和我們的理念相違背。況且，災害發生時通常通訊品質不佳，還要額外浪費網路流量在載入廣告，這件事太令人沮喪了。',
+            ], Symbols.block_rounded),
             _buildInfoCard(context, '對大眾收費？', [
               '如果植入廣告行不通，那對大眾收費呢？變成付費軟體？',
               '首先，作為防災軟體，我們希望盡可能地將防災資訊傳遞給越多人越好。而且，或許真正需要的人沒辦法再多出額外的經費承擔這項支出，我們希望幫助更多的人。其次，作為開發人員，我們希望軟體可以有很多人使用，收費會直接導致大家使用意願降低。',

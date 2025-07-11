@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 IconData getListIcon(String name) => switch (name) {

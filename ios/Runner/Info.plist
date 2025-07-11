@@ -50,7 +50,7 @@
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>用於儲存地震報告圖片。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>用於儲存地震報告圖片。</string>
+	<string>用於儲存地震報告圖片至您的相簿。</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

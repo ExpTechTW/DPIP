@@ -28,7 +28,7 @@ class IntensityBox extends StatelessWidget {
               ),
       child: Center(
         child: Text(
-          intensity.asIntensityLabel,
+          intensity.asIntensityDisplayLabel,
           style: TextStyle(
             color: border ? context.colors.onSurface : IntensityColor.onIntensity(intensity),
             fontSize: size / 2,

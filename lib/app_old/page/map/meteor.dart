@@ -1,13 +1,11 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
-import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/meteor_station.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 typedef StationIdUpdateCallback = void Function(String?);
 
@@ -87,13 +85,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
   }
 
   Map<String, String> get dataTypeToChineseMap {
-    return {
-      'temperature': '氣溫',
-      'wind_speed': '風向/風速',
-      'precipitation': '降水',
-      'humidity': '濕度',
-      'pressure': '氣壓',
-    };
+    return {'temperature': '氣溫', 'wind_speed': '風向/風速', 'precipitation': '降水', 'humidity': '濕度', 'pressure': '氣壓'};
   }
 
   final Map<String, String> units = {
@@ -183,9 +175,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('24小時${dataTypeToChineseMap[selectedDataType]}趨勢',
-                  style: context.theme.textTheme.titleMedium,
-                ),
+                Text('24小時${dataTypeToChineseMap[selectedDataType]}趨勢', style: context.theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 Text(
                   displayValue,
@@ -298,10 +288,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                 final int index = value.toInt();
                 if (index >= 0 && index < weatherData['time']!.length) {
                   final DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(weatherData['time']![index].toInt());
-                  return Text(
-                    DateFormat('HH時').format(dateTime),
-                    style: const TextStyle(fontSize: 10),
-                  );
+                  return Text(DateFormat('HH時').format(dateTime), style: const TextStyle(fontSize: 10));
                 } else {
                   return const Text('');
                 }
@@ -429,10 +416,7 @@ class _AdvancedWeatherChartState extends State<AdvancedWeatherChart> {
                         );
                         return SideTitleWidget(
                           meta: meta,
-                          child: Text(
-                            DateFormat('HH時').format(dateTime),
-                            style: const TextStyle(fontSize: 10),
-                          ),
+                          child: Text(DateFormat('HH時').format(dateTime), style: const TextStyle(fontSize: 10)),
                         );
                       } else {
                         return SideTitleWidget(meta: meta, child: const Text(''));

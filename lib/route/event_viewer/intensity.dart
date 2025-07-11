@@ -10,9 +10,9 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/api/model/history.dart';
-import 'package:dpip/core/providers.dart';
+import 'package:dpip/api/model/history/intensity_history.dart';
 import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/intensity_color.dart';
@@ -26,7 +26,7 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart';
 
 class IntensityPage extends StatefulWidget {
-  final History item;
+  final IntensityHistory item;
 
   const IntensityPage({super.key, required this.item});
 
@@ -42,13 +42,7 @@ class _IntensityPageState extends State<IntensityPage> {
   bool isUserLocationValid = false;
   bool _showLegend = false;
   Timer? _update;
-  History? data;
-
-  @override
-  void initState() {
-    super.initState();
-    data = widget.item;
-  }
+  late IntensityHistory data = widget.item;
 
   @override
   void dispose() {
@@ -135,11 +129,11 @@ class _IntensityPageState extends State<IntensityPage> {
 
     getEventInfo();
 
-    if (widget.item.addition?['final'] != 1) {
+    if (!widget.item.addition.isFinal) {
       _update = Timer.periodic(const Duration(seconds: 1), (_) async {
-        data = (await ExpTech().getEvent(widget.item.id))[0];
+        data = (await ExpTech().getEvent(widget.item.id))[0] as IntensityHistory;
         getEventInfo();
-        if (data?.addition?['final'] == 1) {
+        if (data.addition.isFinal == true) {
           _update?.cancel();
         }
       });
@@ -147,7 +141,7 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Future<void> getEventInfo() async {
-    final Map<String, dynamic> originalArea = data?.addition?['area'];
+    final originalArea = data.addition.area;
     final Map<String, int> invertedArea = {};
 
     originalArea.forEach((key, value) {
@@ -155,7 +149,8 @@ class _IntensityPageState extends State<IntensityPage> {
         invertedArea[code.toString()] = int.parse(key);
       }
     });
-    _mapController.setLayerProperties(
+
+    await _mapController.setLayerProperties(
       'town',
       FillLayerProperties(
         fillColor: [
@@ -328,7 +323,7 @@ class _IntensityPageState extends State<IntensityPage> {
               Text(subtitle, style: context.theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
               const SizedBox(width: 8),
               LabelChip(
-                label: "第${data?.addition?["serial"]}報${(data?.addition?["final"] == 1) ? '(最終)' : ""}",
+                label: "第${data.addition.serial}報${(data.addition.isFinal) ? '(最終)' : ""}",
                 backgroundColor: context.colors.secondaryContainer,
                 foregroundColor: context.colors.onSecondaryContainer,
                 outlineColor: context.colors.secondaryContainer,
@@ -344,7 +339,7 @@ class _IntensityPageState extends State<IntensityPage> {
     final DateTime sendTime = widget.item.time.send;
     final int expireTimestamp = widget.item.time.expires['all']!;
     final TZDateTime expireTimeUTC = parseDateTime(expireTimestamp);
-    final String description = data?.text.description['all'] ?? '';
+    final String description = data.text.description['all'] ?? '';
     final bool isExpired = TZDateTime.now(UTC).isAfter(expireTimeUTC.toUtc());
     final DateTime localExpireTime = expireTimeUTC;
 
@@ -390,7 +385,7 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final grouped = groupBy(data!.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
+    final grouped = groupBy(data.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
     final List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {

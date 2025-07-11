@@ -8,15 +8,20 @@ extension GeoJsonLatLng on LatLng {
   bool get isValid => latitude != 0 && longitude != 0;
 
   GeoJsonFeatureBuilder toFeatureBuilder() {
-    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point).setGeometry(toGeoJsonCoordinates());
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(toGeoJsonCoordinates() as List<dynamic>);
   }
 
   double to(LatLng other) {
-    final double sinLatA = sin(atan(tan(latitude)));
-    final double sinLatB = sin(atan(tan(other.latitude)));
-    final double cosLatA = cos(atan(tan(latitude)));
-    final double cosLatB = cos(atan(tan(other.latitude)));
+    final lat1 = latitude * pi / 180;
+    final lat2 = other.latitude * pi / 180;
+    final lon1 = longitude * pi / 180;
+    final lon2 = other.longitude * pi / 180;
 
-    return acos(sinLatA * sinLatB + cosLatA * cosLatB * cos(longitude - other.longitude)) * 6371.008;
+    final dlon = lon2 - lon1;
+    final dlat = lat2 - lat1;
+    final a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return 6371.0 * c;
   }
 }

@@ -1,8 +1,7 @@
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
-
 import 'package:dpip/core/preference.dart';
+import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 class SettingsLocationModel extends ChangeNotifier {

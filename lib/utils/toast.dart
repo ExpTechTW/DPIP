@@ -1,6 +1,6 @@
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 
 void showToast(BuildContext context, ToastWidget toast) {
   final fToast = FToast();

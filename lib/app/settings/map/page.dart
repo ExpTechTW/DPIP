@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class SettingsMapPage extends StatelessWidget {
   const SettingsMapPage({super.key});
@@ -35,14 +34,68 @@ class SettingsMapPage extends StatelessWidget {
                 );
               },
             ),
-            Selector<SettingsMapModel, MapLayer>(
-              selector: (context, model) => model.layer,
-              builder: (context, layer, child) {
+            Selector<SettingsMapModel, List<MapLayer>>(
+              selector: (context, model) => model.layers,
+              builder: (context, layers, child) {
                 return ListSectionTile(
                   icon: Symbols.layers_rounded,
                   title: '初始圖層'.i18n,
-                  subtitle: Text(layer.name),
+                  subtitle: Text(layers.map((e) => e.name).join(', ')),
                   trailing: const Icon(Symbols.chevron_right_rounded),
+                );
+              },
+            ),
+            Selector<SettingsMapModel, int>(
+              selector: (context, model) => model.updateInterval,
+              builder: (context, updateInterval, child) {
+                final maxFpsAllowed =
+                    WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate.floorToDouble();
+
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    spacing: 8,
+                    children: [
+                      Row(
+                        spacing: 16,
+                        children: [
+                          Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
+                          Text('動畫幀率'.i18n, style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      Row(
+                        spacing: 4,
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: updateInterval.toDouble(),
+                              min: 1,
+                              max: maxFpsAllowed,
+                              divisions: maxFpsAllowed.floor() ~/ 5,
+                              onChanged: (value) {
+                                context.read<SettingsMapModel>().setUpdateInterval(value.floor());
+                              },
+                              year2023: false,
+                            ),
+                          ),
+                          SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),
+                        ],
+                      ),
+                      if (updateInterval > 20)
+                        Row(
+                          spacing: 8,
+                          children: [
+                            Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
+                            Expanded(
+                              child: Text(
+                                '過高的動畫幀率可能會造成卡頓或設備發熱',
+                                style: context.textTheme.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 );
               },
             ),

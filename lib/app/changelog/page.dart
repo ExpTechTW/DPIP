@@ -1,13 +1,11 @@
-import 'package:dpip/core/i18n.dart';
-import 'package:flutter/material.dart';
-
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class ChangelogPage extends StatefulWidget {
   const ChangelogPage({super.key});

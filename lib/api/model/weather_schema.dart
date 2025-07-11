@@ -1,6 +1,5 @@
-import 'package:json_annotation/json_annotation.dart';
-
 import 'package:dpip/utils/parser.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'weather_schema.g.dart';
 

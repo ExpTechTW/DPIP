@@ -1,26 +1,24 @@
-import 'package:dpip/app/settings/map/page.dart';
-import 'package:dpip/core/i18n.dart';
-import 'package:flutter/material.dart';
-
 import 'package:clipboard/clipboard.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:simple_icons/simple_icons.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:dpip/app/debug/logs/page.dart';
-import 'package:dpip/widgets/list/list_section.dart';
-import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/app/settings/donate/page.dart';
 import 'package:dpip/app/settings/locale/page.dart';
 import 'package:dpip/app/settings/location/page.dart';
+import 'package:dpip/app/settings/map/page.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/app/settings/theme/page.dart';
 import 'package:dpip/app/settings/unit/page.dart';
 import 'package:dpip/core/device_info.dart';
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/list/list_section.dart';
+import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:simple_icons/simple_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsIndexPage extends StatelessWidget {
   const SettingsIndexPage({super.key});
