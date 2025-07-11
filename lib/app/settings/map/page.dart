@@ -2,6 +2,7 @@ import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -47,6 +48,9 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, int>(
               selector: (context, model) => model.updateInterval,
               builder: (context, updateInterval, child) {
+                final maxFpsAllowed =
+                    WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate.floorToDouble();
+
                 return Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -56,10 +60,7 @@ class SettingsMapPage extends StatelessWidget {
                         spacing: 16,
                         children: [
                           Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
-                          Text(
-                            '動畫更新幀率'.i18n,
-                            style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-                          ),
+                          Text('動畫幀率'.i18n, style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
                         ],
                       ),
                       Row(
@@ -69,8 +70,8 @@ class SettingsMapPage extends StatelessWidget {
                             child: Slider(
                               value: updateInterval.toDouble(),
                               min: 1,
-                              max: 60,
-                              divisions: 59,
+                              max: maxFpsAllowed,
+                              divisions: maxFpsAllowed.floor() ~/ 5,
                               onChanged: (value) {
                                 context.read<SettingsMapModel>().setUpdateInterval(value.floor());
                               },
@@ -80,6 +81,19 @@ class SettingsMapPage extends StatelessWidget {
                           SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),
                         ],
                       ),
+                      if (updateInterval > 20)
+                        Row(
+                          spacing: 8,
+                          children: [
+                            Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
+                            Expanded(
+                              child: Text(
+                                '過高的動畫幀率可能會造成卡頓或設備發熱',
+                                style: context.textTheme.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 );
