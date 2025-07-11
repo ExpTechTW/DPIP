@@ -27,8 +27,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
         setupFlutterChannels()
         setupLocationManager()
         
-        requestNotificationPermission()
-        
         if let locationKey = launchOptions?[
             UIApplication.LaunchOptionsKey.location] as? NSNumber,
             locationKey.boolValue
@@ -48,7 +46,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     
     override func applicationDidBecomeActive(_ application: UIApplication) {
         super.applicationDidBecomeActive(application)
-        requestNotificationPermission()
     }
 
     // MARK: - Setup Methods
