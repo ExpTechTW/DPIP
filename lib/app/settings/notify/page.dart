@@ -112,7 +112,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     return Selector<SettingsLocationModel, String?>(
       selector: (_, model) => model.code,
       builder: (context, code, child) {
-        final enabled = code != null;
+        final enabled = code != null || Preference.locationAuto!;
 
         return Stack(
           children: [
@@ -275,28 +275,6 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                           icon: Symbols.campaign_rounded,
                           enabled: !isLoading && enabled,
                           onTap: () => context.push(SettingsNotifyAnnouncementPage.route),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-                ListSection(
-                  title: '除錯'.i18n,
-                  children: [
-                    Selector<SettingsNotificationModel, BasicNotifyType>(
-                      selector: (_, model) => model.announcement,
-                      builder: (context, announcement, child) {
-                        return ListSectionTile(
-                          title: '同步通知設定'.i18n,
-                          subtitle: const Text('套用伺服器上的通知設定紀錄'),
-                          icon: Symbols.sync_alt_rounded,
-                          enabled: !isLoading && enabled,
-                          onTap: () {
-                            Preference.notifyAnnouncement = null;
-                            if (mounted) {
-                              context.pop();
-                            }
-                          },
                         );
                       },
                     ),

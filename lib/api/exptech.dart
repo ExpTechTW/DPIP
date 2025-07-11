@@ -518,13 +518,17 @@ class ExpTech {
   }
 
   /// 設定通知
-  Future<void> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
+  Future<NotifySettings> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
     final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
 
     final res = await get(requestUrl);
 
-    if (res.statusCode != 202) {
+    if (!res.ok) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
     }
+
+    final List<dynamic> jsonData = jsonDecode(res.body) as List<dynamic>;
+
+    return NotifySettings.fromJson(jsonData.map((e) => e as int).toList());
   }
 }
