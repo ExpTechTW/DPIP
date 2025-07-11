@@ -55,7 +55,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
         'radar-source',
         'radar',
         const RasterLayerProperties(),
-        belowLayerId: 'county-outline',
+        belowLayerId: BaseMapLayerIds.exptechCountyOutline,
       );
     } catch (e) {
       TalkerManager.instance.error('RadarMapCard._setupRadarLayer', e);
