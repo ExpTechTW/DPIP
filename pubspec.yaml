@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 3.0.012
+version: 3.0.013
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
