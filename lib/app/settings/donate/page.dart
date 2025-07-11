@@ -126,6 +126,16 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
 
           return ListView(
             children: [
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！'.i18n,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant, // 調整顏色，使其顯眼
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+              ),
               if (subscriptions.isNotEmpty)
                 ListSection(
                   title: '訂閱制'.i18n,
@@ -168,10 +178,10 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                       ),
                   ],
                 ),
-              SettingsListTextSection(
-                content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
-                contentAlignment: TextAlign.justify,
-              ),
+              // SettingsListTextSection(
+              //   content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
+              //   contentAlignment: TextAlign.justify,
+              // ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
