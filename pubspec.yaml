@@ -80,7 +80,6 @@ flutter:
   uses-material-design: true
   assets:
   - assets/translations/
-  - assets/flags/
   - assets/map/
   - assets/DPIP.png
   - assets/ExpTech.png

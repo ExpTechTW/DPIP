@@ -93,7 +93,23 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                               ],
                             )
                             : Text('來源語言'.i18n),
-                    leading: item.flag,
+                    leading: Container(
+                      height: 28,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: context.colors.secondaryContainer,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Center(
+                        child: Text(
+                          item.iconLabel,
+                          style: context.textTheme.labelLarge?.copyWith(
+                            color: context.colors.onSecondaryContainer,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ),
                     trailing: Icon(isSelected ? Symbols.check_rounded : null),
                     onTap: () {
                       context.locale = item;
