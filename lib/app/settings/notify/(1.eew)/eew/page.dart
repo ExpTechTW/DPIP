@@ -33,17 +33,17 @@ class SettingsNotifyEewPage extends StatelessWidget {
             SoundListTile(
               title: '緊急地震速報(重大)'.i18n,
               subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 4 以上'.i18n),
-              type: 'eew_alert-important',
+              type: 'eew_alert-important-v2',
             ),
             SoundListTile(
               title: '緊急地震速報(一般)'.i18n,
               subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 2 以上'.i18n),
-              type: 'eew_alert-general',
+              type: 'eew_alert-general-v2',
             ),
             SoundListTile(
               title: '緊急地震速報(無聲)'.i18n,
               subtitle: Text('最大震度 5 弱以上 且\n所在地(鄉鎮)預估震度 1 以上'.i18n),
-              type: 'eew_alert-silent',
+              type: 'eew_alert-silent-v2',
             ),
             SoundListTile(title: '地震速報(重大)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 4 以上'.i18n), type: 'eew-important-v2'),
             SoundListTile(title: '地震速報(一般)'.i18n, subtitle: Text('所在地(鄉鎮)預估震度 2 以上'.i18n), type: 'eew-general-v2'),
