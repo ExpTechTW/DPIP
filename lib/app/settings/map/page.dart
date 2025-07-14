@@ -26,22 +26,30 @@ class SettingsMapPage extends StatelessWidget {
             Selector<SettingsMapModel, BaseMapType>(
               selector: (context, model) => model.baseMap,
               builder: (context, baseMapType, child) {
-                return ListSectionTile(
-                  icon: Symbols.layers_rounded,
-                  title: '底圖'.i18n,
-                  subtitle: Text(baseMapType.name),
-                  trailing: const Icon(Symbols.chevron_right_rounded),
+                bool isDisabled = true; // 判斷是否禁用
+                return Opacity( //ListSectionTile(
+                  opacity: isDisabled ? 0.4 : 1.0,
+                  child: ListSectionTile(
+                    icon: Symbols.layers_rounded,
+                    title: '底圖'.i18n,
+                    subtitle: Text(baseMapType.name),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                  ),
                 );
               },
             ),
             Selector<SettingsMapModel, List<MapLayer>>(
               selector: (context, model) => model.layers,
               builder: (context, layers, child) {
-                return ListSectionTile(
-                  icon: Symbols.layers_rounded,
-                  title: '初始圖層'.i18n,
-                  subtitle: Text(layers.map((e) => e.name).join(', ')),
-                  trailing: const Icon(Symbols.chevron_right_rounded),
+                bool isDisabled = true; // 判斷是否禁用
+                return Opacity( //ListSectionTile(
+                  opacity: isDisabled ? 0.4 : 1.0,
+                  child: ListSectionTile(
+                    icon: Symbols.layers_rounded,
+                    title: '初始圖層'.i18n,
+                    subtitle: Text(layers.map((e) => e.name).join(', ')),
+                    trailing: const Icon(Symbols.chevron_right_rounded),
+                  ),
                 );
               },
             ),
