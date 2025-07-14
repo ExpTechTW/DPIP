@@ -62,31 +62,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     _mapController = controller;
   }
 
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
   Future<void> _loadMap() async {
     radarList = await ExpTech().getRadarList();
 
@@ -99,7 +74,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         'radarSource',
         'radarLayer',
         const RasterLayerProperties(),
-        belowLayerId: 'county-outline',
+        belowLayerId: BaseMapLayerIds.userLocation,
       );
     }
 
@@ -108,6 +83,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       'town-outline-default',
       LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB(), lineWidth: 1),
       sourceLayer: 'town',
+      belowLayerId: BaseMapLayerIds.userLocation,
     );
 
     await _mapController.addLayer(
@@ -120,6 +96,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         ['get', 'CODE'],
         ['literal', widget.item.area],
       ],
+      belowLayerId: BaseMapLayerIds.userLocation,
     );
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
@@ -171,8 +148,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     }
-
-    await _addUserLocationMarker();
 
     setState(() {});
   }
