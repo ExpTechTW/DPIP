@@ -94,6 +94,15 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
     await _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
+    if (!isExpired) {
+      await _mapController.addLayer(
+        'radarSource',
+        'radarLayer',
+        const RasterLayerProperties(),
+        belowLayerId: 'county-outline',
+      );
+    }
+
     await _mapController.addLayer(
       'map',
       'town-outline-default',
@@ -112,15 +121,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         ['literal', widget.item.area],
       ],
     );
-
-    if (!isExpired) {
-      await _mapController.addLayer(
-        'radarSource',
-        'radarLayer',
-        const RasterLayerProperties(),
-        belowLayerId: 'county-outline',
-      );
-    }
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
       await getSavedLocation();
