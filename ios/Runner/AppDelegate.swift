@@ -50,24 +50,6 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
 
     // MARK: - Setup Methods
     
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { [weak self] granted, error in
-            if let error = error {
-                print("Error requesting notification permission: \(error)")
-                return
-            }
-            
-            if granted {
-                print("Notification permission granted")
-                DispatchQueue.main.async {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            } else {
-                print("Notification permission denied")
-            }
-        }
-    }
-    
     private func setupFlutterChannels() {
         guard let controller = window?.rootViewController as? FlutterViewController else { return }
         
