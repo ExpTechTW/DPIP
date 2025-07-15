@@ -129,7 +129,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
     return SheetContainer(
       icon: Symbols.layers_rounded,
       title: '地圖圖層'.i18n,
-      description: '地震類與氣象類圖層互斥'.i18n,
+      description: '選擇要顯示的地圖圖層'.i18n,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

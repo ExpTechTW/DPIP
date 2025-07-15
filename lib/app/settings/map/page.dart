@@ -96,7 +96,7 @@ class SettingsMapPage extends StatelessWidget {
                             Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
                             Expanded(
                               child: Text(
-                                '過高的動畫幀率可能會造成卡頓或設備發熱',
+                                '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
                                 style: context.textTheme.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
                               ),
                             ),
