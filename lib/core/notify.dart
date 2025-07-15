@@ -332,7 +332,7 @@ void handlePendingNotificationNavigation(BuildContext context) {
 
   TalkerManager.instance.debug('Handling pending notification: channelKey=$_pendingChannelKey');
 
-  if (_pendingChannelKey?.startsWith('eq') == true) {
+  if (_pendingChannelKey?.startsWith('eq') == true || _pendingChannelKey?.startsWith('eew') == true) {
     context.push(MapPage.route(options: MapPageOptions(initialLayers: [MapLayer.monitor])));
   }
 
@@ -351,7 +351,7 @@ Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
   final channelKey = receivedAction.channelKey;
   TalkerManager.instance.debug('Notification clicked: channelKey=$channelKey');
 
-  if (channelKey?.startsWith('eq') == true) {
+  if (channelKey?.startsWith('eq') == true || channelKey?.startsWith('eew') == true) {
     context.push(MapPage.route(options: MapPageOptions(initialLayers: [MapLayer.monitor])));
     return;
   }
