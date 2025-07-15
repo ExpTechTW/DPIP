@@ -136,6 +136,18 @@ class DpipMapState extends State<DpipMap> {
           'paint': {'background-color': colors.surface.toHexStringRGB()},
         },
         {
+          'id': BaseMapLayerIds.osmGlobalRaster,
+          'type': 'raster',
+          'source': 'osm',
+          'layout': {'visibility': widget.baseMapType == BaseMapType.osm ? 'visible' : 'none'},
+        },
+        {
+          'id': BaseMapLayerIds.googleGlobalRaster,
+          'type': 'raster',
+          'source': 'google',
+          'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
+        },
+        {
           'id': BaseMapLayerIds.exptechCountyFill,
           'type': 'fill',
           'source': 'map',
@@ -166,18 +178,6 @@ class DpipMapState extends State<DpipMap> {
           'source-layer': 'global',
           'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
           'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.osmGlobalRaster,
-          'type': 'raster',
-          'source': 'osm',
-          'layout': {'visibility': widget.baseMapType == BaseMapType.osm ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.googleGlobalRaster,
-          'type': 'raster',
-          'source': 'google',
-          'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
         },
         {
           'id': 'tsunami',
