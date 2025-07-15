@@ -173,7 +173,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
                 onChanged: (checked) => _toggleLayer(MapLayer.report, checked),
               ),
               LayerToggle(
-                label: '${'海嘯資訊'.i18n}(未開放)',
+                label: '海嘯資訊'.i18n,
                 checked: _activeLayers.contains(MapLayer.tsunami),
                 onChanged: null, //(checked) => _toggleLayer(MapLayer.tsunami, checked),
               ),
