@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-06-16 16:30\n"
+"PO-Revision-Date: 2025-07-15 16:27\n"
 
 #: ./lib/app/settings/location/page.dart:557
 msgid "所在地"
@@ -575,7 +575,7 @@ msgstr ""
 
 #: ./lib/app/welcome/2-exptech/page.dart:88
 msgid "我們是誰？"
-msgstr ""
+msgstr "私たちについて？"
 
 #: ./lib/app/welcome/2-exptech/page.dart:92
 msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
@@ -587,11 +587,11 @@ msgstr ""
 
 #: ./lib/app/welcome/2-exptech/page.dart:99
 msgid "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
-msgstr ""
+msgstr "設立のきっかけは、コンピュータやテクノロジーに興味と能力を持つ仲間を集めることでした。その後、活動は学外に広がり、現在の形になりました。"
 
 #: ./lib/app/welcome/3-notice/page.dart:43
 msgid "注意事項"
-msgstr ""
+msgstr "注意事項"
 
 #: ./lib/app/welcome/3-notice/page.dart:79
 msgid "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
