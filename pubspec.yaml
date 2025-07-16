@@ -31,7 +31,6 @@ dependencies:
       url: https://github.com/ExpTechTW/flutter_background_service.git
       path: packages/flutter_background_service
       ref: master
-  flutter_local_notifications: ^19.1.0
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.7
