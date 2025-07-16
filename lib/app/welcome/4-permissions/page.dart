@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:autostarter/autostarter.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/app/home/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -75,9 +75,7 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
       final status = await Permission.notification.status;
       _isNotificationPermission = status.isGranted;
     } else if (Platform.isIOS) {
-      await Firebase.initializeApp();
-      final settings = await FirebaseMessaging.instance.getNotificationSettings();
-      _isNotificationPermission = settings.authorizationStatus == AuthorizationStatus.authorized;
+      _isNotificationPermission = await AwesomeNotifications().isNotificationAllowed();
     }
   }
 
