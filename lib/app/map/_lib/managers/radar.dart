@@ -624,12 +624,12 @@ class RadarMapLayerSheet extends StatelessWidget {
                               spacing: 8,
                               children: [
                                 _LegendItem(
-                                  label: '目前時間',
+                                  label: '目前時間'.i18n,
                                   color: context.colors.primaryContainer,
                                   borderColor: context.colors.primary,
                                 ),
                                 _LegendItem(
-                                  label: '播放起點',
+                                  label: '播放起點'.i18n,
                                   color: context.colors.tertiaryContainer,
                                   borderColor: context.colors.tertiary,
                                 ),
@@ -903,7 +903,7 @@ class _RadarProgressBar extends StatelessWidget {
       spacing: 8,
       children: [
         Icon(Icons.play_circle_rounded, size: 16, color: context.colors.primary),
-        Text('播放進度', style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
+        Text('播放進度'.i18n, style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
         Expanded(child: LinearProgressIndicator(value: progress, year2023: false)),
         Text(
           '${(progress * 100).round()}%',
