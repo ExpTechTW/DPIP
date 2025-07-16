@@ -2,24 +2,21 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:flutter/cupertino.dart';
-
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:intl/intl.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app_old/page/home/home.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
 import 'package:dpip/core/location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/location_to_code.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:intl/intl.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Timer? _locationUpdateTimer;
 final _backgroundService = FlutterBackgroundService();
@@ -87,7 +84,6 @@ void _setupPositionListener() {
     GlobalProviders.location.setCode(location?.code.toString());
     GlobalProviders.location.setLatLng(latitude: latitude, longitude: longitude);
 
-    HomePage.updatePosition();
     RadarMap.updatePosition();
   });
 
@@ -101,25 +97,23 @@ void _setupPositionListener() {
 
 Future<void> _initializeAndroidForegroundService() async {
   _isAndroidServiceInitialized = true;
-  const notificationChannel = AndroidNotificationChannel(
-    'my_foreground',
-    '前景自動定位',
-    description: '前景自動定位',
-    importance: Importance.low,
+
+  await AwesomeNotifications().initialize(
+    null, // 使用預設 launcher icon
+    [
+      NotificationChannel(
+        channelKey: 'my_foreground',
+        channelName: '前景自動定位',
+        channelDescription: '背景定位服務通知',
+        importance: NotificationImportance.Low,
+        defaultColor: const Color(0xFF2196f3),
+        ledColor: Colors.white,
+        locked: true,
+        playSound: false,
+        onlyAlertOnce: true,
+      )
+    ],
   );
-
-  final notifications = FlutterLocalNotificationsPlugin();
-
-  await notifications.initialize(
-    const InitializationSettings(
-      iOS: DarwinInitializationSettings(),
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-    ),
-  );
-
-  await notifications
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(notificationChannel);
 
   await _backgroundService.configure(
     androidConfiguration: AndroidConfiguration(
@@ -150,7 +144,6 @@ Future<void> _onServiceStart(ServiceInstance service) async {
   GlobalProviders.init();
 
   final locationService = LocationService();
-  final notifications = FlutterLocalNotificationsPlugin();
 
   // Setup service event listeners
   service.on(ServiceEvent.stopService.name).listen((event) {
@@ -166,12 +159,16 @@ Future<void> _onServiceStart(ServiceInstance service) async {
   if (service is AndroidServiceInstance) {
     // Initialize foreground service and notification
     await service.setAsForegroundService();
-    await notifications.show(
-      888,
-      'DPIP',
-      '前景服務啟動中...',
-      const NotificationDetails(
-        android: AndroidNotificationDetails('my_foreground', '前景自動定位', icon: '@drawable/ic_stat_name', ongoing: true),
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: 888,
+        channelKey: 'my_foreground',
+        title: 'DPIP',
+        body: '前景服務啟動中...',
+        notificationLayout: NotificationLayout.Default,
+        locked: true,
+        autoDismissible: false,
+        icon: 'resource://drawable/ic_stat_name',
       ),
     );
 
@@ -187,6 +184,7 @@ Future<void> _onServiceStart(ServiceInstance service) async {
 
     // Define the periodic location update task
     Future<void> updateLocation() async {
+      _locationUpdateTimer?.cancel();
       if (!await service.isForegroundService()) return;
 
       // Get current position and location info
@@ -213,12 +211,15 @@ Future<void> _onServiceStart(ServiceInstance service) async {
       final notificationBody = '$timestamp\n$latitude,$longitude $locationName';
 
       service.invoke(ServiceEvent.sendDebug.name, {'notifyBody': notificationBody});
-      await notifications.show(
-        888,
-        notificationTitle,
-        notificationBody,
-        const NotificationDetails(
-          android: AndroidNotificationDetails('my_foreground', '前景自動定位', icon: 'ic_stat_name', ongoing: true),
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 888,
+          channelKey: 'my_foreground',
+          title: notificationTitle,
+          body: notificationBody,
+          notificationLayout: NotificationLayout.Default,
+          locked: true,
+          autoDismissible: false,
         ),
       );
       service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
