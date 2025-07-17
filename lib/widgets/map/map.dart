@@ -169,7 +169,7 @@ class DpipMapState extends State<DpipMap> {
           'source-layer': 'city',
           'type': 'line',
           'paint': {'line-color': colors.outline.toHexStringRGB()},
-          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
+          'layout': {'visibility': 'visible'},
         },
         {
           'id': BaseMapLayerIds.exptechGlobalFill,

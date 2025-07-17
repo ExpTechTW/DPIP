@@ -31,7 +31,7 @@ class AppLayout extends StatelessWidget {
             top: 24,
             left: 24,
             child: SafeArea(
-              child: Selector<SettingsMapModel, List<MapLayer>>(
+              child: Selector<SettingsMapModel, Set<MapLayer>>(
                 selector: (context, model) => model.layers,
                 builder: (context, layers, child) {
                   return BlurredIconButton(

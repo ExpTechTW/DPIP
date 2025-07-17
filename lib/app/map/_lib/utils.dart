@@ -3,6 +3,49 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 
 enum MapLayer { monitor, report, tsunami, radar, temperature, precipitation, wind }
 
+const Set<MapLayer> kEarthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
+
+const Set<MapLayer> kWeatherLayers = {MapLayer.radar, MapLayer.temperature, MapLayer.precipitation, MapLayer.wind};
+
+const Map<MapLayer, Set<MapLayer>> kAllowedLayerCombinations = {
+  MapLayer.monitor: {MapLayer.monitor},
+  MapLayer.report: {MapLayer.report},
+  MapLayer.tsunami: {MapLayer.tsunami},
+  MapLayer.temperature: {MapLayer.radar, MapLayer.temperature},
+  MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
+  MapLayer.wind: {MapLayer.radar, MapLayer.wind},
+};
+
+/// Validates if a combination of map layers follows the defined rules.
+///
+/// Returns true if:
+/// - earthquakeLayers.length ≤ 1 AND one of:
+///   - weatherLayers.length == 0
+///   - weatherLayers.length == 1
+///   - weatherLayers.length == 2 AND weatherLayers contains radar AND
+///     the other layer exists in _allowedRadarCombinations
+///
+/// Where:
+/// - earthquakeLayers = layers ∩ _earthquakeLayers
+/// - weatherLayers = layers ∩ _weatherLayers
+bool isValidLayerCombination(Set<MapLayer> layers) {
+  final earthquakeLayerCount = layers.where((l) => kEarthquakeLayers.contains(l)).length;
+  if (earthquakeLayerCount > 1) return false;
+
+  final weatherLayers = layers.where((l) => kWeatherLayers.contains(l)).toSet();
+
+  if (weatherLayers.length == 1) return true;
+
+  if (weatherLayers.length == 2) {
+    if (weatherLayers.contains(MapLayer.radar)) {
+      final otherLayer = weatherLayers.where((l) => l != MapLayer.radar).first;
+      return kAllowedLayerCombinations.containsKey(otherLayer);
+    }
+  }
+
+  return false;
+}
+
 class MapSourceIds {
   const MapSourceIds._();
 

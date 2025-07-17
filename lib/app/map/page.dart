@@ -1,12 +1,15 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/managers/monitor.dart';
 import 'package:dpip/app/map/_lib/managers/precipitation.dart';
 import 'package:dpip/app/map/_lib/managers/radar.dart';
 import 'package:dpip/app/map/_lib/managers/report.dart';
 import 'package:dpip/app/map/_lib/managers/temperature.dart';
-// import 'package:dpip/app/map/_lib/managers/tsunami.dart';
 import 'package:dpip/app/map/_lib/managers/wind.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
@@ -15,11 +18,9 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/unimplemented.dart';
 import 'package:dpip/widgets/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
 class MapPageOptions {
-  final List<MapLayer>? initialLayers;
+  final Set<MapLayer>? initialLayers;
   final String? reportId;
 
   MapPageOptions({this.initialLayers, this.reportId});
@@ -29,7 +30,7 @@ class MapPageOptions {
     final report = queryParameters['report'];
 
     return MapPageOptions(
-      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toList(),
+      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
       reportId: report,
     );
   }
@@ -62,22 +63,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
-  final Set<MapLayer> _activeLayers = {};
-
-  static const Set<MapLayer> _earthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
-
-  static const Set<MapLayer> _weatherLayers = {
-    MapLayer.radar,
-    MapLayer.temperature,
-    MapLayer.precipitation,
-    MapLayer.wind,
-  };
-
-  static const Map<MapLayer, Set<MapLayer>> _allowedRadarCombinations = {
-    MapLayer.temperature: {MapLayer.radar, MapLayer.temperature},
-    MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
-    MapLayer.wind: {MapLayer.radar, MapLayer.wind},
-  };
+  Set<MapLayer> _activeLayers = Set.from(GlobalProviders.map.layers);
 
   void _setupTicker() {
     _ticker?.cancel();
@@ -131,7 +117,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   Future<void> _syncRadarTimeOnCombination(MapLayer newLayer) async {
-    if (!_activeLayers.contains(MapLayer.radar) || !_weatherLayers.contains(newLayer) || newLayer == MapLayer.radar) {
+    if (!_activeLayers.contains(MapLayer.radar) || !kWeatherLayers.contains(newLayer) || newLayer == MapLayer.radar) {
       return;
     }
 
@@ -159,26 +145,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return manager is T ? manager : null;
   }
 
-  bool _isAllowedCombination(Set<MapLayer> layers) {
-    final earthquakeCount = layers.where((l) => _earthquakeLayers.contains(l)).length;
-    if (earthquakeCount > 1) return false;
-
-    final weatherLayers = layers.where((l) => _weatherLayers.contains(l)).toSet();
-    if (weatherLayers.isEmpty) return true;
-
-    if (weatherLayers.length == 1) return true;
-
-    if (weatherLayers.length == 2) {
-      if (weatherLayers.contains(MapLayer.radar)) {
-        final otherLayer = weatherLayers.where((l) => l != MapLayer.radar).first;
-        return _allowedRadarCombinations.containsKey(otherLayer);
-      }
-    }
-
-    return false;
-  }
-
-  Future<void> toggleLayer(MapLayer layer) async {
+  Future<void> toggleLayer(MapLayer layer, bool show, Set<MapLayer> activeLayers) async {
     if (!mounted) return;
 
     try {
@@ -198,31 +165,34 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           _activeLayers.remove(layer);
         });
 
-        if (_weatherLayers.contains(layer)) {
-          final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
+        if (kWeatherLayers.contains(layer)) {
+          final hasOtherWeatherLayers = _activeLayers.any((l) => kWeatherLayers.contains(l));
           if (!hasOtherWeatherLayers) {
             await _showMonitorLayer();
           }
-        } else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
+        } else if (kEarthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
           await _showMonitorLayer();
         }
       } else {
         final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
 
-        if (_earthquakeLayers.contains(layer)) {
-          await _clearLayerGroup(_earthquakeLayers);
-          await _clearLayerGroup(_weatherLayers);
-        } else if (_weatherLayers.contains(layer)) {
-          final weatherLayersInNew = newLayers.where((l) => _weatherLayers.contains(l)).toSet();
-          if (!_isAllowedCombination(weatherLayersInNew)) {
+        final isEarthquakeLayer = kEarthquakeLayers.contains(layer);
+        final isWeatherLayer = kWeatherLayers.contains(layer);
+
+        if (isEarthquakeLayer) {
+          await _clearLayers(kEarthquakeLayers);
+          await _clearLayers(kWeatherLayers);
+        } else if (isWeatherLayer) {
+          final weatherLayersInNew = newLayers.where((l) => kWeatherLayers.contains(l)).toSet();
+          if (!isValidLayerCombination(weatherLayersInNew)) {
             if (weatherLayersInNew.contains(MapLayer.radar)) {
-              final nonRadarWeatherLayers = _weatherLayers.where((l) => l != MapLayer.radar).toSet();
-              await _clearLayerGroup(nonRadarWeatherLayers);
+              final nonRadarWeatherLayers = kWeatherLayers.where((l) => l != MapLayer.radar).toSet();
+              await _clearLayers(nonRadarWeatherLayers);
             } else {
-              await _clearLayerGroup(_weatherLayers);
+              await _clearLayers(kWeatherLayers);
             }
           }
-          await _clearLayerGroup(_earthquakeLayers);
+          await _clearLayers(kEarthquakeLayers);
         }
 
         if (!manager.didSetup) await manager.setup();
@@ -256,18 +226,28 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _clearLayerGroup(Set<MapLayer> layers) async {
+  /// Hides and removes the specified map layers from the active layer set.
+  ///
+  /// Takes a [Set] of [MapLayer]s to clear. For each layer in the set that is
+  /// currently active:
+  /// 1. Hides the layer's visual elements via its manager if one exists
+  /// 2. Removes the layer from the active layers set
+  ///
+  /// This is used when switching between incompatible layer types, like
+  /// earthquake and weather layers.
+  Future<void> _clearLayers(Set<MapLayer> layers) async {
+    final newLayers = Set<MapLayer>.from(_activeLayers);
+
     for (final layer in layers) {
-      if (_activeLayers.contains(layer)) {
+      if (newLayers.contains(layer)) {
         final manager = _managers[layer];
         if (manager != null) {
           await manager.hide();
         }
+        newLayers.remove(layer);
       }
     }
-    setState(() {
-      _activeLayers.removeAll(layers);
-    });
+    setState(() => _activeLayers = newLayers);
   }
 
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
@@ -296,7 +276,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
     _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
     _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyOutline, false);
     _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
     _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
   }
@@ -321,7 +300,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     if (widget.options?.initialLayers != null) {
       for (final layer in widget.options!.initialLayers!) {
-        toggleLayer(layer);
+        toggleLayer(layer, true, _activeLayers);
       }
     } else {
       _showMonitorLayer();
@@ -345,7 +324,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           PositionedLayerButton(
             activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,
-            onLayerToggled: toggleLayer,
+            onLayerChanged: toggleLayer,
             onBaseMapChanged: setBaseMapType,
           ),
           const PositionedBackButton(),

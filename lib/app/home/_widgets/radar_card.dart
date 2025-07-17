@@ -126,7 +126,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: [MapLayer.radar]))),
+              onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
               borderRadius: BorderRadius.circular(16),
             ),
           ),

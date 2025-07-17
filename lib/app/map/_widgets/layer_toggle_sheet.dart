@@ -1,23 +1,26 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/sheet_container.dart';
 import 'package:dpip/widgets/ui/labeled_divider.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class LayerToggleSheet extends StatefulWidget {
   final Set<MapLayer> activeLayers;
   final BaseMapType currentBaseMap;
-  final void Function(MapLayer layer) onLayerToggled;
+  final void Function(MapLayer layer, bool state, Set<MapLayer> activeLayers) onLayerChanged;
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
   const LayerToggleSheet({
     super.key,
     required this.activeLayers,
     required this.currentBaseMap,
-    required this.onLayerToggled,
+    required this.onLayerChanged,
     required this.onBaseMapChanged,
   });
 
@@ -29,97 +32,60 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
   late Set<MapLayer> _activeLayers = Set.from(widget.activeLayers);
   late BaseMapType _currentBaseMap = widget.currentBaseMap;
 
-  static const Set<MapLayer> _earthquakeLayers = {MapLayer.monitor, MapLayer.report, MapLayer.tsunami};
-
-  static const Set<MapLayer> _weatherLayers = {
-    MapLayer.radar,
-    MapLayer.temperature,
-    MapLayer.precipitation,
-    MapLayer.wind,
-  };
-
-  static const Map<MapLayer, Set<MapLayer>> _allowedRadarCombinations = {
-    MapLayer.temperature: {MapLayer.radar, MapLayer.temperature},
-    MapLayer.precipitation: {MapLayer.radar, MapLayer.precipitation},
-    MapLayer.wind: {MapLayer.radar, MapLayer.wind},
-  };
-
   @override
   void didUpdateWidget(LayerToggleSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.activeLayers != widget.activeLayers) {
-      setState(() {
-        _activeLayers = Set.from(widget.activeLayers);
-      });
+
+    if (!setEquals(oldWidget.activeLayers, widget.activeLayers)) {
+      _activeLayers = widget.activeLayers;
     }
+
     if (oldWidget.currentBaseMap != widget.currentBaseMap) {
-      setState(() {
-        _currentBaseMap = widget.currentBaseMap;
-      });
+      _currentBaseMap = widget.currentBaseMap;
     }
   }
 
-  bool _isAllowedCombination(Set<MapLayer> layers) {
-    final earthquakeCount = layers.where((l) => _earthquakeLayers.contains(l)).length;
-    if (earthquakeCount > 1) return false;
+  void _toggleLayer(MapLayer layer, bool show) {
+    Set<MapLayer> newLayers = Set.from(_activeLayers);
 
-    final weatherLayers = layers.where((l) => _weatherLayers.contains(l)).toSet();
-    if (weatherLayers.isEmpty) return true;
+    $layerOperation:
+    {
+      final isEarthquakeLayer = kEarthquakeLayers.contains(layer);
+      final isWeatherLayer = kWeatherLayers.contains(layer);
 
-    if (weatherLayers.length == 1) return true;
+      if (show) {
+        if (isEarthquakeLayer) {
+          newLayers = {layer};
 
-    if (weatherLayers.length == 2) {
-      if (weatherLayers.contains(MapLayer.radar)) {
-        final otherLayer = weatherLayers.where((l) => l != MapLayer.radar).first;
-        return _allowedRadarCombinations.containsKey(otherLayer);
-      }
-    }
-
-    return false;
-  }
-
-  void _toggleLayer(MapLayer layer, bool checked) {
-    if (!checked && layer == MapLayer.monitor && _activeLayers.length == 1) {
-      return;
-    }
-
-    widget.onLayerToggled(layer);
-    setState(() {
-      if (checked) {
-        final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
-
-        if (_earthquakeLayers.contains(layer)) {
-          _activeLayers.removeAll(_earthquakeLayers);
-          _activeLayers.removeAll(_weatherLayers);
-        } else if (_weatherLayers.contains(layer)) {
-          final weatherLayersInNew = newLayers.where((l) => _weatherLayers.contains(l)).toSet();
-          if (!_isAllowedCombination(weatherLayersInNew)) {
-            if (weatherLayersInNew.contains(MapLayer.radar)) {
-              final nonRadarWeatherLayers = _weatherLayers.where((l) => l != MapLayer.radar).toSet();
-              _activeLayers.removeAll(nonRadarWeatherLayers);
-            } else {
-              _activeLayers.removeAll(_weatherLayers);
-            }
-          }
-          _activeLayers.removeAll(_earthquakeLayers);
+          break $layerOperation;
         }
-        _activeLayers.add(layer);
+
+        if (isWeatherLayer) {
+          final combination = kAllowedLayerCombinations[layer];
+          if (combination != null) {
+            newLayers.removeWhere((l) => !combination.contains(l));
+          }
+
+          newLayers.add(layer);
+
+          break $layerOperation;
+        }
+
+        newLayers.add(layer);
       } else {
-        _activeLayers.remove(layer);
-
-        if (_weatherLayers.contains(layer)) {
-          final hasOtherWeatherLayers = _activeLayers.any((l) => _weatherLayers.contains(l));
-          if (!hasOtherWeatherLayers) {
-            _activeLayers.add(MapLayer.monitor);
-          }
-        } else if (_earthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
-          _activeLayers.add(MapLayer.monitor);
-        }
+        newLayers.remove(layer);
       }
-    });
+    }
+
+    if (setEquals(_activeLayers, newLayers)) return;
+
+    final hasLayerChanged = newLayers.contains(layer) != _activeLayers.contains(layer);
+    if (hasLayerChanged) widget.onLayerChanged(layer, show, newLayers);
+
+    setState(() => _activeLayers = newLayers);
   }
 
-  void _changeBaseMap(BaseMapType baseMap) {
+  void _setBaseMap(BaseMapType baseMap) {
     setState(() => _currentBaseMap = baseMap);
     widget.onBaseMapChanged(baseMap);
   }
@@ -143,17 +109,17 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
               LayerToggle(
                 label: '線條'.i18n,
                 checked: _currentBaseMap == BaseMapType.exptech,
-                onChanged: (checked) => _changeBaseMap(BaseMapType.exptech),
+                onChanged: (_) => _setBaseMap(BaseMapType.exptech),
               ),
               LayerToggle(
                 label: 'OpenStreetMap',
                 checked: _currentBaseMap == BaseMapType.osm,
-                onChanged: (checked) => _changeBaseMap(BaseMapType.osm),
+                onChanged: (_) => _setBaseMap(BaseMapType.osm),
               ),
               LayerToggle(
                 label: 'Google',
                 checked: _currentBaseMap == BaseMapType.google,
-                onChanged: (checked) => _changeBaseMap(BaseMapType.google),
+                onChanged: (_) => _setBaseMap(BaseMapType.google),
               ),
             ],
           ),
@@ -175,7 +141,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
               LayerToggle(
                 label: '海嘯資訊'.i18n,
                 checked: _activeLayers.contains(MapLayer.tsunami),
-                onChanged: null, //(checked) => _toggleLayer(MapLayer.tsunami, checked),
+                onChanged: null, // (checked) => _toggleLayer(MapLayer.tsunami, checked),
               ),
             ],
           ),
