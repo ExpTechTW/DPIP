@@ -28,7 +28,7 @@ msgstr "Ngôn ngữ"
 msgid "單位"
 msgstr ""
 
-#: lib/app/settings/map/page.dart:23
+#: lib/app/settings/map/page.dart:24
 msgid "地圖"
 msgstr "Bản đồ"
 
@@ -44,7 +44,7 @@ msgstr "Cảnh báo động đất sớm"
 msgid "強震監視器"
 msgstr "giám sát động đất"
 
-#: lib/app/map/_lib/managers/report.dart:800
+#: lib/app/map/_lib/managers/report.dart:814
 msgid "地震報告"
 msgstr "Báo cáo động đất"
 
@@ -52,7 +52,7 @@ msgstr "Báo cáo động đất"
 msgid "震度速報"
 msgstr "Cảnh báo nhanh về cường độ địa chấn"
 
-#: lib/app/home/_widgets/thunderstorm_card.dart:57
+#: lib/app/home/_widgets/thunderstorm_card.dart:59
 msgid "雷雨即時訊息"
 msgstr "Thông báo giông sét"
 
@@ -149,14 +149,6 @@ msgstr ""
 #: lib/app/settings/notify/page.dart:266
 msgid "其他"
 msgstr "Khác"
-
-#: lib/app/settings/page.dart:162
-msgid "除錯"
-msgstr "Gỡ lỗi"
-
-#: lib/app/settings/notify/page.dart:290
-msgid "同步通知設定"
-msgstr ""
 
 #: lib/app/settings/notify/(3.weather)/advisory/page.dart:34
 msgid "重大"
@@ -352,63 +344,75 @@ msgstr "Hỗ trợ biên dịch"
 msgid "點擊這裡來幫助我們改進 DPIP 的翻譯"
 msgstr "Nhấp vào đây để giúp chúng tôi cải thiện bản dịch DPIP"
 
-#: lib/app/settings/locale/select/page.dart:44
+#: lib/app/settings/locale/select/page.dart:46
 msgid "選擇語言"
 msgstr "Chọn ngôn ngữ"
 
-#: lib/app/settings/locale/select/page.dart:62
+#: lib/app/settings/locale/select/page.dart:67
 msgid "已翻譯 {translated}・已校對 {approved}"
 msgstr "Đã dịch {translated}・Đã hiệu đính {approved}"
 
-#: lib/app/settings/locale/select/page.dart:90
+#: lib/app/settings/locale/select/page.dart:95
 msgid "來源語言"
 msgstr "Ngôn ngữ nguồn"
 
-#: lib/app/settings/donate/page.dart:37
+#: lib/app/settings/donate/page.dart:38
 msgid "無法連線至商店，請稍後再試"
 msgstr "Không thể tải nhật ký thay đổi, vui lòng thử lại sau."
 
-#: lib/app/settings/donate/page.dart:43
+#: lib/app/settings/donate/page.dart:44
 msgid "找不到商品，請稍候再試"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:104
+#: lib/app/settings/donate/page.dart:105
 msgid "重新載入"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:114
+#: lib/app/settings/donate/page.dart:115
 msgid "正在載入商店物品中"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:130
+#: lib/app/settings/donate/page.dart:132
+msgid ""
+"DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維"
+"持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與"
+"維護的成本。\n"
+"\n"
+"您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地"
+"為您提供服務。感謝您的理解與慷慨！"
+msgstr ""
+
+#: lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:139
+#: lib/app/settings/donate/page.dart:150
 msgid "{price}/月"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:151
+#: lib/app/settings/donate/page.dart:162
 msgid "單次支援"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:171
-msgid ""
-"感謝您的支持！❤️\n"
-"您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。"
-msgstr ""
-
-#: lib/app/settings/donate/page.dart:185
+#: lib/app/settings/donate/page.dart:197
 #, fuzzy
 msgid "無法連線至 {store}，請稍後再試。"
 msgstr "Không thể tải nhật ký thay đổi, vui lòng thử lại sau."
 
-#: lib/app/settings/donate/page.dart:190
+#: lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
 msgstr ""
 
-#: lib/app/settings/donate/page.dart:193
+#: lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
+msgstr ""
+
+#: lib/app/settings/donate/page.dart:216
+msgid "使用條款"
+msgstr ""
+
+#: lib/app/settings/donate/page.dart:223
+msgid "隱私權政策"
 msgstr ""
 
 #: lib/app/welcome/4-permissions/page.dart:163
@@ -472,6 +476,10 @@ msgstr "Giấy phép gói phần mềm của bên thứ ba"
 #: lib/app/settings/page.dart:120
 msgid "DPIP 的實現歸功於開放源始碼"
 msgstr ""
+
+#: lib/app/settings/page.dart:162
+msgid "除錯"
+msgstr "Gỡ lỗi"
 
 #: lib/app/settings/page.dart:166
 msgid "應用程式版本"
@@ -538,8 +546,16 @@ msgstr ""
 msgid "底圖"
 msgstr ""
 
-#: lib/app/settings/map/page.dart:41
+#: lib/app/settings/map/page.dart:49
 msgid "初始圖層"
+msgstr ""
+
+#: lib/app/settings/map/page.dart:71
+msgid "動畫幀率"
+msgstr ""
+
+#: lib/app/settings/map/page.dart:99
+msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr ""
 
 #: lib/app/settings/theme/page.dart:30
@@ -578,7 +594,7 @@ msgstr "Hủy bỏ"
 msgid "確定"
 msgstr "Xác nhận"
 
-#: lib/app/home/_widgets/thunderstorm_card.dart:74
+#: lib/app/home/_widgets/thunderstorm_card.dart:76
 msgid ""
 "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
 msgstr ""
@@ -591,7 +607,7 @@ msgstr ""
 "Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm khác nhau trên khắp Đài "
 "Loan."
 
-#: lib/app/map/_lib/managers/radar.dart:467
+#: lib/app/map/_lib/managers/radar.dart:499
 msgid "雷達回波"
 msgstr "Hình ảnh radar"
 
@@ -629,7 +645,7 @@ msgstr ""
 msgid "抵達"
 msgstr ""
 
-#: lib/app/home/page.dart:53
+#: lib/app/home/page.dart:55
 msgid "已更新至 {version}"
 msgstr ""
 
@@ -779,7 +795,7 @@ msgid "地圖圖層"
 msgstr ""
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:132
-msgid "地震類與氣象類圖層互斥"
+msgid "選擇要顯示的地圖圖層"
 msgstr ""
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:144
@@ -802,8 +818,20 @@ msgstr "Lượng mưa"
 msgid "風向/風速"
 msgstr "Hướng gió/Tốc độ gió"
 
-#: lib/app/map/_lib/managers/radar.dart:630
+#: lib/app/map/_lib/managers/radar.dart:613
 msgid "長按設定播放起點"
+msgstr ""
+
+#: lib/app/map/_lib/managers/radar.dart:627
+msgid "目前時間"
+msgstr ""
+
+#: lib/app/map/_lib/managers/radar.dart:632
+msgid "播放起點"
+msgstr ""
+
+#: lib/app/map/_lib/managers/radar.dart:906
+msgid "播放進度"
 msgstr ""
 
 #: lib/app/map/_lib/managers/precipitation.dart:305
@@ -858,59 +886,59 @@ msgstr ""
 msgid "已抵達"
 msgstr ""
 
-#: lib/app/map/_lib/managers/report.dart:357
+#: lib/app/map/_lib/managers/report.dart:371
 msgid "近期的地震報告"
 msgstr ""
 
-#: lib/app/map/_lib/managers/report.dart:362
+#: lib/app/map/_lib/managers/report.dart:376
 msgid "更多"
 msgstr "Thêm"
 
-#: lib/app/map/_lib/managers/report.dart:578
+#: lib/app/map/_lib/managers/report.dart:592
 msgid "編號 {number} 顯著有感地震"
 msgstr ""
 
-#: lib/app/map/_lib/managers/report.dart:579
+#: lib/app/map/_lib/managers/report.dart:593
 msgid "小區域有感地震"
 msgstr "Động đất nhẹ, cảm nhận được ở khu vực nhỏ"
 
-#: lib/app/map/_lib/managers/report.dart:638
+#: lib/app/map/_lib/managers/report.dart:652
 msgid "地震規模"
 msgstr "Cường độ"
 
-#: lib/app/map/_lib/managers/report.dart:660
+#: lib/app/map/_lib/managers/report.dart:674
 msgid "震源深度"
 msgstr "Độ sâu chấn tiêu"
 
-#: lib/app/map/_lib/managers/report.dart:597
+#: lib/app/map/_lib/managers/report.dart:611
 msgid "報告頁面"
 msgstr "Trang báo cáo"
 
-#: lib/app/map/_lib/managers/report.dart:621
+#: lib/app/map/_lib/managers/report.dart:635
 msgid "發震時間"
 msgstr "Ngày giờ nhận biết động đất"
 
-#: lib/app/map/_lib/managers/report.dart:628
+#: lib/app/map/_lib/managers/report.dart:642
 msgid "位於"
 msgstr "nằm ở"
 
-#: lib/app/map/_lib/managers/report.dart:684
+#: lib/app/map/_lib/managers/report.dart:698
 msgid "各地震度"
 msgstr "Cường độ địa chấn tại các khu vực"
 
-#: lib/app/map/_lib/managers/report.dart:755
+#: lib/app/map/_lib/managers/report.dart:769
 msgid "地震報告圖"
 msgstr "Bản đồ báo cáo động đất"
 
-#: lib/app/map/_lib/managers/report.dart:765
+#: lib/app/map/_lib/managers/report.dart:779
 msgid "震度圖"
 msgstr "Bản đồ cường độ địa chấn"
 
-#: lib/app/map/_lib/managers/report.dart:775
+#: lib/app/map/_lib/managers/report.dart:789
 msgid "最大地動加速度圖"
 msgstr "Bản đồ gia tốc mặt đất tối đa"
 
-#: lib/app/map/_lib/managers/report.dart:785
+#: lib/app/map/_lib/managers/report.dart:799
 msgid "最大地動速度圖"
 msgstr "Bản đồ vận tốc mặt đất tối đa"
 

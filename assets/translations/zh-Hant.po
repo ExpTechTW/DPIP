@@ -20,6 +20,7 @@ msgstr "所在地"
 msgid "主題"
 msgstr "主題"
 
+#: lib/app/settings/page.dart:60
 msgid "語言"
 msgstr "語言"
 
@@ -27,7 +28,7 @@ msgstr "語言"
 msgid "單位"
 msgstr "單位"
 
-#: lib/app/settings/map/page.dart:23
+#: lib/app/settings/map/page.dart:24
 msgid "地圖"
 msgstr "地圖"
 
@@ -43,7 +44,7 @@ msgstr "緊急地震速報"
 msgid "強震監視器"
 msgstr "強震監視器"
 
-#: lib/app/map/_lib/managers/report.dart:800
+#: lib/app/map/_lib/managers/report.dart:814
 msgid "地震報告"
 msgstr "地震報告"
 
@@ -51,7 +52,7 @@ msgstr "地震報告"
 msgid "震度速報"
 msgstr "震度速報"
 
-#: lib/app/home/_widgets/thunderstorm_card.dart:57
+#: lib/app/home/_widgets/thunderstorm_card.dart:59
 msgid "雷雨即時訊息"
 msgstr "雷雨即時訊息"
 
@@ -150,15 +151,6 @@ msgstr "海嘯"
 #: lib/app/settings/notify/page.dart:266
 msgid "其他"
 msgstr "其他"
-
-#: lib/app/settings/page.dart:162
-msgid "除錯"
-msgstr "除錯"
-
-#: lib/app/settings/notify/page.dart:290
-#, fuzzy
-msgid "同步通知設定"
-msgstr "同步通知設定"
 
 #: lib/app/settings/notify/(3.weather)/advisory/page.dart:34
 msgid "重大"
@@ -356,66 +348,82 @@ msgstr "協助翻譯"
 msgid "點擊這裡來幫助我們改進 DPIP 的翻譯"
 msgstr "點擊這裡來幫助我們改進 DPIP 的翻譯"
 
-#: lib/app/settings/locale/select/page.dart:44
+#: lib/app/settings/locale/select/page.dart:46
 msgid "選擇語言"
 msgstr "選擇語言"
 
-#: lib/app/settings/locale/select/page.dart:62
+#: lib/app/settings/locale/select/page.dart:67
 msgid "已翻譯 {translated}・已校對 {approved}"
 msgstr "已翻譯 {translated}・已校對 {approved}"
 
-#: lib/app/settings/locale/select/page.dart:90
+#: lib/app/settings/locale/select/page.dart:95
 msgid "來源語言"
 msgstr "來源語言"
 
-#: lib/app/settings/donate/page.dart:37
+#: lib/app/settings/donate/page.dart:38
 msgid "無法連線至商店，請稍後再試"
 msgstr "無法連線至商店，請稍後再試"
 
-#: lib/app/settings/donate/page.dart:43
+#: lib/app/settings/donate/page.dart:44
 msgid "找不到商品，請稍候再試"
 msgstr "找不到商品，請稍候再試"
 
-#: lib/app/settings/donate/page.dart:104
+#: lib/app/settings/donate/page.dart:105
 msgid "重新載入"
 msgstr "重新載入"
 
-#: lib/app/settings/donate/page.dart:114
+#: lib/app/settings/donate/page.dart:115
 msgid "正在載入商店物品中"
 msgstr "正在載入商店物品中"
 
-#: lib/app/settings/donate/page.dart:130
+#: lib/app/settings/donate/page.dart:132
+msgid ""
+"DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維"
+"持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與"
+"維護的成本。\n"
+"\n"
+"您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地"
+"為您提供服務。感謝您的理解與慷慨！"
+msgstr ""
+"DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維"
+"持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與"
+"維護的成本。\n"
+"\n"
+"您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地"
+"為您提供服務。感謝您的理解與慷慨！"
+
+#: lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
 msgstr "訂閱制"
 
-#: lib/app/settings/donate/page.dart:139
+#: lib/app/settings/donate/page.dart:150
 msgid "{price}/月"
 msgstr "{price}/月"
 
-#: lib/app/settings/donate/page.dart:151
+#: lib/app/settings/donate/page.dart:162
 msgid "單次支援"
 msgstr "單次支援"
 
-#: lib/app/settings/donate/page.dart:171
-msgid ""
-"感謝您的支持！❤️\n"
-"您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。"
-msgstr ""
-"感謝您的支持！❤️\n"
-"您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。"
-
-#: lib/app/settings/donate/page.dart:185
+#: lib/app/settings/donate/page.dart:197
 #, fuzzy
 msgid "無法連線至 {store}，請稍後再試。"
 msgstr "無法連線至 {store}，請稍後再試。"
 
-#: lib/app/settings/donate/page.dart:190
+#: lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
 msgstr "正在恢復您購買的訂閱"
 
-#: lib/app/settings/donate/page.dart:193
+#: lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
 msgstr "恢復購買"
+
+#: lib/app/settings/donate/page.dart:216
+msgid "使用條款"
+msgstr "使用條款"
+
+#: lib/app/settings/donate/page.dart:223
+msgid "隱私權政策"
+msgstr "隱私權政策"
 
 #: lib/app/welcome/4-permissions/page.dart:163
 msgid "位置"
@@ -476,6 +484,10 @@ msgstr "第三方套件授權"
 #: lib/app/settings/page.dart:120
 msgid "DPIP 的實現歸功於開放源始碼"
 msgstr "DPIP 的實現歸功於開放源始碼"
+
+#: lib/app/settings/page.dart:162
+msgid "除錯"
+msgstr "除錯"
 
 #: lib/app/settings/page.dart:166
 msgid "應用程式版本"
@@ -539,9 +551,17 @@ msgstr "目前所在地"
 msgid "底圖"
 msgstr "底圖"
 
-#: lib/app/settings/map/page.dart:41
+#: lib/app/settings/map/page.dart:49
 msgid "初始圖層"
 msgstr "初始圖層"
+
+#: lib/app/settings/map/page.dart:71
+msgid "動畫幀率"
+msgstr "動畫幀率"
+
+#: lib/app/settings/map/page.dart:99
+msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
+msgstr "過高的動畫幀率可能會造成卡頓或設備發熱"
 
 #: lib/app/settings/theme/page.dart:30
 msgid "主題模式"
@@ -579,7 +599,7 @@ msgstr "取消"
 msgid "確定"
 msgstr "確定"
 
-#: lib/app/home/_widgets/thunderstorm_card.dart:74
+#: lib/app/home/_widgets/thunderstorm_card.dart:76
 msgid ""
 "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
 msgstr ""
@@ -589,7 +609,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "服務區域外，僅在臺灣各地可用"
 
-#: lib/app/map/_lib/managers/radar.dart:467
+#: lib/app/map/_lib/managers/radar.dart:499
 msgid "雷達回波"
 msgstr "雷達回波"
 
@@ -629,7 +649,7 @@ msgstr " 秒"
 msgid "抵達"
 msgstr "抵達"
 
-#: lib/app/home/page.dart:53
+#: lib/app/home/page.dart:55
 msgid "已更新至 {version}"
 msgstr "已更新至 {version}"
 
@@ -758,8 +778,8 @@ msgid "地圖圖層"
 msgstr "地圖圖層"
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:132
-msgid "地震類與氣象類圖層互斥"
-msgstr "地震類與氣象類圖層互斥"
+msgid "選擇要顯示的地圖圖層"
+msgstr "選擇要顯示的地圖圖層"
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "線條"
@@ -781,9 +801,22 @@ msgstr "降水"
 msgid "風向/風速"
 msgstr "風向/風速"
 
-#: lib/app/map/_lib/managers/radar.dart:630
+#: lib/app/map/_lib/managers/radar.dart:613
 msgid "長按設定播放起點"
 msgstr "長按設定播放起點"
+
+#: lib/app/map/_lib/managers/radar.dart:627
+msgid "目前時間"
+msgstr "目前時間"
+
+#: lib/app/map/_lib/managers/radar.dart:632
+#, fuzzy
+msgid "播放起點"
+msgstr "播放起點"
+
+#: lib/app/map/_lib/managers/radar.dart:906
+msgid "播放進度"
+msgstr "播放進度"
 
 #: lib/app/map/_lib/managers/precipitation.dart:305
 msgid "今日"
@@ -837,59 +870,59 @@ msgstr "{countdown}秒後抵達"
 msgid "已抵達"
 msgstr "已抵達"
 
-#: lib/app/map/_lib/managers/report.dart:357
+#: lib/app/map/_lib/managers/report.dart:371
 msgid "近期的地震報告"
 msgstr "近期的地震報告"
 
-#: lib/app/map/_lib/managers/report.dart:362
+#: lib/app/map/_lib/managers/report.dart:376
 msgid "更多"
 msgstr "更多"
 
-#: lib/app/map/_lib/managers/report.dart:578
+#: lib/app/map/_lib/managers/report.dart:592
 msgid "編號 {number} 顯著有感地震"
 msgstr "編號 {number} 顯著有感地震"
 
-#: lib/app/map/_lib/managers/report.dart:579
+#: lib/app/map/_lib/managers/report.dart:593
 msgid "小區域有感地震"
 msgstr "小區域有感地震"
 
-#: lib/app/map/_lib/managers/report.dart:638
+#: lib/app/map/_lib/managers/report.dart:652
 msgid "地震規模"
 msgstr "地震規模"
 
-#: lib/app/map/_lib/managers/report.dart:660
+#: lib/app/map/_lib/managers/report.dart:674
 msgid "震源深度"
 msgstr "震源深度"
 
-#: lib/app/map/_lib/managers/report.dart:597
+#: lib/app/map/_lib/managers/report.dart:611
 msgid "報告頁面"
 msgstr "報告頁面"
 
-#: lib/app/map/_lib/managers/report.dart:621
+#: lib/app/map/_lib/managers/report.dart:635
 msgid "發震時間"
 msgstr "發震時間"
 
-#: lib/app/map/_lib/managers/report.dart:628
+#: lib/app/map/_lib/managers/report.dart:642
 msgid "位於"
 msgstr "位於"
 
-#: lib/app/map/_lib/managers/report.dart:684
+#: lib/app/map/_lib/managers/report.dart:698
 msgid "各地震度"
 msgstr "各地震度"
 
-#: lib/app/map/_lib/managers/report.dart:755
+#: lib/app/map/_lib/managers/report.dart:769
 msgid "地震報告圖"
 msgstr "地震報告圖"
 
-#: lib/app/map/_lib/managers/report.dart:765
+#: lib/app/map/_lib/managers/report.dart:779
 msgid "震度圖"
 msgstr "震度圖"
 
-#: lib/app/map/_lib/managers/report.dart:775
+#: lib/app/map/_lib/managers/report.dart:789
 msgid "最大地動加速度圖"
 msgstr "最大地動加速度圖"
 
-#: lib/app/map/_lib/managers/report.dart:785
+#: lib/app/map/_lib/managers/report.dart:799
 msgid "最大地動速度圖"
 msgstr "最大地動速度圖"
 
@@ -1238,5 +1271,18 @@ msgstr "陰大雷雨"
 msgid "陰大雷雹"
 msgstr "陰大雷雹"
 
-#~ msgid "選擇要顯示的地圖圖層"
-#~ msgstr "選擇要顯示的地圖圖層"
+#, fuzzy
+#~ msgid "同步通知設定"
+#~ msgstr "同步通知設定"
+
+#~ msgid ""
+#~ "感謝您的支持！❤️\n"
+#~ "您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯"
+#~ "繫。"
+#~ msgstr ""
+#~ "感謝您的支持！❤️\n"
+#~ "您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯"
+#~ "繫。"
+
+#~ msgid "地震類與氣象類圖層互斥"
+#~ msgstr "地震類與氣象類圖層互斥"
