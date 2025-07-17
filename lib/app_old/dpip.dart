@@ -1,13 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-
-import 'package:in_app_update/in_app_update.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/app_old/page/history/history.dart';
-import 'package:dpip/app_old/page/home/home.dart';
 import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
@@ -19,6 +12,9 @@ import 'package:dpip/dialog/welcome/changelog.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:flutter/material.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class Dpip extends StatefulWidget {
   const Dpip({super.key});
@@ -181,31 +177,19 @@ class _DpipState extends State<Dpip> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentActivePage,
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Symbols.home),
-            selectedIcon: Icon(Symbols.home, fill: 1),
-            label: '首頁',
-          ),
+          NavigationDestination(icon: Icon(Symbols.home), selectedIcon: Icon(Symbols.home, fill: 1), label: '首頁'),
           NavigationDestination(
             icon: Icon(Symbols.clock_loader_10_rounded),
             selectedIcon: Icon(Symbols.clock_loader_10_rounded, fill: 1),
             label: '歷史',
           ),
-          NavigationDestination(
-            icon: Icon(Symbols.map),
-            selectedIcon: Icon(Symbols.map, fill: 1),
-            label: '地圖',
-          ),
+          NavigationDestination(icon: Icon(Symbols.map), selectedIcon: Icon(Symbols.map, fill: 1), label: '地圖'),
           NavigationDestination(
             icon: Icon(Symbols.note_stack_add_rounded),
             selectedIcon: Icon(Symbols.note_stack_add_rounded, fill: 1),
             label: '更多',
           ),
-          NavigationDestination(
-            icon: Icon(Symbols.person),
-            selectedIcon: Icon(Symbols.person, fill: 1),
-            label: '我',
-          ),
+          NavigationDestination(icon: Icon(Symbols.person), selectedIcon: Icon(Symbols.person, fill: 1), label: '我'),
         ],
         onDestinationSelected: (value) {
           setState(() {
@@ -217,7 +201,7 @@ class _DpipState extends State<Dpip> {
       body: PageView(
         controller: controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [HomePage(), HistoryPage(), MapPage(), MorePage(), MePage()],
+        children: const [MapPage(), MorePage(), MePage()],
       ),
     );
   }

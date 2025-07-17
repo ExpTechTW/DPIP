@@ -1,16 +1,14 @@
-import 'package:json_annotation/json_annotation.dart';
-
 import 'package:dpip/api/model/eew_info.dart';
 import 'package:dpip/utils/parser.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 part 'eew.g.dart';
 
 @JsonSerializable()
 class Eew {
-  final String type = 'eew';
-
   /// 地震速報來源機關
-  final String author;
+  @JsonKey(name: 'author')
+  final String agency;
 
   /// 地震速報 ID
   final String id;
@@ -26,15 +24,16 @@ class Eew {
   final bool isFinal;
 
   /// 地震速報參數
-  final EewInfo eq;
+  @JsonKey(name: 'eq')
+  final EewInfo info;
 
   const Eew({
-    required this.author,
+    required this.agency,
     required this.id,
     required this.serial,
     required this.status,
     required this.isFinal,
-    required this.eq,
+    required this.info,
   });
 
   factory Eew.fromJson(Map<String, dynamic> json) => _$EewFromJson(json);

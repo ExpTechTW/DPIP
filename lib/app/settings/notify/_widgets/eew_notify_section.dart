@@ -1,12 +1,10 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/app/settings/notify/_lib/utils.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class EewNotifySection extends StatefulWidget {
   final EewNotifyType value;

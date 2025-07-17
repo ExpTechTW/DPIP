@@ -37,12 +37,14 @@ import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
 
 class ReportMapLayerManager extends MapLayerManager {
-  ReportMapLayerManager(super.context, super.controller);
+  String? initialReportId;
+
+  ReportMapLayerManager(super.context, super.controller, {this.initialReportId});
 
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
 
-  Future<void> _setReport(PartialEarthquakeReport? report, {bool focus = true}) async {
+  Future<void> setReport(String? reportId, {bool focus = true}) async {
     if (isLoading.value) return;
 
     isLoading.value = true;
@@ -50,15 +52,20 @@ class ReportMapLayerManager extends MapLayerManager {
     try {
       await _removeReport(currentReport.value, focus: focus);
 
+      PartialEarthquakeReport? report;
+      if (reportId != null) {
+        report = GlobalProviders.data.partialReport.firstWhereOrNull((r) => r.id == reportId);
+      }
+
       currentReport.value = report;
 
       if (report != null) {
         await _addReport(currentReport.value, focus: focus);
       }
 
-      TalkerManager.instance.info('Updated report to "${report?.id}"');
+      TalkerManager.instance.info('Updated report to "$reportId"');
     } catch (e, s) {
-      TalkerManager.instance.error('Failed to update report', e, s);
+      TalkerManager.instance.error('ReportMapLayerManager.setReport', e, s);
     } finally {
       isLoading.value = false;
     }
@@ -94,10 +101,10 @@ class ReportMapLayerManager extends MapLayerManager {
 
     try {
       if (GlobalProviders.data.partialReport.isEmpty) {
-        final radarList = await ExpTech().getReportList();
+        final reportList = await ExpTech().getReportList();
         if (!context.mounted) return;
 
-        GlobalProviders.data.setPartialReport(radarList);
+        GlobalProviders.data.setPartialReport(reportList);
       }
 
       final sourceId = MapSourceIds.report();
@@ -146,7 +153,7 @@ class ReportMapLayerManager extends MapLayerManager {
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
           symbolZOrder: 'source',
-          visibility: visible ? 'visible' : 'none',
+          visibility: visible && initialReportId == null ? 'visible' : 'none',
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
@@ -165,7 +172,7 @@ class ReportMapLayerManager extends MapLayerManager {
     if (!visible) return;
 
     if (currentReport.value != null) {
-      await _setReport(null, focus: false);
+      await setReport(null, focus: false);
     }
 
     final layerId = MapLayerIds.report();
@@ -187,10 +194,15 @@ class ReportMapLayerManager extends MapLayerManager {
     final layerId = MapLayerIds.report();
 
     try {
-      await controller.setLayerVisibility(layerId, true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
+      if (initialReportId != null) {
+        await setReport(initialReportId);
+        initialReportId = null;
+      } else {
+        await controller.setLayerVisibility(layerId, true);
+        TalkerManager.instance.info('Showing Layer "$layerId"');
 
-      await _focus();
+        await _focus();
+      }
 
       visible = true;
     } catch (e, s) {
@@ -220,7 +232,7 @@ class ReportMapLayerManager extends MapLayerManager {
   void onPopInvoked() {
     if (currentReport.value == null) return;
 
-    _setReport(null);
+    setReport(null);
   }
 
   Future<void> _addReport(PartialEarthquakeReport? partial, {bool focus = true}) async {
@@ -263,7 +275,7 @@ class ReportMapLayerManager extends MapLayerManager {
           symbolZOrder: 'source',
         );
 
-        await controller.addLayer(sourceId, layerId, properties);
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
@@ -544,7 +556,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   style: context.textTheme.labelLarge,
                                 ),
                                 onTap: () {
-                                  widget.manager._setReport(report);
+                                  widget.manager.setReport(report.id);
                                   sheetController.collapse();
                                 },
                               ),
@@ -802,7 +814,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                   title: Text('地震報告'.i18n),
                   leading: BackButton(
                     onPressed: () {
-                      widget.manager._setReport(null);
+                      widget.manager.setReport(null);
                       controller.animateTo(0, duration: Durations.short4, curve: Easing.emphasizedDecelerate);
                     },
                   ),

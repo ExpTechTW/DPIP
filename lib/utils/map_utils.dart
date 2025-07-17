@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import 'package:maplibre_gl/maplibre_gl.dart';
-
+import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 List<double> expandBounds(List<double> bounds, LatLng point) {
   // [南西,北東]
@@ -160,4 +161,26 @@ GeoJsonFeatureBuilder circleFeature({
   coordinates.add(coordinates[0]);
 
   return polygon.setGeometry(coordinates);
+}
+
+bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, List box) {
+  bool passed = false;
+
+  for (final eew in eewLastInfo.keys) {
+    int skip = 0;
+    for (int i = 0; i < 4; i++) {
+      final dist = LatLng(
+        eewLastInfo[eew]!.info.latitude,
+        eewLastInfo[eew]!.info.longitude,
+      ).to(LatLng(box[i][1], box[i][0]));
+
+      if (eewDist[eew]! > dist) skip++;
+    }
+    if (skip >= 4) {
+      passed = true;
+      break;
+    }
+  }
+
+  return passed;
 }

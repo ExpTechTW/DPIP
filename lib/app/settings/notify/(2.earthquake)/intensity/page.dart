@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/settings/notify/_widgets/earthquake_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyIntensityPage extends StatelessWidget {
   const SettingsNotifyIntensityPage({super.key});
@@ -32,11 +30,11 @@ class SettingsNotifyIntensityPage extends StatelessWidget {
         ListSection(
           title: '音效測試'.i18n,
           children: [
-            SoundListTile(title: '震度速報(一般)'.i18n, subtitle: Text('所在地(鄉鎮)實測震度 3 以上'.i18n), type: 'int_report-general'),
+            SoundListTile(title: '震度速報(一般)'.i18n, subtitle: Text('所在地(鄉鎮)實測震度 3 以上'.i18n), type: 'int_report-general-v2'),
             SoundListTile(
               title: '震度速報(無聲通知)'.i18n,
               subtitle: Text('所在地(鄉鎮)實測震度 1 以上'.i18n),
-              type: 'int_report-silence',
+              type: 'int_report-silence-v2',
             ),
           ],
         ),

@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:intl/intl.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
 import 'package:dpip/utils/parser.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 enum MergeType { none, county, town }
 
@@ -102,21 +100,10 @@ class _RankingWindTabState extends State<RankingWindTab> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Text('依')),
-                  ChoiceChip(
-                    label: const Text('降冪'),
-                    selected: !reversed,
-                    onSelected: (value) => setReversed(false),
-                  ),
-                  ChoiceChip(
-                    label: const Text('升冪'),
-                    selected: reversed,
-                    onSelected: (value) => setReversed(true),
-                  ),
+                  ChoiceChip(label: const Text('降冪'), selected: !reversed, onSelected: (value) => setReversed(false)),
+                  ChoiceChip(label: const Text('升冪'), selected: reversed, onSelected: (value) => setReversed(true)),
                   const SizedBox(height: kToolbarHeight - 16, child: VerticalDivider()),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Text('合併至'),
-                  ),
+                  const Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Text('合併至')),
                   ChoiceChip(
                     label: const Text('鄉鎮'),
                     selected: merge == MergeType.town,
@@ -133,9 +120,7 @@ class _RankingWindTabState extends State<RankingWindTab> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text('資料時間：$time\n共 ${ranked.length} 觀測點',
-              style: TextStyle(color: context.colors.onSurfaceVariant),
-            ),
+            child: Text('資料時間：$time\n共 ${ranked.length} 觀測點', style: TextStyle(color: context.colors.onSurfaceVariant)),
           ),
           Expanded(
             child: ListView.builder(

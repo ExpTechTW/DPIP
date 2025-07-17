@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/settings/notify/_widgets/earthquake_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyMonitorPage extends StatelessWidget {
   const SettingsNotifyMonitorPage({super.key});
@@ -31,7 +29,7 @@ class SettingsNotifyMonitorPage extends StatelessWidget {
         ),
         ListSection(
           title: '音效測試'.i18n,
-          children: [SoundListTile(title: '強震監視器(一般)'.i18n, subtitle: Text('偵測到晃動'.i18n), type: 'eq')],
+          children: [SoundListTile(title: '強震監視器(一般)'.i18n, subtitle: Text('偵測到晃動'.i18n), type: 'eq-v2')],
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,

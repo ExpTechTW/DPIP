@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/app/settings/notify/(1.eew)/eew/page.dart';
@@ -23,6 +17,10 @@ import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyPage extends StatefulWidget {
   const SettingsNotifyPage({super.key});
@@ -78,10 +76,34 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
         Preference.notifyTsunami == null ||
         Preference.notifyAnnouncement == null) {
       setState(() => isLoading = true);
-      ExpTech().getNotify(token: Preference.notifyToken).then((value) {
-        GlobalProviders.notification.apply(value);
-        setState(() => isLoading = false);
-      });
+      ExpTech()
+          .getNotify(token: Preference.notifyToken)
+          .then((value) {
+            GlobalProviders.notification.apply(value);
+            setState(() => isLoading = false);
+          })
+          .catchError((error) {
+            if (error.toString().contains('401')) {
+              if (GlobalProviders.location.latitude != null && GlobalProviders.location.longitude != null) {
+                Future.delayed(const Duration(seconds: 2), () {
+                  ExpTech()
+                      .updateDeviceLocation(
+                        token: Preference.notifyToken,
+                        lat: GlobalProviders.location.latitude.toString(),
+                        lng: GlobalProviders.location.longitude.toString(),
+                      )
+                      .then((_) {
+                        if (mounted) {
+                          context.pop();
+                        }
+                      })
+                      .catchError((updateError) {
+                        print('Failed to update location: $updateError');
+                      });
+                });
+              }
+            }
+          });
     }
   }
 
@@ -90,7 +112,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     return Selector<SettingsLocationModel, String?>(
       selector: (_, model) => model.code,
       builder: (context, code, child) {
-        final enabled = code != null;
+        final enabled = code != null || Preference.locationAuto!;
 
         return Stack(
           children: [

@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class LocationNotSetCard extends StatelessWidget {
   const LocationNotSetCard({super.key});

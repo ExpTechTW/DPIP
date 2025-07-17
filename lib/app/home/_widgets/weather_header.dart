@@ -1,18 +1,16 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-
 import 'package:dpip/api/model/weather_schema.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/double.dart';
 import 'package:dpip/utils/weather_icon.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class WeatherHeader extends StatelessWidget {
   final RealtimeWeather weather;

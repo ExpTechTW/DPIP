@@ -5,27 +5,52 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/managers/monitor.dart';
 import 'package:dpip/app/map/_lib/managers/precipitation.dart';
 import 'package:dpip/app/map/_lib/managers/radar.dart';
 import 'package:dpip/app/map/_lib/managers/report.dart';
 import 'package:dpip/app/map/_lib/managers/temperature.dart';
-// import 'package:dpip/app/map/_lib/managers/tsunami.dart';
 import 'package:dpip/app/map/_lib/managers/wind.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_back_button.dart';
 import 'package:dpip/app/map/_widgets/ui/positioned_layer_button.dart';
-// import 'package:dpip/app/map/monitor/monitor.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/unimplemented.dart';
 import 'package:dpip/widgets/map/map.dart';
 
+class MapPageOptions {
+  final Set<MapLayer>? initialLayers;
+  final String? reportId;
+
+  MapPageOptions({this.initialLayers, this.reportId});
+
+  factory MapPageOptions.fromQueryParameters(Map<String, String> queryParameters) {
+    final layers = queryParameters['layers']?.split(',');
+    final report = queryParameters['report'];
+
+    return MapPageOptions(
+      initialLayers: layers?.map((layer) => MapLayer.values.byName(layer)).toSet(),
+      reportId: report,
+    );
+  }
+}
+
 class MapPage extends StatefulWidget {
-  final MapLayer? initialLayer;
+  final MapPageOptions? options;
 
-  const MapPage({super.key, this.initialLayer});
+  const MapPage({super.key, this.options});
 
-  static String route({MapLayer? layer}) => "/map${layer != null ? '?layer=${layer.name}' : ''}";
+  static String route({MapPageOptions? options}) {
+    if (options == null) return '/map';
+
+    final parameters = [];
+
+    if (options.initialLayers != null) parameters.add('layers=${options.initialLayers!.map((e) => e.name).join(',')}');
+    if (options.reportId != null) parameters.add('report=${options.reportId}');
+
+    return "/map?${parameters.join('&')}";
+  }
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -37,52 +62,173 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
-  late MapLayer? _currentLayer = widget.initialLayer ?? GlobalProviders.map.layer;
+
+  late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
 
   void _setupTicker() {
     _ticker?.cancel();
-    _ticker = Timer.periodic(Duration(milliseconds: GlobalProviders.map.updateIntervalNotifier.value), (timer) {
-      if (currentLayer != MapLayer.monitor) return;
-
-      final manager = _managers[currentLayer];
-      if (manager == null) return;
-
-      manager.tick();
+    _ticker = Timer.periodic(Duration(milliseconds: 1000 ~/ GlobalProviders.map.updateIntervalNotifier.value), (timer) {
+      for (final layer in _activeLayers) {
+        _managers[layer]?.tick();
+      }
     });
   }
 
-  /// 目前地圖顯示的圖層
-  MapLayer? get currentLayer => _currentLayer;
+  Set<MapLayer> get activeLayers => _activeLayers;
 
-  /// 設定地圖顯示的圖層
-  Future<void> setCurrentLayer(MapLayer? layer) async {
-    if (!mounted) return;
+  MapLayer? get primaryLayer {
+    for (final layer in [MapLayer.temperature, MapLayer.precipitation, MapLayer.wind]) {
+      if (_activeLayers.contains(layer)) {
+        return layer;
+      }
+    }
+    return _activeLayers.isNotEmpty ? _activeLayers.first : null;
+  }
 
-    await _hideLayers();
+  Future<void> syncTimeToRadar(String time) async {
+    if (!_activeLayers.contains(MapLayer.radar)) return;
+
+    final radarManager = getLayerManager<RadarMapLayerManager>(MapLayer.radar);
+    if (radarManager != null) {
+      try {
+        await radarManager.updateRadarTime(time);
+        TalkerManager.instance.info('Synced radar time to: $time');
+      } catch (e, s) {
+        TalkerManager.instance.error('Failed to sync radar time', e, s);
+      }
+    }
+  }
+
+  void _setupWeatherLayerTimeSync() {
+    final temperatureManager = getLayerManager<TemperatureMapLayerManager>(MapLayer.temperature);
+    temperatureManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
+
+    final precipitationManager = getLayerManager<PrecipitationMapLayerManager>(MapLayer.precipitation);
+    precipitationManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
+
+    final windManager = getLayerManager<WindMapLayerManager>(MapLayer.wind);
+    windManager?.onTimeChanged = (time) {
+      syncTimeToRadar(time);
+    };
+  }
+
+  Future<void> _syncRadarTimeOnCombination(MapLayer newLayer) async {
+    if (!_activeLayers.contains(MapLayer.radar) || !kWeatherLayers.contains(newLayer) || newLayer == MapLayer.radar) {
+      return;
+    }
+
+    String? newTime;
+    switch (newLayer) {
+      case MapLayer.temperature:
+        final manager = getLayerManager<TemperatureMapLayerManager>(MapLayer.temperature);
+        newTime = manager?.currentTemperatureTime.value;
+      case MapLayer.precipitation:
+        final manager = getLayerManager<PrecipitationMapLayerManager>(MapLayer.precipitation);
+        newTime = manager?.currentPrecipitationTime.value;
+      case MapLayer.wind:
+        final manager = getLayerManager<WindMapLayerManager>(MapLayer.wind);
+        newTime = manager?.currentWindTime.value;
+      default:
+    }
+
+    if (newTime != null) {
+      await syncTimeToRadar(newTime);
+    }
+  }
+
+  T? getLayerManager<T extends MapLayerManager>(MapLayer layer) {
+    final manager = _managers[layer];
+    return manager is T ? manager : null;
+  }
+
+  Future<void> toggleLayer(MapLayer layer, bool show, Set<MapLayer> activeLayers) async {
     if (!mounted) return;
 
     try {
-      if (layer == null) {
-        await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        return;
-      }
-
       final manager = _managers[layer];
-
       if (manager == null) {
         showUnimplementedSnackBar(context);
         throw UnimplementedError('Unknown layer: $layer');
       }
 
-      if (!manager.didSetup) await manager.setup();
+      if (_activeLayers.contains(layer)) {
+        await manager.hide();
+        setState(() {
+          _activeLayers.remove(layer);
+        });
+      } else {
+        final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
 
-      await _hideLayers();
-      await manager.show();
+        final isEarthquakeLayer = kEarthquakeLayers.contains(layer);
+        final isWeatherLayer = kWeatherLayers.contains(layer);
+
+        if (isEarthquakeLayer) {
+          await _clearLayers(kEarthquakeLayers);
+          await _clearLayers(kWeatherLayers);
+        } else if (isWeatherLayer) {
+          final weatherLayersInNew = newLayers.where((l) => kWeatherLayers.contains(l)).toSet();
+          if (!isValidLayerCombination(weatherLayersInNew)) {
+            if (weatherLayersInNew.contains(MapLayer.radar)) {
+              final nonRadarWeatherLayers = kWeatherLayers.where((l) => l != MapLayer.radar).toSet();
+              await _clearLayers(nonRadarWeatherLayers);
+            } else {
+              await _clearLayers(kWeatherLayers);
+            }
+          }
+          await _clearLayers(kEarthquakeLayers);
+        }
+
+        if (!manager.didSetup) await manager.setup();
+        await manager.show();
+        setState(() {
+          _activeLayers.add(layer);
+        });
+
+        await _syncRadarTimeOnCombination(layer);
+      }
+
+      if (_activeLayers.isEmpty) {
+        await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
+      }
     } catch (e, s) {
-      TalkerManager.instance.error('_MapPageState._setCurrentLayer', e, s);
-    } finally {
-      setState(() => _currentLayer = layer);
+      TalkerManager.instance.error('_MapPageState.toggleLayer', e, s);
     }
+  }
+
+  /// Hides and removes the specified map layers from the active layer set.
+  ///
+  /// Takes a [Set] of [MapLayer]s to clear. For each layer in the set that is
+  /// currently active:
+  /// 1. Hides the layer's visual elements via its manager if one exists
+  /// 2. Removes the layer from the active layers set
+  ///
+  /// This is used when switching between incompatible layer types, like
+  /// earthquake and weather layers.
+  Future<void> _clearLayers(Set<MapLayer> layers) async {
+    final newLayers = Set<MapLayer>.from(_activeLayers);
+
+    for (final layer in layers) {
+      if (newLayers.contains(layer)) {
+        final manager = _managers[layer];
+        if (manager != null) {
+          await manager.hide();
+        }
+        newLayers.remove(layer);
+      }
+    }
+    setState(() => _activeLayers = newLayers);
+  }
+
+  void _hideBaseMapLayers() {
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
   }
 
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
@@ -107,44 +253,38 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _baseMapType = baseMapType);
   }
 
-  /// 隱藏所有圖層
-  Future<void> _hideLayers() async {
+  Future<void> setLayers(Set<MapLayer> layers) async {
     if (!mounted) return;
 
-    try {
-      for (final manager in _managers.values) {
-        await manager.hide();
+    for (final layer in layers) {
+      final manager = _managers[layer];
+      if (manager != null) {
+        if (!manager.didSetup) await manager.setup();
+        await manager.show();
       }
-    } catch (e, s) {
-      TalkerManager.instance.error('_MapPageState._hideLayers', e, s);
     }
 
-    setState(() => _currentLayer = null);
-  }
-
-  /// 隱藏所有地圖底圖圖層
-  void _hideBaseMapLayers() {
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyOutline, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
+    setState(() => _activeLayers = layers);
   }
 
   void onMapCreated(MapLibreMapController controller) {
     setState(() => _controller = controller);
 
-    // _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
-    _managers[MapLayer.report] = ReportMapLayerManager(context, controller);
-    // _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
-    _managers[MapLayer.radar] = RadarMapLayerManager(context, controller);
+    _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
+    _managers[MapLayer.report] = ReportMapLayerManager(context, controller, initialReportId: widget.options?.reportId);
+    _managers[MapLayer.radar] = RadarMapLayerManager(
+      context,
+      controller,
+      getActiveLayerCount: () => _activeLayers.length,
+    );
     _managers[MapLayer.temperature] = TemperatureMapLayerManager(context, controller);
     _managers[MapLayer.precipitation] = PrecipitationMapLayerManager(context, controller);
     _managers[MapLayer.wind] = WindMapLayerManager(context, controller);
 
+    _setupWeatherLayerTimeSync();
+
     setBaseMapType(_baseMapType);
-    setCurrentLayer(currentLayer);
+    setLayers(_activeLayers);
   }
 
   @override
@@ -157,20 +297,24 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final manager = _managers[currentLayer];
-
     return Scaffold(
       body: Stack(
         children: [
           DpipMap(onMapCreated: onMapCreated, tiltGesturesEnabled: true),
           PositionedLayerButton(
-            currentLayer: currentLayer,
+            activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,
-            onChanged: (layer) => setCurrentLayer(layer),
-            onBaseMapChanged: (baseMap) => setBaseMapType(baseMap),
+            onLayerChanged: toggleLayer,
+            onBaseMapChanged: setBaseMapType,
           ),
           const PositionedBackButton(),
-          if (manager != null) manager.build(context),
+          ..._activeLayers.map((layer) {
+            final manager = _managers[layer];
+            if (manager != null) {
+              return manager.build(context);
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
     );
@@ -179,6 +323,13 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _ticker?.cancel();
+
+    for (final manager in _managers.values) {
+      manager.dispose();
+    }
+
+    GlobalProviders.map.updateIntervalNotifier.removeListener(_setupTicker);
+
     super.dispose();
   }
 }

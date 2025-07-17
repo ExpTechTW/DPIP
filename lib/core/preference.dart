@@ -1,8 +1,9 @@
+import 'package:dpip/utils/extensions/preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:dpip/utils/extensions/preference.dart';
-
 class PreferenceKeys {
+  static const lastUpdateToServerTime = 'lastUpdateToServerTime';
+
   // #region Location
   static const locationAuto = 'location:auto';
   static const locationCode = 'location:code';
@@ -17,9 +18,9 @@ class PreferenceKeys {
   static const themeColor = 'pref:ui:color';
   static const locale = 'pref:ui:locale';
   static const useFahrenheit = 'pref:ui:fahrenheit';
-  static const mapUpdateInterval = 'pref:ui:map:updateInterval';
+  static const mapUpdateFps = 'pref:ui:map:updateFps';
   static const mapBase = 'pref:ui:map:base';
-  static const mapLayer = 'pref:ui:map:layer';
+  static const mapLayers = 'pref:ui:map:layers';
   // #endregion
 
   // #region Notification
@@ -46,6 +47,9 @@ class Preference {
 
   static String? get version => instance.getString('app-version');
   static set version(String? value) => instance.set('app-version', value);
+
+  static int? get lastUpdateToServerTime => instance.getInt(PreferenceKeys.lastUpdateToServerTime);
+  static set lastUpdateToServerTime(int? value) => instance.set(PreferenceKeys.lastUpdateToServerTime, value);
 
   static bool get isTosAccepted => instance.getInt('accepted-tos-version') == 1;
   static set isTosAccepted(bool value) => instance.set('accepted-tos-version', value ? 1 : null);
@@ -89,16 +93,14 @@ class Preference {
   static bool? get useFahrenheit => instance.getBool(PreferenceKeys.useFahrenheit);
   static set useFahrenheit(bool? value) => instance.set(PreferenceKeys.useFahrenheit, value);
 
-  static int? get mapUpdateInterval => instance.getInt(PreferenceKeys.mapUpdateInterval);
-  static set mapUpdateInterval(int? value) => instance.set(PreferenceKeys.mapUpdateInterval, value);
+  static int? get mapUpdateFps => instance.getInt(PreferenceKeys.mapUpdateFps);
+  static set mapUpdateFps(int? value) => instance.set(PreferenceKeys.mapUpdateFps, value);
 
-  /* temporary disabled preference saving until map is completed
   static String? get mapBase => instance.getString(PreferenceKeys.mapBase);
   static set mapBase(String? value) => instance.set(PreferenceKeys.mapBase, value);
 
-  static String? get mapLayer => instance.getString(PreferenceKeys.mapLayer);
-  static set mapLayer(String? value) => instance.set(PreferenceKeys.mapLayer, value);
-  */
+  static String? get mapLayers => instance.getString(PreferenceKeys.mapLayers);
+  static set mapLayers(String? value) => instance.set(PreferenceKeys.mapLayers, value);
   // #endregion
 
   // #region Notification

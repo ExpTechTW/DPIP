@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dpip/core/preference.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
-import 'package:dpip/utils/log.dart';
 
 Future<void> fcmInit() async {
   await Firebase.initializeApp();
@@ -41,12 +40,12 @@ Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
   final Map<String, dynamic> data = silentData.data!.cast<String, dynamic>();
 
   if (silentData.createdLifeCycle == NotificationLifeCycle.AppKilled) {
-    final String channelKey = data['channel'] ?? 'other';
+    final channelKey = (data['channel'] as String?) ?? 'other';
     data['content'] = {
-      'id': int.parse(data['id'] ?? '0'),
+      'id': int.parse((data['id'] as String?) ?? '0'),
       'channelKey': channelKey,
-      'title': data['title'],
-      'body': data['body'],
+      'title': data['title'] as String?,
+      'body': data['body'] as String?,
       'notificationLayout': NotificationLayout.Default.name,
     };
     await AwesomeNotifications().createNotificationFromJsonData(data);
@@ -57,14 +56,14 @@ Future<void> onFcmSilentDataHandle(FcmSilentData silentData) async {
 }
 
 Future<void> showNotify(Map<String, dynamic> data) async {
-  final String channelKey = data['channel'] ?? 'other';
+  final channelKey = (data['channel'] as String?) ?? 'other';
 
   await AwesomeNotifications().createNotification(
     content: NotificationContent(
-      id: int.parse(data['id'] ?? '0'),
+      id: int.parse((data['id'] as String?) ?? '0'),
       channelKey: channelKey,
-      title: data['title'],
-      body: data['body'],
+      title: data['title'] as String?,
+      body: data['body'] as String?,
     ),
   );
 }

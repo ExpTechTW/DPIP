@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
-
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet_controller.dart';
+import 'package:flutter/material.dart';
 
 typedef MorphingSheetBuilder =
     Widget Function(BuildContext context, ScrollController controller, MorphingSheetController sheetController);
@@ -14,7 +13,9 @@ class MorphingSheet extends StatefulWidget {
   final double maxChildSize;
   final double fullThreshold;
   final Color? backgroundColor;
+  final Color? borderColor;
   final BorderRadius? borderRadius;
+  final double? borderWidth;
   final EdgeInsets floatingPadding;
   final double elevation;
   final String? title;
@@ -28,7 +29,9 @@ class MorphingSheet extends StatefulWidget {
     this.maxChildSize = 1.0,
     this.fullThreshold = 0.8,
     this.backgroundColor,
+    this.borderColor,
     this.borderRadius,
+    this.borderWidth,
     this.floatingPadding = const EdgeInsets.symmetric(horizontal: 16.0),
     this.elevation = 8.0,
     this.title,
@@ -197,7 +200,10 @@ class _MorphingSheetState extends State<MorphingSheet> with SingleTickerProvider
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(borderRadius),
-                  border: Border.all(color: context.colors.outline.withValues(alpha: 0.2)),
+                  border: Border.all(
+                    width: widget.borderWidth ?? 1,
+                    color: widget.borderColor ?? context.colors.outline.withValues(alpha: 0.2),
+                  ),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(borderRadius),

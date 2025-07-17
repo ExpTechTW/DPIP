@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 extension NativeLocale on Locale {
   String get nativeName {
@@ -7,8 +6,6 @@ extension NativeLocale on Locale {
       case 'zh-Hant':
         return '繁體中文';
       case 'zh-Hans':
-        return '簡體中文';
-      case 'zh':
         return '簡體中文';
       case 'en':
         return 'English';
@@ -25,32 +22,24 @@ extension NativeLocale on Locale {
     }
   }
 
-  String? flagCodeFromLocale(Locale locale) {
-    switch (locale.toLanguageTag()) {
+  String get iconLabel {
+    switch (toLanguageTag()) {
       case 'zh-Hant':
-        return 'tw';
+        return '繁';
       case 'zh-Hans':
-      case 'zh':
-        return 'cn';
+        return '简';
       case 'en':
-        return 'us';
+        return 'EN';
       case 'ja':
-        return 'jp';
+        return 'あ';
       case 'ko':
-        return 'kr';
+        return '한';
       case 'vi':
-        return 'vn';
+        return 'VI';
       case 'ru':
-        return 'ru';
+        return 'РУ';
       default:
-        return null;
+        return toString().substring(0, 2);
     }
-  }
-
-  Widget get flag {
-    final code = flagCodeFromLocale(this);
-    if (code == null) return const SizedBox.shrink();
-
-    return SvgPicture.asset('assets/flags/$code.svg', height: 24);
   }
 }
