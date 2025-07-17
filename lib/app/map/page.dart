@@ -355,6 +355,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       manager.dispose();
     }
 
+    GlobalProviders.map.updateIntervalNotifier.removeListener(_setupTicker);
+
     super.dispose();
   }
 }
