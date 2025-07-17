@@ -63,7 +63,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Timer? _ticker;
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
-  Set<MapLayer> _activeLayers = Set.from(GlobalProviders.map.layers);
+  late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
 
   void _setupTicker() {
     _ticker?.cancel();
@@ -250,6 +250,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _activeLayers = newLayers);
   }
 
+  void _hideBaseMapLayers() {
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
+    _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
+  }
+
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
     if (!mounted) return;
 
@@ -272,12 +280,18 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _baseMapType = baseMapType);
   }
 
-  void _hideBaseMapLayers() {
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
+  Future<void> setLayers(Set<MapLayer> layers) async {
+    if (!mounted) return;
+
+    for (final layer in layers) {
+      final manager = _managers[layer];
+      if (manager != null) {
+        if (!manager.didSetup) await manager.setup();
+        await manager.show();
+      }
+    }
+
+    setState(() => _activeLayers = layers);
   }
 
   void onMapCreated(MapLibreMapController controller) {
@@ -297,14 +311,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     _setupWeatherLayerTimeSync();
 
     setBaseMapType(_baseMapType);
-
-    if (widget.options?.initialLayers != null) {
-      for (final layer in widget.options!.initialLayers!) {
-        toggleLayer(layer, true, _activeLayers);
-      }
-    } else {
-      _showMonitorLayer();
-    }
+    setLayers(_activeLayers);
   }
 
   @override

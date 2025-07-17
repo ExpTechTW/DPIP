@@ -110,7 +110,7 @@ class SettingsMapPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Slider(
-                              value: updateInterval.toDouble(),
+                              value: updateInterval.toDouble().clamp(1, maxFpsAllowed),
                               min: 1,
                               max: maxFpsAllowed,
                               divisions: maxFpsAllowed.floor() ~/ 5,
