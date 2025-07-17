@@ -249,6 +249,6 @@ class HLayout {
 class Layout {
   const Layout._();
 
-  static _VerticalLayout get v => VLayout.base;
-  static _HorizontalLayout get h => HLayout.base;
+  static _VerticalLayout get col => VLayout.base;
+  static _HorizontalLayout get row => HLayout.base;
 }

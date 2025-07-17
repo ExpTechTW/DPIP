@@ -94,13 +94,13 @@ class SettingsMapPage extends StatelessWidget {
                 final maxFpsAllowed =
                     WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate.floorToDouble();
 
-                return Layout.v.left[8](
+                return Layout.col.left[8](
                   padding: const EdgeInsets.all(16),
                   children: [
-                    Layout.h.left[16](
+                    Layout.row.left[16](
                       children: [
                         Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
-                        Layout.v.left(
+                        Layout.col.left(
                           children: [
                             Text(
                               '動畫幀率'.i18n,
@@ -114,7 +114,7 @@ class SettingsMapPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Layout.h.left[4](
+                    Layout.row.left[4](
                       children: [
                         Expanded(
                           child: Slider(
@@ -132,7 +132,7 @@ class SettingsMapPage extends StatelessWidget {
                       ],
                     ),
                     if (updateInterval > 20)
-                      Layout.h.left[8](
+                      Layout.row.left[8](
                         children: [
                           Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
                           Expanded(
