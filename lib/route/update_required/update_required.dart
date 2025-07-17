@@ -56,11 +56,7 @@ class UpdateRequiredPage extends StatelessWidget {
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
                       children: [
-                        _buildVersionInfo(
-                          '目前版本',
-                          Global.packageInfo.version,
-                          Colors.red.shade400,
-                        ),
+                        _buildVersionInfo('目前版本', Global.packageInfo.version, Colors.red.shade400),
                         const SizedBox(height: 12),
                         _buildVersionInfo('最新版本', lastVersion, Colors.green.shade400),
                       ],
@@ -87,10 +83,7 @@ class UpdateRequiredPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 4,
                   ),
-                  child: const Text(
-                    '立即更新',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('立即更新', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
                 if (showSkipButton) ...[
                   const SizedBox(height: 16),

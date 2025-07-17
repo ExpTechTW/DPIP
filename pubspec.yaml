@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 3.0.012
+version: 3.0.013
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -38,20 +38,17 @@ dependencies:
   flutter_svg: ^2.1.0
   fluttertoast: 8.2.12
   freezed_annotation: ^3.0.0
+  gal: ^2.3.0
   geolocator: ^14.0.0
   geolocator_android: ^5.0.1+1
   go_router: ^15.1.1
   http: ^1.3.0
   i18n_extension: ^15.0.5
-  image_gallery_saver:
-    git:
-      url: https://github.com/knottx/image_gallery_saver.git
-      ref: knottx-latest
   in_app_purchase: ^3.2.2
   in_app_update: 4.2.3
   intl: any
   json_annotation: 4.9.0
-  maplibre_gl: 0.21.0
+  maplibre_gl: 0.22.0
   material_symbols_icons: ^4.2815.0
   package_info_plus: ^8.3.0
   path_provider: ^2.1.5
@@ -83,7 +80,6 @@ flutter:
   uses-material-design: true
   assets:
   - assets/translations/
-  - assets/flags/
   - assets/map/
   - assets/DPIP.png
   - assets/ExpTech.png

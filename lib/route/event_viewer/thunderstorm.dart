@@ -11,10 +11,10 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
-import 'package:dpip/api/model/history.dart';
+import 'package:dpip/api/model/history/history.dart';
 import 'package:dpip/app_old/page/map/radar/radar.dart';
-import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/ios_get_location.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/list_icon.dart';
@@ -62,31 +62,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     _mapController = controller;
   }
 
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
   Future<void> _loadMap() async {
     radarList = await ExpTech().getRadarList();
 
@@ -94,11 +69,21 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
 
     await _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
+    if (!isExpired) {
+      await _mapController.addLayer(
+        'radarSource',
+        'radarLayer',
+        const RasterLayerProperties(),
+        belowLayerId: BaseMapLayerIds.userLocation,
+      );
+    }
+
     await _mapController.addLayer(
       'map',
       'town-outline-default',
       LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB(), lineWidth: 1),
       sourceLayer: 'town',
+      belowLayerId: BaseMapLayerIds.userLocation,
     );
 
     await _mapController.addLayer(
@@ -111,16 +96,8 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
         ['get', 'CODE'],
         ['literal', widget.item.area],
       ],
+      belowLayerId: BaseMapLayerIds.userLocation,
     );
-
-    if (!isExpired) {
-      await _mapController.addLayer(
-        'radarSource',
-        'radarLayer',
-        const RasterLayerProperties(),
-        belowLayerId: 'county-outline',
-      );
-    }
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
       await getSavedLocation();
@@ -171,8 +148,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     if (!isUserLocationValid && !GlobalProviders.location.auto) {
       await showLocationDialog(context);
     }
-
-    await _addUserLocationMarker();
 
     setState(() {});
   }

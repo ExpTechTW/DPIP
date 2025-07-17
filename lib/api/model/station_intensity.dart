@@ -1,7 +1,6 @@
+import 'package:dpip/utils/geojson.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
-
-import 'package:dpip/utils/geojson.dart';
 
 part 'station_intensity.g.dart';
 

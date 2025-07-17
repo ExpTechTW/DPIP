@@ -1,16 +1,16 @@
+import 'dart:io';
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
-
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
+import 'package:flutter/material.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsDonatePage extends StatefulWidget {
   const SettingsDonatePage({super.key});
@@ -126,6 +126,16 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
 
           return ListView(
             children: [
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！'.i18n,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant, // 調整顏色，使其顯眼
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+              ),
               if (subscriptions.isNotEmpty)
                 ListSection(
                   title: '訂閱制'.i18n,
@@ -168,20 +178,53 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                       ),
                   ],
                 ),
-              SettingsListTextSection(
-                content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
-                contentAlignment: TextAlign.justify,
-              ),
-              // FilledButton.tonalIcon(
-              //   icon: const Icon(Icons.restore),
-              //   label: const Text('恢復購買'),
-              //   onPressed: () {
-              //     InAppPurchase.instance.restorePurchases();
-              //     ScaffoldMessenger.of(context).showSnackBar(
-              //       const SnackBar(content: Text('已開始恢復先前的購買項目（不包含單次支援的購買）')),
-              //     );
-              //   },
+              // SettingsListTextSection(
+              //   content: '感謝您的支持！❤️\n您所支付的款項將用於伺服器維護用途。若您有任何問題，歡迎於付款前與我們聯繫。'.i18n,
+              //   contentAlignment: TextAlign.justify,
               // ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () async {
+                        final bool available = await InAppPurchase.instance.isAvailable();
+                        if (!context.mounted) return;
+
+                        if (!available) {
+                          final storeName = Platform.isIOS ? 'App Store' : 'Google Play';
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('無法連線至 {store}，請稍後再試。'.i18n.args({'store': storeName}))));
+                          return;
+                        }
+                        InAppPurchase.instance.restorePurchases();
+
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('正在恢復您購買的訂閱'.i18n)));
+                      },
+                      child: Text(
+                        '恢復購買'.i18n,
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    InkWell(
+                      onTap: () {
+                        launchUrl(Uri.parse('https://exptech.dev/tos')); // 替換為你的 Terms URL
+                      },
+                      child: Text('使用條款'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                    ),
+                    const SizedBox(height: 4),
+                    InkWell(
+                      onTap: () {
+                        launchUrl(Uri.parse('https://exptech.dev/privacy')); // 替換為你的 Privacy URL
+                      },
+                      child: Text('隱私權政策'.i18n, style: const TextStyle(decoration: TextDecoration.underline)),
+                    ),
+                  ],
+                ),
+              ),
             ],
           );
         },

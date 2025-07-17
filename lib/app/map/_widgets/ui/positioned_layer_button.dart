@@ -1,24 +1,22 @@
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
-import 'package:dpip/widgets/map/map.dart';
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/layer_toggle_sheet.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/widgets/map/map.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class PositionedLayerButton extends StatelessWidget {
-  final MapLayer? currentLayer;
+  final Set<MapLayer> activeLayers;
   final BaseMapType currentBaseMap;
-  final void Function(MapLayer? layer) onChanged;
+  final void Function(MapLayer layer, bool show, Set<MapLayer> activeLayers) onLayerChanged;
   final void Function(BaseMapType baseMap) onBaseMapChanged;
 
   const PositionedLayerButton({
     super.key,
-    required this.currentLayer,
+    required this.activeLayers,
     required this.currentBaseMap,
-    required this.onChanged,
+    required this.onLayerChanged,
     required this.onBaseMapChanged,
   });
 
@@ -38,13 +36,14 @@ class PositionedLayerButton extends StatelessWidget {
                 useSafeArea: true,
                 isScrollControlled: true,
                 constraints: context.bottomSheetConstraints,
-                builder:
-                    (context) => LayerToggleSheet(
-                      currentLayer: currentLayer,
-                      currentBaseMap: currentBaseMap,
-                      onChanged: onChanged,
-                      onBaseMapChanged: onBaseMapChanged,
-                    ),
+                builder: (context) {
+                  return LayerToggleSheet(
+                    activeLayers: activeLayers,
+                    currentBaseMap: currentBaseMap,
+                    onLayerChanged: onLayerChanged,
+                    onBaseMapChanged: onBaseMapChanged,
+                  );
+                },
               ),
         ),
       ),

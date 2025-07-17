@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
-
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-
 import 'package:dpip/app/settings/notify/_widgets/basic_notify_section.dart';
 import 'package:dpip/app/settings/notify/_widgets/sound_list_tile.dart';
 import 'package:dpip/app/settings/notify/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/widgets/list/list_section.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
 
 class SettingsNotifyAnnouncementPage extends StatelessWidget {
   const SettingsNotifyAnnouncementPage({super.key});
@@ -31,7 +29,7 @@ class SettingsNotifyAnnouncementPage extends StatelessWidget {
         ),
         ListSection(
           title: '音效測試'.i18n,
-          children: [SoundListTile(title: '公告'.i18n, subtitle: Text('發送公告時'.i18n), type: 'announcement-general')],
+          children: [SoundListTile(title: '公告'.i18n, subtitle: Text('發送公告時'.i18n), type: 'announcement-general-v2')],
         ),
         SettingsListTextSection(
           icon: Symbols.info_rounded,

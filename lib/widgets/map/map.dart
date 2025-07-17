@@ -2,18 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/log.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:path_provider/path_provider.dart';
-
+import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:path_provider/path_provider.dart';
 
 enum BaseMapType { exptech, osm, google }
 
@@ -137,6 +136,18 @@ class DpipMapState extends State<DpipMap> {
           'paint': {'background-color': colors.surface.toHexStringRGB()},
         },
         {
+          'id': BaseMapLayerIds.osmGlobalRaster,
+          'type': 'raster',
+          'source': 'osm',
+          'layout': {'visibility': widget.baseMapType == BaseMapType.osm ? 'visible' : 'none'},
+        },
+        {
+          'id': BaseMapLayerIds.googleGlobalRaster,
+          'type': 'raster',
+          'source': 'google',
+          'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
+        },
+        {
           'id': BaseMapLayerIds.exptechCountyFill,
           'type': 'fill',
           'source': 'map',
@@ -158,7 +169,7 @@ class DpipMapState extends State<DpipMap> {
           'source-layer': 'city',
           'type': 'line',
           'paint': {'line-color': colors.outline.toHexStringRGB()},
-          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
+          'layout': {'visibility': 'visible'},
         },
         {
           'id': BaseMapLayerIds.exptechGlobalFill,
@@ -167,18 +178,6 @@ class DpipMapState extends State<DpipMap> {
           'source-layer': 'global',
           'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
           'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.osmGlobalRaster,
-          'type': 'raster',
-          'source': 'osm',
-          'layout': {'visibility': widget.baseMapType == BaseMapType.osm ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.googleGlobalRaster,
-          'type': 'raster',
-          'source': 'google',
-          'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
         },
         {
           'id': 'tsunami',
@@ -216,6 +215,10 @@ class DpipMapState extends State<DpipMap> {
     try {
       final controller = _controller;
       if (controller == null) return;
+
+      if (Platform.isIOS && GlobalProviders.location.auto) {
+        await getSavedLocation();
+      }
 
       final location = GlobalProviders.location.coordinateNotifier.value;
 

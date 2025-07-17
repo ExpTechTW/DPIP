@@ -1,5 +1,3 @@
-import 'package:dpip/app/map/_lib/utils.dart';
-import 'package:dpip/app/map/page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -8,6 +6,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -55,7 +55,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
         'radar-source',
         'radar',
         const RasterLayerProperties(),
-        belowLayerId: 'county-outline',
+        belowLayerId: BaseMapLayerIds.exptechCountyOutline,
       );
     } catch (e) {
       TalkerManager.instance.error('RadarMapCard._setupRadarLayer', e);
@@ -126,7 +126,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => context.push(MapPage.route(layer: MapLayer.radar)),
+              onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
               borderRadius: BorderRadius.circular(16),
             ),
           ),

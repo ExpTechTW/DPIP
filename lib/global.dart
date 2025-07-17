@@ -1,12 +1,10 @@
-import 'package:dpip/utils/extensions/asset_bundle.dart';
-import 'package:flutter/services.dart';
-
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
+import 'package:dpip/utils/extensions/asset_bundle.dart';
 import 'package:dpip/utils/location_to_code.dart';
+import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Global {
   Global._();

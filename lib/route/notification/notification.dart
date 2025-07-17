@@ -140,10 +140,7 @@ class NotificationCard extends StatelessWidget {
 
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
-      label: Text(
-        record.critical ? '緊急' : '一般',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
+      label: Text(record.critical ? '緊急' : '一般', style: const TextStyle(fontWeight: FontWeight.bold)),
       backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -254,10 +251,7 @@ class NotificationDetailPage extends StatelessWidget {
 
   Widget _buildCriticalityChip(BuildContext context) {
     return Chip(
-      label: Text(
-        record.critical ? '緊急通知' : '一般通知',
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
+      label: Text(record.critical ? '緊急通知' : '一般通知', style: const TextStyle(fontWeight: FontWeight.bold)),
       backgroundColor: record.critical ? Colors.red.withValues(alpha: 0.16) : Colors.grey.withValues(alpha: 0.16),
       side: BorderSide(color: record.critical ? Colors.red : Colors.grey),
       padding: const EdgeInsets.symmetric(horizontal: 8),
