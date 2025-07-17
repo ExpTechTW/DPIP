@@ -1,3 +1,4 @@
+import 'package:dpip/widgets/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -93,51 +94,56 @@ class SettingsMapPage extends StatelessWidget {
                 final maxFpsAllowed =
                     WidgetsBinding.instance.platformDispatcher.views.first.display.refreshRate.floorToDouble();
 
-                return Padding(
+                return Layout.v.left[8](
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    spacing: 8,
-                    children: [
-                      Row(
-                        spacing: 16,
-                        children: [
-                          Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
-                          Text('動畫幀率'.i18n, style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      Row(
-                        spacing: 4,
-                        children: [
-                          Expanded(
-                            child: Slider(
-                              value: updateInterval.toDouble().clamp(1, maxFpsAllowed),
-                              min: 1,
-                              max: maxFpsAllowed,
-                              divisions: maxFpsAllowed.floor() ~/ 5,
-                              onChanged: (value) {
-                                context.read<SettingsMapModel>().setUpdateInterval(value.floor());
-                              },
-                              year2023: false,
-                            ),
-                          ),
-                          SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),
-                        ],
-                      ),
-                      if (updateInterval > 20)
-                        Row(
-                          spacing: 8,
+                  children: [
+                    Layout.h.left[16](
+                      children: [
+                        Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
+                        Layout.v.left(
                           children: [
-                            Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
-                            Expanded(
-                              child: Text(
-                                '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
-                                style: context.textTheme.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
-                              ),
+                            Text(
+                              '動畫幀率'.i18n,
+                              style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              '影響強震監視器的震波模擬動畫流暢度'.i18n,
+                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                             ),
                           ],
                         ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    Layout.h.left[4](
+                      children: [
+                        Expanded(
+                          child: Slider(
+                            value: updateInterval.toDouble().clamp(1, maxFpsAllowed),
+                            min: 1,
+                            max: maxFpsAllowed,
+                            divisions: maxFpsAllowed.floor() ~/ 5,
+                            onChanged: (value) {
+                              context.read<SettingsMapModel>().setUpdateInterval(value.floor());
+                            },
+                            year2023: false,
+                          ),
+                        ),
+                        SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),
+                      ],
+                    ),
+                    if (updateInterval > 20)
+                      Layout.h.left[8](
+                        children: [
+                          Icon(Symbols.warning_rounded, color: context.theme.extendedColors.amber, size: 16),
+                          Expanded(
+                            child: Text(
+                              '過高的動畫幀率可能會造成卡頓或設備發熱'.i18n,
+                              style: context.textTheme.bodySmall?.copyWith(color: context.theme.extendedColors.amber),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
                 );
               },
             ),
