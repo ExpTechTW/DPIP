@@ -66,6 +66,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             newLayers.removeWhere((l) => !combination.contains(l));
           }
 
+          newLayers.removeAll(kEarthquakeLayers);
           newLayers.add(layer);
 
           break $layerOperation;
@@ -73,6 +74,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
 
         newLayers.add(layer);
       } else {
+        if (_activeLayers.length <= 1) return;
         newLayers.remove(layer);
       }
     }

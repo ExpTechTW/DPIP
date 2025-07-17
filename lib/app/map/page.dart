@@ -156,23 +156,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       }
 
       if (_activeLayers.contains(layer)) {
-        if (layer == MapLayer.monitor && _activeLayers.length == 1) {
-          return;
-        }
-
         await manager.hide();
         setState(() {
           _activeLayers.remove(layer);
         });
-
-        if (kWeatherLayers.contains(layer)) {
-          final hasOtherWeatherLayers = _activeLayers.any((l) => kWeatherLayers.contains(l));
-          if (!hasOtherWeatherLayers) {
-            await _showMonitorLayer();
-          }
-        } else if (kEarthquakeLayers.contains(layer) && layer != MapLayer.monitor) {
-          await _showMonitorLayer();
-        }
       } else {
         final newLayers = Set<MapLayer>.from(_activeLayers)..add(layer);
 
@@ -206,23 +193,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
       if (_activeLayers.isEmpty) {
         await _controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        await _showMonitorLayer();
       }
     } catch (e, s) {
       TalkerManager.instance.error('_MapPageState.toggleLayer', e, s);
-    }
-  }
-
-  Future<void> _showMonitorLayer() async {
-    if (_activeLayers.contains(MapLayer.monitor)) return;
-
-    final manager = _managers[MapLayer.monitor];
-    if (manager != null) {
-      if (!manager.didSetup) await manager.setup();
-      await manager.show();
-      setState(() {
-        _activeLayers.add(MapLayer.monitor);
-      });
     }
   }
 
