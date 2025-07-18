@@ -531,4 +531,21 @@ class ExpTech {
 
     return NotifySettings.fromJson(jsonData.map((e) => e as int).toList());
   }
+
+  Future<void> sendNetWorkInfo({required String? ip,required String? isp, required List<int?> status, required List<int?> status_dev}) async {
+    final requestUrl = Route.networkInfo();
+
+    String body=jsonEncode({
+      'ip':ip,
+      'isp':isp,
+      'status':status,
+      'status-dev':status_dev
+    });
+
+    final res = await post(requestUrl,body: body);
+
+    if (!res.ok) {
+      throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
+    }
+  }
 }
