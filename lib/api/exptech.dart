@@ -539,7 +539,7 @@ class ExpTech {
       'ip':ip,
       'isp':isp,
       'status':status,
-      'status-dev':status_dev
+      'status_dev':status_dev
     });
 
     final res = await post(requestUrl,body: body);
