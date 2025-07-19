@@ -4,6 +4,7 @@ import 'package:dpip/app.dart';
 import 'package:dpip/core/device_info.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/core/installation_tracker.dart';
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
@@ -21,6 +22,7 @@ import 'package:timezone/data/latest.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeInstallationData();
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
