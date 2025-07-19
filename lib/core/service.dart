@@ -37,7 +37,7 @@ Future<void> initBackgroundService() async {
   if (notificationPermission.isGranted && locationPermission.isGranted) {
     if (!Platform.isAndroid) return;
 
-    _initializeAndroidForegroundService();
+    await _initializeAndroidForegroundService();
     _setupPositionListener();
     startAndroidBackgroundService(shouldInitialize: true);
   }
@@ -45,7 +45,7 @@ Future<void> initBackgroundService() async {
 
 Future<void> startAndroidBackgroundService({required bool shouldInitialize}) async {
   if (!_isAndroidServiceInitialized) {
-    _initializeAndroidForegroundService();
+    await _initializeAndroidForegroundService();
     _setupPositionListener();
   }
 
@@ -96,7 +96,7 @@ void _setupPositionListener() {
 }
 
 Future<void> _initializeAndroidForegroundService() async {
-  _isAndroidServiceInitialized = true;
+  if (_isAndroidServiceInitialized) return;
 
   await AwesomeNotifications().initialize(
     null, // 使用預設 launcher icon
@@ -127,6 +127,7 @@ Future<void> _initializeAndroidForegroundService() async {
     ),
     iosConfiguration: IosConfiguration(onForeground: _onServiceStart, onBackground: _onIosBackground),
   );
+  _isAndroidServiceInitialized = true;
 }
 
 @pragma('vm:entry-point')
@@ -138,7 +139,23 @@ Future<bool> _onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 Future<void> _onServiceStart(ServiceInstance service) async {
-  // Initialize required services and dependencies
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  if (service is AndroidServiceInstance) {
+  service.setAsForegroundService();
+  await AwesomeNotifications().createNotification(
+    content: NotificationContent(
+      id: 888,
+      channelKey: 'my_foreground',
+      title: 'DPIP',
+      body: '前景服務啟動中...',
+      notificationLayout: NotificationLayout.Default,
+      locked: true,
+      autoDismissible: false,
+      icon: 'resource://drawable/ic_stat_name',
+    ),
+  );
+}
   await Global.init();
   await Preference.init();
   GlobalProviders.init();
@@ -157,21 +174,6 @@ Future<void> _onServiceStart(ServiceInstance service) async {
 
   // Only proceed with Android-specific setup if this is an Android service
   if (service is AndroidServiceInstance) {
-    // Initialize foreground service and notification
-    await service.setAsForegroundService();
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: 888,
-        channelKey: 'my_foreground',
-        title: 'DPIP',
-        body: '前景服務啟動中...',
-        notificationLayout: NotificationLayout.Default,
-        locked: true,
-        autoDismissible: false,
-        icon: 'resource://drawable/ic_stat_name',
-      ),
-    );
-
     service.setAutoStartOnBootMode(true);
 
     // Setup service state change listeners
