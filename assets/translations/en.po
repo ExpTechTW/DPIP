@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-17 08:43\n"
+"PO-Revision-Date: 2025-07-19 08:33\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -118,7 +118,7 @@ msgstr "Sound Test"
 
 #: ./lib/app/settings/notify/(5.basic)/announcement/page.dart:32
 msgid "發送公告時"
-msgstr ""
+msgstr "When sending an announcement"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:42
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
@@ -150,7 +150,7 @@ msgstr "Other"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:34
 msgid "重大"
-msgstr ""
+msgstr "Major"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時\n"
@@ -159,7 +159,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "一般"
-msgstr ""
+msgstr "General"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯警報發布時\n"
@@ -176,7 +176,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
-msgstr ""
+msgstr "Monitor(General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
@@ -591,11 +591,11 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:978
 msgid " 秒"
-msgstr ""
+msgstr " seconds"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:994
 msgid "抵達"
-msgstr ""
+msgstr "arrive"
 
 #: ./lib/app/home/page.dart:55
 msgid "已更新至 {version}"
@@ -607,7 +607,7 @@ msgstr "Error while retrieving weather data"
 
 #: ./lib/app/changelog/page.dart:109
 msgid "無法載入更新日誌，請稍後再試。"
-msgstr ""
+msgstr "Unable to load update logs, please try again later."
 
 #: ./lib/app/changelog/page.dart:113
 msgid "重試"
