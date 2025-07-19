@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-19 08:33\n"
+"PO-Revision-Date: 2025-07-19 09:49\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -94,23 +94,23 @@ msgstr "Category"
 
 #: ./lib/app/settings/notify/page.dart:44
 msgid "所在地震度1以上"
-msgstr ""
+msgstr "Intensity 1 or higher at current location"
 
 #: ./lib/app/settings/notify/page.dart:55
 msgid "海嘯消息、海嘯警報"
-msgstr ""
+msgstr "Tsunami information and tsunami warning"
 
 #: ./lib/app/settings/notify/page.dart:54
 msgid "只接收海嘯警報"
-msgstr ""
+msgstr "Tsunami warning only"
 
 #: ./lib/app/settings/notify/page.dart:50
 msgid "接收所在地"
-msgstr ""
+msgstr "Receive for current location"
 
 #: ./lib/app/settings/notify/page.dart:37
 msgid "所在地震度4以上"
-msgstr ""
+msgstr "Intensity 4 or higher at current location"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:31
 msgid "音效測試"
@@ -122,11 +122,11 @@ msgstr "When sending an announcement"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:42
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
-msgstr ""
+msgstr "The sound test is a local notification performed on the device, used only to confirm whether sound can be played properly when receiving alerts. This test does not send any requests to any server"
 
 #: ./lib/app/settings/notify/page.dart:135
 msgid "請先設定所在地來使用通知功能"
-msgstr ""
+msgstr "Please set your current location to enable notifications"
 
 #: ./lib/app/settings/notify/page.dart:142
 msgid "地震速報"
@@ -150,12 +150,12 @@ msgstr "Other"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:34
 msgid "重大"
-msgstr "Major"
+msgstr "Severe"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時\n"
 "沿海地區鄉鎮"
-msgstr ""
+msgstr "When a tsunami warning is issued for coastal towns and townships"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "一般"
@@ -164,15 +164,15 @@ msgstr "General"
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯警報發布時\n"
 "上述除外地區"
-msgstr ""
+msgstr "When a tsunami warning is issued for non-coastal areas"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
-msgstr ""
+msgstr "Pacific Tsunami Information (Silent Notification)"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息發布時"
-msgstr ""
+msgstr "When the Pacific information is issued"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
@@ -180,7 +180,7 @@ msgstr "Monitor(General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
-msgstr ""
+msgstr "Shaking detected"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
 msgid "震度速報(一般)"
@@ -216,7 +216,7 @@ msgstr "Local (Municipality/County) measured intensity is greater than 1."
 
 #: ./lib/app/settings/notify/_lib/utils.dart:13
 msgid "已更新通知設定"
-msgstr ""
+msgstr "Updated notification setting"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:17
 msgid "更新通知設定失敗"
@@ -275,11 +275,11 @@ msgstr "Local (City/Town/District) estimated intensity is greater than 1."
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布避難警訊時"
-msgstr ""
+msgstr "When the local area(township) issues an evacuating warning"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布避難資訊時"
-msgstr ""
+msgstr "When the local area(township) issues an evacuating warning"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
@@ -334,11 +334,11 @@ msgstr "Source Language"
 
 #: ./lib/app/settings/donate/page.dart:38
 msgid "無法連線至商店，請稍後再試"
-msgstr ""
+msgstr "Unable to connect to the store, please try again later"
 
 #: ./lib/app/settings/donate/page.dart:44
 msgid "找不到商品，請稍候再試"
-msgstr ""
+msgstr "Unable to find the item, please try again later"
 
 #: ./lib/app/settings/donate/page.dart:105
 msgid "重新載入"
@@ -346,7 +346,7 @@ msgstr "Reload"
 
 #: ./lib/app/settings/donate/page.dart:115
 msgid "正在載入商店物品中"
-msgstr ""
+msgstr "Loading store items"
 
 #: ./lib/app/settings/donate/page.dart:132
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
@@ -367,7 +367,7 @@ msgstr "One-time"
 
 #: ./lib/app/settings/donate/page.dart:197
 msgid "無法連線至 {store}，請稍後再試。"
-msgstr ""
+msgstr "Unable to connect to the {store}, please try again later."
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
@@ -375,15 +375,15 @@ msgstr ""
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
-msgstr ""
+msgstr "Restore purchases"
 
 #: ./lib/app/settings/donate/page.dart:216
 msgid "使用條款"
-msgstr ""
+msgstr "Terms of use"
 
 #: ./lib/app/settings/donate/page.dart:223
 msgid "隱私權政策"
-msgstr ""
+msgstr "Privacy policy"
 
 #: ./lib/app/welcome/4-permissions/page.dart:163
 msgid "位置"
@@ -399,7 +399,7 @@ msgstr "Interface"
 
 #: ./lib/app/settings/page.dart:53
 msgid "調整 DPIP 整體的外觀與顏色"
-msgstr ""
+msgstr "Adjust the overall appearance and color of DPIP"
 
 #: ./lib/app/settings/page.dart:61
 msgid "調整 DPIP 的顯示語言"
@@ -407,11 +407,11 @@ msgstr "Adjust the display language of DPIP"
 
 #: ./lib/app/settings/page.dart:69
 msgid "調整 DPIP 顯示數值時使用的單位"
-msgstr ""
+msgstr "Adjust the units for value in DPIP"
 
 #: ./lib/app/settings/page.dart:75
 msgid "調整 DPIP 地圖的設定"
-msgstr ""
+msgstr "Adjust settings of map in DPIP"
 
 #: ./lib/app/settings/page.dart:87
 msgid "推播通知設定與通知音效測試"
@@ -511,11 +511,11 @@ msgstr "Initial Layer"
 
 #: ./lib/app/settings/map/page.dart:71
 msgid "動畫幀率"
-msgstr ""
+msgstr "Animation frame rate"
 
 #: ./lib/app/settings/map/page.dart:99
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
-msgstr ""
+msgstr "Excessively high the animation frame rate may cause lag or device overheating"
 
 #: ./lib/app/settings/theme/page.dart:30
 msgid "主題模式"
@@ -575,7 +575,7 @@ msgstr "Location not set"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:874
 msgid "第 {serial} 報"
-msgstr ""
+msgstr "{serial} report"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
@@ -583,11 +583,11 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:923
 msgid "所在地預估"
-msgstr ""
+msgstr "Estimated intensity at current location"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:957
 msgid "震波"
-msgstr ""
+msgstr "The earthquake"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:978
 msgid " 秒"
@@ -595,7 +595,7 @@ msgstr " seconds"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:994
 msgid "抵達"
-msgstr "arrive"
+msgstr "arrived"
 
 #: ./lib/app/home/page.dart:55
 msgid "已更新至 {version}"
