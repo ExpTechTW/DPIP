@@ -26,12 +26,11 @@
             android:name="${applicationName}"
             android:icon="@mipmap/ic_launcher"
             android:theme="@style/LaunchTheme"
-            android:enableOnBackInvokedCallback="true"
-            android:allowBackup="false"
-            tools:replace="android:allowBackup">
+            android:enableOnBackInvokedCallback="true">
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
+                android:allowBackup="true"
                 android:largeHeap="true"
                 android:launchMode="singleTop"
                 android:theme="@style/NormalTheme"
