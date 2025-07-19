@@ -22,7 +22,6 @@ import 'package:timezone/data/latest.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeInstallationData();
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(systemNavigationBarColor: Colors.transparent));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.top]);
@@ -44,6 +43,8 @@ void main() async {
   await AppLocalizations.load();
 
   initializeTimeZones();
+
+  await initializeInstallationData();
 
   await fcmInit();
   await notifyInit();
