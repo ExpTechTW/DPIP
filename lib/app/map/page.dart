@@ -63,7 +63,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   final _managers = <MapLayer, MapLayerManager>{};
 
   Timer? _ticker;
-  DateTime _ntpTime = DateTime.now();
+  String _formattedTime = '';
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
   late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
@@ -293,28 +293,20 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _updateNtpTime();
-
     GlobalProviders.map.updateIntervalNotifier.addListener(_setupTicker);
     _setupTicker();
+    GlobalProviders.data.addListener(_updateFormattedTime);
+    _updateFormattedTime();
   }
 
-  Future<DateTime> getNtpAsDateTime() async {
-    final ntpTimestamp = await ExpTech().getNtp();
-    return DateTime.fromMillisecondsSinceEpoch(ntpTimestamp);
-  }
-
-  Future<void> _updateNtpTime() async {
-    try {
-      _ntpTime = await getNtpAsDateTime();
-    } catch (e) {
-      print('Error fetching NTP time: $e');
+  void _updateFormattedTime() {
+    if (GlobalProviders.data.rts != null) {
+      setState(() => _formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(GlobalProviders.data.rts!.time)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_ntpTime);
     return Scaffold(
       body: Stack(
         children: [
@@ -328,14 +320,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           if (activeLayers.contains(MapLayer.monitor))
             Positioned(
               top: 24,
-              left: 24,
+              left: 100,
+              right: 100,
               child: SafeArea(
                 child: Container(
                   padding: EdgeInsets.all(8.0),
                   color: Colors.black54,
                   child: Text(
-                    '$formattedTime',
-                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    textAlign: TextAlign.center,
+                    _formattedTime,
+                    style: const TextStyle(color: Colors.white, fontSize: 16.0),
                   ),
                 ),
               ),
@@ -362,6 +356,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
 
     GlobalProviders.map.updateIntervalNotifier.removeListener(_setupTicker);
+    GlobalProviders.data.removeListener(_updateFormattedTime);
 
     super.dispose();
   }
