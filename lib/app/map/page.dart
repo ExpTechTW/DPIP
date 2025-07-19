@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:dpip/api/exptech.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -61,6 +63,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   final _managers = <MapLayer, MapLayerManager>{};
 
   Timer? _ticker;
+  DateTime _ntpTime = DateTime.now();
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
   late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
@@ -290,13 +293,28 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    _updateNtpTime();
 
     GlobalProviders.map.updateIntervalNotifier.addListener(_setupTicker);
     _setupTicker();
   }
 
+  Future<DateTime> getNtpAsDateTime() async {
+    final ntpTimestamp = await ExpTech().getNtp();
+    return DateTime.fromMillisecondsSinceEpoch(ntpTimestamp);
+  }
+
+  Future<void> _updateNtpTime() async {
+    try {
+      _ntpTime = await getNtpAsDateTime();
+    } catch (e) {
+      print('Error fetching NTP time: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(_ntpTime);
     return Scaffold(
       body: Stack(
         children: [
@@ -307,6 +325,21 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             onLayerChanged: toggleLayer,
             onBaseMapChanged: setBaseMapType,
           ),
+          if (activeLayers.contains(MapLayer.monitor))
+            Positioned(
+              top: 24,
+              left: 24,
+              child: SafeArea(
+                child: Container(
+                  padding: EdgeInsets.all(8.0),
+                  color: Colors.black54,
+                  child: Text(
+                    '$formattedTime',
+                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                  ),
+                ),
+              ),
+            ),
           const PositionedBackButton(),
           ..._activeLayers.map((layer) {
             final manager = _managers[layer];
