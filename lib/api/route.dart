@@ -170,4 +170,6 @@ class Route {
 
     return Uri.parse('https://api-1.exptech.dev/api/v2/notify/$token/$type/$value');
   }
+
+  static Uri networkInfo() => Uri.parse('$lb/v1/dpip/networkInfo');
 }

@@ -58,7 +58,7 @@
                 android:foregroundServiceType="location"
                 android:exported="true"
                 android:stopWithTask="true"
-                tools:replace="android:stopWithTask"
+                tools:replace="android:exported,android:stopWithTask"
         />
     </application>
     <queries>
