@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-17 08:43\n"
+"PO-Revision-Date: 2025-07-20 08:08\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -170,7 +170,7 @@ msgstr "津波警報が発令された時\n"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
-msgstr ""
+msgstr "太平洋津波通信（音無しお知らせ）"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息發布時"
@@ -178,7 +178,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
-msgstr ""
+msgstr "強震モニター（通常）"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
@@ -186,35 +186,35 @@ msgstr "揺れを検出"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
 msgid "震度速報(一般)"
-msgstr ""
+msgstr "震度速報（通常）"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
 msgid "所在地(鄉鎮)實測震度 3 以上"
-msgstr ""
+msgstr "現在地（郷／鎮）測りにより震度 3 超え"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "震度速報(無聲通知)"
-msgstr ""
+msgstr "震度速報（音無し）"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:36
 msgid "所在地(鄉鎮)實測震度 1 以上"
-msgstr ""
+msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:33
 msgid "地震報告(一般)"
-msgstr ""
+msgstr "地震報告（通常）"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:33
 msgid "所在地(縣市)實測震度 3 以上"
-msgstr ""
+msgstr "現在地（県／市）測りにより震度 3 超え"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:34
 msgid "地震報告(無聲通知)"
-msgstr ""
+msgstr "地震報告（音無し）"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:34
 msgid "所在地(縣市)實測震度 1 以上"
-msgstr ""
+msgstr "現在地（県／市）測りにより震度 1 超え"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:13
 msgid "已更新通知設定"
@@ -226,34 +226,37 @@ msgstr "通知設定の更新に失敗しました"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:34
 msgid "緊急地震速報(重大)"
-msgstr ""
+msgstr "緊急地震速報（非常）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:35
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 4 以上"
-msgstr ""
+msgstr "最大震度 5 弱超え　かつ\n"
+"現在地（郷／鎮）測りにより震度 4 超え"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:39
 msgid "緊急地震速報(一般)"
-msgstr ""
+msgstr "緊急地震速報（通常）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:40
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 2 以上"
-msgstr ""
+msgstr "最大震度 5 弱超え　かつ\n"
+"現在地（郷／鎮）測りにより震度 2 超え"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:44
 msgid "緊急地震速報(無聲)"
-msgstr ""
+msgstr "緊急地震速報（音無し）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:45
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 1 以上"
-msgstr ""
+msgstr "最大震度 5 弱超え　かつ\n"
+"現在地（郷／鎮）測りにより震度 1 超え"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "地震速報(重大)"
-msgstr ""
+msgstr "地震速報（非常）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "所在地(鄉鎮)預估震度 4 以上"
@@ -261,19 +264,19 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "地震速報(一般)"
-msgstr ""
+msgstr "地震速報（通常）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "所在地(鄉鎮)預估震度 2 以上"
-msgstr ""
+msgstr "現在地（郷／鎮）測りにより震度 2 超え"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "地震速報(無聲)"
-msgstr ""
+msgstr "地震速報（音無し）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "所在地(鄉鎮)預估震度 1 以上"
-msgstr ""
+msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布避難警訊時"
