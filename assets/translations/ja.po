@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-20 11:38\n"
+"PO-Revision-Date: 2025-07-20 12:50\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -289,17 +289,17 @@ msgstr "現在地（郷／鎮）に避難情報が発信された時"
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "現在地（郷／鎮）にレッドアラートの天気注意報／特報が発令され"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:40
 msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "現在地（郷／鎮）にその以外の天気注意報／特報が発令され"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布雷雨即時訊息或\n"
 "山區暴雨時"
-msgstr ""
+msgstr "現在地（郷／鎮）に雷雨／山地にわか雨リアルタイム情報が発信された時"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
@@ -351,16 +351,17 @@ msgstr "再読み込み"
 
 #: ./lib/app/settings/donate/page.dart:115
 msgid "正在載入商店物品中"
-msgstr ""
+msgstr "ストアーの商品読み込み中"
 
 #: ./lib/app/settings/donate/page.dart:132
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
 "您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
-msgstr ""
+msgstr "DPIP はリアルタイムで地震情報の提供に努めているアプリケーションとして、今までに広告や他の収益方法などはございません。サービスの品質をより高く保たれるため、サーバーの運行、地震データの取り込みや伝送、またはより豊富な機能の開発やメンテナンスなどのコストを負担しております。\n\n"
+"貴台がお選びになるサポートプランは全て以上の運営コストの一部のお支払いに活用しておりまして、DPIP をより穏やかなサービスができることを支えております。ご理解、ご厚意に感謝しています！"
 
 #: ./lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
-msgstr ""
+msgstr "サブスクリプション必要"
 
 #: ./lib/app/settings/donate/page.dart:150
 msgid "{price}/月"
@@ -368,31 +369,31 @@ msgstr "{price}/毎月"
 
 #: ./lib/app/settings/donate/page.dart:162
 msgid "單次支援"
-msgstr ""
+msgstr "一回のお支え"
 
 #: ./lib/app/settings/donate/page.dart:197
 msgid "無法連線至 {store}，請稍後再試。"
-msgstr ""
+msgstr "{store} への接続異常。"
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
-msgstr ""
+msgstr "お買いになったサブスクリプションを直っております"
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
-msgstr ""
+msgstr "お買いになったものを直す"
 
 #: ./lib/app/settings/donate/page.dart:216
 msgid "使用條款"
-msgstr ""
+msgstr "利用規約"
 
 #: ./lib/app/settings/donate/page.dart:223
 msgid "隱私權政策"
-msgstr ""
+msgstr "プライバシーポリシー"
 
 #: ./lib/app/welcome/4-permissions/page.dart:163
 msgid "位置"
-msgstr ""
+msgstr "位置"
 
 #: ./lib/app/settings/page.dart:39
 msgid "設定你的所在地來接收當地的即時資訊"
@@ -412,11 +413,11 @@ msgstr "DPIPの表示言語を調整"
 
 #: ./lib/app/settings/page.dart:69
 msgid "調整 DPIP 顯示數值時使用的單位"
-msgstr ""
+msgstr "DPIP でディスプレイする数値の単位を調整する"
 
 #: ./lib/app/settings/page.dart:75
 msgid "調整 DPIP 地圖的設定"
-msgstr ""
+msgstr "DPIP 地図の設定"
 
 #: ./lib/app/settings/page.dart:87
 msgid "推播通知設定與通知音效測試"
@@ -476,7 +477,7 @@ msgstr "すべての情報は、中央気象署（CWA）の公式発表を基準
 
 #: ./lib/app/settings/location/page.dart:422
 msgid "自動更新"
-msgstr ""
+msgstr "自動更新"
 
 #: ./lib/app/settings/location/page.dart:423
 msgid "定期更新目前的所在地"
@@ -500,11 +501,11 @@ msgstr "区町村"
 
 #: ./lib/app/settings/location/select/page.dart:26
 msgid "縣市"
-msgstr ""
+msgstr "県／市"
 
 #: ./lib/app/settings/location/select/page.dart:38
 msgid "目前所在地"
-msgstr ""
+msgstr "現在地"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:138
 msgid "底圖"
@@ -516,11 +517,11 @@ msgstr "初期レイヤー"
 
 #: ./lib/app/settings/map/page.dart:71
 msgid "動畫幀率"
-msgstr ""
+msgstr "動画のフレームレート"
 
 #: ./lib/app/settings/map/page.dart:99
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
-msgstr ""
+msgstr "速すぎたフレームレートはラッグや設備発熱に至る可能性があります"
 
 #: ./lib/app/settings/theme/page.dart:30
 msgid "主題模式"
@@ -584,11 +585,11 @@ msgstr "第 {serial} 報"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr ""
+msgstr "{time} 時点に有感地震が<bold>{location}</bold>付近に発生し、規模は<bold>M{magnitude}</bold>の見積もりで、現在地最大震度は<bold>{intensity}</bold>の見積もりです。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:923
 msgid "所在地預估"
-msgstr ""
+msgstr "現在地の見積もり"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:957
 msgid "震波"
