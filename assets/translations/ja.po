@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-20 08:08\n"
+"PO-Revision-Date: 2025-07-20 09:12\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -260,7 +260,7 @@ msgstr "地震速報（非常）"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "所在地(鄉鎮)預估震度 4 以上"
-msgstr ""
+msgstr "現在地（郷／鎮）測りにより震度 4 超え"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "地震速報(一般)"
@@ -339,11 +339,11 @@ msgstr "ソース言語"
 
 #: ./lib/app/settings/donate/page.dart:38
 msgid "無法連線至商店，請稍後再試"
-msgstr ""
+msgstr "ストアーへの接続異常"
 
 #: ./lib/app/settings/donate/page.dart:44
 msgid "找不到商品，請稍候再試"
-msgstr ""
+msgstr "該当商品が見つかりません"
 
 #: ./lib/app/settings/donate/page.dart:105
 msgid "重新載入"
@@ -580,7 +580,7 @@ msgstr "現在地が設定されていません"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:874
 msgid "第 {serial} 報"
-msgstr ""
+msgstr "第 {serial} 報"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
@@ -592,15 +592,15 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:957
 msgid "震波"
-msgstr ""
+msgstr "地震波"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:978
 msgid " 秒"
-msgstr ""
+msgstr " 秒"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:994
 msgid "抵達"
-msgstr ""
+msgstr "到達"
 
 #: ./lib/app/home/page.dart:55
 msgid "已更新至 {version}"
@@ -620,11 +620,11 @@ msgstr "再試行"
 
 #: ./lib/app/welcome/4-permissions/page.dart:366
 msgid "下一步"
-msgstr ""
+msgstr "次"
 
 #: ./lib/app/welcome/1-about/page.dart:60
 msgid "防災資訊平台"
-msgstr ""
+msgstr "防災情報サイト"
 
 #: ./lib/app/welcome/2-exptech/page.dart:83
 msgid "我們是誰？"
