@@ -518,7 +518,11 @@ class ExpTech {
   }
 
   /// 設定通知
-  Future<NotifySettings> setNotify({required String token, required NotifyChannel channel, required Enum status}) async {
+  Future<NotifySettings> setNotify({
+    required String token,
+    required NotifyChannel channel,
+    required Enum status,
+  }) async {
     final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
 
     final res = await get(requestUrl);
@@ -532,17 +536,17 @@ class ExpTech {
     return NotifySettings.fromJson(jsonData.map((e) => e as int).toList());
   }
 
-  Future<void> sendNetWorkInfo({required String? ip,required String? isp, required List<int?> status, required List<int?> status_dev}) async {
+  Future<void> sendNetWorkInfo({
+    required String? ip,
+    required String? isp,
+    required List<int?> status,
+    required List<int?> status_dev,
+  }) async {
     final requestUrl = Route.networkInfo();
 
-    String body=jsonEncode({
-      'ip':ip,
-      'isp':isp,
-      'status':status,
-      'status_dev':status_dev
-    });
+    String body = jsonEncode({'ip': ip, 'isp': isp, 'status': status, 'status_dev': status_dev});
 
-    final res = await post(requestUrl,body: body);
+    final res = await post(requestUrl, body: body);
 
     if (!res.ok) {
       throw HttpException('The server returned a status of ${res.statusCode}', uri: requestUrl);
