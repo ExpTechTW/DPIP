@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-20 14:12\n"
+"PO-Revision-Date: 2025-07-20 15:17\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -174,7 +174,7 @@ msgstr "太平洋津波通信（音無しお知らせ）"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息發布時"
-msgstr "太平洋津波情報発信した時"
+msgstr "太平洋津波情報発信された時"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
@@ -361,7 +361,7 @@ msgstr "DPIP はリアルタイムで地震情報の提供に努めているア�
 
 #: ./lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
-msgstr "サブスクリプション必要"
+msgstr "サブスクリプション"
 
 #: ./lib/app/settings/donate/page.dart:150
 msgid "{price}/月"
@@ -377,11 +377,11 @@ msgstr "{store} への接続異常。"
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
-msgstr "お買いになったサブスクリプションを直っております"
+msgstr "サブスクリプションを直っております"
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
-msgstr "お買いになったものを直す"
+msgstr "サブスクリプションを直す"
 
 #: ./lib/app/settings/donate/page.dart:216
 msgid "使用條款"
@@ -405,19 +405,20 @@ msgstr "インターフェース"
 
 #: ./lib/app/settings/page.dart:53
 msgid "調整 DPIP 整體的外觀與顏色"
-msgstr "DPIPのテーマを調整"
+msgstr "DPIPのテーマを調整する"
 
 #: ./lib/app/settings/page.dart:61
 msgid "調整 DPIP 的顯示語言"
-msgstr "DPIPの表示言語を調整"
+msgstr "DPIPの表示言語を調整する"
 
 #: ./lib/app/settings/page.dart:69
 msgid "調整 DPIP 顯示數值時使用的單位"
-msgstr "DPIP でディスプレイする数値の単位を調整する"
+msgstr "DPIP で数値をディスプレイする時の\n"
+"が現れる単位を調整する"
 
 #: ./lib/app/settings/page.dart:75
 msgid "調整 DPIP 地圖的設定"
-msgstr "DPIP 地図の設定"
+msgstr "DPIP 地図の設定を調整する"
 
 #: ./lib/app/settings/page.dart:87
 msgid "推播通知設定與通知音效測試"
@@ -673,7 +674,7 @@ msgstr "DPIP は台湾本土のグループが作ったアプリケーション�
 
 #: ./lib/app/welcome/4-permissions/page.dart:156
 msgid "在重大災害發生時以通知來傳遞即時防災資訊"
-msgstr ""
+msgstr "非常災害が発生した時、通知で即時防災情報を伝えます"
 
 #: ./lib/app/welcome/4-permissions/page.dart:164
 msgid "使用定位來自動更新所在地設定，提供當地的即時防災資訊"
@@ -693,7 +694,7 @@ msgstr "セーブ"
 
 #: ./lib/app/welcome/4-permissions/page.dart:177
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
-msgstr ""
+msgstr "台湾中央気象署またはExpTechから提供されたデータ可視化画像をセーブすることに用いることになります"
 
 #: ./lib/app/welcome/4-permissions/page.dart:344
 msgid "權限請求"
@@ -701,7 +702,7 @@ msgstr "権限を要求"
 
 #: ./lib/app/welcome/4-permissions/page.dart:345
 msgid "需要使用者手動到設定開啟相關權限。"
-msgstr ""
+msgstr "ユーザー手動で設定まで相関な権限を開けることが必要です。"
 
 #: ./lib/app/welcome/4-permissions/page.dart:385
 msgid "權限"
@@ -709,7 +710,7 @@ msgstr "権限"
 
 #: ./lib/app/welcome/4-permissions/page.dart:398
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-msgstr ""
+msgstr "私たちはユーザーの側に立ち、休むことなくユーザーのプライバシーに努めております。"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:131
 msgid "地圖圖層"
@@ -741,19 +742,19 @@ msgstr "風向・風速"
 
 #: ./lib/app/map/_lib/managers/radar.dart:613
 msgid "長按設定播放起點"
-msgstr ""
+msgstr "長タッチし、プレイ起点を設定する"
 
 #: ./lib/app/map/_lib/managers/radar.dart:627
 msgid "目前時間"
-msgstr ""
+msgstr "今の時間"
 
 #: ./lib/app/map/_lib/managers/radar.dart:632
 msgid "播放起點"
-msgstr ""
+msgstr "プレイ起点"
 
 #: ./lib/app/map/_lib/managers/radar.dart:906
 msgid "播放進度"
-msgstr ""
+msgstr "プレイ進度"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:305
 msgid "今日"
@@ -921,11 +922,11 @@ msgstr "公告詳細"
 
 #: ./lib/route/image_viewer/image_viewer.dart:57
 msgid "無法取得權限"
-msgstr ""
+msgstr "権限を取りかねます"
 
 #: ./lib/route/image_viewer/image_viewer.dart:59
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
-msgstr ""
+msgstr "アプリケーション設定に「画像や映像」の権限をお開けてから、もう一度試すことをお願いします。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "再試一次"
