@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-20 09:12\n"
+"PO-Revision-Date: 2025-07-20 11:38\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -174,7 +174,7 @@ msgstr "太平洋津波通信（音無しお知らせ）"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息發布時"
-msgstr ""
+msgstr "太平洋津波情報発信した時"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
@@ -280,11 +280,11 @@ msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布避難警訊時"
-msgstr ""
+msgstr "現在地（郷／鎮）に避難注意報が発令された時"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布避難資訊時"
-msgstr ""
+msgstr "現在地（郷／鎮）に避難情報が発信された時"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
