@@ -35,8 +35,6 @@ import 'package:dpip/app/welcome/2-exptech/page.dart';
 import 'package:dpip/app/welcome/3-notice/page.dart';
 import 'package:dpip/app/welcome/4-permissions/page.dart';
 import 'package:dpip/app/welcome/layout.dart';
-import 'package:dpip/app_old/page/me/me.dart';
-import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
@@ -77,22 +75,14 @@ final router = GoRouter(
         ),
       ],
     ),
-    StatefulShellRoute.indexedStack(
-      branches: [
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/home', pageBuilder: (context, state) => const NoTransitionPage(child: HomePage()))],
+    GoRoute(
+      path: '/home',
+      pageBuilder: (context, state) => NoTransitionPage(
+        child: AppLayout(
+          currentLocation: state.uri.path,
+          child: const HomePage(),
         ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/more', pageBuilder: (context, state) => const NoTransitionPage(child: MorePage()))],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/me', pageBuilder: (context, state) => const NoTransitionPage(child: MePage()))],
-        ),
-      ],
-
-      builder: (context, state, navigationShell) {
-        return AppLayout(location: state.matchedLocation, navigationShell: navigationShell);
-      },
+      ),
     ),
     ShellRoute(
       navigatorKey: _settingsNavigatorKey,

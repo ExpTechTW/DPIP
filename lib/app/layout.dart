@@ -13,20 +13,17 @@ class NavigationLocation extends NavigationDrawerDestination {
 }
 
 class AppLayout extends StatelessWidget {
-  final String location;
-  final StatefulNavigationShell navigationShell;
+  final Widget child;
+  final String currentLocation;
 
-  AppLayout({super.key, required this.location, required this.navigationShell});
-
-  final _scaffold = GlobalKey<ScaffoldState>();
+  const AppLayout({super.key, required this.child, required this.currentLocation});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffold,
       body: Stack(
         children: [
-          navigationShell,
+          child,
           Positioned(
             top: 24,
             left: 24,
