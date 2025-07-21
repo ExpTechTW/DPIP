@@ -77,10 +77,9 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/home',
-      pageBuilder: (context, state) => NoTransitionPage(
+      pageBuilder: (context, state) => const NoTransitionPage(
         child: AppLayout(
-          currentLocation: state.uri.path,
-          child: const HomePage(),
+          child: HomePage(),
         ),
       ),
     ),

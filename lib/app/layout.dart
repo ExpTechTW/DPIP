@@ -14,9 +14,8 @@ class NavigationLocation extends NavigationDrawerDestination {
 
 class AppLayout extends StatelessWidget {
   final Widget child;
-  final String currentLocation;
 
-  const AppLayout({super.key, required this.child, required this.currentLocation});
+  const AppLayout({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
