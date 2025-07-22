@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:dpip/api/exptech.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -63,7 +61,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   final _managers = <MapLayer, MapLayerManager>{};
 
   Timer? _ticker;
-  String _formattedTime = '';
   late BaseMapType _baseMapType = GlobalProviders.map.baseMap;
 
   late Set<MapLayer> _activeLayers = widget.options?.initialLayers ?? {};
@@ -295,14 +292,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     super.initState();
     GlobalProviders.map.updateIntervalNotifier.addListener(_setupTicker);
     _setupTicker();
-    GlobalProviders.data.addListener(_updateFormattedTime);
-    _updateFormattedTime();
-  }
-
-  void _updateFormattedTime() {
-    if (GlobalProviders.data.rts != null) {
-      setState(() => _formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(GlobalProviders.data.rts!.time)));
-    }
   }
 
   @override
@@ -317,23 +306,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             onLayerChanged: toggleLayer,
             onBaseMapChanged: setBaseMapType,
           ),
-          if (activeLayers.contains(MapLayer.monitor))
-            Positioned(
-              top: 24,
-              left: 100,
-              right: 100,
-              child: SafeArea(
-                child: Container(
-                  padding: EdgeInsets.all(8.0),
-                  color: Colors.black54,
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    _formattedTime,
-                    style: const TextStyle(color: Colors.white, fontSize: 16.0),
-                  ),
-                ),
-              ),
-            ),
           const PositionedBackButton(),
           ..._activeLayers.map((layer) {
             final manager = _managers[layer];
@@ -350,13 +322,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _ticker?.cancel();
-
     for (final manager in _managers.values) {
       manager.dispose();
     }
-
     GlobalProviders.map.updateIntervalNotifier.removeListener(_setupTicker);
-    GlobalProviders.data.removeListener(_updateFormattedTime);
 
     super.dispose();
   }

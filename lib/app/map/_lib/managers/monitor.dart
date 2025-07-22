@@ -19,6 +19,7 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
+import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -686,6 +687,15 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
 
   bool _isCollapsed = true;
 
+  String _formattedTime = '';
+
+  @override
+  void initState() {
+    super.initState();
+    widget.manager.currentRtsTime.addListener(_updateFormattedTime);
+    _updateFormattedTime();
+  }
+
   void _toggleCollapse() {
     setState(() => _isCollapsed = !_isCollapsed);
   }
@@ -697,12 +707,20 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     setState(() => countdown = remainingSeconds);
   }
 
+  void _updateFormattedTime() {
+    if (GlobalProviders.data.rts != null) {
+      setState(() => _formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(GlobalProviders.data.rts!.time)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<DpipDataModel, UnmodifiableListView<Eew>>(
       selector: (_, data) => data.eew,
       builder: (context, activeEew, child) {
-        return MorphingSheet(
+        return Stack(
+          children: [
+            MorphingSheet(
           title: '強震監視器'.i18n,
           borderRadius: BorderRadius.circular(16),
           elevation: 4,
@@ -1017,6 +1035,24 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               );
             }
           },
+            ),
+          Positioned(
+            top: 24,
+            left: 100,
+            right: 100,
+            child: SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.black54,
+                child: Text(
+                  textAlign: TextAlign.center,
+                  _formattedTime,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ),
+          ],
         );
       },
     );
@@ -1025,6 +1061,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
   @override
   void dispose() {
     _timer?.cancel();
+    widget.manager.currentRtsTime.removeListener(_updateFormattedTime);
     super.dispose();
   }
 }
