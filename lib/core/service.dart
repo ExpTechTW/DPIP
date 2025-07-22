@@ -108,6 +108,7 @@ Future<void> _initializeAndroidForegroundService() async {
         importance: NotificationImportance.Low,
         defaultColor: const Color(0xFF2196f3),
         ledColor: Colors.white,
+        channelShowBadge: false,
         locked: true,
         playSound: false,
         onlyAlertOnce: true,
