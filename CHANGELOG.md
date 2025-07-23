@@ -7,6 +7,8 @@
 
 ## [未發布]
 
+## [3.0.014] - 2025-07-23
+
 ### 新增
 
 - 新增初始圖層設定。
@@ -173,7 +175,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.013...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.014...HEAD
+[3.0.014]: https://github.com/exptechtw/dpip/compare/v3.0.013(2)...v3.0.014
 [3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012...v3.0.013(2)
 [3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012(1)
 [3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
