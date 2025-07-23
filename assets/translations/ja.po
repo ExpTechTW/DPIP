@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-23 02:43\n"
+"PO-Revision-Date: 2025-07-23 03:45\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -98,7 +98,7 @@ msgstr "現在地震度1以上で受信"
 
 #: ./lib/app/settings/notify/page.dart:55
 msgid "海嘯消息、海嘯警報"
-msgstr "津波情報、津波警報"
+msgstr "津波警報・情報"
 
 #: ./lib/app/settings/notify/page.dart:54
 msgid "只接收海嘯警報"
@@ -369,19 +369,19 @@ msgstr "{price}/毎月"
 
 #: ./lib/app/settings/donate/page.dart:162
 msgid "單次支援"
-msgstr "一回のお支え"
+msgstr "一回払い"
 
 #: ./lib/app/settings/donate/page.dart:197
 msgid "無法連線至 {store}，請稍後再試。"
-msgstr "{store} への接続異常。"
+msgstr "{store}に接続できませんでした。しばらく時間をおいてから、もう一度お試しください。"
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
-msgstr "サブスクリプションを直っております"
+msgstr "ご購入内容を復元しています"
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
-msgstr "サブスクリプションを直す"
+msgstr "購入を復元"
 
 #: ./lib/app/settings/donate/page.dart:216
 msgid "使用條款"
@@ -401,7 +401,7 @@ msgstr "現在地を設定して地域のリアルタイム情報を受け取る
 
 #: ./lib/app/settings/page.dart:48
 msgid "介面"
-msgstr "インターフェース"
+msgstr "画面"
 
 #: ./lib/app/settings/page.dart:53
 msgid "調整 DPIP 整體的外觀與顏色"
@@ -438,7 +438,7 @@ msgstr "更新履歴"
 
 #: ./lib/app/settings/page.dart:106
 msgid "瀏覽 DPIP 的歷次更新紀錄"
-msgstr "DPIP の過去の更新履歴を見る"
+msgstr "過去の更新履歴を見る"
 
 #: ./lib/app/settings/page.dart:113
 msgid "幫助我們維護伺服器的穩定和長久發展"
@@ -586,11 +586,11 @@ msgstr "第 {serial} 報"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "{time} 時点に有感地震が<bold>{location}</bold>付近に発生し、規模は<bold>M{magnitude}</bold>の見積もりで、現在地最大震度は<bold>{intensity}</bold>の見積もりです。"
+msgstr "{time}ごろ、<bold>{location}</bold>付近で地震。推定M<bold>{magnitude}</bold>、最大震度<bold>{intensity}</bold>。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:923
 msgid "所在地預估"
-msgstr "現在地の見積もり"
+msgstr "現在地の予想"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:957
 msgid "震波"
@@ -626,7 +626,7 @@ msgstr "次"
 
 #: ./lib/app/welcome/1-about/page.dart:60
 msgid "防災資訊平台"
-msgstr "防災情報サイト"
+msgstr "防災情報プラットフォーム"
 
 #: ./lib/app/welcome/2-exptech/page.dart:83
 msgid "我們是誰？"
@@ -634,7 +634,7 @@ msgstr "私たちについて？"
 
 #: ./lib/app/welcome/2-exptech/page.dart:88
 msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
-msgstr "私たちの初心"
+msgstr "ExpTech Studio は殆ど学生で構成され、平均年齢 20 歳未満で人数 15 人超えた団体です。台湾北中南部、日本、韓国と中国の学生たちの組み合いです。"
 
 #: ./lib/app/welcome/2-exptech/page.dart:93
 msgid "我們的初衷"
@@ -666,7 +666,7 @@ msgstr "あらゆる公式により認可されておりません挙動は法律
 
 #: ./lib/app/welcome/1-about/page.dart:40
 msgid "歡迎使用 DPIP"
-msgstr "ようこそ DPIP へ"
+msgstr "DPIPへようこそ"
 
 #: ./lib/app/welcome/1-about/page.dart:81
 msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
@@ -690,7 +690,7 @@ msgstr "バックグラウンドでも DPIP の運行ができることを同意
 
 #: ./lib/route/image_viewer/image_viewer.dart:228
 msgid "儲存"
-msgstr "セーブ"
+msgstr "保存"
 
 #: ./lib/app/welcome/4-permissions/page.dart:177
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
@@ -794,11 +794,11 @@ msgstr "3日間"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:714
 msgid "目前沒有生效中的地震速報"
-msgstr "今は効く地震速報がありません"
+msgstr "緊急地震速報は発表されていません"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:808
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
-msgstr "規模 <bold>M{magnitude}</bold>、現在地に<bold>{intensity}</bold>と見積もりです"
+msgstr "M<bold>{magnitude}</bold>、最大震度<bold>{intensity}</bold>"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:824
 msgid "{countdown}秒後抵達"
@@ -870,7 +870,7 @@ msgstr "エラーが発生した"
 
 #: ./lib/route/announcement/announcement.dart:13
 msgid "已解決"
-msgstr "解決し"
+msgstr "解決済み"
 
 #: ./lib/route/announcement/announcement.dart:14
 msgid "影響：小"
@@ -914,15 +914,15 @@ msgstr "未知"
 
 #: ./lib/route/announcement/announcement.dart:103
 msgid "目前沒有公告"
-msgstr "今は公告はありません"
+msgstr "現在お知らせはありません"
 
 #: ./lib/route/announcement/announcement.dart:223
 msgid "公告詳情"
-msgstr "公告詳細"
+msgstr "お知らせの詳細"
 
 #: ./lib/route/image_viewer/image_viewer.dart:57
 msgid "無法取得權限"
-msgstr "権限を取りかねます"
+msgstr "権限を取得できませんでした"
 
 #: ./lib/route/image_viewer/image_viewer.dart:59
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
@@ -930,11 +930,11 @@ msgstr "アプリケーション設定に「画像や映像」の権限をお開
 
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "再試一次"
-msgstr "もう一回"
+msgstr "再試行"
 
 #: ./lib/route/image_viewer/image_viewer.dart:110
 msgid "已儲存圖片"
-msgstr "画像がセーブされた"
+msgstr "保存しました"
 
 #: ./lib/route/image_viewer/image_viewer.dart:126
 msgid "儲存圖片時發生錯誤"
@@ -942,23 +942,23 @@ msgstr "画像をセーブする時にエラーが発生しました"
 
 #: ./lib/utils/extensions/int.dart:13
 msgid "０級"
-msgstr "０級"
+msgstr "０"
 
 #: ./lib/utils/extensions/int.dart:14
 msgid "１級"
-msgstr "１級"
+msgstr "１"
 
 #: ./lib/utils/extensions/int.dart:15
 msgid "２級"
-msgstr "２級"
+msgstr "２"
 
 #: ./lib/utils/extensions/int.dart:16
 msgid "３級"
-msgstr "３級"
+msgstr "３"
 
 #: ./lib/utils/extensions/int.dart:17
 msgid "４級"
-msgstr "４級"
+msgstr "４"
 
 #: ./lib/utils/extensions/int.dart:18
 msgid "５弱"
@@ -978,7 +978,7 @@ msgstr "６強"
 
 #: ./lib/utils/extensions/int.dart:22
 msgid "７級"
-msgstr "７級"
+msgstr "７"
 
 #: ./lib/utils/weather_icon.dart:283
 msgid "晴"
