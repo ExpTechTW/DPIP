@@ -44,7 +44,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     _setupBlinkTimer();
   }
 
-  final currentRtsTime = ValueNotifier<String?>(GlobalProviders.data.rts?.time.toString());
+  final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
 
   static final kRtsCircleColor = [
     Expressions.interpolate,
@@ -423,7 +423,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   void _onDataChanged() {
     final newRts = GlobalProviders.data.rts;
-    final newRtsTime = newRts?.time.toString();
+    final newRtsTime = newRts?.time;
 
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
@@ -702,321 +702,353 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     return Selector<DpipDataModel, UnmodifiableListView<Eew>>(
       selector: (_, data) => data.eew,
       builder: (context, activeEew, child) {
-        return MorphingSheet(
-          title: '強震監視器'.i18n,
-          borderRadius: BorderRadius.circular(16),
-          elevation: 4,
-          borderWidth: activeEew.isNotEmpty ? 2 : null,
-          borderColor: activeEew.isNotEmpty ? context.colors.error : null,
-          backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
-          partialBuilder: (context, controller, sheetController) {
-            if (activeEew.isEmpty) {
-              return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
-            } else {
-              final data = activeEew.first;
+        return Stack(
+          children: [
+            MorphingSheet(
+              title: '強震監視器'.i18n,
+              borderRadius: BorderRadius.circular(16),
+              elevation: 4,
+              borderWidth: activeEew.isNotEmpty ? 2 : null,
+              borderColor: activeEew.isNotEmpty ? context.colors.error : null,
+              backgroundColor: activeEew.isNotEmpty ? context.colors.errorContainer : null,
+              partialBuilder: (context, controller, sheetController) {
+                if (activeEew.isEmpty) {
+                  return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
+                } else {
+                  final data = activeEew.first;
 
-              final info = eewLocationInfo(
-                data.info.magnitude,
-                data.info.depth,
-                data.info.latitude,
-                data.info.longitude,
-                GlobalProviders.location.coordinateNotifier.value.latitude,
-                GlobalProviders.location.coordinateNotifier.value.longitude,
-              );
+                  final info = eewLocationInfo(
+                    data.info.magnitude,
+                    data.info.depth,
+                    data.info.latitude,
+                    data.info.longitude,
+                    GlobalProviders.location.coordinateNotifier.value.latitude,
+                    GlobalProviders.location.coordinateNotifier.value.longitude,
+                  );
 
-              localIntensity = intensityFloatToInt(info.i);
-              localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
+                  localIntensity = intensityFloatToInt(info.i);
+                  localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
 
-              _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+                  _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
 
-              return InkWell(
-                onTap: () => _toggleCollapse(),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child:
-                      _isCollapsed
-                          ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return InkWell(
+                    onTap: () => _toggleCollapse(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child:
+                          _isCollapsed
+                              ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    spacing: 8,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: context.colors.error,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        padding:
-                                            activeEew.length > 1
-                                                ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
-                                                : const EdgeInsets.fromLTRB(8, 6, 8, 6),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          spacing: 4,
-                                          children: [
-                                            Icon(
-                                              Symbols.crisis_alert_rounded,
-                                              color: context.colors.onError,
-                                              weight: 700,
-                                              size: 16,
+                                      Row(
+                                        spacing: 8,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: context.colors.error,
+                                              borderRadius: BorderRadius.circular(8),
                                             ),
-                                            if (activeEew.length > 1)
-                                              RichText(
-                                                text: TextSpan(
-                                                  children: [
-                                                    TextSpan(
-                                                      text: '1',
-                                                      style: context.textTheme.labelMedium!.copyWith(
-                                                        color: context.colors.onError,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    TextSpan(
-                                                      text: '/${activeEew.length}',
-                                                      style: context.textTheme.labelMedium!.copyWith(
-                                                        color: context.colors.onError.withValues(alpha: 0.6),
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
+                                            padding:
+                                                activeEew.length > 1
+                                                    ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
+                                                    : const EdgeInsets.fromLTRB(8, 6, 8, 6),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              spacing: 4,
+                                              children: [
+                                                Icon(
+                                                  Symbols.crisis_alert_rounded,
+                                                  color: context.colors.onError,
+                                                  weight: 700,
+                                                  size: 16,
                                                 ),
-                                              ),
-                                          ],
-                                        ),
+                                                if (activeEew.length > 1)
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: '1',
+                                                          style: context.textTheme.labelMedium!.copyWith(
+                                                            color: context.colors.onError,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: '/${activeEew.length}',
+                                                          style: context.textTheme.labelMedium!.copyWith(
+                                                            color: context.colors.onError.withValues(alpha: 0.6),
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          Text(
+                                            '#${data.serial} ${data.info.time.toSimpleDateTimeString(context)} ${data.info.location}',
+                                            style: context.textTheme.bodyMedium!.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: context.colors.onErrorContainer,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        '#${data.serial} ${data.info.time.toSimpleDateTimeString(context)} ${data.info.location}',
-                                        style: context.textTheme.bodyMedium!.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: context.colors.onErrorContainer,
-                                        ),
+                                      Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24
                                       ),
                                     ],
                                   ),
-                                  Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    StyledText(
-                                      text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
-                                        'time': data.info.time.toSimpleDateTimeString(context),
-                                        'location': data.info.location,
-                                        'magnitude': data.info.magnitude.toStringAsFixed(1),
-                                        'intensity': localIntensity.asIntensityLabel,
-                                      }),
-                                      style: context.textTheme.bodyMedium!.copyWith(
-                                        color: context.colors.onErrorContainer,
-                                      ),
-                                      tags: {
-                                        'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold)),
-                                      },
-                                    ),
-
-                                    Text(
-                                      countdown >= 0
-                                          ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown})
-                                          : '已抵達'.i18n,
-                                      style: context.textTheme.bodyMedium!.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: context.colors.onErrorContainer,
-                                        height: 1,
-                                        leadingDistribution: TextLeadingDistribution.even,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          )
-                          : Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    spacing: 8,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          color: context.colors.error,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          spacing: 4,
-                                          children: [
-                                            Icon(
-                                              Symbols.crisis_alert_rounded,
-                                              color: context.colors.onError,
-                                              weight: 700,
-                                              size: 22,
-                                            ),
-                                            Text(
-                                              '緊急地震速報'.i18n,
-                                              style: context.textTheme.labelLarge!.copyWith(
-                                                color: context.colors.onError,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Text(
-                                        '第 {serial} 報'.i18n.args({'serial': activeEew.first.serial}),
-                                        style: context.textTheme.bodyLarge!.copyWith(
-                                          color: context.colors.onErrorContainer,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8),
-                                child: StyledText(
-                                  text:
-                                      '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                                          .i18n
-                                          .args({
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        StyledText(
+                                          text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
                                             'time': data.info.time.toSimpleDateTimeString(context),
                                             'location': data.info.location,
                                             'magnitude': data.info.magnitude.toStringAsFixed(1),
                                             'intensity': localIntensity.asIntensityLabel,
                                           }),
-                                  style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                                  tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                                ),
-                              ),
-                              Selector<SettingsLocationModel, String?>(
-                                selector: (context, model) => model.code,
-                                builder: (context, code, child) {
-                                  if (code == null) {
-                                    return const SizedBox.shrink();
-                                  }
+                                          style: context.textTheme.bodyMedium!.copyWith(
+                                            color: context.colors.onErrorContainer,
+                                          ),
+                                          tags: {
+                                            'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold)),
+                                          },
+                                        ),
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 8, bottom: 4),
-                                    child: IntrinsicHeight(
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        Text(
+                                          countdown >= 0
+                                              ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown})
+                                              : '已抵達'.i18n,
+                                          style: context.textTheme.bodyMedium!.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: context.colors.onErrorContainer,
+                                            height: 1,
+                                            leadingDistribution: TextLeadingDistribution.even,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              )
+                              : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        spacing: 8,
                                         children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(4),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  Text(
-                                                    '所在地預估'.i18n,
-                                                    style: context.textTheme.labelLarge!.copyWith(
-                                                      color: context.colors.onErrorContainer.withValues(alpha: 0.6),
-                                                    ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: context.colors.error,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              spacing: 4,
+                                              children: [
+                                                Icon(
+                                                  Symbols.crisis_alert_rounded,
+                                                  color: context.colors.onError,
+                                                  weight: 700,
+                                                  size: 22,
+                                                ),
+                                                Text(
+                                                  '緊急地震速報'.i18n,
+                                                  style: context.textTheme.labelLarge!.copyWith(
+                                                    color: context.colors.onError,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 12, bottom: 8),
-                                                    child: Text(
-                                                      localIntensity.asIntensityLabel,
-                                                      style: context.textTheme.displayMedium!.copyWith(
-                                                        fontWeight: FontWeight.bold,
-                                                        color: context.colors.onErrorContainer,
-                                                        height: 1,
-                                                        leadingDistribution: TextLeadingDistribution.even,
-                                                      ),
-                                                      textAlign: TextAlign.center,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          VerticalDivider(
-                                            color: context.colors.onErrorContainer.withValues(alpha: 0.4),
-                                            width: 24,
-                                          ),
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(4),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                                children: [
-                                                  Text(
-                                                    '震波'.i18n,
-                                                    style: context.textTheme.labelLarge!.copyWith(
-                                                      color: context.colors.onErrorContainer.withValues(alpha: 0.6),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 12, bottom: 8),
-                                                    child:
-                                                        (countdown >= 0)
-                                                            ? RichText(
-                                                              text: TextSpan(
-                                                                children: [
-                                                                  TextSpan(
-                                                                    text: countdown.toString(),
-                                                                    style: TextStyle(
-                                                                      fontSize:
-                                                                          context.textTheme.displayMedium!.fontSize! *
-                                                                          1.15,
-                                                                    ),
-                                                                  ),
-                                                                  TextSpan(
-                                                                    text: ' 秒'.i18n,
-                                                                    style: TextStyle(
-                                                                      fontSize: context.textTheme.labelLarge!.fontSize,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                                style: context.textTheme.displayMedium!.copyWith(
-                                                                  fontWeight: FontWeight.bold,
-                                                                  color: context.colors.onErrorContainer,
-                                                                  height: 1,
-                                                                  leadingDistribution: TextLeadingDistribution.even,
-                                                                ),
-                                                              ),
-                                                              textAlign: TextAlign.center,
-                                                            )
-                                                            : Text(
-                                                              '抵達'.i18n,
-                                                              style: context.textTheme.displayMedium!.copyWith(
-                                                                fontWeight: FontWeight.bold,
-                                                                color: context.colors.onErrorContainer,
-                                                                height: 1,
-                                                                leadingDistribution: TextLeadingDistribution.even,
-                                                              ),
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                  ),
-                                                ],
-                                              ),
+                                          Text(
+                                            '第 {serial} 報'.i18n.args({'serial': activeEew.first.serial}),
+                                            style: context.textTheme.bodyLarge!.copyWith(
+                                              color: context.colors.onErrorContainer,
                                             ),
                                           ),
                                         ],
                                       ),
+                                      Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: StyledText(
+                                      text:
+                                          '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
+                                              .i18n
+                                              .args({
+                                                'time': data.info.time.toSimpleDateTimeString(context),
+                                                'location': data.info.location,
+                                                'magnitude': data.info.magnitude.toStringAsFixed(1),
+                                                'intensity': localIntensity.asIntensityLabel,
+                                              }),
+                                      style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
+                                      tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
                                     ),
-                                  );
-                                },
+                                  ),
+                                  Selector<SettingsLocationModel, String?>(
+                                    selector: (context, model) => model.code,
+                                    builder: (context, code, child) {
+                                      if (code == null) {
+                                        return const SizedBox.shrink();
+                                      }
+
+                                      return Padding(
+                                        padding: const EdgeInsets.only(top: 8, bottom: 4),
+                                        child: IntrinsicHeight(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(4),
+                                                  child: Column(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                    children: [
+                                                      Text(
+                                                        '所在地預估'.i18n,
+                                                        style: context.textTheme.labelLarge!.copyWith(
+                                                          color: context.colors.onErrorContainer.withValues(alpha: 0.6),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(top: 12, bottom: 8),
+                                                        child: Text(
+                                                          localIntensity.asIntensityLabel,
+                                                          style: context.textTheme.displayMedium!.copyWith(
+                                                            fontWeight: FontWeight.bold,
+                                                            color: context.colors.onErrorContainer,
+                                                            height: 1,
+                                                            leadingDistribution: TextLeadingDistribution.even,
+                                                          ),
+                                                          textAlign: TextAlign.center,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              VerticalDivider(
+                                                color: context.colors.onErrorContainer.withValues(alpha: 0.4),
+                                                width: 24,
+                                              ),
+                                              Expanded(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(4),
+                                                  child: Column(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                    children: [
+                                                      Text(
+                                                        '震波'.i18n,
+                                                        style: context.textTheme.labelLarge!.copyWith(
+                                                          color: context.colors.onErrorContainer.withValues(alpha: 0.6),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding: const EdgeInsets.only(top: 12, bottom: 8),
+                                                        child:
+                                                            (countdown >= 0)
+                                                                ? RichText(
+                                                                  text: TextSpan(
+                                                                    children: [
+                                                                      TextSpan(
+                                                                        text: countdown.toString(),
+                                                                        style: TextStyle(
+                                                                          fontSize:
+                                                                              context.textTheme.displayMedium!.fontSize! *
+                                                                              1.15,
+                                                                        ),
+                                                                      ),
+                                                                      TextSpan(
+                                                                        text: ' 秒'.i18n,
+                                                                        style: TextStyle(
+                                                                          fontSize: context.textTheme.labelLarge!.fontSize,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                    style: context.textTheme.displayMedium!.copyWith(
+                                                                      fontWeight: FontWeight.bold,
+                                                                      color: context.colors.onErrorContainer,
+                                                                      height: 1,
+                                                                      leadingDistribution: TextLeadingDistribution.even,
+                                                                    ),
+                                                                  ),
+                                                                  textAlign: TextAlign.center,
+                                                                )
+                                                                : Text(
+                                                                  '抵達'.i18n,
+                                                                  style: context.textTheme.displayMedium!.copyWith(
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: context.colors.onErrorContainer,
+                                                                    height: 1,
+                                                                    leadingDistribution: TextLeadingDistribution.even,
+                                                                  ),
+                                                                  textAlign: TextAlign.center,
+                                                                ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                    ),
+                  );
+                }
+              },
+            ),
+            Positioned(
+              top: 24,
+              left: 100,
+              right: 100,
+              child: SafeArea(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ValueListenableBuilder<int?>(
+                    valueListenable: widget.manager.currentRtsTime,
+                    builder: (context, currentTimeMillis, child) {
+                      String displayTime = 'N/A';
+                      if (currentTimeMillis != null && currentTimeMillis > 0) {
+                        displayTime = currentTimeMillis.toLocaleDateTimeString(context);
+                      }
+                      return Container(
+                        padding: const EdgeInsets.all(8),
+                        color: Theme.of(context).colorScheme.surface,
+                        child: Text(
+                          displayTime,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              );
-            }
-          },
+              ),
+            ),
+          ],
         );
       },
     );
