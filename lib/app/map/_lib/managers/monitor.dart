@@ -19,7 +19,6 @@ import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:i18n_extension/i18n_extension.dart';
-import 'package:intl/intl.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
@@ -1033,9 +1032,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     builder: (context, currentTimeMillis, child) {
                       String displayTime = 'N/A';
                       if (currentTimeMillis != null && currentTimeMillis > 0) {
-                        displayTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(
-                          DateTime.fromMillisecondsSinceEpoch(currentTimeMillis),
-                        );
+                        displayTime = currentTimeMillis.toLocaleDateTimeString(context);
                       }
                       return Container(
                         padding: const EdgeInsets.all(8),
