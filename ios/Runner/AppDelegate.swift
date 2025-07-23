@@ -49,7 +49,7 @@ class AppDelegate: FlutterAppDelegate, CLLocationManagerDelegate {
     }
 
     // MARK: - Setup Methods
-    
+
     private func setupFlutterChannels() {
         guard let controller = window?.rootViewController as? FlutterViewController else { return }
         

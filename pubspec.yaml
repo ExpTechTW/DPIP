@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 3.0.013
+version: 3.0.014
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -31,7 +31,6 @@ dependencies:
       url: https://github.com/ExpTechTW/flutter_background_service.git
       path: packages/flutter_background_service
       ref: master
-  flutter_local_notifications: ^19.1.0
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.7

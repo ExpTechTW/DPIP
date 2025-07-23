@@ -48,6 +48,9 @@ class Preference {
   static String? get version => instance.getString('app-version');
   static set version(String? value) => instance.set('app-version', value);
 
+  static int? get installTime => instance.getInt('install-time');
+  static set installTime(int? value) => instance.set('install-time', value);
+
   static int? get lastUpdateToServerTime => instance.getInt(PreferenceKeys.lastUpdateToServerTime);
   static set lastUpdateToServerTime(int? value) => instance.set(PreferenceKeys.lastUpdateToServerTime, value);
 
