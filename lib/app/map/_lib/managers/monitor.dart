@@ -45,7 +45,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     _setupBlinkTimer();
   }
 
-  final currentRtsTime = ValueNotifier<String?>(GlobalProviders.data.rts?.time.toString());
+  final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
 
   static final kRtsCircleColor = [
     Expressions.interpolate,
@@ -424,7 +424,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   void _onDataChanged() {
     final newRts = GlobalProviders.data.rts;
-    final newRtsTime = newRts?.time.toString();
+    final newRtsTime = newRts?.time;
 
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
@@ -687,15 +687,6 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
 
   bool _isCollapsed = true;
 
-  String _formattedTime = '';
-
-  @override
-  void initState() {
-    super.initState();
-    widget.manager.currentRtsTime.addListener(_updateFormattedTime);
-    _updateFormattedTime();
-  }
-
   void _toggleCollapse() {
     setState(() => _isCollapsed = !_isCollapsed);
   }
@@ -705,12 +696,6 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
-  }
-
-  void _updateFormattedTime() {
-    if (GlobalProviders.data.rts != null) {
-      setState(() => _formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.fromMillisecondsSinceEpoch(GlobalProviders.data.rts!.time)));
-    }
   }
 
   @override
@@ -1041,13 +1026,27 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               left: 100,
               right: 100,
               child: SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  color: Colors.black54,
-                  child: Text(
-                    textAlign: TextAlign.center,
-                    _formattedTime,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: ValueListenableBuilder<int?>(
+                    valueListenable: widget.manager.currentRtsTime,
+                    builder: (context, currentTimeMillis, child) {
+                      String displayTime = 'N/A';
+                      if (currentTimeMillis != null && currentTimeMillis > 0) {
+                        displayTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                          DateTime.fromMillisecondsSinceEpoch(currentTimeMillis),
+                        );
+                      }
+                      return Container(
+                        padding: const EdgeInsets.all(8),
+                        color: Theme.of(context).colorScheme.surface,
+                        child: Text(
+                          displayTime,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -1061,7 +1060,6 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
   @override
   void dispose() {
     _timer?.cancel();
-    widget.manager.currentRtsTime.removeListener(_updateFormattedTime);
     super.dispose();
   }
 }
