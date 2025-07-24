@@ -76,10 +76,8 @@
 	</array>
 	<key>NSBonjourServices</key>
     <array>
-        <string>${DART_DEBUG_BONJOUR_SERVICE}</string>  <!-- Flutter Debug 用 -->
-        <!-- 若你真的有自己的服務，照 _xxx._tcp 寫在這 -->
+        <string>${DART_DEBUG_BONJOUR_SERVICE}</string>
     </array>
-
     <key>NSLocalNetworkUsageDescription</key>
     <string>App 需要搜尋本地裝置以完成除錯/連線。</string>
 </dict>
