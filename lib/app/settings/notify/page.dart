@@ -112,7 +112,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
     return Selector<SettingsLocationModel, String?>(
       selector: (_, model) => model.code,
       builder: (context, code, child) {
-        final enabled = code != null || Preference.locationAuto!;
+        final enabled = code != null || (Preference.locationAuto ?? false);
 
         return Stack(
           children: [
