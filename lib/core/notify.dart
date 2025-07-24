@@ -10,6 +10,54 @@ import 'package:go_router/go_router.dart';
 
 String? _pendingChannelKey;
 
+@pragma('vm:entry-point')
+Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
+  print(receivedAction);
+  final context = router.routerDelegate.navigatorKey.currentContext;
+  if (context == null) {
+    _pendingChannelKey = receivedAction.channelKey;
+    TalkerManager.instance.debug('Context not available, stored pending notification: channelKey=$_pendingChannelKey');
+    return;
+  }
+
+  final channelKey = receivedAction.channelKey;
+  TalkerManager.instance.debug('Notification clicked: channelKey=$channelKey');
+
+  _navigateBasedOnChannelKey(context, channelKey);
+}
+
+void handlePendingNotificationNavigation(BuildContext context) {
+  if (_pendingChannelKey == null) return;
+
+  TalkerManager.instance.debug('Handling pending notification: channelKey=$_pendingChannelKey');
+
+  _navigateBasedOnChannelKey(context, _pendingChannelKey);
+  _pendingChannelKey = null;
+}
+
+void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
+  if (channelKey == null) return;
+
+  TalkerManager.instance.debug('Navigating based on channelKey: $channelKey');
+
+  if (channelKey.startsWith('eew')) {
+    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
+    return;
+  }
+  
+  if (channelKey.startsWith('int_report')) {
+    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
+    return;
+  }
+  
+  if (channelKey.startsWith('eq')) {
+    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
+    return;
+  }
+  
+  context.go('/home');
+}
+
 Future<void> notifyInit() async {
   await AwesomeNotifications().initialize(
     'resource://drawable/ic_stat_name',
@@ -319,40 +367,4 @@ Future<void> notifyInit() async {
   );
 
   AwesomeNotifications().setListeners(onActionReceivedMethod: onActionReceivedMethod);
-
-  final receivedAction = await AwesomeNotifications().getInitialNotificationAction();
-  if (receivedAction != null) {
-    _pendingChannelKey = receivedAction.channelKey;
-    TalkerManager.instance.debug('Stored pending notification: channelKey=$_pendingChannelKey');
-  }
-}
-
-void handlePendingNotificationNavigation(BuildContext context) {
-  if (_pendingChannelKey == null) return;
-
-  TalkerManager.instance.debug('Handling pending notification: channelKey=$_pendingChannelKey');
-
-  if (_pendingChannelKey?.startsWith('eq') == true || _pendingChannelKey?.startsWith('eew') == true) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
-  }
-
-  _pendingChannelKey = null;
-}
-
-@pragma('vm:entry-point')
-Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-  final context = router.routerDelegate.navigatorKey.currentContext;
-  if (context == null) {
-    _pendingChannelKey = receivedAction.channelKey;
-    TalkerManager.instance.debug('Context not available, stored pending notification: channelKey=$_pendingChannelKey');
-    return;
-  }
-
-  final channelKey = receivedAction.channelKey;
-  TalkerManager.instance.debug('Notification clicked: channelKey=$channelKey');
-
-  if (channelKey?.startsWith('eq') == true || channelKey?.startsWith('eew') == true) {
-    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
-    return;
-  }
 }
