@@ -148,6 +148,14 @@ class DpipMapState extends State<DpipMap> {
           'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
         },
         {
+          'id': BaseMapLayerIds.exptechGlobalFill,
+          'type': 'fill',
+          'source': 'map',
+          'source-layer': 'global',
+          'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
+          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
+        },
+        {
           'id': BaseMapLayerIds.exptechCountyFill,
           'type': 'fill',
           'source': 'map',
@@ -170,14 +178,6 @@ class DpipMapState extends State<DpipMap> {
           'type': 'line',
           'paint': {'line-color': colors.outline.toHexStringRGB()},
           'layout': {'visibility': 'visible'},
-        },
-        {
-          'id': BaseMapLayerIds.exptechGlobalFill,
-          'type': 'fill',
-          'source': 'map',
-          'source-layer': 'global',
-          'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
-          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
         },
         {
           'id': 'tsunami',
