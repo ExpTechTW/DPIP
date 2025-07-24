@@ -1036,7 +1036,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       }
                       return Container(
                         padding: const EdgeInsets.all(8),
-                        color: Theme.of(context).colorScheme.surface,
+                        color: Theme.of(context).colorScheme.surface.withAlpha((0.5 * 255).round()),
                         child: Text(
                           displayTime,
                           textAlign: TextAlign.center,
