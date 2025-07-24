@@ -1022,8 +1022,8 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
             ),
             Positioned(
               top: 24,
-              left: 100,
-              right: 100,
+              left: 95,
+              right: 95,
               child: SafeArea(
                 child: Align(
                   alignment: Alignment.topCenter,
@@ -1036,7 +1036,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       }
                       return Container(
                         padding: const EdgeInsets.all(8),
-                        color: Theme.of(context).colorScheme.surface.withAlpha((0.5 * 255).round()),
+                        width: 200,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface.withAlpha((0.5 * 255).round()),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         child: Text(
                           displayTime,
                           textAlign: TextAlign.center,
