@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-25 05:53\n"
+"PO-Revision-Date: 2025-07-25 13:48\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -284,17 +284,20 @@ msgstr "When the local area(township) issues an evacuating warning"
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "The location (township) issues a red signal\n"
+"Weather Warning"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:40
 msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr ""
+msgstr "The location (township) where the above-mentioned exceptions are issued\n"
+"Weather Warning"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布雷雨即時訊息或\n"
 "山區暴雨時"
-msgstr ""
+msgstr "The location (township) issues instant thunderstorm information or\n"
+"Heavy rain in mountainous areas"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
@@ -351,7 +354,8 @@ msgstr "Loading store items"
 #: ./lib/app/settings/donate/page.dart:132
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
 "您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
-msgstr ""
+msgstr "As an app dedicated to providing real-time earthquake information, DPIP currently has no advertising or other profit models. In order to maintain high-quality services, we need to bear the costs of server operation, seismic data acquisition and transmission, and subsequent function development and maintenance.\n\n"
+"Every donation you make below will go directly toward these operating costs, helping DPIP to continue to provide you with services in a sustainable manner. Thank you for your understanding and generosity!"
 
 #: ./lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
@@ -371,7 +375,7 @@ msgstr "Unable to connect to the {store}, please try again later."
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
-msgstr ""
+msgstr "Restoring your purchased subscription"
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
@@ -415,7 +419,7 @@ msgstr "Adjust settings of map in DPIP"
 
 #: ./lib/app/settings/page.dart:87
 msgid "推播通知設定與通知音效測試"
-msgstr ""
+msgstr "Push notification settings and notification sound test"
 
 #: ./lib/app/settings/page.dart:94
 msgid "資訊"
@@ -423,7 +427,7 @@ msgstr "Information"
 
 #: ./lib/app/settings/page.dart:99
 msgid "掌握 ExpTech Studio 的最新公告與資訊"
-msgstr ""
+msgstr "Get the latest announcements and news from ExpTech Studio"
 
 #: ./lib/app/changelog/page.dart:54
 msgid "更新日誌"
