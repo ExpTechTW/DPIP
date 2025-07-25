@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-07-23 03:45\n"
+"PO-Revision-Date: 2025-07-25 13:48\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -359,7 +359,8 @@ msgstr "正在加载商店商品中"
 #: ./lib/app/settings/donate/page.dart:132
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
 "您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
-msgstr ""
+msgstr "DPIP 作为一款致力于提供及时地震信息的app，目前并无广告或其他盈利模式。为了维持高质量服务，我们需要承担服务器运行，地震信息获取与传输、以及后续功能开发与维护的成本！\n\n"
+"您在下方所选择的每一份支持，都将直接用于支付这些营运费用，帮助 DPIP 持续稳定底，为您提供服务。感谢您的理解与慷慨！"
 
 #: ./lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
@@ -375,23 +376,23 @@ msgstr "单次支持"
 
 #: ./lib/app/settings/donate/page.dart:197
 msgid "無法連線至 {store}，請稍後再試。"
-msgstr ""
+msgstr "无法连接至 {store} ，请稍后再试。"
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
-msgstr ""
+msgstr "正在恢复您购买的订阅"
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
-msgstr ""
+msgstr "恢复购买"
 
 #: ./lib/app/settings/donate/page.dart:216
 msgid "使用條款"
-msgstr ""
+msgstr "使用条款"
 
 #: ./lib/app/settings/donate/page.dart:223
 msgid "隱私權政策"
-msgstr ""
+msgstr "隐私权政策"
 
 #: ./lib/app/welcome/4-permissions/page.dart:163
 msgid "位置"
@@ -519,11 +520,11 @@ msgstr "默认图层"
 
 #: ./lib/app/settings/map/page.dart:71
 msgid "動畫幀率"
-msgstr ""
+msgstr "动画帧率"
 
 #: ./lib/app/settings/map/page.dart:99
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
-msgstr ""
+msgstr "过高的动画帧率可能会造成设备卡顿或发热"
 
 #: ./lib/app/settings/theme/page.dart:30
 msgid "主題模式"
@@ -583,27 +584,27 @@ msgstr "尚未设定所在地"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:874
 msgid "第 {serial} 報"
-msgstr ""
+msgstr "第{serial}报"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr ""
+msgstr "{time}左右，<bold>{location}</bold>附近发生有感地震，预计规模<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:923
 msgid "所在地預估"
-msgstr ""
+msgstr "所在地预估"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:957
 msgid "震波"
-msgstr ""
+msgstr "震波"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:978
 msgid " 秒"
-msgstr ""
+msgstr " 秒"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:994
 msgid "抵達"
-msgstr ""
+msgstr "抵达"
 
 #: ./lib/app/home/page.dart:55
 msgid "已更新至 {version}"
@@ -743,19 +744,19 @@ msgstr "风向/风速"
 
 #: ./lib/app/map/_lib/managers/radar.dart:613
 msgid "長按設定播放起點"
-msgstr ""
+msgstr "长按设定播放起点"
 
 #: ./lib/app/map/_lib/managers/radar.dart:627
 msgid "目前時間"
-msgstr ""
+msgstr "目前时间"
 
 #: ./lib/app/map/_lib/managers/radar.dart:632
 msgid "播放起點"
-msgstr ""
+msgstr "播放起点"
 
 #: ./lib/app/map/_lib/managers/radar.dart:906
 msgid "播放進度"
-msgstr ""
+msgstr "播放进度"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:305
 msgid "今日"
@@ -795,19 +796,19 @@ msgstr "3 天"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:714
 msgid "目前沒有生效中的地震速報"
-msgstr ""
+msgstr "目前没有生效中的地震预警"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:808
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
-msgstr ""
+msgstr "规模<bold>M{magnitude}</bold>，所在地预估<bold>{intensity}</bold>"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:824
 msgid "{countdown}秒後抵達"
-msgstr ""
+msgstr "{countdown}秒后抵达"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:825
 msgid "已抵達"
-msgstr ""
+msgstr "已抵达"
 
 #: ./lib/app/map/_lib/managers/report.dart:371
 msgid "近期的地震報告"
@@ -867,111 +868,111 @@ msgstr "峰值最大地震动速度图"
 
 #: ./lib/route/announcement/announcement.dart:12
 msgid "錯誤"
-msgstr ""
+msgstr "错误"
 
 #: ./lib/route/announcement/announcement.dart:13
 msgid "已解決"
-msgstr ""
+msgstr "已解决"
 
 #: ./lib/route/announcement/announcement.dart:14
 msgid "影響：小"
-msgstr ""
+msgstr "影响：小"
 
 #: ./lib/route/announcement/announcement.dart:15
 msgid "影響：中"
-msgstr ""
+msgstr "影响：中"
 
 #: ./lib/route/announcement/announcement.dart:16
 msgid "影響：大"
-msgstr ""
+msgstr "影响：大"
 
 #: ./lib/route/announcement/announcement.dart:18
 msgid "維修"
-msgstr ""
+msgstr "维护"
 
 #: ./lib/route/announcement/announcement.dart:19
 msgid "測試"
-msgstr ""
+msgstr "测试"
 
 #: ./lib/route/announcement/announcement.dart:20
 msgid "變更"
-msgstr ""
+msgstr "变更"
 
 #: ./lib/route/announcement/announcement.dart:21
 msgid "完成"
-msgstr ""
+msgstr "完成"
 
 #: ./lib/route/announcement/announcement.dart:22
 msgid "地震相關"
-msgstr ""
+msgstr "地震相关信息"
 
 #: ./lib/route/announcement/announcement.dart:23
 msgid "氣象相關"
-msgstr ""
+msgstr "气象相关信息"
 
 #: ./lib/route/announcement/announcement.dart:29
 msgid "未知"
-msgstr ""
+msgstr "未知"
 
 #: ./lib/route/announcement/announcement.dart:103
 msgid "目前沒有公告"
-msgstr ""
+msgstr "目前没有通知"
 
 #: ./lib/route/announcement/announcement.dart:223
 msgid "公告詳情"
-msgstr ""
+msgstr "通知详情"
 
 #: ./lib/route/image_viewer/image_viewer.dart:57
 msgid "無法取得權限"
-msgstr ""
+msgstr "无法取得权限"
 
 #: ./lib/route/image_viewer/image_viewer.dart:59
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
-msgstr ""
+msgstr "请领导应用程序设定中找到并允许「相片和媒体」权限后在试一次。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "再試一次"
-msgstr ""
+msgstr "再试一次"
 
 #: ./lib/route/image_viewer/image_viewer.dart:110
 msgid "已儲存圖片"
-msgstr ""
+msgstr "已存储图片"
 
 #: ./lib/route/image_viewer/image_viewer.dart:126
 msgid "儲存圖片時發生錯誤"
-msgstr ""
+msgstr "存储图片时发生错误"
 
 #: ./lib/utils/extensions/int.dart:13
 msgid "０級"
-msgstr ""
+msgstr "０级"
 
 #: ./lib/utils/extensions/int.dart:14
 msgid "１級"
-msgstr ""
+msgstr "弱震"
 
 #: ./lib/utils/extensions/int.dart:15
 msgid "２級"
-msgstr ""
+msgstr "弱震"
 
 #: ./lib/utils/extensions/int.dart:16
 msgid "３級"
-msgstr ""
+msgstr "有感地震"
 
 #: ./lib/utils/extensions/int.dart:17
 msgid "４級"
-msgstr ""
+msgstr "有感地震"
 
 #: ./lib/utils/extensions/int.dart:18
 msgid "５弱"
-msgstr ""
+msgstr "V度"
 
 #: ./lib/utils/extensions/int.dart:19
 msgid "５強"
-msgstr ""
+msgstr "VI度"
 
 #: ./lib/utils/extensions/int.dart:20
 msgid "６弱"
-msgstr ""
+msgstr "VII度"
 
 #: ./lib/utils/extensions/int.dart:21
 msgid "６強"
@@ -979,7 +980,7 @@ msgstr ""
 
 #: ./lib/utils/extensions/int.dart:22
 msgid "７級"
-msgstr ""
+msgstr "级"
 
 #: ./lib/utils/weather_icon.dart:283
 msgid "晴"
