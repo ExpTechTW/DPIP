@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-25 13:48\n"
+"PO-Revision-Date: 2025-07-25 15:51\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -42,15 +42,15 @@ msgstr "Earthquake Early Warning"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:706
 msgid "強震監視器"
-msgstr "Monitor"
+msgstr "Strong Earthquake Monitor"
 
 #: ./lib/app/map/_lib/managers/report.dart:814
 msgid "地震報告"
-msgstr "Reports"
+msgstr "Earthquake Reports"
 
 #: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
-msgstr "Intensity Report"
+msgstr "Earthquake Intensity Report"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:59
 msgid "雷雨即時訊息"
@@ -62,11 +62,11 @@ msgstr "Weather Advisory"
 
 #: ./lib/app/settings/notify/page.dart:236
 msgid "避難資訊"
-msgstr "Evacuation"
+msgstr "Evacuation information"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:176
 msgid "海嘯資訊"
-msgstr "Tsunami"
+msgstr "Tsunami information"
 
 #: ./lib/route/announcement/announcement.dart:82
 msgid "公告"
@@ -98,7 +98,7 @@ msgstr "Intensity 1 or higher at current location"
 
 #: ./lib/app/settings/notify/page.dart:55
 msgid "海嘯消息、海嘯警報"
-msgstr "Tsunami information and tsunami warning"
+msgstr "Tsunami information, Tsunami warning"
 
 #: ./lib/app/settings/notify/page.dart:54
 msgid "只接收海嘯警報"
