@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-25 16:59\n"
+"PO-Revision-Date: 2025-07-25 18:29\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -627,7 +627,7 @@ msgstr "Disaster Prevention Information Platform"
 
 #: ./lib/app/welcome/2-exptech/page.dart:83
 msgid "我們是誰？"
-msgstr ""
+msgstr "Who are we?"
 
 #: ./lib/app/welcome/2-exptech/page.dart:88
 msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
@@ -635,7 +635,7 @@ msgstr "ExpTech Studio is a group of mostly students, with an average age of und
 
 #: ./lib/app/welcome/2-exptech/page.dart:93
 msgid "我們的初衷"
-msgstr ""
+msgstr "Our original intention"
 
 #: ./lib/app/welcome/2-exptech/page.dart:98
 msgid "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
@@ -655,7 +655,7 @@ msgstr "Strong shaking has a chance of reaching the user's location before the n
 
 #: ./lib/app/welcome/3-notice/page.dart:99
 msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
-msgstr ""
+msgstr "Earthquake early warning is the result of rapid calculation and may have large errors. It should be understood and used with caution."
 
 #: ./lib/app/welcome/3-notice/page.dart:110
 msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
@@ -663,7 +663,7 @@ msgstr ""
 
 #: ./lib/app/welcome/1-about/page.dart:40
 msgid "歡迎使用 DPIP"
-msgstr ""
+msgstr "Welcome to DPIP"
 
 #: ./lib/app/welcome/1-about/page.dart:81
 msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
@@ -699,7 +699,7 @@ msgstr ""
 
 #: ./lib/app/welcome/4-permissions/page.dart:345
 msgid "需要使用者手動到設定開啟相關權限。"
-msgstr ""
+msgstr "Users are required to manually go to settings to enable relevant permissions."
 
 #: ./lib/app/welcome/4-permissions/page.dart:385
 msgid "權限"
@@ -867,15 +867,15 @@ msgstr "Mistake"
 
 #: ./lib/route/announcement/announcement.dart:13
 msgid "已解決"
-msgstr ""
+msgstr "Resolved"
 
 #: ./lib/route/announcement/announcement.dart:14
 msgid "影響：小"
-msgstr ""
+msgstr "Impact: Small"
 
 #: ./lib/route/announcement/announcement.dart:15
 msgid "影響：中"
-msgstr ""
+msgstr "Impact: Medium"
 
 #: ./lib/route/announcement/announcement.dart:16
 msgid "影響：大"
@@ -883,15 +883,15 @@ msgstr ""
 
 #: ./lib/route/announcement/announcement.dart:18
 msgid "維修"
-msgstr ""
+msgstr "Impact: Major"
 
 #: ./lib/route/announcement/announcement.dart:19
 msgid "測試"
-msgstr ""
+msgstr "Test"
 
 #: ./lib/route/announcement/announcement.dart:20
 msgid "變更"
-msgstr ""
+msgstr "Change"
 
 #: ./lib/route/announcement/announcement.dart:21
 msgid "完成"
@@ -903,7 +903,7 @@ msgstr ""
 
 #: ./lib/route/announcement/announcement.dart:23
 msgid "氣象相關"
-msgstr ""
+msgstr "Weather related"
 
 #: ./lib/route/announcement/announcement.dart:29
 msgid "未知"
@@ -915,27 +915,27 @@ msgstr ""
 
 #: ./lib/route/announcement/announcement.dart:223
 msgid "公告詳情"
-msgstr ""
+msgstr "Announcement Details"
 
 #: ./lib/route/image_viewer/image_viewer.dart:57
 msgid "無法取得權限"
-msgstr ""
+msgstr "Unable to obtain permission"
 
 #: ./lib/route/image_viewer/image_viewer.dart:59
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
-msgstr ""
+msgstr "Please go to the app settings and allow the \"Photos and Media\" permissions and try again."
 
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "再試一次"
-msgstr ""
+msgstr "Try again"
 
 #: ./lib/route/image_viewer/image_viewer.dart:110
 msgid "已儲存圖片"
-msgstr ""
+msgstr "Saved pictures"
 
 #: ./lib/route/image_viewer/image_viewer.dart:126
 msgid "儲存圖片時發生錯誤"
-msgstr ""
+msgstr "An error occurred while saving the image"
 
 #: ./lib/utils/extensions/int.dart:13
 msgid "０級"
@@ -1043,7 +1043,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:299
 msgid "晴有雷雹"
-msgstr ""
+msgstr "Clear with thunder and hail"
 
 #: ./lib/utils/weather_icon.dart:300
 msgid "晴大雷雨"
@@ -1051,19 +1051,19 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:301
 msgid "晴大雷雹"
-msgstr ""
+msgstr "Clear sky with heavy thunder and hail"
 
 #: ./lib/utils/weather_icon.dart:303
 msgid "多雲"
-msgstr ""
+msgstr "Partly cloudy"
 
 #: ./lib/utils/weather_icon.dart:304
 msgid "多雲有霾"
-msgstr ""
+msgstr "Cloudy with haze"
 
 #: ./lib/utils/weather_icon.dart:305
 msgid "多雲有靄"
-msgstr ""
+msgstr "Cloudy with haze"
 
 #: ./lib/utils/weather_icon.dart:306
 msgid "多雲有閃電"
@@ -1071,7 +1071,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:322
 msgid "多雲伴有雷"
-msgstr ""
+msgstr "Cloudy with thunder"
 
 #: ./lib/utils/weather_icon.dart:308
 msgid "多雲有霧"
@@ -1083,11 +1083,11 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:310
 msgid "多雲有雨雪"
-msgstr ""
+msgstr "Cloudy with rain and snow"
 
 #: ./lib/utils/weather_icon.dart:311
 msgid "多雲有大雪"
-msgstr ""
+msgstr "Cloudy with heavy snow"
 
 #: ./lib/utils/weather_icon.dart:312
 msgid "多雲有雪珠"
@@ -1171,37 +1171,37 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:333
 msgid "陰有冰珠"
-msgstr ""
+msgstr "Cloudy with ice beads"
 
 #: ./lib/utils/weather_icon.dart:334
 msgid "陰有陣雪"
-msgstr ""
+msgstr "Cloudy with snow showers"
 
 #: ./lib/utils/weather_icon.dart:335
 msgid "陰陣雨雪"
-msgstr ""
+msgstr "Cloudy with rain and snow"
 
 #: ./lib/utils/weather_icon.dart:336
 msgid "陰有雹"
-msgstr ""
+msgstr "Cloudy with Hail"
 
 #: ./lib/utils/weather_icon.dart:337
 msgid "陰有雷雨"
-msgstr ""
+msgstr "Cloudy with thunderstorm"
 
 #: ./lib/utils/weather_icon.dart:338
 msgid "陰有雷雪"
-msgstr ""
+msgstr "Cloudy with thunder and snow"
 
 #: ./lib/utils/weather_icon.dart:339
 msgid "陰有雷雹"
-msgstr ""
+msgstr "Cloudy with thunder and hail"
 
 #: ./lib/utils/weather_icon.dart:340
 msgid "陰大雷雨"
-msgstr ""
+msgstr "Cloudy with heavy thunderstorm"
 
 #: ./lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
-msgstr ""
+msgstr "Heavy thunder and hail"
 
