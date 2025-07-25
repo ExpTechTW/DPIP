@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-25 15:51\n"
+"PO-Revision-Date: 2025-07-25 16:59\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -176,7 +176,7 @@ msgstr "When the Pacific information is issued"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
-msgstr "Monitor(General)"
+msgstr "Strong Earthquake Monitor(General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
@@ -188,7 +188,7 @@ msgstr "Intensity Report"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
 msgid "所在地(鄉鎮)實測震度 3 以上"
-msgstr "Local (City/Town/District) measured intensity is greater than 3."
+msgstr "Local (City/Town/District) measured intensity is greater than 3"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "震度速報(無聲通知)"
@@ -196,15 +196,15 @@ msgstr "Intensity Report (Silent)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:36
 msgid "所在地(鄉鎮)實測震度 1 以上"
-msgstr "Local (City/Town/District) measured intensity is greater than 1."
+msgstr "Local (City/Town/District) measured intensity is greater than 1"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:33
 msgid "地震報告(一般)"
-msgstr "Earthquake Report"
+msgstr "Earthquake Report (General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:33
 msgid "所在地(縣市)實測震度 3 以上"
-msgstr "Local (Municipality/County) measured intensity is greater than 3."
+msgstr "Local (Municipality/County) measured intensity is greater than 3"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:34
 msgid "地震報告(無聲通知)"
@@ -212,7 +212,7 @@ msgstr "Earthquake Report (Silent)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:34
 msgid "所在地(縣市)實測震度 1 以上"
-msgstr "Local (Municipality/County) measured intensity is greater than 1."
+msgstr "Local (Municipality/County) measured intensity is greater than 1"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:13
 msgid "已更新通知設定"
@@ -220,25 +220,25 @@ msgstr "Updated notification setting"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:17
 msgid "更新通知設定失敗"
-msgstr "Notification settings updated successfully"
+msgstr "Failed To Update Notification Settings"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:34
 msgid "緊急地震速報(重大)"
-msgstr "Failed to update notification settings"
+msgstr "Earthquake Early Warning (Critical)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:35
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 4 以上"
-msgstr "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 4."
+msgstr "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 4"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:39
 msgid "緊急地震速報(一般)"
-msgstr "Emergency Earthquake Early Warning"
+msgstr "Emergency Earthquake Early Warning (General)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:40
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 2 以上"
-msgstr "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 2."
+msgstr "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 2"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:44
 msgid "緊急地震速報(無聲)"
@@ -247,7 +247,7 @@ msgstr "Emergency Earthquake Early Warning (Silent)"
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:45
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 1 以上"
-msgstr "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 1."
+msgstr "Maximum intensity is greater than 5- and local (City/Town/District) estimated intensity is greater than 1"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "地震速報(重大)"
@@ -255,15 +255,15 @@ msgstr "Earthquake Early Warning (Critical)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "所在地(鄉鎮)預估震度 4 以上"
-msgstr "Local (City/Town/District) estimated intensity is greater than 4."
+msgstr "Local (City/Town/District) estimated intensity is greater than 4"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "地震速報(一般)"
-msgstr "Earthquake Early Warning"
+msgstr "Earthquake Early Warning (General)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "所在地(鄉鎮)預估震度 2 以上"
-msgstr "Local (City/Town/District) estimated intensity is greater than 2."
+msgstr "Local (City/Town/District) estimated intensity is greater than 2"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "地震速報(無聲)"
@@ -271,7 +271,7 @@ msgstr "Earthquake Early Warning (Silent)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "所在地(鄉鎮)預估震度 1 以上"
-msgstr "Local (City/Town/District) estimated intensity is greater than 1."
+msgstr "Local (City/Town/District) estimated intensity is greater than 1"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布避難警訊時"
@@ -317,7 +317,7 @@ msgstr "System Language"
 
 #: ./lib/app/settings/locale/page.dart:40
 msgid "協助翻譯"
-msgstr "Help us translate!"
+msgstr "Help us translate"
 
 #: ./lib/app/settings/locale/page.dart:41
 msgid "點擊這裡來幫助我們改進 DPIP 的翻譯"
@@ -435,11 +435,11 @@ msgstr "Release Notes"
 
 #: ./lib/app/settings/page.dart:106
 msgid "瀏覽 DPIP 的歷次更新紀錄"
-msgstr ""
+msgstr "View DPIP's Previous Update Records"
 
 #: ./lib/app/settings/page.dart:113
 msgid "幫助我們維護伺服器的穩定和長久發展"
-msgstr ""
+msgstr "Help us maintain the stability and long-term development of the server"
 
 #: ./lib/app/settings/page.dart:119
 msgid "第三方套件授權"
@@ -583,7 +583,7 @@ msgstr "{serial} report"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "At around {time}, a felt earthquake near <bold>{location}</bold> had an estimated magnitude of <bold>M{magnitude}</bold> and a max intensity of <bold>{intensity}</bold>"
+msgstr "At around {time}, a felt earthquake near <bold>{location}</bold> had an estimated magnitude of <bold>M{magnitude}</bold> and a max intensity of <bold>{intensity}</bold>."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:923
 msgid "所在地預估"
@@ -595,11 +595,11 @@ msgstr "The earthquake"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:978
 msgid " 秒"
-msgstr " seconds"
+msgstr " Seconds"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:994
 msgid "抵達"
-msgstr "arrived"
+msgstr "Arrived"
 
 #: ./lib/app/home/page.dart:55
 msgid "已更新至 {version}"
@@ -631,7 +631,7 @@ msgstr ""
 
 #: ./lib/app/welcome/2-exptech/page.dart:88
 msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
-msgstr ""
+msgstr "ExpTech Studio is a group of mostly students, with an average age of under 20 and a headcount of 15+. Members are students from northern, central and southern Taiwan, Japan, South Korea and China."
 
 #: ./lib/app/welcome/2-exptech/page.dart:93
 msgid "我們的初衷"
@@ -643,15 +643,15 @@ msgstr ""
 
 #: ./lib/app/welcome/3-notice/page.dart:38
 msgid "注意事項"
-msgstr ""
+msgstr "Precautions"
 
 #: ./lib/app/welcome/3-notice/page.dart:75
 msgid "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
-msgstr ""
+msgstr "Depending on the network status, server status, application status, upstream data source status, etc., there is a possibility that information will not be received. We will try our best to avoid such situations, but we cannot guarantee that they will not happen."
 
 #: ./lib/app/welcome/3-notice/page.dart:88
 msgid "強烈搖晃有機率比通知早抵達使用者所在地。"
-msgstr ""
+msgstr "Strong shaking has a chance of reaching the user's location before the notification."
 
 #: ./lib/app/welcome/3-notice/page.dart:99
 msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
@@ -667,23 +667,23 @@ msgstr ""
 
 #: ./lib/app/welcome/1-about/page.dart:81
 msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
-msgstr ""
+msgstr "DPIP is an app designed by a local Taiwanese team that integrates information from TREM-Net (Taiwan Real-time Earthquake Observation Network) and data from the Central Weather Administration to provide an integrated, single and convenient disaster prevention information application."
 
 #: ./lib/app/welcome/4-permissions/page.dart:156
 msgid "在重大災害發生時以通知來傳遞即時防災資訊"
-msgstr ""
+msgstr "Delivering real-time disaster prevention information via notifications when major disasters occur"
 
 #: ./lib/app/welcome/4-permissions/page.dart:164
 msgid "使用定位來自動更新所在地設定，提供當地的即時防災資訊"
-msgstr ""
+msgstr "Use location to automatically update location settings and provide local real-time disaster prevention information"
 
 #: ./lib/app/welcome/4-permissions/page.dart:169
 msgid "省電策略"
-msgstr ""
+msgstr "Power saving"
 
 #: ./lib/app/welcome/4-permissions/page.dart:170
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
-msgstr ""
+msgstr "Allow DPIP to run continuously in the background for real-time disaster notification information."
 
 #: ./lib/route/image_viewer/image_viewer.dart:228
 msgid "儲存"
@@ -691,7 +691,7 @@ msgstr "Save"
 
 #: ./lib/app/welcome/4-permissions/page.dart:177
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
-msgstr ""
+msgstr "Used to store data visualization images provided by the Central Meteorological Administration or ExpTech"
 
 #: ./lib/app/welcome/4-permissions/page.dart:344
 msgid "權限請求"
@@ -707,7 +707,7 @@ msgstr "Permissions"
 
 #: ./lib/app/welcome/4-permissions/page.dart:398
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-msgstr ""
+msgstr "We always stand with our users and work hard for their privacy."
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:131
 msgid "地圖圖層"
@@ -739,15 +739,15 @@ msgstr "Wind/Gust"
 
 #: ./lib/app/map/_lib/managers/radar.dart:613
 msgid "長按設定播放起點"
-msgstr ""
+msgstr "Long press to set the start point of playback"
 
 #: ./lib/app/map/_lib/managers/radar.dart:627
 msgid "目前時間"
-msgstr ""
+msgstr "Current time"
 
 #: ./lib/app/map/_lib/managers/radar.dart:632
 msgid "播放起點"
-msgstr ""
+msgstr "Play start"
 
 #: ./lib/app/map/_lib/managers/radar.dart:906
 msgid "播放進度"
@@ -759,7 +759,7 @@ msgstr "Today"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:306
 msgid "10 分鐘"
-msgstr "10min"
+msgstr "10 mins"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:307
 msgid "1 小時"
@@ -767,7 +767,7 @@ msgstr "1hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:308
 msgid "3 小時"
-msgstr "3hr"
+msgstr "3 hour"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:309
 msgid "6 小時"
@@ -775,7 +775,7 @@ msgstr "6hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:310
 msgid "12 小時"
-msgstr "12hr"
+msgstr "12 hours"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:311
 msgid "24 小時"
@@ -787,11 +787,11 @@ msgstr "2d"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:313
 msgid "3 天"
-msgstr "3d"
+msgstr "3 days"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:714
 msgid "目前沒有生效中的地震速報"
-msgstr ""
+msgstr "There are currently no earthquake warnings in effect"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:808
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
@@ -799,15 +799,15 @@ msgstr "Estimated <bold>M{magnitude}</bold>, max intensity <bold>{intensity}</bo
 
 #: ./lib/app/map/_lib/managers/monitor.dart:824
 msgid "{countdown}秒後抵達"
-msgstr ""
+msgstr "{countdown} Arrived in seconds"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:825
 msgid "已抵達"
-msgstr ""
+msgstr "Arrived"
 
 #: ./lib/app/map/_lib/managers/report.dart:371
 msgid "近期的地震報告"
-msgstr "Recent Reports"
+msgstr "Recent Earthquake Reports"
 
 #: ./lib/app/map/_lib/managers/report.dart:376
 msgid "更多"
@@ -815,7 +815,7 @@ msgstr "More"
 
 #: ./lib/app/map/_lib/managers/report.dart:592
 msgid "編號 {number} 顯著有感地震"
-msgstr "No. {number}"
+msgstr "No. {number} Significantly Felt Earthquake"
 
 #: ./lib/app/map/_lib/managers/report.dart:593
 msgid "小區域有感地震"
@@ -847,11 +847,11 @@ msgstr "Observed Intensities"
 
 #: ./lib/app/map/_lib/managers/report.dart:769
 msgid "地震報告圖"
-msgstr "Intensity Map Image"
+msgstr "Earthquake Intensity Map Image"
 
 #: ./lib/app/map/_lib/managers/report.dart:779
 msgid "震度圖"
-msgstr "Intensity Map Image"
+msgstr "震度圖"
 
 #: ./lib/app/map/_lib/managers/report.dart:789
 msgid "最大地動加速度圖"
@@ -863,7 +863,7 @@ msgstr "Max PGV Image"
 
 #: ./lib/route/announcement/announcement.dart:12
 msgid "錯誤"
-msgstr ""
+msgstr "Mistake"
 
 #: ./lib/route/announcement/announcement.dart:13
 msgid "已解決"
@@ -975,7 +975,7 @@ msgstr "6+"
 
 #: ./lib/utils/extensions/int.dart:22
 msgid "７級"
-msgstr "7"
+msgstr "Intensity 7"
 
 #: ./lib/utils/weather_icon.dart:283
 msgid "晴"
