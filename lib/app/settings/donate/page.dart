@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/product_detail.dart';
 import 'package:dpip/utils/functions.dart';
 import 'package:dpip/widgets/list/list_section.dart';
@@ -158,9 +159,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                 child: Text(
                   'DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！'
                       .i18n,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
                   textAlign: TextAlign.justify,
                 ),
               ),
@@ -176,20 +175,20 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                 : product.title,
                         titleStyle:
                             (processingProductId != null && processingProductId != product.id)
-                                ? TextStyle(color: Theme.of(context).disabledColor)
+                                ? TextStyle(color: context.theme.disabledColor)
                                 : const TextStyle(fontWeight: FontWeight.bold),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
                             color:
                                 (processingProductId != null && processingProductId != product.id)
-                                    ? Theme.of(context).disabledColor
-                                    : Theme.of(context).textTheme.bodySmall?.color,
+                                    ? context.theme.disabledColor
+                                    : context.textTheme.bodySmall?.color,
                           ),
                         ),
                         trailing:
-                            (purchasedProductIds.contains(product.id)) // 判斷是否已訂閱
-                                ? Icon(Symbols.check_rounded, color: Theme.of(context).colorScheme.primary)
+                            (purchasedProductIds.contains(product.id))
+                                ? Icon(Symbols.check_rounded, color: context.colors.primary)
                                 : (processingProductId == product.id)
                                 ? const CircularProgressIndicator.adaptive()
                                 : Text(
@@ -197,8 +196,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                   style: TextStyle(
                                     color:
                                         (processingProductId != null && processingProductId != product.id)
-                                            ? Theme.of(context).disabledColor
-                                            : Theme.of(context).textTheme.bodyMedium?.color,
+                                            ? context.theme.disabledColor
+                                            : context.textTheme.bodyMedium?.color,
                                   ),
                                 ),
                         onTap:
@@ -227,15 +226,15 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                 : product.title,
                         titleStyle:
                             (processingProductId != null && processingProductId != product.id)
-                                ? TextStyle(color: Theme.of(context).disabledColor)
+                                ? TextStyle(color: context.theme.disabledColor)
                                 : const TextStyle(fontWeight: FontWeight.bold),
                         subtitle: Text(
                           product.description,
                           style: TextStyle(
                             color:
                                 (processingProductId != null && processingProductId != product.id)
-                                    ? Theme.of(context).disabledColor
-                                    : Theme.of(context).textTheme.bodySmall?.color,
+                                    ? context.theme.disabledColor
+                                    : context.textTheme.bodySmall?.color,
                           ),
                         ),
                         trailing:
@@ -246,8 +245,8 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
                                   style: TextStyle(
                                     color:
                                         (processingProductId != null && processingProductId != product.id)
-                                            ? Theme.of(context).disabledColor
-                                            : Theme.of(context).textTheme.bodyMedium?.color,
+                                            ? context.theme.disabledColor
+                                            : context.textTheme.bodyMedium?.color,
                                   ),
                                 ),
                         onTap:
