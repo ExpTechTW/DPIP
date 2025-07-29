@@ -214,9 +214,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           properties.entries.map(
             (entry) => controller
                 .addLayer(sourceId, '$layerId-${entry.key}', entry.value, belowLayerId: BaseMapLayerIds.userLocation)
-                .then((value) {
-                  TalkerManager.instance.info('Added Layer "$layerId-${entry.key}"');
-                }),
+                .then((value) {}),
           ),
         );
       }
@@ -271,7 +269,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       for (final interval in precipitationIntervals) {
         await controller.removeLayer('$layerId-$interval');
-        TalkerManager.instance.info('Removed Layer "$layerId-$interval"');
       }
 
       await controller.removeSource(sourceId);

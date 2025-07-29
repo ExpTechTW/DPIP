@@ -253,7 +253,6 @@ class ReportMapLayerManager extends MapLayerManager {
         final properties = GeojsonSourceProperties(data: data);
 
         await controller.addSource(sourceId, properties);
-        TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
       }
@@ -268,13 +267,11 @@ class ReportMapLayerManager extends MapLayerManager {
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       if (focus) await _focus(report);
 
       await controller.setLayerVisibility(MapLayerIds.report(), false);
-      TalkerManager.instance.info('Hiding Layer "$layerId"');
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager._addReport', e, s);
     }
@@ -292,18 +289,15 @@ class ReportMapLayerManager extends MapLayerManager {
 
       if (isLayerExists) {
         await controller.removeLayer(layerId);
-        TalkerManager.instance.info('Removed Layer "$layerId"');
       }
 
       if (isSourceExists) {
         await controller.removeSource(sourceId);
-        TalkerManager.instance.info('Removed Source "$sourceId"');
       }
 
       if (focus) await _focus();
 
       await controller.setLayerVisibility(MapLayerIds.report(), true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager._removeReport', e, s);
     }

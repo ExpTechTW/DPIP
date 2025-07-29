@@ -249,7 +249,6 @@ class DpipMapState extends State<DpipMap> {
           sourceId,
           GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build()),
         );
-        TalkerManager.instance.info('Added Source "$sourceId"');
       } else {
         await controller.setGeoJsonSource(sourceId, GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build());
         TalkerManager.instance.info('Updated Source "$sourceId"');
@@ -267,11 +266,9 @@ class DpipMapState extends State<DpipMap> {
             iconIgnorePlacement: true,
           ),
         );
-        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));
-      TalkerManager.instance.info('Moved Camera to $location');
     } catch (e, s) {
       TalkerManager.instance.error('DpipMap._updateUserLocation', e, s);
     }
