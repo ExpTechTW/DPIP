@@ -102,6 +102,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
           if (purchaseDetails.pendingCompletePurchase) {
             InAppPurchase.instance.completePurchase(purchaseDetails);
           }
+          break;
 
         case PurchaseStatus.pending:
           if (processingProductId == null) {
