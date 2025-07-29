@@ -58,8 +58,6 @@ class TemperatureMapLayerManager extends MapLayerManager {
       await setup();
 
       onTimeChanged?.call(time);
-
-      TalkerManager.instance.info('Updated Temperature data time to "$time"');
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.setTemperatureTime', e, s);
     } finally {
@@ -73,10 +71,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
       if (location.isValid) {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
-        TalkerManager.instance.info('Moved Camera to $location');
       } else {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
       }
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager._focus', e, s);
@@ -127,7 +123,6 @@ class TemperatureMapLayerManager extends MapLayerManager {
         final properties = GeojsonSourceProperties(data: data);
 
         await controller.addSource(sourceId, properties);
-        TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
       }
@@ -170,7 +165,6 @@ class TemperatureMapLayerManager extends MapLayerManager {
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       if (isSourceExists && isLayerExists) return;
@@ -189,7 +183,6 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, false);
-      TalkerManager.instance.info('Hiding Layer "$layerId"');
 
       visible = false;
     } catch (e, s) {
@@ -205,8 +198,6 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
-
       await _focus();
 
       visible = true;
@@ -222,10 +213,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.temperature(currentTemperatureTime.value);
 
       await controller.removeLayer(layerId);
-      TalkerManager.instance.info('Removed Layer "$layerId"');
-
       await controller.removeSource(sourceId);
-      TalkerManager.instance.info('Removed Source "$sourceId"');
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.remove', e, s);
     }

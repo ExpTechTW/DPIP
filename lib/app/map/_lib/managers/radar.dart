@@ -133,8 +133,6 @@ class RadarMapLayerManager extends MapLayerManager {
       currentRadarTime.value = time;
 
       await _setupAndShowLayer(time);
-
-      TalkerManager.instance.info('Updated Radar tiles to "$time"');
     } catch (e, s) {
       TalkerManager.instance.error('RadarMapLayerManager._updateRadarTileUrl', e, s);
     } finally {
@@ -358,7 +356,6 @@ class RadarMapLayerManager extends MapLayerManager {
       }
 
       visible = false;
-      TalkerManager.instance.info('Hidden all radar layers');
     } catch (e, s) {
       TalkerManager.instance.error('RadarMapLayerManager.hide', e, s);
     }
@@ -372,7 +369,6 @@ class RadarMapLayerManager extends MapLayerManager {
       if (currentRadarTime.value != null) {
         final layerId = MapLayerIds.radar(currentRadarTime.value);
         await controller.setLayerVisibility(layerId, true);
-        TalkerManager.instance.info('Showing Layer "$layerId"');
       }
 
       await _focus();
