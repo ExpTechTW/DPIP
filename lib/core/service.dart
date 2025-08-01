@@ -110,8 +110,6 @@ Future<void> _initializeAndroidForegroundService() async {
         ledColor: Colors.white,
         channelShowBadge: false,
         locked: true,
-        playSound: false,
-        onlyAlertOnce: true,
       )
     ],
   );
