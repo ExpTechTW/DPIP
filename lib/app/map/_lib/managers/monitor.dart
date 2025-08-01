@@ -1036,15 +1036,15 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                       }
                       return Container(
                         padding: const EdgeInsets.all(8),
-                        width: 200,
+                        width: 230,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface.withAlpha((0.5 * 255).round()),
+                          color: context.colors.surface.withAlpha((0.5 * 255).round()),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
                           displayTime,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
+                          style: TextStyle(color: context.colors.onSurface, fontSize: 16),
                         ),
                       );
                     },
