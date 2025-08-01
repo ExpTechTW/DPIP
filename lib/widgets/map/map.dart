@@ -249,7 +249,6 @@ class DpipMapState extends State<DpipMap> {
           sourceId,
           GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build()),
         );
-        TalkerManager.instance.info('Added Source "$sourceId"');
       } else {
         await controller.setGeoJsonSource(sourceId, GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build());
         TalkerManager.instance.info('Updated Source "$sourceId"');
@@ -267,11 +266,9 @@ class DpipMapState extends State<DpipMap> {
             iconIgnorePlacement: true,
           ),
         );
-        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));
-      TalkerManager.instance.info('Moved Camera to $location');
     } catch (e, s) {
       TalkerManager.instance.error('DpipMap._updateUserLocation', e, s);
     }
@@ -301,7 +298,6 @@ class DpipMapState extends State<DpipMap> {
       await spritePngFile.writeAsBytes(spritePngData.buffer.asUint8List());
       final spritePngFile2x = File('$mapDir/sprites@2x.png');
       await spritePngFile2x.writeAsBytes(spritePngData.buffer.asUint8List());
-      TalkerManager.instance.info('Copied sprite.png to $spritePngFile');
 
       // Copy sprite.json
       final spriteJsonData = await rootBundle.load('assets/sprites.json');
@@ -309,7 +305,6 @@ class DpipMapState extends State<DpipMap> {
       await spriteJsonFile.writeAsBytes(spriteJsonData.buffer.asUint8List());
       final spriteJsonFile2x = File('$mapDir/sprites@2x.json');
       await spriteJsonFile2x.writeAsBytes(spriteJsonData.buffer.asUint8List());
-      TalkerManager.instance.info('Copied sprite.json to $spriteJsonFile');
 
       final spriteUri = '${spriteJsonFile.parent.uri}sprites';
       TalkerManager.instance.info('Sprite is $spriteUri');

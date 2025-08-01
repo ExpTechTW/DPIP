@@ -112,7 +112,6 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       if (location.isValid) {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
-        TalkerManager.instance.info('Moved Camera to $location');
       } else {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
         TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
@@ -532,23 +531,16 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       // rts
       await controller.setLayerVisibility(rtsLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$rtsLayerId"');
 
       // intensity
       await controller.setLayerVisibility(intensityLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$intensityLayerId"');
       await controller.setLayerVisibility(intensity0LayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$intensity0LayerId"');
       await controller.setLayerVisibility(boxLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$boxLayerId"');
 
       // eew
       await controller.setLayerVisibility(epicenterLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$epicenterLayerId"');
       await controller.setLayerVisibility(pWaveLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$pWaveLayerId"');
       await controller.setLayerVisibility(sWaveLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$sWaveLayerId"');
 
       visible = false;
     } catch (e, s) {
@@ -575,21 +567,14 @@ class MonitorMapLayerManager extends MapLayerManager {
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await controller.setLayerVisibility(rtsLayerId, !hasBox);
-      TalkerManager.instance.info('Showing Layer "$rtsLayerId"');
 
       await controller.setLayerVisibility(intensityLayerId, hasBox);
-      TalkerManager.instance.info('Showing Layer "$intensityLayerId"');
       await controller.setLayerVisibility(intensity0LayerId, hasBox);
-      TalkerManager.instance.info('Showing Layer "$intensity0LayerId"');
       await controller.setLayerVisibility(boxLayerId, hasBox);
-      TalkerManager.instance.info('Showing Layer "$boxLayerId"');
 
       await controller.setLayerVisibility(epicenterLayerId, true);
-      TalkerManager.instance.info('Showing Layer "$epicenterLayerId"');
       await controller.setLayerVisibility(pWaveLayerId, true);
-      TalkerManager.instance.info('Showing Layer "$pWaveLayerId"');
       await controller.setLayerVisibility(sWaveLayerId, true);
-      TalkerManager.instance.info('Showing Layer "$sWaveLayerId"');
 
       await _focus();
 
