@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-02 15:19\n"
+"PO-Revision-Date: 2025-08-02 16:35\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -492,7 +492,7 @@ msgstr "설정되지 않음"
 
 #: ./lib/app/settings/location/page.dart:592
 msgid "鄉鎮市區"
-msgstr "읍/면/시/구"
+msgstr "향/진/시/구"
 
 #: ./lib/app/settings/location/select/page.dart:26
 msgid "縣市"
@@ -560,7 +560,7 @@ msgstr "현재 위치 부근 강한 뇌우 또는 비. <bold>{time}</bold>까지
 
 #: ./lib/app/home/_widgets/location_out_of_service.dart:24
 msgid "服務區域外，僅在臺灣各地可用"
-msgstr ""
+msgstr "서비스 지역 외에서는 사용할 수 없으며, 대만에서만 이용 가능합니다"
 
 #: ./lib/app/map/_lib/managers/radar.dart:499
 msgid "雷達回波"
@@ -652,7 +652,7 @@ msgstr "강한 흔들림이 알림보다 먼저 사용자 위치에 도착할 �
 
 #: ./lib/app/welcome/3-notice/page.dart:99
 msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
-msgstr "지진 속보는 빠른 계산 결과로, 상당한 오차가 있을 수 있으니 이해하고 신중히 사용해 주세요."
+msgstr "지진 속보는 신속한 계산 결과이므로, 오차가 클 수 있습니다. 이 점을 이해하고 신중하게 사용해야 합니다."
 
 #: ./lib/app/welcome/3-notice/page.dart:110
 msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
@@ -984,7 +984,7 @@ msgstr "맑음・연무"
 
 #: ./lib/utils/weather_icon.dart:285
 msgid "晴有靄"
-msgstr "맑음・안개"
+msgstr "맑음・옅은 안개"
 
 #: ./lib/utils/weather_icon.dart:286
 msgid "晴有閃電"
@@ -996,7 +996,7 @@ msgstr "맑음・천둥"
 
 #: ./lib/utils/weather_icon.dart:288
 msgid "晴有霧"
-msgstr "맑음・안개"
+msgstr "맑음・짙은 안개"
 
 #: ./lib/utils/weather_icon.dart:289
 msgid "晴有雨"
@@ -1004,7 +1004,7 @@ msgstr "맑음・비"
 
 #: ./lib/utils/weather_icon.dart:290
 msgid "晴有雨雪"
-msgstr "맑음・눈비"
+msgstr "맑음・비/눈"
 
 #: ./lib/utils/weather_icon.dart:291
 msgid "晴有大雪"
@@ -1016,7 +1016,7 @@ msgstr "맑음・싸라기 눈"
 
 #: ./lib/utils/weather_icon.dart:293
 msgid "晴有冰珠"
-msgstr "맑음・진눈깨비/우빙"
+msgstr "맑음・진눈깨비"
 
 #: ./lib/utils/weather_icon.dart:294
 msgid "晴有陣雪"
@@ -1060,71 +1060,71 @@ msgstr "구름 많음・연무"
 
 #: ./lib/utils/weather_icon.dart:305
 msgid "多雲有靄"
-msgstr "구름 많음・안개"
+msgstr "구름 많음・옅은 안개"
 
 #: ./lib/utils/weather_icon.dart:306
 msgid "多雲有閃電"
-msgstr ""
+msgstr "구름 많음・번개"
 
 #: ./lib/utils/weather_icon.dart:322
 msgid "多雲伴有雷"
-msgstr ""
+msgstr "구름 많음・천둥"
 
 #: ./lib/utils/weather_icon.dart:308
 msgid "多雲有霧"
-msgstr ""
+msgstr "구름 많음・짙은 안개"
 
 #: ./lib/utils/weather_icon.dart:309
 msgid "多雲有雨"
-msgstr ""
+msgstr "구름 많음・비"
 
 #: ./lib/utils/weather_icon.dart:310
 msgid "多雲有雨雪"
-msgstr ""
+msgstr "구름 많음・비/눈"
 
 #: ./lib/utils/weather_icon.dart:311
 msgid "多雲有大雪"
-msgstr ""
+msgstr "구름 많음・폭설"
 
 #: ./lib/utils/weather_icon.dart:312
 msgid "多雲有雪珠"
-msgstr ""
+msgstr "구름 많음・싸라기눈"
 
 #: ./lib/utils/weather_icon.dart:313
 msgid "多雲有冰珠"
-msgstr ""
+msgstr "구름 많음・진눈깨비"
 
 #: ./lib/utils/weather_icon.dart:314
 msgid "多雲有陣雪"
-msgstr ""
+msgstr "구름 많음・소나기 눈"
 
 #: ./lib/utils/weather_icon.dart:315
 msgid "多雲陣雨雪"
-msgstr ""
+msgstr "구름 많음・소나기 눈/비"
 
 #: ./lib/utils/weather_icon.dart:316
 msgid "多雲有雹"
-msgstr ""
+msgstr "구름 많음・우박"
 
 #: ./lib/utils/weather_icon.dart:317
 msgid "多雲有雷雨"
-msgstr ""
+msgstr "구름 많음・뇌우"
 
 #: ./lib/utils/weather_icon.dart:318
 msgid "多雲有雷雪"
-msgstr ""
+msgstr "구름 많음・천둥/눈"
 
 #: ./lib/utils/weather_icon.dart:319
 msgid "多雲有雷雹"
-msgstr ""
+msgstr "구름 많음・천둥/우박"
 
 #: ./lib/utils/weather_icon.dart:320
 msgid "多雲大雷雨"
-msgstr ""
+msgstr "구름 많음・강한 뇌우"
 
 #: ./lib/utils/weather_icon.dart:321
 msgid "多雲大雷雹"
-msgstr ""
+msgstr "구름 많음・강한 천둥/우박"
 
 #: ./lib/utils/weather_icon.dart:323
 msgid "陰"
@@ -1132,51 +1132,51 @@ msgstr "흐림"
 
 #: ./lib/utils/weather_icon.dart:324
 msgid "陰有霾"
-msgstr "맑음・연무"
+msgstr "흐림・연무"
 
 #: ./lib/utils/weather_icon.dart:325
 msgid "陰有靄"
-msgstr "맑음・안개"
+msgstr "흐림・안개"
 
 #: ./lib/utils/weather_icon.dart:326
 msgid "陰有閃電"
-msgstr ""
+msgstr "흐림・번개"
 
 #: ./lib/utils/weather_icon.dart:342
 msgid "陰天伴有雷"
-msgstr "맑음・천둥"
+msgstr "흐림・천둥"
 
 #: ./lib/utils/weather_icon.dart:328
 msgid "陰有霧"
-msgstr "맑음・안개"
+msgstr "흐림・옅은 안개"
 
 #: ./lib/utils/weather_icon.dart:329
 msgid "陰有雨"
-msgstr "맑음・비"
+msgstr "흐림・비"
 
 #: ./lib/utils/weather_icon.dart:330
 msgid "陰有雨雪"
-msgstr ""
+msgstr "흐림・눈/비"
 
 #: ./lib/utils/weather_icon.dart:331
 msgid "陰有大雪"
-msgstr ""
+msgstr "흐림・폭설"
 
 #: ./lib/utils/weather_icon.dart:332
 msgid "陰有雪珠"
-msgstr ""
+msgstr "흐림・싸라기눈"
 
 #: ./lib/utils/weather_icon.dart:333
 msgid "陰有冰珠"
-msgstr ""
+msgstr "흐림・진눈깨비"
 
 #: ./lib/utils/weather_icon.dart:334
 msgid "陰有陣雪"
-msgstr ""
+msgstr "흐림・소나기 눈"
 
 #: ./lib/utils/weather_icon.dart:335
 msgid "陰陣雨雪"
-msgstr ""
+msgstr "흐림・소나기 눈/비"
 
 #: ./lib/utils/weather_icon.dart:336
 msgid "陰有雹"
@@ -1184,21 +1184,21 @@ msgstr "맑음・우박"
 
 #: ./lib/utils/weather_icon.dart:337
 msgid "陰有雷雨"
-msgstr ""
+msgstr "흐림・뇌우"
 
 #: ./lib/utils/weather_icon.dart:338
 msgid "陰有雷雪"
-msgstr ""
+msgstr "흐림・천둥/눈"
 
 #: ./lib/utils/weather_icon.dart:339
 msgid "陰有雷雹"
-msgstr ""
+msgstr "흐림・천둥/우박"
 
 #: ./lib/utils/weather_icon.dart:340
 msgid "陰大雷雨"
-msgstr ""
+msgstr "흐림・강한 뇌우"
 
 #: ./lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
-msgstr ""
+msgstr "흐림・강한 천둥/우박"
 
