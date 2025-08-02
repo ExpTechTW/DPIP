@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-02 13:17\n"
+"PO-Revision-Date: 2025-08-02 14:19\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -216,93 +216,93 @@ msgstr "소재지(현, 시) 실측 진도 1 이상"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:13
 msgid "已更新通知設定"
-msgstr ""
+msgstr "알림 설정 갱신"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:17
 msgid "更新通知設定失敗"
-msgstr ""
+msgstr "알림 설정 갱신 실패"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:34
 msgid "緊急地震速報(重大)"
-msgstr ""
+msgstr "긴급 지진 속보(중대)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:35
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 4 以上"
-msgstr ""
+msgstr "​최대 진도 5 약 이상, 소재지(향, 진) 예상 진도 4 이상"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:39
 msgid "緊急地震速報(一般)"
-msgstr ""
+msgstr "긴급 지진 속보(일반)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:40
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 2 以上"
-msgstr ""
+msgstr "최대 진도 5 약 이상, 소재지(향, 진) 예상 진도 2 이상"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:44
 msgid "緊急地震速報(無聲)"
-msgstr ""
+msgstr "긴급 지진 속보(무음)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:45
 msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 1 以上"
-msgstr ""
+msgstr "최대 진도 5 약 이상, 소재지(향, 진) 예상 진도 1 이상"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "地震速報(重大)"
-msgstr ""
+msgstr "지진 속보(중대)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "所在地(鄉鎮)預估震度 4 以上"
-msgstr "소재지(향ㆍ진) 예상 진도 4 이상"
+msgstr "소재지(향, 진) 예상 진도 4 이상"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "地震速報(一般)"
-msgstr ""
+msgstr "지진 속보(일반)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "所在地(鄉鎮)預估震度 2 以上"
-msgstr "소재지(향ㆍ진) 예상 진도 2 이상"
+msgstr "소재지(향, 진) 예상 진도 2 이상"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "地震速報(無聲)"
-msgstr ""
+msgstr "지진 속보(무음)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "所在地(鄉鎮)預估震度 1 以上"
-msgstr "소재지(향ㆍ진) 예상 진도 1 이상"
+msgstr "소재지(향, 진) 예상 진도 1 이상"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布避難警訊時"
-msgstr "소재지(향ㆍ진)에 피난 경보가 발령된 경우"
+msgstr "소재지(향, 진) 피난 경보 발령 시"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布避難資訊時"
-msgstr "소재지(향ㆍ진)에 피난 정보가 발령된 경우"
+msgstr "소재지(향ㆍ진) 피난 정보 발령 시"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr "소재지(향ㆍ진)에서 적색 기상 경보 특보를 발령"
+msgstr "소재지(향, 진)에 적색 기상 경보 특보를 발령"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:40
 msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr "소재지(향ㆍ진)에서 기상 경보를 발령"
+msgstr "소재지(향, 진)에 기상 경보를 발령"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布雷雨即時訊息或\n"
 "山區暴雨時"
-msgstr "소재지(향ㆍ진)으로 뇌우 실시간 정보 또는 산간지역 호우 시 전송합니다."
+msgstr "소재지(향, 진)의 실시간 뇌우 정보 또는 산간 지역 폭우 발령 시"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
-msgstr ""
+msgstr "화씨 사용"
 
 #: ./lib/app/settings/unit/page.dart:29
 msgid "切換溫度顯示單位為華氏度 (℉)"
-msgstr ""
+msgstr "온도 표시를 화씨(°F)로 전환"
 
 #: ./lib/app/settings/locale/page.dart:31
 msgid "顯示語言"
@@ -310,7 +310,7 @@ msgstr "표시 언어"
 
 #: ./lib/app/settings/locale/page.dart:32
 msgid "系統語言"
-msgstr ""
+msgstr "시스템 언어"
 
 #: ./lib/app/settings/locale/page.dart:40
 msgid "協助翻譯"
@@ -322,7 +322,7 @@ msgstr "여기를 눌러 DPIP 번역 개선을 도와주세요"
 
 #: ./lib/app/settings/locale/select/page.dart:46
 msgid "選擇語言"
-msgstr ""
+msgstr "언어 선택"
 
 #: ./lib/app/settings/locale/select/page.dart:67
 msgid "已翻譯 {translated}・已校對 {approved}"
@@ -334,68 +334,69 @@ msgstr "출처 언어"
 
 #: ./lib/app/settings/donate/page.dart:38
 msgid "無法連線至商店，請稍後再試"
-msgstr ""
+msgstr "스토어에 연결할 수 없습니다, 잠시 후 다시 시도해 주세요"
 
 #: ./lib/app/settings/donate/page.dart:44
 msgid "找不到商品，請稍候再試"
-msgstr ""
+msgstr "상품을 찾을 수 없습니다, 잠시 후 다시 시도해 주세요"
 
 #: ./lib/app/settings/donate/page.dart:105
 msgid "重新載入"
-msgstr ""
+msgstr "새로 고침"
 
 #: ./lib/app/settings/donate/page.dart:115
 msgid "正在載入商店物品中"
-msgstr ""
+msgstr "스토어 상품 로드 중"
 
 #: ./lib/app/settings/donate/page.dart:132
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
 "您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
-msgstr ""
+msgstr "DPIP는 실시간 지진 정보를 제공하는 데 전념하는 앱으로서, 현재 광고나 다른 수익 모델이 없습니다. 고품질 서비스를 유지하기 위해 우리는 서버 운영, 지진 데이터 확보 및 전송, 그리고 후속 기능 개발 및 유지 보수에 드는 비용을 부담해야 합니다.\n"
+"​아래에서 선택해 주시는 모든 후원금은 이러한 운영 비용을 지불하는 데 직접 사용되어, DPIP가 여러분께 지속적으로 안정적인 서비스를 제공하는 데 도움이 될 것입니다. 여러분의 이해와 너그러운 마음에 감사드립니다!"
 
 #: ./lib/app/settings/donate/page.dart:141
 msgid "訂閱制"
-msgstr ""
+msgstr "정기 구독"
 
 #: ./lib/app/settings/donate/page.dart:150
 msgid "{price}/月"
-msgstr ""
+msgstr "{price}/월마다"
 
 #: ./lib/app/settings/donate/page.dart:162
 msgid "單次支援"
-msgstr ""
+msgstr "일회성 후원"
 
 #: ./lib/app/settings/donate/page.dart:197
 msgid "無法連線至 {store}，請稍後再試。"
-msgstr ""
+msgstr "{store}에 연결할 수 없습니다, 잠시 후 다시 시도해 주세요."
 
 #: ./lib/app/settings/donate/page.dart:202
 msgid "正在恢復您購買的訂閱"
-msgstr ""
+msgstr "구매했던 구독 복원"
 
 #: ./lib/app/settings/donate/page.dart:205
 msgid "恢復購買"
-msgstr ""
+msgstr "구매 기록 복원"
 
 #: ./lib/app/settings/donate/page.dart:216
 msgid "使用條款"
-msgstr ""
+msgstr "이용 약관"
 
 #: ./lib/app/settings/donate/page.dart:223
 msgid "隱私權政策"
-msgstr ""
+msgstr "개인 정보 보호 정책"
 
 #: ./lib/app/welcome/4-permissions/page.dart:163
 msgid "位置"
-msgstr ""
+msgstr "위치"
 
 #: ./lib/app/settings/page.dart:39
 msgid "設定你的所在地來接收當地的即時資訊"
-msgstr ""
+msgstr "소재지를 설정하여 해당 지역 실시간 정보 수신"
 
 #: ./lib/app/settings/page.dart:48
 msgid "介面"
-msgstr ""
+msgstr "인터페이스"
 
 #: ./lib/app/settings/page.dart:53
 msgid "調整 DPIP 整體的外觀與顏色"
@@ -403,27 +404,27 @@ msgstr "DPIP 전체의 외관과 색상을 조정합니다"
 
 #: ./lib/app/settings/page.dart:61
 msgid "調整 DPIP 的顯示語言"
-msgstr "DPIP의 표시 언어 조정"
+msgstr "DPIP 표시 언어 조정"
 
 #: ./lib/app/settings/page.dart:69
 msgid "調整 DPIP 顯示數值時使用的單位"
-msgstr ""
+msgstr "DPIP의 표시 단위 조정"
 
 #: ./lib/app/settings/page.dart:75
 msgid "調整 DPIP 地圖的設定"
-msgstr ""
+msgstr "DPIP 지도 설정 조정"
 
 #: ./lib/app/settings/page.dart:87
 msgid "推播通知設定與通知音效測試"
-msgstr ""
+msgstr "푸시 알림 설정 및 알림음 테스트"
 
 #: ./lib/app/settings/page.dart:94
 msgid "資訊"
-msgstr ""
+msgstr "정보"
 
 #: ./lib/app/settings/page.dart:99
 msgid "掌握 ExpTech Studio 的最新公告與資訊"
-msgstr ""
+msgstr "ExpTech Studio의 최신 공지 및 정보 확인"
 
 #: ./lib/app/changelog/page.dart:54
 msgid "更新日誌"
@@ -431,7 +432,7 @@ msgstr "업데이트 로그"
 
 #: ./lib/app/settings/page.dart:106
 msgid "瀏覽 DPIP 的歷次更新紀錄"
-msgstr ""
+msgstr "DPIP 이전 업데이트 기록"
 
 #: ./lib/app/settings/page.dart:113
 msgid "幫助我們維護伺服器的穩定和長久發展"
@@ -439,11 +440,11 @@ msgstr "서버의 안정과 장기적인 발전 돕기"
 
 #: ./lib/app/settings/page.dart:119
 msgid "第三方套件授權"
-msgstr "서드파티 라이브러리 라이선스"
+msgstr "제3자 라이브러리 라이선스"
 
 #: ./lib/app/settings/page.dart:120
 msgid "DPIP 的實現歸功於開放源始碼"
-msgstr ""
+msgstr "DPIP의 구현은 오픈 소스에 힘입었습니다"
 
 #: ./lib/app/settings/page.dart:162
 msgid "除錯"
