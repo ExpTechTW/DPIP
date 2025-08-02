@@ -10,11 +10,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-02 12:19\n"
+"PO-Revision-Date: 2025-08-02 13:17\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
-msgstr "소재지"
+msgstr "현재 지역"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
@@ -66,7 +66,7 @@ msgstr "피난 정보"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:176
 msgid "海嘯資訊"
-msgstr "쓰나미 정보"
+msgstr "해일 정보"
 
 #: ./lib/route/announcement/announcement.dart:82
 msgid "公告"
@@ -86,76 +86,76 @@ msgstr "모두 수신"
 
 #: ./lib/app/settings/notify/page.dart:59
 msgid "關閉"
-msgstr ""
+msgstr "닫기"
 
 #: ./lib/app/settings/notify/_widgets/eew_notify_section.dart:37
 msgid "接收類別"
-msgstr ""
+msgstr "수신 카테고리"
 
 #: ./lib/app/settings/notify/page.dart:44
 msgid "所在地震度1以上"
-msgstr ""
+msgstr "소재지 진도 1 이상"
 
 #: ./lib/app/settings/notify/page.dart:55
 msgid "海嘯消息、海嘯警報"
-msgstr ""
+msgstr "해일 정보, 해일 경보"
 
 #: ./lib/app/settings/notify/page.dart:54
 msgid "只接收海嘯警報"
-msgstr ""
+msgstr "해일 경보만 수신"
 
 #: ./lib/app/settings/notify/page.dart:50
 msgid "接收所在地"
-msgstr ""
+msgstr "수신 지역"
 
 #: ./lib/app/settings/notify/page.dart:37
 msgid "所在地震度4以上"
-msgstr ""
+msgstr "소재지 진도 4 이상"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:31
 msgid "音效測試"
-msgstr ""
+msgstr "사운드 테스트"
 
 #: ./lib/app/settings/notify/(5.basic)/announcement/page.dart:32
 msgid "發送公告時"
-msgstr ""
+msgstr "공지 발송 시"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:42
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
-msgstr ""
+msgstr "사운드 테스트는 기기에서 수행되는 로컬 알림입니다. 기기가 알림을 수신했을 때 음향 효과를 정상적으로 재생할 수 있는지 확인하는 데만 사용됩니다. 이 테스트는 요청을 서버에 전송하지 않습니다"
 
 #: ./lib/app/settings/notify/page.dart:135
 msgid "請先設定所在地來使用通知功能"
-msgstr ""
+msgstr "알림 기능을 사용하시려면 먼저 위치를 설정해 주세요"
 
 #: ./lib/app/settings/notify/page.dart:142
 msgid "地震速報"
-msgstr ""
+msgstr "지진 속보"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:160
 msgid "地震"
-msgstr ""
+msgstr "지진"
 
 #: ./lib/app/settings/notify/page.dart:204
 msgid "天氣"
-msgstr ""
+msgstr "날씨"
 
 #: ./lib/app/settings/notify/page.dart:248
 msgid "海嘯"
-msgstr ""
+msgstr "해일"
 
 #: ./lib/app/settings/notify/page.dart:266
 msgid "其他"
-msgstr ""
+msgstr "기타"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:34
 msgid "重大"
-msgstr ""
+msgstr "중대"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時\n"
 "沿海地區鄉鎮"
-msgstr ""
+msgstr "해일 경보 발령 시, 해안 지역(향, 진)"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "一般"
@@ -164,15 +164,15 @@ msgstr "일반"
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯警報發布時\n"
 "上述除外地區"
-msgstr ""
+msgstr "해일 경보 발령 시, 위의 언급 지역 외"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
-msgstr ""
+msgstr "태평양 해일 정보(무음 알림)"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息發布時"
-msgstr ""
+msgstr "태평양 해일 정보 발령 시"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
@@ -180,39 +180,39 @@ msgstr "강진 모니터(일반)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
-msgstr "흔들림이 감지되었습니다"
+msgstr "흔들림 감지"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
 msgid "震度速報(一般)"
-msgstr ""
+msgstr "진도 속보(일반)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:33
 msgid "所在地(鄉鎮)實測震度 3 以上"
-msgstr "소재지(향ㆍ진) 실측 진도 3 이상"
+msgstr "소재지(향, 진) 실측 진도 3 이상"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:35
 msgid "震度速報(無聲通知)"
-msgstr ""
+msgstr "진도 속보(무음 알림)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/intensity/page.dart:36
 msgid "所在地(鄉鎮)實測震度 1 以上"
-msgstr "소재지(향ㆍ진) 실측 진도 1 이상"
+msgstr "소재지(향, 진) 실측 진도 1 이상"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:33
 msgid "地震報告(一般)"
-msgstr ""
+msgstr "지진 보고(일반)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:33
 msgid "所在地(縣市)實測震度 3 以上"
-msgstr "소재지(현ㆍ시) 실측 진도 3 이상"
+msgstr "소재지(현, 시) 실측 진도 3 이상"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:34
 msgid "地震報告(無聲通知)"
-msgstr ""
+msgstr "지진 보고(무음 알림)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/report/page.dart:34
 msgid "所在地(縣市)實測震度 1 以上"
-msgstr "소재지(현ㆍ시) 실측 진도 1 이상"
+msgstr "소재지(현, 시) 실측 진도 1 이상"
 
 #: ./lib/app/settings/notify/_lib/utils.dart:13
 msgid "已更新通知設定"
