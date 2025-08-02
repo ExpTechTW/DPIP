@@ -10,31 +10,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-07-23 03:45\n"
+"PO-Revision-Date: 2025-08-02 12:19\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
-msgstr ""
+msgstr "소재지"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
-msgstr ""
+msgstr "주제"
 
 #: ./lib/app/settings/page.dart:60
 msgid "語言"
-msgstr ""
+msgstr "언어"
 
 #: ./lib/app/settings/page.dart:68
 msgid "單位"
-msgstr ""
+msgstr "단위"
 
 #: ./lib/app/settings/map/page.dart:24
 msgid "地圖"
-msgstr ""
+msgstr "지도"
 
 #: ./lib/app/welcome/4-permissions/page.dart:155
 msgid "通知"
-msgstr ""
+msgstr "알림"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:864
 msgid "緊急地震速報"
@@ -42,27 +42,27 @@ msgstr "긴급 지진 속보"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:706
 msgid "強震監視器"
-msgstr ""
+msgstr "강진 모니터"
 
 #: ./lib/app/map/_lib/managers/report.dart:814
 msgid "地震報告"
-msgstr ""
+msgstr "지진 보고"
 
 #: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
-msgstr ""
+msgstr "진도 속보"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:59
 msgid "雷雨即時訊息"
-msgstr ""
+msgstr "실시간 뇌우 정보"
 
 #: ./lib/app/settings/notify/page.dart:223
 msgid "天氣警特報"
-msgstr ""
+msgstr "기상특보"
 
 #: ./lib/app/settings/notify/page.dart:236
 msgid "避難資訊"
-msgstr ""
+msgstr "피난 정보"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:176
 msgid "海嘯資訊"
@@ -74,15 +74,15 @@ msgstr "공지"
 
 #: ./lib/app/settings/page.dart:112
 msgid "贊助我們"
-msgstr ""
+msgstr "저희를 후원해주세요"
 
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "設定"
-msgstr ""
+msgstr "설정"
 
 #: ./lib/app/settings/notify/page.dart:60
 msgid "接收全部"
-msgstr ""
+msgstr "모두 수신"
 
 #: ./lib/app/settings/notify/page.dart:59
 msgid "關閉"
