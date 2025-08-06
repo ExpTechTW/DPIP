@@ -705,6 +705,7 @@ class RadarMapLayerSheet extends StatelessWidget {
               shadowColor: context.colors.shadow.withValues(alpha: 0.4),
               child: ColorLegend(
                 reverse: true,
+                unit: 'dBZ',
                 items: [
                   ColorLegendItem(color: const Color(0xff00ffff), value: 0),
                   ColorLegendItem(color: const Color(0xff00a3ff), value: 5),
