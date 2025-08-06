@@ -27,7 +27,6 @@ enum ServiceEvent { setAsForeground, setAsBackground, sendPosition, sendDebug, r
 Future<void> initBackgroundService() async {
   final isAutoLocationEnabled = GlobalProviders.location.auto;
   if (!isAutoLocationEnabled) {
-    TalkerManager.instance.info('自動定位未啟用，不初始化背景服務');
     return;
   }
 

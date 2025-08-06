@@ -66,7 +66,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       onTimeChanged?.call(time);
 
-      TalkerManager.instance.info('Updated Precipitation data to "$time"');
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.setPrecipitationTime', e, s);
     } finally {
@@ -83,10 +82,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
 
       await controller.setLayerVisibility(showLayerId, true);
-      TalkerManager.instance.info('Showing Layer "$showLayerId"');
 
       await controller.setLayerVisibility(hideLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$hideLayerId"');
 
       currentPrecipitationInterval.value = interval;
     } catch (e, s) {
@@ -100,7 +97,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       if (location.isValid) {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
-        TalkerManager.instance.info('Moved Camera to $location');
       } else {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
         TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
@@ -150,7 +146,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
         final properties = GeojsonSourceProperties(data: data);
 
         await controller.addSource(sourceId, properties);
-        TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
       }
@@ -223,9 +218,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
           properties.entries.map(
             (entry) => controller
                 .addLayer(sourceId, '$layerId-${entry.key}', entry.value, belowLayerId: BaseMapLayerIds.userLocation)
-                .then((value) {
-                  TalkerManager.instance.info('Added Layer "$layerId-${entry.key}"');
-                }),
+                .then((value) {}),
           ),
         );
       }
@@ -247,7 +240,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(hideLayerId, false);
-      TalkerManager.instance.info('Hiding Layer "$hideLayerId"');
 
       visible = false;
     } catch (e, s) {
@@ -264,7 +256,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(showLayerId, true);
-      TalkerManager.instance.info('Showing Layer "$showLayerId"');
 
       await _focus();
 
@@ -282,11 +273,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       for (final interval in precipitationIntervals) {
         await controller.removeLayer('$layerId-$interval');
-        TalkerManager.instance.info('Removed Layer "$layerId-$interval"');
       }
 
       await controller.removeSource(sourceId);
-      TalkerManager.instance.info('Removed Source "$sourceId"');
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.remove', e, s);
     }
