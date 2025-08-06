@@ -58,8 +58,6 @@ class WindMapLayerManager extends MapLayerManager {
       await setup();
 
       onTimeChanged?.call(time);
-
-      TalkerManager.instance.info('Updated Wind data time to "$time"');
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.setWindTime', e, s);
     } finally {
@@ -111,7 +109,6 @@ class WindMapLayerManager extends MapLayerManager {
         final properties = GeojsonSourceProperties(data: data);
 
         await controller.addSource(sourceId, properties);
-        TalkerManager.instance.info('Added Source "$sourceId"');
 
         if (!context.mounted) return;
       }
@@ -127,7 +124,6 @@ class WindMapLayerManager extends MapLayerManager {
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
-        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       if (isSourceExists && isLayerExists) return;
@@ -146,7 +142,6 @@ class WindMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, false);
-      TalkerManager.instance.info('Hiding Layer "$layerId"');
 
       visible = false;
     } catch (e, s) {
@@ -162,7 +157,6 @@ class WindMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, true);
-      TalkerManager.instance.info('Showing Layer "$layerId"');
 
       visible = true;
     } catch (e, s) {
@@ -177,10 +171,7 @@ class WindMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.wind(currentWindTime.value);
 
       await controller.removeLayer(layerId);
-      TalkerManager.instance.info('Removed Layer "$layerId"');
-
       await controller.removeSource(sourceId);
-      TalkerManager.instance.info('Removed Source "$sourceId"');
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.dispose', e, s);
     }
