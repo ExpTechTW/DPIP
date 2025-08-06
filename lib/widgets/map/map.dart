@@ -269,6 +269,7 @@ class DpipMapState extends State<DpipMap> {
       }
 
       await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));
+      TalkerManager.instance.info('Moved Camera to $location');
     } catch (e, s) {
       TalkerManager.instance.error('DpipMap._updateUserLocation', e, s);
     }
