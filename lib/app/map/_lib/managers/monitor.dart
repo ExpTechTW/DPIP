@@ -1,6 +1,14 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
+
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:styled_text/styled_text.dart';
+
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
@@ -17,12 +25,6 @@ import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
-import 'package:flutter/material.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
-import 'package:styled_text/styled_text.dart';
 
 class MonitorMapLayerManager extends MapLayerManager {
   final bool isReplayMode;
@@ -783,7 +785,10 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                           ),
                                         ],
                                       ),
-                                      Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24
+                                      Icon(
+                                        Symbols.expand_less_rounded,
+                                        color: context.colors.onErrorContainer,
+                                        size: 24,
                                       ),
                                     ],
                                   ),
@@ -866,7 +871,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                           ),
                                         ],
                                       ),
-                                      Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
+                                      Icon(
+                                        Symbols.expand_more_rounded,
+                                        color: context.colors.onErrorContainer,
+                                        size: 24,
+                                      ),
                                     ],
                                   ),
                                   Padding(
@@ -881,8 +890,12 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                                 'magnitude': data.info.magnitude.toStringAsFixed(1),
                                                 'intensity': localIntensity.asIntensityLabel,
                                               }),
-                                      style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                                      tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                                      style: context.textTheme.bodyLarge!.copyWith(
+                                        color: context.colors.onErrorContainer,
+                                      ),
+                                      tags: {
+                                        'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold)),
+                                      },
                                     ),
                                   ),
                                   Selector<SettingsLocationModel, String?>(
@@ -957,14 +970,18 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                                                         text: countdown.toString(),
                                                                         style: TextStyle(
                                                                           fontSize:
-                                                                              context.textTheme.displayMedium!.fontSize! *
+                                                                              context
+                                                                                  .textTheme
+                                                                                  .displayMedium!
+                                                                                  .fontSize! *
                                                                               1.15,
                                                                         ),
                                                                       ),
                                                                       TextSpan(
                                                                         text: ' 秒'.i18n,
                                                                         style: TextStyle(
-                                                                          fontSize: context.textTheme.labelLarge!.fontSize,
+                                                                          fontSize:
+                                                                              context.textTheme.labelLarge!.fontSize,
                                                                         ),
                                                                       ),
                                                                     ],

@@ -1,9 +1,17 @@
 import 'dart:async';
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/_widgets/map_legend.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
@@ -11,13 +19,10 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/blurred_container.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/morphing_sheet.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:provider/provider.dart';
 
 class RadarMapLayerManager extends MapLayerManager {
   RadarMapLayerManager(super.context, super.controller, {this.getActiveLayerCount});
@@ -456,230 +461,265 @@ class RadarMapLayerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MorphingSheet(
-      title: '雷達回波'.i18n,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 4,
-      partialBuilder: (context, controller, sheetController) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 4, bottom: 8),
-          child: Selector<DpipDataModel, UnmodifiableListView<String>>(
-            selector: (context, model) => model.radar,
-            builder: (context, radar, child) {
-              final times = radar.map((time) {
-                final t = time.toSimpleDateTimeString(context).split(' ');
-                return (date: t[0], time: t[1], value: time);
-              });
-              final grouped = times.groupListsBy((time) => time.date).entries.toList();
+    return Stack(
+      children: [
+        MorphingSheet(
+          title: '雷達回波'.i18n,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 4,
+          partialBuilder: (context, controller, sheetController) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 8),
+              child: Selector<DpipDataModel, UnmodifiableListView<String>>(
+                selector: (context, model) => model.radar,
+                builder: (context, radar, child) {
+                  final times = radar.map((time) {
+                    final t = time.toSimpleDateTimeString(context).split(' ');
+                    return (date: t[0], time: t[1], value: time);
+                  });
+                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
 
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 4),
-                    child: SizedBox(
-                      height: 48,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            spacing: 8,
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 4),
+                        child: SizedBox(
+                          height: 48,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
-                              Text(
-                                '雷達回波'.i18n,
-                                style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                              Row(
+                                spacing: 8,
+                                children: [
+                                  Icon(Symbols.radar_rounded, size: 24, color: context.colors.onSurface),
+                                  Text(
+                                    '雷達回波'.i18n,
+                                    style: context.textTheme.titleMedium?.copyWith(color: context.colors.onSurface),
+                                  ),
+                                  AnimatedBuilder(
+                                    animation: Listenable.merge([
+                                      manager.currentRadarTime,
+                                      manager.playStartTime,
+                                      manager.isPlaying,
+                                    ]),
+                                    builder: (context, child) {
+                                      final currentTime = manager.currentRadarTime.value;
+
+                                      if (currentTime == null) return const SizedBox.shrink();
+
+                                      try {
+                                        final timeFormatted = currentTime.toSimpleDateTimeString(context);
+                                        final timeData = timeFormatted.split(' ');
+                                        final date = timeData.length > 1 ? timeData[0] : '';
+                                        final time = timeData.length > 1 ? timeData[1] : timeData[0];
+
+                                        return Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                          decoration: BoxDecoration(
+                                            color: context.colors.surfaceContainer.withValues(alpha: 0.6),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: context.colors.outline),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            spacing: 4,
+                                            children: [
+                                              Icon(
+                                                Icons.schedule_rounded,
+                                                size: 12,
+                                                color: context.colors.onSurfaceVariant,
+                                              ),
+                                              if (date.isNotEmpty) ...[
+                                                Text(
+                                                  date,
+                                                  style: context.textTheme.labelSmall?.copyWith(
+                                                    color: context.colors.onSurfaceVariant,
+                                                    height: 1,
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: 0.5,
+                                                  height: 14,
+                                                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                                                  color: context.colors.outline,
+                                                ),
+                                              ],
+                                              Text(
+                                                time,
+                                                style: context.textTheme.bodySmall?.copyWith(
+                                                  color: context.colors.onSurface,
+                                                  fontWeight: FontWeight.bold,
+                                                  height: 1,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      } catch (e) {
+                                        return const SizedBox.shrink();
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
                               AnimatedBuilder(
                                 animation: Listenable.merge([
-                                  manager.currentRadarTime,
-                                  manager.playStartTime,
                                   manager.isPlaying,
+                                  manager.playStartTime,
+                                  manager.currentRadarTime,
                                 ]),
                                 builder: (context, child) {
-                                  final currentTime = manager.currentRadarTime.value;
+                                  final isPlaying = manager.isPlaying.value;
+                                  final startTime = manager.playStartTime.value;
+                                  final canPlay = manager.canPlay;
 
-                                  if (currentTime == null) return const SizedBox.shrink();
+                                  final shouldHide = startTime == null && !isPlaying;
 
-                                  try {
-                                    final timeFormatted = currentTime.toSimpleDateTimeString(context);
-                                    final timeData = timeFormatted.split(' ');
-                                    final date = timeData.length > 1 ? timeData[0] : '';
-                                    final time = timeData.length > 1 ? timeData[1] : timeData[0];
-
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        color: context.colors.surfaceContainer.withValues(alpha: 0.6),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: context.colors.outline),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        spacing: 4,
-                                        children: [
-                                          Icon(
-                                            Icons.schedule_rounded,
-                                            size: 12,
-                                            color: context.colors.onSurfaceVariant,
-                                          ),
-                                          if (date.isNotEmpty) ...[
-                                            Text(
-                                              date,
-                                              style: context.textTheme.labelSmall?.copyWith(
-                                                color: context.colors.onSurfaceVariant,
-                                                height: 1,
-                                              ),
-                                            ),
-                                            Container(
-                                              width: 0.5,
-                                              height: 14,
-                                              margin: const EdgeInsets.symmetric(horizontal: 2),
-                                              color: context.colors.outline,
-                                            ),
-                                          ],
-                                          Text(
-                                            time,
-                                            style: context.textTheme.bodySmall?.copyWith(
-                                              color: context.colors.onSurface,
-                                              fontWeight: FontWeight.bold,
-                                              height: 1,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  } catch (e) {
+                                  if (shouldHide) {
                                     return const SizedBox.shrink();
                                   }
+
+                                  return IconButton(
+                                    onPressed: canPlay || isPlaying ? manager.toggleAutoPlay : null,
+                                    icon: Icon(
+                                      isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
+                                      size: 24,
+                                      color: context.colors.primary,
+                                    ),
+                                  );
                                 },
                               ),
                             ],
                           ),
-                          AnimatedBuilder(
-                            animation: Listenable.merge([
-                              manager.isPlaying,
-                              manager.playStartTime,
-                              manager.currentRadarTime,
-                            ]),
-                            builder: (context, child) {
-                              final isPlaying = manager.isPlaying.value;
-                              final startTime = manager.playStartTime.value;
-                              final canPlay = manager.canPlay;
-
-                              final shouldHide = startTime == null && !isPlaying;
-
-                              if (shouldHide) {
-                                return const SizedBox.shrink();
-                              }
-
-                              return IconButton(
-                                onPressed: canPlay || isPlaying ? manager.toggleAutoPlay : null,
-                                icon: Icon(
-                                  isPlaying ? Symbols.pause_rounded : Symbols.play_arrow_rounded,
-                                  size: 24,
-                                  color: context.colors.primary,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  AnimatedBuilder(
-                    animation: Listenable.merge([manager.playStartTime, manager.isPlaying]),
-                    builder: (context, child) {
-                      final startTime = manager.playStartTime.value;
-                      final isPlaying = manager.isPlaying.value;
+                      AnimatedBuilder(
+                        animation: Listenable.merge([manager.playStartTime, manager.isPlaying]),
+                        builder: (context, child) {
+                          final startTime = manager.playStartTime.value;
+                          final isPlaying = manager.isPlaying.value;
 
-                      if (isPlaying) {
-                        return const SizedBox.shrink();
-                      }
+                          if (isPlaying) {
+                            return const SizedBox.shrink();
+                          }
 
-                      if (startTime == null && !isPlaying) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                          child: Text(
-                            '長按設定播放起點'.i18n,
-                            style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
-                          ),
-                        );
-                      }
+                          if (startTime == null && !isPlaying) {
+                            return Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                              child: Text(
+                                '長按設定播放起點'.i18n,
+                                style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
+                              ),
+                            );
+                          }
 
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                        child: Column(
-                          children: [
-                            Row(
-                              spacing: 8,
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                            child: Column(
                               children: [
-                                _LegendItem(
-                                  label: '目前時間'.i18n,
-                                  color: context.colors.primaryContainer,
-                                  borderColor: context.colors.primary,
-                                ),
-                                _LegendItem(
-                                  label: '播放起點'.i18n,
-                                  color: context.colors.tertiaryContainer,
-                                  borderColor: context.colors.tertiary,
+                                Row(
+                                  spacing: 8,
+                                  children: [
+                                    _LegendItem(
+                                      label: '目前時間'.i18n,
+                                      color: context.colors.primaryContainer,
+                                      borderColor: context.colors.primary,
+                                    ),
+                                    _LegendItem(
+                                      label: '播放起點'.i18n,
+                                      color: context.colors.tertiaryContainer,
+                                      borderColor: context.colors.tertiary,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: manager.isPlaying,
-                    builder: (context, isPlaying, child) {
-                      if (isPlaying) {
-                        return Container(
-                          height: 32,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                          child: AnimatedBuilder(
-                            animation: Listenable.merge([
-                              manager.currentRadarTime,
-                              manager.playStartTime,
-                              manager.playEndTime,
-                            ]),
-                            builder: (context, child) {
-                              return _RadarProgressBar(manager: manager);
-                            },
-                          ),
-                        );
-                      }
+                          );
+                        },
+                      ),
+                      ValueListenableBuilder<bool>(
+                        valueListenable: manager.isPlaying,
+                        builder: (context, isPlaying, child) {
+                          if (isPlaying) {
+                            return Container(
+                              height: 32,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                              child: AnimatedBuilder(
+                                animation: Listenable.merge([
+                                  manager.currentRadarTime,
+                                  manager.playStartTime,
+                                  manager.playEndTime,
+                                ]),
+                                builder: (context, child) {
+                                  return _RadarProgressBar(manager: manager);
+                                },
+                              ),
+                            );
+                          }
 
-                      return SizedBox(
-                        height: kMinInteractiveDimension,
-                        child: ValueListenableBuilder<String?>(
-                          valueListenable: manager.currentRadarTime,
-                          builder: (context, currentTime, child) {
-                            return ValueListenableBuilder<String?>(
-                              valueListenable: manager.playStartTime,
-                              builder: (context, startTime, child) {
-                                return _AutoScrollingTimeList(
-                                  grouped: grouped,
-                                  currentTime: currentTime,
-                                  startTime: startTime,
-                                  manager: manager,
-                                  shouldFocusOnShow: true,
+                          return SizedBox(
+                            height: kMinInteractiveDimension,
+                            child: ValueListenableBuilder<String?>(
+                              valueListenable: manager.currentRadarTime,
+                              builder: (context, currentTime, child) {
+                                return ValueListenableBuilder<String?>(
+                                  valueListenable: manager.playStartTime,
+                                  builder: (context, startTime, child) {
+                                    return _AutoScrollingTimeList(
+                                      grouped: grouped,
+                                      currentTime: currentTime,
+                                      startTime: startTime,
+                                      manager: manager,
+                                      shouldFocusOnShow: true,
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        ),
+        Positioned(
+          top: 24 + 48 + 16,
+          left: 24,
+          child: SafeArea(
+            child: BlurredContainer(
+              elevation: 4,
+              shadowColor: context.colors.shadow.withValues(alpha: 0.4),
+              child: ColorLegend(
+                reverse: true,
+                unit: 'dBZ',
+                items: [
+                  ColorLegendItem(color: const Color(0xff00ffff), value: 0),
+                  ColorLegendItem(color: const Color(0xff00a3ff), value: 5),
+                  ColorLegendItem(color: const Color(0xff005bff), value: 10),
+                  ColorLegendItem(color: const Color(0xff0000ff), value: 15, blendTail: false),
+                  ColorLegendItem(color: const Color(0xff00ff00), value: 16, hidden: true),
+                  ColorLegendItem(color: const Color(0xff00d300), value: 20),
+                  ColorLegendItem(color: const Color(0xff00a000), value: 25),
+                  ColorLegendItem(color: const Color(0xffccea00), value: 30),
+                  ColorLegendItem(color: const Color(0xffffd300), value: 35),
+                  ColorLegendItem(color: const Color(0xffff8800), value: 40),
+                  ColorLegendItem(color: const Color(0xffff1800), value: 45),
+                  ColorLegendItem(color: const Color(0xffd30000), value: 50),
+                  ColorLegendItem(color: const Color(0xffa00000), value: 55),
+                  ColorLegendItem(color: const Color(0xffea00cc), value: 60),
+                  ColorLegendItem(color: const Color(0xff9600ff), value: 65),
                 ],
-              );
-            },
+              ),
+            ),
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }
