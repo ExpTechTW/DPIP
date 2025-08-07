@@ -7,6 +7,20 @@
 
 ## [未發布]
 
+### 新增
+
+- 氣象類別圖例
+- 地圖頁面-氣象站顯示參數
+
+### 更改
+
+- 贊助頁面邏輯。
+
+### 修正
+
+- 強震監視器顯示時間
+- 雷達迴波 被 世界圖層 覆蓋
+
 ## [3.0.014] - 2025-07-23
 
 ### 新增
@@ -175,9 +189,9 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.014...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.0.0...HEAD
 [3.0.014]: https://github.com/exptechtw/dpip/compare/v3.0.013(2)...v3.0.014
-[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012...v3.0.013(2)
+[3.0.013]: https://github.com/exptechtw/dpip/compare/v3.0.012(1)...v3.0.013(2)
 [3.0.012]: https://github.com/exptechtw/dpip/compare/v3.0.011...v3.0.012(1)
 [3.0.011]: https://github.com/exptechtw/dpip/compare/v3.0.010...v3.0.011
 [3.0.010]: https://github.com/exptechtw/dpip/compare/v3.0.009...v3.0.010
