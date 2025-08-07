@@ -76,6 +76,7 @@ class BackgroundLocationService {
     await instance.configure(
       androidConfiguration: AndroidConfiguration(
         onStart: _$onStart,
+        autoStart: false,
         isForegroundMode: true,
         foregroundServiceTypes: [AndroidForegroundType.location],
         notificationChannelId: 'background',
