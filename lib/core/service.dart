@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/services.dart';
@@ -73,6 +74,11 @@ class BackgroundLocationService {
 
     TalkerManager.instance.info('⚙️ initializing location service');
 
+    if (!Platform.isAndroid && !Platform.isIOS) {
+      TalkerManager.instance.warning('⚙️ service is not supported on this platform (${Platform.operatingSystem})');
+      return;
+    }
+
     await instance.configure(
       androidConfiguration: AndroidConfiguration(
         onStart: _$onStart,
@@ -85,7 +91,7 @@ class BackgroundLocationService {
         foregroundServiceNotificationId: kNotificationId,
       ),
       // iOS is handled in native code
-      iosConfiguration: IosConfiguration(),
+      iosConfiguration: IosConfiguration(autoStart: false),
     );
 
     // Reloads the UI isolate's preference cache when a new position is set in the background service.
