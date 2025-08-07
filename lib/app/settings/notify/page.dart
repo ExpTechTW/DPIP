@@ -84,13 +84,12 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
           })
           .catchError((error) {
             if (error.toString().contains('401')) {
-              if (GlobalProviders.location.latitude != null && GlobalProviders.location.longitude != null) {
+              if (GlobalProviders.location.coordinates != null) {
                 Future.delayed(const Duration(seconds: 2), () {
                   ExpTech()
                       .updateDeviceLocation(
                         token: Preference.notifyToken,
-                        lat: GlobalProviders.location.latitude.toString(),
-                        lng: GlobalProviders.location.longitude.toString(),
+                        coordinates: GlobalProviders.location.coordinates!,
                       )
                       .then((_) {
                         if (mounted) {

@@ -220,7 +220,7 @@ class DpipMapState extends State<DpipMap> {
         await getSavedLocation();
       }
 
-      final location = GlobalProviders.location.coordinateNotifier.value;
+      final location = GlobalProviders.location.coordinates;
 
       const sourceId = BaseMapSourceIds.userLocation;
       const layerId = BaseMapLayerIds.userLocation;
@@ -228,7 +228,7 @@ class DpipMapState extends State<DpipMap> {
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
-      if (!location.isValid) {
+      if (location == null || !location.isValid) {
         if (isLayerExists) {
           await controller.removeLayer(layerId);
           TalkerManager.instance.info('Removed Layer "$layerId"');
@@ -285,7 +285,7 @@ class DpipMapState extends State<DpipMap> {
   void initState() {
     super.initState();
 
-    GlobalProviders.location.coordinateNotifier.addListener(_updateUserLocation);
+    GlobalProviders.location.$coordinates.addListener(_updateUserLocation);
 
     getApplicationDocumentsDirectory().then((dir) async {
       final documentDir = dir.path;
@@ -355,7 +355,7 @@ class DpipMapState extends State<DpipMap> {
 
   @override
   void dispose() {
-    GlobalProviders.location.coordinateNotifier.removeListener(_updateUserLocation);
+    GlobalProviders.location.$coordinates.removeListener(_updateUserLocation);
     super.dispose();
   }
 }

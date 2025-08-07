@@ -4,6 +4,7 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/location_to_code.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/services.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 const _channel = MethodChannel('com.exptech.dpip/data');
 Completer<void>? _completer;
@@ -22,12 +23,13 @@ Future<void> getSavedLocation() async {
     final latitude = data?['lat'] as double?;
     final longitude = data?['lon'] as double?;
 
-    GlobalProviders.location.setLatLng(latitude: latitude, longitude: longitude);
-
     if (latitude != null && longitude != null) {
+      GlobalProviders.location.setCoordinates(LatLng(latitude, longitude));
       final location = GeoJsonHelper.checkPointInPolygons(latitude, longitude);
       print(location);
       GlobalProviders.location.setCode(location?.code.toString());
+    } else {
+      GlobalProviders.location.setCoordinates(null);
     }
   } catch (e) {
     TalkerManager.instance.error('Error in getSavedLocation: $e');

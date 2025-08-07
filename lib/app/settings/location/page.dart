@@ -159,56 +159,22 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   }
 
   Future<bool> checkLocationAlwaysPermission() async {
-    final status = await Permission.locationAlways.status;
+    final status = await [Permission.location, Permission.locationWhenInUse, Permission.locationAlways].request();
 
-    setState(() => locationAlwaysPermission = status);
-
-    if (status.isGranted) {
-      return true;
-    } else {
-      if (!mounted) return false;
-      final permissionType = Platform.isAndroid ? '一律允許' : '永遠';
-
-      final status =
-          await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                icon: const Icon(Symbols.my_location),
-                title: Text('$permissionType 位置權限'),
-                content: Text('為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以便讓 DPIP 在背景自動設定所在地資訊。'),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: const Text('取消'),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  FilledButton(
-                    child: const Text('確定'),
-                    onPressed: () async {
-                      final status = await Permission.locationAlways.request();
-
-                      setState(() => locationAlwaysPermission = status);
-
-                      if (status.isPermanentlyDenied) {
-                        openAppSettings();
-                      }
-
-                      if (!context.mounted) return;
-
-                      Navigator.pop(context, status.isGranted);
-                    },
-                  ),
-                ],
-              );
-            },
-          ) ??
-          false;
-
-      return status;
+    if (!status[Permission.location]!.isGranted) {
+      TalkerManager.instance.warning('🧪 failed location (ACCESS_COARSE_LOCATION) permission test');
+      return false;
     }
+    if (!status[Permission.locationWhenInUse]!.isGranted) {
+      TalkerManager.instance.warning('🧪 failed location when in use (ACCESS_FINE_LOCATION) permission test');
+      return false;
+    }
+    if (!status[Permission.locationAlways]!.isGranted) {
+      TalkerManager.instance.warning('🧪 failed location always (ACCESS_BACKGROUND_LOCATION) permission test');
+      return false;
+    }
+
+    return true;
   }
 
   Future<bool> androidCheckAutoStartPermission(int num) async {
@@ -311,41 +277,54 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   }
 
   Future toggleAutoLocation() async {
-    final isAuto = context.read<SettingsLocationModel>().auto;
+    final shouldEnable = !context.read<SettingsLocationModel>().auto;
 
-    stopAndroidBackgroundService();
+    await BackgroundLocationService.stop();
 
-    if (!isAuto) {
+    if (shouldEnable) {
       final notification = await checkNotificationPermission();
-      if (!notification) return;
+      if (!notification) {
+        TalkerManager.instance.warning('🧪 failed notification permission test');
+        return;
+      }
 
       final location = await checkLocationPermission();
-      if (!location) return;
+      if (!location) {
+        TalkerManager.instance.warning('🧪 failed location permission test');
+        return;
+      }
 
       await checkLocationAlwaysPermission();
 
       final bool autoStart = await androidCheckAutoStartPermission(0);
       autoStartPermission = autoStart;
-      if (!autoStart) return;
+      if (!autoStart) {
+        TalkerManager.instance.warning('🧪 failed auto start permission test');
+        return;
+      }
 
       final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
       batteryOptimizationPermission = batteryOptimization;
-      if (!batteryOptimization) return;
-
-      if (!isAuto) {
-        startAndroidBackgroundService(shouldInitialize: false);
+      if (!batteryOptimization) {
+        TalkerManager.instance.warning('🧪 failed battery optimization permission test');
+        return;
       }
     }
 
+    if (Platform.isAndroid) {
+      if (shouldEnable) {
+        await BackgroundLocationService.start();
+      }
+    }
     if (Platform.isIOS) {
-      await platform.invokeMethod('toggleLocation', {'isEnabled': !isAuto}).catchError((_) {});
+      await platform.invokeMethod('toggleLocation', {'isEnabled': shouldEnable}).catchError((_) {});
     }
 
     if (!mounted) return;
 
-    context.read<SettingsLocationModel>().setAuto(!isAuto);
+    context.read<SettingsLocationModel>().setAuto(shouldEnable);
     context.read<SettingsLocationModel>().setCode(null);
-    context.read<SettingsLocationModel>().setLatLng();
+    context.read<SettingsLocationModel>().setCoordinates(null);
   }
 
   @override

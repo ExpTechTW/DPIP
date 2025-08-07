@@ -1,7 +1,6 @@
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/utils/extensions/asset_bundle.dart';
-import 'package:dpip/utils/location_to_code.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,10 +17,10 @@ class Global {
   static late Map<String, ({String title, String body})> notifyTestContent;
   static ExpTech api = ExpTech();
 
-  static Future<void> loadLocationData() async {
+  static Future<Map<String, Location>> loadLocationData() async {
     final data = await rootBundle.loadJson('assets/location.json');
 
-    location = data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
+    return data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
   }
 
   static Future<void> loadTimeTableData() async {
@@ -54,11 +53,9 @@ class Global {
     packageInfo = await PackageInfo.fromPlatform();
     preference = await SharedPreferences.getInstance();
     box = await rootBundle.loadJson('assets/box.json');
+    location = await loadLocationData();
 
-    await loadLocationData();
     await loadTimeTableData();
     await loadNotifyTestContent();
-
-    await GeoJsonHelper.loadGeoJson('assets/map/town.json');
   }
 }

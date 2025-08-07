@@ -1,3 +1,4 @@
+import 'package:dpip/utils/log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 extension PreferenceExtension on SharedPreferencesWithCache {
@@ -16,23 +17,30 @@ extension PreferenceExtension on SharedPreferencesWithCache {
   ///
   /// If [value] is null or omitted, the key will be removed from SharedPreferences.
   Future<void> set<T>(String key, [T? value]) {
-    if (value == null) {
-      return remove(key);
-    }
+    try {
+      if (value == null) {
+        return remove(key);
+      }
 
-    switch (value) {
-      case String():
-        return setString(key, value);
-      case int():
-        return setInt(key, value);
-      case bool():
-        return setBool(key, value);
-      case double():
-        return setDouble(key, value);
-      case List<String>():
-        return setStringList(key, value);
-      default:
-        throw ArgumentError.value(value, 'value', 'Unsupported type: ${value.runtimeType}');
+      switch (value) {
+        case String():
+          return setString(key, value);
+        case int():
+          return setInt(key, value);
+        case bool():
+          return setBool(key, value);
+        case double():
+          return setDouble(key, value);
+        case List<String>():
+          return setStringList(key, value);
+        default:
+          throw ArgumentError.value(value, 'value', 'Unsupported type: ${value.runtimeType}');
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('💾 $key set to "$value" FAILED', e, s);
+      rethrow;
+    } finally {
+      TalkerManager.instance.info('💾 $key set to "$value"');
     }
   }
 }
