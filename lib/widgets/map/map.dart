@@ -128,7 +128,7 @@ class DpipMapState extends State<DpipMap> {
         },
       },
       'sprite': spritePath,
-      'glyphs': 'https://glyphs.geolonia.com/{fontstack}/{range}.pbf',
+      'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-glyph/{fontstack}/{range}.pbf',
       'layers': [
         {
           'id': 'background',
@@ -328,7 +328,7 @@ class DpipMapState extends State<DpipMap> {
     final double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
 
     return MapLibreMap(
-      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(3, 9),
+      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12),
       trackCameraPosition: true,
       initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
       styleString: styleAbsoluteFilePath!,

@@ -14,6 +14,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/models/settings/ui.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
@@ -89,6 +90,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
   Future<void> setup() async {
     if (didSetup) return;
 
+    final colors = context.colors;
+
     try {
       if (GlobalProviders.data.temperature.isEmpty) {
         final temperatureList = (await ExpTech().getWeatherList()).reversed.toList();
@@ -134,16 +137,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
       }
 
       if (!isLayerExists) {
+        // circles
         final properties = CircleLayerProperties(
-          circleRadius: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            7,
-            5,
-            12,
-            15,
-          ],
           circleColor: [
             Expressions.interpolate,
             ['linear'],
@@ -163,14 +158,57 @@ class TemperatureMapLayerManager extends MapLayerManager {
             40,
             '#8B0000',
           ],
-          circleOpacity: 0.7,
-          circleStrokeWidth: 0.2,
-          circleStrokeColor: '#000000',
-          circleStrokeOpacity: 0.7,
+          circleRadius: kCircleIconSize,
+          circleOpacity: 0.75,
+          circleStrokeColor: colors.outlineVariant.toHexStringRGB(),
+          circleStrokeWidth: 0.5,
+          circleStrokeOpacity: 0.75,
+          visibility: visible ? 'visible' : 'none',
+        );
+
+        // labels
+        final temperature = [
+          Expressions.caseExpression,
+          GlobalProviders.ui.useFahrenheit,
+          [
+            Expressions.round,
+            [
+              Expressions.plus,
+              [
+                Expressions.multiply,
+                [Expressions.get, 'temperature'],
+                1.8,
+              ],
+              32,
+            ],
+          ],
+          [Expressions.get, 'temperature'],
+        ];
+        final properties2 = SymbolLayerProperties(
+          textField: [
+            Expressions.concat,
+            [Expressions.get, 'name'],
+            '\n',
+            [Expressions.concat, temperature, if (GlobalProviders.ui.useFahrenheit) '℉' else '℃'],
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Bold'],
+          textOffset: [0, 1],
+          textAnchor: 'top',
           visibility: visible ? 'visible' : 'none',
         );
 
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          sourceId,
+          '$layerId-label',
+          properties2,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          minzoom: 10,
+        );
       }
 
       if (isSourceExists && isLayerExists) return;
@@ -189,6 +227,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, false);
+      await controller.setLayerVisibility('$layerId-label', false);
 
       visible = false;
     } catch (e, s) {
@@ -204,6 +243,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, true);
+      await controller.setLayerVisibility('$layerId-label', true);
+
       await _focus();
 
       visible = true;
@@ -219,6 +260,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.temperature(currentTemperatureTime.value);
 
       await controller.removeLayer(layerId);
+      await controller.removeLayer('$layerId-label');
+
       await controller.removeSource(sourceId);
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.remove', e, s);
