@@ -11,7 +11,7 @@ class Global {
   static late PackageInfo packageInfo;
   static late SharedPreferences preference;
   static late Map<String, Location> location;
-  static late Map<String, dynamic> geojson;
+  static late Map<String, dynamic> townGeojson;
   static late Map<String, List<({double P, double S, double R})>> timeTable;
   static late Map<String, dynamic> box;
   static late Map<String, ({String title, String body})> notifyTestContent;
@@ -54,6 +54,7 @@ class Global {
     preference = await SharedPreferences.getInstance();
     box = await rootBundle.loadJson('assets/box.json');
     location = await loadLocationData();
+    townGeojson = await rootBundle.loadJson('assets/map/town.json');
 
     await loadTimeTableData();
     await loadNotifyTestContent();

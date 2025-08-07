@@ -1,10 +1,12 @@
 import 'dart:async';
 
-import 'package:dpip/core/providers.dart';
-import 'package:dpip/utils/location_to_code.dart';
-import 'package:dpip/utils/log.dart';
 import 'package:flutter/services.dart';
+
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:dpip/utils/map_utils.dart';
 
 const _channel = MethodChannel('com.exptech.dpip/data');
 Completer<void>? _completer;
@@ -18,17 +20,18 @@ Future<void> getSavedLocation() async {
 
   try {
     final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getSavedLocation');
-    final data = result?.map((key, value) => MapEntry(key, value.toDouble()));
 
-    final latitude = data?['lat'] as double?;
-    final longitude = data?['lon'] as double?;
+    if (result == null) return;
+
+    final latitude = result['lat'] as double?;
+    final longitude = result['lon'] as double?;
 
     if (latitude != null && longitude != null) {
+      final code = getTownCodeFromCoordinates(LatLng(latitude, longitude));
+      GlobalProviders.location.setCode(code);
       GlobalProviders.location.setCoordinates(LatLng(latitude, longitude));
-      final location = GeoJsonHelper.checkPointInPolygons(latitude, longitude);
-      print(location);
-      GlobalProviders.location.setCode(location?.code.toString());
     } else {
+      GlobalProviders.location.setCode(null);
       GlobalProviders.location.setCoordinates(null);
     }
   } catch (e) {

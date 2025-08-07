@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 import 'package:dpip/api/model/eew.dart';
+import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
 List<double> expandBounds(List<double> bounds, LatLng point) {
   // [南西,北東]
@@ -183,4 +185,77 @@ bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, Lis
   }
 
   return passed;
+}
+
+String? getTownCodeFromCoordinates(LatLng target) {
+  final features = (Global.townGeojson['features'] as List).cast<Map<String, dynamic>>();
+
+  for (final feature in features) {
+    final geometry = (feature['geometry'] as Map).cast<String, dynamic>();
+    final type = geometry['type'] as String;
+
+    if (type == 'Polygon' || type == 'MultiPolygon') {
+      bool isInPolygon = false;
+
+      if (type == 'Polygon') {
+        final coordinates = ((geometry['coordinates'] as List)[0] as List).cast<List>();
+        final List<List<double>> polygon =
+            coordinates.map<List<double>>((coord) {
+              return coord.map<double>((e) => (e as num).toDouble()).toList();
+            }).toList();
+
+        bool isInside = false;
+        int j = polygon.length - 1;
+        for (int i = 0; i < polygon.length; i++) {
+          final double xi = polygon[i][0];
+          final double yi = polygon[i][1];
+          final double xj = polygon[j][0];
+          final double yj = polygon[j][1];
+
+          final bool intersect =
+              ((yi > target.latitude) != (yj > target.latitude)) &&
+              (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+          if (intersect) isInside = !isInside;
+
+          j = i;
+        }
+        isInPolygon = isInside;
+      } else {
+        final multiPolygon = (geometry['coordinates'] as List).cast<List<List>>();
+        for (final polygonCoordinates in multiPolygon) {
+          final coordinates = polygonCoordinates[0].cast<List>();
+          final List<List<double>> polygon =
+              coordinates.map<List<double>>((coord) {
+                return coord.map<double>((e) => (e as num).toDouble()).toList();
+              }).toList();
+
+          bool isInside = false;
+          int j = polygon.length - 1;
+          for (int i = 0; i < polygon.length; i++) {
+            final double xi = polygon[i][0];
+            final double yi = polygon[i][1];
+            final double xj = polygon[j][0];
+            final double yj = polygon[j][1];
+
+            final bool intersect =
+                ((yi > target.latitude) != (yj > target.latitude)) &&
+                (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+            if (intersect) isInside = !isInside;
+
+            j = i;
+          }
+          if (isInside) {
+            isInPolygon = true;
+            break;
+          }
+        }
+      }
+
+      if (isInPolygon) {
+        return (feature['properties'] as Map<String, dynamic>)['CODE'] as String;
+      }
+    }
+  }
+
+  return null;
 }
