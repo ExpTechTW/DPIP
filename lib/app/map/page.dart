@@ -299,7 +299,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          DpipMap(onMapCreated: onMapCreated, tiltGesturesEnabled: true),
+          DpipMap(onMapCreated: onMapCreated),
           PositionedLayerButton(
             activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,

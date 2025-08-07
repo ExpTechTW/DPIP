@@ -13,6 +13,7 @@ import 'package:dpip/app/map/_widgets/map_legend.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/extensions/string.dart';
@@ -65,7 +66,6 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       await setup();
 
       onTimeChanged?.call(time);
-
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.setPrecipitationTime', e, s);
     } finally {
@@ -110,6 +110,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   Future<void> setup() async {
     if (didSetup) return;
 
+    final colors = context.colors;
+
     try {
       if (GlobalProviders.data.precipitation.isEmpty) {
         final precipitationList = (await ExpTech().getRainList()).reversed.toList();
@@ -151,75 +153,83 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       }
 
       if (!isLayerExists) {
-        final properties = {
+        final Map<String, LayerProperties> properties = {
           for (final interval in precipitationIntervals)
-            interval: CircleLayerProperties(
-              circleRadius: [
-                Expressions.interpolate,
-                ['linear'],
-                [Expressions.zoom],
-                7,
-                5,
-                12,
-                15,
-              ],
-              circleColor: [
-                Expressions.interpolate,
-                ['linear'],
-                [Expressions.get, interval],
-                0,
-                '#c2c2c2',
-                10,
-                '#9cfcff',
-                30,
-                '#059bff',
-                50,
-                '#39ff03',
-                100,
-                '#fffb03',
-                200,
-                '#ff9500',
-                300,
-                '#ff0000',
-                500,
-                '#fb00ff',
-                1000,
-                '#960099',
-                2000,
-                '#000000',
-              ],
-              circleOpacity: [
-                'case',
-                [
-                  '<',
+            ...({
+              interval: CircleLayerProperties(
+                circleColor: [
+                  Expressions.interpolate,
+                  ['linear'],
                   [Expressions.get, interval],
                   0,
+                  '#c2c2c2',
+                  10,
+                  '#9cfcff',
+                  30,
+                  '#059bff',
+                  50,
+                  '#39ff03',
+                  100,
+                  '#fffb03',
+                  200,
+                  '#ff9500',
+                  300,
+                  '#ff0000',
+                  500,
+                  '#fb00ff',
+                  1000,
+                  '#960099',
+                  2000,
+                  '#000000',
                 ],
-                0,
-                0.7,
-              ],
-              circleStrokeWidth: 0.2,
-              circleStrokeColor: '#000000',
-              circleStrokeOpacity: [
-                'case',
-                [
-                  '<',
-                  [Expressions.get, interval],
-                  0,
+                circleRadius: kCircleIconSize,
+                circleOpacity: 0.75,
+                circleStrokeColor: colors.outlineVariant.toHexStringRGB(),
+                circleStrokeWidth: 0.5,
+                circleStrokeOpacity: 0.75,
+                visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+              ),
+              '$interval-label': SymbolLayerProperties(
+                textField: [
+                  Expressions.concat,
+                  [Expressions.get, 'name'],
+                  '\n',
+                  [
+                    Expressions.concat,
+                    [Expressions.get, interval],
+                    'mm',
+                  ],
                 ],
-                0,
-                0.7,
-              ],
-              visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
-            ),
+                textSize: 10,
+                textColor: colors.onSurfaceVariant.toHexStringRGB(),
+                textHaloColor: colors.outlineVariant.toHexStringRGB(),
+                textHaloWidth: 1,
+                textFont: ['Noto Sans TC Bold'],
+                textOffset: [0, 1],
+                textAnchor: 'top',
+                visibility: interval == currentPrecipitationInterval.value ? 'visible' : 'none',
+              ),
+            }),
         };
 
         await Future.wait(
-          properties.entries.map(
-            (entry) => controller
-                .addLayer(sourceId, '$layerId-${entry.key}', entry.value, belowLayerId: BaseMapLayerIds.userLocation)
-                .then((value) {}),
-          ),
+          properties.entries.map((entry) {
+            final isValueLayer = entry.key.endsWith('-label');
+            final interval = isValueLayer ? entry.key.substring(0, entry.key.length - 6) : entry.key;
+
+            return controller.addLayer(
+              sourceId,
+              '$layerId-${entry.key}',
+              entry.value,
+              belowLayerId: BaseMapLayerIds.userLocation,
+              minzoom: isValueLayer ? 10 : null,
+              filter: [
+                Expressions.largerOrEqual,
+                [Expressions.get, interval],
+                0,
+              ],
+            );
+          }),
         );
       }
 
@@ -237,9 +247,11 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final hideLayerId = '$layerId-${currentPrecipitationInterval.value}';
+    final hideValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label';
 
     try {
       await controller.setLayerVisibility(hideLayerId, false);
+      await controller.setLayerVisibility(hideValueLayerId, false);
 
       visible = false;
     } catch (e, s) {
@@ -253,9 +265,11 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     final layerId = MapLayerIds.precipitation(currentPrecipitationTime.value);
     final showLayerId = '$layerId-${currentPrecipitationInterval.value}';
+    final showValueLayerId = '$layerId-${currentPrecipitationInterval.value}-label';
 
     try {
       await controller.setLayerVisibility(showLayerId, true);
+      await controller.setLayerVisibility(showValueLayerId, true);
 
       await _focus();
 
@@ -273,6 +287,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
       for (final interval in precipitationIntervals) {
         await controller.removeLayer('$layerId-$interval');
+        await controller.removeLayer('$layerId-$interval-label');
       }
 
       await controller.removeSource(sourceId);

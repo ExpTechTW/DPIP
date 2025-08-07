@@ -16,6 +16,16 @@ const kSymbolIconSize = [
   [Expressions.zoom],
   5,
   0.1,
-  10,
-  0.6,
+  15,
+  1,
+];
+
+const kCircleIconSize = [
+  Expressions.interpolate,
+  ['linear'],
+  [Expressions.zoom],
+  5,
+  2,
+  15,
+  12,
 ];

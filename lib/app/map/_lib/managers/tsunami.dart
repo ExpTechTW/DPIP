@@ -272,7 +272,7 @@ class _TsunamiMapLayerSheetState extends State<TsunamiMapLayerSheet> {
           textColor: '#ffffff',
           textHaloColor: '#000000',
           textHaloWidth: 1,
-          textFont: ['Noto Sans Regular'],
+          textFont: ['Noto Sans TC Bold'],
           textOffset: [
             Expressions.literal,
             [0, 3.5],

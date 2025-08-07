@@ -13,7 +13,6 @@ import 'package:dpip/app/map/_widgets/map_legend.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
-import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/geojson.dart';
@@ -69,6 +68,8 @@ class WindMapLayerManager extends MapLayerManager {
   Future<void> setup() async {
     if (didSetup) return;
 
+    final colors = context.colors;
+
     try {
       if (GlobalProviders.data.wind.isEmpty) {
         final windList = (await ExpTech().getWeatherList()).reversed.toList();
@@ -114,16 +115,55 @@ class WindMapLayerManager extends MapLayerManager {
       }
 
       if (!isLayerExists) {
+        // arrows
         final properties = SymbolLayerProperties(
           iconImage: [Expressions.get, 'icon'],
-          iconSize: kSymbolIconSize,
+          iconSize: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.zoom],
+            5,
+            0.1,
+            15,
+            0.8,
+          ],
           iconRotate: [Expressions.get, 'wind_direction'],
+          iconOpacity: 0.75,
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
           visibility: visible ? 'visible' : 'none',
         );
 
+        // labels
+        final properties2 = SymbolLayerProperties(
+          textField: [
+            Expressions.concat,
+            [Expressions.get, 'name'],
+            '\n',
+            [
+              Expressions.concat,
+              [Expressions.get, 'wind_speed'],
+              'm/s',
+            ],
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Bold'],
+          textOffset: [0, 2],
+          textAnchor: 'top',
+          visibility: visible ? 'visible' : 'none',
+        );
+
         await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+        await controller.addLayer(
+          sourceId,
+          '$layerId-label',
+          properties2,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          minzoom: 10,
+        );
       }
 
       if (isSourceExists && isLayerExists) return;
@@ -142,6 +182,7 @@ class WindMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, false);
+      await controller.setLayerVisibility('$layerId-label', false);
 
       visible = false;
     } catch (e, s) {
@@ -157,6 +198,7 @@ class WindMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, true);
+      await controller.setLayerVisibility('$layerId-label', true);
 
       visible = true;
     } catch (e, s) {
@@ -171,6 +213,8 @@ class WindMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.wind(currentWindTime.value);
 
       await controller.removeLayer(layerId);
+      await controller.removeLayer('$layerId-label');
+
       await controller.removeSource(sourceId);
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.dispose', e, s);
