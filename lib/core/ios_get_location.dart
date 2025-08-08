@@ -34,8 +34,8 @@ Future<void> getSavedLocation() async {
       GlobalProviders.location.setCode(null);
       GlobalProviders.location.setCoordinates(null);
     }
-  } catch (e) {
-    TalkerManager.instance.error('Error in getSavedLocation: $e');
+  } catch (e, s) {
+    TalkerManager.instance.error('Error in getSavedLocation', e, s);
   } finally {
     _completer?.complete();
     _completer = null;
