@@ -1,16 +1,20 @@
 import 'dart:io';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/utils/toast.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
@@ -156,8 +160,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       }
 
       await DisableBatteryOptimization.showEnableAutoStartSettings(
-        '自動啟動',
-        '為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。',
+        '自動啟動'.i18n,
+        '為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。'.i18n,
       );
     }
 
@@ -178,8 +182,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       if (status == null || status) break manufacturerBatteryOptimization;
 
       await DisableBatteryOptimization.showEnableAutoStartSettings(
-        '省電策略',
-        '為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。',
+        '省電策略'.i18n,
+        '為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。'.i18n,
       );
     }
 
@@ -213,7 +217,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
   @override
   Widget build(BuildContext context) {
-    final permissionType = Platform.isAndroid ? '一律允許' : '永遠';
+    final permissionType = Platform.isAndroid ? '一律允許'.i18n : '永遠'.i18n;
 
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
@@ -260,11 +264,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。',
+                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。'.i18n,
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
-                        TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
+                        TextButton(child: Text('設定'.i18n), onPressed: () => openAppSettings()),
                       ],
                     ),
                   ),
@@ -293,8 +297,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                           child: Icon(Symbols.warning_rounded, color: context.colors.error),
                         ),
                         const SizedBox(width: 8),
-                        Expanded(child: Text('通知功能已被拒絕，請移至設定允許權限。', style: TextStyle(color: context.colors.error))),
-                        TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
+                        Expanded(
+                          child: Text('通知功能已被拒絕，請移至設定允許權限。'.i18n, style: TextStyle(color: context.colors.error)),
+                        ),
+                        TextButton(child: Text('設定'.i18n), onPressed: () => openAppSettings()),
                       ],
                     ),
                   ),
@@ -317,10 +323,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: '自啟動權限已被拒絕，請移至設定允許權限。',
+                    content: '自啟動權限已被拒絕，請移至設定允許權限。'.i18n,
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: const Text('設定'),
+                      child: Text('設定'.i18n),
                       onPressed: () => Autostarter.getAutoStartPermission(newTask: true),
                     ),
                   ),
@@ -343,10 +349,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: '省電策略已被拒絕，請移至設定允許權限。',
+                    content: '省電策略已被拒絕，請移至設定允許權限。'.i18n,
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: const Text('設定'),
+                      child: Text('設定'.i18n),
                       onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                       },
@@ -356,44 +362,72 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        ListSection(
-          title: '所在地'.i18n,
-          children: [
-            Selector<SettingsLocationModel, ({bool auto, String? code})>(
-              selector: (context, model) => (auto: model.auto, code: model.code),
-              builder: (context, data, child) {
-                final (:auto, :code) = data;
-                final city = Global.location[code]?.city;
+        Consumer<SettingsLocationModel>(
+          builder: (context, model, child) {
+            String? loadingCode;
 
-                return ListSectionTile(
-                  title: '直轄市/縣市'.i18n,
-                  subtitle: Text(city ?? '尚未設定'.i18n),
-                  icon: Symbols.location_city_rounded,
-                  trailing: const Icon(Symbols.chevron_right_rounded),
-                  enabled: !auto,
-                  onTap: () => context.push(SettingsLocationSelectPage.route),
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return ListSection(
+                  title: '所在地'.i18n,
+                  children: [
+                    ...model.favorited.map((code) {
+                      final location = Global.location[code]!;
+
+                      final isCurrentLoading = loadingCode == code;
+                      final isSelected = code == model.code;
+
+                      return ListSectionTile(
+                        title: '${location.city} ${location.town}',
+                        subtitle: Text(
+                          '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
+                        ),
+                        leading:
+                            isCurrentLoading
+                                ? const LoadingIcon()
+                                : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
+                        trailing: IconButton(
+                          icon: const Icon(Symbols.delete_rounded),
+                          color: context.colors.error,
+                          onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
+                        ),
+                        enabled: !model.auto && loadingCode == null,
+                        onTap:
+                            isSelected
+                                ? null
+                                : () async {
+                                  setState(() => loadingCode = code);
+
+                                  try {
+                                    await ExpTech().updateDeviceLocation(
+                                      token: Preference.notifyToken,
+                                      coordinates: LatLng(location.lat, location.lng),
+                                    );
+
+                                    if (!context.mounted) return;
+
+                                    model.setCode(code);
+                                  } catch (e, s) {
+                                    if (!context.mounted) return;
+                                    TalkerManager.instance.error('Failed to set location code', e, s);
+                                    showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n));
+                                  }
+
+                                  setState(() => loadingCode = null);
+                                },
+                      );
+                    }),
+                    ListSectionTile(
+                      title: '新增地點'.i18n,
+                      icon: Symbols.add_circle_rounded,
+                      enabled: loadingCode == null,
+                      onTap: () => context.push(SettingsLocationSelectPage.route),
+                    ),
+                  ],
                 );
               },
-            ),
-            Selector<SettingsLocationModel, ({bool auto, String? code})>(
-              selector: (context, model) => (auto: model.auto, code: model.code),
-              builder: (context, data, child) {
-                final (:auto, :code) = data;
-
-                final city = Global.location[code]?.city;
-                final town = Global.location[code]?.town;
-
-                return ListSectionTile(
-                  title: '鄉鎮市區'.i18n,
-                  subtitle: Text(town ?? '尚未設定'.i18n),
-                  icon: Symbols.forest_rounded,
-                  trailing: const Icon(Symbols.chevron_right_rounded),
-                  enabled: !auto && city != null,
-                  onTap: city == null ? null : () => context.push(SettingsLocationSelectCityPage.route(city)),
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
       ],
     );
