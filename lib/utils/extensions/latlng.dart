@@ -10,7 +10,7 @@ extension GeoJsonLatLng on LatLng {
     return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(toGeoJsonCoordinates() as List<dynamic>);
   }
 
-  /// Calculates the distance between the supplied coordinates in meters.
-  /// The distance between the coordinates is calculated using the Haversine formula (see https://en.wikipedia.org/wiki/Haversine_formula).
+  /// Calculates the distance between the supplied coordinates in meters. The distance between the coordinates is
+  /// calculated using the Haversine formula (see https://en.wikipedia.org/wiki/Haversine_formula).
   double to(LatLng other) => Geolocator.distanceBetween(latitude, longitude, other.latitude, other.longitude);
 }

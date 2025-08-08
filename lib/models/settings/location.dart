@@ -10,14 +10,12 @@ import 'package:dpip/global.dart';
 class _SettingsLocationModel extends ChangeNotifier {
   /// The underlying [ValueNotifier] for the current location represented as a postal code.
   ///
-  /// Returns the stored location code from preferences.
-  /// Returns `null` if no location code has been set.
+  /// Returns the stored location code from preferences. Returns `null` if no location code has been set.
   final $code = ValueNotifier(Preference.locationCode);
 
   /// The current location represented as a postal code.
   ///
-  /// Returns the stored location code from preferences.
-  /// Returns `null` if no location code has been set.
+  /// Returns the stored location code from preferences. Returns `null` if no location code has been set.
   String? get code => $code.value;
 
   /// Sets the current location using a postal code.
@@ -26,9 +24,8 @@ class _SettingsLocationModel extends ChangeNotifier {
   ///
   /// Invoking this method will also update [$code] and notify all attached listeners.
   ///
-  /// If [value] matches the current code, no changes are made.
-  /// When [auto] is false, also updates the stored latitude and longitude based on the
-  /// location data associated with the postal code.
+  /// If [value] matches the current code, no changes are made. When [auto] is false, also updates the stored latitude
+  /// and longitude based on the location data associated with the postal code.
   void setCode(String? value) {
     if (code == value) return;
 
@@ -65,8 +62,8 @@ class _SettingsLocationModel extends ChangeNotifier {
 
   /// The underlying [ValueNotifier] for the current location represented as a [LatLng] coordinate.
   ///
-  /// Returns a [LatLng] object containing the stored coordinates for the current [code].
-  /// Returns `null` if either latitude or longitude is not set.
+  /// Returns a [LatLng] object containing the stored coordinates for the current [code]. Returns `null` if either
+  /// latitude or longitude is not set.
   ///
   /// This is used to display the precise location of the user on the map.
   ///
@@ -79,8 +76,8 @@ class _SettingsLocationModel extends ChangeNotifier {
 
   /// The current location represented as a LatLng coordinate.
   ///
-  /// Returns a [LatLng] object containing the stored coordinates for the current [code].
-  /// Returns `null` if either latitude or longitude is not set.
+  /// Returns a [LatLng] object containing the stored coordinates for the current [code]. Returns `null` if either
+  /// latitude or longitude is not set.
   ///
   /// This is used to display the precise location of the user on the map.
   ///
@@ -89,9 +86,8 @@ class _SettingsLocationModel extends ChangeNotifier {
 
   /// Sets the current location using a LatLng coordinate.
   ///
-  /// Takes a [LatLng] value containing latitude and longitude coordinates and updates
-  /// the stored location preferences. If value is `null`, both latitude and longitude
-  /// will be set to `null`.
+  /// Takes a [LatLng] value containing latitude and longitude coordinates and updates the stored location preferences.
+  /// If value is `null`, both latitude and longitude will be set to `null`.
   ///
   /// Invoking this method will also update [$coordinates] and notify all attached listeners.
   ///
@@ -109,27 +105,26 @@ class _SettingsLocationModel extends ChangeNotifier {
 
   /// The underlying [ValueNotifier] for the current state of automatic location update.
   ///
-  /// Returns a [bool] indicating if automatic location update is enabled.
-  /// When enabled, the app will use GPS to automatically update
-  /// the current location. When disabled, the location must be set manually either by [setCode] or [setCoordinates].
+  /// Returns a [bool] indicating if automatic location update is enabled. When enabled, the app will use GPS to
+  /// automatically update the current location. When disabled, the location must be set manually either by [setCode] or
+  /// [setCoordinates].
   ///
   /// Defaults to `false` if no preference has been set.
   final $auto = ValueNotifier(Preference.locationAuto ?? false);
 
   /// The current state of automatic location update.
   ///
-  /// Returns a [bool] indicating if automatic location update is enabled.
-  /// When enabled, the app will use GPS to automatically update
-  /// the current location. When disabled, the location must be set manually either by [setCode] or [setCoordinates].
+  /// Returns a [bool] indicating if automatic location update is enabled. When enabled, the app will use GPS to
+  /// automatically update the current location. When disabled, the location must be set manually either by [setCode] or
+  /// [setCoordinates].
   ///
   /// Defaults to `false` if no preference has been set.
   bool get auto => $auto.value;
 
   /// Sets whether location should be automatically determined using GPS.
   ///
-  /// Takes a [bool] value indicating if automatic location detection should be enabled.
-  /// When enabled, the app will use GPS to automatically determine and update the current location.
-  /// When disabled, the location must be set manually.
+  /// Takes a [bool] value indicating if automatic location detection should be enabled. When enabled, the app will use
+  /// GPS to automatically determine and update the current location. When disabled, the location must be set manually.
   void setAuto(bool value) {
     Preference.locationAuto = value;
 

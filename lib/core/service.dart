@@ -39,8 +39,7 @@ class PositionEvent {
 
 /// Events emitted by the background service.
 final class LocationServiceEvent {
-  /// Event emitted when a new position is set in the background service.
-  /// Contains the updated location coordinates.
+  /// Event emitted when a new position is set in the background service. Contains the updated location coordinates.
   static const position = 'position';
 
   /// Method event to stop the service.
@@ -49,8 +48,8 @@ final class LocationServiceEvent {
 
 /// Background location service.
 ///
-/// This class is responsible for managing the background location service.
-/// It is used to handle start and stop the service.
+/// This class is responsible for managing the background location service. It is used to handle start and stop the
+/// service.
 class LocationServiceManager {
   LocationServiceManager._();
 
@@ -68,8 +67,8 @@ class LocationServiceManager {
 
   /// Initializes the background location service.
   ///
-  /// Configures the service with Android specific settings.
-  /// Sets up a listener for position updates that reloads preferences and updates device location.
+  /// Configures the service with Android specific settings. Sets up a listener for position updates that reloads
+  /// preferences and updates device location.
   ///
   /// Will starts the service if automatic location updates are enabled.
   static Future<void> initalize() async {
@@ -182,7 +181,8 @@ class LocationServiceManager {
 
 /// The background location service.
 ///
-/// This service is used to get the current location of the device in the background and notify the main isolate to update the UI with the new location.
+/// This service is used to get the current location of the device in the background and notify the main isolate to
+/// update the UI with the new location.
 ///
 /// All property prefixed with `_$` are isolated from the main app.
 @pragma('vm:entry-point')
@@ -206,9 +206,8 @@ class LocationService {
 
   /// Entry point for the background service.
   ///
-  /// Sets up notifications, initializes required data, and starts periodic location updates.
-  /// Updates the notification with current location information.
-  /// Adjusts update frequency based on movement distance.
+  /// Sets up notifications, initializes required data, and starts periodic location updates. Updates the notification
+  /// with current location information. Adjusts update frequency based on movement distance.
   @pragma('vm:entry-point')
   static Future<void> _$onStart(ServiceInstance service) async {
     if (service is! AndroidServiceInstance) return;
@@ -268,8 +267,8 @@ class LocationService {
 
   /// The main tick function of the service.
   ///
-  /// This function is used to get the current location of the device and update the notification.
-  /// It is called periodically to check if the device has moved and update the notification accordingly.
+  /// This function is used to get the current location of the device and update the notification. It is called
+  /// periodically to check if the device has moved and update the notification accordingly.
   @pragma('vm:entry-point')
   static Future<void> _$task() async {
     if (!await _$service.isForegroundService()) return;
@@ -329,8 +328,7 @@ class LocationService {
 
   /// Gets the current geographical location of the device.
   ///
-  /// Returns null if location services are disabled.
-  /// Uses medium accuracy for location detection.
+  /// Returns null if location services are disabled. Uses medium accuracy for location detection.
   @pragma('vm:entry-point')
   static Future<LatLng?> _$getDeviceGeographicalLocation() async {
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -349,8 +347,8 @@ class LocationService {
 
   /// Gets the location code for given coordinates by checking if they fall within polygon boundaries.
   ///
-  /// Takes a target LatLng and checks if it falls within any polygon in the GeoJSON data.
-  /// Returns the location code if found, null otherwise.
+  /// Takes a target LatLng and checks if it falls within any polygon in the GeoJSON data. Returns the location code if
+  /// found, null otherwise.
   static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
     final features = _$geoJsonData.features;
 
@@ -428,8 +426,7 @@ class LocationService {
 
   /// Updates the current position in the service.
   ///
-  /// Invokes a position event with the new coordinates that can be listened to
-  /// by the main app to update the UI.
+  /// Invokes a position event with the new coordinates that can be listened to by the main app to update the UI.
   @pragma('vm:entry-point')
   static Future<void> _$updatePosition(ServiceInstance service, LatLng? position) async {
     _$location = position;

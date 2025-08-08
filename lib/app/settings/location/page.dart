@@ -62,8 +62,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     });
   }
 
-  /// Shows a error dialog to the user with the given permission type.
-  /// [type] can be either [Permission] or `"auto-start"`
+  /// Shows a error dialog to the user with the given permission type. [type] can be either [Permission] or
+  /// `"auto-start"`
   Future<void> showPermissionDialog(dynamic type) async {
     if (!mounted) return;
     if (type is! Permission && type is! String) return;
