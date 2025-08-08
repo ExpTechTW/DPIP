@@ -279,7 +279,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   Future toggleAutoLocation() async {
     final shouldEnable = !context.read<SettingsLocationModel>().auto;
 
-    await BackgroundLocationService.stop();
+    await BackgroundLocationServiceManager.stop();
 
     if (shouldEnable) {
       final notification = await checkNotificationPermission();
@@ -313,7 +313,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
     if (Platform.isAndroid) {
       if (shouldEnable) {
-        await BackgroundLocationService.start();
+        await BackgroundLocationServiceManager.start();
       }
     }
     if (Platform.isIOS) {

@@ -12,6 +12,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/core/preference.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/asset_bundle.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
@@ -47,12 +48,9 @@ final class BackgroundLocationServiceEvent {
 /// Background location service.
 ///
 /// This class is responsible for managing the background location service.
-/// It is used to get the current location of the device inthe background and notify the main isolate to update the UI with the new location.
-///
-/// All property prefixed with `_$` are isolated from the main app.
-@pragma('vm:entry-point')
-class BackgroundLocationService {
-  BackgroundLocationService._();
+/// It is used to handle start and stop the service.
+class BackgroundLocationServiceManager {
+  BackgroundLocationServiceManager._();
 
   /// The notification ID used for the background service notification
   static const kNotificationId = 888888;
@@ -78,36 +76,48 @@ class BackgroundLocationService {
       TalkerManager.instance.warning('⚙️ service is not supported on this platform (${Platform.operatingSystem})');
       return;
     }
+    try {
+      await instance.configure(
+        androidConfiguration: AndroidConfiguration(
+          onStart: BackgroundLocationService._$onStart,
+          autoStart: false,
+          isForegroundMode: false,
+          foregroundServiceTypes: [AndroidForegroundType.location],
+          notificationChannelId: 'background',
+          initialNotificationTitle: 'DPIP',
+          initialNotificationContent: '正在初始化自動定位服務...',
+          foregroundServiceNotificationId: kNotificationId,
+        ),
+        // iOS is handled in native code
+        iosConfiguration: IosConfiguration(autoStart: false),
+      );
 
-    await instance.configure(
-      androidConfiguration: AndroidConfiguration(
-        onStart: _$onStart,
-        autoStart: false,
-        isForegroundMode: true,
-        foregroundServiceTypes: [AndroidForegroundType.location],
-        notificationChannelId: 'background',
-        initialNotificationTitle: 'DPIP',
-        initialNotificationContent: '正在初始化自動定位服務...',
-        foregroundServiceNotificationId: kNotificationId,
-      ),
-      // iOS is handled in native code
-      iosConfiguration: IosConfiguration(autoStart: false),
-    );
+      // Reloads the UI isolate's preference cache when a new position is set in the background service.
+      instance.on(BackgroundLocationServiceEvent.position).listen((data) async {
+        final event = PositionEvent.fromJson(data!);
+        try {
+          TalkerManager.instance.info('⚙️ location updated by service, reloading preferences');
 
-    // Reloads the UI isolate's preference cache when a new position is set in the background service.
-    instance.on(BackgroundLocationServiceEvent.position).listen((data) {
-      final event = PositionEvent.fromJson(data!);
+          await Preference.reload();
+          GlobalProviders.location.refresh();
 
-      Preference.reload();
+          // Handle FCM notification
+          final fcmToken = Preference.notifyToken;
+          if (fcmToken.isNotEmpty && event.coordinates != null) {
+            await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: event.coordinates!);
+          }
 
-      // Handle FCM notification
-      final fcmToken = Preference.notifyToken;
-      if (fcmToken.isNotEmpty && event.coordinates != null) {
-        ExpTech().updateDeviceLocation(token: fcmToken, coordinates: event.coordinates!);
-      }
-    });
+          TalkerManager.instance.info('⚙️ preferences reloaded');
+        } catch (e, s) {
+          TalkerManager.instance.error('⚙️ failed to reload preferences', e, s);
+        }
+      });
 
-    initialized = true;
+      initialized = true;
+      TalkerManager.instance.info('⚙️ service initialized');
+    } catch (e, s) {
+      TalkerManager.instance.error('⚙️ initializing location service FAILED', e, s);
+    }
 
     if (Preference.locationAuto == true) await start();
   }
@@ -134,6 +144,19 @@ class BackgroundLocationService {
     TalkerManager.instance.info('⚙️ stopping location service');
     instance.invoke(BackgroundLocationServiceEvent.stop);
   }
+}
+
+/// The background location service.
+///
+/// This service is used to get the current location of the device in the background and notify the main isolate to update the UI with the new location.
+///
+/// All property prefixed with `_$` are isolated from the main app.
+@pragma('vm:entry-point')
+class BackgroundLocationService {
+  BackgroundLocationService._();
+
+  /// The service instance
+  static late AndroidServiceInstance _$service;
 
   /// The last known location coordinates
   static LatLng? _$location;
@@ -154,13 +177,14 @@ class BackgroundLocationService {
   /// Adjusts update frequency based on movement distance.
   @pragma('vm:entry-point')
   static Future<void> _$onStart(ServiceInstance service) async {
-    DartPluginRegistrant.ensureInitialized();
-
     if (service is! AndroidServiceInstance) return;
+    _$service = service;
+
+    DartPluginRegistrant.ensureInitialized();
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: kNotificationId,
+        id: BackgroundLocationServiceManager.kNotificationId,
         channelKey: 'background',
         title: 'DPIP',
         body: '自動定位服務啟動中...',
@@ -170,51 +194,73 @@ class BackgroundLocationService {
       ),
     );
 
+    await _$service.setAsForegroundService();
+
     await Preference.init();
     _$geoJsonData = await rootBundle.loadJson('assets/map/town.json');
     _$locationData = await Global.loadLocationData();
 
-    service.setAutoStartOnBootMode(true);
+    _$service.setAutoStartOnBootMode(true);
 
-    service.on(BackgroundLocationServiceEvent.stop).listen((data) {
-      _$locationUpdateTimer?.cancel();
-      service.stopSelf().then((_) {
+    _$service.on(BackgroundLocationServiceEvent.stop).listen((data) async {
+      try {
+        TalkerManager.instance.info('⚙️ stopping location service');
+
+        // Cleanup timer
+        _$locationUpdateTimer?.cancel();
+
+        await _$service.setAutoStartOnBootMode(false);
+        await _$service.stopSelf();
+
         TalkerManager.instance.info('⚙️ location service stopped');
-      });
+      } catch (e, s) {
+        TalkerManager.instance.error('⚙️ stopping location service FAILED', e, s);
+      }
     });
 
-    // Define the periodic location update task
-    Future<void> updateLocation() async {
-      _$locationUpdateTimer?.cancel();
-      if (!await service.isForegroundService()) return;
+    // Start the periodic location update task
+    await _$task();
+  }
 
+  /// The main tick function of the service.
+  ///
+  /// This function is used to get the current location of the device and update the notification.
+  /// It is called periodically to check if the device has moved and update the notification accordingly.
+  @pragma('vm:entry-point')
+  static Future<void> _$task() async {
+    if (!await _$service.isForegroundService()) return;
+
+    final $perf = Stopwatch()..start();
+    TalkerManager.instance.debug('⚙️ task started');
+
+    try {
       // Get current position and location info
-      final coordinates = await _$getDeviceGeographicalLocation(service);
+      final coordinates = await _$getDeviceGeographicalLocation();
 
       if (coordinates == null) {
-        _$updatePosition(service, null);
+        _$updatePosition(_$service, null);
         return;
       }
 
       final locationCode = _$getLocationFromCoordinates(coordinates);
-      final lastLocation = _$location;
+      final previousLocation = _$location;
 
-      final distanceInKm = lastLocation != null ? coordinates.to(lastLocation) : null;
+      final distanceInKm = previousLocation != null ? coordinates.to(previousLocation) : null;
 
       if (distanceInKm == null || distanceInKm >= 250) {
-        TalkerManager.instance.debug('距離: $distanceInKm 更新位置');
-        _$updatePosition(service, coordinates);
+        TalkerManager.instance.debug('⚙️ distance: $distanceInKm, updating position');
+        _$updatePosition(_$service, coordinates);
       } else {
-        TalkerManager.instance.debug('距離: $distanceInKm 不更新位置');
+        TalkerManager.instance.debug('⚙️ distance: $distanceInKm, not updating position');
       }
 
+      // Update notification with current position
       final latitude = coordinates.latitude.toStringAsFixed(4);
       final longitude = coordinates.longitude.toStringAsFixed(4);
 
       final location = locationCode != null ? _$locationData[locationCode] : null;
       final locationName = location == null ? '服務區域外' : '${location.city} ${location.town}';
 
-      // Update notification with current position
       const notificationTitle = '自動定位中';
       final timestamp = DateTime.now().toDateTimeString();
       final notificationBody =
@@ -223,7 +269,7 @@ class BackgroundLocationService {
 
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
-          id: kNotificationId,
+          id: BackgroundLocationServiceManager.kNotificationId,
           channelKey: 'background',
           title: notificationTitle,
           body: notificationBody,
@@ -232,25 +278,31 @@ class BackgroundLocationService {
           badge: 0,
         ),
       );
-      service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
 
-      int time = 15;
+      _$service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
+
+      // Determine the next update time based on the distance moved
+      int nextUpdateInterval = 15;
 
       if (distanceInKm != null) {
         if (distanceInKm > 30) {
-          time = 5;
+          nextUpdateInterval = 5;
         } else if (distanceInKm > 10) {
-          time = 10;
+          nextUpdateInterval = 10;
         }
       }
 
-      _$location = coordinates;
-
-      _$locationUpdateTimer = Timer.periodic(Duration(minutes: time), (timer) => updateLocation());
+      _$locationUpdateTimer?.cancel();
+      _$locationUpdateTimer = Timer.periodic(Duration(minutes: nextUpdateInterval), (timer) => _$task());
+    } catch (e, s) {
+      $perf.stop();
+      TalkerManager.instance.error('⚙️ task FAILED after ${$perf.elapsedMilliseconds}ms', e, s);
+    } finally {
+      if ($perf.isRunning) {
+        $perf.stop();
+        TalkerManager.instance.debug('⚙️ task completed in ${$perf.elapsedMilliseconds}ms');
+      }
     }
-
-    // Start the periodic task
-    updateLocation();
   }
 
   /// Gets the current geographical location of the device.
@@ -258,7 +310,7 @@ class BackgroundLocationService {
   /// Returns null if location services are disabled.
   /// Uses medium accuracy for location detection.
   @pragma('vm:entry-point')
-  static Future<LatLng?> _$getDeviceGeographicalLocation(ServiceInstance service) async {
+  static Future<LatLng?> _$getDeviceGeographicalLocation() async {
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
@@ -356,6 +408,8 @@ class BackgroundLocationService {
   /// by the main app to update the UI.
   @pragma('vm:entry-point')
   static Future<void> _$updatePosition(ServiceInstance service, LatLng? position) async {
+    _$location = position;
+
     service.invoke(BackgroundLocationServiceEvent.position, PositionEvent(position).toJson());
   }
 }
