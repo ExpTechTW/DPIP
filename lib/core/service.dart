@@ -90,7 +90,11 @@ class BackgroundLocationServiceManager {
           foregroundServiceNotificationId: kNotificationId,
         ),
         // iOS is handled in native code
-        iosConfiguration: IosConfiguration(autoStart: false),
+        iosConfiguration: IosConfiguration(
+          autoStart: false,
+          onForeground: BackgroundLocationService._$onStartIOS,
+          onBackground: BackgroundLocationService._$onStartIOS,
+        ),
       );
 
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
@@ -247,6 +251,15 @@ class BackgroundLocationService {
 
     // Start the periodic location update task
     await _$task();
+  }
+
+  /// Entry point for ios background service.
+  ///
+  /// iOS background service is handled in native code.
+  @pragma('vm:entry-point')
+  static Future<bool> _$onStartIOS(ServiceInstance service) async {
+    DartPluginRegistrant.ensureInitialized();
+    return true;
   }
 
   /// The main tick function of the service.
