@@ -288,22 +288,24 @@ class LocationService {
 
       final previousLocation = _$location;
 
-      final distanceInKm = previousLocation != null ? coordinates.to(previousLocation) : null;
+      final distanceInMeters = previousLocation != null ? coordinates.to(previousLocation) : null;
 
-      if (distanceInKm == null || distanceInKm >= 250) {
-        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInKm, updating position');
+      if (distanceInMeters == null || distanceInMeters >= 250) {
+        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInMeters, updating position');
         _$updatePosition(_$service, coordinates);
       } else {
-        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInKm, not updating position');
+        TalkerManager.instance.debug(
+          '⚙️::BackgroundLocationService distance: $distanceInMeters, not updating position',
+        );
       }
 
       // Determine the next update time based on the distance moved
       int nextUpdateInterval = 15;
 
-      if (distanceInKm != null) {
-        if (distanceInKm > 30) {
+      if (distanceInMeters != null) {
+        if (distanceInMeters > 30) {
           nextUpdateInterval = 5;
-        } else if (distanceInKm > 10) {
+        } else if (distanceInMeters > 10) {
           nextUpdateInterval = 10;
         }
       }
