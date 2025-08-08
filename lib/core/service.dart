@@ -99,26 +99,7 @@ class LocationServiceManager {
       );
 
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
-      service.on(LocationServiceEvent.position).listen((data) async {
-        final event = PositionEvent.fromJson(data!);
-
-        try {
-          TalkerManager.instance.info('👷 location updated by service, reloading preferences');
-
-          await Preference.reload();
-          GlobalProviders.location.refresh();
-
-          // Handle FCM notification
-          final fcmToken = Preference.notifyToken;
-          if (fcmToken.isNotEmpty && event.coordinates != null) {
-            await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: event.coordinates!);
-          }
-
-          TalkerManager.instance.info('👷 preferences reloaded');
-        } catch (e, s) {
-          TalkerManager.instance.error('👷 failed to update location', e, s);
-        }
-      });
+      service.on(LocationServiceEvent.position).listen((data) => _onPosition(PositionEvent.fromJson(data!)));
 
       instance = service;
       TalkerManager.instance.info('👷 service initialized');
@@ -175,6 +156,27 @@ class LocationServiceManager {
       service.invoke(LocationServiceEvent.stop);
     } catch (e, s) {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
+    }
+  }
+
+  /// The event handler for the "position" event.
+  ///
+  /// Called when the service has updated the current location.
+  static Future<void> _onPosition(PositionEvent event) async {
+    try {
+      TalkerManager.instance.info('👷 location updated by service, reloading preferences');
+
+      await Preference.reload();
+      GlobalProviders.location.refresh();
+
+      final fcmToken = Preference.notifyToken;
+      if (fcmToken.isNotEmpty && event.coordinates != null) {
+        await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: event.coordinates!);
+      }
+
+      TalkerManager.instance.info('👷 preferences reloaded');
+    } catch (e, s) {
+      TalkerManager.instance.error('👷 failed to update location', e, s);
     }
   }
 }
@@ -236,21 +238,7 @@ class LocationService {
 
     _$service.setAutoStartOnBootMode(true);
 
-    _$service.on(LocationServiceEvent.stop).listen((data) async {
-      try {
-        TalkerManager.instance.info('⚙️::BackgroundLocationService stopping location service');
-
-        // Cleanup timer
-        _$locationUpdateTimer?.cancel();
-
-        await _$service.setAutoStartOnBootMode(false);
-        await _$service.stopSelf();
-
-        TalkerManager.instance.info('⚙️::BackgroundLocationService location service stopped');
-      } catch (e, s) {
-        TalkerManager.instance.error('⚙️::BackgroundLocationService stopping location service FAILED', e, s);
-      }
-    });
+    _$service.on(LocationServiceEvent.stop).listen((_) => _$onStop());
 
     // Start the periodic location update task
     await _$task();
@@ -323,6 +311,26 @@ class LocationService {
         $perf.stop();
         TalkerManager.instance.debug('⚙️::BackgroundLocationService task completed in ${$perf.elapsedMilliseconds}ms');
       }
+    }
+  }
+
+  /// The event handler for the "stop" event.
+  ///
+  /// Called when the service manager sends a stop signal to terminate the location service.
+  @pragma('vm:entry-point')
+  static Future<void> _$onStop() async {
+    try {
+      TalkerManager.instance.info('⚙️::BackgroundLocationService stopping location service');
+
+      // Cleanup timer
+      _$locationUpdateTimer?.cancel();
+
+      await _$service.setAutoStartOnBootMode(false);
+      await _$service.stopSelf();
+
+      TalkerManager.instance.info('⚙️::BackgroundLocationService location service stopped');
+    } catch (e, s) {
+      TalkerManager.instance.error('⚙️::BackgroundLocationService stopping location service FAILED', e, s);
     }
   }
 
