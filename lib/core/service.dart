@@ -290,7 +290,7 @@ class LocationService {
 
       final distanceInKm = previousLocation != null ? coordinates.to(previousLocation) : null;
 
-      if (distanceInKm == null || distanceInKm >= 250) {
+      if (distanceInKm == null || distanceInKm >= 0.25) {
         TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInKm, updating position');
         _$updatePosition(_$service, coordinates);
       } else {
@@ -301,9 +301,9 @@ class LocationService {
       int nextUpdateInterval = 15;
 
       if (distanceInKm != null) {
-        if (distanceInKm > 30) {
+        if (distanceInKm > 0.03) {
           nextUpdateInterval = 5;
-        } else if (distanceInKm > 10) {
+        } else if (distanceInKm > 0.01) {
           nextUpdateInterval = 10;
         }
       }
