@@ -58,6 +58,9 @@ class BackgroundLocationServiceManager {
   /// Instance of the background service
   static final instance = FlutterBackgroundService();
 
+  /// Platform channel for iOS
+  static const platform = MethodChannel('com.exptech.dpip/location');
+
   /// Whether the background service has been initialized
   static bool initialized = false;
 
@@ -70,10 +73,10 @@ class BackgroundLocationServiceManager {
   static Future<void> initalize() async {
     if (initialized) return;
 
-    TalkerManager.instance.info('⚙️ initializing location service');
+    TalkerManager.instance.info('👷 initializing location service');
 
     if (!Platform.isAndroid && !Platform.isIOS) {
-      TalkerManager.instance.warning('⚙️ service is not supported on this platform (${Platform.operatingSystem})');
+      TalkerManager.instance.warning('👷 service is not supported on this platform (${Platform.operatingSystem})');
       return;
     }
     try {
@@ -96,7 +99,7 @@ class BackgroundLocationServiceManager {
       instance.on(BackgroundLocationServiceEvent.position).listen((data) async {
         final event = PositionEvent.fromJson(data!);
         try {
-          TalkerManager.instance.info('⚙️ location updated by service, reloading preferences');
+          TalkerManager.instance.info('👷 location updated by service, reloading preferences');
 
           await Preference.reload();
           GlobalProviders.location.refresh();
@@ -107,16 +110,16 @@ class BackgroundLocationServiceManager {
             await ExpTech().updateDeviceLocation(token: fcmToken, coordinates: event.coordinates!);
           }
 
-          TalkerManager.instance.info('⚙️ preferences reloaded');
+          TalkerManager.instance.info('👷 preferences reloaded');
         } catch (e, s) {
-          TalkerManager.instance.error('⚙️ failed to reload preferences', e, s);
+          TalkerManager.instance.error('👷 failed to reload preferences', e, s);
         }
       });
 
       initialized = true;
-      TalkerManager.instance.info('⚙️ service initialized');
+      TalkerManager.instance.info('👷 service initialized');
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️ initializing location service FAILED', e, s);
+      TalkerManager.instance.error('👷 initializing location service FAILED', e, s);
     }
 
     if (Preference.locationAuto == true) await start();
@@ -127,10 +130,15 @@ class BackgroundLocationServiceManager {
   /// Initializes the service if not already initialized. Only starts if the service is not already running.
   static Future<void> start() async {
     if (!initialized) await initalize();
-    TalkerManager.instance.info('⚙️ starting location service');
+    TalkerManager.instance.info('👷 starting location service');
+
+    if (Platform.isIOS) {
+      await platform.invokeMethod('toggleLocation', {'isEnabled': true});
+      return;
+    }
 
     if (await instance.isRunning()) {
-      TalkerManager.instance.warning('⚙️ location service is already running, skipping...');
+      TalkerManager.instance.warning('👷 location service is already running, skipping...');
       return;
     }
 
@@ -141,7 +149,13 @@ class BackgroundLocationServiceManager {
   static Future<void> stop() async {
     if (!initialized) return;
 
-    TalkerManager.instance.info('⚙️ stopping location service');
+    TalkerManager.instance.info('👷 stopping location service');
+
+    if (Platform.isIOS) {
+      await platform.invokeMethod('toggleLocation', {'isEnabled': false});
+      return;
+    }
+
     instance.invoke(BackgroundLocationServiceEvent.stop);
   }
 }
@@ -204,7 +218,7 @@ class BackgroundLocationService {
 
     _$service.on(BackgroundLocationServiceEvent.stop).listen((data) async {
       try {
-        TalkerManager.instance.info('⚙️ stopping location service');
+        TalkerManager.instance.info('⚙️::BackgroundLocationService stopping location service');
 
         // Cleanup timer
         _$locationUpdateTimer?.cancel();
@@ -212,9 +226,9 @@ class BackgroundLocationService {
         await _$service.setAutoStartOnBootMode(false);
         await _$service.stopSelf();
 
-        TalkerManager.instance.info('⚙️ location service stopped');
+        TalkerManager.instance.info('⚙️::BackgroundLocationService location service stopped');
       } catch (e, s) {
-        TalkerManager.instance.error('⚙️ stopping location service FAILED', e, s);
+        TalkerManager.instance.error('⚙️::BackgroundLocationService stopping location service FAILED', e, s);
       }
     });
 
@@ -231,7 +245,7 @@ class BackgroundLocationService {
     if (!await _$service.isForegroundService()) return;
 
     final $perf = Stopwatch()..start();
-    TalkerManager.instance.debug('⚙️ task started');
+    TalkerManager.instance.debug('⚙️::BackgroundLocationService task started');
 
     try {
       // Get current position and location info
@@ -248,10 +262,10 @@ class BackgroundLocationService {
       final distanceInKm = previousLocation != null ? coordinates.to(previousLocation) : null;
 
       if (distanceInKm == null || distanceInKm >= 250) {
-        TalkerManager.instance.debug('⚙️ distance: $distanceInKm, updating position');
+        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInKm, updating position');
         _$updatePosition(_$service, coordinates);
       } else {
-        TalkerManager.instance.debug('⚙️ distance: $distanceInKm, not updating position');
+        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInKm, not updating position');
       }
 
       // Update notification with current position
@@ -296,11 +310,15 @@ class BackgroundLocationService {
       _$locationUpdateTimer = Timer.periodic(Duration(minutes: nextUpdateInterval), (timer) => _$task());
     } catch (e, s) {
       $perf.stop();
-      TalkerManager.instance.error('⚙️ task FAILED after ${$perf.elapsedMilliseconds}ms', e, s);
+      TalkerManager.instance.error(
+        '⚙️::BackgroundLocationService task FAILED after ${$perf.elapsedMilliseconds}ms',
+        e,
+        s,
+      );
     } finally {
       if ($perf.isRunning) {
         $perf.stop();
-        TalkerManager.instance.debug('⚙️ task completed in ${$perf.elapsedMilliseconds}ms');
+        TalkerManager.instance.debug('⚙️::BackgroundLocationService task completed in ${$perf.elapsedMilliseconds}ms');
       }
     }
   }
