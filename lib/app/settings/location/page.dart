@@ -197,8 +197,6 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     }
 
     GlobalProviders.location.setAuto(shouldEnable);
-    GlobalProviders.location.setCode(null);
-    GlobalProviders.location.setCoordinates(null);
   }
 
   @override
