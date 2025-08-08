@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/preference.dart';
 import 'package:flutter_icmp_ping/flutter_icmp_ping.dart';
 import 'package:ip_country_lookup/ip_country_lookup.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/preference.dart';
 
 Future<void> updateInfoToServer() async {
   final latitude = Preference.locationLatitude;
