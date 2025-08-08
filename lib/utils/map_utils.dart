@@ -250,7 +250,7 @@ String? getTownCodeFromCoordinates(LatLng target) {
     }
 
     if (isInPolygon) {
-      return feature.properties!['CODE'] as String?;
+      return feature.properties!['CODE']?.toString();
     }
   }
 
