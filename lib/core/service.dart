@@ -21,17 +21,19 @@ import 'package:dpip/utils/log.dart';
 
 class PositionEvent {
   final LatLng? coordinates;
+  final String? code;
 
-  PositionEvent(this.coordinates);
+  PositionEvent(this.coordinates, this.code);
 
   factory PositionEvent.fromJson(Map<String, dynamic> json) {
     final coordinates = json['coordinates'] as List<dynamic>?;
+    final code = json['code'] as String?;
 
-    return PositionEvent(coordinates != null ? LatLng(coordinates[0] as double, coordinates[1] as double) : null);
+    return PositionEvent(coordinates != null ? LatLng(coordinates[0] as double, coordinates[1] as double) : null, code);
   }
 
   Map<String, dynamic> toJson() {
-    return {'coordinates': coordinates?.toJson()};
+    return {'coordinates': coordinates?.toJson(), 'code': code};
   }
 }
 
@@ -100,6 +102,7 @@ class LocationServiceManager {
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
       service.on(LocationServiceEvent.position).listen((data) async {
         final event = PositionEvent.fromJson(data!);
+
         try {
           TalkerManager.instance.info('👷 location updated by service, reloading preferences');
 
@@ -114,7 +117,7 @@ class LocationServiceManager {
 
           TalkerManager.instance.info('👷 preferences reloaded');
         } catch (e, s) {
-          TalkerManager.instance.error('👷 failed to reload preferences', e, s);
+          TalkerManager.instance.error('👷 failed to update location', e, s);
         }
       });
 
@@ -283,7 +286,6 @@ class LocationService {
         return;
       }
 
-      final locationCode = _$getLocationFromCoordinates(coordinates);
       final previousLocation = _$location;
 
       final distanceInKm = previousLocation != null ? coordinates.to(previousLocation) : null;
@@ -294,33 +296,6 @@ class LocationService {
       } else {
         TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInKm, not updating position');
       }
-
-      // Update notification with current position
-      final latitude = coordinates.latitude.toStringAsFixed(4);
-      final longitude = coordinates.longitude.toStringAsFixed(4);
-
-      final location = locationCode != null ? _$locationData[locationCode] : null;
-      final locationName = location == null ? '服務區域外' : '${location.city} ${location.town}';
-
-      const notificationTitle = '自動定位中';
-      final timestamp = DateTime.now().toDateTimeString();
-      final notificationBody =
-          '$timestamp\n'
-          '$locationName ($latitude, $longitude) ';
-
-      await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: LocationServiceManager.kNotificationId,
-          channelKey: 'background',
-          title: notificationTitle,
-          body: notificationBody,
-          locked: true,
-          autoDismissible: false,
-          badge: 0,
-        ),
-      );
-
-      _$service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
 
       // Determine the next update time based on the distance moved
       int nextUpdateInterval = 15;
@@ -374,7 +349,7 @@ class LocationService {
   ///
   /// Takes a target LatLng and checks if it falls within any polygon in the GeoJSON data.
   /// Returns the location code if found, null otherwise.
-  static String? _$getLocationFromCoordinates(LatLng target) {
+  static ({String code, Location location})? _$getLocationFromCoordinates(LatLng target) {
     final features = _$geoJsonData.features;
 
     for (final feature in features) {
@@ -436,7 +411,13 @@ class LocationService {
       }
 
       if (isInPolygon) {
-        return feature.properties!['CODE']?.toString();
+        final code = feature.properties!['CODE']?.toString();
+        if (code == null) return null;
+
+        final location = _$locationData[code];
+        if (location == null) return null;
+
+        return (code: code, location: location);
       }
     }
 
@@ -451,6 +432,48 @@ class LocationService {
   static Future<void> _$updatePosition(ServiceInstance service, LatLng? position) async {
     _$location = position;
 
-    service.invoke(LocationServiceEvent.position, PositionEvent(position).toJson());
+    final result = position != null ? _$getLocationFromCoordinates(position) : null;
+
+    Preference.locationCode = result?.code;
+    Preference.locationLatitude = position?.latitude;
+    Preference.locationLongitude = position?.longitude;
+
+    service.invoke(LocationServiceEvent.position, PositionEvent(position, result?.code).toJson());
+
+    // Update notification with current position
+    final timestamp = DateTime.now().toDateTimeString();
+    String content = '服務區域外';
+
+    if (position == null) {
+      content = '服務區域外';
+    } else {
+      final latitude = position.latitude.toStringAsFixed(6);
+      final longitude = position.longitude.toStringAsFixed(6);
+
+      if (result == null) {
+        content = '服務區域外 ($latitude, $longitude)';
+      } else {
+        content = '${result.location.city} ${result.location.town} ($latitude, $longitude)';
+      }
+    }
+
+    const notificationTitle = '自動定位中';
+    final notificationBody =
+        '$timestamp\n'
+        '$content';
+
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: LocationServiceManager.kNotificationId,
+        channelKey: 'background',
+        title: notificationTitle,
+        body: notificationBody,
+        locked: true,
+        autoDismissible: false,
+        badge: 0,
+      ),
+    );
+
+    _$service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
   }
 }
