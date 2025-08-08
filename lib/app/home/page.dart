@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                     children:
                         grouped.entries.sorted((a, b) => b.key.compareTo(a.key)).mapIndexed((index, entry) {
                           final date = entry.key;
-                          final historyGroup = entry.value;
+                          final historyGroup = entry.value.sorted((a, b) => b.time.send.compareTo(a.time.send));
                           return Column(
                             children: [
                               DateTimelineItem(date, first: index == 0),
