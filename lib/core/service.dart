@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:geojson_vi/geojson_vi.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
@@ -14,7 +15,6 @@ import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
-import 'package:dpip/utils/extensions/asset_bundle.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/log.dart';
@@ -196,7 +196,7 @@ class BackgroundLocationService {
   static Timer? _$locationUpdateTimer;
 
   /// Cached GeoJSON data for location lookups
-  static late Map<String, dynamic> _$geoJsonData;
+  static late GeoJSONFeatureCollection _$geoJsonData;
 
   /// Cached location data mapping
   static late Map<String, Location> _$locationData;
@@ -228,7 +228,7 @@ class BackgroundLocationService {
     await _$service.setAsForegroundService();
 
     await Preference.init();
-    _$geoJsonData = await rootBundle.loadJson('assets/map/town.json');
+    _$geoJsonData = await Global.loadTownGeojson();
     _$locationData = await Global.loadLocationData();
 
     _$service.setAutoStartOnBootMode(true);
@@ -374,21 +374,42 @@ class BackgroundLocationService {
   /// Takes a target LatLng and checks if it falls within any polygon in the GeoJSON data.
   /// Returns the location code if found, null otherwise.
   static String? _$getLocationFromCoordinates(LatLng target) {
-    final features = (_$geoJsonData['features'] as List).cast<Map<String, dynamic>>();
+    final features = _$geoJsonData.features;
 
     for (final feature in features) {
-      final geometry = (feature['geometry'] as Map).cast<String, dynamic>();
-      final type = geometry['type'] as String;
+      if (feature == null) continue;
 
-      if (type == 'Polygon' || type == 'MultiPolygon') {
-        bool isInPolygon = false;
+      final geometry = feature.geometry;
+      if (geometry == null) continue;
 
-        if (type == 'Polygon') {
-          final coordinates = ((geometry['coordinates'] as List)[0] as List).cast<List>();
-          final List<List<double>> polygon =
-              coordinates.map<List<double>>((coord) {
-                return coord.map<double>((e) => (e as num).toDouble()).toList();
-              }).toList();
+      bool isInPolygon = false;
+
+      if (geometry is GeoJSONPolygon) {
+        final polygon = geometry.coordinates[0];
+
+        bool isInside = false;
+        int j = polygon.length - 1;
+        for (int i = 0; i < polygon.length; i++) {
+          final double xi = polygon[i][0];
+          final double yi = polygon[i][1];
+          final double xj = polygon[j][0];
+          final double yj = polygon[j][1];
+
+          final bool intersect =
+              ((yi > target.latitude) != (yj > target.latitude)) &&
+              (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
+          if (intersect) isInside = !isInside;
+
+          j = i;
+        }
+        isInPolygon = isInside;
+      }
+
+      if (geometry is GeoJSONMultiPolygon) {
+        final multiPolygon = geometry.coordinates;
+
+        for (final polygonCoordinates in multiPolygon) {
+          final polygon = polygonCoordinates[0];
 
           bool isInside = false;
           int j = polygon.length - 1;
@@ -405,41 +426,16 @@ class BackgroundLocationService {
 
             j = i;
           }
-          isInPolygon = isInside;
-        } else {
-          final multiPolygon = (geometry['coordinates'] as List).cast<List<List>>();
-          for (final polygonCoordinates in multiPolygon) {
-            final coordinates = polygonCoordinates[0].cast<List>();
-            final List<List<double>> polygon =
-                coordinates.map<List<double>>((coord) {
-                  return coord.map<double>((e) => (e as num).toDouble()).toList();
-                }).toList();
 
-            bool isInside = false;
-            int j = polygon.length - 1;
-            for (int i = 0; i < polygon.length; i++) {
-              final double xi = polygon[i][0];
-              final double yi = polygon[i][1];
-              final double xj = polygon[j][0];
-              final double yj = polygon[j][1];
-
-              final bool intersect =
-                  ((yi > target.latitude) != (yj > target.latitude)) &&
-                  (target.longitude < (xj - xi) * (target.latitude - yi) / (yj - yi) + xi);
-              if (intersect) isInside = !isInside;
-
-              j = i;
-            }
-            if (isInside) {
-              isInPolygon = true;
-              break;
-            }
+          if (isInside) {
+            isInPolygon = true;
+            break;
           }
         }
+      }
 
-        if (isInPolygon) {
-          return (feature['properties'] as Map<String, dynamic>)['CODE'] as String;
-        }
+      if (isInPolygon) {
+        return feature.properties!['CODE'] as String?;
       }
     }
 

@@ -190,6 +190,7 @@ bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, Lis
 
 String? getTownCodeFromCoordinates(LatLng target) {
   final features = Global.townGeojson.features;
+
   for (final feature in features) {
     if (feature == null) continue;
 
