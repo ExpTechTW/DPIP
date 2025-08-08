@@ -36,7 +36,7 @@ class PositionEvent {
 }
 
 /// Events emitted by the background service.
-final class BackgroundLocationServiceEvent {
+final class LocationServiceEvent {
   /// Event emitted when a new position is set in the background service.
   /// Contains the updated location coordinates.
   static const position = 'position';
@@ -49,8 +49,8 @@ final class BackgroundLocationServiceEvent {
 ///
 /// This class is responsible for managing the background location service.
 /// It is used to handle start and stop the service.
-class BackgroundLocationServiceManager {
-  BackgroundLocationServiceManager._();
+class LocationServiceManager {
+  LocationServiceManager._();
 
   /// The notification ID used for the background service notification
   static const kNotificationId = 888888;
@@ -80,7 +80,7 @@ class BackgroundLocationServiceManager {
     try {
       await service.configure(
         androidConfiguration: AndroidConfiguration(
-          onStart: BackgroundLocationService._$onStart,
+          onStart: LocationService._$onStart,
           autoStart: false,
           isForegroundMode: false,
           foregroundServiceTypes: [AndroidForegroundType.location],
@@ -92,13 +92,13 @@ class BackgroundLocationServiceManager {
         // iOS is handled in native code
         iosConfiguration: IosConfiguration(
           autoStart: false,
-          onForeground: BackgroundLocationService._$onStartIOS,
-          onBackground: BackgroundLocationService._$onStartIOS,
+          onForeground: LocationService._$onStartIOS,
+          onBackground: LocationService._$onStartIOS,
         ),
       );
 
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
-      service.on(BackgroundLocationServiceEvent.position).listen((data) async {
+      service.on(LocationServiceEvent.position).listen((data) async {
         final event = PositionEvent.fromJson(data!);
         try {
           TalkerManager.instance.info('👷 location updated by service, reloading preferences');
@@ -170,7 +170,7 @@ class BackgroundLocationServiceManager {
         return;
       }
 
-      service.invoke(BackgroundLocationServiceEvent.stop);
+      service.invoke(LocationServiceEvent.stop);
     } catch (e, s) {
       TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
     }
@@ -183,8 +183,8 @@ class BackgroundLocationServiceManager {
 ///
 /// All property prefixed with `_$` are isolated from the main app.
 @pragma('vm:entry-point')
-class BackgroundLocationService {
-  BackgroundLocationService._();
+class LocationService {
+  LocationService._();
 
   /// The service instance
   static late AndroidServiceInstance _$service;
@@ -215,13 +215,14 @@ class BackgroundLocationService {
 
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
-        id: BackgroundLocationServiceManager.kNotificationId,
+        id: LocationServiceManager.kNotificationId,
         channelKey: 'background',
         title: 'DPIP',
         body: '自動定位服務啟動中...',
         locked: true,
         autoDismissible: false,
         icon: 'resource://drawable/ic_stat_name',
+        badge: 0,
       ),
     );
 
@@ -233,7 +234,7 @@ class BackgroundLocationService {
 
     _$service.setAutoStartOnBootMode(true);
 
-    _$service.on(BackgroundLocationServiceEvent.stop).listen((data) async {
+    _$service.on(LocationServiceEvent.stop).listen((data) async {
       try {
         TalkerManager.instance.info('⚙️::BackgroundLocationService stopping location service');
 
@@ -309,7 +310,7 @@ class BackgroundLocationService {
 
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
-          id: BackgroundLocationServiceManager.kNotificationId,
+          id: LocationServiceManager.kNotificationId,
           channelKey: 'background',
           title: notificationTitle,
           body: notificationBody,
@@ -450,6 +451,6 @@ class BackgroundLocationService {
   static Future<void> _$updatePosition(ServiceInstance service, LatLng? position) async {
     _$location = position;
 
-    service.invoke(BackgroundLocationServiceEvent.position, PositionEvent(position).toJson());
+    service.invoke(LocationServiceEvent.position, PositionEvent(position).toJson());
   }
 }

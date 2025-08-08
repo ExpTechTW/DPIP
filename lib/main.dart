@@ -50,7 +50,7 @@ void main() async {
     updateInfoToServer(),
   ]);
 
-  await BackgroundLocationServiceManager.initalize();
+  await LocationServiceManager.initalize();
 
   runApp(
     I18n(

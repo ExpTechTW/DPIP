@@ -191,9 +191,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
     if (shouldEnable) {
       if (!await requestPermissions()) return;
 
-      await BackgroundLocationServiceManager.start();
+      await LocationServiceManager.start();
     } else {
-      await BackgroundLocationServiceManager.stop();
+      await LocationServiceManager.stop();
     }
 
     GlobalProviders.location.setAuto(shouldEnable);
