@@ -93,9 +93,9 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
   Future<void> _focus() async {
     try {
-      final location = GlobalProviders.location.coordinateNotifier.value;
+      final location = GlobalProviders.location.coordinates;
 
-      if (location.isValid) {
+      if (location != null && location.isValid) {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
       } else {
         await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));

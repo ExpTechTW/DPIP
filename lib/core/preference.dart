@@ -11,6 +11,7 @@ class PreferenceKeys {
   static const locationLatitude = 'location:latitude';
   static const locationOldLongitude = 'location:oldLongitude';
   static const locationOldLatitude = 'location:oldLatitude';
+  static const locationFavorited = 'location:favorite';
   // #endregion
 
   // #region User Interface
@@ -43,6 +44,10 @@ class Preference {
 
   static Future<void> init() async {
     instance = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
+  }
+
+  static Future<void> reload() async {
+    await instance.reloadCache();
   }
 
   static String? get version => instance.getString('app-version');
@@ -81,6 +86,9 @@ class Preference {
 
   static double? get locationOldLatitude => instance.getDouble(PreferenceKeys.locationOldLatitude);
   static set locationOldLatitude(double? value) => instance.set(PreferenceKeys.locationOldLatitude, value);
+
+  static List<String> get locationFavorited => instance.getStringList(PreferenceKeys.locationFavorited) ?? [];
+  static set locationFavorited(List<String> value) => instance.set(PreferenceKeys.locationFavorited, value);
   // #endregion
 
   // #region User Interface

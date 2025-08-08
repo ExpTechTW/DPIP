@@ -74,7 +74,7 @@ class ThunderstormCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 8),
                   child: StyledText(
                     text: '您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。'.i18n.args({
-                      'time': history.time.expiresAt.toSimpleDateTimeString(context),
+                      'time': history.time.expiresAt.toSimpleDateTimeString(),
                     }),
                     style: context.textTheme.bodyLarge!.copyWith(color: context.theme.extendedColors.onBlueContainer),
                     tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},

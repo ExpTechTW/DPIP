@@ -1,13 +1,19 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:dpip/api/exptech.dart';
-import 'package:dpip/core/preference.dart';
 import 'package:flutter_icmp_ping/flutter_icmp_ping.dart';
 import 'package:ip_country_lookup/ip_country_lookup.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/preference.dart';
 
 Future<void> updateInfoToServer() async {
+  final latitude = Preference.locationLatitude;
+  final longitude = Preference.locationLongitude;
+
   try {
+    if (latitude == null || longitude == null) return;
     if (Preference.notifyToken != '' &&
         DateTime.now().millisecondsSinceEpoch - (Preference.lastUpdateToServerTime ?? 0) > 86400 * 1 * 1000) {
       final random = Random();
@@ -15,14 +21,10 @@ Future<void> updateInfoToServer() async {
 
       if (rand != 0) return;
 
-      ExpTech().updateDeviceLocation(
-        token: Preference.notifyToken,
-        lat: Preference.locationLatitude.toString(),
-        lng: Preference.locationLongitude.toString(),
-      );
+      ExpTech().updateDeviceLocation(token: Preference.notifyToken, coordinates: LatLng(latitude, longitude));
     }
 
-    unawaited(_performNetworkCheck());
+    _performNetworkCheck();
   } catch (e) {
     print('Network info update failed: $e');
   }
@@ -49,5 +51,3 @@ Future<void> _performNetworkCheck() async {
     print('Network check failed: $e');
   }
 }
-
-void unawaited(Future<void> future) {}

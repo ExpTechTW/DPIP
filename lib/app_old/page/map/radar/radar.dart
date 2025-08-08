@@ -1,17 +1,18 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
-import 'package:dpip/utils/need_location.dart';
 import 'package:dpip/utils/radar_color.dart';
 import 'package:dpip/widgets/list/time_selector.dart';
 import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
-import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
 
 typedef PositionUpdateCallback = void Function();
 
@@ -141,36 +142,15 @@ class _RadarMapState extends State<RadarMap> {
   }
 
   Future<void> start() async {
-    userLat = GlobalProviders.location.latitude ?? 0;
-    userLon = GlobalProviders.location.longitude ?? 0;
+    final location = GlobalProviders.location.coordinates;
 
-    final location = LatLng(userLat, userLon);
-
-    if (location.isValid) {
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    if (location != null && location.isValid) {
+      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+    } else {
+      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
     }
 
     if (!mounted) return;
-
-    if (!location.isValid && !GlobalProviders.location.auto) {
-      await showLocationDialog(context);
-    }
-
-    _addUserLocationMarker();
 
     setState(() {});
   }
