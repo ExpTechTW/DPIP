@@ -38,34 +38,36 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
         ListSection(
           title: widget.city,
           children: [
-            for (final town in towns)
+            for (final MapEntry(key: code, value: town) in towns)
               Selector<SettingsLocationModel, String?>(
                 selector: (context, model) => model.code,
-                builder: (context, code, child) {
+                builder: (context, currentCode, child) {
+                  final isSelected = currentCode == code;
+
                   return ListSectionTile(
-                    title: '${town.value.city} ${town.value.town}',
-                    subtitle: Text(
-                      '${town.key}・${town.value.lng.toStringAsFixed(2)}°E・${town.value.lat.toStringAsFixed(2)}°N',
-                    ),
+                    title: '${town.city} ${town.town}',
+                    subtitle: Text('$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N'),
                     trailing:
-                        loadingTown == town.key
-                            ? const LoadingIcon()
-                            : Icon(code == town.key ? Symbols.check_rounded : null),
+                        loadingTown == code ? const LoadingIcon() : Icon(isSelected ? Symbols.check_rounded : null),
                     enabled: loadingTown == null,
                     onTap: () async {
                       if (loadingTown != null) return;
 
-                      setState(() => loadingTown = town.key);
-                      await ExpTech().updateDeviceLocation(
-                        token: Preference.notifyToken,
-                        coordinates: LatLng(town.value.lat, town.value.lng),
-                      );
+                      if (currentCode == null) {
+                        setState(() => loadingTown = code);
+                        await ExpTech().updateDeviceLocation(
+                          token: Preference.notifyToken,
+                          coordinates: LatLng(town.lat, town.lng),
+                        );
 
-                      if (!context.mounted) return;
-                      setState(() => loadingTown = null);
+                        if (!context.mounted) return;
+                        setState(() => loadingTown = null);
 
-                      context.read<SettingsLocationModel>().setCode(town.key);
-                      context.read<SettingsLocationModel>().setCoordinates(LatLng(town.value.lat, town.value.lng));
+                        context.read<SettingsLocationModel>().setCode(code);
+                      }
+
+                      context.read<SettingsLocationModel>().favorite(code);
+
                       context.popUntil(SettingsLocationPage.route);
                     },
                   );

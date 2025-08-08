@@ -138,14 +138,14 @@ class _SettingsLocationModel extends ChangeNotifier {
   /// Returns a [List] of [String] containing the postal codes of the favorited locations.
   ///
   /// Defaults to an empty list if no favorited locations have been set.
-  final $favorited = ValueNotifier(Preference.locationFavorited);
+  final $favorited = ValueNotifier(Preference.locationFavorited.toSet());
 
   /// The list of favorited locations.
   ///
-  /// Returns a [List<String>] containing the postal codes of the favorited locations.
+  /// Returns a [UnmodifiableSetView<String>] containing the postal codes of the favorited locations.
   ///
-  /// Defaults to an empty list if no favorited locations have been set.
-  UnmodifiableListView<String> get favorited => UnmodifiableListView($favorited.value);
+  /// Defaults to an empty [Set] if no favorited locations have been set.
+  UnmodifiableSetView<String> get favorited => UnmodifiableSetView($favorited.value);
 
   /// Adds a location to the list of favorited locations.
   ///
@@ -153,7 +153,11 @@ class _SettingsLocationModel extends ChangeNotifier {
   ///
   /// If the location is already favorited, this method will do nothing.
   void favorite(String code) {
-    Preference.locationFavorited.add(code);
+    final list = {...Preference.locationFavorited}..add(code);
+
+    Preference.locationFavorited = list.toList();
+
+    $favorited.value = list;
 
     notifyListeners();
   }
@@ -164,7 +168,11 @@ class _SettingsLocationModel extends ChangeNotifier {
   ///
   /// If the location is not favorited, this method will do nothing.
   void unfavorite(String code) {
-    Preference.locationFavorited.remove(code);
+    final list = {...Preference.locationFavorited}..remove(code);
+
+    Preference.locationFavorited = list.toList();
+
+    $favorited.value = list;
 
     notifyListeners();
   }
@@ -181,7 +189,7 @@ class _SettingsLocationModel extends ChangeNotifier {
             ? LatLng(Preference.locationLatitude!, Preference.locationLongitude!)
             : null;
     $auto.value = Preference.locationAuto ?? false;
-    $favorited.value = Preference.locationFavorited;
+    $favorited.value = Preference.locationFavorited.toSet();
   }
 }
 

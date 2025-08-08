@@ -32,6 +32,7 @@ class ListSectionTile extends StatelessWidget {
       title: Text(title, style: titleStyle ?? const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: subtitle,
       trailing: trailing,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       enabled: enabled,
       visualDensity: VisualDensity.comfortable,
       onTap: onTap,

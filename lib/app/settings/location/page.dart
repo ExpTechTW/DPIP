@@ -1,10 +1,16 @@
+import 'dart:collection';
 import 'dart:io';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/utils/toast.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -356,44 +362,76 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        ListSection(
-          title: '所在地'.i18n,
-          children: [
-            Selector<SettingsLocationModel, ({bool auto, String? code})>(
-              selector: (context, model) => (auto: model.auto, code: model.code),
-              builder: (context, data, child) {
-                final (:auto, :code) = data;
-                final city = Global.location[code]?.city;
+        Consumer<SettingsLocationModel>(
+          builder: (context, model, child) {
+            final favorited = model.favorited;
+            final auto = model.auto;
+            final code = model.code;
 
-                return ListSectionTile(
-                  title: '直轄市/縣市'.i18n,
-                  subtitle: Text(city ?? '尚未設定'.i18n),
-                  icon: Symbols.location_city_rounded,
-                  trailing: const Icon(Symbols.chevron_right_rounded),
-                  enabled: !auto,
-                  onTap: () => context.push(SettingsLocationSelectPage.route),
+            String? loadingCode;
+
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return ListSection(
+                  title: '所在地'.i18n,
+                  children: [
+                    ...favorited.map((code) {
+                      final location = Global.location[code]!;
+
+                      final isCurrentLoading = loadingCode == code;
+                      final isSelected = code == model.code;
+
+                      return ListSectionTile(
+                        title: '${location.city} ${location.town}',
+                        subtitle: Text(
+                          '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
+                        ),
+                        leading:
+                            isCurrentLoading
+                                ? const LoadingIcon()
+                                : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
+                        trailing: IconButton(
+                          icon: const Icon(Symbols.delete_rounded),
+                          color: context.colors.error,
+                          onPressed: loadingCode == null ? () => model.unfavorite(code) : null,
+                        ),
+                        enabled: !auto && loadingCode == null,
+                        onTap:
+                            isSelected
+                                ? null
+                                : () async {
+                                  setState(() => loadingCode = code);
+
+                                  try {
+                                    await ExpTech().updateDeviceLocation(
+                                      token: Preference.notifyToken,
+                                      coordinates: LatLng(location.lat, location.lng),
+                                    );
+
+                                    if (!context.mounted) return;
+
+                                    context.read<SettingsLocationModel>().setCode(code);
+                                  } catch (e, s) {
+                                    if (!context.mounted) return;
+                                    TalkerManager.instance.error('Failed to set location code', e, s);
+                                    showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'));
+                                  }
+
+                                  setState(() => loadingCode = null);
+                                },
+                      );
+                    }),
+                    ListSectionTile(
+                      title: '新增地點',
+                      icon: Symbols.add_circle_rounded,
+                      enabled: !auto && loadingCode == null,
+                      onTap: () => context.push(SettingsLocationSelectPage.route),
+                    ),
+                  ],
                 );
               },
-            ),
-            Selector<SettingsLocationModel, ({bool auto, String? code})>(
-              selector: (context, model) => (auto: model.auto, code: model.code),
-              builder: (context, data, child) {
-                final (:auto, :code) = data;
-
-                final city = Global.location[code]?.city;
-                final town = Global.location[code]?.town;
-
-                return ListSectionTile(
-                  title: '鄉鎮市區'.i18n,
-                  subtitle: Text(town ?? '尚未設定'.i18n),
-                  icon: Symbols.forest_rounded,
-                  trailing: const Icon(Symbols.chevron_right_rounded),
-                  enabled: !auto && city != null,
-                  onTap: city == null ? null : () => context.push(SettingsLocationSelectCityPage.route(city)),
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
       ],
     );
