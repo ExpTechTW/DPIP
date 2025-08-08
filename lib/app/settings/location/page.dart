@@ -1,4 +1,3 @@
-import 'dart:collection';
 import 'dart:io';
 
 import 'package:dpip/api/exptech.dart';
@@ -16,7 +15,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
@@ -364,10 +362,6 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
           ),
         Consumer<SettingsLocationModel>(
           builder: (context, model, child) {
-            final favorited = model.favorited;
-            final auto = model.auto;
-            final code = model.code;
-
             String? loadingCode;
 
             return StatefulBuilder(
@@ -375,7 +369,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 return ListSection(
                   title: '所在地'.i18n,
                   children: [
-                    ...favorited.map((code) {
+                    ...model.favorited.map((code) {
                       final location = Global.location[code]!;
 
                       final isCurrentLoading = loadingCode == code;
@@ -393,9 +387,9 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         trailing: IconButton(
                           icon: const Icon(Symbols.delete_rounded),
                           color: context.colors.error,
-                          onPressed: loadingCode == null ? () => model.unfavorite(code) : null,
+                          onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
                         ),
-                        enabled: !auto && loadingCode == null,
+                        enabled: !model.auto && loadingCode == null,
                         onTap:
                             isSelected
                                 ? null
@@ -410,7 +404,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
                                     if (!context.mounted) return;
 
-                                    context.read<SettingsLocationModel>().setCode(code);
+                                    model.setCode(code);
                                   } catch (e, s) {
                                     if (!context.mounted) return;
                                     TalkerManager.instance.error('Failed to set location code', e, s);
@@ -424,7 +418,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                     ListSectionTile(
                       title: '新增地點',
                       icon: Symbols.add_circle_rounded,
-                      enabled: !auto && loadingCode == null,
+                      enabled: loadingCode == null,
                       onTap: () => context.push(SettingsLocationSelectPage.route),
                     ),
                   ],
