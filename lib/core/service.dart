@@ -56,13 +56,13 @@ class BackgroundLocationServiceManager {
   static const kNotificationId = 888888;
 
   /// Instance of the background service
-  static final instance = FlutterBackgroundService();
+  static FlutterBackgroundService? instance;
 
   /// Platform channel for iOS
   static const platform = MethodChannel('com.exptech.dpip/location');
 
-  /// Whether the background service has been initialized
-  static bool initialized = false;
+  /// Whether the background service is available on the current platform
+  static bool get avaliable => Platform.isAndroid || Platform.isIOS;
 
   /// Initializes the background location service.
   ///
@@ -71,16 +71,14 @@ class BackgroundLocationServiceManager {
   ///
   /// Will starts the service if automatic location updates are enabled.
   static Future<void> initalize() async {
-    if (initialized) return;
+    if (instance != null || !avaliable) return;
 
     TalkerManager.instance.info('👷 initializing location service');
 
-    if (!Platform.isAndroid && !Platform.isIOS) {
-      TalkerManager.instance.warning('👷 service is not supported on this platform (${Platform.operatingSystem})');
-      return;
-    }
+    final service = FlutterBackgroundService();
+
     try {
-      await instance.configure(
+      await service.configure(
         androidConfiguration: AndroidConfiguration(
           onStart: BackgroundLocationService._$onStart,
           autoStart: false,
@@ -96,7 +94,7 @@ class BackgroundLocationServiceManager {
       );
 
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
-      instance.on(BackgroundLocationServiceEvent.position).listen((data) async {
+      service.on(BackgroundLocationServiceEvent.position).listen((data) async {
         final event = PositionEvent.fromJson(data!);
         try {
           TalkerManager.instance.info('👷 location updated by service, reloading preferences');
@@ -116,7 +114,7 @@ class BackgroundLocationServiceManager {
         }
       });
 
-      initialized = true;
+      instance = service;
       TalkerManager.instance.info('👷 service initialized');
     } catch (e, s) {
       TalkerManager.instance.error('👷 initializing location service FAILED', e, s);
@@ -129,34 +127,49 @@ class BackgroundLocationServiceManager {
   ///
   /// Initializes the service if not already initialized. Only starts if the service is not already running.
   static Future<void> start() async {
-    if (!initialized) await initalize();
+    if (!avaliable) return;
+
     TalkerManager.instance.info('👷 starting location service');
 
-    if (Platform.isIOS) {
-      await platform.invokeMethod('toggleLocation', {'isEnabled': true});
-      return;
-    }
+    try {
+      final service = instance;
+      if (service == null) throw Exception('Not initialized.');
 
-    if (await instance.isRunning()) {
-      TalkerManager.instance.warning('👷 location service is already running, skipping...');
-      return;
-    }
+      if (Platform.isIOS) {
+        await platform.invokeMethod('toggleLocation', {'isEnabled': true});
+        return;
+      }
 
-    await instance.startService();
+      if (await service.isRunning()) {
+        TalkerManager.instance.warning('👷 location service is already running, skipping...');
+        return;
+      }
+
+      await service.startService();
+    } catch (e, s) {
+      TalkerManager.instance.error('👷 starting location service FAILED', e, s);
+    }
   }
 
   /// Stops the background location service by invoking the stop event.
   static Future<void> stop() async {
-    if (!initialized) return;
+    if (!avaliable) return;
 
     TalkerManager.instance.info('👷 stopping location service');
 
-    if (Platform.isIOS) {
-      await platform.invokeMethod('toggleLocation', {'isEnabled': false});
-      return;
-    }
+    try {
+      final service = instance;
+      if (service == null) throw Exception('Not initialized.');
 
-    instance.invoke(BackgroundLocationServiceEvent.stop);
+      if (Platform.isIOS) {
+        await platform.invokeMethod('toggleLocation', {'isEnabled': false});
+        return;
+      }
+
+      service.invoke(BackgroundLocationServiceEvent.stop);
+    } catch (e, s) {
+      TalkerManager.instance.error('👷 stopping location service FAILED', e, s);
+    }
   }
 }
 
