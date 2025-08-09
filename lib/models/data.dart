@@ -287,6 +287,7 @@ class DpipDataModel extends _DpipDataModel {
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
             ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates() as List<dynamic>)
             ..setId(int.parse(id))
+            ..setProperty('id', id)
             ..setProperty('net', s.net)
             ..setProperty('code', s.info.last.code);
 
@@ -300,6 +301,13 @@ class DpipDataModel extends _DpipDataModel {
             ..setProperty('pga', data.pga)
             ..setProperty('pgv', data.pgv);
         }
+      }
+
+      final location = Global.location['${s.info.last.code}'];
+      if (location != null) {
+        feature
+          ..setProperty('city', location.city)
+          ..setProperty('town', location.town);
       }
 
       builder.addFeature(feature);
