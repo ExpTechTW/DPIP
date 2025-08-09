@@ -59,13 +59,21 @@ class Global {
   }
 
   static Future init() async {
-    packageInfo = await PackageInfo.fromPlatform();
-    preference = await SharedPreferences.getInstance();
-    box = await rootBundle.loadJson('assets/box.json');
-    location = await loadLocationData();
-    townGeojson = await loadTownGeojson();
+    final results = await Future.wait([
+      PackageInfo.fromPlatform(),
+      SharedPreferences.getInstance(),
+      rootBundle.loadJson('assets/box.json'),
+      loadLocationData(),
+      loadTownGeojson(),
+      loadTimeTableData(),
+    ]);
 
-    await loadTimeTableData();
+    packageInfo = results[0] as PackageInfo;
+    preference = results[1] as SharedPreferences;
+    box = results[2] as Map<String, dynamic>;
+    location = results[3] as Map<String, Location>;
+    townGeojson = results[4] as GeoJSONFeatureCollection;
+
     await loadNotifyTestContent();
   }
 }
