@@ -31,6 +31,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Switch Xcode to 16.2
+      run: sudo xcode-select -s /Applications/Xcode_16.2.app
+
     - name: Cache Flutter SDK
       uses: actions/cache@v3
       with:
