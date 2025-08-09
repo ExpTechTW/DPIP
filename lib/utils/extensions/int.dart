@@ -23,7 +23,9 @@ extension CommonContext on int {
       ][this];
   String get asIntensityDisplayLabel => ['0', '1', '2', '3', '4', '5⁻', '5⁺', '6⁻', '6⁺', '7'][this];
   TZDateTime get asTZDateTime => parseDateTime(this);
-  String toSimpleDateTimeString(BuildContext context) => asTZDateTime.toSimpleDateTimeString(context);
+  int get asFahrenheit => (this * 9 / 5 + 32).round();
+
+  String toSimpleDateTimeString(BuildContext context) => asTZDateTime.toSimpleDateTimeString();
   String toLocaleFullDateString(BuildContext context) => asTZDateTime.toLocaleFullDateString(context);
   String toLocaleDateTimeString(BuildContext context) => asTZDateTime.toLocaleDateTimeString(context);
   String toLocaleTimeString(BuildContext context) => asTZDateTime.toLocaleTimeString(context);

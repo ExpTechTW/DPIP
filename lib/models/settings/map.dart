@@ -40,4 +40,16 @@ class SettingsMapModel extends ChangeNotifier {
     _log('Changed ${PreferenceKeys.mapLayers} to $value');
     notifyListeners();
   }
+
+  /// Refreshes the map settings from preferences.
+  ///
+  /// Updates the [updateInterval], [baseMap], and [layers] properties to reflect the current preferences.
+  ///
+  /// This method is used to refresh the map settings when the preferences are updated.
+  void refresh() {
+    updateIntervalNotifier.value = Preference.mapUpdateFps ?? 10;
+    baseMapNotifier.value = BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech;
+    layersNotifier.value =
+        Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor};
+  }
 }

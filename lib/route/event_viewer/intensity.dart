@@ -15,9 +15,9 @@ import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/need_location.dart';
 import 'package:dpip/utils/parser.dart';
 import 'package:dpip/widgets/chip/label_chip.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
@@ -55,31 +55,6 @@ class _IntensityPageState extends State<IntensityPage> {
     _mapController = controller;
   }
 
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
   Future<void> _loadMap() async {
     radarList = await ExpTech().getRadarList();
 
@@ -96,36 +71,13 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Future<void> start() async {
-    userLat = GlobalProviders.location.latitude ?? 0;
-    userLon = GlobalProviders.location.longitude ?? 0;
+    final location = GlobalProviders.location.coordinates;
 
-    isUserLocationValid = userLon != 0 && userLat != 0;
-
-    if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    if (location != null && location.isValid) {
+      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+    } else {
+      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
     }
-
-    if (!isUserLocationValid && !GlobalProviders.location.auto) {
-      await showLocationDialog(context);
-    }
-
-    await _addUserLocationMarker();
-
-    setState(() {});
 
     getEventInfo();
 

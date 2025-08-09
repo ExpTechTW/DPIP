@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:geolocator/geolocator.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/utils/geojson.dart';
@@ -11,17 +10,7 @@ extension GeoJsonLatLng on LatLng {
     return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(toGeoJsonCoordinates() as List<dynamic>);
   }
 
-  double to(LatLng other) {
-    final lat1 = latitude * pi / 180;
-    final lat2 = other.latitude * pi / 180;
-    final lon1 = longitude * pi / 180;
-    final lon2 = other.longitude * pi / 180;
-
-    final dlon = lon2 - lon1;
-    final dlat = lat2 - lat1;
-    final a = sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2);
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return 6371.0 * c;
-  }
+  /// Calculates the distance between the supplied coordinates in meters. The distance between the coordinates is
+  /// calculated using the Haversine formula (see https://en.wikipedia.org/wiki/Haversine_formula).
+  double to(LatLng other) => Geolocator.distanceBetween(latitude, longitude, other.latitude, other.longitude);
 }

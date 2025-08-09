@@ -221,7 +221,7 @@ class _PressureMapState extends State<PressureMap> {
         textColor: '#ffffff',
         textHaloColor: '#000000',
         textHaloWidth: 1,
-        textFont: ['Noto Sans Regular'],
+        textFont: ['Noto Sans TC Bold'],
         textOffset: [
           Expressions.literal,
           [0, 2],

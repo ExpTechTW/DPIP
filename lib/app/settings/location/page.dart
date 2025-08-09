@@ -1,10 +1,23 @@
 import 'dart:io';
 
+import 'package:dpip/api/exptech.dart';
+import 'package:dpip/core/preference.dart';
+import 'package:dpip/utils/toast.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
+import 'package:flutter/material.dart';
+
 import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
-import 'package:dpip/app/settings/location/select/%5Bcity%5D/page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/app/settings/location/select/page.dart';
 import 'package:dpip/core/i18n.dart';
+import 'package:dpip/core/providers.dart';
 import 'package:dpip/core/service.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
@@ -12,13 +25,6 @@ import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
 
 final stateSettingsLocationView = _SettingsLocationPageState();
 
@@ -33,319 +39,168 @@ class SettingsLocationPage extends StatefulWidget {
   State<SettingsLocationPage> createState() => _SettingsLocationPageState();
 }
 
-const platform = MethodChannel('com.exptech.dpip/location');
-
 class _SettingsLocationPageState extends State<SettingsLocationPage> with WidgetsBindingObserver {
   PermissionStatus? notificationPermission;
   PermissionStatus? locationPermission;
   PermissionStatus? locationAlwaysPermission;
-  bool? autoStartPermission;
-  bool? batteryOptimizationPermission;
+  bool autoStartPermission = true;
+  bool batteryOptimizationPermission = true;
 
-  Future<bool> requestLocationAlwaysPermission() async {
-    var status = await Permission.locationWhenInUse.status;
-    if (status.isDenied) {
-      status = await Permission.locationWhenInUse.request();
-    }
-
-    if (status.isPermanentlyDenied) {
-      openAppSettings();
-      return false;
-    }
-
-    return status.isGranted;
-  }
-
-  Future<bool> checkNotificationPermission() async {
-    final status = await Permission.notification.request();
-    if (!mounted) return false;
-
-    setState(() => notificationPermission = status);
-
-    if (!status.isGranted) {
-      await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            icon: const Icon(Symbols.error),
-            title: const Text('無法取得通知權限'),
-            content: Text(
-              "'自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。'${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「通知」權限後再試一次。' : ""}",
-            ),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: const Text('取消'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              if (status.isPermanentlyDenied)
-                FilledButton(
-                  child: const Text('設定'),
-                  onPressed: () {
-                    openAppSettings();
-                    Navigator.pop(context);
-                  },
-                )
-              else
-                FilledButton(
-                  child: const Text('再試一次'),
-                  onPressed: () {
-                    checkNotificationPermission();
-                    Navigator.pop(context);
-                  },
-                ),
-            ],
-          );
-        },
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<bool> checkLocationPermission() async {
-    final status = await Permission.location.request();
-    if (!mounted) return false;
-
-    setState(() => locationPermission = status);
-
-    if (!status.isGranted) {
-      await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            icon: const Icon(Symbols.error),
-            title: const Text('無法取得位置權限'),
-            content: Text(
-              "'自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。'${status.isPermanentlyDenied ? '請您到應用程式設定中找到並允許「位置」權限後再試一次。' : ""}",
-            ),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              TextButton(
-                child: const Text('取消'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              if (status.isPermanentlyDenied)
-                FilledButton(
-                  child: const Text('設定'),
-                  onPressed: () {
-                    openAppSettings();
-                    Navigator.pop(context);
-                  },
-                )
-              else
-                FilledButton(
-                  child: const Text('再試一次'),
-                  onPressed: () {
-                    checkLocationPermission();
-                    Navigator.pop(context);
-                  },
-                ),
-            ],
-          );
-        },
-      );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<bool> checkLocationAlwaysPermission() async {
-    final status = await Permission.locationAlways.status;
-
-    setState(() => locationAlwaysPermission = status);
-
-    if (status.isGranted) {
-      return true;
-    } else {
-      if (!mounted) return false;
-      final permissionType = Platform.isAndroid ? '一律允許' : '永遠';
-
-      final status =
-          await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                icon: const Icon(Symbols.my_location),
-                title: Text('$permissionType 位置權限'),
-                content: Text('為了獲得更好的自動定位體驗，您需要將位置權限提升至「$permissionType」以便讓 DPIP 在背景自動設定所在地資訊。'),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: const Text('取消'),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  FilledButton(
-                    child: const Text('確定'),
-                    onPressed: () async {
-                      final status = await Permission.locationAlways.request();
-
-                      setState(() => locationAlwaysPermission = status);
-
-                      if (status.isPermanentlyDenied) {
-                        openAppSettings();
-                      }
-
-                      if (!context.mounted) return;
-
-                      Navigator.pop(context, status.isGranted);
-                    },
-                  ),
-                ],
-              );
-            },
-          ) ??
-          false;
-
-      return status;
-    }
-  }
-
-  Future<bool> androidCheckAutoStartPermission(int num) async {
-    if (!Platform.isAndroid) return true;
-
-    try {
-      final bool? isAvailable = await Autostarter.isAutoStartPermissionAvailable();
-      if (isAvailable == null || !isAvailable) return true;
-
-      final bool? status = await Autostarter.checkAutoStartState();
-      if (status == null || status) return true;
-
-      if (!mounted) return true;
-
-      final String contentText =
-          (num == 0)
-              ? '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'
-              : '為了獲得更好的 DPIP 體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景有正常接收警訊通知。';
-
-      return await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                icon: const Icon(Symbols.my_location),
-                title: const Text('自啟動權限'),
-                content: Text(contentText),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: const Text('取消'),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  FilledButton(
-                    child: const Text('確定'),
-                    onPressed: () async {
-                      await Autostarter.getAutoStartPermission(newTask: true);
-
-                      if (!context.mounted) return;
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                ],
-              );
-            },
-          ) ??
-          false;
-    } catch (err) {
-      TalkerManager.instance.error(err);
-      return false;
-    }
-  }
-
-  Future<bool> androidCheckBatteryOptimizationPermission(int num) async {
-    if (!Platform.isAndroid) return true;
-
-    try {
-      final bool status = await DisableBatteryOptimization.isBatteryOptimizationDisabled ?? false;
-      if (status) return true;
-
-      if (!mounted) return true;
-
-      final String contentText =
-          (num == 0)
-              ? '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'
-              : '為了獲得更好的 DPIP 體驗，您需要給予「無限制」以便讓 DPIP 在背景有正常接收警訊通知。';
-
-      return await showDialog<bool>(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                icon: const Icon(Symbols.my_location),
-                title: const Text('省電策略'),
-                content: Text(contentText),
-                actionsAlignment: MainAxisAlignment.spaceBetween,
-                actions: [
-                  TextButton(
-                    child: const Text('取消'),
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                  FilledButton(
-                    child: const Text('確定'),
-                    onPressed: () {
-                      DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                ],
-              );
-            },
-          ) ??
-          false;
-    } catch (err) {
-      TalkerManager.instance.error(err);
-      return false;
-    }
-  }
-
-  Future toggleAutoLocation() async {
-    final isAuto = context.read<SettingsLocationModel>().auto;
-
-    stopAndroidBackgroundService();
-
-    if (!isAuto) {
-      final notification = await checkNotificationPermission();
-      if (!notification) return;
-
-      final location = await checkLocationPermission();
-      if (!location) return;
-
-      await checkLocationAlwaysPermission();
-
-      final bool autoStart = await androidCheckAutoStartPermission(0);
-      autoStartPermission = autoStart;
-      if (!autoStart) return;
-
-      final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(0);
-      batteryOptimizationPermission = batteryOptimization;
-      if (!batteryOptimization) return;
-
-      if (!isAuto) {
-        startAndroidBackgroundService(shouldInitialize: false);
-      }
-    }
-
-    if (Platform.isIOS) {
-      await platform.invokeMethod('toggleLocation', {'isEnabled': !isAuto}).catchError((_) {});
-    }
+  Future<void> permissionStatusUpdate() async {
+    final values = await Future.wait([
+      Permission.notification.status,
+      Permission.location.status,
+      Permission.locationAlways.status,
+      if (Platform.isAndroid) Autostarter.checkAutoStartState(),
+      if (Platform.isAndroid) DisableBatteryOptimization.isBatteryOptimizationDisabled,
+    ]);
 
     if (!mounted) return;
 
-    context.read<SettingsLocationModel>().setAuto(!isAuto);
-    context.read<SettingsLocationModel>().setCode(null);
-    context.read<SettingsLocationModel>().setLatLng();
+    setState(() {
+      notificationPermission = values[0] as PermissionStatus?;
+      locationPermission = values[1] as PermissionStatus?;
+      locationAlwaysPermission = values[2] as PermissionStatus?;
+      autoStartPermission = values[3] as bool? ?? true;
+      batteryOptimizationPermission = values[4] as bool? ?? true;
+    });
+  }
+
+  /// Shows a error dialog to the user with the given permission type. [type] can be either [Permission] or
+  /// `"auto-start"`
+  Future<void> showPermissionDialog(dynamic type) async {
+    if (!mounted) return;
+    if (type is! Permission && type is! String) return;
+
+    final title = switch (type) {
+      Permission.notification => '無法取得通知權限'.i18n,
+      Permission.location => '無法取得位置權限'.i18n,
+      Permission.locationAlways => '無法取得位置權限'.i18n,
+      'auto-start' => '無法取得自啟動權限'.i18n,
+      'battery-optimization' => '省電策略'.i18n,
+      _ => '無法取得權限'.i18n,
+    };
+
+    final content = switch (type) {
+      Permission.notification => '自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。'.i18n,
+      Permission.location => '自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。'.i18n,
+      Permission.locationAlways =>
+        Platform.isIOS
+            ? '自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。'.i18n
+            : '自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。'.i18n,
+      'auto-start' => '為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
+      'battery-optimization' => '為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。'.i18n,
+      _ => '自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。'.i18n,
+    };
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          icon: const Icon(Symbols.error_rounded),
+          title: Text(title),
+          content: Text(content),
+          actionsAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            TextButton(
+              child: Text('取消'.i18n),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FilledButton(
+              child: Text('設定'.i18n),
+              onPressed: () {
+                openAppSettings();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<bool> requestPermissions() async {
+    if (!await Permission.notification.request().isGranted) {
+      TalkerManager.instance.warning('🧪 failed notification (NOTIFICATION) permission test');
+      await showPermissionDialog(Permission.notification);
+      return false;
+    }
+
+    if (!await Permission.location.request().isGranted) {
+      TalkerManager.instance.warning('🧪 failed location (ACCESS_COARSE_LOCATION) permission test');
+      showPermissionDialog(Permission.location);
+      return false;
+    }
+
+    if (!await Permission.locationWhenInUse.request().isGranted) {
+      TalkerManager.instance.warning('🧪 failed location when in use (ACCESS_FINE_LOCATION) permission test');
+      showPermissionDialog(Permission.locationWhenInUse);
+      return false;
+    }
+
+    if (!await Permission.locationAlways.request().isGranted) {
+      TalkerManager.instance.warning('🧪 failed location always (ACCESS_BACKGROUND_LOCATION) permission test');
+      showPermissionDialog(Permission.locationAlways);
+      return false;
+    }
+
+    if (!Platform.isAndroid) return true;
+
+    autoStart:
+    {
+      final available = await Autostarter.isAutoStartPermissionAvailable();
+      if (available == null) break autoStart;
+
+      final status = await DisableBatteryOptimization.isAutoStartEnabled;
+      if (status == null || status) {
+        batteryOptimizationPermission = true;
+        break autoStart;
+      }
+
+      await DisableBatteryOptimization.showEnableAutoStartSettings(
+        '自動啟動'.i18n,
+        '為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。'.i18n,
+      );
+    }
+
+    batteryOptimization:
+    {
+      final status = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
+      if (status == null || status) {
+        batteryOptimizationPermission = true;
+        break batteryOptimization;
+      }
+
+      await DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
+    }
+
+    manufacturerBatteryOptimization:
+    {
+      final status = await DisableBatteryOptimization.isManufacturerBatteryOptimizationDisabled;
+      if (status == null || status) break manufacturerBatteryOptimization;
+
+      await DisableBatteryOptimization.showEnableAutoStartSettings(
+        '省電策略'.i18n,
+        '為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。'.i18n,
+      );
+    }
+
+    setState(() {});
+    return true;
+  }
+
+  Future toggleAutoLocation(bool shouldEnable) async {
+    if (shouldEnable) {
+      if (!await requestPermissions()) return;
+
+      await LocationServiceManager.start();
+    } else {
+      await LocationServiceManager.stop();
+    }
+
+    GlobalProviders.location.setAuto(shouldEnable);
   }
 
   @override
@@ -356,59 +211,13 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     permissionStatusUpdate();
   }
 
-  void permissionStatusUpdate() {
-    Permission.notification.status.then((value) {
-      setState(() {
-        notificationPermission = value;
-      });
-    });
-    Permission.location.status.then((value) {
-      setState(() {
-        locationPermission = value;
-      });
-    });
-    Permission.locationAlways.status.then((value) {
-      setState(() {
-        locationAlwaysPermission = value;
-      });
-    });
-    if (Platform.isAndroid) {
-      Future<void> checkAutoStart() async {
-        final autoStart = await Autostarter.checkAutoStartState();
-        if (mounted) {
-          setState(() {
-            autoStartPermission = autoStart ?? false;
-          });
-        }
-      }
-
-      Future<void> checkBatteryOptimization() async {
-        final batteryOptimization = await DisableBatteryOptimization.isBatteryOptimizationDisabled;
-        if (mounted) {
-          setState(() {
-            batteryOptimizationPermission = batteryOptimization ?? false;
-          });
-        }
-      }
-
-      checkAutoStart();
-      checkBatteryOptimization();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final permissionType = Platform.isAndroid ? '一律允許' : '永遠';
+    final permissionType = Platform.isAndroid ? '一律允許'.i18n : '永遠'.i18n;
 
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
@@ -422,7 +231,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                   title: '自動更新'.i18n,
                   subtitle: Text('定期更新目前的所在地'.i18n),
                   icon: Symbols.my_location_rounded,
-                  trailing: Switch(value: auto, onChanged: (value) => toggleAutoLocation()),
+                  trailing: Switch(value: auto, onChanged: toggleAutoLocation),
                 );
               },
             ),
@@ -455,11 +264,11 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。',
+                            '自動定位功能需要將位置權限提升至「$permissionType」以在背景使用。'.i18n,
                             style: TextStyle(color: context.colors.error),
                           ),
                         ),
-                        TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
+                        TextButton(child: Text('設定'.i18n), onPressed: () => openAppSettings()),
                       ],
                     ),
                   ),
@@ -488,8 +297,10 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                           child: Icon(Symbols.warning_rounded, color: context.colors.error),
                         ),
                         const SizedBox(width: 8),
-                        Expanded(child: Text('通知功能已被拒絕，請移至設定允許權限。', style: TextStyle(color: context.colors.error))),
-                        TextButton(child: const Text('設定'), onPressed: () => openAppSettings()),
+                        Expanded(
+                          child: Text('通知功能已被拒絕，請移至設定允許權限。'.i18n, style: TextStyle(color: context.colors.error)),
+                        ),
+                        TextButton(child: Text('設定'.i18n), onPressed: () => openAppSettings()),
                       ],
                     ),
                   ),
@@ -497,25 +308,25 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        if (Platform.isAndroid && false)
+        if (Platform.isAndroid)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
             builder: (context, auto, child) {
               return Visibility(
-                visible: auto && !autoStartPermission!,
+                visible: auto && !autoStartPermission,
                 maintainAnimation: true,
                 maintainState: true,
                 child: AnimatedOpacity(
-                  opacity: auto && !autoStartPermission! ? 1 : 0,
+                  opacity: auto && !autoStartPermission ? 1 : 0,
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: '自啟動權限已被拒絕，請移至設定允許權限。',
+                    content: '自啟動權限已被拒絕，請移至設定允許權限。'.i18n,
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: const Text('設定'),
+                      child: Text('設定'.i18n),
                       onPressed: () => Autostarter.getAutoStartPermission(newTask: true),
                     ),
                   ),
@@ -523,25 +334,25 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        if (batteryOptimizationPermission != null && Platform.isAndroid)
+        if (Platform.isAndroid)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
             builder: (context, auto, child) {
               return Visibility(
-                visible: auto && !batteryOptimizationPermission!,
+                visible: auto && !batteryOptimizationPermission,
                 maintainAnimation: true,
                 maintainState: true,
                 child: AnimatedOpacity(
-                  opacity: auto && !batteryOptimizationPermission! ? 1 : 0,
+                  opacity: auto && !batteryOptimizationPermission ? 1 : 0,
                   curve: const Interval(0.2, 1, curve: Easing.standard),
                   duration: Durations.medium2,
                   child: SettingsListTextSection(
                     icon: Symbols.warning_rounded,
                     iconColor: context.colors.error,
-                    content: '省電策略已被拒絕，請移至設定允許權限。',
+                    content: '省電策略已被拒絕，請移至設定允許權限。'.i18n,
                     contentColor: context.colors.error,
                     trailing: TextButton(
-                      child: const Text('設定'),
+                      child: Text('設定'.i18n),
                       onPressed: () {
                         DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
                       },
@@ -551,129 +362,80 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        ListSection(
-          title: '所在地'.i18n,
-          children: [
-            Selector<SettingsLocationModel, ({bool auto, String? code})>(
-              selector: (context, model) => (auto: model.auto, code: model.code),
-              builder: (context, data, child) {
-                final (:auto, :code) = data;
-                final city = Global.location[code]?.city;
+        Consumer<SettingsLocationModel>(
+          builder: (context, model, child) {
+            String? loadingCode;
 
-                return ListSectionTile(
-                  title: '直轄市/縣市'.i18n,
-                  subtitle: Text(city ?? '尚未設定'.i18n),
-                  icon: Symbols.location_city_rounded,
-                  trailing: const Icon(Symbols.chevron_right_rounded),
-                  enabled: !auto,
-                  onTap: () async {
-                    final bool autoStart = await androidCheckAutoStartPermission(1);
-                    if (!autoStart) return;
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return ListSection(
+                  title: '所在地'.i18n,
+                  children: [
+                    ...model.favorited.map((code) {
+                      final location = Global.location[code]!;
 
-                    final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
-                    if (!batteryOptimization) return;
+                      final isCurrentLoading = loadingCode == code;
+                      final isSelected = code == model.code;
 
-                    if (!context.mounted) return;
+                      return ListSectionTile(
+                        title: '${location.city} ${location.town}',
+                        subtitle: Text(
+                          '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
+                        ),
+                        leading:
+                            isCurrentLoading
+                                ? const LoadingIcon()
+                                : Icon(isSelected ? Symbols.check_rounded : null, color: context.colors.primary),
+                        trailing: IconButton(
+                          icon: const Icon(Symbols.delete_rounded),
+                          color: context.colors.error,
+                          onPressed: isCurrentLoading ? null : () => model.unfavorite(code),
+                        ),
+                        enabled: !model.auto && loadingCode == null,
+                        onTap:
+                            isSelected
+                                ? null
+                                : () async {
+                                  setState(() => loadingCode = code);
 
-                    context.push(SettingsLocationSelectPage.route);
-                  },
+                                  try {
+                                    await ExpTech().updateDeviceLocation(
+                                      token: Preference.notifyToken,
+                                      coordinates: LatLng(location.lat, location.lng),
+                                    );
+
+                                    if (!context.mounted) return;
+
+                                    model.setCode(code);
+                                  } catch (e, s) {
+                                    if (!context.mounted) return;
+                                    TalkerManager.instance.error('Failed to set location code', e, s);
+                                    showToast(context, ToastWidget.text('設定所在地時發生錯誤，請稍候再試一次。'.i18n));
+                                  }
+
+                                  setState(() => loadingCode = null);
+                                },
+                      );
+                    }),
+                    ListSectionTile(
+                      title: '新增地點'.i18n,
+                      icon: Symbols.add_circle_rounded,
+                      enabled: loadingCode == null,
+                      onTap: () => context.push(SettingsLocationSelectPage.route),
+                    ),
+                  ],
                 );
               },
-            ),
-            Selector<SettingsLocationModel, ({bool auto, String? code})>(
-              selector: (context, model) => (auto: model.auto, code: model.code),
-              builder: (context, data, child) {
-                final (:auto, :code) = data;
-
-                final city = Global.location[code]?.city;
-                final town = Global.location[code]?.town;
-
-                return ListSectionTile(
-                  title: '鄉鎮市區'.i18n,
-                  subtitle: Text(town ?? '尚未設定'.i18n),
-                  icon: Symbols.forest_rounded,
-                  trailing: const Icon(Symbols.chevron_right_rounded),
-                  enabled: !auto && city != null,
-                  onTap: () async {
-                    if (city == null) return;
-
-                    final bool autoStart = await androidCheckAutoStartPermission(1);
-                    if (!autoStart) return;
-
-                    final bool batteryOptimization = await androidCheckBatteryOptimizationPermission(1);
-                    if (!batteryOptimization) return;
-
-                    if (!context.mounted) return;
-
-                    context.push(SettingsLocationSelectCityPage.route(city));
-                  },
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
-        if (false && Platform.isAndroid)
-          Selector<SettingsLocationModel, ({bool auto, String? code})>(
-            selector: (context, model) => (auto: model.auto, code: model.code),
-            builder: (context, data, child) {
-              final (:auto, :code) = data;
-
-              return Visibility(
-                visible: !auto && code != null && !autoStartPermission!,
-                maintainAnimation: true,
-                maintainState: true,
-                child: AnimatedOpacity(
-                  opacity: !auto && code != null && !autoStartPermission! ? 1 : 0,
-                  curve: const Interval(0.2, 1, curve: Easing.standard),
-                  duration: Durations.medium2,
-                  child: SettingsListTextSection(
-                    icon: Symbols.warning_rounded,
-                    iconColor: context.colors.error,
-                    content: '自啟動權限已被拒絕，請移至設定允許權限。',
-                    contentColor: context.colors.error,
-                    trailing: TextButton(
-                      child: const Text('設定'),
-                      onPressed: () async {
-                        await Autostarter.getAutoStartPermission(newTask: true);
-                      },
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        if (batteryOptimizationPermission != null && Platform.isAndroid)
-          Selector<SettingsLocationModel, ({bool auto, String? code})>(
-            selector: (context, model) => (auto: model.auto, code: model.code),
-            builder: (context, data, child) {
-              final (:auto, :code) = data;
-
-              return Visibility(
-                visible: !auto && code != null && !batteryOptimizationPermission!,
-                maintainAnimation: true,
-                maintainState: true,
-                child: AnimatedOpacity(
-                  opacity: !auto && code != null && !batteryOptimizationPermission! ? 1 : 0,
-                  curve: const Interval(0.2, 1, curve: Easing.standard),
-                  duration: Durations.medium2,
-                  child: SettingsListTextSection(
-                    icon: Symbols.warning_rounded,
-                    iconColor: context.colors.error,
-                    content: '省電策略已被拒絕，請移至設定允許權限。',
-                    contentColor: context.colors.error,
-                    trailing: TextButton(
-                      child: const Text('設定'),
-                      onPressed: () {
-                        DisableBatteryOptimization.showDisableBatteryOptimizationSettings();
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }

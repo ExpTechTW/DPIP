@@ -39,8 +39,7 @@ class HistoryTimelineItem extends StatelessWidget {
                 children: [
                   Positioned(
                     top: first ? 42 : 0,
-                    bottom: last ? null : 0,
-                    height: last ? 42 : null,
+                    bottom: last ? 0 : 0,
                     width: 1,
                     child: Container(color: context.colors.outlineVariant),
                   ),

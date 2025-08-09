@@ -62,7 +62,7 @@ class GeoJsonFeatureBuilder<T extends GeoJsonFeatureType> {
   }
 
   GeoJsonFeatureBuilder setProperty(String key, dynamic value) {
-    this.properties[key] = value;
+    properties[key] = value;
     return this;
   }
 

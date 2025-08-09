@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
     if (_isLoading) return;
 
     final auto = GlobalProviders.location.auto;
-    final code = GlobalProviders.location.codeNotifier.value;
+    final code = GlobalProviders.location.code;
     final location = Global.location[code];
 
     if (code == null || location == null) {
@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkVersion());
-    GlobalProviders.location.codeNotifier.addListener(_refresh);
+    GlobalProviders.location.$code.addListener(_refresh);
     _refresh();
   }
 
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                     children:
                         grouped.entries.sorted((a, b) => b.key.compareTo(a.key)).mapIndexed((index, entry) {
                           final date = entry.key;
-                          final historyGroup = entry.value;
+                          final historyGroup = entry.value.sorted((a, b) => b.time.send.compareTo(a.time.send));
                           return Column(
                             children: [
                               DateTimelineItem(date, first: index == 0),
@@ -218,7 +218,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    GlobalProviders.location.codeNotifier.removeListener(_refresh);
+    GlobalProviders.location.$code.removeListener(_refresh);
     super.dispose();
   }
 }

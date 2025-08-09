@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:http/http.dart';
+import 'package:maplibre_gl/maplibre_gl.dart';
+
 import 'package:dpip/api/model/announcement.dart';
 import 'package:dpip/api/model/changelog/changelog.dart';
 import 'package:dpip/api/model/crowdin/localization_progress.dart';
@@ -24,7 +27,6 @@ import 'package:dpip/core/preference.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/response.dart';
 import 'package:dpip/utils/extensions/string.dart';
-import 'package:http/http.dart';
 
 class ExpTech {
   String? apikey;
@@ -486,8 +488,8 @@ class ExpTech {
   }
 
   /// 回傳所在地
-  Future<String> updateDeviceLocation({required String token, required String lat, required String lng}) async {
-    final requestUrl = Route.location(token: token, lat: lat, lng: lng);
+  Future<String> updateDeviceLocation({required String token, required LatLng coordinates}) async {
+    final requestUrl = Route.location(token: token, lat: '${coordinates.latitude}', lng: '${coordinates.longitude}');
 
     final res = await get(requestUrl);
 

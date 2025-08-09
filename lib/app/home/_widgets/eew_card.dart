@@ -28,14 +28,16 @@ class EewCard extends StatefulWidget {
 }
 
 class _EewCardState extends State<EewCard> {
-  late int localIntensity;
-  late int localArrivalTime;
+  int? localIntensity;
+  int? localArrivalTime;
   int countdown = 0;
 
   Timer? _timer;
 
   void _updateCountdown() {
-    final remainingSeconds = ((localArrivalTime - GlobalProviders.data.currentTime) / 1000).floor();
+    if (localArrivalTime == null) return;
+
+    final remainingSeconds = ((localArrivalTime! - GlobalProviders.data.currentTime) / 1000).floor();
     if (remainingSeconds < -1) return;
 
     setState(() => countdown = remainingSeconds);
@@ -45,17 +47,19 @@ class _EewCardState extends State<EewCard> {
   void initState() {
     super.initState();
 
-    final info = eewLocationInfo(
-      widget.data.info.magnitude,
-      widget.data.info.depth,
-      widget.data.info.latitude,
-      widget.data.info.longitude,
-      GlobalProviders.location.coordinateNotifier.value.latitude,
-      GlobalProviders.location.coordinateNotifier.value.longitude,
-    );
+    if (GlobalProviders.location.coordinates != null) {
+      final info = eewLocationInfo(
+        widget.data.info.magnitude,
+        widget.data.info.depth,
+        widget.data.info.latitude,
+        widget.data.info.longitude,
+        GlobalProviders.location.coordinates!.latitude,
+        GlobalProviders.location.coordinates!.longitude,
+      );
 
-    localIntensity = intensityFloatToInt(info.i);
-    localArrivalTime = (widget.data.info.time + sWaveTimeByDistance(widget.data.info.depth, info.dist)).floor();
+      localIntensity = intensityFloatToInt(info.i);
+      localArrivalTime = (widget.data.info.time + sWaveTimeByDistance(widget.data.info.depth, info.dist)).floor();
+    }
 
     _updateCountdown();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
@@ -118,14 +122,23 @@ class _EewCardState extends State<EewCard> {
                   padding: const EdgeInsets.only(top: 8),
                   child: StyledText(
                     text:
-                        '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                            .i18n
-                            .args({
-                              'time': widget.data.info.time.toSimpleDateTimeString(context),
-                              'location': widget.data.info.location,
-                              'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
-                              'intensity': localIntensity.asIntensityLabel,
-                            }),
+                        localIntensity != null
+                            ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
+                                .i18n
+                                .args({
+                                  'time': widget.data.info.time.toSimpleDateTimeString(context),
+                                  'location': widget.data.info.location,
+                                  'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
+                                  'intensity': localIntensity!.asIntensityLabel,
+                                })
+                            : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
+                                .i18n
+                                .args({
+                                  'time': widget.data.info.time.toSimpleDateTimeString(context),
+                                  'location': widget.data.info.location,
+                                  'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
+                                  'depth': widget.data.info.depth.toStringAsFixed(1),
+                                }),
                     style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
                     tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
                   ),
@@ -133,7 +146,7 @@ class _EewCardState extends State<EewCard> {
                 Selector<SettingsLocationModel, String?>(
                   selector: (context, model) => model.code,
                   builder: (context, code, child) {
-                    if (code == null) {
+                    if (code == null || localIntensity == null) {
                       return const SizedBox.shrink();
                     }
 
@@ -160,7 +173,7 @@ class _EewCardState extends State<EewCard> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 12, bottom: 8),
                                       child: Text(
-                                        localIntensity.asIntensityLabel,
+                                        localIntensity!.asIntensityLabel,
                                         style: context.textTheme.displayMedium!.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: context.colors.onErrorContainer,

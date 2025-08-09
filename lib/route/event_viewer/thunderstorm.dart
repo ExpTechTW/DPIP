@@ -12,18 +12,16 @@ import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/history.dart';
-import 'package:dpip/app_old/page/map/radar/radar.dart';
+import 'package:dpip/app/map/_widgets/map_legend.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/list_icon.dart';
-import 'package:dpip/utils/need_location.dart';
 import 'package:dpip/utils/parser.dart';
-import 'package:dpip/utils/radar_color.dart';
 import 'package:dpip/widgets/chip/label_chip.dart';
 import 'package:dpip/widgets/list/detail_field_tile.dart';
-import 'package:dpip/widgets/map/legend.dart';
 import 'package:dpip/widgets/map/map.dart';
 import 'package:dpip/widgets/sheet/bottom_sheet_drag_handle.dart';
 
@@ -39,8 +37,8 @@ class ThunderstormPage extends StatefulWidget {
 class _ThunderstormPageState extends State<ThunderstormPage> {
   late MapLibreMapController _mapController;
   List<String> radarList = [];
-  double userLat = 0;
-  double userLon = 0;
+  double? userLat;
+  double? userLon;
   bool isUserLocationValid = false;
   bool _showLegend = false;
   Timer? _blinkTimer;
@@ -122,34 +120,13 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Future<void> start() async {
-    userLat = GlobalProviders.location.latitude ?? 0;
-    userLon = GlobalProviders.location.longitude ?? 0;
+    final location = GlobalProviders.location.coordinates;
 
-    isUserLocationValid = userLon != 0 && userLat != 0;
-
-    if (isUserLocationValid) {
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
+    if (location != null && location.isValid) {
+      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
+    } else {
+      await _mapController.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
     }
-
-    if (!isUserLocationValid && !GlobalProviders.location.auto) {
-      await showLocationDialog(context);
-    }
-
-    setState(() {});
   }
 
   void _toggleLegend() {
@@ -159,29 +136,26 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Widget _buildLegend() {
-    return MapLegend(
-      children: [
-        _buildColorBar(),
-        const SizedBox(height: 8),
-        _buildColorBarLabels(),
-        const SizedBox(height: 12),
-        Text('單位：dBZ', style: context.theme.textTheme.labelMedium),
+    return ColorLegend(
+      reverse: true,
+      unit: 'dBZ',
+      items: [
+        ColorLegendItem(color: const Color(0xff00ffff), value: 0),
+        ColorLegendItem(color: const Color(0xff00a3ff), value: 5),
+        ColorLegendItem(color: const Color(0xff005bff), value: 10),
+        ColorLegendItem(color: const Color(0xff0000ff), value: 15, blendTail: false),
+        ColorLegendItem(color: const Color(0xff00ff00), value: 16, hidden: true),
+        ColorLegendItem(color: const Color(0xff00d300), value: 20),
+        ColorLegendItem(color: const Color(0xff00a000), value: 25),
+        ColorLegendItem(color: const Color(0xffccea00), value: 30),
+        ColorLegendItem(color: const Color(0xffffd300), value: 35),
+        ColorLegendItem(color: const Color(0xffff8800), value: 40),
+        ColorLegendItem(color: const Color(0xffff1800), value: 45),
+        ColorLegendItem(color: const Color(0xffd30000), value: 50),
+        ColorLegendItem(color: const Color(0xffa00000), value: 55),
+        ColorLegendItem(color: const Color(0xffea00cc), value: 60),
+        ColorLegendItem(color: const Color(0xff9600ff), value: 65),
       ],
-    );
-  }
-
-  Widget _buildColorBar() {
-    return SizedBox(height: 20, width: 300, child: CustomPaint(painter: ColorBarPainter(dBZColors)));
-  }
-
-  Widget _buildColorBarLabels() {
-    final labels = List.generate(14, (index) => (index * 5).toString());
-    return SizedBox(
-      width: 300,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: labels.map((label) => Text(label, style: const TextStyle(fontSize: 9))).toList(),
-      ),
     );
   }
 

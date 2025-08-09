@@ -44,17 +44,17 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
     context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
     return;
   }
-  
+
   if (channelKey.startsWith('int_report')) {
     context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
     return;
   }
-  
+
   if (channelKey.startsWith('eq')) {
     context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.monitor})));
     return;
   }
-  
+
   context.go('/home');
 }
 
@@ -355,6 +355,18 @@ Future<void> notifyInit() async {
         ledColor: Colors.red,
         enableVibration: true,
         vibrationPattern: lowVibrationPattern,
+      ),
+      NotificationChannel(
+        channelKey: 'background',
+        channelName: '自動定位',
+        channelDescription: '背景定位服務通知',
+        importance: NotificationImportance.Low,
+        defaultColor: const Color(0xFF2196f3),
+        channelShowBadge: false,
+        enableVibration: false,
+        enableLights: false,
+        playSound: false,
+        locked: true,
       ),
     ],
     channelGroups: [

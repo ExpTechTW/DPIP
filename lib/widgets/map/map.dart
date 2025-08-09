@@ -128,7 +128,7 @@ class DpipMapState extends State<DpipMap> {
         },
       },
       'sprite': spritePath,
-      'glyphs': 'https://glyphs.geolonia.com/{fontstack}/{range}.pbf',
+      'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-glyph/{fontstack}/{range}.pbf',
       'layers': [
         {
           'id': 'background',
@@ -220,7 +220,7 @@ class DpipMapState extends State<DpipMap> {
         await getSavedLocation();
       }
 
-      final location = GlobalProviders.location.coordinateNotifier.value;
+      final location = GlobalProviders.location.coordinates;
 
       const sourceId = BaseMapSourceIds.userLocation;
       const layerId = BaseMapLayerIds.userLocation;
@@ -228,7 +228,7 @@ class DpipMapState extends State<DpipMap> {
       final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
       final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
-      if (!location.isValid) {
+      if (location == null || !location.isValid) {
         if (isLayerExists) {
           await controller.removeLayer(layerId);
           TalkerManager.instance.info('Removed Layer "$layerId"');
@@ -249,7 +249,6 @@ class DpipMapState extends State<DpipMap> {
           sourceId,
           GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build()),
         );
-        TalkerManager.instance.info('Added Source "$sourceId"');
       } else {
         await controller.setGeoJsonSource(sourceId, GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build());
         TalkerManager.instance.info('Updated Source "$sourceId"');
@@ -267,7 +266,6 @@ class DpipMapState extends State<DpipMap> {
             iconIgnorePlacement: true,
           ),
         );
-        TalkerManager.instance.info('Added Layer "$layerId"');
       }
 
       await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));
@@ -287,7 +285,7 @@ class DpipMapState extends State<DpipMap> {
   void initState() {
     super.initState();
 
-    GlobalProviders.location.coordinateNotifier.addListener(_updateUserLocation);
+    GlobalProviders.location.$coordinates.addListener(_updateUserLocation);
 
     getApplicationDocumentsDirectory().then((dir) async {
       final documentDir = dir.path;
@@ -301,7 +299,6 @@ class DpipMapState extends State<DpipMap> {
       await spritePngFile.writeAsBytes(spritePngData.buffer.asUint8List());
       final spritePngFile2x = File('$mapDir/sprites@2x.png');
       await spritePngFile2x.writeAsBytes(spritePngData.buffer.asUint8List());
-      TalkerManager.instance.info('Copied sprite.png to $spritePngFile');
 
       // Copy sprite.json
       final spriteJsonData = await rootBundle.load('assets/sprites.json');
@@ -309,7 +306,6 @@ class DpipMapState extends State<DpipMap> {
       await spriteJsonFile.writeAsBytes(spriteJsonData.buffer.asUint8List());
       final spriteJsonFile2x = File('$mapDir/sprites@2x.json');
       await spriteJsonFile2x.writeAsBytes(spriteJsonData.buffer.asUint8List());
-      TalkerManager.instance.info('Copied sprite.json to $spriteJsonFile');
 
       final spriteUri = '${spriteJsonFile.parent.uri}sprites';
       TalkerManager.instance.info('Sprite is $spriteUri');
@@ -332,7 +328,7 @@ class DpipMapState extends State<DpipMap> {
     final double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
 
     return MapLibreMap(
-      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(3, 9),
+      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 15),
       trackCameraPosition: true,
       initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
       styleString: styleAbsoluteFilePath!,
@@ -359,7 +355,7 @@ class DpipMapState extends State<DpipMap> {
 
   @override
   void dispose() {
-    GlobalProviders.location.coordinateNotifier.removeListener(_updateUserLocation);
+    GlobalProviders.location.$coordinates.removeListener(_updateUserLocation);
     super.dispose();
   }
 }

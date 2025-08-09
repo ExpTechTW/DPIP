@@ -37,20 +37,20 @@ void main() async {
   };
 
   await Global.init();
-  await DeviceInfo.init();
   await Preference.init();
   GlobalProviders.init();
-  await AppLocalizations.load();
-
   initializeTimeZones();
 
-  await initializeInstallationData();
+  await Future.wait([
+    DeviceInfo.init(),
+    AppLocalizations.load(),
+    initializeInstallationData(),
+    fcmInit(),
+    notifyInit(),
+    updateInfoToServer(),
+  ]);
 
-  await fcmInit();
-  await notifyInit();
-  initBackgroundService();
-
-  await updateInfoToServer();
+  await LocationServiceManager.initalize();
 
   runApp(
     I18n(
