@@ -55,6 +55,16 @@ void _navigateBasedOnChannelKey(BuildContext context, String? channelKey) {
     return;
   }
 
+  if (channelKey.startsWith('report')) {
+    context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.report})));
+    return;
+  }
+
+  if (channelKey.startsWith('announcement')) {
+    context.push('/announcement');
+    return;
+  }
+
   context.go('/home');
 }
 
