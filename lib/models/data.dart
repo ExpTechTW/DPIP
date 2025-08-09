@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
+
 import 'package:collection/collection.dart';
+import 'package:geojson_vi/geojson_vi.dart';
+
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/eew.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
@@ -15,7 +19,6 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
-import 'package:flutter/material.dart';
 
 class _DpipDataModel extends ChangeNotifier {
   Map<String, Station> _station = {};
@@ -337,6 +340,7 @@ class DpipDataModel extends _DpipDataModel {
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
             ..setGeometry(e.info.latlng.toGeoJsonCoordinates() as List<dynamic>)
             ..setProperty('type', 'x');
+
       builder.addFeature(epicenter);
     }
 
@@ -376,14 +380,15 @@ class DpipDataModel extends _DpipDataModel {
     final builder = GeoJsonBuilder();
 
     if (rts != null && rts.box.isNotEmpty) {
-      for (final area in Global.box['features']) {
-        final id = area['properties']['ID'].toString();
+      for (final area in Global.boxGeojson.features) {
+        if (area == null) continue;
+
+        final id = area.properties!['ID'].toString();
         if (!rts.box.containsKey(id)) continue;
 
-        final coordinates =
-            (area['geometry']['coordinates'][0] as List)
-                .map((e) => (e as List).map((n) => n as double).toList())
-                .toList();
+        final geometry = area.geometry! as GeoJSONPolygon;
+
+        final coordinates = geometry.coordinates[0];
 
         if (eew.isNotEmpty == true) {
           final eewMap = {for (final e in eew) e.id: e};
