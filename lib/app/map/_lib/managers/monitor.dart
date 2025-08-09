@@ -127,6 +127,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> setup() async {
     if (didSetup) return;
 
+    final colors = context.colors;
+
     try {
       final sources = await controller.getSourceIds();
       final layers = await controller.getLayerIds();
@@ -213,9 +215,96 @@ class MonitorMapLayerManager extends MapLayerManager {
           ],
           visibility: visible ? 'visible' : 'none',
         );
+        final properties2 = SymbolLayerProperties(
+          textField: [
+            Expressions.format,
+            [Expressions.get, 'id'],
+            {
+              'text-font': [
+                Expressions.literal,
+                ['Noto Sans TC Bold'],
+              ],
+            },
+            '\n',
+            {},
+            [
+              Expressions.caseExpression,
+              [
+                Expressions.all,
+                [Expressions.has, 'city'],
+                [Expressions.has, 'town'],
+              ],
+              [
+                Expressions.concat,
+                [Expressions.get, 'city'],
+                ' ',
+                [Expressions.get, 'town'],
+              ],
+              '海外測站'.i18n,
+            ],
+            {
+              'text-font': [
+                Expressions.literal,
+                ['Noto Sans TC Bold'],
+              ],
+            },
+            '\n',
+            {},
+            [
+              Expressions.caseExpression,
+              [
+                Expressions.all,
+                [Expressions.has, 'i'],
+                [Expressions.has, 'pga'],
+                [Expressions.has, 'pgv'],
+              ],
+              [
+                Expressions.concat,
+                [
+                  Expressions.concat,
+                  '即時震度：'.i18n,
+                  [Expressions.get, 'i'],
+                ],
+                '\n',
+                [
+                  Expressions.concat,
+                  '地動加速度：'.i18n,
+                  [Expressions.get, 'pga'],
+                  'gal',
+                ],
+                '\n',
+                [
+                  Expressions.concat,
+                  '地動速度：'.i18n,
+                  [Expressions.get, 'pgv'],
+                  'cm/s',
+                ],
+              ],
+              '無資料'.i18n,
+            ],
+            {},
+          ],
+          textSize: 10,
+          textColor: colors.onSurfaceVariant.toHexStringRGB(),
+          textHaloColor: colors.outlineVariant.toHexStringRGB(),
+          textHaloWidth: 1,
+          textFont: ['Noto Sans TC Regular'],
+          textOffset: [0, 1],
+          textAnchor: 'top',
+          visibility: visible ? 'visible' : 'none',
+        );
 
         await controller.addLayer(rtsSourceId, rtsLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
         TalkerManager.instance.info('Added Layer "$rtsLayerId"');
+
+        await controller.addLayer(
+          rtsSourceId,
+          '$rtsLayerId-label',
+          properties2,
+          belowLayerId: BaseMapLayerIds.userLocation,
+          minzoom: 10,
+        );
+        TalkerManager.instance.info('Added Layer "$rtsLayerId-label"');
       }
 
       // 2. Intensity0 图层
@@ -448,6 +537,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await controller.setLayerVisibility(rtsLayerId, !hasBox);
+      await controller.setLayerVisibility('$rtsLayerId-label', !hasBox);
       await controller.setLayerVisibility(intensityLayerId, hasBox);
       await controller.setLayerVisibility(intensity0LayerId, hasBox);
       await controller.setLayerVisibility(boxLayerId, hasBox);
@@ -533,6 +623,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       // rts
       await controller.setLayerVisibility(rtsLayerId, false);
+      await controller.setLayerVisibility('$rtsLayerId-label', false);
 
       // intensity
       await controller.setLayerVisibility(intensityLayerId, false);
@@ -569,6 +660,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await controller.setLayerVisibility(rtsLayerId, !hasBox);
+      await controller.setLayerVisibility('$rtsLayerId-label', !hasBox);
 
       await controller.setLayerVisibility(intensityLayerId, hasBox);
       await controller.setLayerVisibility(intensity0LayerId, hasBox);
@@ -606,6 +698,8 @@ class MonitorMapLayerManager extends MapLayerManager {
       // rts
       await controller.removeLayer(rtsLayerId);
       TalkerManager.instance.info('Removed Layer "$rtsLayerId"');
+      await controller.removeLayer('$rtsLayerId-label');
+      TalkerManager.instance.info('Removed Layer "$rtsLayerId-label"');
       await controller.removeSource(rtsSourceId);
       TalkerManager.instance.info('Removed Source "$rtsSourceId"');
 
