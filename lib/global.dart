@@ -8,15 +8,17 @@ import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/utils/extensions/asset_bundle.dart';
 
+typedef TimeTable = Map<String, List<({double P, double S, double R})>>;
+
 class Global {
   Global._();
 
   static late PackageInfo packageInfo;
   static late SharedPreferences preference;
   static late Map<String, Location> location;
+  static late GeoJSONFeatureCollection boxGeojson;
   static late GeoJSONFeatureCollection townGeojson;
-  static late Map<String, List<({double P, double S, double R})>> timeTable;
-  static late Map<String, dynamic> box;
+  static late TimeTable timeTable;
   static late Map<String, ({String title, String body})> notifyTestContent;
   static ExpTech api = ExpTech();
 
@@ -26,10 +28,10 @@ class Global {
     return data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
   }
 
-  static Future<void> loadTimeTableData() async {
+  static Future<TimeTable> loadTimeTableData() async {
     final data = await rootBundle.loadJson('assets/time.json');
 
-    timeTable = data.map((key, value) {
+    return data.map((key, value) {
       final list =
           (value as List).map((item) {
             final map = item as Map<String, dynamic>;
@@ -52,6 +54,12 @@ class Global {
     });
   }
 
+  static Future<GeoJSONFeatureCollection> loadBoxGeojson() async {
+    final data = await rootBundle.loadJson('assets/box.json');
+
+    return GeoJSONFeatureCollection.fromMap(data);
+  }
+
   static Future<GeoJSONFeatureCollection> loadTownGeojson() async {
     final data = await rootBundle.loadJson('assets/map/town.json');
 
@@ -59,13 +67,22 @@ class Global {
   }
 
   static Future init() async {
-    packageInfo = await PackageInfo.fromPlatform();
-    preference = await SharedPreferences.getInstance();
-    box = await rootBundle.loadJson('assets/box.json');
-    location = await loadLocationData();
-    townGeojson = await loadTownGeojson();
+    final results = await Future.wait([
+      PackageInfo.fromPlatform(),
+      SharedPreferences.getInstance(),
+      loadBoxGeojson(),
+      loadLocationData(),
+      loadTownGeojson(),
+      loadTimeTableData(),
+    ]);
 
-    await loadTimeTableData();
+    packageInfo = (results[0] as PackageInfo?)!;
+    preference = (results[1] as SharedPreferences?)!;
+    boxGeojson = (results[2] as GeoJSONFeatureCollection?)!;
+    location = (results[3] as Map<String, Location>?)!;
+    townGeojson = (results[4] as GeoJSONFeatureCollection?)!;
+    timeTable = (results[5] as TimeTable?)!;
+
     await loadNotifyTestContent();
   }
 }

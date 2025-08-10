@@ -1,0 +1,6 @@
+/.github/ @exptechtw/dpip-developers
+
+/lib/app/ @kamiya10
+/lib/models/ @kamiya10
+/lib/core/service.dart @kamiya10
+/tools/update_translations.sh @kamiya10
