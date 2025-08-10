@@ -1061,7 +1061,7 @@ class MapStyle {
   static Map<String, dynamic> googleSource() => {
     'google': {
       'type': 'raster',
-      'tiles': ['https://mts1.google.com/vt/lyrs=p&hl=zh-TW&x={x}&y={y}&z={z}'],
+      'tiles': ['https://mt1.google.com/vt/lyrs=s&hl=zh-TW&x={x}&y={y}&z={z}'],
       'tileSize': 256,
       'attribution': '&copy; Google Maps',
       'maxzoom': 19,
