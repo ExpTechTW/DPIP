@@ -6,8 +6,10 @@ import 'package:dpip/utils/geojson.dart';
 extension GeoJsonLatLng on LatLng {
   bool get isValid => latitude != 0 && longitude != 0;
 
+  List<double> get asGeoJsonCooridnate => [longitude, latitude];
+
   GeoJsonFeatureBuilder toFeatureBuilder() {
-    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(toGeoJsonCoordinates() as List<dynamic>);
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(asGeoJsonCooridnate);
   }
 
   /// Calculates the distance between the supplied coordinates in meters. The distance between the coordinates is
