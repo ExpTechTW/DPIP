@@ -11,6 +11,7 @@ import 'package:dpip/core/eew.dart';
 import 'package:dpip/route/report/report_sheet_content.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/color_scheme.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/intensity_color.dart';
 import 'package:dpip/utils/log.dart';
@@ -96,7 +97,7 @@ class _ReportRouteState extends State<ReportRoute> with TickerProviderStateMixin
         'properties': {
           'intensity': 10, // 10 is for classifying epicenter cross
         },
-        'geometry': {'coordinates': data.latlng.toGeoJsonCoordinates(), 'type': 'Point'},
+        'geometry': {'coordinates': data.latlng.asGeoJsonCooridnate, 'type': 'Point'},
       });
 
       expandBounds(bounds, data.latlng);

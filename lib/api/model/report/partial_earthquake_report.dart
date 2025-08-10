@@ -1,9 +1,12 @@
-import 'package:dpip/utils/geojson.dart';
-import 'package:dpip/utils/parser.dart';
 import 'package:flutter/material.dart';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
+
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/parser.dart';
 
 part 'partial_earthquake_report.g.dart';
 
@@ -163,7 +166,7 @@ class PartialEarthquakeReport {
   GeoJsonFeatureBuilder toGeoJsonFeature() {
     return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
         .setId(time.millisecondsSinceEpoch)
-        .setGeometry(latlng.toGeoJsonCoordinates())
+        .setGeometry(latlng.asGeoJsonCooridnate)
         .setProperty('icon', 'cross-$intensity')
         .setProperty('magnitude', magnitude)
         .setProperty('intensity', intensity)

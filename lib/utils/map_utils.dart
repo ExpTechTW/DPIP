@@ -129,7 +129,7 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
 
   for (var i = 0; i < steps; i++) {
     final point = destination(center, radius, (i * -360) / steps, units: units);
-    coordinates.add(point.toGeoJsonCoordinates());
+    coordinates.add(point.asGeoJsonCooridnate);
   }
 
   coordinates.add(coordinates[0]);
@@ -154,11 +154,11 @@ GeoJsonFeatureBuilder circleFeature({
 }) {
   // main
   final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
-  final List coordinates = [];
+  final List<List<double>> coordinates = [];
 
   for (var i = 0; i < steps; i++) {
     final point = destination(center, radius, (i * -360) / steps, units: units);
-    coordinates.add(point.toGeoJsonCoordinates());
+    coordinates.add(point.asGeoJsonCooridnate);
   }
 
   coordinates.add(coordinates[0]);
@@ -166,7 +166,7 @@ GeoJsonFeatureBuilder circleFeature({
   return polygon.setGeometry(coordinates);
 }
 
-bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, List box) {
+bool checkBoxSkip(Map<String, Eew> eewLastInfo, Map<String, double> eewDist, List<List<double>> box) {
   bool passed = false;
 
   for (final eew in eewLastInfo.keys) {

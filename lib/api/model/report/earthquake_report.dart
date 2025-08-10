@@ -1,11 +1,13 @@
 import 'package:collection/collection.dart';
-import 'package:dpip/api/model/report/area_intensity.dart';
-import 'package:dpip/utils/geojson.dart';
-import 'package:dpip/utils/map_utils.dart';
-import 'package:dpip/utils/parser.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:timezone/timezone.dart';
+
+import 'package:dpip/api/model/report/area_intensity.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/map_utils.dart';
+import 'package:dpip/utils/parser.dart';
 
 part 'earthquake_report.g.dart';
 
@@ -203,7 +205,7 @@ class EarthquakeReport {
             .toList();
     final cross =
         GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-          ..setGeometry(latlng.toGeoJsonCoordinates())
+          ..setGeometry(latlng.asGeoJsonCooridnate)
           ..setProperty('icon', 'cross-7')
           ..setProperty('magnitude', magnitude);
 
