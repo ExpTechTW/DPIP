@@ -161,7 +161,7 @@ class MapStyle {
         ['get', 'class'],
         'grass',
       ],
-      'paint': {'fill-color': '#d8e8c8', 'fill-opacity': colors.brightness == Brightness.dark ? 0.4 : 1},
+      'paint': {'fill-color': '#d2e8c2', 'fill-opacity': colors.brightness == Brightness.dark ? 0.2 : 1},
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {
