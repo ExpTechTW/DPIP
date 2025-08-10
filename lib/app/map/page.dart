@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:flutter/material.dart';
 
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -223,32 +224,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     setState(() => _activeLayers = newLayers);
   }
 
-  void _hideBaseMapLayers() {
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, false);
-    _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, false);
-  }
-
   Future<void> setBaseMapType(BaseMapType baseMapType) async {
     if (!mounted) return;
 
-    _hideBaseMapLayers();
-
-    switch (baseMapType) {
-      case BaseMapType.exptech:
-        await _controller.setLayerVisibility(BaseMapLayerIds.exptechGlobalFill, true);
-        await _controller.setLayerVisibility(BaseMapLayerIds.exptechTownFill, true);
-        await _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyFill, true);
-        await _controller.setLayerVisibility(BaseMapLayerIds.exptechCountyOutline, true);
-
-      case BaseMapType.osm:
-        await _controller.setLayerVisibility(BaseMapLayerIds.osmGlobalRaster, true);
-
-      case BaseMapType.google:
-        await _controller.setLayerVisibility(BaseMapLayerIds.googleGlobalRaster, true);
-    }
+    await _controller.setBaseMap(baseMapType);
 
     setState(() => _baseMapType = baseMapType);
   }
@@ -283,7 +262,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     _setupWeatherLayerTimeSync();
 
-    setBaseMapType(_baseMapType);
     setLayers(_activeLayers);
   }
 
@@ -299,7 +277,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          DpipMap(onMapCreated: onMapCreated),
+          DpipMap(baseMapType: _baseMapType, onMapCreated: onMapCreated),
           PositionedLayerButton(
             activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,
