@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-10 02:39\n"
+"PO-Revision-Date: 2025-08-10 07:03\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -972,7 +972,7 @@ msgstr "５强"
 
 #: ./lib/utils/extensions/int.dart:20
 msgid "６弱"
-msgstr "VII度"
+msgstr "６弱"
 
 #: ./lib/utils/extensions/int.dart:21
 msgid "６強"
