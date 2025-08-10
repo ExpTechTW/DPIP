@@ -1,18 +1,17 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+
+import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/constants.dart';
-import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:maplibre_gl/maplibre_gl.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:dpip/widgets/map/style.dart';
 
 enum BaseMapType { exptech, osm, google }
 
@@ -35,9 +34,6 @@ class BaseMapLayerIds {
   static const exptechTownFill = 'exptech-town';
   static const exptechCountyFill = 'exptech-county';
   static const exptechCountyOutline = 'exptech-county-outline';
-
-  static const osmGlobalRaster = 'osm-global';
-  static const googleGlobalRaster = 'google-global';
 
   static const userLocation = 'user-location';
 
@@ -72,11 +68,12 @@ class DpipMap extends StatefulWidget {
   final bool focusUserLocationOnValueUpdate;
 
   static const kTaiwanCenter = LatLng(23.60, 120.85);
+  static const kTaiwanZoom = 6.4;
 
   const DpipMap({
     super.key,
     this.baseMapType = BaseMapType.exptech,
-    this.initialCameraPosition = const CameraPosition(target: kTaiwanCenter, zoom: 6.4),
+    this.initialCameraPosition = const CameraPosition(target: kTaiwanCenter, zoom: kTaiwanZoom),
     this.onMapCreated,
     this.onMapClick,
     this.onMapIdle,
@@ -94,106 +91,8 @@ class DpipMap extends StatefulWidget {
 
   @override
   State<DpipMap> createState() => DpipMapState();
-}
 
-class DpipMapState extends State<DpipMap> {
-  String _getStyleJson(String spritePath) {
-    final colors = context.colors;
-
-    return jsonEncode({
-      'version': 8,
-      'name': 'ExpTech Studio',
-      'center': [120.85, 23.10],
-      'zoom': 6.2,
-      'sources': {
-        'map': {
-          'type': 'vector',
-          'url': 'https://lb.exptech.dev/api/v1/map/tiles/tiles.json',
-          'tileSize': 512,
-          'buffer': 64,
-        },
-        'osm': {
-          'type': 'raster',
-          'tiles': ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-          'tileSize': 256,
-          'attribution': '&copy; OpenStreetMap Contributors',
-          'maxzoom': 19,
-        },
-        'google': {
-          'type': 'raster',
-          'tiles': ['https://mts1.google.com/vt/lyrs=p&hl=zh-TW&x={x}&y={y}&z={z}'],
-          'tileSize': 256,
-          'attribution': '&copy; Google Maps',
-          'maxzoom': 19,
-        },
-      },
-      'sprite': spritePath,
-      'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-glyph/{fontstack}/{range}.pbf',
-      'layers': [
-        {
-          'id': 'background',
-          'type': 'background',
-          'paint': {'background-color': colors.surface.toHexStringRGB()},
-        },
-        {
-          'id': BaseMapLayerIds.osmGlobalRaster,
-          'type': 'raster',
-          'source': 'osm',
-          'layout': {'visibility': widget.baseMapType == BaseMapType.osm ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.googleGlobalRaster,
-          'type': 'raster',
-          'source': 'google',
-          'layout': {'visibility': widget.baseMapType == BaseMapType.google ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.exptechGlobalFill,
-          'type': 'fill',
-          'source': 'map',
-          'source-layer': 'global',
-          'paint': {'fill-color': colors.surfaceContainer.toHexStringRGB(), 'fill-opacity': 1},
-          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.exptechCountyFill,
-          'type': 'fill',
-          'source': 'map',
-          'source-layer': 'city',
-          'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
-          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.exptechTownFill,
-          'type': 'fill',
-          'source': 'map',
-          'source-layer': 'town',
-          'paint': {'fill-color': colors.surfaceContainerHigh.toHexStringRGB(), 'fill-opacity': 1},
-          'layout': {'visibility': widget.baseMapType == BaseMapType.exptech ? 'visible' : 'none'},
-        },
-        {
-          'id': BaseMapLayerIds.exptechCountyOutline,
-          'source': 'map',
-          'source-layer': 'city',
-          'type': 'line',
-          'paint': {'line-color': colors.outline.toHexStringRGB()},
-          'layout': {'visibility': 'visible'},
-        },
-        {
-          'id': 'tsunami',
-          'type': 'line',
-          'source': 'map',
-          'source-layer': 'tsunami',
-          'paint': {'line-opacity': 0, 'line-width': 3, 'line-join': 'round'},
-        },
-      ],
-    });
-  }
-
-  MapLibreMapController? _controller;
-  String? styleAbsoluteFilePath;
-
-  double adjustedZoom(double zoom) {
+  static double adjustedZoom(BuildContext context, double zoom) {
     final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
     const double baseZoomAdjustment = 1.0;
     const double mediumZoomAdjustment = 0.3;
@@ -208,6 +107,11 @@ class DpipMapState extends State<DpipMap> {
       return zoom + baseZoomAdjustment;
     }
   }
+}
+
+class DpipMapState extends State<DpipMap> {
+  MapLibreMapController? _controller;
+  late Future<String> styleAbsoluteFilePath = MapStyle(context, baseMap: widget.baseMapType).save();
 
   Future<void> _updateUserLocation() async {
     if (!mounted) return;
@@ -286,69 +190,45 @@ class DpipMapState extends State<DpipMap> {
     super.initState();
 
     GlobalProviders.location.$coordinates.addListener(_updateUserLocation);
-
-    getApplicationDocumentsDirectory().then((dir) async {
-      final documentDir = dir.path;
-      final mapDir = '$documentDir/map';
-
-      await Directory(mapDir).create(recursive: true);
-
-      // Copy sprite.png
-      final spritePngData = await rootBundle.load('assets/sprites.png');
-      final spritePngFile = File('$mapDir/sprites.png');
-      await spritePngFile.writeAsBytes(spritePngData.buffer.asUint8List());
-      final spritePngFile2x = File('$mapDir/sprites@2x.png');
-      await spritePngFile2x.writeAsBytes(spritePngData.buffer.asUint8List());
-
-      // Copy sprite.json
-      final spriteJsonData = await rootBundle.load('assets/sprites.json');
-      final spriteJsonFile = File('$mapDir/sprites.json');
-      await spriteJsonFile.writeAsBytes(spriteJsonData.buffer.asUint8List());
-      final spriteJsonFile2x = File('$mapDir/sprites@2x.json');
-      await spriteJsonFile2x.writeAsBytes(spriteJsonData.buffer.asUint8List());
-
-      final spriteUri = '${spriteJsonFile.parent.uri}sprites';
-      TalkerManager.instance.info('Sprite is $spriteUri');
-
-      // Create style.json
-      final styleJsonData = _getStyleJson(spriteUri);
-      final styleJsonFile = File('$mapDir/style.json');
-      await styleJsonFile.writeAsString(styleJsonData);
-
-      setState(() => styleAbsoluteFilePath = styleJsonFile.uri.toFilePath());
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (styleAbsoluteFilePath == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    final double adjustedZoomValue = DpipMap.adjustedZoom(context, widget.initialCameraPosition.zoom);
 
-    final double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
+    return FutureBuilder(
+      future: styleAbsoluteFilePath,
+      builder: (context, snapshot) {
+        final styleString = snapshot.data;
 
-    return MapLibreMap(
-      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12.5),
-      trackCameraPosition: true,
-      initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
-      styleString: styleAbsoluteFilePath!,
-      tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
-      scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
-      rotateGesturesEnabled: widget.rotateGesturesEnabled ?? false,
-      zoomGesturesEnabled: widget.zoomGesturesEnabled ?? true,
-      doubleClickZoomEnabled: widget.doubleClickZoomEnabled ?? true,
-      dragEnabled: widget.dragEnabled ?? true,
-      attributionButtonMargins: const Point<double>(-100, -100),
-      onMapCreated: (controller) {
-        _controller = controller;
-        widget.onMapCreated?.call(controller);
-      },
-      onMapClick: widget.onMapClick,
-      onMapIdle: widget.onMapIdle,
-      onMapLongClick: widget.onMapLongClick,
-      onStyleLoadedCallback: () {
-        _initMap();
-        widget.onStyleLoadedCallback?.call();
+        if (styleString == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return MapLibreMap(
+          minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12.5),
+          trackCameraPosition: true,
+          initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
+          styleString: styleString,
+          tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
+          scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
+          rotateGesturesEnabled: widget.rotateGesturesEnabled ?? false,
+          zoomGesturesEnabled: widget.zoomGesturesEnabled ?? true,
+          doubleClickZoomEnabled: widget.doubleClickZoomEnabled ?? true,
+          dragEnabled: widget.dragEnabled ?? true,
+          attributionButtonMargins: const Point<double>(-100, -100),
+          onMapCreated: (controller) {
+            _controller = controller;
+            widget.onMapCreated?.call(controller);
+          },
+          onMapClick: widget.onMapClick,
+          onMapIdle: widget.onMapIdle,
+          onMapLongClick: widget.onMapLongClick,
+          onStyleLoadedCallback: () {
+            _initMap();
+            widget.onStyleLoadedCallback?.call();
+          },
+        );
       },
     );
   }
