@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-01 03:50\n"
+"PO-Revision-Date: 2025-08-10 02:39\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -948,27 +948,27 @@ msgstr "０级"
 
 #: ./lib/utils/extensions/int.dart:14
 msgid "１級"
-msgstr "弱震"
+msgstr "１级"
 
 #: ./lib/utils/extensions/int.dart:15
 msgid "２級"
-msgstr "弱震"
+msgstr "２级"
 
 #: ./lib/utils/extensions/int.dart:16
 msgid "３級"
-msgstr "有感地震"
+msgstr "３级"
 
 #: ./lib/utils/extensions/int.dart:17
 msgid "４級"
-msgstr "有感地震"
+msgstr "４级"
 
 #: ./lib/utils/extensions/int.dart:18
 msgid "５弱"
-msgstr "V度"
+msgstr "５弱"
 
 #: ./lib/utils/extensions/int.dart:19
 msgid "５強"
-msgstr "VI度"
+msgstr "５强"
 
 #: ./lib/utils/extensions/int.dart:20
 msgid "６弱"
@@ -976,7 +976,7 @@ msgstr "VII度"
 
 #: ./lib/utils/extensions/int.dart:21
 msgid "６強"
-msgstr ""
+msgstr "６强"
 
 #: ./lib/utils/extensions/int.dart:22
 msgid "７級"
