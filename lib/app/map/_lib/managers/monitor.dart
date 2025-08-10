@@ -1189,7 +1189,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                               Padding(
                                                 padding: const EdgeInsets.only(top: 12, bottom: 8),
                                                 child:
-                                                    (countdown >= 0)
+                                                    (countdown > 0)
                                                         ? RichText(
                                                           text: TextSpan(
                                                             children: [
