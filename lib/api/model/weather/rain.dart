@@ -1,7 +1,9 @@
-import 'package:dpip/utils/geojson.dart';
-import 'package:dpip/widgets/map/latlng_altitude.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/widgets/map/latlng_altitude.dart';
 
 part 'rain.g.dart';
 
@@ -21,7 +23,7 @@ class RainStation {
 
   GeoJsonFeatureBuilder toFeatureBuilder() =>
       GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        ..setGeometry(station.latlng.toGeoJsonCoordinates())
+        ..setGeometry(station.latlng.asGeoJsonCooridnate)
         ..setProperty('id', id)
         ..setProperty('name', station.name)
         ..setProperty('county', station.county)

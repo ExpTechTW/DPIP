@@ -328,7 +328,7 @@ class DpipMapState extends State<DpipMap> {
     final double adjustedZoomValue = adjustedZoom(widget.initialCameraPosition.zoom);
 
     return MapLibreMap(
-      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 15),
+      minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12.5),
       trackCameraPosition: true,
       initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
       styleString: styleAbsoluteFilePath!,
