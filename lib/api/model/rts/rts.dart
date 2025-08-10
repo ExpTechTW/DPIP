@@ -1,8 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import 'package:dpip/api/model/rts/rts_intensity.dart';
 import 'package:dpip/api/model/rts/rts_station.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 part 'rts.g.dart';
 
@@ -38,7 +40,7 @@ class Rts {
       }
 
       return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        ..setGeometry(latlng.toGeoJsonCoordinates())
+        ..setGeometry(latlng.asGeoJsonCooridnate)
         ..setProperty('id', id)
         ..setProperty('I', s.I)
         ..setProperty('i', s.i)

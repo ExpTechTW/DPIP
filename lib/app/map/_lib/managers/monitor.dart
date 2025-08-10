@@ -289,8 +289,19 @@ class MonitorMapLayerManager extends MapLayerManager {
           textHaloColor: colors.outlineVariant.toHexStringRGB(),
           textHaloWidth: 1,
           textFont: ['Noto Sans TC Regular'],
-          textOffset: [0, 1],
+          textRadialOffset: 1.5,
           textAnchor: 'top',
+          textJustify: 'auto',
+          textVariableAnchor: [
+            'top',
+            'bottom',
+            'left',
+            'right',
+            'top-left',
+            'bottom-left',
+            'top-right',
+            'bottom-right',
+          ],
           visibility: visible ? 'visible' : 'none',
         );
 

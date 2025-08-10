@@ -1,6 +1,8 @@
-import 'package:dpip/utils/geojson.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
 
 part 'station_intensity.g.dart';
 
@@ -25,8 +27,8 @@ class StationIntensity {
   Map<String, dynamic> toJson() => _$StationIntensityToJson(this);
 
   GeoJsonFeatureBuilder toGeoJsonFeature() {
-    return GeoJsonFeatureBuilder(
-      GeoJsonFeatureType.Point,
-    ).setGeometry(latlng.toGeoJsonCoordinates()).setProperty('icon', 'intensity-$intensity');
+    return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+      ..setGeometry(latlng.asGeoJsonCooridnate)
+      ..setProperty('icon', 'intensity-$intensity');
   }
 }

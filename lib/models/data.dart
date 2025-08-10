@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,7 @@ import 'package:dpip/api/model/weather/rain.dart';
 import 'package:dpip/api/model/weather/weather.dart';
 import 'package:dpip/core/eew.dart';
 import 'package:dpip/global.dart';
+import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/utils/map_utils.dart';
@@ -286,9 +288,18 @@ class DpipDataModel extends _DpipDataModel {
 
     for (final MapEntry(key: id, value: s) in station.entries) {
       if (s.work == false) continue;
+
+      final coordinates = s.info.last.latlng.asGeoJsonCooridnate;
+
+      // Create displaced coordinates with ~5 meter random offset
+      final random = Random();
+      final offsetLng = (random.nextDouble() - 0.5) * 0.00009; // ~5m longitude offset
+      final offsetLat = (random.nextDouble() - 0.5) * 0.00009; // ~5m latitude offset
+      final displacedCoordinates = [coordinates[0] + offsetLng, coordinates[1] + offsetLat];
+
       final feature =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates() as List<dynamic>)
+            ..setGeometry(displacedCoordinates)
             ..setId(int.parse(id))
             ..setProperty('id', id)
             ..setProperty('net', s.net)
@@ -338,7 +349,7 @@ class DpipDataModel extends _DpipDataModel {
 
       final epicenter =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-            ..setGeometry(e.info.latlng.toGeoJsonCoordinates() as List<dynamic>)
+            ..setGeometry(e.info.latlng.asGeoJsonCooridnate)
             ..setProperty('type', 'x');
 
       builder.addFeature(epicenter);
@@ -355,7 +366,7 @@ class DpipDataModel extends _DpipDataModel {
       if (s.work == false) continue;
       final feature =
           GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-            ..setGeometry(s.info.last.latlng.toGeoJsonCoordinates() as List<dynamic>)
+            ..setGeometry(s.info.last.latlng.asGeoJsonCooridnate)
             ..setId(int.parse(id))
             ..setProperty('net', s.net)
             ..setProperty('code', s.info.last.code);
