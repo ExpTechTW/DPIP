@@ -39,13 +39,10 @@ fi
 PO_DIR="./assets/translations"
 POT_FILE="$PO_DIR/strings.pot"
 
-# 檢查 .pot 檔案是否存在
-if [ ! -f "$POT_FILE" ]; then
-  # 執行 i18n 擴充功能匯入器
-  echo -e "${BLUE}$ dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot${RESET}"
-  dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot
-  echo
-fi
+# 執行 i18n 擴充功能匯入器
+echo -e "${BLUE}$ dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot${RESET}"
+dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot
+echo
 
 # 更新每個 .po 檔案
 for po_file in "$PO_DIR"/*.po; do
