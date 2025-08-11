@@ -15,9 +15,9 @@ const kSymbolIconSize = [
   ['linear'],
   [Expressions.zoom],
   5,
-  0.1,
+  0.2,
   15,
-  1,
+  0.6,
 ];
 
 const kCircleIconSize = [

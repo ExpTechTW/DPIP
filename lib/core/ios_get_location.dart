@@ -11,12 +11,12 @@ import 'package:dpip/utils/map_utils.dart';
 const _channel = MethodChannel('com.exptech.dpip/data');
 Completer<void>? _completer;
 
-Future<void> getSavedLocation() async {
-  if (_completer != null && !_completer!.isCompleted) {
-    return _completer!.future;
-  }
+Future<void> updateSavedLocationIOS() async {
+  final completer = _completer;
 
-  _completer = Completer<void>();
+  if (completer != null && !completer.isCompleted) return completer.future;
+
+  _completer = Completer();
 
   try {
     final result = await _channel.invokeMethod<Map<dynamic, dynamic>>('getSavedLocation');
@@ -38,6 +38,5 @@ Future<void> getSavedLocation() async {
     TalkerManager.instance.error('Error in getSavedLocation', e, s);
   } finally {
     _completer?.complete();
-    _completer = null;
   }
 }

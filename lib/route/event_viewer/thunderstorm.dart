@@ -12,6 +12,7 @@ import 'package:timezone/timezone.dart';
 
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/history/history.dart';
+import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_widgets/map_legend.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
@@ -52,10 +53,6 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     super.dispose();
   }
 
-  String getTileUrl(String timestamp) {
-    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
-  }
-
   void _initMap(MapLibreMapController controller) {
     _mapController = controller;
   }
@@ -63,7 +60,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   Future<void> _loadMap() async {
     radarList = await ExpTech().getRadarList();
 
-    final String newTileUrl = getTileUrl(radarList.last);
+    final String newTileUrl = Routes.radarTile(radarList.last);
 
     await _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
@@ -98,7 +95,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     );
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
-      await getSavedLocation();
+      await updateSavedLocationIOS();
     }
 
     await _mapController.addSource(

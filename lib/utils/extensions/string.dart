@@ -15,7 +15,7 @@ extension StringExtension on String {
 
   String toLocaleFullDateString(BuildContext context) => asInt.asTZDateTime.toLocaleFullDateString(context);
   String toLocaleTimeString(BuildContext context) => asInt.asTZDateTime.toLocaleTimeString(context);
-  String toSimpleDateTimeString(BuildContext context) => asInt.asTZDateTime.toSimpleDateTimeString();
+  String toSimpleDateTimeString() => asInt.asTZDateTime.toSimpleDateTimeString();
 
   Text get asText => Text(this);
   TextSpan get asTextSpan => TextSpan(text: this);

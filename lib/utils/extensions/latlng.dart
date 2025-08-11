@@ -8,8 +8,16 @@ extension GeoJsonLatLng on LatLng {
 
   List<double> get asGeoJsonCooridnate => [longitude, latitude];
 
-  GeoJsonFeatureBuilder toFeatureBuilder() {
+  GeoJsonFeatureBuilder toGeoJsonFeatureBuilder() {
     return GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)..setGeometry(asGeoJsonCooridnate);
+  }
+
+  GeoJsonBuilder toGeoJsonBuilder() {
+    return GeoJsonBuilder()..addFeature(toGeoJsonFeatureBuilder());
+  }
+
+  Map<String, dynamic> toGeoJsonMap() {
+    return toGeoJsonBuilder().build();
   }
 
   /// Calculates the distance between the supplied coordinates in meters. The distance between the coordinates is

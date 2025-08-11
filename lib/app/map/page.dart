@@ -248,6 +248,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   void onMapCreated(MapLibreMapController controller) {
     setState(() => _controller = controller);
+  }
+
+  void onStyleLoaded() {
+    final controller = _controller;
+
+    for (final manager in _managers.values) {
+      manager.dispose();
+    }
 
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller, initialReportId: widget.options?.reportId);
@@ -277,7 +285,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          DpipMap(baseMapType: _baseMapType, onMapCreated: onMapCreated),
+          DpipMap(baseMapType: _baseMapType, onMapCreated: onMapCreated, onStyleLoadedCallback: onStyleLoaded),
           PositionedLayerButton(
             activeLayers: _activeLayers,
             currentBaseMap: _baseMapType,

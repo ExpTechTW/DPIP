@@ -161,7 +161,7 @@ class _HorizontalLayout {
     );
   }
 
-  Widget call({Key? key, required List<Widget> children, EdgeInsets? padding}) {
+  Widget call({Key? key, Iterable<Widget> children = const [], EdgeInsets? padding}) {
     final widget = Row(
       key: key,
       mainAxisAlignment: mainAxisAlignment,
@@ -171,7 +171,7 @@ class _HorizontalLayout {
       verticalDirection: verticalDirection,
       textBaseline: textBaseline,
       spacing: spacing,
-      children: children,
+      children: children is List<Widget> ? children : children.toList(),
     );
 
     if (padding != null) {
@@ -183,6 +183,9 @@ class _HorizontalLayout {
 
   _HorizontalLayout get left => copyWith(mainAxisAlignment: MainAxisAlignment.start);
   _HorizontalLayout get right => copyWith(mainAxisAlignment: MainAxisAlignment.end);
+  _HorizontalLayout get between => copyWith(mainAxisAlignment: MainAxisAlignment.spaceBetween);
+  _HorizontalLayout get around => copyWith(mainAxisAlignment: MainAxisAlignment.spaceAround);
+  _HorizontalLayout get evenly => copyWith(mainAxisAlignment: MainAxisAlignment.spaceEvenly);
   _HorizontalLayout get top => copyWith(crossAxisAlignment: CrossAxisAlignment.start);
   _HorizontalLayout get bottom => copyWith(crossAxisAlignment: CrossAxisAlignment.end);
   _HorizontalLayout get center => copyWith(crossAxisAlignment: CrossAxisAlignment.center);

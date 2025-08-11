@@ -98,7 +98,7 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
               builder: (context, child) {
                 final mediaQueryData = MediaQuery.of(context);
                 final scale = mediaQueryData.textScaler.clamp(minScaleFactor: 0.5, maxScaleFactor: 1.2);
-                return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: scale), child: child!);
+                return MediaQuery(data: mediaQueryData.copyWith(textScaler: scale), child: child!);
               },
               title: 'DPIP',
               theme: lightTheme,

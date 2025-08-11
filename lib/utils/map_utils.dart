@@ -48,8 +48,6 @@ enum Units {
   degrees,
 }
 
-const emptyGeoJson = {'type': 'FeatureCollection', 'features': []};
-
 /// Earth Radius used with the Harvesine formula and approximates using a spherical (non-ellipsoid) Earth.
 ///
 /// @memberof helpers

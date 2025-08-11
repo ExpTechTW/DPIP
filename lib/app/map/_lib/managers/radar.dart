@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -9,6 +8,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/_widgets/map_legend.dart';
@@ -153,10 +153,7 @@ class RadarMapLayerManager extends MapLayerManager {
     final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
     if (!isSourceExists) {
-      final properties = RasterSourceProperties(
-        tiles: ['https://api-1.exptech.dev/api/v1/tiles/radar/$time/{z}/{x}/{y}.png'],
-        tileSize: 256,
-      );
+      final properties = RasterSourceProperties(tiles: [Routes.radarTile(time)], tileSize: 256);
 
       await controller.addSource(sourceId, properties);
     }
@@ -474,7 +471,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                 selector: (context, model) => model.radar,
                 builder: (context, radar, child) {
                   final times = radar.map((time) {
-                    final t = time.toSimpleDateTimeString(context).split(' ');
+                    final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
                   final grouped = times.groupListsBy((time) => time.date).entries.toList();
@@ -510,7 +507,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                                       if (currentTime == null) return const SizedBox.shrink();
 
                                       try {
-                                        final timeFormatted = currentTime.toSimpleDateTimeString(context);
+                                        final timeFormatted = currentTime.toSimpleDateTimeString();
                                         final timeData = timeFormatted.split(' ');
                                         final date = timeData.length > 1 ? timeData[0] : '';
                                         final time = timeData.length > 1 ? timeData[1] : timeData[0];
