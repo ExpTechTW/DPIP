@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-07-23 03:45\n"
+"PO-Revision-Date: 2025-08-01 03:50\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -94,7 +94,7 @@ msgstr "受信カテゴリ"
 
 #: ./lib/app/settings/notify/page.dart:44
 msgid "所在地震度1以上"
-msgstr "現在地震度1以上で受信"
+msgstr "現在地震度 1 以上で受信"
 
 #: ./lib/app/settings/notify/page.dart:55
 msgid "海嘯消息、海嘯警報"
@@ -110,7 +110,7 @@ msgstr "現地のみ受信"
 
 #: ./lib/app/settings/notify/page.dart:37
 msgid "所在地震度4以上"
-msgstr "現在地震度4以上で受信"
+msgstr "現在地震度 4 以上で受信"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:31
 msgid "音效測試"
