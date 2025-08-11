@@ -146,7 +146,6 @@ class MonitorMapLayerManager extends MapLayerManager {
       final pWaveLayerId = MapLayerIds.eew('p');
       final sWaveLayerId = MapLayerIds.eew('s');
 
-      // 检查所有源和图层是否存在
       final isRtsSourceExists = sources.contains(rtsSourceId);
       final isRtsLayerExists = layers.contains(rtsLayerId);
       final isIntensitySourceExists = sources.contains(intensitySourceId);
@@ -161,7 +160,6 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       if (!context.mounted) return;
 
-      // 按顺序添加所有数据源
       if (!isRtsSourceExists) {
         final data = GlobalProviders.data.getRtsGeoJson();
         await controller.addSource(rtsSourceId, GeojsonSourceProperties(data: data));
@@ -194,8 +192,6 @@ class MonitorMapLayerManager extends MapLayerManager {
 
       if (!context.mounted) return;
 
-      // 按顺序从下到上添加图层
-      // 1. RTS 图层（最底层）
       if (!isRtsLayerExists) {
         final properties = CircleLayerProperties(
           circleColor: kRtsCircleColor,
@@ -318,7 +314,6 @@ class MonitorMapLayerManager extends MapLayerManager {
         TalkerManager.instance.info('Added Layer "$rtsLayerId-label"');
       }
 
-      // 2. Intensity0 图层
       if (!isIntensity0LayerExists) {
         final properties = CircleLayerProperties(
           circleColor: Colors.grey.toHexStringRGB(),
@@ -358,20 +353,11 @@ class MonitorMapLayerManager extends MapLayerManager {
         TalkerManager.instance.info('Added Layer "$intensity0LayerId"');
       }
 
-      // 3. Intensity 图层
       if (!isIntensityLayerExists) {
         const properties = SymbolLayerProperties(
           symbolSortKey: [Expressions.get, 'intensity'],
           symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.2,
-            10,
-            0.8,
-          ],
+          iconSize: kSymbolIconSize,
           iconImage: [
             Expressions.match,
             [Expressions.get, 'intensity'],
@@ -409,9 +395,8 @@ class MonitorMapLayerManager extends MapLayerManager {
         TalkerManager.instance.info('Added Layer "$intensityLayerId"');
       }
 
-      // 4. Box 图层
       if (!isBoxLayerExists) {
-        final properties = LineLayerProperties(
+        const properties = LineLayerProperties(
           lineWidth: 2,
           lineColor: [
             Expressions.match,
@@ -443,14 +428,13 @@ class MonitorMapLayerManager extends MapLayerManager {
         TalkerManager.instance.info('Added Layer "$boxLayerId"');
       }
 
-      // 5. EEW 图层（P波、S波、震央标记）
       if (!isEewLayerExists) {
-        // 5.1 P波圈
         final pWaveProperties = LineLayerProperties(
           lineColor: Colors.cyan.toHexStringRGB(),
           lineWidth: 2,
           visibility: visible ? 'visible' : 'none',
         );
+
         await controller.addLayer(
           eewSourceId,
           pWaveLayerId,
@@ -465,12 +449,12 @@ class MonitorMapLayerManager extends MapLayerManager {
         );
         TalkerManager.instance.info('Added Layer "$pWaveLayerId"');
 
-        // 5.2 S波圈
         final sWaveProperties = LineLayerProperties(
           lineColor: Colors.red.toHexStringRGB(),
           lineWidth: 2,
           visibility: visible ? 'visible' : 'none',
         );
+
         await controller.addLayer(
           eewSourceId,
           sWaveLayerId,
@@ -485,7 +469,6 @@ class MonitorMapLayerManager extends MapLayerManager {
         );
         TalkerManager.instance.info('Added Layer "$sWaveLayerId"');
 
-        // 5.3 震央标记（最顶层）
         final epicenterProperties = SymbolLayerProperties(
           iconImage: 'cross-7',
           iconSize: kSymbolIconSize,
@@ -494,6 +477,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           symbolZOrder: 'source',
           visibility: visible ? 'visible' : 'none',
         );
+
         await controller.addLayer(
           eewSourceId,
           epicenterLayerId,
