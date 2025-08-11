@@ -6,7 +6,6 @@ import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
-import 'package:dpip/core/service.dart';
 import 'package:dpip/dialog/welcome/announcement.dart';
 import 'package:dpip/dialog/welcome/changelog.dart';
 import 'package:dpip/global.dart';
@@ -168,7 +167,6 @@ class _DpipState extends State<Dpip> {
   void _initializeServices() {
     fcmInit();
     notifyInit();
-    initBackgroundService();
   }
 
   @override

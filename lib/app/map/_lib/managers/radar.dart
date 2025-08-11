@@ -701,7 +701,7 @@ class RadarMapLayerSheet extends StatelessWidget {
                   ColorLegendItem(color: const Color(0xff005bff), value: 10),
                   ColorLegendItem(color: const Color(0xff0000ff), value: 15, blendTail: false),
                   ColorLegendItem(color: const Color(0xff00ff00), value: 16, hidden: true),
-                  ColorLegendItem(color: const Color.fromARGB(255, 114, 128, 114), value: 20),
+                  ColorLegendItem(color: const Color(0xff00d300), value: 20),
                   ColorLegendItem(color: const Color(0xff00a000), value: 25),
                   ColorLegendItem(color: const Color(0xffccea00), value: 30),
                   ColorLegendItem(color: const Color(0xffffd300), value: 35),
