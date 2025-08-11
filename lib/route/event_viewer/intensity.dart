@@ -59,7 +59,7 @@ class _IntensityPageState extends State<IntensityPage> {
     radarList = await ExpTech().getRadarList();
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
-      await getSavedLocation();
+      await updateSavedLocationIOS();
     }
 
     await _mapController.addSource(

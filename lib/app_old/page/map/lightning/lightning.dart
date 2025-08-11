@@ -49,7 +49,7 @@ class _LightningMapState extends State<LightningMap> {
 
   Future<void> _loadMap() async {
     if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-      await getSavedLocation();
+      await updateSavedLocationIOS();
     }
 
     userLat = Global.preference.getDouble('user-lat') ?? 0.0;

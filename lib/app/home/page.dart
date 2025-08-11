@@ -39,6 +39,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+  Key? _mapKey;
 
   bool _isLoading = false;
   bool _isOutOfService = false;
@@ -70,11 +71,16 @@ class _HomePageState extends State<HomePage> {
       if (auto) {
         setState(() => _isOutOfService = true);
       }
+
       setState(() => _weather = _history = null);
       return;
     }
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _mapKey = Key('${DateTime.now().millisecondsSinceEpoch}');
+    });
+
     _refreshIndicatorKey.currentState?.show();
 
     try {
@@ -130,6 +136,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = 24 + 48 + context.padding.top;
+
     return Stack(
       children: [
         RefreshIndicator(
@@ -165,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                 Padding(padding: const EdgeInsets.all(16), child: ThunderstormCard(_thunderstorm!)),
 
               // 地圖
-              const Padding(padding: EdgeInsets.all(16), child: RadarMapCard()),
+              Padding(padding: const EdgeInsets.all(16), child: RadarMapCard(key: _mapKey)),
 
               // 歷史資訊
               Builder(

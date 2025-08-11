@@ -7,8 +7,10 @@ import 'package:crypto/crypto.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
+import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 class MapStyle {
@@ -28,12 +30,13 @@ class MapStyle {
       },
       'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf',
       'sprite': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/sprites',
-      'sources': {...osmSource(), ...googleSource(), ...exptechSource()},
+      'sources': {...osmSource(), ...googleSource(), ...exptechSource(), ...locationSource()},
       'layers': [
         background(context.colors),
         ...osmLayers(context.colors, visible: baseMap == BaseMapType.osm),
         ...googleLayers(visible: baseMap == BaseMapType.google),
         ...exptechLayers(context.colors, visible: baseMap == BaseMapType.exptech),
+        locationLayer(),
       ],
     };
   }
@@ -1120,4 +1123,20 @@ class MapStyle {
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
   ];
+
+  static Map<String, dynamic> locationSource() => {
+    'user-location': {'type': 'geojson', 'data': GeoJsonBuilder.empty},
+  };
+
+  static Map<String, dynamic> locationLayer() => {
+    'id': 'user-location',
+    'type': 'symbol',
+    'source': 'user-location',
+    'layout': {
+      'icon-image': 'gps',
+      'icon-size': kSymbolIconSize,
+      'icon-allow-overlap': true,
+      'icon-ignore-placement': true,
+    },
+  };
 }

@@ -294,7 +294,7 @@ class TemperatureMapLayerSheet extends StatelessWidget {
                 selector: (context, model) => model.temperature,
                 builder: (context, temperature, header) {
                   final times = temperature.map((time) {
-                    final t = time.toSimpleDateTimeString(context).split(' ');
+                    final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
                   final grouped = times.groupListsBy((time) => time.date).entries.toList();

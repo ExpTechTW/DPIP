@@ -34,7 +34,7 @@ class ExpTech {
   ExpTech({this.apikey});
 
   Future<EarthquakeReport> getReport(String reportId) async {
-    final requestUrl = Route.report(reportId);
+    final requestUrl = Routes.report(reportId);
 
     final res = await get(requestUrl);
 
@@ -57,7 +57,7 @@ class ExpTech {
     int? minDepth = 0,
     int? maxDepth = 700,
   }) async {
-    final requestUrl = Route.reportList(
+    final requestUrl = Routes.reportList(
       limit: limit,
       page: page,
       minIntensity: minIntensity,
@@ -80,7 +80,7 @@ class ExpTech {
   }
 
   Future<Rts> getRts([int? time]) async {
-    var requestUrl = Route.rts();
+    var requestUrl = Routes.rts();
 
     if (time != null) {
       requestUrl = Uri.parse(
@@ -104,7 +104,7 @@ class ExpTech {
   }
 
   Future<List<Eew>> getEew([int? time]) async {
-    var requestUrl = Route.eew();
+    var requestUrl = Routes.eew();
 
     if (time != null) {
       requestUrl = Uri.parse(
@@ -128,7 +128,7 @@ class ExpTech {
   }
 
   Future<int> getNtp() async {
-    final requestUrl = Route.ntp();
+    final requestUrl = Routes.ntp();
 
     final res = await get(requestUrl);
 
@@ -140,7 +140,7 @@ class ExpTech {
   }
 
   Future<Map<String, Station>> getStations() async {
-    final requestUrl = Route.station();
+    final requestUrl = Routes.station();
 
     final res = await get(requestUrl);
 
@@ -154,7 +154,7 @@ class ExpTech {
   }
 
   Future<Tsunami> getTsunami(String tsuId) async {
-    final requestUrl = Route.tsunami(tsuId);
+    final requestUrl = Routes.tsunami(tsuId);
 
     final res = await get(requestUrl);
 
@@ -168,7 +168,7 @@ class ExpTech {
   }
 
   Future<List<String>> getTsunamiList() async {
-    final requestUrl = Route.tsunamiList();
+    final requestUrl = Routes.tsunamiList();
 
     final res = await get(requestUrl);
 
@@ -182,7 +182,7 @@ class ExpTech {
   }
 
   Future<List<CrowdinLocalizationProgress>> getLocalizationProgress() async {
-    final requestUrl = Route.locale();
+    final requestUrl = Routes.locale();
 
     final res = await get(requestUrl);
 
@@ -196,7 +196,7 @@ class ExpTech {
   }
 
   Future<List<String>> getRadarList() async {
-    final requestUrl = Route.radarList();
+    final requestUrl = Routes.radarList();
 
     final res = await get(requestUrl);
 
@@ -210,7 +210,7 @@ class ExpTech {
   }
 
   Future<List<String>> getWeatherList() async {
-    final requestUrl = Route.weatherList();
+    final requestUrl = Routes.weatherList();
 
     final res = await get(requestUrl);
 
@@ -224,7 +224,7 @@ class ExpTech {
   }
 
   Future<List<WeatherStation>> getWeather(String time) async {
-    final requestUrl = Route.weather(time);
+    final requestUrl = Routes.weather(time);
 
     final res = await get(requestUrl);
 
@@ -238,7 +238,7 @@ class ExpTech {
   }
 
   Future<RealtimeWeather> getWeatherRealtime(String region) async {
-    final requestUrl = Route.weatherRealtime(region);
+    final requestUrl = Routes.weatherRealtime(region);
 
     final res = await get(requestUrl);
 
@@ -252,7 +252,7 @@ class ExpTech {
   }
 
   Future<List<String>> getRainList() async {
-    final requestUrl = Route.rainList();
+    final requestUrl = Routes.rainList();
 
     final res = await get(requestUrl);
 
@@ -266,7 +266,7 @@ class ExpTech {
   }
 
   Future<List<RainStation>> getRain(String time) async {
-    final requestUrl = Route.rain(time);
+    final requestUrl = Routes.rain(time);
 
     final res = await get(requestUrl);
 
@@ -280,7 +280,7 @@ class ExpTech {
   }
 
   Future<List> getTyphoonImagesList() async {
-    final requestUrl = Route.typhoonImagesList();
+    final requestUrl = Routes.typhoonImagesList();
 
     final res = await get(requestUrl);
 
@@ -294,7 +294,7 @@ class ExpTech {
   }
 
   Future<List<String>> getLightningList() async {
-    final requestUrl = Route.lightningList();
+    final requestUrl = Routes.lightningList();
 
     final res = await get(requestUrl);
 
@@ -308,7 +308,7 @@ class ExpTech {
   }
 
   Future<Map<String, dynamic>> getTyphoonGeojson() async {
-    final requestUrl = Route.typhoonGeojson();
+    final requestUrl = Routes.typhoonGeojson();
 
     final res = await get(requestUrl);
 
@@ -322,7 +322,7 @@ class ExpTech {
   }
 
   Future<List<Lightning>> getLightning(String time) async {
-    final requestUrl = Route.lightning(time);
+    final requestUrl = Routes.lightning(time);
 
     final res = await get(requestUrl);
 
@@ -336,7 +336,7 @@ class ExpTech {
   }
 
   Future<List<History>> getRealtime() async {
-    final requestUrl = Route.realtime();
+    final requestUrl = Routes.realtime();
 
     final res = await get(requestUrl);
 
@@ -350,7 +350,7 @@ class ExpTech {
   }
 
   Future<List<History>> getHistory() async {
-    final requestUrl = Route.history();
+    final requestUrl = Routes.history();
 
     final res = await get(requestUrl);
 
@@ -364,7 +364,7 @@ class ExpTech {
   }
 
   Future<List<History>> getRealtimeRegion(String region) async {
-    final requestUrl = Route.realtimeRegion(region);
+    final requestUrl = Routes.realtimeRegion(region);
 
     final res = await get(requestUrl);
 
@@ -378,7 +378,7 @@ class ExpTech {
   }
 
   Future<List<History>> getHistoryRegion(String region) async {
-    final requestUrl = Route.historyRegion(region);
+    final requestUrl = Routes.historyRegion(region);
 
     final res = await get(requestUrl);
 
@@ -392,7 +392,7 @@ class ExpTech {
   }
 
   Future<Map<String, dynamic>> getSupport() async {
-    final requestUrl = Route.support();
+    final requestUrl = Routes.support();
 
     final res = await get(requestUrl);
 
@@ -418,7 +418,7 @@ class ExpTech {
   }
 
   Future<List<Announcement>> getAnnouncement() async {
-    final requestUrl = Route.announcement();
+    final requestUrl = Routes.announcement();
 
     final res = await get(requestUrl);
 
@@ -432,7 +432,7 @@ class ExpTech {
   }
 
   Future<List<NotificationRecord>> getNotificationHistory() async {
-    final requestUrl = Route.notificationHistory();
+    final requestUrl = Routes.notificationHistory();
 
     final res = await get(requestUrl);
 
@@ -446,7 +446,7 @@ class ExpTech {
   }
 
   Future<List<ServerStatus>> getStatus() async {
-    final requestUrl = Route.status();
+    final requestUrl = Routes.status();
 
     final res = await get(requestUrl);
 
@@ -460,7 +460,7 @@ class ExpTech {
   }
 
   Future<MeteorStation> getMeteorStation(String id) async {
-    final requestUrl = Route.meteorStation(id);
+    final requestUrl = Routes.meteorStation(id);
 
     final res = await get(requestUrl);
 
@@ -474,7 +474,7 @@ class ExpTech {
   }
 
   Future<List<History>> getEvent(String id) async {
-    final requestUrl = Route.event(id);
+    final requestUrl = Routes.event(id);
 
     final res = await get(requestUrl);
 
@@ -489,7 +489,7 @@ class ExpTech {
 
   /// 回傳所在地
   Future<String> updateDeviceLocation({required String token, required LatLng coordinates}) async {
-    final requestUrl = Route.location(token: token, lat: '${coordinates.latitude}', lng: '${coordinates.longitude}');
+    final requestUrl = Routes.location(token: token, lat: '${coordinates.latitude}', lng: '${coordinates.longitude}');
 
     final res = await get(requestUrl);
 
@@ -506,7 +506,7 @@ class ExpTech {
 
   /// 取得通知
   Future<NotifySettings> getNotify({required String token}) async {
-    final requestUrl = Route.notify(token: token);
+    final requestUrl = Routes.notify(token: token);
 
     final res = await get(requestUrl);
 
@@ -525,7 +525,7 @@ class ExpTech {
     required NotifyChannel channel,
     required Enum status,
   }) async {
-    final requestUrl = Route.notifyStatus(token: token, channel: channel, status: status);
+    final requestUrl = Routes.notifyStatus(token: token, channel: channel, status: status);
 
     final res = await get(requestUrl);
 
@@ -544,7 +544,7 @@ class ExpTech {
     required List<int?> status,
     required List<int?> status_dev,
   }) async {
-    final requestUrl = Route.networkInfo();
+    final requestUrl = Routes.networkInfo();
 
     String body = jsonEncode({'ip': ip, 'isp': isp, 'status': status, 'status_dev': status_dev});
 

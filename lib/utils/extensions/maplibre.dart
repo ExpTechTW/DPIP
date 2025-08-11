@@ -31,4 +31,32 @@ extension MapLibreMapControllerExtension on MapLibreMapController {
 
     await Future.wait(exptechLayers.map((v) => setLayerVisibility(v, visible)));
   }
+
+  /// Checks if the provided [id] exists in the map as a source or layer.
+  ///
+  /// By default, checks both sources and layers. Use [source] and [layer]
+  /// parameters to limit the search scope:
+  /// - If [source] is `true`, only sources will be checked
+  /// - If [layer] is `true`, only layers will be checked
+  /// - If both are `true`, both sources and layers will be checked
+  ///
+  /// Returns `true` if the [id] exists in any of the checked categories, otherwise, returns `false`.
+  Future<bool> exists(String id, {bool? source, bool? layer}) async {
+    final shouldCheckBoth = source == null && layer == null;
+
+    final checkSource = shouldCheckBoth || (source ?? false);
+    final checkLayer = shouldCheckBoth || (layer ?? false);
+
+    if (checkSource) {
+      final sourceIds = await getSourceIds();
+      if (sourceIds.contains(id)) return true;
+    }
+
+    if (checkLayer) {
+      final layerIds = await getLayerIds();
+      if (layerIds.contains(id)) return true;
+    }
+
+    return false;
+  }
 }

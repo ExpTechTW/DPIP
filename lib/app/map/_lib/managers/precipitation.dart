@@ -337,7 +337,7 @@ class PrecipitationMapLayerSheet extends StatelessWidget {
                 selector: (context, model) => model.precipitation,
                 builder: (context, precipitation, header) {
                   final times = precipitation.map((time) {
-                    final t = time.toSimpleDateTimeString(context).split(' ');
+                    final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
                   final grouped = times.groupListsBy((time) => time.date).entries.toList();

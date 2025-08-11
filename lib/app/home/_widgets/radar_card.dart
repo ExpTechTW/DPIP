@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/route.dart';
 import 'package:dpip/app/map/_lib/utils.dart';
 import 'package:dpip/app/map/page.dart';
 import 'package:dpip/core/i18n.dart';
-import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/extensions/maplibre.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/layout.dart';
 import 'package:dpip/widgets/map/map.dart';
 
 typedef PositionUpdateCallback = void Function();
@@ -25,41 +26,46 @@ class RadarMapCard extends StatefulWidget {
 }
 
 class _RadarMapCardState extends State<RadarMapCard> {
+  late final _key = widget.key ?? UniqueKey();
+
   late MapLibreMapController mapController;
-  List<String> radarList = [];
+  late Future<List<String>> radarListFuture;
 
-  String _getTileUrl(String timestamp) {
-    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
-  }
+  Future<void> _setupMapLayers() async {
+    final controller = mapController;
 
-  Future<void> _initializeMap() async {
+    final sourceId = MapSourceIds.radar();
+    final layerId = MapLayerIds.radar();
+
     try {
-      radarList = await ExpTech().getRadarList();
+      final time = (await radarListFuture).last;
+      final newTileUrl = Routes.radarTile(time);
+
+      if (await controller.exists(sourceId, source: true)) {
+        await controller.removeSource(sourceId);
+      }
+
+      await controller.addSource(sourceId, RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
+
       if (!mounted) return;
 
-      await _setupRadarLayer();
-      if (!mounted) return;
-    } catch (e) {
-      TalkerManager.instance.error('RadarMapCard._initializeMap', e);
+      if (!await controller.exists(layerId, layer: true)) {
+        await controller.addLayer(
+          sourceId,
+          layerId,
+          const RasterLayerProperties(),
+          belowLayerId: BaseMapLayerIds.exptechCountyOutline,
+        );
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('RadarMapCard._setupMapLayers', e, s);
     }
   }
 
-  Future<void> _setupRadarLayer() async {
-    try {
-      final newTileUrl = _getTileUrl(radarList.last);
-
-      await mapController.addSource('radar-source', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
-      if (!mounted) return;
-
-      await mapController.addLayer(
-        'radar-source',
-        'radar',
-        const RasterLayerProperties(),
-        belowLayerId: BaseMapLayerIds.exptechCountyOutline,
-      );
-    } catch (e) {
-      TalkerManager.instance.error('RadarMapCard._setupRadarLayer', e);
-    }
+  @override
+  void initState() {
+    super.initState();
+    radarListFuture = ExpTech().getRadarList();
   }
 
   @override
@@ -75,42 +81,59 @@ class _RadarMapCardState extends State<RadarMapCard> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+              child: Layout.col.min(
                 children: [
                   SizedBox(
                     height: 200,
-                    child: Selector<SettingsUserInterfaceModel, ({ThemeMode? themeMode, Color? themeColor})>(
-                      selector: (context, ui) => (themeMode: ui.themeMode, themeColor: ui.themeColor),
-                      builder: (context, data, _) {
-                        final (:themeMode, :themeColor) = data;
-
-                        return DpipMap(
-                          key: Key('$themeMode-$themeColor'),
-                          onMapCreated: (controller) => mapController = controller,
-                          onStyleLoadedCallback: () => _initializeMap(),
-                          dragEnabled: false,
-                          rotateGesturesEnabled: false,
-                          zoomGesturesEnabled: false,
-                        );
-                      },
+                    child: DpipMap(
+                      key: _key,
+                      onMapCreated: (controller) => mapController = controller,
+                      onStyleLoadedCallback: () => _setupMapLayers(),
+                      dragEnabled: false,
+                      rotateGesturesEnabled: false,
+                      zoomGesturesEnabled: false,
+                      focusUserLocationWhenUpdated: true,
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Layout.row.between(
                       children: [
-                        Row(
-                          spacing: 8,
+                        Layout.row[8](
                           children: [
                             const Icon(Symbols.radar, size: 24),
                             Text('雷達回波'.i18n, style: context.textTheme.titleMedium),
-                            if (radarList.isNotEmpty)
-                              Text(
-                                radarList.last.toLocaleTimeString(context),
-                                style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
-                              ),
+                            FutureBuilder(
+                              future: radarListFuture,
+                              builder: (context, snapshot) {
+                                final data = snapshot.data;
+
+                                if (data == null) return const SizedBox.shrink();
+
+                                final style = context.textTheme.labelSmall?.copyWith(
+                                  color: context.colors.onSurfaceVariant,
+                                );
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: context.colors.surfaceContainer,
+                                    border: Border.all(color: context.colors.outlineVariant),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Layout.row[4](
+                                    children: [
+                                      Icon(
+                                        Symbols.schedule_rounded,
+                                        size: (style?.fontSize ?? 12) * 1.25,
+                                        color: context.colors.onSurfaceVariant,
+                                      ),
+                                      Text(data.last.toSimpleDateTimeString(), style: style),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ],
                         ),
                         const Icon(Symbols.chevron_right_rounded, size: 24),
@@ -124,7 +147,7 @@ class _RadarMapCardState extends State<RadarMapCard> {
         ),
         Positioned.fill(
           child: Material(
-            color: Colors.transparent,
+            type: MaterialType.transparency,
             child: InkWell(
               onTap: () => context.push(MapPage.route(options: MapPageOptions(initialLayers: {MapLayer.radar}))),
               borderRadius: BorderRadius.circular(16),
@@ -133,11 +156,5 @@ class _RadarMapCardState extends State<RadarMapCard> {
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    mapController.dispose();
-    super.dispose();
   }
 }

@@ -864,7 +864,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                     ),
                                   ),
                                   Text(
-                                    '#${data.serial} ${data.info.time.toSimpleDateTimeString(context)} ${data.info.location}',
+                                    '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
                                     style: context.textTheme.bodyMedium!.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: context.colors.onErrorContainer,
@@ -942,7 +942,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
                                       .i18n
                                       .args({
-                                        'time': data.info.time.toSimpleDateTimeString(context),
+                                        'time': data.info.time.toSimpleDateTimeString(),
                                         'location': data.info.location,
                                         'magnitude': data.info.magnitude.toStringAsFixed(1),
                                         'depth': data.info.depth.toStringAsFixed(1),
@@ -1023,7 +1023,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                     ),
                                   ),
                                   Text(
-                                    '#${data.serial} ${data.info.time.toSimpleDateTimeString(context)} ${data.info.location}',
+                                    '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
                                     style: context.textTheme.bodyMedium!.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: context.colors.onErrorContainer,
@@ -1116,7 +1116,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                   '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
                                       .i18n
                                       .args({
-                                        'time': data.info.time.toSimpleDateTimeString(context),
+                                        'time': data.info.time.toSimpleDateTimeString(),
                                         'location': data.info.location,
                                         'magnitude': data.info.magnitude.toStringAsFixed(1),
                                         'intensity': localIntensity.asIntensityLabel,

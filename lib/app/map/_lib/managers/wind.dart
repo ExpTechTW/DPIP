@@ -247,7 +247,7 @@ class WindMapLayerSheet extends StatelessWidget {
                 selector: (context, model) => model.wind,
                 builder: (context, wind, child) {
                   final times = wind.map((time) {
-                    final t = time.toSimpleDateTimeString(context).split(' ');
+                    final t = time.toSimpleDateTimeString().split(' ');
                     return (date: t[0], time: t[1], value: time);
                   });
                   final grouped = times.groupListsBy((time) => time.date).entries.toList();

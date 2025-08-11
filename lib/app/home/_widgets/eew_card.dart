@@ -126,7 +126,7 @@ class _EewCardState extends State<EewCard> {
                             ? '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
                                 .i18n
                                 .args({
-                                  'time': widget.data.info.time.toSimpleDateTimeString(context),
+                                  'time': widget.data.info.time.toSimpleDateTimeString(),
                                   'location': widget.data.info.location,
                                   'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
                                   'intensity': localIntensity!.asIntensityLabel,
@@ -134,7 +134,7 @@ class _EewCardState extends State<EewCard> {
                             : '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
                                 .i18n
                                 .args({
-                                  'time': widget.data.info.time.toSimpleDateTimeString(context),
+                                  'time': widget.data.info.time.toSimpleDateTimeString(),
                                   'location': widget.data.info.location,
                                   'magnitude': widget.data.info.magnitude.toStringAsFixed(1),
                                   'depth': widget.data.info.depth.toStringAsFixed(1),

@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/notify.dart';
 
-class Route {
+class Routes {
+  Routes._();
+
   static String get api => baseApi();
 
   static String get onlyapi => baseApi(i: 1);
@@ -172,4 +174,8 @@ class Route {
   }
 
   static Uri networkInfo() => Uri.parse('$lb/v1/dpip/networkInfo');
+
+  static String radarTile(String timestamp) {
+    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
+  }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/route.dart';
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -47,10 +48,6 @@ class _RadarMapState extends State<RadarMap> {
   double userLon = 0;
   bool isUserLocationValid = false;
   bool _showLegend = false;
-
-  String getTileUrl(String timestamp) {
-    return 'https://api-1.exptech.dev/api/v1/tiles/radar/$timestamp/{z}/{x}/{y}.png';
-  }
 
   @override
   void initState() {
@@ -105,7 +102,7 @@ class _RadarMapState extends State<RadarMap> {
     radar_list = await ExpTech().getRadarList();
     if (!mounted) return;
 
-    final String newTileUrl = getTileUrl(radar_list.last);
+    final String newTileUrl = Routes.radarTile(radar_list.last);
 
     _mapController.addSource('radarSource', RasterSourceProperties(tiles: [newTileUrl], tileSize: 256));
 
@@ -130,7 +127,7 @@ class _RadarMapState extends State<RadarMap> {
     _mapController.addLayer('radarSource', 'radarLayer', const RasterLayerProperties(), belowLayerId: 'county-outline');
 
     if (Platform.isIOS && GlobalProviders.location.auto) {
-      await getSavedLocation();
+      await updateSavedLocationIOS();
     }
 
     await _mapController.addSource(
@@ -231,7 +228,7 @@ class _RadarMapState extends State<RadarMap> {
                 setState(() {});
               },
               onTimeSelected: (time) {
-                final String newTileUrl = getTileUrl(time);
+                final String newTileUrl = Routes.radarTile(time);
 
                 _mapController.removeLayer('radarLayer');
                 _mapController.removeSource('radarSource');

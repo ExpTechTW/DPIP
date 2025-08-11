@@ -40,7 +40,7 @@ class _TyphoonMapState extends State<TyphoonMap> {
       typhoonData = await ExpTech().getTyphoonGeojson();
 
       if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-        await getSavedLocation();
+        await updateSavedLocationIOS();
       }
       userLat = Global.preference.getDouble('user-lat') ?? 0.0;
       userLon = Global.preference.getDouble('user-lon') ?? 0.0;

@@ -7,7 +7,6 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
-import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
@@ -65,10 +64,11 @@ class DpipMap extends StatefulWidget {
   /// Whether to set camera focus to user location when the user longitude or latitude is updated.
   ///
   /// Default is `false`.
-  final bool focusUserLocationOnValueUpdate;
+  final bool focusUserLocationWhenUpdated;
 
   static const kTaiwanCenter = LatLng(23.60, 120.85);
   static const kTaiwanZoom = 6.4;
+  static const kUserLocationZoom = 7.2;
 
   const DpipMap({
     super.key,
@@ -86,7 +86,7 @@ class DpipMap extends StatefulWidget {
     this.dragEnabled,
     this.scrollGesturesEnabled,
     this.tiltGesturesEnabled,
-    this.focusUserLocationOnValueUpdate = false,
+    this.focusUserLocationWhenUpdated = false,
   });
 
   @override
@@ -111,71 +111,36 @@ class DpipMap extends StatefulWidget {
 
 class DpipMapState extends State<DpipMap> {
   MapLibreMapController? _controller;
-  late Future<String> styleAbsoluteFilePath = MapStyle(context, baseMap: widget.baseMapType).save();
+  late Future<String> _stylePathFuture;
+
+  void _updateStylePath() {
+    setState(() {
+      _stylePathFuture = MapStyle(context, baseMap: widget.baseMapType).save();
+    });
+  }
 
   Future<void> _updateUserLocation() async {
     if (!mounted) return;
 
-    try {
-      final controller = _controller;
-      if (controller == null) return;
+    final controller = _controller;
+    if (controller == null) return;
 
+    try {
       if (Platform.isIOS && GlobalProviders.location.auto) {
-        await getSavedLocation();
+        await updateSavedLocationIOS();
       }
 
       final location = GlobalProviders.location.coordinates;
 
-      const sourceId = BaseMapSourceIds.userLocation;
-      const layerId = BaseMapLayerIds.userLocation;
+      final data = location?.toGeoJsonMap() ?? GeoJsonBuilder.empty;
 
-      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
-      final isLayerExists = (await controller.getLayerIds()).contains(layerId);
+      await controller.setGeoJsonSource(BaseMapSourceIds.userLocation, data);
 
-      if (location == null || !location.isValid) {
-        if (isLayerExists) {
-          await controller.removeLayer(layerId);
-          TalkerManager.instance.info('Removed Layer "$layerId"');
-        }
-
-        if (isSourceExists) {
-          await controller.removeSource(sourceId);
-          TalkerManager.instance.info('Removed Source "$sourceId"');
-        }
-
-        await controller.moveCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.2));
-        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
-        return;
+      if (widget.focusUserLocationWhenUpdated) {
+        await controller.moveCamera(CameraUpdate.newLatLngZoom(location!, DpipMap.kUserLocationZoom));
       }
-
-      if (!isSourceExists) {
-        await controller.addSource(
-          sourceId,
-          GeojsonSourceProperties(data: GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build()),
-        );
-      } else {
-        await controller.setGeoJsonSource(sourceId, GeoJsonBuilder().addFeature(location.toFeatureBuilder()).build());
-        TalkerManager.instance.info('Updated Source "$sourceId"');
-      }
-
-      if (!isLayerExists) {
-        await controller.addLayer(
-          sourceId,
-          layerId,
-          const SymbolLayerProperties(
-            symbolZOrder: 'source',
-            iconImage: 'gps',
-            iconSize: kSymbolIconSize,
-            iconAllowOverlap: true,
-            iconIgnorePlacement: true,
-          ),
-        );
-      }
-
-      await controller.moveCamera(CameraUpdate.newLatLngZoom(location, 7));
-      TalkerManager.instance.info('Moved Camera to $location');
     } catch (e, s) {
-      TalkerManager.instance.error('DpipMap._updateUserLocation', e, s);
+      TalkerManager.instance.error('🗺️ failed to update user location', e, s);
     }
   }
 
@@ -193,11 +158,18 @@ class DpipMapState extends State<DpipMap> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _updateStylePath();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final double adjustedZoomValue = DpipMap.adjustedZoom(context, widget.initialCameraPosition.zoom);
 
     return FutureBuilder(
-      future: styleAbsoluteFilePath,
+      future: _stylePathFuture,
       builder: (context, snapshot) {
         final styleString = snapshot.data;
 
