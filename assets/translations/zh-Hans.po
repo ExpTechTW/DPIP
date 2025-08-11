@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-10 07:03\n"
+"PO-Revision-Date: 2025-08-11 02:40\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -584,11 +584,11 @@ msgstr "尚未设定所在地"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:874
 msgid "第 {serial} 報"
-msgstr "第{serial}报"
+msgstr "第 {serial} 报"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:889
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "{time}左右，<bold>{location}</bold>附近发生有感地震，预计规模<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
+msgstr "{time} 左右，<bold>{location}</bold>附近发生有感地震，预计规模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:923
 msgid "所在地預估"
@@ -800,7 +800,7 @@ msgstr "目前没有生效中的地震预警"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:808
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
-msgstr "规模<bold>M{magnitude}</bold>，所在地预估<bold>{intensity}</bold>"
+msgstr "规模 <bold>M{magnitude}</bold>，所在地预估<bold>{intensity}</bold>"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:824
 msgid "{countdown}秒後抵達"
