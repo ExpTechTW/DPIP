@@ -159,8 +159,6 @@ class DpipMapState extends State<DpipMap> {
     final controller = _controller;
     if (controller == null) return;
 
-    TalkerManager.instance.debug('setThemeColors---------------------------------------------------------------------');
-
     final layers = [...MapStyle.osmLayers(colors), ...MapStyle.exptechLayers(colors)];
 
     for (final layer in layers) {
@@ -178,7 +176,6 @@ class DpipMapState extends State<DpipMap> {
       };
 
       await controller.setLayerProperties(layer['id'] as String, properties!);
-      TalkerManager.instance.debug('--> Updated ${layer['id']}');
     }
   }
 
