@@ -50,7 +50,7 @@ packages:
     source: hosted
     version: "2.7.0"
   async:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: async
       sha256: "758e6d74e971c3e5aceb4110bfd6698efc7f501675bcfe0c775459a8140750eb"
@@ -853,10 +853,11 @@ packages:
   maplibre_gl:
     dependency: "direct main"
     description:
-      name: maplibre_gl
-      sha256: "5c7b1008396b2a321bada7d986ed60f9423406fbc7bd16f7ce91b385dfa054cd"
-      url: "https://pub.dev"
-    source: hosted
+      path: maplibre_gl
+      ref: main
+      resolved-ref: "4876f98336cb811f4722652629d0271ffffcab5f"
+      url: "https://github.com/maplibre/flutter-maplibre-gl.git"
+    source: git
     version: "0.22.0"
   maplibre_gl_platform_interface:
     dependency: transitive

@@ -32,7 +32,7 @@ class MapStyle {
       'sprite': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/sprites',
       'sources': {...osmSource(), ...googleSource(), ...exptechSource(), ...locationSource()},
       'layers': [
-        background(context.colors),
+        background(),
         ...osmLayers(context.colors, visible: baseMap == BaseMapType.osm),
         ...googleLayers(visible: baseMap == BaseMapType.google),
         ...exptechLayers(context.colors, visible: baseMap == BaseMapType.exptech),
@@ -67,20 +67,14 @@ class MapStyle {
     'openmaptiles': {'type': 'vector', 'url': 'https://tiles.openfreemap.org/planet', 'volatile': true},
   };
 
-  static Map<String, dynamic> background(ColorScheme colors) => {
+  static Map<String, dynamic> background() => {
     'id': 'background',
     'type': 'background',
+    'paint': {'background-opacity': 0},
     'layout': {'visibility': 'visible'},
-    'paint': {'background-color': colors.surface.toHexStringRGB()},
   };
 
   static List<Map<String, dynamic>> osmLayers(ColorScheme colors, {bool visible = false}) => [
-    {
-      'id': 'osm-background',
-      'type': 'background',
-      'layout': {'visibility': visible ? 'visible' : 'none'},
-      'paint': {'background-color': colors.surfaceContainerHigh.toHexStringRGB()},
-    },
     {
       'id': 'osm-landcover-glacier',
       'type': 'fill',
@@ -464,7 +458,10 @@ class MapStyle {
           'tunnel',
         ],
       ],
-      'paint': {'fill-color': colors.brightness == Brightness.dark ? colors.surface.toHexStringRGB() : '#AECFE2'},
+      'paint': {
+        'fill-color': colors.brightness == Brightness.dark ? colors.surfaceContainer.toHexStringRGB() : '#AECFE2',
+        'fill-outline-color': colors.brightness == Brightness.dark ? colors.outline.toHexStringRGB() : '#AECFE2',
+      },
       'layout': {'visibility': visible ? 'visible' : 'none'},
     },
     {

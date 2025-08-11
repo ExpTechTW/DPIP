@@ -3,10 +3,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'package:async/async.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import 'package:dpip/core/ios_get_location.dart';
 import 'package:dpip/core/providers.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/geojson.dart';
 import 'package:dpip/utils/log.dart';
@@ -111,13 +113,7 @@ class DpipMap extends StatefulWidget {
 
 class DpipMapState extends State<DpipMap> {
   MapLibreMapController? _controller;
-  late Future<String> _stylePathFuture;
-
-  void _updateStylePath() {
-    setState(() {
-      _stylePathFuture = MapStyle(context, baseMap: widget.baseMapType).save();
-    });
-  }
+  Future<String>? _stylePathFuture;
 
   Future<void> _updateUserLocation() async {
     if (!mounted) return;
@@ -157,11 +153,47 @@ class DpipMapState extends State<DpipMap> {
     GlobalProviders.location.$coordinates.addListener(_updateUserLocation);
   }
 
+  ColorScheme? _lastColors;
+  CancelableOperation? _setThemeColorFuture;
+  Future<void> setThemeColors(ColorScheme colors) async {
+    final controller = _controller;
+    if (controller == null) return;
+
+    TalkerManager.instance.debug('setThemeColors---------------------------------------------------------------------');
+
+    final layers = [...MapStyle.osmLayers(colors), ...MapStyle.exptechLayers(colors)];
+
+    for (final layer in layers) {
+      if (layer['type'] == 'background') continue;
+
+      final json = layer['paint'] as Map<String, dynamic>;
+      json.remove('visibility');
+
+      final properties = switch (layer['type']) {
+        'fill' => FillLayerProperties.fromJson(json),
+        'line' => LineLayerProperties.fromJson(json),
+        'symbol' => SymbolLayerProperties.fromJson(json),
+        'raster' => RasterLayerProperties.fromJson(json),
+        _ => null,
+      };
+
+      await controller.setLayerProperties(layer['id'] as String, properties!);
+      TalkerManager.instance.debug('--> Updated ${layer['id']}');
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _updateStylePath();
+    if (_stylePathFuture == null) {
+      _stylePathFuture = MapStyle(context, baseMap: widget.baseMapType).save();
+    } else if (_lastColors != context.colors) {
+      _setThemeColorFuture?.cancel();
+      _setThemeColorFuture = CancelableOperation.fromFuture(setThemeColors(context.colors));
+    }
+
+    _lastColors = context.colors;
   }
 
   @override
@@ -177,29 +209,33 @@ class DpipMapState extends State<DpipMap> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return MapLibreMap(
-          minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12.5),
-          trackCameraPosition: true,
-          initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
-          styleString: styleString,
-          tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
-          scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
-          rotateGesturesEnabled: widget.rotateGesturesEnabled ?? false,
-          zoomGesturesEnabled: widget.zoomGesturesEnabled ?? true,
-          doubleClickZoomEnabled: widget.doubleClickZoomEnabled ?? true,
-          dragEnabled: widget.dragEnabled ?? true,
-          attributionButtonMargins: const Point<double>(-100, -100),
-          onMapCreated: (controller) {
-            _controller = controller;
-            widget.onMapCreated?.call(controller);
-          },
-          onMapClick: widget.onMapClick,
-          onMapIdle: widget.onMapIdle,
-          onMapLongClick: widget.onMapLongClick,
-          onStyleLoadedCallback: () {
-            _initMap();
-            widget.onStyleLoadedCallback?.call();
-          },
+        return ColoredBox(
+          color: context.colors.surface,
+          child: MapLibreMap(
+            minMaxZoomPreference: widget.minMaxZoomPreference ?? const MinMaxZoomPreference(4, 12.5),
+            trackCameraPosition: true,
+            initialCameraPosition: CameraPosition(target: widget.initialCameraPosition.target, zoom: adjustedZoomValue),
+            styleString: styleString,
+            tiltGesturesEnabled: widget.tiltGesturesEnabled ?? false,
+            scrollGesturesEnabled: widget.scrollGesturesEnabled ?? true,
+            rotateGesturesEnabled: widget.rotateGesturesEnabled ?? false,
+            zoomGesturesEnabled: widget.zoomGesturesEnabled ?? true,
+            doubleClickZoomEnabled: widget.doubleClickZoomEnabled ?? true,
+            dragEnabled: widget.dragEnabled ?? true,
+            attributionButtonMargins: const Point<double>(-100, -100),
+            onMapCreated: (controller) {
+              _controller = controller;
+              widget.onMapCreated?.call(controller);
+            },
+            onMapClick: widget.onMapClick,
+            onMapIdle: widget.onMapIdle,
+            onMapLongClick: widget.onMapLongClick,
+            onStyleLoadedCallback: () {
+              _initMap();
+              widget.onStyleLoadedCallback?.call();
+            },
+            translucentTextureSurface: true,
+          ),
         );
       },
     );
