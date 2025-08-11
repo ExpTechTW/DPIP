@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-11 07:55\n"
+"PO-Revision-Date: 2025-08-11 11:02\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -702,7 +702,7 @@ msgstr "{time}ごろ、<bold>{location}</bold>付近で地震。推定M<bold>{ma
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
-msgstr ""
+msgstr "{time}ごろ、<bold>{location}</bold>付近で地震。推定M<bold>{magnitude}</bold>、深さ<bold>{depth}</bold>キロメートル。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1134
 msgid "所在地預估"
@@ -918,7 +918,7 @@ msgstr "緊急地震速報は発表されていません"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:865
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
-msgstr ""
+msgstr "M<bold>{magnitude}</bold>、深さ<bold>{depth}</bold>キロメートル"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1027
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
