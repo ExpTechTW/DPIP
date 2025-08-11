@@ -193,7 +193,7 @@ class WeatherHeader extends StatelessWidget {
                 children: [
                   Icon(Symbols.pin_drop_rounded, size: 16, color: context.colors.onSurfaceVariant),
                   Text(
-                    weather.weather.station.name,
+                    '${weather.weather.station.name}站',
                     style: context.theme.textTheme.bodyLarge!.copyWith(color: context.colors.onSurfaceVariant),
                   ),
                 ],
