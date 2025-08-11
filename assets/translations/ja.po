@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-11 11:02\n"
+"PO-Revision-Date: 2025-08-11 12:54\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -377,7 +377,7 @@ msgstr "{store}に接続できませんでした。しばらく時間をおい�
 
 #: ./lib/app/settings/donate/page.dart:290
 msgid "正在恢復您購買的訂閱"
-msgstr "ご購入内容を復元しています"
+msgstr "購入内容を復元しています"
 
 #: ./lib/app/settings/donate/page.dart:292
 msgid "恢復購買"
@@ -405,7 +405,7 @@ msgstr "画面"
 
 #: ./lib/app/settings/page.dart:53
 msgid "調整 DPIP 整體的外觀與顏色"
-msgstr "DPIPのテーマを調整する"
+msgstr "外観とカラーをカスタマイズ"
 
 #: ./lib/app/settings/page.dart:61
 msgid "調整 DPIP 的顯示語言"
