@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-07-25 18:29\n"
+"PO-Revision-Date: 2025-08-11 02:40\n"
 
 #: ./lib/app/settings/location/page.dart:555
 msgid "所在地"
@@ -759,35 +759,35 @@ msgstr "Today"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:306
 msgid "10 分鐘"
-msgstr "10 mins"
+msgstr "10 min"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:307
 msgid "1 小時"
-msgstr "1hr"
+msgstr "1 hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:308
 msgid "3 小時"
-msgstr "3 hour"
+msgstr "3 hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:309
 msgid "6 小時"
-msgstr "6hr"
+msgstr "6 hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:310
 msgid "12 小時"
-msgstr "12 hours"
+msgstr "12 hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:311
 msgid "24 小時"
-msgstr "24hr"
+msgstr "24 hr"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:312
 msgid "2 天"
-msgstr "2d"
+msgstr "2 d"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:313
 msgid "3 天"
-msgstr "3 days"
+msgstr "3 d"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:714
 msgid "目前沒有生效中的地震速報"
@@ -851,7 +851,7 @@ msgstr "Earthquake Intensity Map Image"
 
 #: ./lib/app/map/_lib/managers/report.dart:779
 msgid "震度圖"
-msgstr "震度圖"
+msgstr "Intensity Map Image"
 
 #: ./lib/app/map/_lib/managers/report.dart:789
 msgid "最大地動加速度圖"
