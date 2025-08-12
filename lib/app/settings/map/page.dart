@@ -125,7 +125,6 @@ class SettingsMapPage extends StatelessWidget {
                             onChanged: (value) {
                               context.read<SettingsMapModel>().setUpdateInterval(value.floor());
                             },
-                            year2023: false,
                           ),
                         ),
                         SizedBox(width: 28, child: Text('$updateInterval', style: context.textTheme.labelSmall)),

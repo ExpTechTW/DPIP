@@ -666,7 +666,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                               margin: const EdgeInsets.only(right: 6),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: DepthColor.depth(report.depth),
+                                color: depth(report.depth),
                               ),
                             ),
                             Text(
