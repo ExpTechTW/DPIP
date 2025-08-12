@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-11 12:54\n"
+"PO-Revision-Date: 2025-08-12 03:18\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -838,7 +838,7 @@ msgstr "気象"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
-msgstr ""
+msgstr "単位：{unit}"
 
 #: ./lib/app/map/_lib/managers/radar.dart:609
 msgid "長按設定播放起點"
