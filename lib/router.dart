@@ -104,7 +104,7 @@ final router = GoRouter(
           SettingsNotifyIntensityPage.route => '震度速報'.i18n,
           SettingsNotifyThunderstormPage.route => '雷雨即時訊息'.i18n,
           SettingsNotifyAdvisoryPage.route => '天氣警特報'.i18n,
-          SettingsNotifyEvacuationPage.route => '避難資訊'.i18n,
+          SettingsNotifyEvacuationPage.route => '防災資訊'.i18n,
           SettingsNotifyTsunamiPage.route => '海嘯資訊'.i18n,
           SettingsNotifyAnnouncementPage.route => '公告'.i18n,
 

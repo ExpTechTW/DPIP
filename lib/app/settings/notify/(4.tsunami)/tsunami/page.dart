@@ -31,7 +31,7 @@ class SettingsNotifyTsunamiPage extends StatelessWidget {
           title: '音效測試'.i18n,
           children: [
             SoundListTile(title: '重大'.i18n, subtitle: Text('海嘯警報發布時'.i18n), type: 'tsunami-important-v2'),
-            SoundListTile(title: '一般'.i18n, subtitle: Text('海嘯警報發布時'.i18n), type: 'tsunami-general-v2'),
+            SoundListTile(title: '一般'.i18n, subtitle: Text('海嘯消息發布時'.i18n), type: 'tsunami-general-v2'),
             SoundListTile(title: '太平洋海嘯消息(無聲通知)'.i18n, subtitle: Text('太平洋海嘯消息發布時'.i18n), type: 'tsunami-silent-v2'),
           ],
         ),
