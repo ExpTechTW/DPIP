@@ -71,8 +71,10 @@ class LocationServiceManager {
   /// preferences and updates device location.
   ///
   /// Will starts the service if automatic location updates are enabled.
+  ///
+  /// This method is Android specific.
   static Future<void> initalize() async {
-    if (instance != null || !avaliable) return;
+    if (instance != null || !Platform.isAndroid) return;
 
     TalkerManager.instance.info('👷 initializing location service');
 
@@ -91,11 +93,7 @@ class LocationServiceManager {
           foregroundServiceNotificationId: kNotificationId,
         ),
         // iOS is handled in native code
-        iosConfiguration: IosConfiguration(
-          autoStart: false,
-          onForeground: LocationService._$onStartIOS,
-          onBackground: LocationService._$onStartIOS,
-        ),
+        iosConfiguration: IosConfiguration(autoStart: false),
       );
 
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
@@ -119,13 +117,13 @@ class LocationServiceManager {
     TalkerManager.instance.info('👷 starting location service');
 
     try {
-      final service = instance;
-      if (service == null) throw Exception('Not initialized.');
-
       if (Platform.isIOS) {
         await platform.invokeMethod('toggleLocation', {'isEnabled': true});
         return;
       }
+
+      final service = instance;
+      if (service == null) throw Exception('Not initialized.');
 
       if (await service.isRunning()) {
         TalkerManager.instance.warning('👷 location service is already running, skipping...');
@@ -145,13 +143,13 @@ class LocationServiceManager {
     TalkerManager.instance.info('👷 stopping location service');
 
     try {
-      final service = instance;
-      if (service == null) throw Exception('Not initialized.');
-
       if (Platform.isIOS) {
         await platform.invokeMethod('toggleLocation', {'isEnabled': false});
         return;
       }
+
+      final service = instance;
+      if (service == null) throw Exception('Not initialized.');
 
       service.invoke(LocationServiceEvent.stop);
     } catch (e, s) {
@@ -242,15 +240,6 @@ class LocationService {
 
     // Start the periodic location update task
     await _$task();
-  }
-
-  /// Entry point for ios background service.
-  ///
-  /// iOS background service is handled in native code.
-  @pragma('vm:entry-point')
-  static Future<bool> _$onStartIOS(ServiceInstance service) async {
-    DartPluginRegistrant.ensureInitialized();
-    return true;
   }
 
   /// The main tick function of the service.
