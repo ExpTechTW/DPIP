@@ -138,20 +138,12 @@ msgstr ""
 msgid "重大"
 msgstr ""
 
-#: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
-msgid ""
-"海嘯警報發布時\n"
-"沿海地區鄉鎮"
+#: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
+msgid "海嘯警報發布時"
 msgstr ""
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "一般"
-msgstr ""
-
-#: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
-msgid ""
-"海嘯警報發布時\n"
-"上述除外地區"
 msgstr ""
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
