@@ -61,8 +61,9 @@ msgid "天氣警特報"
 msgstr "天気警報"
 
 #: lib/app/settings/notify/page.dart:235
-msgid "避難資訊"
-msgstr "避難情報"
+#, fuzzy
+msgid "防災資訊"
+msgstr "防災情報プラットフォーム"
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯資訊"
@@ -120,7 +121,7 @@ msgstr "サウンドテスト"
 msgid "發送公告時"
 msgstr "通知受信時"
 
-#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:42
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:47
 msgid ""
 "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音"
 "效。此測試不會向伺服器發送任何請求"
@@ -152,29 +153,25 @@ msgstr "津波"
 msgid "其他"
 msgstr "その他"
 
-#: lib/app/settings/notify/(3.weather)/advisory/page.dart:34
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "重大"
 msgstr "重大"
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
-msgid ""
-"海嘯警報發布時\n"
-"沿海地區鄉鎮"
+#, fuzzy
+msgid "海嘯警報發布時"
 msgstr ""
 "津波警報が発令された時\n"
 "沿岸地域"
 
-#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
 msgstr "一般"
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
-msgid ""
-"海嘯警報發布時\n"
-"上述除外地區"
-msgstr ""
-"津波警報が発令された時\n"
-"沿岸地域を除いた地域"
+#, fuzzy
+msgid "海嘯消息發布時"
+msgstr "太平洋津波情報発信された時"
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
@@ -293,11 +290,13 @@ msgid "所在地(鄉鎮)預估震度 1 以上"
 msgstr "現在地（郷／鎮）測りにより震度 1 超え"
 
 #: lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
-msgid "所在地(鄉鎮)發布避難警訊時"
+#, fuzzy
+msgid "所在地(鄉鎮)發布防災警訊時"
 msgstr "現在地（郷／鎮）に避難注意報が発令された時"
 
 #: lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
-msgid "所在地(鄉鎮)發布避難資訊時"
+#, fuzzy
+msgid "所在地(鄉鎮)發布防災資訊時"
 msgstr "現在地（郷／鎮）に避難情報が発信された時"
 
 #: lib/app/settings/notify/(3.weather)/advisory/page.dart:35
@@ -313,9 +312,13 @@ msgid ""
 msgstr "現在地（郷／鎮）にその以外の天気注意報／特報が発令され"
 
 #: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
-msgid ""
-"所在地(鄉鎮)發布雷雨即時訊息或\n"
-"山區暴雨時"
+#, fuzzy
+msgid "所在地(鄉鎮)發布山區暴雨時"
+msgstr "現在地（郷／鎮）に雷雨／山地にわか雨リアルタイム情報が発信された時"
+
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
+#, fuzzy
+msgid "所在地(鄉鎮)發布雷雨即時訊息時"
 msgstr "現在地（郷／鎮）に雷雨／山地にわか雨リアルタイム情報が発信された時"
 
 #: lib/app/settings/unit/page.dart:28
@@ -1441,6 +1444,16 @@ msgstr "曇りのち雨、大雷あり"
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
 msgstr "曇りのち大雹、大雷あり"
+
+#~ msgid "避難資訊"
+#~ msgstr "避難情報"
+
+#~ msgid ""
+#~ "海嘯警報發布時\n"
+#~ "上述除外地區"
+#~ msgstr ""
+#~ "津波警報が発令された時\n"
+#~ "沿岸地域を除いた地域"
 
 #~ msgid "直轄市/縣市"
 #~ msgstr "直轄市/県市"
