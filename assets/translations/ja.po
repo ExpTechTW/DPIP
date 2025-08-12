@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-12 03:18\n"
+"PO-Revision-Date: 2025-08-12 07:12\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -610,7 +610,7 @@ msgstr "風向・風速"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "線條"
-msgstr "線"
+msgstr "シンプル"
 
 #: ./lib/app/settings/map/page.dart:57
 msgid "OpenStreetMap"
