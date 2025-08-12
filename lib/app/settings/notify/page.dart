@@ -233,7 +233,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                       selector: (_, model) => model.evacuation,
                       builder: (context, evacuation, child) {
                         return ListSectionTile(
-                          title: '避難資訊'.i18n,
+                          title: '防災資訊'.i18n,
                           subtitle: Text(getWeatherNotifyTypeName(evacuation)),
                           trailing: const Icon(Symbols.chevron_right_rounded),
                           icon: Symbols.directions_run_rounded,

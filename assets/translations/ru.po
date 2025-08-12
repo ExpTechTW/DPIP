@@ -61,7 +61,7 @@ msgid "天氣警特報"
 msgstr ""
 
 #: lib/app/settings/notify/page.dart:235
-msgid "避難資訊"
+msgid "防災資訊"
 msgstr ""
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:144
@@ -120,7 +120,7 @@ msgstr ""
 msgid "發送公告時"
 msgstr ""
 
-#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:42
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:47
 msgid ""
 "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音"
 "效。此測試不會向伺服器發送任何請求"
@@ -150,24 +150,20 @@ msgstr ""
 msgid "其他"
 msgstr ""
 
-#: lib/app/settings/notify/(3.weather)/advisory/page.dart:34
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "重大"
 msgstr ""
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
-msgid ""
-"海嘯警報發布時\n"
-"沿海地區鄉鎮"
+msgid "海嘯警報發布時"
 msgstr ""
 
-#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
 msgstr ""
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
-msgid ""
-"海嘯警報發布時\n"
-"上述除外地區"
+msgid "海嘯消息發布時"
 msgstr ""
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
@@ -281,11 +277,11 @@ msgid "所在地(鄉鎮)預估震度 1 以上"
 msgstr ""
 
 #: lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
-msgid "所在地(鄉鎮)發布避難警訊時"
+msgid "所在地(鄉鎮)發布防災警訊時"
 msgstr ""
 
 #: lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
-msgid "所在地(鄉鎮)發布避難資訊時"
+msgid "所在地(鄉鎮)發布防災資訊時"
 msgstr ""
 
 #: lib/app/settings/notify/(3.weather)/advisory/page.dart:35
@@ -301,9 +297,11 @@ msgid ""
 msgstr ""
 
 #: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
-msgid ""
-"所在地(鄉鎮)發布雷雨即時訊息或\n"
-"山區暴雨時"
+msgid "所在地(鄉鎮)發布山區暴雨時"
+msgstr ""
+
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
+msgid "所在地(鄉鎮)發布雷雨即時訊息時"
 msgstr ""
 
 #: lib/app/settings/unit/page.dart:28

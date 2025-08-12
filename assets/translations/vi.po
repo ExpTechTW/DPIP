@@ -61,8 +61,9 @@ msgid "天氣警特報"
 msgstr "Cảnh báo thời tiết"
 
 #: lib/app/settings/notify/page.dart:235
-msgid "避難資訊"
-msgstr "Thông tin di tản"
+#, fuzzy
+msgid "防災資訊"
+msgstr "Cổng thông tin phòng chống thiên tai"
 
 #: lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯資訊"
@@ -120,7 +121,7 @@ msgstr "Kiểm tra âm thanh"
 msgid "發送公告時"
 msgstr "Khi gửi thông báo"
 
-#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:42
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:47
 msgid ""
 "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音"
 "效。此測試不會向伺服器發送任何請求"
@@ -150,29 +151,25 @@ msgstr ""
 msgid "其他"
 msgstr "Khác"
 
-#: lib/app/settings/notify/(3.weather)/advisory/page.dart:34
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
 msgid "重大"
 msgstr ""
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
-msgid ""
-"海嘯警報發布時\n"
-"沿海地區鄉鎮"
+#, fuzzy
+msgid "海嘯警報發布時"
 msgstr ""
 "Khi phát hành cảnh báo sóng thần\n"
 "các xã, thị trấn ven biển"
 
-#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:34
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
 msgstr "Nói chung"
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
-msgid ""
-"海嘯警報發布時\n"
-"上述除外地區"
-msgstr ""
-"Khi cảnh báo sóng thần được ban hành.\n"
-"Các khu vực bị loại trừ khỏi các mục trên."
+#, fuzzy
+msgid "海嘯消息發布時"
+msgstr "Khi tin tức về sóng thần Thái Bình Dương được công bố"
 
 #: lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
@@ -291,11 +288,13 @@ msgid "所在地(鄉鎮)預估震度 1 以上"
 msgstr "Dự đoán cường độ tại địa phương (thị trấn) từ 1 trở lên"
 
 #: lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
-msgid "所在地(鄉鎮)發布避難警訊時"
+#, fuzzy
+msgid "所在地(鄉鎮)發布防災警訊時"
 msgstr "Khi khu vực địa phương (thị trấn) ban hành cảnh báo sơ tán"
 
 #: lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
-msgid "所在地(鄉鎮)發布避難資訊時"
+#, fuzzy
+msgid "所在地(鄉鎮)發布防災資訊時"
 msgstr "Khi khu vực địa phương (thị trấn) thông báo thông tin sơ tán"
 
 #: lib/app/settings/notify/(3.weather)/advisory/page.dart:35
@@ -315,10 +314,14 @@ msgstr ""
 "tín hiệu"
 
 #: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
-msgid ""
-"所在地(鄉鎮)發布雷雨即時訊息或\n"
-"山區暴雨時"
-msgstr ""
+#, fuzzy
+msgid "所在地(鄉鎮)發布山區暴雨時"
+msgstr "Khi khu vực địa phương (thị trấn) ban hành cảnh báo sơ tán"
+
+#: lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
+#, fuzzy
+msgid "所在地(鄉鎮)發布雷雨即時訊息時"
+msgstr "Khi khu vực địa phương (thị trấn) thông báo thông tin sơ tán"
 
 #: lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
@@ -1427,6 +1430,16 @@ msgstr ""
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
 msgstr ""
+
+#~ msgid "避難資訊"
+#~ msgstr "Thông tin di tản"
+
+#~ msgid ""
+#~ "海嘯警報發布時\n"
+#~ "上述除外地區"
+#~ msgstr ""
+#~ "Khi cảnh báo sóng thần được ban hành.\n"
+#~ "Các khu vực bị loại trừ khỏi các mục trên."
 
 #~ msgid "直轄市/縣市"
 #~ msgstr "Thành phố trực thuộc trung ương/Tỉnh thành"
