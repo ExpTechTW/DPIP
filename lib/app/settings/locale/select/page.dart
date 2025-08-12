@@ -78,15 +78,17 @@ class _SettingsLocaleSelectPageState extends State<SettingsLocaleSelectPage> {
                                               LinearProgressIndicator(
                                                 value: p.translation / 100,
                                                 color: Colors.blue,
+                                                year2023: false,
                                               ),
                                               LinearProgressIndicator(
                                                 value: p.approval / 100,
                                                 color: Colors.lightGreen,
                                                 backgroundColor: Colors.transparent,
+                                                year2023: false,
                                               ),
                                             ],
                                           )
-                                          : const LinearProgressIndicator(),
+                                          : const LinearProgressIndicator(year2023: false),
                                 ),
                               ],
                             )

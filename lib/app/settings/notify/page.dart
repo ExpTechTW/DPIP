@@ -123,7 +123,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               child: AnimatedOpacity(
                 opacity: isLoading ? 1 : 0,
                 duration: Durations.short4,
-                child: const LinearProgressIndicator(),
+                child: const LinearProgressIndicator(year2023: false),
               ),
             ),
             ListView(

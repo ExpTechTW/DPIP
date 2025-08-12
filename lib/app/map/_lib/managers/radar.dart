@@ -926,7 +926,7 @@ class _RadarProgressBar extends StatelessWidget {
       children: [
         Icon(Icons.play_circle_rounded, size: 16, color: context.colors.primary),
         Text('播放進度'.i18n, style: context.textTheme.labelSmall?.copyWith(color: context.colors.onSurface, height: 1)),
-        Expanded(child: LinearProgressIndicator(value: progress)),
+        Expanded(child: LinearProgressIndicator(value: progress, year2023: false)),
         Text(
           '${(progress * 100).round()}%',
           style: context.textTheme.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
