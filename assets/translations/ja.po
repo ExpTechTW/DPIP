@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-12 07:12\n"
+"PO-Revision-Date: 2025-08-12 09:15\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -638,7 +638,7 @@ msgstr ""
 
 #: ./lib/app/settings/map/page.dart:140
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
-msgstr "速すぎたフレームレートはラッグや設備発熱に至る可能性があります"
+msgstr "高いフレームレートは処理の遅延や端末の発熱を引き起こす可能性があります。"
 
 #: ./lib/app/settings/theme/page.dart:30
 msgid "主題模式"
@@ -674,7 +674,7 @@ msgstr "確認"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:76
 msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
-msgstr "お住まいの地域付近で激しい雷雨または降雨が発生しています。ご注意ください。<bold>{time}</bold> まで続く見込みです。"
+msgstr "お住まいの地域付近で激しい雷雨や降雨が発生しています。ご注意ください。<bold>{time}</bold> まで続く見込みです。"
 
 #: ./lib/app/home/_widgets/location_out_of_service.dart:24
 msgid "服務區域外，僅在臺灣各地可用"
@@ -694,7 +694,7 @@ msgstr "現在地が設定されていません"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1086
 msgid "第 {serial} 報"
-msgstr "第 {serial} 報"
+msgstr "第{serial}報"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1100
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
