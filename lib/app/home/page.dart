@@ -212,7 +212,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-
         const Positioned(
           top: 24,
           left: 0,

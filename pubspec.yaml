@@ -87,11 +87,15 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
+  # localizations
   - assets/translations/
+  - assets/location_names.csv
+  - assets/weather_station_names.csv
+  # other
   - assets/map/
   - assets/DPIP.png
   - assets/ExpTech.png
+  - assets/box.json
   - assets/location.json
   - assets/notify_test.json
   - assets/time.json
-  - assets/box.json

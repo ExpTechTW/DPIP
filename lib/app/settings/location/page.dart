@@ -378,7 +378,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                       final isSelected = code == model.code;
 
                       return ListSectionTile(
-                        title: '${location.city} ${location.town}',
+                        title: location.cityTownWithLevel,
                         subtitle: Text(
                           '$code・${location.lng.toStringAsFixed(2)}°E・${location.lat.toStringAsFixed(2)}°N',
                         ),

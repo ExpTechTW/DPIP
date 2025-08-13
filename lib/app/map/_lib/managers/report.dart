@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:dpip/api/exptech.dart';
+import 'package:dpip/api/model/location/location.dart';
 import 'package:dpip/api/model/report/earthquake_report.dart';
 import 'package:dpip/api/model/report/partial_earthquake_report.dart';
 import 'package:dpip/app/map/_lib/manager.dart';
@@ -334,8 +335,12 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
         return ValueListenableBuilder(
           valueListenable: widget.manager.currentReport,
           builder: (context, currentReport, child) {
+            // Show the first report from partial report list
             if (currentReport == null) {
               final report = GlobalProviders.data.partialReport.first;
+
+              final locationString = report.extractLocation();
+              final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
 
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -385,7 +390,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                     Text(
                                       report.hasNumber
                                           ? '編號 {number} 顯著有感地震'.i18n.args({'number': report.number})
-                                          : report.extractLocation(),
+                                          : location,
                                       style: context.textTheme.titleMedium,
                                     ),
                                     Text(
@@ -407,6 +412,11 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                 ),
               );
             }
+
+            // Show the current report with details
+
+            final locationString = currentReport.extractLocation();
+            final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
 
             return Padding(
               padding: const EdgeInsets.all(12),
@@ -430,10 +440,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   : '小區域有感地震'.i18n,
                               style: context.textTheme.labelMedium?.copyWith(color: context.colors.outline),
                             ),
-                            Text(
-                              currentReport.extractLocation(),
-                              style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500),
-                            ),
+                            Text(location, style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w500)),
                             Text(
                               currentReport.time.toLocaleDateTimeString(context),
                               style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
@@ -522,31 +529,35 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                       itemCount: grouped.length,
                       itemBuilder: (context, index) {
                         final MapEntry(key: date, value: reports) = grouped[index];
+
                         return ListSection(
                           title: date,
-                          children: [
-                            for (final report in reports)
-                              ListSectionTile(
-                                leading: IntensityBox(
-                                  intensity: report.intensity,
-                                  size: 36,
-                                  borderRadius: 8,
-                                  border: !report.hasNumber,
-                                ),
-                                title: report.extractLocation(),
-                                subtitle: Text(
-                                  '${report.hasNumber ? '${'編號 {number} 顯著有感地震'.i18n.args({'number': report.number})}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
-                                ),
-                                trailing: Text(
-                                  'M ${report.magnitude.toStringAsFixed(1)}',
-                                  style: context.textTheme.labelLarge,
-                                ),
-                                onTap: () {
-                                  widget.manager.setReport(report.id);
-                                  sheetController.collapse();
-                                },
-                              ),
-                          ],
+                          children:
+                              reports.map((report) {
+                                final locationString = report.extractLocation();
+                                final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+
+                                return ListSectionTile(
+                                  leading: IntensityBox(
+                                    intensity: report.intensity,
+                                    size: 36,
+                                    borderRadius: 8,
+                                    border: !report.hasNumber,
+                                  ),
+                                  title: location,
+                                  subtitle: Text(
+                                    '${report.hasNumber ? '${'編號 {number} 顯著有感地震'.i18n.args({'number': report.number})}\n' : ''}${report.time.toLocaleTimeString(context)}・${report.depth}km',
+                                  ),
+                                  trailing: Text(
+                                    'M ${report.magnitude.toStringAsFixed(1)}',
+                                    style: context.textTheme.labelLarge,
+                                  ),
+                                  onTap: () {
+                                    widget.manager.setReport(report.id);
+                                    sheetController.collapse();
+                                  },
+                                );
+                              }).toList(),
                         );
                       },
                     ),
@@ -562,6 +573,9 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
             if (report == null) {
               content = [const Center(child: CircularProgressIndicator())];
             } else {
+              final locationString = report.getLocation();
+              final location = Location.tryParse(locationString)?.dynamicName ?? locationString;
+
               content = [
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -579,10 +593,7 @@ class _ReportMapLayerSheetState extends State<ReportMapLayerSheet> {
                                   : '小區域有感地震'.i18n,
                               style: TextStyle(color: context.colors.onSurfaceVariant, fontSize: 14),
                             ),
-                            Text(
-                              report.getLocation(),
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
+                            Text(location, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),

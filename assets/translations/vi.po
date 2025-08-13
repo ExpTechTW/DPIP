@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: dpip\n"
+"PO-Revision-Date: 2025-07-23 03:45\n"
+"Language-Team: Vietnamese\n"
+"Language: vi_VN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: vi\n"
 "X-Crowdin-File: /main/assets/translations/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
-"Project-Id-Version: dpip\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language-Team: Vietnamese\n"
-"Language: vi_VN\n"
-"PO-Revision-Date: 2025-07-23 03:45\n"
 
 #: lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -740,7 +740,7 @@ msgstr ""
 "Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm khác nhau trên khắp Đài "
 "Loan."
 
-#: lib/app/home/_widgets/location_button.dart:21
+#: lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr "Chưa đặt"
 
@@ -1429,6 +1429,22 @@ msgstr ""
 
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
+msgstr ""
+
+#: lib/api/model/location/location.dart:80
+msgid "{city}{cityLevel} {town}{townLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:93
+msgid "{city} {town}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:102
+msgid "{city}{cityLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:111
+msgid "{town}{townLevel}"
 msgstr ""
 
 #~ msgid "避難資訊"

@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: dpip\n"
+"PO-Revision-Date: 2025-08-11 02:40\n"
+"Language-Team: English\n"
+"Language: en_US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: en\n"
 "X-Crowdin-File: /main/assets/translations/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
-"Project-Id-Version: dpip\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language-Team: English\n"
-"Language: en_US\n"
-"PO-Revision-Date: 2025-08-11 02:40\n"
 
 #: lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -763,7 +763,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "Out of service area. Available only in Taiwan"
 
-#: lib/app/home/_widgets/location_button.dart:21
+#: lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr "Not Set"
 
@@ -1460,6 +1460,22 @@ msgstr "Cloudy with heavy thunderstorm"
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
 msgstr "Heavy thunder and hail"
+
+#: lib/api/model/location/location.dart:80
+msgid "{city}{cityLevel} {town}{townLevel}"
+msgstr "{town} {townLevel}, {city} {cityLevel}"
+
+#: lib/api/model/location/location.dart:93
+msgid "{city}{town}"
+msgstr "{town}, {city}"
+
+#: lib/api/model/location/location.dart:102
+msgid "{city}{cityLevel}"
+msgstr "{city} {cityLevel}"
+
+#: lib/api/model/location/location.dart:111
+msgid "{town}{townLevel}"
+msgstr "{town} {townLevel}"
 
 #~ msgid "避難資訊"
 #~ msgstr "Evacuation information"
