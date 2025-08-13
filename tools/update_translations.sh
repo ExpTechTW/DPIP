@@ -37,7 +37,7 @@ fi
 
 # .po 檔案所在目錄
 PO_DIR="./assets/translations"
-POT_FILE="$PO_DIR/strings.pot"
+POT_FILE="./.crowdin/strings.pot"
 
 # 執行 i18n 擴充功能匯入器
 echo -e "${BLUE}$ dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot${RESET}"

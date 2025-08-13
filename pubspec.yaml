@@ -84,7 +84,6 @@ dev_dependencies:
   lint: ^2.0.0
 
 flutter:
-  generate: true
   uses-material-design: true
   assets:
   # localizations
