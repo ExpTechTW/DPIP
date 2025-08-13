@@ -89,8 +89,6 @@ flutter:
   assets:
   # localizations
   - assets/translations/
-  - assets/location_names.csv
-  - assets/weather_station_names.csv
   # other
   - assets/map/
   - assets/DPIP.png
