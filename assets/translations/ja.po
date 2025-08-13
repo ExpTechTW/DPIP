@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-13 10:04\n"
+"PO-Revision-Date: 2025-08-13 12:00\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -429,7 +429,7 @@ msgstr "情報"
 
 #: ./lib/app/settings/page.dart:99
 msgid "掌握 ExpTech Studio 的最新公告與資訊"
-msgstr "ExpTech Studio の最新のお知らせと情報をチェック"
+msgstr "ExpTech Studioの最新のお知らせと情報をチェック"
 
 #: ./lib/app/changelog/page.dart:54
 msgid "更新日誌"
@@ -613,11 +613,11 @@ msgstr "線"
 
 #: ./lib/app/settings/map/page.dart:57
 msgid "OpenStreetMap"
-msgstr ""
+msgstr "OpenStreetMap"
 
 #: ./lib/app/settings/map/page.dart:58
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:106
 msgid "底圖"
@@ -721,7 +721,7 @@ msgstr "到達"
 
 #: ./lib/app/home/page.dart:56
 msgid "已更新至 {version}"
-msgstr "{version} に更新されました"
+msgstr "{version}に更新されました"
 
 #: ./lib/utils/weather_icon.dart:282
 msgid "取得天氣異常"
@@ -1329,17 +1329,17 @@ msgstr "曇りのち大雹、大雷あり"
 
 #: ./lib/api/model/location/location.dart:80
 msgid "{city}{cityLevel} {town}{townLevel}"
-msgstr ""
+msgstr "{city}{cityLevel} {town}{townLevel}"
 
 #: ./lib/api/model/location/location.dart:93
 msgid "{city} {town}"
-msgstr ""
+msgstr "{city} {town}"
 
 #: ./lib/api/model/location/location.dart:102
 msgid "{city}{cityLevel}"
-msgstr ""
+msgstr "{city}{cityLevel}"
 
 #: ./lib/api/model/location/location.dart:111
 msgid "{town}{townLevel}"
-msgstr ""
+msgstr "{town}{townLevel}"
 
