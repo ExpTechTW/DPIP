@@ -670,7 +670,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr ""
 
-#: ./lib/app/home/_widgets/location_button.dart:21
+#: ./lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr ""
 
@@ -1322,4 +1322,20 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
+msgstr ""
+
+#: ./lib/api/model/location/location.dart:80
+msgid "{city}{cityLevel} {town}{townLevel}"
+msgstr ""
+
+#: ./lib/api/model/location/location.dart:93
+msgid "{city} {town}"
+msgstr ""
+
+#: ./lib/api/model/location/location.dart:102
+msgid "{city}{cityLevel}"
+msgstr ""
+
+#: ./lib/api/model/location/location.dart:111
+msgid "{town}{townLevel}"
 msgstr ""

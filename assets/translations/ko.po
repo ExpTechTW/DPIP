@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: dpip\n"
+"PO-Revision-Date: 2025-08-02 16:35\n"
+"Language-Team: Korean\n"
+"Language: ko_KR\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: ko\n"
 "X-Crowdin-File: /main/assets/translations/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
-"Project-Id-Version: dpip\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language-Team: Korean\n"
-"Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-02 16:35\n"
 
 #: lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -746,7 +746,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "서비스 지역 외에서는 사용할 수 없으며, 대만에서만 이용 가능합니다"
 
-#: lib/app/home/_widgets/location_button.dart:21
+#: lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr "설정되지 않음"
 
@@ -1438,6 +1438,22 @@ msgstr "흐림・강한 뇌우"
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
 msgstr "흐림・강한 천둥/우박"
+
+#: lib/api/model/location/location.dart:80
+msgid "{city}{cityLevel} {town}{townLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:93
+msgid "{city} {town}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:102
+msgid "{city}{cityLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:111
+msgid "{town}{townLevel}"
+msgstr ""
 
 #~ msgid "避難資訊"
 #~ msgstr "피난 정보"

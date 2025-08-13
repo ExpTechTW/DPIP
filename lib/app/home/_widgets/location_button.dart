@@ -1,12 +1,14 @@
+import 'package:flutter/material.dart';
+
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/app/home/_widgets/blurred_button.dart';
 import 'package:dpip/app/settings/location/page.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/global.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 
 class LocationButton extends StatelessWidget {
   const LocationButton({super.key});
@@ -18,7 +20,12 @@ class LocationButton extends StatelessWidget {
       builder: (context, code, child) {
         final location = Global.location[code];
 
-        final content = location == null ? '尚未設定'.i18n : '${location.city} ${location.town}';
+        late String content;
+        if (location == null) {
+          content = '尚未設定'.i18n;
+        } else {
+          content = location.dynamicName;
+        }
 
         return BlurredTextButton(
           onPressed: () => context.push(SettingsLocationPage.route),
