@@ -61,7 +61,7 @@ class _ChangelogPageState extends State<ChangelogPage> {
             child: AnimatedOpacity(
               opacity: _isLoading ? 1 : 0,
               duration: Durations.short4,
-              child: const LinearProgressIndicator(),
+              child: const LinearProgressIndicator(year2023: false),
             ),
           ),
           if (_releases != null)
