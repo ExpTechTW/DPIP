@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-13 10:04\n"
+"PO-Revision-Date: 2025-08-13 13:25\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -62,7 +62,7 @@ msgstr "天气警特报"
 
 #: ./lib/app/settings/notify/page.dart:235
 msgid "防災資訊"
-msgstr ""
+msgstr "防灾资讯"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯資訊"
@@ -154,7 +154,7 @@ msgstr "重大"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時"
-msgstr ""
+msgstr "海啸警报发布时"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
@@ -162,7 +162,7 @@ msgstr "常规​​​​​"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯消息發布時"
-msgstr ""
+msgstr "海啸信息发布时"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
@@ -276,11 +276,11 @@ msgstr "所在地(乡镇)预估震度 1 以上"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布防災警訊時"
-msgstr ""
+msgstr "所在地（乡镇）发布防灾警讯时"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布防災資訊時"
-msgstr ""
+msgstr "所在地（乡镇）发布防灾资讯时"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
@@ -296,11 +296,11 @@ msgstr "所在地(乡镇)发布上述除外灯信号的\n"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布山區暴雨時"
-msgstr ""
+msgstr "所在地(乡镇)发布山区暴雨时"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
 msgid "所在地(鄉鎮)發布雷雨即時訊息時"
-msgstr ""
+msgstr "所在地(乡镇)发布雷雨即时信息时"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
@@ -518,7 +518,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:92
 msgid "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
-msgstr ""
+msgstr "为了获得更好的自动定位体验，您需要授予「无限制」以便让 DPIP 在后台自动设置所在地信息。"
 
 #: ./lib/app/settings/location/page.dart:93
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
@@ -542,7 +542,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "一律允許"
-msgstr ""
+msgstr "始终允许"
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "永遠"
@@ -562,7 +562,7 @@ msgstr "自动定位功能会使用您设备上的 GPS，即使 DPIP 处于关�
 
 #: ./lib/app/settings/location/page.dart:301
 msgid "通知功能已被拒絕，請移至設定允許權限。"
-msgstr ""
+msgstr "通知功能已被拒绝，请前往设置允许权限。"
 
 #: ./lib/app/settings/location/page.dart:326
 msgid "自啟動權限已被拒絕，請移至設定允許權限。"
@@ -570,7 +570,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:352
 msgid "省電策略已被拒絕，請移至設定允許權限。"
-msgstr ""
+msgstr "省电策略被拒绝，请前往设置允许权限。"
 
 #: ./lib/app/settings/location/page.dart:413
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
@@ -578,7 +578,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:421
 msgid "新增地點"
-msgstr ""
+msgstr "新增地点"
 
 #: ./lib/app/settings/location/select/page.dart:26
 msgid "縣市"
@@ -614,11 +614,11 @@ msgstr "线条"
 
 #: ./lib/app/settings/map/page.dart:57
 msgid "OpenStreetMap"
-msgstr ""
+msgstr "OpenStreetMap"
 
 #: ./lib/app/settings/map/page.dart:58
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:106
 msgid "底圖"
@@ -634,7 +634,7 @@ msgstr "动画帧率"
 
 #: ./lib/app/settings/map/page.dart:110
 msgid "影響強震監視器的震波模擬動畫流暢度"
-msgstr ""
+msgstr "影响强震监视器的地震波模拟动画流畅度"
 
 #: ./lib/app/settings/map/page.dart:140
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
@@ -702,7 +702,7 @@ msgstr "{time} 左右，<bold>{location}</bold>附近发生有感地震，预计
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
-msgstr ""
+msgstr "{time} 左右，<bold>{location}</bold>附近发生有感地震，预计规模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1134
 msgid "所在地預估"
@@ -838,7 +838,7 @@ msgstr "气象"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
-msgstr ""
+msgstr "单位：{unit}"
 
 #: ./lib/app/map/_lib/managers/radar.dart:609
 msgid "長按設定播放起點"
@@ -894,23 +894,23 @@ msgstr "3 天"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:239
 msgid "海外測站"
-msgstr ""
+msgstr "海外测站"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:261
 msgid "即時震度："
-msgstr ""
+msgstr "实时震度："
 
 #: ./lib/app/map/_lib/managers/monitor.dart:267
 msgid "地動加速度："
-msgstr ""
+msgstr "地动加速度："
 
 #: ./lib/app/map/_lib/managers/monitor.dart:274
 msgid "地動速度："
-msgstr ""
+msgstr "地动速度："
 
 #: ./lib/app/map/_lib/managers/monitor.dart:279
 msgid "無資料"
-msgstr ""
+msgstr "无数据"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:792
 msgid "目前沒有生效中的地震速報"
@@ -918,7 +918,7 @@ msgstr "目前没有生效中的地震预警"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:865
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
-msgstr ""
+msgstr "规模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1027
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
@@ -1330,17 +1330,17 @@ msgstr "阴天有强雷冰雹"
 
 #: ./lib/api/model/location/location.dart:80
 msgid "{city}{cityLevel} {town}{townLevel}"
-msgstr ""
+msgstr "{city}{cityLevel} {town}{townLevel}"
 
 #: ./lib/api/model/location/location.dart:93
 msgid "{city} {town}"
-msgstr ""
+msgstr "{city} {town}"
 
 #: ./lib/api/model/location/location.dart:102
 msgid "{city}{cityLevel}"
-msgstr ""
+msgstr "{city}{cityLevel}"
 
 #: ./lib/api/model/location/location.dart:111
 msgid "{town}{townLevel}"
-msgstr ""
+msgstr "{town}{townLevel}"
 
