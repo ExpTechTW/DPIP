@@ -29,6 +29,9 @@ enum HistoryType {
 
   @JsonValue('extremely-torrential-rain')
   extremelyTorrentialRain,
+
+  @JsonValue('workSchlClos')
+  workAndClassSuspension,
 }
 
 @JsonSerializable()
