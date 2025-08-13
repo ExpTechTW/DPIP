@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-13 12:00\n"
+"PO-Revision-Date: 2025-08-13 13:25\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -841,19 +841,19 @@ msgstr "単位：{unit}"
 
 #: ./lib/app/map/_lib/managers/radar.dart:609
 msgid "長按設定播放起點"
-msgstr "長タッチし、プレイ起点を設定する"
+msgstr "長タッチして再生の起点を設定する"
 
 #: ./lib/app/map/_lib/managers/radar.dart:623
 msgid "目前時間"
-msgstr "今の時間"
+msgstr "表示中の時刻"
 
 #: ./lib/app/map/_lib/managers/radar.dart:628
 msgid "播放起點"
-msgstr "プレイ起点"
+msgstr "再生の起点"
 
 #: ./lib/app/map/_lib/managers/radar.dart:935
 msgid "播放進度"
-msgstr "プレイ進度"
+msgstr "再生中"
 
 #: ./lib/app/map/_lib/managers/precipitation.dart:315
 msgid "今日"
@@ -961,7 +961,7 @@ msgstr "Webで見る"
 
 #: ./lib/app/map/_lib/managers/report.dart:621
 msgid "發震時間"
-msgstr "発生時刻"
+msgstr "発震時刻"
 
 #: ./lib/app/map/_lib/managers/report.dart:628
 msgid "位於"
