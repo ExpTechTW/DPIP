@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-13 13:25\n"
+"PO-Revision-Date: 2025-08-13 19:41\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -62,7 +62,7 @@ msgstr "天気警報"
 
 #: ./lib/app/settings/notify/page.dart:235
 msgid "防災資訊"
-msgstr ""
+msgstr "防災インフォメーション"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯資訊"
@@ -154,7 +154,7 @@ msgstr "重大"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時"
-msgstr ""
+msgstr "津波警報発令中"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
