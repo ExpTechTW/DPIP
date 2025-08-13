@@ -102,7 +102,7 @@ extension LocationNameLocalizations on String {
   static Future<void> load() async {
     if (_isLoaded) return;
 
-    final translations = await I18nCsvLoader.fromFile('assets/location_names.csv');
+    final translations = await I18nCsvLoader.fromFile('assets/translations/location_names.csv');
 
     _locationNames = Translations.byId('zh-Hant', translations);
     _isLoaded = true;
@@ -118,7 +118,7 @@ extension WeatherStationLocalizations on String {
   static Future<void> load() async {
     if (_isLoaded) return;
 
-    final translations = await I18nCsvLoader.fromFile('assets/weather_station_names.csv');
+    final translations = await I18nCsvLoader.fromFile('assets/translations/weather_station_names.csv');
 
     _weatherStations = Translations.byId('zh-Hant', translations);
     _isLoaded = true;
