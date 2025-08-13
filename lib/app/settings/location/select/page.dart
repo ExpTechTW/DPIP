@@ -1,3 +1,4 @@
+import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -36,14 +37,17 @@ class SettingsLocationSelectPage extends StatelessWidget {
         ListSection(
           title: '縣市'.i18n,
           children: [
-            for (final MapEntry(key: code, value: location) in locations)
+            for (final MapEntry(key: _, value: location) in locations)
               Selector<SettingsLocationModel, String?>(
                 selector: (context, model) => model.code,
                 builder:
                     (context, currentCode, child) => ListSectionTile(
                       title: location.cityWithLevel,
                       trailing: const Icon(Symbols.chevron_right_rounded),
-                      subtitle: currentCode != null && code == currentCode ? Text('目前所在地'.i18n) : null,
+                      subtitle:
+                          currentCode != null && location.cityWithLevel == currentCode.getLocation().cityWithLevel
+                              ? Text('目前所在地'.i18n)
+                              : null,
                       onTap: () => context.push('/settings/location/select/${location.cityWithLevel}'),
                     ),
               ),
