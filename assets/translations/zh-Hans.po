@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-13 13:25\n"
+"PO-Revision-Date: 2025-08-13 21:15\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -478,11 +478,11 @@ msgstr "任何信息应以中央气象署发布内容为准。"
 
 #: ./lib/app/settings/location/page.dart:76
 msgid "無法取得通知權限"
-msgstr ""
+msgstr "无法取得通知权限"
 
 #: ./lib/app/settings/location/page.dart:78
 msgid "無法取得位置權限"
-msgstr ""
+msgstr "无法取得位置权限"
 
 #: ./lib/app/settings/location/page.dart:79
 msgid "無法取得自啟動權限"
@@ -498,7 +498,7 @@ msgstr "无法取得权限"
 
 #: ./lib/app/settings/location/page.dart:85
 msgid "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。"
-msgstr ""
+msgstr "自动定位功能需要您允许 DPIP 使用通知权限才能正常运作。请您到应用程式设定中找到并允许「通知」权限后再试一次。"
 
 #: ./lib/app/settings/location/page.dart:86
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
