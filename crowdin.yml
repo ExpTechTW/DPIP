@@ -1,3 +1,8 @@
 files:
   - source: /assets/translations/strings.pot
     translation: /assets/translations/%osx_locale%.po
+  - source: /assets/*.csv
+    translation: /assets/translations/%original_file_name%
+    multilingual: 1
+    first_line_contains_header: 1
+    scheme: 'identifier,source_phrase,en,ja,ko,ru,vi,zh-CN'
