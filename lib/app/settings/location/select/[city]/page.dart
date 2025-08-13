@@ -26,7 +26,7 @@ class SettingsLocationSelectCityPage extends StatefulWidget {
 class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectCityPage> {
   @override
   Widget build(BuildContext context) {
-    final towns = Global.location.entries.where((e) => e.value.city == widget.city).toList();
+    final towns = Global.location.entries.where((e) => e.value.cityWithLevel == widget.city).toList();
 
     return ListView(
       padding: EdgeInsets.only(top: 8, bottom: 16 + context.padding.bottom),
@@ -41,7 +41,7 @@ class _SettingsLocationSelectCityPageState extends State<SettingsLocationSelectC
                   final isFavorited = favorited.contains(code);
 
                   return ListSectionTile(
-                    title: '${town.city} ${town.town}',
+                    title: town.cityTownWithLevel,
                     subtitle: Text('$code・${town.lng.toStringAsFixed(2)}°E・${town.lat.toStringAsFixed(2)}°N'),
                     trailing: isFavorited ? const Icon(Symbols.star_rounded, fill: 1) : null,
                     onTap:

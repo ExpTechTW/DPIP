@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: dpip\n"
+"PO-Revision-Date: 2025-08-11 02:40\n"
+"Language-Team: Chinese Simplified\n"
+"Language: zh_CN\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: zh-CN\n"
 "X-Crowdin-File: /main/assets/translations/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
-"Project-Id-Version: dpip\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language-Team: Chinese Simplified\n"
-"Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-11 02:40\n"
 
 #: lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -751,7 +751,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "服务区域外，仅在台湾各地可用"
 
-#: lib/app/home/_widgets/location_button.dart:21
+#: lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr "尚未设置"
 
@@ -1426,6 +1426,22 @@ msgstr "阴天有强雷阵雨"
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
 msgstr "阴天有强雷冰雹"
+
+#: lib/api/model/location/location.dart:80
+msgid "{city}{cityLevel} {town}{townLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:93
+msgid "{city} {town}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:102
+msgid "{city}{cityLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:111
+msgid "{town}{townLevel}"
+msgstr ""
 
 #~ msgid "避難資訊"
 #~ msgstr "避难信息"

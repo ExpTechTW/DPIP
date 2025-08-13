@@ -1,16 +1,18 @@
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"Project-Id-Version: dpip\n"
+"PO-Revision-Date: 2025-07-23 03:45\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 "
+"&& n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 "
+"&& n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: ru\n"
 "X-Crowdin-File: /main/assets/translations/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
-"Project-Id-Version: dpip\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Language-Team: Russian\n"
-"Language: ru_RU\n"
-"PO-Revision-Date: 2025-07-23 03:45\n"
 
 #: lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -708,7 +710,7 @@ msgstr ""
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr ""
 
-#: lib/app/home/_widgets/location_button.dart:21
+#: lib/app/home/_widgets/location_button.dart:23
 msgid "尚未設定"
 msgstr ""
 
@@ -1366,4 +1368,20 @@ msgstr ""
 
 #: lib/utils/weather_icon.dart:341
 msgid "陰大雷雹"
+msgstr ""
+
+#: lib/api/model/location/location.dart:80
+msgid "{city}{cityLevel} {town}{townLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:93
+msgid "{city} {town}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:102
+msgid "{city}{cityLevel}"
+msgstr ""
+
+#: lib/api/model/location/location.dart:111
+msgid "{town}{townLevel}"
 msgstr ""

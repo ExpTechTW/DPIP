@@ -44,6 +44,8 @@ void main() async {
   await Future.wait([
     DeviceInfo.init(),
     AppLocalizations.load(),
+    LocationNameLocalizations.load(),
+    WeatherStationLocalizations.load(),
     initializeInstallationData(),
     fcmInit(),
     notifyInit(),

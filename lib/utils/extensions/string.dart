@@ -1,3 +1,5 @@
+import 'package:dpip/api/model/location/location.dart';
+import 'package:dpip/global.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:dpip/utils/extensions/build_context.dart';
@@ -19,6 +21,9 @@ extension StringExtension on String {
 
   Text get asText => Text(this);
   TextSpan get asTextSpan => TextSpan(text: this);
+
+  Location getLocation() => Global.location[this]!;
+  Location? get asLocation => Location.tryParse(this);
 }
 
 extension TextExtension on Text {
