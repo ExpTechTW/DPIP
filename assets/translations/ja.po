@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-14 02:09\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -589,7 +589,7 @@ msgstr "現在地"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
 msgid "監視器"
-msgstr ""
+msgstr "強震モニター"
 
 #: ./lib/app/map/_lib/managers/radar.dart:495
 msgid "雷達回波"
@@ -633,7 +633,7 @@ msgstr "動画のフレームレート"
 
 #: ./lib/app/settings/map/page.dart:110
 msgid "影響強震監視器的震波模擬動畫流暢度"
-msgstr ""
+msgstr "強震モニターの地震波アニメーションの滑らかさを調整します"
 
 #: ./lib/app/settings/map/page.dart:140
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
@@ -833,11 +833,11 @@ msgstr "表示する地図のレイヤーを選択してください"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "簡單"
-msgstr ""
+msgstr "シンプル"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
-msgstr ""
+msgstr "地震情報"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
