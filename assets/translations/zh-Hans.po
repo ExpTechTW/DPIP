@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-14 03:07\n"
+"PO-Revision-Date: 2025-08-14 05:14\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -546,7 +546,7 @@ msgstr "始终允许"
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "永遠"
-msgstr ""
+msgstr "永远"
 
 #: ./lib/app/settings/location/page.dart:231
 msgid "自動更新"
