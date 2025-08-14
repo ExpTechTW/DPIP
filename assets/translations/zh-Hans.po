@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-14 03:07\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -590,7 +590,7 @@ msgstr "当前位置"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
 msgid "監視器"
-msgstr ""
+msgstr "监视器"
 
 #: ./lib/app/map/_lib/managers/radar.dart:495
 msgid "雷達回波"
@@ -834,11 +834,11 @@ msgstr "选择要显示的地图图层"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "簡單"
-msgstr ""
+msgstr "简单"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
-msgstr ""
+msgstr "报告"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
