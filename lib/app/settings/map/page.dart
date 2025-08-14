@@ -100,17 +100,19 @@ class SettingsMapPage extends StatelessWidget {
                     Layout.row.left[16](
                       children: [
                         Icon(Symbols.animation_rounded, weight: 600, color: context.colors.secondary),
-                        Layout.col.left(
-                          children: [
-                            Text(
-                              '動畫幀率'.i18n,
-                              style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              '影響強震監視器的震波模擬動畫流暢度'.i18n,
-                              style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
-                            ),
-                          ],
+                        Expanded(
+                          child: Layout.col.left.min(
+                            children: [
+                              Text(
+                                '動畫幀率'.i18n,
+                                style: context.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '影響強震監視器的震波模擬動畫流暢度'.i18n,
+                                style: context.textTheme.bodyMedium?.copyWith(color: context.colors.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
