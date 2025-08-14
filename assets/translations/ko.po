@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-14 01:07\n"
+"PO-Revision-Date: 2025-08-14 02:09\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -609,11 +609,11 @@ msgstr "선"
 
 #: ./lib/app/settings/map/page.dart:57
 msgid "OpenStreetMap"
-msgstr ""
+msgstr "OpenStreetMap"
 
 #: ./lib/app/settings/map/page.dart:58
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:106
 msgid "底圖"
@@ -1333,17 +1333,17 @@ msgstr "흐림・강한 천둥/우박"
 
 #: ./lib/api/model/location/location.dart:82
 msgid "{city}{cityLevel} {town}{townLevel}"
-msgstr ""
+msgstr "{city}{cityLevel} {town}{townLevel}"
 
 #: ./lib/api/model/location/location.dart:95
 msgid "{city} {town}"
-msgstr ""
+msgstr "{city} {town}"
 
 #: ./lib/api/model/location/location.dart:104
 msgid "{city}{cityLevel}"
-msgstr ""
+msgstr "{city}{cityLevel}"
 
 #: ./lib/api/model/location/location.dart:113
 msgid "{town}{townLevel}"
-msgstr ""
+msgstr "{town}{townLevel}"
 
