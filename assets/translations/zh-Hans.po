@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-13 21:15\n"
+"PO-Revision-Date: 2025-08-14 00:59\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "紧急地震预警"
 msgid "強震監視器"
 msgstr "强震监视器"
 
-#: ./lib/app/map/_lib/managers/report.dart:800
+#: ./lib/app/map/_lib/managers/report.dart:811
 msgid "地震報告"
 msgstr "地震报告"
 
@@ -64,7 +64,7 @@ msgstr "天气警特报"
 msgid "防災資訊"
 msgstr "防灾资讯"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
+#: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
 msgstr "海啸信息"
 
@@ -140,7 +140,7 @@ msgstr "地震"
 msgid "天氣"
 msgstr "天气"
 
-#: ./lib/app/settings/notify/page.dart:247
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯"
 msgstr "海啸"
 
@@ -580,15 +580,15 @@ msgstr ""
 msgid "新增地點"
 msgstr "新增地点"
 
-#: ./lib/app/settings/location/select/page.dart:26
+#: ./lib/app/settings/location/select/page.dart:38
 msgid "縣市"
 msgstr "县市"
 
-#: ./lib/app/settings/location/select/page.dart:38
+#: ./lib/app/settings/location/select/page.dart:49
 msgid "目前所在地"
 msgstr "当前位置"
 
-#: ./lib/app/settings/map/page.dart:47
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
 msgid "監視器"
 msgstr ""
 
@@ -608,7 +608,7 @@ msgstr "降水"
 msgid "風向/風速"
 msgstr "风向/风速"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+#: ./lib/app/settings/map/page.dart:56
 msgid "線條"
 msgstr "线条"
 
@@ -680,7 +680,7 @@ msgstr "您所在区域附近正发生强雷雨或降雨，请注意防范，预
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "服务区域外，仅在台湾各地可用"
 
-#: ./lib/app/home/_widgets/location_button.dart:23
+#: ./lib/app/home/_widgets/location_button.dart:25
 msgid "尚未設定"
 msgstr "尚未设置"
 
@@ -832,6 +832,14 @@ msgstr "地图图层"
 msgid "選擇要顯示的地圖圖層"
 msgstr "选择要显示的地图图层"
 
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+msgid "簡單"
+msgstr ""
+
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
+msgid "報告"
+msgstr ""
+
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
 msgstr "气象"
@@ -932,59 +940,59 @@ msgstr "{countdown}秒后抵达"
 msgid "已抵達"
 msgstr "已抵达"
 
-#: ./lib/app/map/_lib/managers/report.dart:357
+#: ./lib/app/map/_lib/managers/report.dart:362
 msgid "近期的地震報告"
 msgstr "近期地震报告"
 
-#: ./lib/app/map/_lib/managers/report.dart:362
+#: ./lib/app/map/_lib/managers/report.dart:367
 msgid "更多"
 msgstr "更多"
 
-#: ./lib/app/map/_lib/managers/report.dart:578
+#: ./lib/app/map/_lib/managers/report.dart:592
 msgid "編號 {number} 顯著有感地震"
 msgstr "序号 {number} 显著有感地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:579
+#: ./lib/app/map/_lib/managers/report.dart:593
 msgid "小區域有感地震"
 msgstr "小区域有感地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:638
+#: ./lib/app/map/_lib/managers/report.dart:649
 msgid "地震規模"
 msgstr "地震震级"
 
-#: ./lib/app/map/_lib/managers/report.dart:660
+#: ./lib/app/map/_lib/managers/report.dart:671
 msgid "震源深度"
 msgstr "震源深度"
 
-#: ./lib/app/map/_lib/managers/report.dart:597
+#: ./lib/app/map/_lib/managers/report.dart:608
 msgid "報告頁面"
 msgstr "报告详情"
 
-#: ./lib/app/map/_lib/managers/report.dart:621
+#: ./lib/app/map/_lib/managers/report.dart:632
 msgid "發震時間"
 msgstr "发震时刻"
 
-#: ./lib/app/map/_lib/managers/report.dart:628
+#: ./lib/app/map/_lib/managers/report.dart:639
 msgid "位於"
 msgstr "位于"
 
-#: ./lib/app/map/_lib/managers/report.dart:684
+#: ./lib/app/map/_lib/managers/report.dart:695
 msgid "各地震度"
 msgstr "各地震度"
 
-#: ./lib/app/map/_lib/managers/report.dart:755
+#: ./lib/app/map/_lib/managers/report.dart:766
 msgid "地震報告圖"
 msgstr "地震报告图"
 
-#: ./lib/app/map/_lib/managers/report.dart:765
+#: ./lib/app/map/_lib/managers/report.dart:776
 msgid "震度圖"
 msgstr "震度图"
 
-#: ./lib/app/map/_lib/managers/report.dart:775
+#: ./lib/app/map/_lib/managers/report.dart:786
 msgid "最大地動加速度圖"
 msgstr "峰值地震动加速度图"
 
-#: ./lib/app/map/_lib/managers/report.dart:785
+#: ./lib/app/map/_lib/managers/report.dart:796
 msgid "最大地動速度圖"
 msgstr "峰值最大地震动速度图"
 
@@ -1328,19 +1336,19 @@ msgstr "阴天有强雷阵雨"
 msgid "陰大雷雹"
 msgstr "阴天有强雷冰雹"
 
-#: ./lib/api/model/location/location.dart:80
+#: ./lib/api/model/location/location.dart:82
 msgid "{city}{cityLevel} {town}{townLevel}"
 msgstr "{city}{cityLevel} {town}{townLevel}"
 
-#: ./lib/api/model/location/location.dart:93
+#: ./lib/api/model/location/location.dart:95
 msgid "{city} {town}"
 msgstr "{city} {town}"
 
-#: ./lib/api/model/location/location.dart:102
+#: ./lib/api/model/location/location.dart:104
 msgid "{city}{cityLevel}"
 msgstr "{city}{cityLevel}"
 
-#: ./lib/api/model/location/location.dart:111
+#: ./lib/api/model/location/location.dart:113
 msgid "{town}{townLevel}"
 msgstr "{town}{townLevel}"
 
