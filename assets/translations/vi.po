@@ -1,16 +1,16 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: dpip\n"
-"PO-Revision-Date: 2025-08-13 10:04\n"
-"Language-Team: Vietnamese\n"
-"Language: vi_VN\n"
-"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: vi\n"
 "X-Crowdin-File: /main/.crowdin/strings.pot\n"
 "X-Crowdin-File-ID: 26\n"
+"Project-Id-Version: dpip\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Vietnamese\n"
+"Language: vi_VN\n"
+"PO-Revision-Date: 2025-08-14 00:59\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -121,9 +121,7 @@ msgid "發送公告時"
 msgstr "Khi gửi thông báo"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:47
-msgid ""
-"音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音"
-"效。此測試不會向伺服器發送任何請求"
+msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:134
@@ -227,11 +225,9 @@ msgid "緊急地震速報(重大)"
 msgstr "Cảnh báo động đất khẩn cấp (Lớn)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:35
-msgid ""
-"最大震度 5 弱以上 且\n"
+msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 4 以上"
-msgstr ""
-"Cường độ tối đa từ 5 yếu trở lên\n"
+msgstr "Cường độ tối đa từ 5 yếu trở lên\n"
 "và dự đoán tại địa phương (thị trấn) từ 4 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:39
@@ -239,11 +235,9 @@ msgid "緊急地震速報(一般)"
 msgstr "Cảnh báo động đất (Nhỏ)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:40
-msgid ""
-"最大震度 5 弱以上 且\n"
+msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 2 以上"
-msgstr ""
-"Cường độ tối đa từ 5 yếu trở lên\n"
+msgstr "Cường độ tối đa từ 5 yếu trở lên\n"
 "và dự đoán tại địa phương (thị trấn) từ 2 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:44
@@ -251,11 +245,9 @@ msgid "緊急地震速報(無聲)"
 msgstr "Cảnn báo động đất (Im Lặng)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:45
-msgid ""
-"最大震度 5 弱以上 且\n"
+msgid "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 1 以上"
-msgstr ""
-"Cường độ tối đa từ 5 yếu trở lên\n"
+msgstr "Cường độ tối đa từ 5 yếu trở lên\n"
 "và dự đoán tại địa phương (thị trấn) từ 1 trở lên"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
@@ -291,20 +283,14 @@ msgid "所在地(鄉鎮)發布防災資訊時"
 msgstr ""
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
-msgid ""
-"所在地(鄉鎮)發布紅色燈號之\n"
+msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr ""
-"Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết "
-"tín hiệu đỏ"
+msgstr "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu đỏ"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:40
-msgid ""
-"所在地(鄉鎮)發布上述除外燈號之\n"
+msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr ""
-"Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết "
-"tín hiệu"
+msgstr "Khu vực địa phương (thị trấn) ban hành báo cáo đặc biệt cảnh báo thời tiết tín hiệu"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布山區暴雨時"
@@ -367,13 +353,8 @@ msgid "正在載入商店物品中"
 msgstr ""
 
 #: ./lib/app/settings/donate/page.dart:161
-msgid ""
-"DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維"
-"持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與"
-"維護的成本。\n"
-"\n"
-"您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地"
-"為您提供服務。感謝您的理解與慷慨！"
+msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
+"您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
 msgstr ""
 
 #: ./lib/app/settings/donate/page.dart:169
@@ -458,9 +439,7 @@ msgstr ""
 
 #: ./lib/app/settings/page.dart:113
 msgid "幫助我們維護伺服器的穩定和長久發展"
-msgstr ""
-"Hỗ trợ chúng tôi duy trì sự ổn định và phát triển lâu dài của các máy chủ "
-"của chúng tôi"
+msgstr "Hỗ trợ chúng tôi duy trì sự ổn định và phát triển lâu dài của các máy chủ của chúng tôi"
 
 #: ./lib/app/settings/page.dart:119
 msgid "第三方套件授權"
@@ -492,9 +471,7 @@ msgstr "Nhật ký ứng dụng"
 
 #: ./lib/app/welcome/3-notice/page.dart:58
 msgid "任何資訊應以中央氣象署發布之內容為準。"
-msgstr ""
-"Tất cả thông tin phải tuân theo nội dung do Đài Loan Cơ quan Thời tiết Trung "
-"ương (CWA) công bố."
+msgstr "Tất cả thông tin phải tuân theo nội dung do Đài Loan Cơ quan Thời tiết Trung ương (CWA) công bố."
 
 #: ./lib/app/settings/location/page.dart:76
 msgid "無法取得通知權限"
@@ -517,45 +494,31 @@ msgid "無法取得權限"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:85
-msgid ""
-"自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找"
-"到並允許「通知」權限後再試一次。"
+msgid "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:86
-msgid ""
-"自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找"
-"到並允許「位置」權限後再試一次。"
+msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:89
-msgid ""
-"自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定"
-"中找到位置權限設定並選擇「永遠」後再試一次。"
+msgid "自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:90
-msgid ""
-"自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定"
-"中找到位置權限設定並選擇「一律允許」後再試一次。"
+msgid "自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:91
-msgid ""
-"為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設"
-"定所在地資訊。"
+msgid "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:92
-msgid ""
-"為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所"
-"在地資訊。"
+msgid "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:93
-msgid ""
-"自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並"
-"允許「權限」後再試一次。"
+msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
 msgstr ""
 
 #: ./lib/route/image_viewer/image_viewer.dart:64
@@ -567,15 +530,11 @@ msgid "自動啟動"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:164
-msgid ""
-"為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正"
-"常接收資訊以及更新所在地。"
+msgid "為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:186
-msgid ""
-"為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接"
-"收資訊以及更新所在地。"
+msgid "為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
 msgstr ""
 
 #: ./lib/app/settings/location/page.dart:220
@@ -595,15 +554,8 @@ msgid "定期更新目前的所在地"
 msgstr "Cập nhật vị trí hiện tại định kỳ"
 
 #: ./lib/app/settings/location/page.dart:242
-msgid ""
-"自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的"
-"地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新"
-"狀況。"
-msgstr ""
-"Tính năng định vị tự động sẽ sử dụng GPS trên thiết bị của bạn để tự động "
-"cập nhật vị trí của bạn dựa trên vị trí địa lý, cung cấp thông tin thời tiết "
-"và động đất theo thời gian thực, giúp bạn luôn nắm bắt được tình hình mới "
-"nhất tại địa phương."
+msgid "自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
+msgstr "Tính năng định vị tự động sẽ sử dụng GPS trên thiết bị của bạn để tự động cập nhật vị trí của bạn dựa trên vị trí địa lý, cung cấp thông tin thời tiết và động đất theo thời gian thực, giúp bạn luôn nắm bắt được tình hình mới nhất tại địa phương."
 
 #: ./lib/app/settings/location/page.dart:301
 msgid "通知功能已被拒絕，請移至設定允許權限。"
@@ -718,17 +670,12 @@ msgid "確定"
 msgstr "Xác nhận"
 
 #: ./lib/app/home/_widgets/thunderstorm_card.dart:76
-msgid ""
-"您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
-msgstr ""
-"Khu vực gần bạn đang có mưa giông hoặc mưa lớn. Vui lòng chú ý đề phòng. "
-"Tình trạng này kéo dài đến <bold>{time}</bold>."
+msgid "您所在區域附近有劇烈雷雨或降雨發生，請注意防範，持續至 <bold>{time}</bold> 。"
+msgstr "Khu vực gần bạn đang có mưa giông hoặc mưa lớn. Vui lòng chú ý đề phòng. Tình trạng này kéo dài đến <bold>{time}</bold>."
 
 #: ./lib/app/home/_widgets/location_out_of_service.dart:24
 msgid "服務區域外，僅在臺灣各地可用"
-msgstr ""
-"Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm khác nhau trên khắp Đài "
-"Loan."
+msgstr "Ngoài khu vực dịch vụ, chỉ có sẵn ở các địa điểm khác nhau trên khắp Đài Loan."
 
 #: ./lib/app/home/_widgets/location_button.dart:25
 msgid "尚未設定"
@@ -747,15 +694,11 @@ msgid "第 {serial} 報"
 msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1100
-msgid ""
-"{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
-"<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
+msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
-msgid ""
-"{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
-"<bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
+msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1134
@@ -803,72 +746,44 @@ msgid "我們是誰？"
 msgstr "Chúng tôi là ai?"
 
 #: ./lib/app/welcome/2-exptech/page.dart:88
-msgid ""
-"ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團"
-"體。成員來自臺灣北中南、日本、韓國、中國的學生。"
-msgstr ""
-"ExpTech Studio là một nhóm gồm hơn 15 Học sinh, phần lớn là những người có "
-"độ tuổi trung bình dưới 20. Các thành viên đến từ Đài Loan (Bắc, Trung và "
-"Nam), Nhật Bản, Hàn Quốc và Trung Quốc."
+msgid "ExpTech Studio 是一群大部分由學生組成，平均年齡未滿 20 歲、人數超過 15 + 的團體。成員來自臺灣北中南、日本、韓國、中國的學生。"
+msgstr "ExpTech Studio là một nhóm gồm hơn 15 Học sinh, phần lớn là những người có độ tuổi trung bình dưới 20. Các thành viên đến từ Đài Loan (Bắc, Trung và Nam), Nhật Bản, Hàn Quốc và Trung Quốc."
 
 #: ./lib/app/welcome/2-exptech/page.dart:93
 msgid "我們的初衷"
 msgstr "Chúng tôi đã bắt đầu với những gì"
 
 #: ./lib/app/welcome/2-exptech/page.dart:98
-msgid ""
-"成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成"
-"現在的樣子。"
-msgstr ""
-"Nhóm ban đầu được thành lập bằng cách tuyển dụng một nhóm học sinh có sở "
-"thích và năng khiếu về máy tính và công nghệ, sau đó đã phát triển vượt ra "
-"ngoài phạm vi trường học và trở thành nhóm như hiện nay."
+msgid "成立初衷是招募一群對電腦及科技有興趣及能力的同學，後來發展至校外，並逐漸形成現在的樣子。"
+msgstr "Nhóm ban đầu được thành lập bằng cách tuyển dụng một nhóm học sinh có sở thích và năng khiếu về máy tính và công nghệ, sau đó đã phát triển vượt ra ngoài phạm vi trường học và trở thành nhóm như hiện nay."
 
 #: ./lib/app/welcome/3-notice/page.dart:38
 msgid "注意事項"
 msgstr "Những điều cần lưu ý"
 
 #: ./lib/app/welcome/3-notice/page.dart:75
-msgid ""
-"根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可"
-"能性，我們會盡力避免此類情況，但不保證一定不會發生。"
-msgstr ""
-"Tùy thuộc vào trạng thái mạng, trạng thái máy chủ, trạng thái ứng dụng, "
-"trạng thái nguồn dữ liệu ngược dòng, v.v., sự cố không nhận được thông tin "
-"có thể xảy ra và chúng tôi sẽ cố gắng hết sức để tránh những tình huống như "
-"vậy, nhưng chúng tôi không đảm bảo rằng chúng sẽ không xảy ra."
+msgid "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
+msgstr "Tùy thuộc vào trạng thái mạng, trạng thái máy chủ, trạng thái ứng dụng, trạng thái nguồn dữ liệu ngược dòng, v.v., sự cố không nhận được thông tin có thể xảy ra và chúng tôi sẽ cố gắng hết sức để tránh những tình huống như vậy, nhưng chúng tôi không đảm bảo rằng chúng sẽ không xảy ra."
 
 #: ./lib/app/welcome/3-notice/page.dart:88
 msgid "強烈搖晃有機率比通知早抵達使用者所在地。"
-msgstr ""
-"Rung lắc mạnh có xu hướng xảy ra ở vị trí của người dùng sớm hơn thông báo."
+msgstr "Rung lắc mạnh có xu hướng xảy ra ở vị trí của người dùng sớm hơn thông báo."
 
 #: ./lib/app/welcome/3-notice/page.dart:99
 msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
-msgstr ""
-"Báo cáo động đất nhanh là những tính toán nhanh và có thể chứa nhiều lỗi, do "
-"đó cần phải thận trọng và hiểu rõ."
+msgstr "Báo cáo động đất nhanh là những tính toán nhanh và có thể chứa nhiều lỗi, do đó cần phải thận trọng và hiểu rõ."
 
 #: ./lib/app/welcome/3-notice/page.dart:110
 msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
-msgstr ""
-"Bất kỳ hành vi nào không được chính thức cho phép đều có thể bị coi là vi "
-"phạm pháp luật của Trung Hoa Dân Quốc (Đài Loan), vì vậy hãy đảm bảo tuân "
-"thủ các quy định có liên quan."
+msgstr "Bất kỳ hành vi nào không được chính thức cho phép đều có thể bị coi là vi phạm pháp luật của Trung Hoa Dân Quốc (Đài Loan), vì vậy hãy đảm bảo tuân thủ các quy định có liên quan."
 
 #: ./lib/app/welcome/1-about/page.dart:40
 msgid "歡迎使用 DPIP"
 msgstr "Chào mừng đến với DPIP"
 
 #: ./lib/app/welcome/1-about/page.dart:81
-msgid ""
-"DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資"
-"訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
-msgstr ""
-"DPIP là ứng dụng được thiết kế bởi một nhóm địa phương tại Đài Loan, tích "
-"hợp thông tin từ TREM-Net (Mạng quan sát động đất thời gian thực Đài Loan) "
-"và dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) để cung cấp một "
-"ứng dụng thông tin phòng chống thiên tai tích hợp, duy nhất và tiện lợi."
+msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
+msgstr "DPIP là ứng dụng được thiết kế bởi một nhóm địa phương tại Đài Loan, tích hợp thông tin từ TREM-Net (Mạng quan sát động đất thời gian thực Đài Loan) và dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) để cung cấp một ứng dụng thông tin phòng chống thiên tai tích hợp, duy nhất và tiện lợi."
 
 #: ./lib/app/welcome/4-permissions/page.dart:154
 msgid "在重大災害發生時以通知來傳遞即時防災資訊"
@@ -876,15 +791,11 @@ msgstr "Dịch vụ được sử dụng để gửi thông báo cảnh báo thi
 
 #: ./lib/app/welcome/4-permissions/page.dart:162
 msgid "使用定位來自動更新所在地設定，提供當地的即時防災資訊"
-msgstr ""
-"Dịch vụ được sử dụng để cập nhật vị trí và cung cấp thông tin cảnh báo tại "
-"khu vực hiện tại"
+msgstr "Dịch vụ được sử dụng để cập nhật vị trí và cung cấp thông tin cảnh báo tại khu vực hiện tại"
 
 #: ./lib/app/welcome/4-permissions/page.dart:168
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
-msgstr ""
-"Cho phép DPIP tiếp tục hoạt động ở chế độ nền để thông báo phòng ngừa thảm "
-"họa ngay lập tức."
+msgstr "Cho phép DPIP tiếp tục hoạt động ở chế độ nền để thông báo phòng ngừa thảm họa ngay lập tức."
 
 #: ./lib/route/image_viewer/image_viewer.dart:228
 msgid "儲存"
@@ -892,9 +803,7 @@ msgstr "Lưu trữ hình"
 
 #: ./lib/app/welcome/4-permissions/page.dart:175
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
-msgstr ""
-"Để lưu trữ hình ảnh trực quan dữ liệu từ Đài Loan Cơ quan thời tiết trung "
-"ương (CWA) hoặc ExpTech."
+msgstr "Để lưu trữ hình ảnh trực quan dữ liệu từ Đài Loan Cơ quan thời tiết trung ương (CWA) hoặc ExpTech."
 
 #: ./lib/app/welcome/4-permissions/page.dart:342
 msgid "權限請求"
@@ -902,8 +811,7 @@ msgstr "Yêu cầu để xin phép"
 
 #: ./lib/app/welcome/4-permissions/page.dart:343
 msgid "需要使用者手動到設定開啟相關權限。"
-msgstr ""
-"Người dùng cần phải tự tay vào trang cài đặt để mở các quyền có liên quan."
+msgstr "Người dùng cần phải tự tay vào trang cài đặt để mở các quyền có liên quan."
 
 #: ./lib/app/welcome/4-permissions/page.dart:383
 msgid "權限"
@@ -911,9 +819,7 @@ msgstr "Sự cho phép"
 
 #: ./lib/app/welcome/4-permissions/page.dart:396
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-msgstr ""
-"Chúng tôi luôn ủng hộ người dùng và nỗ lực không ngừng vì quyền riêng tư của "
-"họ."
+msgstr "Chúng tôi luôn ủng hộ người dùng và nỗ lực không ngừng vì quyền riêng tư của họ."
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:99
 msgid "地圖圖層"
@@ -928,9 +834,8 @@ msgid "簡單"
 msgstr ""
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
-#, fuzzy
 msgid "報告"
-msgstr "Thông báo"
+msgstr ""
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
@@ -1443,3 +1348,4 @@ msgstr ""
 #: ./lib/api/model/location/location.dart:113
 msgid "{town}{townLevel}"
 msgstr ""
+
