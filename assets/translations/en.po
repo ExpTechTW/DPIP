@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-14 01:07\n"
+"PO-Revision-Date: 2025-08-14 02:09\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -831,11 +831,11 @@ msgstr "Select the layer you want to display"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "簡單"
-msgstr ""
+msgstr "Simple"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
-msgstr ""
+msgstr "Reports"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
