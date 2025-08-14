@@ -40,92 +40,69 @@ PO_DIR="./assets/translations"
 POT_FILE="./.crowdin/strings.pot"
 
 # 執行 i18n 擴充功能匯入器
-echo -e "${BLUE}$ dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot${RESET}"
-dart run i18n_extension_importer:getstrings --output-file ./assets/translations/strings.pot
+echo -e "${BLUE}$ dart run i18n_extension_importer:getstrings --output-file ./.crowdin/strings.pot${RESET}"
+dart run i18n_extension_importer:getstrings --output-file ./.crowdin/strings.pot
 echo
 
-# 更新每個 .po 檔案
+# 更新每個 .po 檔案（跳過 zh-Hant.po）
 for po_file in "$PO_DIR"/*.po; do
-    if [ -f "$po_file" ]; then
+    if [ -f "$po_file" ] && [ "$(basename "$po_file")" != "zh-Hant.po" ]; then
         echo -e -n "${BLUE}更新 $(basename "$po_file") ${RESET}"
-        msgmerge --update --backup=off "$po_file" "$POT_FILE"
+        LC_ALL=C msgmerge --update --backup=off "$po_file" "$POT_FILE"
     fi
 done 
 
-# 更新 zh-Hant.po
+# 確保所有 .po 檔案中的路徑都有 ./ 前綴
+echo -e "${BLUE}統一路徑格式...${RESET}"
+for po_file in "$PO_DIR"/*.po; do
+    if [ -f "$po_file" ] && [ "$(basename "$po_file")" != "zh-Hant.po" ]; then
+        # 為路徑添加 ./ 前綴（如果還沒有的話）
+        LC_ALL=C sed -i '' 's|^#: \([^.]\)|#: ./\1|g' "$po_file"
+    fi
+done
+
+# 重新產生 zh-Hant.po（使用固定標頭並直接從 .pot 檔案複製內容）
 ZH_HANT_PO="$PO_DIR/zh-Hant.po"
-if [ -f "$ZH_HANT_PO" ]; then
-    echo -e "${BLUE}自動填入 zh-Hant.po 的 msgstr...${RESET}"
-    awk '
-    BEGIN {
-        in_msgid = 0
-        in_msgstr = 0
-        msgid_content = ""
-        msgstr_buffer = ""
-        collecting_msgid = 0
-        collecting_msgstr = 0
-    }
-    
-    # 開始新的 msgid
-    /^msgid / {
-        # 處理前一個完整的 msgid/msgstr 對
-        if (in_msgid && in_msgstr) {
-            print "msgid " msgid_content
-            print "msgstr " msgid_content
-        }
-        
-        # 開始新的 msgid
-        in_msgid = 1
-        in_msgstr = 0
-        msgid_content = substr($0, 7)  # 提取 msgid 後面的內容
-        msgstr_buffer = ""
-        collecting_msgid = 1
-        collecting_msgstr = 0
-        next
-    }
-    
-    # 開始 msgstr
-    /^msgstr / {
-        collecting_msgid = 0
-        collecting_msgstr = 1
-        in_msgstr = 1
-        msgstr_buffer = $0
-        next
-    }
-    
-    # 收集 msgid 或 msgstr 的內容行
-    /^"/ {
-        if (collecting_msgid) {
-            msgid_content = msgid_content "\n" $0
-        } else if (collecting_msgstr) {
-            msgstr_buffer = msgstr_buffer "\n" $0
-        }
-        next
-    }
-    
-    # 其他行（註解、空行等）
-    {
-        if (in_msgid && in_msgstr) {
-            print "msgid " msgid_content
-            print "msgstr " msgid_content
-        }
-        
-        # 重置狀態
-        in_msgid = 0
-        in_msgstr = 0
-        msgid_content = ""
-        msgstr_buffer = ""
-        collecting_msgid = 0
-        collecting_msgstr = 0
-        print
-    }
-    
-    END {
-        # 處理最後一個 msgid/msgstr 對
-        if (in_msgid && in_msgstr) {
-            print "msgid " msgid_content
-            print "msgstr " msgid_content
-        }
-    }
-    ' "$ZH_HANT_PO" > "$ZH_HANT_PO.tmp" && mv "$ZH_HANT_PO.tmp" "$ZH_HANT_PO"
-fi
+echo -e "${BLUE}重新產生 zh-Hant.po...${RESET}"
+
+# 創建帶有固定標頭的新檔案
+cat > "$ZH_HANT_PO" << 'EOF'
+msgid ""
+msgstr ""
+"Project-Id-Version: dpip\n"
+"Language-Team: Chinese Traditional\n"
+"Language: zh_TW\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: dpip\n"
+"X-Crowdin-Project-ID: 696803\n"
+"X-Crowdin-Language: zh-TW\n"
+"X-Crowdin-File: /main/.crowdin/strings.pot\n"
+"X-Crowdin-File-ID: 20\n"
+
+EOF
+
+# 直接從 .pot 檔案複製內容並將 msgstr 設為 msgid 的內容
+LC_ALL=C sed 's/^msgstr ""/msgstr/' "$POT_FILE" | LC_ALL=C awk '
+/^#/ { print; next }
+/^msgid / { 
+    msgid_line = $0
+    msgid_content = substr($0, 7)
+    print msgid_line
+    # 輸出對應的 msgstr（複製 msgid 的內容）
+    print "msgstr " msgid_content
+    next
+}
+/^msgstr/ { next }  # 跳過原有的空 msgstr 行
+/^$/ { print; next }  # 保留空行
+{ print }  # 輸出其他所有行
+' >> "$ZH_HANT_PO"
+
+# 最後確保所有 .po 檔案（包括 zh-Hant.po）的路徑格式一致
+echo -e "${BLUE}統一所有檔案的路徑格式...${RESET}"
+for po_file in "$PO_DIR"/*.po; do
+    if [ -f "$po_file" ]; then
+        # 為路徑添加 ./ 前綴（如果還沒有的話）
+        LC_ALL=C sed -i '' 's|^#: \([^.]\)|#: ./\1|g' "$po_file"
+    fi
+done
