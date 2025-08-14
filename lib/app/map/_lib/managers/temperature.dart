@@ -52,6 +52,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
   final currentTemperatureTime = ValueNotifier<String?>(GlobalProviders.data.temperature.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
+  DateTime? _lastFetchTime;
+
   Function(String)? onTimeChanged;
 
   Future<void> setTemperatureTime(String time) async {
@@ -86,6 +88,19 @@ class TemperatureMapLayerManager extends MapLayerManager {
     }
   }
 
+  Future<void> _fetchData() async {
+    try {
+      final temperatureList = (await ExpTech().getWeatherList()).reversed.toList();
+      if (!context.mounted) return;
+
+      GlobalProviders.data.setTemperature(temperatureList);
+      currentTemperatureTime.value ??= temperatureList.first;
+      _lastFetchTime = DateTime.now();
+    } catch (e, s) {
+      TalkerManager.instance.error('TemperatureMapLayerManager._fetchData', e, s);
+    }
+  }
+
   @override
   Future<void> setup() async {
     if (didSetup) return;
@@ -93,13 +108,7 @@ class TemperatureMapLayerManager extends MapLayerManager {
     final colors = context.colors;
 
     try {
-      if (GlobalProviders.data.temperature.isEmpty) {
-        final temperatureList = (await ExpTech().getWeatherList()).reversed.toList();
-        if (!context.mounted) return;
-
-        GlobalProviders.data.setTemperature(temperatureList);
-        currentTemperatureTime.value = temperatureList.first;
-      }
+      if (GlobalProviders.data.temperature.isEmpty) await _fetchData();
 
       final time = currentTemperatureTime.value;
 
@@ -248,6 +257,8 @@ class TemperatureMapLayerManager extends MapLayerManager {
       await _focus();
 
       visible = true;
+
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('TemperatureMapLayerManager.show', e, s);
     }

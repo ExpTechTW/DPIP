@@ -45,6 +45,8 @@ class ReportMapLayerManager extends MapLayerManager {
   final currentReport = ValueNotifier<PartialEarthquakeReport?>(null);
   final isLoading = ValueNotifier<bool>(false);
 
+  DateTime? _lastFetchTime;
+
   Future<void> setReport(String? reportId, {bool focus = true}) async {
     if (isLoading.value) return;
 
@@ -96,17 +98,20 @@ class ReportMapLayerManager extends MapLayerManager {
     );
   }
 
+  Future<void> _fetchData() async {
+    final reportList = await ExpTech().getReportList();
+    if (!context.mounted) return;
+
+    GlobalProviders.data.setPartialReport(reportList);
+    _lastFetchTime = DateTime.now();
+  }
+
   @override
   Future<void> setup() async {
     if (didSetup) return;
 
     try {
-      if (GlobalProviders.data.partialReport.isEmpty) {
-        final reportList = await ExpTech().getReportList();
-        if (!context.mounted) return;
-
-        GlobalProviders.data.setPartialReport(reportList);
-      }
+      if (GlobalProviders.data.partialReport.isEmpty) await _fetchData();
 
       final sourceId = MapSourceIds.report();
       final layerId = MapLayerIds.report();
@@ -201,6 +206,8 @@ class ReportMapLayerManager extends MapLayerManager {
       }
 
       visible = true;
+
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('ReportMapLayerManager.show', e, s);
     }

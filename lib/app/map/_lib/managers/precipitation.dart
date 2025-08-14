@@ -53,6 +53,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
   final currentPrecipitationInterval = ValueNotifier<String>('now');
   final isLoading = ValueNotifier<bool>(false);
 
+  DateTime? _lastFetchTime;
+
   Function(String)? onTimeChanged;
 
   Future<void> setPrecipitationTime(String time) async {
@@ -108,6 +110,19 @@ class PrecipitationMapLayerManager extends MapLayerManager {
     }
   }
 
+  Future<void> _fetchData() async {
+    try {
+      final precipitationList = (await ExpTech().getRainList()).reversed.toList();
+      if (!context.mounted) return;
+
+      GlobalProviders.data.setPrecipitation(precipitationList);
+      currentPrecipitationTime.value ??= precipitationList.first;
+      _lastFetchTime = DateTime.now();
+    } catch (e, s) {
+      TalkerManager.instance.error('PrecipitationMapLayerManager._fetchData', e, s);
+    }
+  }
+
   @override
   Future<void> setup() async {
     if (didSetup) return;
@@ -116,11 +131,7 @@ class PrecipitationMapLayerManager extends MapLayerManager {
 
     try {
       if (GlobalProviders.data.precipitation.isEmpty) {
-        final precipitationList = (await ExpTech().getRainList()).reversed.toList();
-        if (!context.mounted) return;
-
-        GlobalProviders.data.setPrecipitation(precipitationList);
-        currentPrecipitationTime.value = precipitationList.first;
+        await _fetchData();
       }
 
       final time = currentPrecipitationTime.value;
@@ -276,6 +287,8 @@ class PrecipitationMapLayerManager extends MapLayerManager {
       await _focus();
 
       visible = true;
+
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('PrecipitationMapLayerManager.show', e, s);
     }
