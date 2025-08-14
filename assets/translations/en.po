@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-14 00:38\n"
+"PO-Revision-Date: 2025-08-14 00:59\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "Earthquake Early Warning"
 msgid "強震監視器"
 msgstr "Earthquake Monitor"
 
-#: ./lib/app/map/_lib/managers/report.dart:800
+#: ./lib/app/map/_lib/managers/report.dart:811
 msgid "地震報告"
 msgstr "Reports"
 
@@ -64,7 +64,7 @@ msgstr "Weather Advisory"
 msgid "防災資訊"
 msgstr ""
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
+#: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
 msgstr "Tsunami information"
 
@@ -140,7 +140,7 @@ msgstr "Earthquake"
 msgid "天氣"
 msgstr "Weather"
 
-#: ./lib/app/settings/notify/page.dart:247
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯"
 msgstr "Tsunami"
 
@@ -577,15 +577,15 @@ msgstr ""
 msgid "新增地點"
 msgstr ""
 
-#: ./lib/app/settings/location/select/page.dart:26
+#: ./lib/app/settings/location/select/page.dart:38
 msgid "縣市"
 msgstr "Special Municipalities/County"
 
-#: ./lib/app/settings/location/select/page.dart:38
+#: ./lib/app/settings/location/select/page.dart:49
 msgid "目前所在地"
 msgstr "Current Location"
 
-#: ./lib/app/settings/map/page.dart:47
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
 msgid "監視器"
 msgstr "Monitor"
 
@@ -605,7 +605,7 @@ msgstr "Precipitation"
 msgid "風向/風速"
 msgstr "Wind/Gust"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+#: ./lib/app/settings/map/page.dart:56
 msgid "線條"
 msgstr "Simple"
 
@@ -677,7 +677,7 @@ msgstr "Severe thunderstorms or heavy rain are occurring near your area. Please 
 msgid "服務區域外，僅在臺灣各地可用"
 msgstr "Out of service area. Available only in Taiwan"
 
-#: ./lib/app/home/_widgets/location_button.dart:23
+#: ./lib/app/home/_widgets/location_button.dart:25
 msgid "尚未設定"
 msgstr "Not Set"
 
@@ -829,6 +829,14 @@ msgstr "Map Layers"
 msgid "選擇要顯示的地圖圖層"
 msgstr "Select the layer you want to display"
 
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+msgid "簡單"
+msgstr ""
+
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
+msgid "報告"
+msgstr ""
+
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
 msgstr "Weather"
@@ -911,7 +919,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:792
 msgid "目前沒有生效中的地震速報"
-msgstr "There are currently no earthquake warnings in effect"
+msgstr "There are currently no active earthquake early warnings"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:865
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
@@ -929,59 +937,59 @@ msgstr "{countdown} Arrived in seconds"
 msgid "已抵達"
 msgstr "Arrived"
 
-#: ./lib/app/map/_lib/managers/report.dart:357
+#: ./lib/app/map/_lib/managers/report.dart:362
 msgid "近期的地震報告"
 msgstr "Recent Earthquake Reports"
 
-#: ./lib/app/map/_lib/managers/report.dart:362
+#: ./lib/app/map/_lib/managers/report.dart:367
 msgid "更多"
 msgstr "More"
 
-#: ./lib/app/map/_lib/managers/report.dart:578
+#: ./lib/app/map/_lib/managers/report.dart:592
 msgid "編號 {number} 顯著有感地震"
 msgstr "No. {number} Significantly Felt Earthquake"
 
-#: ./lib/app/map/_lib/managers/report.dart:579
+#: ./lib/app/map/_lib/managers/report.dart:593
 msgid "小區域有感地震"
 msgstr "Local Earthquake"
 
-#: ./lib/app/map/_lib/managers/report.dart:638
+#: ./lib/app/map/_lib/managers/report.dart:649
 msgid "地震規模"
 msgstr "Magnitude"
 
-#: ./lib/app/map/_lib/managers/report.dart:660
+#: ./lib/app/map/_lib/managers/report.dart:671
 msgid "震源深度"
 msgstr "Depth"
 
-#: ./lib/app/map/_lib/managers/report.dart:597
+#: ./lib/app/map/_lib/managers/report.dart:608
 msgid "報告頁面"
 msgstr "Web"
 
-#: ./lib/app/map/_lib/managers/report.dart:621
+#: ./lib/app/map/_lib/managers/report.dart:632
 msgid "發震時間"
 msgstr "Event Time"
 
-#: ./lib/app/map/_lib/managers/report.dart:628
+#: ./lib/app/map/_lib/managers/report.dart:639
 msgid "位於"
 msgstr "Location"
 
-#: ./lib/app/map/_lib/managers/report.dart:684
+#: ./lib/app/map/_lib/managers/report.dart:695
 msgid "各地震度"
 msgstr "Observed Intensities"
 
-#: ./lib/app/map/_lib/managers/report.dart:755
+#: ./lib/app/map/_lib/managers/report.dart:766
 msgid "地震報告圖"
 msgstr "Earthquake Intensity Map Image"
 
-#: ./lib/app/map/_lib/managers/report.dart:765
+#: ./lib/app/map/_lib/managers/report.dart:776
 msgid "震度圖"
 msgstr "Intensity Map Image"
 
-#: ./lib/app/map/_lib/managers/report.dart:775
+#: ./lib/app/map/_lib/managers/report.dart:786
 msgid "最大地動加速度圖"
 msgstr "Max PGA Image"
 
-#: ./lib/app/map/_lib/managers/report.dart:785
+#: ./lib/app/map/_lib/managers/report.dart:796
 msgid "最大地動速度圖"
 msgstr "Max PGV Image"
 
@@ -1325,19 +1333,19 @@ msgstr "Cloudy with heavy thunderstorm"
 msgid "陰大雷雹"
 msgstr "Heavy thunder and hail"
 
-#: ./lib/api/model/location/location.dart:80
+#: ./lib/api/model/location/location.dart:82
 msgid "{city}{cityLevel} {town}{townLevel}"
 msgstr "{town} {townLevel}, {city} {cityLevel}"
 
-#: ./lib/api/model/location/location.dart:93
+#: ./lib/api/model/location/location.dart:95
 msgid "{city} {town}"
 msgstr ""
 
-#: ./lib/api/model/location/location.dart:102
+#: ./lib/api/model/location/location.dart:104
 msgid "{city}{cityLevel}"
 msgstr "{city} {cityLevel}"
 
-#: ./lib/api/model/location/location.dart:111
+#: ./lib/api/model/location/location.dart:113
 msgid "{town}{townLevel}"
 msgstr "{town} {townLevel}"
 
