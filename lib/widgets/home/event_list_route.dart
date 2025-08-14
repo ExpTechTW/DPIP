@@ -41,6 +41,9 @@ void handleEventList(BuildContext context, History history) {
     case HistoryType.extremelyTorrentialRain:
       page = ThunderstormPage(item: history);
 
+    case HistoryType.workAndClassSuspension:
+      page = ThunderstormPage(item: history);
+
     case HistoryType.earthquake:
       context.push(
         MapPage.route(

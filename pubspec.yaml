@@ -1,7 +1,7 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 3.0.200
+version: 3.1.0
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -82,13 +82,10 @@ dev_dependencies:
   lint: ^2.0.0
 
 flutter:
-  generate: true
   uses-material-design: true
   assets:
   # localizations
   - assets/translations/
-  - assets/location_names.csv
-  - assets/weather_station_names.csv
   # other
   - assets/map/
   - assets/DPIP.png
