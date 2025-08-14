@@ -109,7 +109,7 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             runSpacing: 8,
             children: [
               LayerToggle(
-                label: '線條'.i18n,
+                label: '簡單'.i18n,
                 checked: _currentBaseMap == BaseMapType.exptech,
                 onChanged: (_) => _setBaseMap(BaseMapType.exptech),
               ),
@@ -131,17 +131,17 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
             runSpacing: 8,
             children: [
               LayerToggle(
-                label: '強震監視器'.i18n,
+                label: '監視器'.i18n,
                 checked: _activeLayers.contains(MapLayer.monitor),
                 onChanged: (checked) => _toggleLayer(MapLayer.monitor, checked),
               ),
               LayerToggle(
-                label: '地震報告'.i18n,
+                label: '報告'.i18n,
                 checked: _activeLayers.contains(MapLayer.report),
                 onChanged: (checked) => _toggleLayer(MapLayer.report, checked),
               ),
               LayerToggle(
-                label: '海嘯資訊'.i18n,
+                label: '海嘯'.i18n,
                 checked: _activeLayers.contains(MapLayer.tsunami),
                 onChanged: null, // (checked) => _toggleLayer(MapLayer.tsunami, checked),
               ),
