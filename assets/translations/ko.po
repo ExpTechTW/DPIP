@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-14 01:07\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -154,7 +154,7 @@ msgstr "중대"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時"
-msgstr ""
+msgstr "해일 경보 발령 시"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
@@ -295,7 +295,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
 msgid "所在地(鄉鎮)發布雷雨即時訊息時"
-msgstr ""
+msgstr "소재지(향ㆍ진)으로 뇌우 실시간 정보"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
