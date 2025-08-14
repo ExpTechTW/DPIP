@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-13 10:04\n"
+"PO-Revision-Date: 2025-08-14 00:38\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -42,11 +42,11 @@ msgstr "Earthquake Early Warning"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:784
 msgid "強震監視器"
-msgstr "Strong Earthquake Monitor"
+msgstr "Earthquake Monitor"
 
 #: ./lib/app/map/_lib/managers/report.dart:800
 msgid "地震報告"
-msgstr "Earthquake Reports"
+msgstr "Reports"
 
 #: ./lib/app/settings/notify/page.dart:191
 msgid "震度速報"
@@ -174,7 +174,7 @@ msgstr "When the Pacific information is issued"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
-msgstr "Strong Earthquake Monitor(General)"
+msgstr "Earthquake Monitor (General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
@@ -587,7 +587,7 @@ msgstr "Current Location"
 
 #: ./lib/app/settings/map/page.dart:47
 msgid "監視器"
-msgstr ""
+msgstr "Monitor"
 
 #: ./lib/app/map/_lib/managers/radar.dart:495
 msgid "雷達回波"
@@ -631,7 +631,7 @@ msgstr "Animation frame rate"
 
 #: ./lib/app/settings/map/page.dart:110
 msgid "影響強震監視器的震波模擬動畫流暢度"
-msgstr ""
+msgstr "Affects the smoothness of the seismic wave simulation in the Earthquake Monitor."
 
 #: ./lib/app/settings/map/page.dart:140
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
