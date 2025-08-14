@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-14 01:07\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -575,7 +575,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:421
 msgid "新增地點"
-msgstr ""
+msgstr "Add a new location"
 
 #: ./lib/app/settings/location/select/page.dart:38
 msgid "縣市"
