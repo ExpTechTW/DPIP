@@ -33,6 +33,8 @@ class RadarMapLayerManager extends MapLayerManager {
   final playStartTime = ValueNotifier<String?>(null);
   final playEndTime = ValueNotifier<String?>(null);
 
+  DateTime? _lastFetchTime;
+
   Timer? _playTimer;
   final Set<String> _preloadedLayers = {};
   final int Function()? getActiveLayerCount;
@@ -324,21 +326,27 @@ class RadarMapLayerManager extends MapLayerManager {
     }
   }
 
+  Future<void> _fetchData() async {
+    final radarList = (await ExpTech().getRadarList()).reversed.toList();
+    if (!context.mounted) return;
+
+    GlobalProviders.data.setRadar(radarList);
+    currentRadarTime.value ??= radarList.first;
+    _lastFetchTime = DateTime.now();
+  }
+
   @override
   Future<void> setup() async {
     if (didSetup) return;
 
     try {
-      if (GlobalProviders.data.radar.isEmpty) {
-        final radarList = (await ExpTech().getRadarList()).reversed.toList();
-        if (!context.mounted) return;
+      if (GlobalProviders.data.radar.isEmpty) await _fetchData();
 
-        GlobalProviders.data.setRadar(radarList);
-        currentRadarTime.value = radarList.first;
-      }
+      final time = currentRadarTime.value;
+      if (time == null) throw Exception('Time is null');
 
-      await _setupAndShowLayer(currentRadarTime.value!);
-      await _preloadAdjacentLayers(currentRadarTime.value!);
+      await _setupAndShowLayer(time);
+      await _preloadAdjacentLayers(time);
 
       didSetup = true;
     } catch (e, s) {
@@ -376,6 +384,8 @@ class RadarMapLayerManager extends MapLayerManager {
       await _focus();
 
       visible = true;
+
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('RadarMapLayerManager.show', e, s);
     }

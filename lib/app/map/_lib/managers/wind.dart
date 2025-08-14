@@ -44,6 +44,8 @@ class WindMapLayerManager extends MapLayerManager {
   final currentWindTime = ValueNotifier<String?>(GlobalProviders.data.wind.firstOrNull);
   final isLoading = ValueNotifier<bool>(false);
 
+  DateTime? _lastFetchTime;
+
   Function(String)? onTimeChanged;
 
   Future<void> setWindTime(String time) async {
@@ -64,6 +66,15 @@ class WindMapLayerManager extends MapLayerManager {
     }
   }
 
+  Future<void> _fetchData() async {
+    final windList = (await ExpTech().getWeatherList()).reversed.toList();
+    if (!context.mounted) return;
+
+    GlobalProviders.data.setWind(windList);
+    currentWindTime.value ??= windList.first;
+    _lastFetchTime = DateTime.now();
+  }
+
   @override
   Future<void> setup() async {
     if (didSetup) return;
@@ -71,13 +82,7 @@ class WindMapLayerManager extends MapLayerManager {
     final colors = context.colors;
 
     try {
-      if (GlobalProviders.data.wind.isEmpty) {
-        final windList = (await ExpTech().getWeatherList()).reversed.toList();
-        if (!context.mounted) return;
-
-        GlobalProviders.data.setWind(windList);
-        currentWindTime.value = windList.first;
-      }
+      if (GlobalProviders.data.wind.isEmpty) await _fetchData();
 
       final time = currentWindTime.value;
 
@@ -201,6 +206,8 @@ class WindMapLayerManager extends MapLayerManager {
       await controller.setLayerVisibility('$layerId-label', true);
 
       visible = true;
+
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
     } catch (e, s) {
       TalkerManager.instance.error('WindMapLayerManager.show', e, s);
     }
