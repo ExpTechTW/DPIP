@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-14 02:09\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -1335,17 +1335,17 @@ msgstr ""
 
 #: ./lib/api/model/location/location.dart:82
 msgid "{city}{cityLevel} {town}{townLevel}"
-msgstr ""
+msgstr "{city}{cityLevel} {town}{townLevel}"
 
 #: ./lib/api/model/location/location.dart:95
 msgid "{city} {town}"
-msgstr ""
+msgstr "{city} {town}"
 
 #: ./lib/api/model/location/location.dart:104
 msgid "{city}{cityLevel}"
-msgstr ""
+msgstr "{city}{cityLevel}"
 
 #: ./lib/api/model/location/location.dart:113
 msgid "{town}{townLevel}"
-msgstr ""
+msgstr "{town}{townLevel}"
 
