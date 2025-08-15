@@ -793,35 +793,28 @@ class _AutoScrollingTimeListState extends State<_AutoScrollingTimeList> {
     final key = _chipKeys[widget.currentTime];
     if (key?.currentContext == null) return;
 
-    try {
-      final RenderBox? renderBox = key!.currentContext!.findRenderObject() as RenderBox?;
-      if (renderBox == null) return;
+    final RenderBox? renderBox = key!.currentContext!.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
 
-      final RenderBox? scrollViewBox =
-          _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
-      if (scrollViewBox == null) return;
+    final RenderBox? scrollViewBox = _scrollController.position.context.storageContext.findRenderObject() as RenderBox?;
+    if (scrollViewBox == null) return;
 
-      if (!renderBox.attached) return;
+    if (!renderBox.attached) return;
 
-      final position = renderBox.localToGlobal(Offset.zero);
-      final localPosition = scrollViewBox.globalToLocal(position);
+    final position = renderBox.localToGlobal(Offset.zero);
+    final localPosition = scrollViewBox.globalToLocal(position);
 
-      final targetOffset =
-          _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
+    final targetOffset =
+        _scrollController.offset + localPosition.dx - (scrollViewBox.size.width / 2) + (renderBox.size.width / 2);
 
-      final clampedOffset = targetOffset.clamp(
-        _scrollController.position.minScrollExtent,
-        _scrollController.position.maxScrollExtent,
-      );
+    final clampedOffset = targetOffset.clamp(
+      _scrollController.position.minScrollExtent,
+      _scrollController.position.maxScrollExtent,
+    );
 
-      if ((clampedOffset - _scrollController.offset).abs() > 20) {
-        _scrollController.animateTo(
-          clampedOffset,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
-    } catch (e) {}
+    if ((clampedOffset - _scrollController.offset).abs() > 20) {
+      _scrollController.animateTo(clampedOffset, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    }
   }
 
   @override
