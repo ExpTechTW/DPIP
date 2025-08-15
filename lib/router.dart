@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -45,7 +42,6 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
-import 'package:dpip/widgets/transitions/predictive_fade_forward.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();
@@ -59,45 +55,15 @@ final router = GoRouter(
       navigatorKey: _welcomeNavigatorKey,
       builder: (context, state, child) => ShellWrapper(WelcomeLayout(child: child)),
       routes: [
-        GoRoute(
-          path: WelcomeAboutPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomeAboutPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeAboutPage());
-          },
-        ),
+        GoRoute(path: WelcomeAboutPage.route, builder: (context, state) => const Material(child: WelcomeAboutPage())),
         GoRoute(
           path: WelcomeExpTechPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomeExpTechPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeExpTechPage());
-          },
+          builder: (context, state) => const Material(child: WelcomeExpTechPage()),
         ),
-        GoRoute(
-          path: WelcomeNoticePage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomeNoticePage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeNoticePage());
-          },
-        ),
+        GoRoute(path: WelcomeNoticePage.route, builder: (context, state) => const Material(child: WelcomeNoticePage())),
         GoRoute(
           path: WelcomePermissionPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomePermissionPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomePermissionPage());
-          },
+          builder: (context, state) => const Material(child: WelcomePermissionPage()),
         ),
       ],
     ),
