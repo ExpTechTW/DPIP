@@ -61,7 +61,7 @@ final router = GoRouter(
           path: WelcomeAboutPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const WelcomeAboutPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomeAboutPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeAboutPage());
@@ -71,7 +71,7 @@ final router = GoRouter(
           path: WelcomeExpTechPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const WelcomeExpTechPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomeExpTechPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeExpTechPage());
@@ -81,7 +81,7 @@ final router = GoRouter(
           path: WelcomeNoticePage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const WelcomeNoticePage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomeNoticePage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeNoticePage());
@@ -91,7 +91,7 @@ final router = GoRouter(
           path: WelcomePermissionPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const WelcomePermissionPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: WelcomePermissionPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomePermissionPage());
@@ -139,7 +139,7 @@ final router = GoRouter(
           path: SettingsIndexPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsIndexPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsIndexPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsIndexPage());
@@ -149,7 +149,7 @@ final router = GoRouter(
           path: SettingsLocationPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsLocationPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocationPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationPage());
@@ -159,7 +159,7 @@ final router = GoRouter(
           path: SettingsLocationSelectPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsLocationSelectPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocationSelectPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationSelectPage());
@@ -168,24 +168,23 @@ final router = GoRouter(
         GoRoute(
           path: SettingsLocationSelectCityPage.route(),
           pageBuilder: (context, state) {
+            final city = state.pathParameters['city']!;
+
             if (Platform.isIOS) {
               return CupertinoPage(
                 key: state.pageKey,
-                child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
+                child: Material(child: SettingsLocationSelectCityPage(city: city)),
               );
             }
 
-            return ForwardBackTransitionPage(
-              key: state.pageKey,
-              child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
-            );
+            return ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationSelectCityPage(city: city));
           },
         ),
         GoRoute(
           path: SettingsThemePage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsThemePage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsThemePage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemePage());
@@ -195,7 +194,7 @@ final router = GoRouter(
           path: SettingsThemeSelectPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsThemeSelectPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsThemeSelectPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemeSelectPage());
@@ -205,7 +204,7 @@ final router = GoRouter(
           path: SettingsLocalePage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsLocalePage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocalePage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocalePage());
@@ -215,7 +214,7 @@ final router = GoRouter(
           path: SettingsLocaleSelectPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsLocaleSelectPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocaleSelectPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocaleSelectPage());
@@ -225,7 +224,7 @@ final router = GoRouter(
           path: SettingsUnitPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsUnitPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsUnitPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage());
@@ -235,7 +234,7 @@ final router = GoRouter(
           path: SettingsMapPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsMapPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsMapPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsMapPage());
@@ -245,7 +244,7 @@ final router = GoRouter(
           path: SettingsNotifyPage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsNotifyPage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyPage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage());
@@ -255,7 +254,7 @@ final router = GoRouter(
               path: SettingsNotifyEewPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyEewPage());
+                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyEewPage()));
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEewPage());
@@ -265,7 +264,7 @@ final router = GoRouter(
               path: SettingsNotifyMonitorPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyMonitorPage());
+                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyMonitorPage()));
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyMonitorPage());
@@ -275,7 +274,7 @@ final router = GoRouter(
               path: SettingsNotifyReportPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyReportPage());
+                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyReportPage()));
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyReportPage());
@@ -285,7 +284,7 @@ final router = GoRouter(
               path: SettingsNotifyIntensityPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyIntensityPage());
+                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyIntensityPage()));
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyIntensityPage());
@@ -295,7 +294,10 @@ final router = GoRouter(
               path: SettingsNotifyThunderstormPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage());
+                  return CupertinoPage(
+                    key: state.pageKey,
+                    child: const Material(child: SettingsNotifyThunderstormPage()),
+                  );
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage());
@@ -305,7 +307,7 @@ final router = GoRouter(
               path: SettingsNotifyAdvisoryPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage());
+                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyAdvisoryPage()));
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage());
@@ -315,7 +317,10 @@ final router = GoRouter(
               path: SettingsNotifyEvacuationPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage());
+                  return CupertinoPage(
+                    key: state.pageKey,
+                    child: const Material(child: SettingsNotifyEvacuationPage()),
+                  );
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage());
@@ -325,7 +330,7 @@ final router = GoRouter(
               path: SettingsNotifyTsunamiPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage());
+                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyTsunamiPage()));
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage());
@@ -335,7 +340,10 @@ final router = GoRouter(
               path: SettingsNotifyAnnouncementPage.name,
               pageBuilder: (context, state) {
                 if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage());
+                  return CupertinoPage(
+                    key: state.pageKey,
+                    child: const Material(child: SettingsNotifyAnnouncementPage()),
+                  );
                 }
 
                 return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage());
@@ -347,7 +355,7 @@ final router = GoRouter(
           path: SettingsDonatePage.route,
           pageBuilder: (context, state) {
             if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const SettingsDonatePage());
+              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsDonatePage()));
             }
 
             return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsDonatePage());
