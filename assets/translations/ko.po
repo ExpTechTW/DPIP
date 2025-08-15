@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-14 02:09\n"
+"PO-Revision-Date: 2025-08-15 01:20\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "긴급 지진 속보"
 msgid "強震監視器"
 msgstr "강진 모니터"
 
-#: ./lib/app/map/_lib/managers/report.dart:811
+#: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
 msgstr "지진 보고"
 
@@ -587,19 +587,19 @@ msgstr "현재 위치"
 msgid "監視器"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:495
+#: ./lib/app/map/_lib/managers/radar.dart:505
 msgid "雷達回波"
 msgstr "레이더"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:371
+#: ./lib/app/map/_lib/managers/temperature.dart:382
 msgid "氣溫"
 msgstr "기온"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:457
+#: ./lib/app/map/_lib/managers/precipitation.dart:470
 msgid "降水"
 msgstr "강우"
 
-#: ./lib/app/map/_lib/managers/wind.dart:264
+#: ./lib/app/map/_lib/managers/wind.dart:271
 msgid "風向/風速"
 msgstr "풍향/풍속"
 
@@ -623,15 +623,15 @@ msgstr "배경 레이어"
 msgid "初始圖層"
 msgstr "기본 지도"
 
-#: ./lib/app/settings/map/page.dart:106
+#: ./lib/app/settings/map/page.dart:107
 msgid "動畫幀率"
 msgstr "애니메이션 주사율"
 
-#: ./lib/app/settings/map/page.dart:110
+#: ./lib/app/settings/map/page.dart:111
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:140
+#: ./lib/app/settings/map/page.dart:142
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr "지나치게 높은 애니메이션 주사율은 끊김 현상이나 기기 발열을 일으킬 수 있습니다"
 
@@ -843,55 +843,55 @@ msgstr "기상"
 msgid "單位：{unit}"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:609
+#: ./lib/app/map/_lib/managers/radar.dart:619
 msgid "長按設定播放起點"
 msgstr "길게 눌러 재생 시작 지점 설정"
 
-#: ./lib/app/map/_lib/managers/radar.dart:623
+#: ./lib/app/map/_lib/managers/radar.dart:633
 msgid "目前時間"
 msgstr "현재 시간"
 
-#: ./lib/app/map/_lib/managers/radar.dart:628
+#: ./lib/app/map/_lib/managers/radar.dart:638
 msgid "播放起點"
 msgstr "재생 시작 지점"
 
-#: ./lib/app/map/_lib/managers/radar.dart:935
+#: ./lib/app/map/_lib/managers/radar.dart:945
 msgid "播放進度"
 msgstr "재생 진행도"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:315
+#: ./lib/app/map/_lib/managers/precipitation.dart:328
 msgid "今日"
 msgstr "오늘"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:316
+#: ./lib/app/map/_lib/managers/precipitation.dart:329
 msgid "10 分鐘"
 msgstr "10 분"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:317
+#: ./lib/app/map/_lib/managers/precipitation.dart:330
 msgid "1 小時"
 msgstr "1 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:318
+#: ./lib/app/map/_lib/managers/precipitation.dart:331
 msgid "3 小時"
 msgstr "3 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:319
+#: ./lib/app/map/_lib/managers/precipitation.dart:332
 msgid "6 小時"
 msgstr "6 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:320
+#: ./lib/app/map/_lib/managers/precipitation.dart:333
 msgid "12 小時"
 msgstr "12 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:321
+#: ./lib/app/map/_lib/managers/precipitation.dart:334
 msgid "24 小時"
 msgstr "24 시간"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:322
+#: ./lib/app/map/_lib/managers/precipitation.dart:335
 msgid "2 天"
 msgstr "2 일"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:323
+#: ./lib/app/map/_lib/managers/precipitation.dart:336
 msgid "3 天"
 msgstr "3 일"
 
@@ -935,59 +935,59 @@ msgstr "{countdown}초 후 도착"
 msgid "已抵達"
 msgstr "도착"
 
-#: ./lib/app/map/_lib/managers/report.dart:362
+#: ./lib/app/map/_lib/managers/report.dart:369
 msgid "近期的地震報告"
 msgstr "최근 지진 현황"
 
-#: ./lib/app/map/_lib/managers/report.dart:367
+#: ./lib/app/map/_lib/managers/report.dart:374
 msgid "更多"
 msgstr "더 보기"
 
-#: ./lib/app/map/_lib/managers/report.dart:592
+#: ./lib/app/map/_lib/managers/report.dart:599
 msgid "編號 {number} 顯著有感地震"
 msgstr "번호 {number} 강한 체감 지진"
 
-#: ./lib/app/map/_lib/managers/report.dart:593
+#: ./lib/app/map/_lib/managers/report.dart:600
 msgid "小區域有感地震"
 msgstr "소구역 체감 지진"
 
-#: ./lib/app/map/_lib/managers/report.dart:649
+#: ./lib/app/map/_lib/managers/report.dart:656
 msgid "地震規模"
 msgstr "지진 규모"
 
-#: ./lib/app/map/_lib/managers/report.dart:671
+#: ./lib/app/map/_lib/managers/report.dart:678
 msgid "震源深度"
 msgstr "진원 깊이"
 
-#: ./lib/app/map/_lib/managers/report.dart:608
+#: ./lib/app/map/_lib/managers/report.dart:615
 msgid "報告頁面"
 msgstr "보고 페이지"
 
-#: ./lib/app/map/_lib/managers/report.dart:632
+#: ./lib/app/map/_lib/managers/report.dart:639
 msgid "發震時間"
 msgstr "지진 발생 시간"
 
-#: ./lib/app/map/_lib/managers/report.dart:639
+#: ./lib/app/map/_lib/managers/report.dart:646
 msgid "位於"
 msgstr "에 위치"
 
-#: ./lib/app/map/_lib/managers/report.dart:695
+#: ./lib/app/map/_lib/managers/report.dart:702
 msgid "各地震度"
 msgstr "각 지역 진도"
 
-#: ./lib/app/map/_lib/managers/report.dart:766
+#: ./lib/app/map/_lib/managers/report.dart:773
 msgid "地震報告圖"
 msgstr "지진 보고"
 
-#: ./lib/app/map/_lib/managers/report.dart:776
+#: ./lib/app/map/_lib/managers/report.dart:783
 msgid "震度圖"
 msgstr "진도"
 
-#: ./lib/app/map/_lib/managers/report.dart:786
+#: ./lib/app/map/_lib/managers/report.dart:793
 msgid "最大地動加速度圖"
 msgstr "최대 지반 가속도"
 
-#: ./lib/app/map/_lib/managers/report.dart:796
+#: ./lib/app/map/_lib/managers/report.dart:803
 msgid "最大地動速度圖"
 msgstr "최대 지반 속도"
 
