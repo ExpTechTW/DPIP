@@ -1,3 +1,4 @@
+import 'package:dpip/widgets/shell_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -51,7 +52,7 @@ final router = GoRouter(
   routes: [
     ShellRoute(
       navigatorKey: _welcomeNavigatorKey,
-      builder: (context, state, child) => WelcomeLayout(child: child),
+      builder: (context, state, child) => ShellWrapper(WelcomeLayout(child: child)),
       routes: [
         GoRoute(
           path: WelcomeAboutPage.route,
@@ -77,19 +78,15 @@ final router = GoRouter(
     ),
     GoRoute(
       path: HomePage.route,
-      pageBuilder: (context, state) => const NoTransitionPage(
-        child: AppLayout(
-          child: HomePage(),
-        ),
-      ),
+      pageBuilder: (context, state) => const NoTransitionPage(child: AppLayout(child: HomePage())),
     ),
     ShellRoute(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
         final title = switch (state.fullPath) {
           SettingsLocationPage.route => '所在地'.i18n,
-          SettingsLocationSelectPage.route => '所在地'.i18n,
-          final p when p == SettingsLocationSelectCityPage.route() => '所在地'.i18n,
+          SettingsLocationSelectPage.route => '新增地點'.i18n,
+          final p when p == SettingsLocationSelectCityPage.route() => '新增地點'.i18n,
           SettingsThemePage.route => '主題'.i18n,
           SettingsThemeSelectPage.route => '主題'.i18n,
           SettingsLocalePage.route => '語言'.i18n,
@@ -111,7 +108,8 @@ final router = GoRouter(
           SettingsDonatePage.route => '贊助我們'.i18n,
           _ => '設定'.i18n,
         };
-        return SettingsLayout(title: title, child: child);
+
+        return ShellWrapper(SettingsLayout(title: title, child: child));
       },
       routes: [
         GoRoute(
