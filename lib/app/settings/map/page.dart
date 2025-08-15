@@ -53,7 +53,7 @@ class SettingsMapPage extends StatelessWidget {
       MapLayer.wind: '風向/風速'.i18n,
     };
     final baseMapLabels = {
-      BaseMapType.exptech: '線條'.i18n,
+      BaseMapType.exptech: '簡單'.i18n,
       BaseMapType.osm: 'OpenStreetMap'.i18n,
       BaseMapType.google: 'Google'.i18n,
     };
