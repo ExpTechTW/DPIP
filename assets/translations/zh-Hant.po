@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: dpip\n"
-"Language-Team: Chinese Traditional\n"
-"Language: zh_TW\n"
-"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: zh-TW\n"
 "X-Crowdin-File: /main/.crowdin/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
+"Project-Id-Version: dpip\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Chinese Traditional\n"
+"Language: zh_TW\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -43,7 +43,7 @@ msgstr "緊急地震速報"
 msgid "強震監視器"
 msgstr "強震監視器"
 
-#: ./lib/app/map/_lib/managers/report.dart:811
+#: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
 msgstr "地震報告"
 
@@ -225,6 +225,8 @@ msgstr "緊急地震速報(重大)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:35
 msgid ""
+"最大震度 5 弱以上 且\n"
+"所在地(鄉鎮)預估震度 4 以上"
 msgstr ""
 "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 4 以上"
@@ -235,6 +237,8 @@ msgstr "緊急地震速報(一般)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:40
 msgid ""
+"最大震度 5 弱以上 且\n"
+"所在地(鄉鎮)預估震度 2 以上"
 msgstr ""
 "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 2 以上"
@@ -245,6 +249,8 @@ msgstr "緊急地震速報(無聲)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:45
 msgid ""
+"最大震度 5 弱以上 且\n"
+"所在地(鄉鎮)預估震度 1 以上"
 msgstr ""
 "最大震度 5 弱以上 且\n"
 "所在地(鄉鎮)預估震度 1 以上"
@@ -283,12 +289,16 @@ msgstr "所在地(鄉鎮)發布防災資訊時"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid ""
+"所在地(鄉鎮)發布紅色燈號之\n"
+"天氣警特報"
 msgstr ""
 "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:40
 msgid ""
+"所在地(鄉鎮)發布上述除外燈號之\n"
+"天氣警特報"
 msgstr ""
 "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
@@ -355,6 +365,10 @@ msgstr "正在載入商店物品中"
 
 #: ./lib/app/settings/donate/page.dart:161
 msgid ""
+"DPIP 作為一款致力於提供即時地震資訊的 "
+"App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n"
+"\n"
+"您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
 msgstr ""
 "DPIP 作為一款致力於提供即時地震資訊的 "
 "App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n"
@@ -559,6 +573,8 @@ msgstr "定期更新目前的所在地"
 
 #: ./lib/app/settings/location/page.dart:242
 msgid ""
+"自動定位功能將使用您的裝置上的 GPS，即使 DPIP "
+"關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
 msgstr ""
 "自動定位功能將使用您的裝置上的 GPS，即使 DPIP "
 "關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
@@ -595,19 +611,19 @@ msgstr "目前所在地"
 msgid "監視器"
 msgstr "監視器"
 
-#: ./lib/app/map/_lib/managers/radar.dart:495
+#: ./lib/app/map/_lib/managers/radar.dart:505
 msgid "雷達回波"
 msgstr "雷達回波"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:371
+#: ./lib/app/map/_lib/managers/temperature.dart:382
 msgid "氣溫"
 msgstr "氣溫"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:457
+#: ./lib/app/map/_lib/managers/precipitation.dart:470
 msgid "降水"
 msgstr "降水"
 
-#: ./lib/app/map/_lib/managers/wind.dart:264
+#: ./lib/app/map/_lib/managers/wind.dart:271
 msgid "風向/風速"
 msgstr "風向/風速"
 
@@ -631,15 +647,15 @@ msgstr "底圖"
 msgid "初始圖層"
 msgstr "初始圖層"
 
-#: ./lib/app/settings/map/page.dart:106
+#: ./lib/app/settings/map/page.dart:107
 msgid "動畫幀率"
 msgstr "動畫幀率"
 
-#: ./lib/app/settings/map/page.dart:110
+#: ./lib/app/settings/map/page.dart:111
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr "影響強震監視器的震波模擬動畫流暢度"
 
-#: ./lib/app/settings/map/page.dart:140
+#: ./lib/app/settings/map/page.dart:142
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr "過高的動畫幀率可能會造成卡頓或設備發熱"
 
@@ -701,12 +717,16 @@ msgstr "第 {serial} 報"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1100
 msgid ""
+"{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
+"<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid ""
+"{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
+"<bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr ""
 "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 "
 "<bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
@@ -793,6 +813,8 @@ msgstr "歡迎使用 DPIP"
 
 #: ./lib/app/welcome/1-about/page.dart:81
 msgid ""
+"DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) "
+"之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
 msgstr ""
 "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) "
 "之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
@@ -857,55 +879,55 @@ msgstr "氣象"
 msgid "單位：{unit}"
 msgstr "單位：{unit}"
 
-#: ./lib/app/map/_lib/managers/radar.dart:609
+#: ./lib/app/map/_lib/managers/radar.dart:619
 msgid "長按設定播放起點"
 msgstr "長按設定播放起點"
 
-#: ./lib/app/map/_lib/managers/radar.dart:623
+#: ./lib/app/map/_lib/managers/radar.dart:633
 msgid "目前時間"
 msgstr "目前時間"
 
-#: ./lib/app/map/_lib/managers/radar.dart:628
+#: ./lib/app/map/_lib/managers/radar.dart:638
 msgid "播放起點"
 msgstr "播放起點"
 
-#: ./lib/app/map/_lib/managers/radar.dart:935
+#: ./lib/app/map/_lib/managers/radar.dart:945
 msgid "播放進度"
 msgstr "播放進度"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:315
+#: ./lib/app/map/_lib/managers/precipitation.dart:328
 msgid "今日"
 msgstr "今日"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:316
+#: ./lib/app/map/_lib/managers/precipitation.dart:329
 msgid "10 分鐘"
 msgstr "10 分鐘"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:317
+#: ./lib/app/map/_lib/managers/precipitation.dart:330
 msgid "1 小時"
 msgstr "1 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:318
+#: ./lib/app/map/_lib/managers/precipitation.dart:331
 msgid "3 小時"
 msgstr "3 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:319
+#: ./lib/app/map/_lib/managers/precipitation.dart:332
 msgid "6 小時"
 msgstr "6 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:320
+#: ./lib/app/map/_lib/managers/precipitation.dart:333
 msgid "12 小時"
 msgstr "12 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:321
+#: ./lib/app/map/_lib/managers/precipitation.dart:334
 msgid "24 小時"
 msgstr "24 小時"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:322
+#: ./lib/app/map/_lib/managers/precipitation.dart:335
 msgid "2 天"
 msgstr "2 天"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:323
+#: ./lib/app/map/_lib/managers/precipitation.dart:336
 msgid "3 天"
 msgstr "3 天"
 
@@ -949,59 +971,59 @@ msgstr "{countdown}秒後抵達"
 msgid "已抵達"
 msgstr "已抵達"
 
-#: ./lib/app/map/_lib/managers/report.dart:362
+#: ./lib/app/map/_lib/managers/report.dart:369
 msgid "近期的地震報告"
 msgstr "近期的地震報告"
 
-#: ./lib/app/map/_lib/managers/report.dart:367
+#: ./lib/app/map/_lib/managers/report.dart:374
 msgid "更多"
 msgstr "更多"
 
-#: ./lib/app/map/_lib/managers/report.dart:592
+#: ./lib/app/map/_lib/managers/report.dart:599
 msgid "編號 {number} 顯著有感地震"
 msgstr "編號 {number} 顯著有感地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:593
+#: ./lib/app/map/_lib/managers/report.dart:600
 msgid "小區域有感地震"
 msgstr "小區域有感地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:649
+#: ./lib/app/map/_lib/managers/report.dart:656
 msgid "地震規模"
 msgstr "地震規模"
 
-#: ./lib/app/map/_lib/managers/report.dart:671
+#: ./lib/app/map/_lib/managers/report.dart:678
 msgid "震源深度"
 msgstr "震源深度"
 
-#: ./lib/app/map/_lib/managers/report.dart:608
+#: ./lib/app/map/_lib/managers/report.dart:615
 msgid "報告頁面"
 msgstr "報告頁面"
 
-#: ./lib/app/map/_lib/managers/report.dart:632
+#: ./lib/app/map/_lib/managers/report.dart:639
 msgid "發震時間"
 msgstr "發震時間"
 
-#: ./lib/app/map/_lib/managers/report.dart:639
+#: ./lib/app/map/_lib/managers/report.dart:646
 msgid "位於"
 msgstr "位於"
 
-#: ./lib/app/map/_lib/managers/report.dart:695
+#: ./lib/app/map/_lib/managers/report.dart:702
 msgid "各地震度"
 msgstr "各地震度"
 
-#: ./lib/app/map/_lib/managers/report.dart:766
+#: ./lib/app/map/_lib/managers/report.dart:773
 msgid "地震報告圖"
 msgstr "地震報告圖"
 
-#: ./lib/app/map/_lib/managers/report.dart:776
+#: ./lib/app/map/_lib/managers/report.dart:783
 msgid "震度圖"
 msgstr "震度圖"
 
-#: ./lib/app/map/_lib/managers/report.dart:786
+#: ./lib/app/map/_lib/managers/report.dart:793
 msgid "最大地動加速度圖"
 msgstr "最大地動加速度圖"
 
-#: ./lib/app/map/_lib/managers/report.dart:796
+#: ./lib/app/map/_lib/managers/report.dart:803
 msgid "最大地動速度圖"
 msgstr "最大地動速度圖"
 

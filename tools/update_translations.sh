@@ -1,7 +1,11 @@
 #!/bin/bash
 
-# 用於更新 .po 檔案與 .pot 檔案中最新翻譯的腳本
+# 用於更新 .pot 檔案與生成 zh-Hant.po 的腳本
 # 此腳本應從專案根目錄執行
+# 其他語言的 .po 檔案由 Crowdin 自動同步管理
+
+# 設定語言環境為繁體中文
+export LC_ALL=zh_TW.UTF-8
 
 # 檢查終端機是否支援顏色
 if [ -t 1 ] && [ -n "$TERM" ] && command -v tput >/dev/null 2>&1; then
@@ -16,93 +20,114 @@ else
     RESET=''
 fi
 
-# 檢查是否已安裝 msgmerge
-if ! command -v msgmerge &> /dev/null; then
-    echo -e "${RED}msgmerge: command not found${RESET}"
-    echo
-    echo -e "${YELLOW}你需要安裝 gettext 套件來更新翻譯檔案。${RESET}"
-    echo
-    echo -e "${BLUE}如果你是 macOS 使用者：${RESET}"
-    echo "  brew install gettext"
-    echo
-    echo -e "${BLUE}如果你是 Ubuntu/Debian 使用者：${RESET}"
-    echo "  sudo apt-get update && sudo apt-get install gettext"
-    echo
-    echo -e "${BLUE}如果你是 Windows 使用者：${RESET}"
-    echo "  choco install gettext    # 使用 Chocolatey"
-    echo "  pacman -S gettext        # 使用 MSYS2"
-    echo
-    exit 1
-fi
-
 # .po 檔案所在目錄
 PO_DIR="./assets/translations"
 POT_FILE="./.crowdin/strings.pot"
 
-# 執行 i18n 擴充功能匯入器
-echo -e "${BLUE}$ dart run i18n_extension_importer:getstrings --output-file ./.crowdin/strings.pot${RESET}"
+# 執行 i18n 擴充功能匯入器來更新 .pot 檔案
+echo -e "${BLUE}> (1/3) 更新 .pot 檔案...${RESET}"
 dart run i18n_extension_importer:getstrings --output-file ./.crowdin/strings.pot
 echo
 
-# 更新每個 .po 檔案（跳過 zh-Hant.po）
-for po_file in "$PO_DIR"/*.po; do
-    if [ -f "$po_file" ] && [ "$(basename "$po_file")" != "zh-Hant.po" ]; then
-        echo -e -n "${BLUE}更新 $(basename "$po_file") ${RESET}"
-        LC_ALL=C msgmerge --update --backup=off "$po_file" "$POT_FILE"
-    fi
-done 
-
-# 確保所有 .po 檔案中的路徑都有 ./ 前綴
-echo -e "${BLUE}統一路徑格式...${RESET}"
-for po_file in "$PO_DIR"/*.po; do
-    if [ -f "$po_file" ] && [ "$(basename "$po_file")" != "zh-Hant.po" ]; then
-        # 為路徑添加 ./ 前綴（如果還沒有的話）
-        LC_ALL=C sed -i '' 's|^#: \([^.]\)|#: ./\1|g' "$po_file"
-    fi
-done
-
 # 重新產生 zh-Hant.po（使用固定標頭並直接從 .pot 檔案複製內容）
 ZH_HANT_PO="$PO_DIR/zh-Hant.po"
-echo -e "${BLUE}重新產生 zh-Hant.po...${RESET}"
+echo -e "${BLUE}> (2/3) 重新產生 zh-Hant.po...${RESET}"
 
 # 創建帶有固定標頭的新檔案
 cat > "$ZH_HANT_PO" << 'EOF'
 msgid ""
 msgstr ""
-"Project-Id-Version: dpip\n"
-"Language-Team: Chinese Traditional\n"
-"Language: zh_TW\n"
-"Content-Type: text/plain; charset=UTF-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Crowdin-Project: dpip\n"
 "X-Crowdin-Project-ID: 696803\n"
 "X-Crowdin-Language: zh-TW\n"
 "X-Crowdin-File: /main/.crowdin/strings.pot\n"
 "X-Crowdin-File-ID: 20\n"
+"Project-Id-Version: dpip\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: Chinese Traditional\n"
+"Language: zh_TW\n"
 
 EOF
 
-# 直接從 .pot 檔案複製內容並將 msgstr 設為 msgid 的內容
-LC_ALL=C sed 's/^msgstr ""/msgstr/' "$POT_FILE" | LC_ALL=C awk '
-/^#/ { print; next }
-/^msgid / { 
-    msgid_line = $0
-    msgid_content = substr($0, 7)
-    print msgid_line
-    # 輸出對應的 msgstr（複製 msgid 的內容）
-    print "msgstr " msgid_content
-    next
+# 從 .pot 檔案複製內容並將 msgstr 設為 msgid 的內容
+gawk '
+BEGIN {
+  collecting_msgid = 0
+  msgid_lines = ""
+  msgid_content = ""
 }
-/^msgstr/ { next }  # 跳過原有的空 msgstr 行
-/^$/ { print; next }  # 保留空行
-{ print }  # 輸出其他所有行
-' >> "$ZH_HANT_PO"
 
-# 最後確保所有 .po 檔案（包括 zh-Hant.po）的路徑格式一致
-echo -e "${BLUE}統一所有檔案的路徑格式...${RESET}"
-for po_file in "$PO_DIR"/*.po; do
-    if [ -f "$po_file" ]; then
-        # 為路徑添加 ./ 前綴（如果還沒有的話）
-        LC_ALL=C sed -i '' 's|^#: \([^.]\)|#: ./\1|g' "$po_file"
-    fi
-done
+# 註解行直接印出
+/^#/ { print $0; next }
+
+# 空行直接印出，並重置狀態
+/^$/ {
+  collecting_msgid = 0
+  msgid_lines = ""
+  msgid_content = ""
+  print ""
+  next
+}
+
+# msgid 開始
+/^msgid/ {
+  collecting_msgid = 1
+  msgid_lines = ""
+  msgid_content = ""
+  print $0
+  
+  # 單行 msgid
+  if ($0 ~ /^msgid ".+"$/) {
+    msgid_content = substr($0, 7)  # 去掉 "msgid " 保留引號
+    collecting_msgid = 0
+  }
+  next
+}
+
+# 多行 msgid 的續行
+collecting_msgid && /^"/ {
+  print $0
+  if (msgid_lines == "") {
+    msgid_lines = $0
+  } else {
+    msgid_lines = msgid_lines "\n" $0
+  }
+  next
+}
+
+# msgstr 行
+/^msgstr/ {
+  collecting_msgid = 0
+  
+  # 單行情況
+  if (msgid_content != "") {
+    print "msgstr " msgid_content
+  }
+  # 多行情況
+  else if (msgid_lines != "") {
+    print "msgstr \"\""
+    print msgid_lines
+  }
+  # 空的情況
+  else {
+    print $0
+  }
+  
+  msgid_content = ""
+  msgid_lines = ""
+  next
+}
+
+# 跳過原本的 msgstr 續行
+/^"/ && !collecting_msgid { next }
+
+# 其他行直接印出
+{ print $0 }
+' "$POT_FILE" >> "$ZH_HANT_PO"
+
+# 統一路徑格式
+echo -e "${BLUE}> (3/3) 統一路徑格式...${RESET}"
+sed -i '' 's|^#: \([^.]\)|#: ./\1|g' "$ZH_HANT_PO"
+
+echo -e "${BLUE}> 完成！${RESET}"
