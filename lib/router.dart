@@ -1,4 +1,3 @@
-import 'package:dpip/widgets/shell_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -40,6 +39,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/shell_wrapper.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
