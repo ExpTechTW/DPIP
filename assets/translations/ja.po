@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-15 01:20\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "緊急地震速報"
 msgid "強震監視器"
 msgstr "強震モニター"
 
-#: ./lib/app/map/_lib/managers/report.dart:811
+#: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
 msgstr "地震情報"
 
@@ -589,21 +589,21 @@ msgstr "現在地"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:134
 msgid "監視器"
-msgstr ""
+msgstr "強震モニター"
 
-#: ./lib/app/map/_lib/managers/radar.dart:495
+#: ./lib/app/map/_lib/managers/radar.dart:505
 msgid "雷達回波"
 msgstr "レーダー"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:371
+#: ./lib/app/map/_lib/managers/temperature.dart:382
 msgid "氣溫"
 msgstr "気温"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:457
+#: ./lib/app/map/_lib/managers/precipitation.dart:470
 msgid "降水"
 msgstr "降水量"
 
-#: ./lib/app/map/_lib/managers/wind.dart:264
+#: ./lib/app/map/_lib/managers/wind.dart:271
 msgid "風向/風速"
 msgstr "風向・風速"
 
@@ -627,15 +627,15 @@ msgstr "ベースマップ"
 msgid "初始圖層"
 msgstr "初期レイヤー"
 
-#: ./lib/app/settings/map/page.dart:106
+#: ./lib/app/settings/map/page.dart:107
 msgid "動畫幀率"
 msgstr "動画のフレームレート"
 
-#: ./lib/app/settings/map/page.dart:110
+#: ./lib/app/settings/map/page.dart:111
 msgid "影響強震監視器的震波模擬動畫流暢度"
-msgstr ""
+msgstr "強震モニターの地震波アニメーションの滑らかさを調整します"
 
-#: ./lib/app/settings/map/page.dart:140
+#: ./lib/app/settings/map/page.dart:142
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr "速すぎたフレームレートはラッグや設備発熱に至る可能性があります"
 
@@ -833,11 +833,11 @@ msgstr "表示する地図のレイヤーを選択してください"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
 msgid "簡單"
-msgstr ""
+msgstr "シンプル"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
-msgstr ""
+msgstr "地震情報"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:150
 msgid "氣象"
@@ -847,55 +847,55 @@ msgstr "気象"
 msgid "單位：{unit}"
 msgstr "単位：{unit}"
 
-#: ./lib/app/map/_lib/managers/radar.dart:609
+#: ./lib/app/map/_lib/managers/radar.dart:619
 msgid "長按設定播放起點"
 msgstr "長タッチして再生の起点を設定する"
 
-#: ./lib/app/map/_lib/managers/radar.dart:623
+#: ./lib/app/map/_lib/managers/radar.dart:633
 msgid "目前時間"
 msgstr "表示中の時刻"
 
-#: ./lib/app/map/_lib/managers/radar.dart:628
+#: ./lib/app/map/_lib/managers/radar.dart:638
 msgid "播放起點"
 msgstr "再生の起点"
 
-#: ./lib/app/map/_lib/managers/radar.dart:935
+#: ./lib/app/map/_lib/managers/radar.dart:945
 msgid "播放進度"
 msgstr "再生中"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:315
+#: ./lib/app/map/_lib/managers/precipitation.dart:328
 msgid "今日"
 msgstr "今日"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:316
+#: ./lib/app/map/_lib/managers/precipitation.dart:329
 msgid "10 分鐘"
 msgstr "10分間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:317
+#: ./lib/app/map/_lib/managers/precipitation.dart:330
 msgid "1 小時"
 msgstr "1時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:318
+#: ./lib/app/map/_lib/managers/precipitation.dart:331
 msgid "3 小時"
 msgstr "3時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:319
+#: ./lib/app/map/_lib/managers/precipitation.dart:332
 msgid "6 小時"
 msgstr "6時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:320
+#: ./lib/app/map/_lib/managers/precipitation.dart:333
 msgid "12 小時"
 msgstr "12時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:321
+#: ./lib/app/map/_lib/managers/precipitation.dart:334
 msgid "24 小時"
 msgstr "24時間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:322
+#: ./lib/app/map/_lib/managers/precipitation.dart:335
 msgid "2 天"
 msgstr "2日間"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:323
+#: ./lib/app/map/_lib/managers/precipitation.dart:336
 msgid "3 天"
 msgstr "3日間"
 
@@ -939,59 +939,59 @@ msgstr "到達まであと{countdown}秒"
 msgid "已抵達"
 msgstr "到達し"
 
-#: ./lib/app/map/_lib/managers/report.dart:362
+#: ./lib/app/map/_lib/managers/report.dart:369
 msgid "近期的地震報告"
 msgstr "最近の地震情報"
 
-#: ./lib/app/map/_lib/managers/report.dart:367
+#: ./lib/app/map/_lib/managers/report.dart:374
 msgid "更多"
 msgstr "さらに表示"
 
-#: ./lib/app/map/_lib/managers/report.dart:592
+#: ./lib/app/map/_lib/managers/report.dart:599
 msgid "編號 {number} 顯著有感地震"
 msgstr "ID #{number} の顕著な地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:593
+#: ./lib/app/map/_lib/managers/report.dart:600
 msgid "小區域有感地震"
 msgstr "局地的地震"
 
-#: ./lib/app/map/_lib/managers/report.dart:649
+#: ./lib/app/map/_lib/managers/report.dart:656
 msgid "地震規模"
 msgstr "マグニチュード"
 
-#: ./lib/app/map/_lib/managers/report.dart:671
+#: ./lib/app/map/_lib/managers/report.dart:678
 msgid "震源深度"
 msgstr "震源の深さ"
 
-#: ./lib/app/map/_lib/managers/report.dart:608
+#: ./lib/app/map/_lib/managers/report.dart:615
 msgid "報告頁面"
 msgstr "Webで見る"
 
-#: ./lib/app/map/_lib/managers/report.dart:632
+#: ./lib/app/map/_lib/managers/report.dart:639
 msgid "發震時間"
 msgstr "発震時刻"
 
-#: ./lib/app/map/_lib/managers/report.dart:639
+#: ./lib/app/map/_lib/managers/report.dart:646
 msgid "位於"
 msgstr "震源地"
 
-#: ./lib/app/map/_lib/managers/report.dart:695
+#: ./lib/app/map/_lib/managers/report.dart:702
 msgid "各地震度"
 msgstr "各地の震度"
 
-#: ./lib/app/map/_lib/managers/report.dart:766
+#: ./lib/app/map/_lib/managers/report.dart:773
 msgid "地震報告圖"
 msgstr "地震情報図"
 
-#: ./lib/app/map/_lib/managers/report.dart:776
+#: ./lib/app/map/_lib/managers/report.dart:783
 msgid "震度圖"
 msgstr "震度分布図"
 
-#: ./lib/app/map/_lib/managers/report.dart:786
+#: ./lib/app/map/_lib/managers/report.dart:793
 msgid "最大地動加速度圖"
 msgstr "地動最大加速度"
 
-#: ./lib/app/map/_lib/managers/report.dart:796
+#: ./lib/app/map/_lib/managers/report.dart:803
 msgid "最大地動速度圖"
 msgstr "地動最大速度"
 

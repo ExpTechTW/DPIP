@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
-"PO-Revision-Date: 2025-08-14 00:59\n"
+"PO-Revision-Date: 2025-08-15 01:20\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -44,7 +44,7 @@ msgstr "Cảnh báo động đất sớm"
 msgid "強震監視器"
 msgstr "giám sát động đất"
 
-#: ./lib/app/map/_lib/managers/report.dart:811
+#: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
 msgstr "Báo cáo động đất"
 
@@ -589,19 +589,19 @@ msgstr ""
 msgid "監視器"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:495
+#: ./lib/app/map/_lib/managers/radar.dart:505
 msgid "雷達回波"
 msgstr "Hình ảnh radar"
 
-#: ./lib/app/map/_lib/managers/temperature.dart:371
+#: ./lib/app/map/_lib/managers/temperature.dart:382
 msgid "氣溫"
 msgstr "Nhiệt độ"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:457
+#: ./lib/app/map/_lib/managers/precipitation.dart:470
 msgid "降水"
 msgstr "Lượng mưa"
 
-#: ./lib/app/map/_lib/managers/wind.dart:264
+#: ./lib/app/map/_lib/managers/wind.dart:271
 msgid "風向/風速"
 msgstr "Hướng gió/Tốc độ gió"
 
@@ -625,15 +625,15 @@ msgstr ""
 msgid "初始圖層"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:106
+#: ./lib/app/settings/map/page.dart:107
 msgid "動畫幀率"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:110
+#: ./lib/app/settings/map/page.dart:111
 msgid "影響強震監視器的震波模擬動畫流暢度"
 msgstr ""
 
-#: ./lib/app/settings/map/page.dart:140
+#: ./lib/app/settings/map/page.dart:142
 msgid "過高的動畫幀率可能會造成卡頓或設備發熱"
 msgstr ""
 
@@ -845,55 +845,55 @@ msgstr ""
 msgid "單位：{unit}"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:609
+#: ./lib/app/map/_lib/managers/radar.dart:619
 msgid "長按設定播放起點"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:623
+#: ./lib/app/map/_lib/managers/radar.dart:633
 msgid "目前時間"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:628
+#: ./lib/app/map/_lib/managers/radar.dart:638
 msgid "播放起點"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/radar.dart:935
+#: ./lib/app/map/_lib/managers/radar.dart:945
 msgid "播放進度"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:315
+#: ./lib/app/map/_lib/managers/precipitation.dart:328
 msgid "今日"
 msgstr "Hôm nay"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:316
+#: ./lib/app/map/_lib/managers/precipitation.dart:329
 msgid "10 分鐘"
 msgstr "10 phút"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:317
+#: ./lib/app/map/_lib/managers/precipitation.dart:330
 msgid "1 小時"
 msgstr "1 giờ"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:318
+#: ./lib/app/map/_lib/managers/precipitation.dart:331
 msgid "3 小時"
 msgstr "3 giờ"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:319
+#: ./lib/app/map/_lib/managers/precipitation.dart:332
 msgid "6 小時"
 msgstr "6 giờ"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:320
+#: ./lib/app/map/_lib/managers/precipitation.dart:333
 msgid "12 小時"
 msgstr "12 giờ"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:321
+#: ./lib/app/map/_lib/managers/precipitation.dart:334
 msgid "24 小時"
 msgstr "24 giờ"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:322
+#: ./lib/app/map/_lib/managers/precipitation.dart:335
 msgid "2 天"
 msgstr "2 ngày"
 
-#: ./lib/app/map/_lib/managers/precipitation.dart:323
+#: ./lib/app/map/_lib/managers/precipitation.dart:336
 msgid "3 天"
 msgstr "3 ngày"
 
@@ -937,59 +937,59 @@ msgstr ""
 msgid "已抵達"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/report.dart:362
+#: ./lib/app/map/_lib/managers/report.dart:369
 msgid "近期的地震報告"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/report.dart:367
+#: ./lib/app/map/_lib/managers/report.dart:374
 msgid "更多"
 msgstr "Thêm"
 
-#: ./lib/app/map/_lib/managers/report.dart:592
+#: ./lib/app/map/_lib/managers/report.dart:599
 msgid "編號 {number} 顯著有感地震"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/report.dart:593
+#: ./lib/app/map/_lib/managers/report.dart:600
 msgid "小區域有感地震"
 msgstr "Động đất nhẹ, cảm nhận được ở khu vực nhỏ"
 
-#: ./lib/app/map/_lib/managers/report.dart:649
+#: ./lib/app/map/_lib/managers/report.dart:656
 msgid "地震規模"
 msgstr "Cường độ"
 
-#: ./lib/app/map/_lib/managers/report.dart:671
+#: ./lib/app/map/_lib/managers/report.dart:678
 msgid "震源深度"
 msgstr "Độ sâu chấn tiêu"
 
-#: ./lib/app/map/_lib/managers/report.dart:608
+#: ./lib/app/map/_lib/managers/report.dart:615
 msgid "報告頁面"
 msgstr "Trang báo cáo"
 
-#: ./lib/app/map/_lib/managers/report.dart:632
+#: ./lib/app/map/_lib/managers/report.dart:639
 msgid "發震時間"
 msgstr "Ngày giờ nhận biết động đất"
 
-#: ./lib/app/map/_lib/managers/report.dart:639
+#: ./lib/app/map/_lib/managers/report.dart:646
 msgid "位於"
 msgstr "nằm ở"
 
-#: ./lib/app/map/_lib/managers/report.dart:695
+#: ./lib/app/map/_lib/managers/report.dart:702
 msgid "各地震度"
 msgstr "Cường độ địa chấn tại các khu vực"
 
-#: ./lib/app/map/_lib/managers/report.dart:766
+#: ./lib/app/map/_lib/managers/report.dart:773
 msgid "地震報告圖"
 msgstr "Bản đồ báo cáo động đất"
 
-#: ./lib/app/map/_lib/managers/report.dart:776
+#: ./lib/app/map/_lib/managers/report.dart:783
 msgid "震度圖"
 msgstr "Bản đồ cường độ địa chấn"
 
-#: ./lib/app/map/_lib/managers/report.dart:786
+#: ./lib/app/map/_lib/managers/report.dart:793
 msgid "最大地動加速度圖"
 msgstr "Bản đồ gia tốc mặt đất tối đa"
 
-#: ./lib/app/map/_lib/managers/report.dart:796
+#: ./lib/app/map/_lib/managers/report.dart:803
 msgid "最大地動速度圖"
 msgstr "Bản đồ vận tốc mặt đất tối đa"
 
@@ -1335,17 +1335,17 @@ msgstr ""
 
 #: ./lib/api/model/location/location.dart:82
 msgid "{city}{cityLevel} {town}{townLevel}"
-msgstr ""
+msgstr "{city}{cityLevel} {town}{townLevel}"
 
 #: ./lib/api/model/location/location.dart:95
 msgid "{city} {town}"
-msgstr ""
+msgstr "{city} {town}"
 
 #: ./lib/api/model/location/location.dart:104
 msgid "{city}{cityLevel}"
-msgstr ""
+msgstr "{city}{cityLevel}"
 
 #: ./lib/api/model/location/location.dart:113
 msgid "{town}{townLevel}"
-msgstr ""
+msgstr "{town}{townLevel}"
 
