@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-14 05:14\n"
+"PO-Revision-Date: 2025-08-15 00:58\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -530,7 +530,7 @@ msgstr "取消"
 
 #: ./lib/app/settings/location/page.dart:163
 msgid "自動啟動"
-msgstr ""
+msgstr "自动启动"
 
 #: ./lib/app/settings/location/page.dart:164
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
