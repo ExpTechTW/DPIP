@@ -99,10 +99,7 @@ final router = GoRouter(
         ),
       ],
     ),
-    GoRoute(
-      path: HomePage.route,
-      pageBuilder: (context, state) => const NoTransitionPage(child: AppLayout(child: HomePage())),
-    ),
+    GoRoute(path: HomePage.route, builder: (context, state) => const AppLayout(child: HomePage())),
     ShellRoute(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
