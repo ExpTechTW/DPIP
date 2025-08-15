@@ -1,16 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
+import 'package:dynamic_system_colors/dynamic_system_colors.dart';
+import 'package:i18n_extension/i18n_extension.dart';
+import 'package:in_app_update/in_app_update.dart';
+import 'package:provider/provider.dart';
+
 import 'package:dpip/core/notify.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/ui.dart';
 import 'package:dpip/router.dart';
+import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dynamic_system_colors/dynamic_system_colors.dart';
-import 'package:flutter/material.dart';
-import 'package:i18n_extension/i18n_extension.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'package:provider/provider.dart';
 
 class DpipApp extends StatefulWidget {
   const DpipApp({super.key});
@@ -81,26 +84,19 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       builder: (lightDynamic, darkDynamic) {
         return Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
-            const pageTransitionsTheme = PageTransitionsTheme(
-              builders: <TargetPlatform, PageTransitionsBuilder>{
-                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
-              },
-            );
-
             final lightTheme = ThemeData(
               colorSchemeSeed: model.themeColor,
               colorScheme: model.themeColor == null ? lightDynamic : null,
               brightness: Brightness.light,
               snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
-              pageTransitionsTheme: pageTransitionsTheme,
+              pageTransitionsTheme: kZoomPageTransitionsTheme,
             );
             final darkTheme = ThemeData(
               colorSchemeSeed: model.themeColor,
               colorScheme: model.themeColor == null ? darkDynamic : null,
               brightness: Brightness.dark,
               snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
-              pageTransitionsTheme: pageTransitionsTheme,
+              pageTransitionsTheme: kZoomPageTransitionsTheme,
             );
 
             return MaterialApp.router(

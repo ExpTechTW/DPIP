@@ -41,6 +41,8 @@ import 'package:dpip/app/welcome/layout.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
 import 'package:dpip/widgets/transitions/forward_back.dart';
@@ -129,234 +131,91 @@ final router = GoRouter(
           _ => '設定'.i18n,
         };
 
-        return ShellWrapper(SettingsLayout(title: title, child: child));
+        return ShellWrapper(
+          SettingsLayout(
+            title: title,
+            child: Theme(
+              data: context.theme.copyWith(pageTransitionsTheme: kFadeForwardPageTransitionsTheme),
+              child: child,
+            ),
+          ),
+        );
       },
       routes: [
-        GoRoute(
-          path: SettingsIndexPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsIndexPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsIndexPage());
-          },
-        ),
+        GoRoute(path: SettingsIndexPage.route, builder: (context, state) => const Material(child: SettingsIndexPage())),
         GoRoute(
           path: SettingsLocationPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocationPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationPage());
-          },
+          builder: (context, state) => const Material(child: SettingsLocationPage()),
         ),
         GoRoute(
           path: SettingsLocationSelectPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocationSelectPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationSelectPage());
-          },
+          builder: (context, state) => const Material(child: SettingsLocationSelectPage()),
         ),
         GoRoute(
           path: SettingsLocationSelectCityPage.route(),
-          pageBuilder: (context, state) {
-            final city = state.pathParameters['city']!;
-
-            if (Platform.isIOS) {
-              return CupertinoPage(
-                key: state.pageKey,
-                child: Material(child: SettingsLocationSelectCityPage(city: city)),
-              );
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: SettingsLocationSelectCityPage(city: city));
-          },
+          builder:
+              (context, state) => Material(child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!)),
         ),
-        GoRoute(
-          path: SettingsThemePage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsThemePage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemePage());
-          },
-        ),
+        GoRoute(path: SettingsThemePage.route, builder: (context, state) => const Material(child: SettingsThemePage())),
         GoRoute(
           path: SettingsThemeSelectPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsThemeSelectPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemeSelectPage());
-          },
+          builder: (context, state) => const Material(child: SettingsThemeSelectPage()),
         ),
         GoRoute(
           path: SettingsLocalePage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocalePage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocalePage());
-          },
+          builder: (context, state) => const Material(child: SettingsLocalePage()),
         ),
         GoRoute(
           path: SettingsLocaleSelectPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsLocaleSelectPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocaleSelectPage());
-          },
+          builder: (context, state) => const Material(child: SettingsLocaleSelectPage()),
         ),
-        GoRoute(
-          path: SettingsUnitPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsUnitPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage());
-          },
-        ),
-        GoRoute(
-          path: SettingsMapPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsMapPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsMapPage());
-          },
-        ),
+        GoRoute(path: SettingsUnitPage.route, builder: (context, state) => const Material(child: SettingsUnitPage())),
+        GoRoute(path: SettingsMapPage.route, builder: (context, state) => const Material(child: SettingsMapPage())),
         GoRoute(
           path: SettingsNotifyPage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyPage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage());
-          },
+          builder: (context, state) => const Material(child: SettingsNotifyPage()),
           routes: [
             GoRoute(
               path: SettingsNotifyEewPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyEewPage()));
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEewPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyEewPage()),
             ),
             GoRoute(
               path: SettingsNotifyMonitorPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyMonitorPage()));
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyMonitorPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyMonitorPage()),
             ),
             GoRoute(
               path: SettingsNotifyReportPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyReportPage()));
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyReportPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyReportPage()),
             ),
             GoRoute(
               path: SettingsNotifyIntensityPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyIntensityPage()));
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyIntensityPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyIntensityPage()),
             ),
             GoRoute(
               path: SettingsNotifyThunderstormPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(
-                    key: state.pageKey,
-                    child: const Material(child: SettingsNotifyThunderstormPage()),
-                  );
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyThunderstormPage()),
             ),
             GoRoute(
               path: SettingsNotifyAdvisoryPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyAdvisoryPage()));
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyAdvisoryPage()),
             ),
             GoRoute(
               path: SettingsNotifyEvacuationPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(
-                    key: state.pageKey,
-                    child: const Material(child: SettingsNotifyEvacuationPage()),
-                  );
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyEvacuationPage()),
             ),
             GoRoute(
               path: SettingsNotifyTsunamiPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsNotifyTsunamiPage()));
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyTsunamiPage()),
             ),
             GoRoute(
               path: SettingsNotifyAnnouncementPage.name,
-              pageBuilder: (context, state) {
-                if (Platform.isIOS) {
-                  return CupertinoPage(
-                    key: state.pageKey,
-                    child: const Material(child: SettingsNotifyAnnouncementPage()),
-                  );
-                }
-
-                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage());
-              },
+              builder: (context, state) => const Material(child: SettingsNotifyAnnouncementPage()),
             ),
           ],
         ),
         GoRoute(
           path: SettingsDonatePage.route,
-          pageBuilder: (context, state) {
-            if (Platform.isIOS) {
-              return CupertinoPage(key: state.pageKey, child: const Material(child: SettingsDonatePage()));
-            }
-
-            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsDonatePage());
-          },
+          builder: (context, state) => const Material(child: SettingsDonatePage()),
         ),
       ],
     ),
