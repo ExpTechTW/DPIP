@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-15 01:20\n"
+"PO-Revision-Date: 2025-08-15 02:56\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -502,19 +502,19 @@ msgstr "自动定位功能需要您允许 DPIP 使用通知权限才能正常运
 
 #: ./lib/app/settings/location/page.dart:86
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
-msgstr ""
+msgstr "自动定位功能需要您允许 DPIP 使用位置权限才能正常运作。请您到应用程式设定中找到并允许「位置」权限后再试一次。"
 
 #: ./lib/app/settings/location/page.dart:89
 msgid "自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。"
-msgstr ""
+msgstr "自动定位功能需要您永远允许 DPIP 使用位置权限才能正常运作。请您到应用程式设定中找到位置权限设定并选择「永远」后再试一次。"
 
 #: ./lib/app/settings/location/page.dart:90
 msgid "自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。"
-msgstr ""
+msgstr "自动定位功能需要您一律允许 DPIP 使用位置权限才能正常运作。请您到应用程式设定中找到位置权限设定并选择「一律允许」后再试一次。"
 
 #: ./lib/app/settings/location/page.dart:91
 msgid "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
-msgstr ""
+msgstr "为了获得更好的自动定位体验，您需要给予「自启动权限」以便让 DPIP 在背景自动设定所在地资讯。"
 
 #: ./lib/app/settings/location/page.dart:92
 msgid "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
@@ -522,7 +522,7 @@ msgstr "为了获得更好的自动定位体验，您需要授予「无限制」
 
 #: ./lib/app/settings/location/page.dart:93
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
-msgstr ""
+msgstr "自动定位功能需要您允许 DPIP 使用权限才能正常运作。请您到应用程式设定中找到并允许「权限」后再试一次。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:64
 msgid "取消"
