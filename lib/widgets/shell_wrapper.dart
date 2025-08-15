@@ -10,8 +10,6 @@ class ShellWrapper extends StatelessWidget {
   const ShellWrapper(this.child, {super.key});
 
   bool _canPop(BuildContext context) {
-    if (!Platform.isIOS) return true;
-
     final lastMatch = GoRouter.of(context).routerDelegate.currentConfiguration.matches.lastOrNull;
 
     if (lastMatch is ShellRouteMatch) {

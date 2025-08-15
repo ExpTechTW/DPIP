@@ -81,17 +81,26 @@ class _DpipAppState extends State<DpipApp> with WidgetsBindingObserver {
       builder: (lightDynamic, darkDynamic) {
         return Consumer<SettingsUserInterfaceModel>(
           builder: (context, model, child) {
+            const pageTransitionsTheme = PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              },
+            );
+
             final lightTheme = ThemeData(
               colorSchemeSeed: model.themeColor,
               colorScheme: model.themeColor == null ? lightDynamic : null,
               brightness: Brightness.light,
               snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
+              pageTransitionsTheme: pageTransitionsTheme,
             );
             final darkTheme = ThemeData(
               colorSchemeSeed: model.themeColor,
               colorScheme: model.themeColor == null ? darkDynamic : null,
               brightness: Brightness.dark,
               snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
+              pageTransitionsTheme: pageTransitionsTheme,
             );
 
             return MaterialApp.router(
