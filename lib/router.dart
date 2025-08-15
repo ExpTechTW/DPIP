@@ -45,7 +45,7 @@ import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/shell_wrapper.dart';
-import 'package:dpip/widgets/transitions/forward_back.dart';
+import 'package:dpip/widgets/transitions/predictive_fade_forward.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();
