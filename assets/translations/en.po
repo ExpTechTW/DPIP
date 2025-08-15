@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-15 01:20\n"
+"PO-Revision-Date: 2025-08-15 01:39\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -1031,7 +1031,7 @@ msgstr "Done"
 
 #: ./lib/route/announcement/announcement.dart:22
 msgid "地震相關"
-msgstr ""
+msgstr "Seismic"
 
 #: ./lib/route/announcement/announcement.dart:23
 msgid "氣象相關"
