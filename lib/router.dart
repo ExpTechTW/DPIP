@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:go_router/go_router.dart';
@@ -56,23 +59,43 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: WelcomeAboutPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeAboutPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const WelcomeAboutPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeAboutPage());
+          },
         ),
         GoRoute(
           path: WelcomeExpTechPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeExpTechPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const WelcomeExpTechPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeExpTechPage());
+          },
         ),
         GoRoute(
           path: WelcomeNoticePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeNoticePage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const WelcomeNoticePage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeNoticePage());
+          },
         ),
         GoRoute(
           path: WelcomePermissionPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomePermissionPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const WelcomePermissionPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const WelcomePermissionPage());
+          },
         ),
       ],
     ),
@@ -114,124 +137,221 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: SettingsIndexPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsIndexPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsIndexPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsIndexPage());
+          },
         ),
         GoRoute(
           path: SettingsLocationPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsLocationPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationPage());
+          },
         ),
         GoRoute(
           path: SettingsLocationSelectPage.route,
-          pageBuilder:
-              (context, state) =>
-                  ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationSelectPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsLocationSelectPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationSelectPage());
+          },
         ),
         GoRoute(
           path: SettingsLocationSelectCityPage.route(),
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(
                 key: state.pageKey,
                 child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
-              ),
+              );
+            }
+
+            return ForwardBackTransitionPage(
+              key: state.pageKey,
+              child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
+            );
+          },
         ),
         GoRoute(
           path: SettingsThemePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemePage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsThemePage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemePage());
+          },
         ),
         GoRoute(
           path: SettingsThemeSelectPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemeSelectPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsThemeSelectPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemeSelectPage());
+          },
         ),
         GoRoute(
           path: SettingsLocalePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocalePage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsLocalePage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocalePage());
+          },
         ),
         GoRoute(
           path: SettingsLocaleSelectPage.route,
-          pageBuilder:
-              (context, state) =>
-                  ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocaleSelectPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsLocaleSelectPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocaleSelectPage());
+          },
         ),
         GoRoute(
           path: SettingsUnitPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsUnitPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage());
+          },
         ),
         GoRoute(
           path: SettingsMapPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsMapPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsMapPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsMapPage());
+          },
         ),
         GoRoute(
           path: SettingsNotifyPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsNotifyPage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage());
+          },
           routes: [
             GoRoute(
               path: SettingsNotifyEewPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEewPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyEewPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEewPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyMonitorPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyMonitorPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyMonitorPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyMonitorPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyReportPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyReportPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyReportPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyReportPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyIntensityPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyIntensityPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyIntensityPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyIntensityPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyThunderstormPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyAdvisoryPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyEvacuationPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyTsunamiPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage());
+              },
             ),
             GoRoute(
               path: SettingsNotifyAnnouncementPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage()),
+              pageBuilder: (context, state) {
+                if (Platform.isIOS) {
+                  return CupertinoPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage());
+                }
+
+                return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage());
+              },
             ),
           ],
         ),
         GoRoute(
           path: SettingsDonatePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsDonatePage()),
+          pageBuilder: (context, state) {
+            if (Platform.isIOS) {
+              return CupertinoPage(key: state.pageKey, child: const SettingsDonatePage());
+            }
+
+            return ForwardBackTransitionPage(key: state.pageKey, child: const SettingsDonatePage());
+          },
         ),
       ],
     ),
