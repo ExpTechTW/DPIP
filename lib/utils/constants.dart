@@ -1,5 +1,22 @@
 import 'package:flutter/material.dart';
+
 import 'package:maplibre_gl/maplibre_gl.dart';
+
+import 'package:dpip/widgets/transitions/predictive_fade_forward.dart';
+
+const kZoomPageTransitionsTheme = PageTransitionsTheme(
+  builders: {
+    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+  },
+);
+
+const kFadeForwardPageTransitionsTheme = PageTransitionsTheme(
+  builders: {
+    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    TargetPlatform.android: PredictiveBackFadeForwardPageTransitionsBuilder(),
+  },
+);
 
 const kEmphasizedAnimationStyle = AnimationStyle(
   curve: Easing.emphasizedDecelerate,
