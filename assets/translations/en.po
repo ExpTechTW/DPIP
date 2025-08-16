@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-15 01:39\n"
+"PO-Revision-Date: 2025-08-16 03:52\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -62,7 +62,7 @@ msgstr "Weather Advisory"
 
 #: ./lib/app/settings/notify/page.dart:235
 msgid "防災資訊"
-msgstr ""
+msgstr "Emergency information"
 
 #: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
@@ -843,7 +843,7 @@ msgstr "Weather"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
-msgstr ""
+msgstr "Units: {unit}"
 
 #: ./lib/app/map/_lib/managers/radar.dart:619
 msgid "長按設定播放起點"
