@@ -420,7 +420,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                     ListSectionTile(
                       title: '新增地點'.i18n,
                       icon: Symbols.add_circle_rounded,
-                      enabled: loadingCode == null,
+                      enabled: !model.auto && loadingCode == null,
                       onTap: () => context.push(SettingsLocationSelectPage.route),
                     ),
                   ],
