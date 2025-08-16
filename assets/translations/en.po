@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-15 01:39\n"
+"PO-Revision-Date: 2025-08-16 08:56\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -62,7 +62,7 @@ msgstr "Weather Advisory"
 
 #: ./lib/app/settings/notify/page.dart:235
 msgid "防災資訊"
-msgstr ""
+msgstr "Emergency information"
 
 #: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
@@ -475,15 +475,15 @@ msgstr "All information should be considered authoritative only if it is consist
 
 #: ./lib/app/settings/location/page.dart:76
 msgid "無法取得通知權限"
-msgstr ""
+msgstr "Unable to obtain Notification Permission"
 
 #: ./lib/app/settings/location/page.dart:78
 msgid "無法取得位置權限"
-msgstr ""
+msgstr "Unable to obtain Location Permission"
 
 #: ./lib/app/settings/location/page.dart:79
 msgid "無法取得自啟動權限"
-msgstr ""
+msgstr "Unable to obtain Self-Start Permission"
 
 #: ./lib/app/welcome/4-permissions/page.dart:167
 msgid "省電策略"
@@ -495,7 +495,7 @@ msgstr "Unable to obtain permission"
 
 #: ./lib/app/settings/location/page.dart:85
 msgid "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。"
-msgstr ""
+msgstr "To use the Auto-Location feature, please allow Notification Permission for DPIP in settings, then try again."
 
 #: ./lib/app/settings/location/page.dart:86
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
@@ -775,7 +775,7 @@ msgstr "Earthquake early warning is the result of rapid calculation and may have
 
 #: ./lib/app/welcome/3-notice/page.dart:110
 msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
-msgstr ""
+msgstr "Any action that is not officially approved could lead to legal consequences. It's essential to follow all applicable rules and regulations."
 
 #: ./lib/app/welcome/1-about/page.dart:40
 msgid "歡迎使用 DPIP"
@@ -843,7 +843,7 @@ msgstr "Weather"
 
 #: ./lib/app/map/_widgets/map_legend.dart:181
 msgid "單位：{unit}"
-msgstr ""
+msgstr "Units: {unit}"
 
 #: ./lib/app/map/_lib/managers/radar.dart:619
 msgid "長按設定播放起點"
@@ -1011,7 +1011,7 @@ msgstr "Impact: Medium"
 
 #: ./lib/route/announcement/announcement.dart:16
 msgid "影響：大"
-msgstr ""
+msgstr "Impact: Large"
 
 #: ./lib/route/announcement/announcement.dart:18
 msgid "維修"
@@ -1251,7 +1251,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:320
 msgid "多雲大雷雨"
-msgstr ""
+msgstr "Cloudy with Thunderstorm"
 
 #: ./lib/utils/weather_icon.dart:321
 msgid "多雲大雷雹"
@@ -1259,43 +1259,43 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:323
 msgid "陰"
-msgstr ""
+msgstr "Overcast"
 
 #: ./lib/utils/weather_icon.dart:324
 msgid "陰有霾"
-msgstr ""
+msgstr "Overcast with Haze"
 
 #: ./lib/utils/weather_icon.dart:325
 msgid "陰有靄"
-msgstr ""
+msgstr "Overcast with Mist"
 
 #: ./lib/utils/weather_icon.dart:326
 msgid "陰有閃電"
-msgstr ""
+msgstr "Overcast with Lighting"
 
 #: ./lib/utils/weather_icon.dart:342
 msgid "陰天伴有雷"
-msgstr ""
+msgstr "Cloudy with Thunder"
 
 #: ./lib/utils/weather_icon.dart:328
 msgid "陰有霧"
-msgstr ""
+msgstr "Overcast with Fog"
 
 #: ./lib/utils/weather_icon.dart:329
 msgid "陰有雨"
-msgstr ""
+msgstr "Overcast with Rain"
 
 #: ./lib/utils/weather_icon.dart:330
 msgid "陰有雨雪"
-msgstr ""
+msgstr "Overcast with Rain/Snow"
 
 #: ./lib/utils/weather_icon.dart:331
 msgid "陰有大雪"
-msgstr ""
+msgstr "Overcast with Heavy Snow"
 
 #: ./lib/utils/weather_icon.dart:332
 msgid "陰有雪珠"
-msgstr ""
+msgstr "Overcast with Snow"
 
 #: ./lib/utils/weather_icon.dart:333
 msgid "陰有冰珠"
