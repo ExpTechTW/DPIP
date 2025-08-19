@@ -96,33 +96,14 @@ class LightningMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setLightningData(time, lightningData);
         }
 
-        final features = lightningData.map((data) {
-          final timeDiff = int.parse(time) - data.time;
-          int level;
-          if (timeDiff < 5 * 60 * 1000) {
-            level = 5;
-          } else if (timeDiff < 10 * 60 * 1000) {
-            level = 10;
-          } else if (timeDiff < 30 * 60 * 1000) {
-            level = 30;
-          } else {
-            level = 60;
-          }
-          return {
-            'type': 'Feature',
-            'properties': {'type': '${data.type}-$level'},
-            'geometry': {
-              'type': 'Point',
-              'coordinates': [data.loc.lng, data.loc.lat],
-            },
-          };
-        }).toList();
+        // final currentTime = int.parse(time);
+        // final features = lightningData.map((data) => data.toFeatureBuilder(currentTime)).toList();
 
-        final data = GeoJsonBuilder().setFeatures(features as Iterable<GeoJsonFeatureBuilder<GeoJsonFeatureType>>).build();
+        // final data = GeoJsonBuilder().setFeatures(features).build();
 
-        final properties = GeojsonSourceProperties(data: data);
+        // final properties = GeojsonSourceProperties(data: data);
 
-        await controller.addSource(sourceId, properties);
+        // await controller.addSource(sourceId, properties);
 
         if (!context.mounted) return;
       }
@@ -155,7 +136,7 @@ class LightningMapLayerManager extends MapLayerManager {
             'lightning-0-10',
             '0-30',
             'lightning-0-30',
-            'lightning-0-60',
+            '0-60',
             'lightning-0-60',
           ],
           iconAllowOverlap: true,
