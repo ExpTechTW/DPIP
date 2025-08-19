@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-08-15 01:20\n"
+"PO-Revision-Date: 2025-08-15 04:19\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -529,7 +529,7 @@ msgstr "キャンセル"
 
 #: ./lib/app/settings/location/page.dart:163
 msgid "自動啟動"
-msgstr ""
+msgstr "自動起動"
 
 #: ./lib/app/settings/location/page.dart:164
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
@@ -541,7 +541,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "一律允許"
-msgstr ""
+msgstr "常に許可"
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "永遠"
@@ -577,7 +577,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:421
 msgid "新增地點"
-msgstr ""
+msgstr "新しい場所を追加"
 
 #: ./lib/app/settings/location/select/page.dart:38
 msgid "縣市"
