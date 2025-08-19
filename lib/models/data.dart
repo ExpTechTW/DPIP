@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:dpip/api/model/weather/lightning.dart';
 import 'package:flutter/material.dart';
 
 import 'package:collection/collection.dart';
@@ -146,6 +147,24 @@ class _DpipDataModel extends ChangeNotifier {
 
   void setWind(List<String> wind) {
     _wind = wind;
+    notifyListeners();
+  }
+
+  List<String> _lightning = [];
+
+  UnmodifiableListView<String> get lightning => UnmodifiableListView(_lightning);
+
+  void setLightning(List<String> lightning) {
+    _lightning = lightning;
+    notifyListeners();
+  }
+
+  final Map<String, List<Lightning>> _lightningData = {};
+
+  UnmodifiableMapView<String, List<Lightning>> get lightningData => UnmodifiableMapView(_lightningData);
+
+  void setLightningData(String time, List<Lightning> lightning) {
+    _lightningData[time] = lightning;
     notifyListeners();
   }
 

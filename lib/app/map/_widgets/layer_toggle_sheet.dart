@@ -172,6 +172,11 @@ class _LayerToggleSheetState extends State<LayerToggleSheet> {
                 checked: _activeLayers.contains(MapLayer.wind),
                 onChanged: (checked) => _toggleLayer(MapLayer.wind, checked),
               ),
+              LayerToggle(
+                label: '閃電'.i18n,
+                checked: _activeLayers.contains(MapLayer.lightning),
+                onChanged: (checked) => _toggleLayer(MapLayer.lightning, checked),
+              ),
             ],
           ),
         ],

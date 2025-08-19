@@ -1,16 +1,27 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:dpip/api/exptech.dart';
 import 'package:dpip/api/model/weather/lightning.dart';
-import 'package:dpip/core/ios_get_location.dart';
-import 'package:dpip/global.dart';
+import 'package:dpip/app/map/_lib/manager.dart';
+import 'package:dpip/app/map/_lib/utils.dart';
+import 'package:dpip/app/map/_widgets/map_legend.dart';
+import 'package:dpip/core/i18n.dart';
+import 'package:dpip/core/providers.dart';
+import 'package:dpip/models/data.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
-import 'package:dpip/widgets/list/time_selector.dart';
-import 'package:dpip/widgets/map/legend.dart';
+import 'package:dpip/utils/extensions/string.dart';
+import 'package:dpip/utils/geojson.dart';
+import 'package:dpip/utils/log.dart';
+import 'package:dpip/widgets/blurred_container.dart';
 import 'package:dpip/widgets/map/map.dart';
+import 'package:dpip/widgets/sheet/morphing_sheet.dart';
+import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 
 class LightningData {
   final double latitude;
@@ -21,124 +32,72 @@ class LightningData {
   LightningData({required this.latitude, required this.longitude, required this.type, required this.time});
 }
 
-class LightningMap extends StatefulWidget {
-  const LightningMap({super.key});
+class LightningMapLayerManager extends MapLayerManager {
+  LightningMapLayerManager(super.context, super.controller);
+
+  final currentLightningTime = ValueNotifier<String?>(GlobalProviders.data.lightning.firstOrNull);
+  final isLoading = ValueNotifier<bool>(false);
+
+  DateTime? _lastFetchTime;
+
+  Function(String)? onTimeChanged;
+
+  Future<void> setLightningTime(String time) async {
+    if (currentLightningTime.value == time || isLoading.value) return;
+
+    isLoading.value = true;
+
+    try {
+      await remove();
+      currentLightningTime.value = time;
+      await setup();
+
+      onTimeChanged?.call(time);
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager.setLightningTime', e, s);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> _fetchData() async {
+    final lightningList = (await ExpTech().getLightningList()).reversed.toList();
+    if (!context.mounted) return;
+
+    GlobalProviders.data.setLightning(lightningList);
+    currentLightningTime.value ??= lightningList.first;
+    _lastFetchTime = DateTime.now();
+  }
 
   @override
-  State<LightningMap> createState() => _LightningMapState();
-}
+  Future<void> setup() async {
+    if (didSetup) return;
 
-class _LightningMapState extends State<LightningMap> {
-  late MapLibreMapController _mapController;
-  List<String> lightningTimeList = [];
-  List<LightningData> lightningDataList = [];
-  double userLat = 0;
-  double userLon = 0;
-  bool isUserLocationValid = false;
-  bool _showLegend = false;
-  int selectTime = 0;
+    try {
+      if (GlobalProviders.data.lightning.isEmpty) await _fetchData();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+      final time = currentLightningTime.value;
 
-  void _initMap(MapLibreMapController controller) {
-    _mapController = controller;
-  }
+      if (time == null) throw Exception('Time is null');
 
-  Future<void> _loadMap() async {
-    if (Platform.isIOS && (Global.preference.getBool('auto-location') ?? false)) {
-      await updateSavedLocationIOS();
-    }
+      final sourceId = MapSourceIds.lightning(time);
+      final layerId = MapLayerIds.lightning(time);
 
-    userLat = Global.preference.getDouble('user-lat') ?? 0.0;
-    userLon = Global.preference.getDouble('user-lon') ?? 0.0;
+      final isSourceExists = (await controller.getSourceIds()).contains(sourceId);
+      final isLayerExists = (await controller.getLayerIds()).contains(layerId);
 
-    isUserLocationValid = !(userLon == 0 || userLat == 0);
-    await _mapController.addSource(
-      'lightning-data',
-      const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-    );
-    lightningTimeList = await ExpTech().getLightningList();
-    if (lightningTimeList.isNotEmpty) {
-      selectTime = int.parse(lightningTimeList.last);
-      await _loadLightningData(lightningTimeList.last);
-    }
+      if (!isSourceExists) {
+        late final List<Lightning> lightningData;
 
-    if (isUserLocationValid) {
-      await _mapController.addSource(
-        'markers-geojson',
-        const GeojsonSourceProperties(data: {'type': 'FeatureCollection', 'features': []}),
-      );
-      await _mapController.setGeoJsonSource('markers-geojson', {
-        'type': 'FeatureCollection',
-        'features': [
-          {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-              'coordinates': [userLon, userLat],
-              'type': 'Point',
-            },
-          },
-        ],
-      });
-      final cameraUpdate = CameraUpdate.newLatLngZoom(LatLng(userLat, userLon), 8);
-      await _mapController.animateCamera(cameraUpdate, duration: const Duration(milliseconds: 1000));
-    }
+        if (GlobalProviders.data.lightningData.containsKey(time)) {
+          lightningData = GlobalProviders.data.lightningData[time]!;
+        } else {
+          lightningData = await ExpTech().getLightning(time);
+          GlobalProviders.data.setLightningData(time, lightningData);
+        }
 
-    await _addUserLocationMarker();
-
-    setState(() {});
-  }
-
-  Future<void> _addUserLocationMarker() async {
-    if (isUserLocationValid) {
-      await _mapController.removeLayer('markers');
-      await _mapController.addLayer(
-        'markers-geojson',
-        'markers',
-        const SymbolLayerProperties(
-          symbolZOrder: 'source',
-          iconSize: [
-            Expressions.interpolate,
-            ['linear'],
-            [Expressions.zoom],
-            5,
-            0.5,
-            10,
-            1.5,
-          ],
-          iconImage: 'gps',
-          iconAllowOverlap: true,
-          iconIgnorePlacement: true,
-        ),
-      );
-    }
-  }
-
-  Future<void> _loadLightningData(String time) async {
-    final List<Lightning> lightningData = await ExpTech().getLightning(time);
-    lightningDataList =
-        lightningData
-            .map(
-              (lightning) => LightningData(
-                latitude: lightning.loc.lat,
-                longitude: lightning.loc.lng,
-                type: lightning.type,
-                time: lightning.time,
-              ),
-            )
-            .toList();
-
-    await _addLightningMarkers();
-  }
-
-  Future<void> _addLightningMarkers() async {
-    final features =
-        lightningDataList.map((data) {
-          final timeDiff = selectTime - data.time;
+        final features = lightningData.map((data) {
+          final timeDiff = int.parse(time) - data.time;
           int level;
           if (timeDiff < 5 * 60 * 1000) {
             level = 5;
@@ -149,155 +108,274 @@ class _LightningMapState extends State<LightningMap> {
           } else {
             level = 60;
           }
-
           return {
             'type': 'Feature',
             'properties': {'type': '${data.type}-$level'},
             'geometry': {
               'type': 'Point',
-              'coordinates': [data.longitude, data.latitude],
+              'coordinates': [data.loc.lng, data.loc.lat],
             },
           };
         }).toList();
 
-    await _mapController.setGeoJsonSource('lightning-data', {'type': 'FeatureCollection', 'features': features});
+        final data = GeoJsonBuilder().setFeatures(features as Iterable<GeoJsonFeatureBuilder<GeoJsonFeatureType>>).build();
 
-    await _mapController.removeLayer('lightning-markers');
-    await _mapController.addLayer(
-      'lightning-data',
-      'lightning-markers',
-      const SymbolLayerProperties(
-        iconSize: [
-          Expressions.interpolate,
-          ['linear'],
-          [Expressions.zoom],
-          5,
-          0.5,
-          10,
-          1.3,
-        ],
-        iconImage: [
-          Expressions.match,
-          ['get', 'type'],
-          '1-5',
-          'lightning-1-5',
-          '1-10',
-          'lightning-1-10',
-          '1-30',
-          'lightning-1-30',
-          '1-60',
-          'lightning-1-60',
-          '0-5',
-          'lightning-0-5',
-          '0-10',
-          'lightning-0-10',
-          '0-30',
-          'lightning-0-30',
-          'lightning-0-60',
-        ],
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
-    );
+        final properties = GeojsonSourceProperties(data: data);
 
-    await _addUserLocationMarker();
-  }
+        await controller.addSource(sourceId, properties);
 
-  void _toggleLegend() {
-    setState(() {
-      _showLegend = !_showLegend;
-    });
-  }
+        if (!context.mounted) return;
+      }
 
-  Widget _buildLegend() {
-    return MapLegend(
-      label: '圖例',
-      children: [
-        _legendItem('lightning-1-5', '5 分鐘內對地閃電'),
-        _legendItem('lightning-1-10', '10 分鐘內對地閃電'),
-        _legendItem('lightning-1-30', '30 分鐘內對地閃電'),
-        _legendItem('lightning-1-60', '60 分鐘內對地閃電'),
-        _legendItem('lightning-0-5', '5 分鐘內雲間閃電'),
-        _legendItem('lightning-0-10', '10 分鐘內雲間閃電'),
-        _legendItem('lightning-0-30', '30 分鐘內雲間閃電'),
-        _legendItem('lightning-0-60', '60 分鐘內雲間閃電'),
-      ],
-    );
-  }
+      if (!isLayerExists) {
+        final properties = SymbolLayerProperties(
+          iconSize: [
+            Expressions.interpolate,
+            ['linear'],
+            [Expressions.zoom],
+            5,
+            0.5,
+            10,
+            1.3,
+          ],
+          iconImage: [
+            Expressions.match,
+            ['get', 'type'],
+            '1-5',
+            'lightning-1-5',
+            '1-10',
+            'lightning-1-10',
+            '1-30',
+            'lightning-1-30',
+            '1-60',
+            'lightning-1-60',
+            '0-5',
+            'lightning-0-5',
+            '0-10',
+            'lightning-0-10',
+            '0-30',
+            'lightning-0-30',
+            'lightning-0-60',
+            'lightning-0-60',
+          ],
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+          visibility: visible ? 'visible' : 'none',
+        );
 
-  Widget _legendItem(String imageName, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Image.asset('assets/map/icons/$imageName.png', width: 24, height: 24),
-          const SizedBox(width: 8),
-          Text(label),
-        ],
-      ),
-    );
+        await controller.addLayer(sourceId, layerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
+      }
+
+      if (isSourceExists && isLayerExists) return;
+
+      didSetup = true;
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager.setup', e, s);
+    }
   }
 
   @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
+  Future<void> hide() async {
+    if (!visible) return;
+
+    final layerId = MapLayerIds.lightning(currentLightningTime.value);
+
+    try {
+      await controller.setLayerVisibility(layerId, false);
+      await controller.setLayerVisibility('$layerId-label', false);
+
+      visible = false;
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager.hide', e, s);
+    }
   }
+
+  @override
+  Future<void> show() async {
+    if (visible) return;
+
+    final layerId = MapLayerIds.lightning(currentLightningTime.value);
+
+    try {
+      await controller.setLayerVisibility(layerId, true);
+      await controller.setLayerVisibility('$layerId-label', true);
+
+      visible = true;
+
+      if (_lastFetchTime == null || DateTime.now().difference(_lastFetchTime!).inMinutes > 5) await _fetchData();
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager.show', e, s);
+    }
+  }
+
+  @override
+  Future<void> remove() async {
+    try {
+      final layerId = MapLayerIds.lightning(currentLightningTime.value);
+      final sourceId = MapSourceIds.lightning(currentLightningTime.value);
+
+      await controller.removeLayer(layerId);
+      await controller.removeLayer('$layerId-label');
+
+      await controller.removeSource(sourceId);
+    } catch (e, s) {
+      TalkerManager.instance.error('LightningMapLayerManager.dispose', e, s);
+    }
+
+    didSetup = false;
+  }
+
+  @override
+  Widget build(BuildContext context) => LightningMapLayerSheet(manager: this);
+}
+
+class LightningMapLayerSheet extends StatelessWidget {
+  final LightningMapLayerManager manager;
+
+  const LightningMapLayerSheet({super.key, required this.manager});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        DpipMap(
-          onMapCreated: _initMap,
-          onStyleLoadedCallback: _loadMap,
-          minMaxZoomPreference: const MinMaxZoomPreference(3, 12),
+        MorphingSheet(
+          title: '閃電'.i18n,
+          borderRadius: BorderRadius.circular(16),
+          elevation: 4,
+          partialBuilder: (context, controller, sheetController) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Selector<DpipDataModel, UnmodifiableListView<String>>(
+                selector: (context, model) => model.lightning,
+                builder: (context, lightning, child) {
+                  final times = lightning.map((time) {
+                    final t = time.toSimpleDateTimeString().split(' ');
+                    return (date: t[0], time: t[1], value: time);
+                  });
+                  final grouped = times.groupListsBy((time) => time.date).entries.toList();
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          spacing: 8,
+                          children: [
+                            const Icon(Symbols.wind_power_rounded, size: 24),
+                            Text('閃電'.i18n, style: context.textTheme.titleMedium),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: kMinInteractiveDimension,
+                        child: ValueListenableBuilder<String?>(
+                          valueListenable: manager.currentLightningTime,
+                          builder: (context, currentLightningTime, child) {
+                            return ListView.builder(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              scrollDirection: Axis.horizontal,
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: grouped.length,
+                              itemBuilder: (context, index) {
+                                final MapEntry(key: date, value: group) = grouped[index];
+
+                                final children = <Widget>[Text(date)];
+
+                                for (final time in group) {
+                                  final isSelected = time.value == currentLightningTime;
+
+                                  children.add(
+                                    ValueListenableBuilder<bool>(
+                                      valueListenable: manager.isLoading,
+                                      builder: (context, isLoading, child) {
+                                        return FilterChip(
+                                          selected: isSelected,
+                                          showCheckmark: !isLoading,
+                                          label: Text(time.time),
+                                          side: BorderSide(
+                                            color: isSelected ? context.colors.primary : context.colors.outlineVariant,
+                                          ),
+                                          avatar: isSelected && isLoading ? const LoadingIcon() : null,
+                                          onSelected:
+                                              isLoading
+                                                  ? null
+                                                  : (selected) {
+                                                    if (!selected) return;
+                                                    manager.setLightningTime(time.value);
+                                                  },
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+
+                                children.add(
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 8),
+                                    child: VerticalDivider(width: 16, indent: 8, endIndent: 8),
+                                  ),
+                                );
+
+                                return Row(mainAxisSize: MainAxisSize.min, spacing: 8, children: children);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
         ),
         Positioned(
-          left: 4,
-          bottom: 4,
-          child: Material(
-            color: context.colors.secondary,
-            elevation: 4.0,
-            shape: const CircleBorder(),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: _toggleLegend,
-              child: Tooltip(
-                message: '圖例',
-                child: Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  child: Icon(
-                    _showLegend ? Icons.close : Icons.info_outline,
-                    size: 20,
-                    color: context.colors.onSecondary,
+          top: 24 + 48 + 16,
+          left: 24,
+          child: SafeArea(
+            child: BlurredContainer(
+              elevation: 4,
+              shadowColor: context.colors.shadow.withValues(alpha: 0.4),
+              child: Legend(
+                items: [
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffffffff), size: 20),
+                    label: '5 分鐘內對地閃電',
                   ),
-                ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff03fff0), size: 20),
+                    label: '10 分鐘內對地閃電',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff0385ff), size: 20),
+                    label: '30 分鐘內對地閃電',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff8000ff), size: 20),
+                    label: '60 分鐘內對地閃電',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    label: '5 分鐘內雲間閃電',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    label: '10 分鐘內雲間閃電',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    label: '30 分鐘內雲間閃電',
+                  ),
+                  LegendItem(
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    label: '60 分鐘內雲間閃電',
+                  ),
+                ],
               ),
             ),
           ),
         ),
-        if (lightningTimeList.isNotEmpty)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 2,
-            child: TimeSelector(
-              timeList: lightningTimeList,
-              onTimeExpanded: () {
-                _showLegend = false;
-                setState(() {});
-              },
-              onTimeSelected: (time) async {
-                selectTime = int.parse(time);
-                await _loadLightningData(time);
-                setState(() {});
-              },
-            ),
-          ),
-        if (_showLegend) Positioned(left: 6, bottom: 50, child: _buildLegend()),
       ],
     );
   }
