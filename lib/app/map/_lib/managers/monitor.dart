@@ -1033,7 +1033,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                 ),
 
                                 Text(
-                                  countdown >= 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
+                                  countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
                                   style: context.textTheme.bodyMedium!.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: context.colors.onErrorContainer,
