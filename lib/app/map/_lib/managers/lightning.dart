@@ -243,7 +243,7 @@ class LightningMapLayerSheet extends StatelessWidget {
                         child: Row(
                           spacing: 8,
                           children: [
-                            const Icon(Symbols.wind_power_rounded, size: 24),
+                            const Icon(Symbols.bolt, size: 24),
                             Text('閃電'.i18n, style: context.textTheme.titleMedium),
                           ],
                         ),
@@ -321,35 +321,35 @@ class LightningMapLayerSheet extends StatelessWidget {
               child: Legend(
                 items: [
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffffffff), size: 20),
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff0000), size: 20),
                     label: '5 分鐘內對地閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff03fff0), size: 20),
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffffff00), size: 20),
                     label: '10 分鐘內對地閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff0385ff), size: 20),
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff00ff00), size: 20),
                     label: '30 分鐘內對地閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff8000ff), size: 20),
+                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xff0000ff), size: 20),
                     label: '60 分鐘內對地閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    icon: const OutlinedIcon(Symbols.circle, fill: Color(0xffff0000), size: 20),
                     label: '5 分鐘內雲間閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    icon: const OutlinedIcon(Symbols.circle, fill: Color(0xffffff00), size: 20),
                     label: '10 分鐘內雲間閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    icon: const OutlinedIcon(Symbols.circle, fill: Color(0xff00ff00), size: 20),
                     label: '30 分鐘內雲間閃電',
                   ),
                   LegendItem(
-                    icon: const OutlinedIcon(Symbols.navigation_rounded, fill: Color(0xffff006b), size: 20),
+                    icon: const OutlinedIcon(Symbols.circle, fill: Color(0xff0000ff), size: 20),
                     label: '60 分鐘內雲間閃電',
                   ),
                 ],
