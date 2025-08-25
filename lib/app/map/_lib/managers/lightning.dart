@@ -163,7 +163,6 @@ class LightningMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, false);
-      await controller.setLayerVisibility('$layerId-label', false);
 
       visible = false;
     } catch (e, s) {
@@ -179,7 +178,6 @@ class LightningMapLayerManager extends MapLayerManager {
 
     try {
       await controller.setLayerVisibility(layerId, true);
-      await controller.setLayerVisibility('$layerId-label', true);
 
       visible = true;
 
@@ -196,7 +194,6 @@ class LightningMapLayerManager extends MapLayerManager {
       final sourceId = MapSourceIds.lightning(currentLightningTime.value);
 
       await controller.removeLayer(layerId);
-      await controller.removeLayer('$layerId-label');
 
       await controller.removeSource(sourceId);
     } catch (e, s) {
