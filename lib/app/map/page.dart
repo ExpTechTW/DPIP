@@ -261,7 +261,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     _managers[MapLayer.monitor] = MonitorMapLayerManager(context, controller);
     _managers[MapLayer.report] = ReportMapLayerManager(context, controller, initialReportId: widget.options?.reportId);
-    _managers[MapLayer.monitor] = TsunamiMapLayerManager(context, controller);
+    _managers[MapLayer.tsunami] = TsunamiMapLayerManager(context, controller);
     _managers[MapLayer.radar] = RadarMapLayerManager(
       context,
       controller,
