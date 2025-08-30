@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-08-15 01:20\n"
+"PO-Revision-Date: 2025-08-30 12:00\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -62,7 +62,7 @@ msgstr "기상특보"
 
 #: ./lib/app/settings/notify/page.dart:235
 msgid "防災資訊"
-msgstr ""
+msgstr "방재 정보"
 
 #: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
@@ -162,7 +162,7 @@ msgstr "일반"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯消息發布時"
-msgstr ""
+msgstr "해일 소식 발표 시"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
@@ -273,7 +273,7 @@ msgstr "현재 위치(향, 진) 예상 진도 1 이상"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布防災警訊時"
-msgstr ""
+msgstr "소재지(향진)에서 재난경보 발령 시"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布防災資訊時"
