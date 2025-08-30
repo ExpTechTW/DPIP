@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-16 08:56\n"
+"PO-Revision-Date: 2025-08-30 13:21\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -695,7 +695,7 @@ msgstr "{serial} report"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1100
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "At around {time}, a felt earthquake near <bold>{location}</bold> had an estimated magnitude of <bold>M{magnitude}</bold> and a max intensity of <bold>{intensity}</bold>."
+msgstr "Around {time}, a felt earthquake near <bold>{location}</bold> had an estimated <bold>M{magnitude}</bold> and max intensity <bold>{intensity}</bold>."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
@@ -931,7 +931,7 @@ msgstr "Estimated <bold>M{magnitude}</bold>, max intensity <bold>{intensity}</bo
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1036
 msgid "{countdown}秒後抵達"
-msgstr "{countdown} Arrived in seconds"
+msgstr "in {countdown}s"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1036
 msgid "已抵達"
