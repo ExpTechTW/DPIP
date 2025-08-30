@@ -15,6 +15,7 @@ import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/models/settings/notify.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
+import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/list/list_section.dart';
 import 'package:dpip/widgets/list/list_tile.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
                         }
                       })
                       .catchError((updateError) {
-                        print('Failed to update location: $updateError');
+                        TalkerManager.instance.error('Failed to update location: $updateError');
                       });
                 });
               }
