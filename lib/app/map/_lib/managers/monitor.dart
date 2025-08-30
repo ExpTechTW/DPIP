@@ -35,8 +35,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
     super.context,
     super.controller, {
-    this.isReplayMode = false,
-    this.replayTimestamp = 0, //1756300289424,
+    this.isReplayMode = true,
+    this.replayTimestamp = 1756300288424,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -951,6 +951,9 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     localIntensity = intensityFloatToInt(info.i);
                     localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
 
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _updateCountdown();
+                    });
                     _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
 
                     if (_isCollapsed) {
