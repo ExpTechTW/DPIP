@@ -35,8 +35,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
     super.context,
     super.controller, {
-    this.isReplayMode = true,
-    this.replayTimestamp = 1756300288424,
+    this.isReplayMode = false,
+    this.replayTimestamp = 0, //1756300288424,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
