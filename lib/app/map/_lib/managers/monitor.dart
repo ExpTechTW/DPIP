@@ -899,7 +899,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                           size: 22,
                                         ),
                                         Text(
-                                          '緊急地震速報'.i18n,
+                                          'EEW'.i18n,
                                           style: context.textTheme.labelLarge!.copyWith(
                                             color: context.colors.onError,
                                             fontWeight: FontWeight.bold,
@@ -1076,7 +1076,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                           size: 22,
                                         ),
                                         Text(
-                                          '緊急地震速報'.i18n,
+                                          'EEW'.i18n,
                                           style: context.textTheme.labelLarge!.copyWith(
                                             color: context.colors.onError,
                                             fontWeight: FontWeight.bold,

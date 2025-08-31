@@ -100,7 +100,7 @@ class _EewCardState extends State<EewCard> {
                             children: [
                               Icon(Symbols.crisis_alert_rounded, color: context.colors.onError, weight: 700, size: 22),
                               Text(
-                                '緊急地震速報'.i18n,
+                                'EEW'.i18n,
                                 style: context.textTheme.labelLarge!.copyWith(
                                   color: context.colors.onError,
                                   fontWeight: FontWeight.bold,
