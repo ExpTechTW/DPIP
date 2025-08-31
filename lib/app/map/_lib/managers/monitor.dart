@@ -36,7 +36,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     super.context,
     super.controller, {
     this.isReplayMode = false,
-    this.replayTimestamp = 0, //1751918230855,
+    this.replayTimestamp = 0, //1756300288424,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -951,6 +951,9 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     localIntensity = intensityFloatToInt(info.i);
                     localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
 
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _updateCountdown();
+                    });
                     _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
 
                     if (_isCollapsed) {
@@ -1033,7 +1036,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                 ),
 
                                 Text(
-                                  countdown >= 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
+                                  countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
                                   style: context.textTheme.bodyMedium!.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: context.colors.onErrorContainer,

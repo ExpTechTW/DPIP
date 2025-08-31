@@ -38,8 +38,10 @@ import 'package:dpip/app/welcome/layout.dart';
 import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/route/announcement/announcement.dart';
+import 'package:dpip/utils/constants.dart';
+import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/log.dart';
-import 'package:dpip/widgets/transitions/forward_back.dart';
+import 'package:dpip/widgets/shell_wrapper.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _welcomeNavigatorKey = GlobalKey<NavigatorState>();
@@ -51,45 +53,28 @@ final router = GoRouter(
   routes: [
     ShellRoute(
       navigatorKey: _welcomeNavigatorKey,
-      builder: (context, state, child) => WelcomeLayout(child: child),
+      builder: (context, state, child) => ShellWrapper(WelcomeLayout(child: child)),
       routes: [
-        GoRoute(
-          path: WelcomeAboutPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeAboutPage()),
-        ),
+        GoRoute(path: WelcomeAboutPage.route, builder: (context, state) => const Material(child: WelcomeAboutPage())),
         GoRoute(
           path: WelcomeExpTechPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeExpTechPage()),
+          builder: (context, state) => const Material(child: WelcomeExpTechPage()),
         ),
-        GoRoute(
-          path: WelcomeNoticePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomeNoticePage()),
-        ),
+        GoRoute(path: WelcomeNoticePage.route, builder: (context, state) => const Material(child: WelcomeNoticePage())),
         GoRoute(
           path: WelcomePermissionPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const WelcomePermissionPage()),
+          builder: (context, state) => const Material(child: WelcomePermissionPage()),
         ),
       ],
     ),
-    GoRoute(
-      path: HomePage.route,
-      pageBuilder: (context, state) => const NoTransitionPage(
-        child: AppLayout(
-          child: HomePage(),
-        ),
-      ),
-    ),
+    GoRoute(path: HomePage.route, builder: (context, state) => const AppLayout(child: HomePage())),
     ShellRoute(
       navigatorKey: _settingsNavigatorKey,
       builder: (context, state, child) {
         final title = switch (state.fullPath) {
           SettingsLocationPage.route => '所在地'.i18n,
-          SettingsLocationSelectPage.route => '所在地'.i18n,
-          final p when p == SettingsLocationSelectCityPage.route() => '所在地'.i18n,
+          SettingsLocationSelectPage.route => '新增地點'.i18n,
+          final p when p == SettingsLocationSelectCityPage.route() => '新增地點'.i18n,
           SettingsThemePage.route => '主題'.i18n,
           SettingsThemeSelectPage.route => '主題'.i18n,
           SettingsLocalePage.route => '語言'.i18n,
@@ -111,129 +96,92 @@ final router = GoRouter(
           SettingsDonatePage.route => '贊助我們'.i18n,
           _ => '設定'.i18n,
         };
-        return SettingsLayout(title: title, child: child);
+
+        return ShellWrapper(
+          SettingsLayout(
+            title: title,
+            child: Theme(
+              data: context.theme.copyWith(pageTransitionsTheme: kFadeForwardPageTransitionsTheme),
+              child: child,
+            ),
+          ),
+        );
       },
       routes: [
-        GoRoute(
-          path: SettingsIndexPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsIndexPage()),
-        ),
+        GoRoute(path: SettingsIndexPage.route, builder: (context, state) => const Material(child: SettingsIndexPage())),
         GoRoute(
           path: SettingsLocationPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationPage()),
+          builder: (context, state) => const Material(child: SettingsLocationPage()),
         ),
         GoRoute(
           path: SettingsLocationSelectPage.route,
-          pageBuilder:
-              (context, state) =>
-                  ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocationSelectPage()),
+          builder: (context, state) => const Material(child: SettingsLocationSelectPage()),
         ),
         GoRoute(
           path: SettingsLocationSelectCityPage.route(),
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(
-                key: state.pageKey,
-                child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!),
-              ),
+          builder:
+              (context, state) => Material(child: SettingsLocationSelectCityPage(city: state.pathParameters['city']!)),
         ),
-        GoRoute(
-          path: SettingsThemePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemePage()),
-        ),
+        GoRoute(path: SettingsThemePage.route, builder: (context, state) => const Material(child: SettingsThemePage())),
         GoRoute(
           path: SettingsThemeSelectPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsThemeSelectPage()),
+          builder: (context, state) => const Material(child: SettingsThemeSelectPage()),
         ),
         GoRoute(
           path: SettingsLocalePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocalePage()),
+          builder: (context, state) => const Material(child: SettingsLocalePage()),
         ),
         GoRoute(
           path: SettingsLocaleSelectPage.route,
-          pageBuilder:
-              (context, state) =>
-                  ForwardBackTransitionPage(key: state.pageKey, child: const SettingsLocaleSelectPage()),
+          builder: (context, state) => const Material(child: SettingsLocaleSelectPage()),
         ),
-        GoRoute(
-          path: SettingsUnitPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsUnitPage()),
-        ),
-        GoRoute(
-          path: SettingsMapPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsMapPage()),
-        ),
+        GoRoute(path: SettingsUnitPage.route, builder: (context, state) => const Material(child: SettingsUnitPage())),
+        GoRoute(path: SettingsMapPage.route, builder: (context, state) => const Material(child: SettingsMapPage())),
         GoRoute(
           path: SettingsNotifyPage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyPage()),
+          builder: (context, state) => const Material(child: SettingsNotifyPage()),
           routes: [
             GoRoute(
               path: SettingsNotifyEewPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEewPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyEewPage()),
             ),
             GoRoute(
               path: SettingsNotifyMonitorPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyMonitorPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyMonitorPage()),
             ),
             GoRoute(
               path: SettingsNotifyReportPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyReportPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyReportPage()),
             ),
             GoRoute(
               path: SettingsNotifyIntensityPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyIntensityPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyIntensityPage()),
             ),
             GoRoute(
               path: SettingsNotifyThunderstormPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyThunderstormPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyThunderstormPage()),
             ),
             GoRoute(
               path: SettingsNotifyAdvisoryPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAdvisoryPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyAdvisoryPage()),
             ),
             GoRoute(
               path: SettingsNotifyEvacuationPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyEvacuationPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyEvacuationPage()),
             ),
             GoRoute(
               path: SettingsNotifyTsunamiPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyTsunamiPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyTsunamiPage()),
             ),
             GoRoute(
               path: SettingsNotifyAnnouncementPage.name,
-              pageBuilder:
-                  (context, state) =>
-                      ForwardBackTransitionPage(key: state.pageKey, child: const SettingsNotifyAnnouncementPage()),
+              builder: (context, state) => const Material(child: SettingsNotifyAnnouncementPage()),
             ),
           ],
         ),
         GoRoute(
           path: SettingsDonatePage.route,
-          pageBuilder:
-              (context, state) => ForwardBackTransitionPage(key: state.pageKey, child: const SettingsDonatePage()),
+          builder: (context, state) => const Material(child: SettingsDonatePage()),
         ),
       ],
     ),

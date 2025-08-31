@@ -12,7 +12,7 @@ String? _pendingChannelKey;
 
 @pragma('vm:entry-point')
 Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-  print(receivedAction);
+  TalkerManager.instance.debug('Received action: $receivedAction');
   final context = router.routerDelegate.navigatorKey.currentContext;
   if (context == null) {
     _pendingChannelKey = receivedAction.channelKey;
