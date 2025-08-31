@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-30 13:21\n"
+"PO-Revision-Date: 2025-08-31 06:51\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -691,11 +691,11 @@ msgstr "Location not set"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1086
 msgid "第 {serial} 報"
-msgstr "{serial} report"
+msgstr "of {serial}"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1100
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "Around {time}, a felt earthquake near <bold>{location}</bold> had an estimated <bold>M{magnitude}</bold> and max intensity <bold>{intensity}</bold>."
+msgstr "Around {time}, felt earthquake near <bold>{location}</bold> estimated <bold>M{magnitude}</bold> and max intensity <bold>{intensity}</bold>."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
@@ -703,11 +703,11 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1134
 msgid "所在地預估"
-msgstr "Estimated intensity at current location"
+msgstr "Estimated"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1168
 msgid "震波"
-msgstr "The earthquake"
+msgstr "Waves"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1188
 msgid " 秒"
