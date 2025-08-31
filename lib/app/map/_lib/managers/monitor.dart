@@ -1206,6 +1206,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                                         : Text(
                                                           '抵達'.i18n,
                                                           style: context.textTheme.displayMedium!.copyWith(
+                                                            fontSize: context.textTheme.displayMedium!.fontSize! * 0.89,
                                                             fontWeight: FontWeight.bold,
                                                             color: context.colors.onErrorContainer,
                                                             height: 1,
