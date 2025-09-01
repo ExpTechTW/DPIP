@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-09-01 03:15\n"
+"PO-Revision-Date: 2025-09-01 04:13\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -158,7 +158,7 @@ msgstr "Severe"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:33
 msgid "海嘯警報發布時"
-msgstr ""
+msgstr "When a tsunami warning is issued"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:39
 msgid "一般"
@@ -166,7 +166,7 @@ msgstr "General"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯消息發布時"
-msgstr ""
+msgstr "When a tsunami message is issued"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
@@ -297,11 +297,11 @@ msgstr "The location (township) where the above-mentioned exceptions are issued\
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布山區暴雨時"
-msgstr ""
+msgstr "The location (township) issues rainstorm alert in the mountains"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:40
 msgid "所在地(鄉鎮)發布雷雨即時訊息時"
-msgstr ""
+msgstr "The location (township) issues instant thunderstorm information"
 
 #: ./lib/app/settings/unit/page.dart:28
 msgid "使用華氏度"
