@@ -10,11 +10,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-08-31 06:51\n"
+"PO-Revision-Date: 2025-09-01 03:15\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
 msgstr "Current Location"
+
+#: ./lib/app/settings/location/page.dart:421
+msgid "新增地點"
+msgstr "Add a new location"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
@@ -36,7 +40,7 @@ msgstr "Map"
 msgid "通知"
 msgstr "Notifications"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1076
+#: ./lib/app/settings/notify/page.dart:148
 msgid "緊急地震速報"
 msgstr "Earthquake Early Warning"
 
@@ -48,7 +52,7 @@ msgstr "Earthquake Monitor"
 msgid "地震報告"
 msgstr "Reports"
 
-#: ./lib/app/settings/notify/page.dart:191
+#: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
 msgstr "Earthquake Intensity Report"
 
@@ -56,11 +60,11 @@ msgstr "Earthquake Intensity Report"
 msgid "雷雨即時訊息"
 msgstr "Thunderstorm Advisory"
 
-#: ./lib/app/settings/notify/page.dart:222
+#: ./lib/app/settings/notify/page.dart:223
 msgid "天氣警特報"
 msgstr "Weather Advisory"
 
-#: ./lib/app/settings/notify/page.dart:235
+#: ./lib/app/settings/notify/page.dart:236
 msgid "防災資訊"
 msgstr "Emergency information"
 
@@ -80,11 +84,11 @@ msgstr "Support Us"
 msgid "設定"
 msgstr "Settings"
 
-#: ./lib/app/settings/notify/page.dart:60
+#: ./lib/app/settings/notify/page.dart:61
 msgid "接收全部"
 msgstr "Receive All"
 
-#: ./lib/app/settings/notify/page.dart:59
+#: ./lib/app/settings/notify/page.dart:60
 msgid "關閉"
 msgstr "Off"
 
@@ -92,23 +96,23 @@ msgstr "Off"
 msgid "接收類別"
 msgstr "Category"
 
-#: ./lib/app/settings/notify/page.dart:44
+#: ./lib/app/settings/notify/page.dart:45
 msgid "所在地震度1以上"
 msgstr "Intensity 1 or higher at current location"
 
-#: ./lib/app/settings/notify/page.dart:55
+#: ./lib/app/settings/notify/page.dart:56
 msgid "海嘯消息、海嘯警報"
 msgstr "Tsunami information, Tsunami warning"
 
-#: ./lib/app/settings/notify/page.dart:54
+#: ./lib/app/settings/notify/page.dart:55
 msgid "只接收海嘯警報"
 msgstr "Tsunami warning only"
 
-#: ./lib/app/settings/notify/page.dart:50
+#: ./lib/app/settings/notify/page.dart:51
 msgid "接收所在地"
 msgstr "Receive for current location"
 
-#: ./lib/app/settings/notify/page.dart:37
+#: ./lib/app/settings/notify/page.dart:38
 msgid "所在地震度4以上"
 msgstr "Intensity 4 or higher at current location"
 
@@ -124,11 +128,11 @@ msgstr "When sending an announcement"
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr "The sound test is a local notification performed on the device, used only to confirm whether sound can be played properly when receiving alerts. This test does not send any requests to any server"
 
-#: ./lib/app/settings/notify/page.dart:134
+#: ./lib/app/settings/notify/page.dart:135
 msgid "請先設定所在地來使用通知功能"
 msgstr "Please set your current location to enable notifications"
 
-#: ./lib/app/settings/notify/page.dart:141
+#: ./lib/app/settings/notify/page.dart:142
 msgid "地震速報"
 msgstr "Earthquake Warning"
 
@@ -136,7 +140,7 @@ msgstr "Earthquake Warning"
 msgid "地震"
 msgstr "Earthquake"
 
-#: ./lib/app/settings/notify/page.dart:203
+#: ./lib/app/settings/notify/page.dart:204
 msgid "天氣"
 msgstr "Weather"
 
@@ -144,7 +148,7 @@ msgstr "Weather"
 msgid "海嘯"
 msgstr "Tsunami"
 
-#: ./lib/app/settings/notify/page.dart:265
+#: ./lib/app/settings/notify/page.dart:266
 msgid "其他"
 msgstr "Other"
 
@@ -573,10 +577,6 @@ msgstr ""
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:421
-msgid "新增地點"
-msgstr "Add a new location"
-
 #: ./lib/app/settings/location/select/page.dart:38
 msgid "縣市"
 msgstr "Special Municipalities/County"
@@ -605,8 +605,8 @@ msgstr "Precipitation"
 msgid "風向/風速"
 msgstr "Wind/Gust"
 
-#: ./lib/app/settings/map/page.dart:56
-msgid "線條"
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+msgid "簡單"
 msgstr "Simple"
 
 #: ./lib/app/settings/map/page.dart:57
@@ -689,11 +689,15 @@ msgstr "Apparent {apparent}°"
 msgid "尚未設定所在地"
 msgstr "Location not set"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1086
+#: ./lib/app/map/_lib/managers/monitor.dart:1079
+msgid "EEW"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1089
 msgid "第 {serial} 報"
 msgstr "of {serial}"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1100
+#: ./lib/app/map/_lib/managers/monitor.dart:1103
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr "Around {time}, felt earthquake near <bold>{location}</bold> estimated <bold>M{magnitude}</bold> and max intensity <bold>{intensity}</bold>."
 
@@ -701,19 +705,19 @@ msgstr "Around {time}, felt earthquake near <bold>{location}</bold> estimated <b
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1134
+#: ./lib/app/map/_lib/managers/monitor.dart:1137
 msgid "所在地預估"
 msgstr "Estimated"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1168
+#: ./lib/app/map/_lib/managers/monitor.dart:1171
 msgid "震波"
 msgstr "Waves"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1188
+#: ./lib/app/map/_lib/managers/monitor.dart:1191
 msgid " 秒"
 msgstr " Seconds"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1204
+#: ./lib/app/map/_lib/managers/monitor.dart:1207
 msgid "抵達"
 msgstr "Arrived"
 
@@ -829,10 +833,6 @@ msgstr "Map Layers"
 msgid "選擇要顯示的地圖圖層"
 msgstr "Select the layer you want to display"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
-msgid "簡單"
-msgstr "Simple"
-
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
 msgstr "Reports"
@@ -857,7 +857,7 @@ msgstr "Current time"
 msgid "播放起點"
 msgstr "Play start"
 
-#: ./lib/app/map/_lib/managers/radar.dart:945
+#: ./lib/app/map/_lib/managers/radar.dart:938
 msgid "播放進度"
 msgstr ""
 
@@ -925,15 +925,15 @@ msgstr "There are currently no active earthquake early warnings"
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 msgstr ""
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1027
+#: ./lib/app/map/_lib/managers/monitor.dart:1030
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "Estimated <bold>M{magnitude}</bold>, max intensity <bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1036
+#: ./lib/app/map/_lib/managers/monitor.dart:1039
 msgid "{countdown}秒後抵達"
 msgstr "in {countdown}s"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1036
+#: ./lib/app/map/_lib/managers/monitor.dart:1039
 msgid "已抵達"
 msgstr "Arrived"
 
