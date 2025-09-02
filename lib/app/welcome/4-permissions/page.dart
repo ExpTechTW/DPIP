@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:autostarter/autostarter.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dpip/app/home/page.dart';
@@ -56,19 +55,19 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _permissionsFuture = _initializePermissions();
-    if (Platform.isAndroid) {
-      _autoStartStatusCheck();
-    }
+    // if (Platform.isAndroid) {
+    //   _autoStartStatusCheck();
+    // }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _checkNotificationPermission();
       setState(() {});
     });
   }
 
-  Future<void> _autoStartStatusCheck() async {
-    _autoStartStatus = await Autostarter.checkAutoStartState() ?? true;
-    _autoStartPermission = Future.value(_autoStartStatus);
-  }
+  // Future<void> _autoStartStatusCheck() async {
+  //   _autoStartStatus = await Autostarter.checkAutoStartState() ?? true;
+  //   _autoStartPermission = Future.value(_autoStartStatus);
+  // }
 
   Future<void> _checkNotificationPermission() async {
     if (Platform.isAndroid) {
@@ -88,12 +87,12 @@ class _WelcomePermissionPageState extends State<WelcomePermissionPage> with Widg
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      setState(() async {
+      setState(() {
         _permissionsFuture = _initializePermissions();
-        if (Platform.isAndroid) {
-          _autoStartStatus = (await Autostarter.checkAutoStartState())!;
-          _autoStartPermission = Future.value(_autoStartStatus);
-        }
+        // if (Platform.isAndroid) {
+        //   _autoStartStatus = (await Autostarter.checkAutoStartState())!;
+        //   _autoStartPermission = Future.value(_autoStartStatus);
+        // }
       });
     }
   }

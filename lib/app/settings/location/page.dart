@@ -6,7 +6,6 @@ import 'package:dpip/utils/toast.dart';
 import 'package:dpip/widgets/ui/loading_icon.dart';
 import 'package:flutter/material.dart';
 
-import 'package:autostarter/autostarter.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
@@ -51,7 +50,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
       Permission.notification.status,
       Permission.location.status,
       Permission.locationAlways.status,
-      if (Platform.isAndroid) Autostarter.checkAutoStartState(),
+      // if (Platform.isAndroid) Autostarter.checkAutoStartState(),
       if (Platform.isAndroid) DisableBatteryOptimization.isBatteryOptimizationDisabled,
     ]);
 
@@ -150,8 +149,8 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
 
     autoStart:
     {
-      final available = await Autostarter.isAutoStartPermissionAvailable();
-      if (available == null) break autoStart;
+      // final available = await Autostarter.isAutoStartPermissionAvailable();
+      // if (available == null) break autoStart;
 
       final status = await DisableBatteryOptimization.isAutoStartEnabled;
       if (status == null || status) {
@@ -308,7 +307,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
               );
             },
           ),
-        if (Platform.isAndroid)
+        /* if (Platform.isAndroid)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
             builder: (context, auto, child) {
@@ -333,7 +332,7 @@ class _SettingsLocationPageState extends State<SettingsLocationPage> with Widget
                 ),
               );
             },
-          ),
+          ),*/
         if (Platform.isAndroid)
           Selector<SettingsLocationModel, bool>(
             selector: (context, model) => model.auto,
