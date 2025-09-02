@@ -10,11 +10,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-15 04:19\n"
+"PO-Revision-Date: 2025-09-01 03:16\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
 msgstr "所在地"
+
+#: ./lib/app/settings/location/page.dart:421
+msgid "新增地點"
+msgstr "新增地点"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
@@ -36,7 +40,7 @@ msgstr "地图"
 msgid "通知"
 msgstr "通知"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1076
+#: ./lib/app/settings/notify/page.dart:148
 msgid "緊急地震速報"
 msgstr "紧急地震预警"
 
@@ -48,7 +52,7 @@ msgstr "强震监视器"
 msgid "地震報告"
 msgstr "地震报告"
 
-#: ./lib/app/settings/notify/page.dart:191
+#: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
 msgstr "震度速报"
 
@@ -56,11 +60,11 @@ msgstr "震度速报"
 msgid "雷雨即時訊息"
 msgstr "雷雨即时信息"
 
-#: ./lib/app/settings/notify/page.dart:222
+#: ./lib/app/settings/notify/page.dart:223
 msgid "天氣警特報"
 msgstr "天气警特报"
 
-#: ./lib/app/settings/notify/page.dart:235
+#: ./lib/app/settings/notify/page.dart:236
 msgid "防災資訊"
 msgstr "防灾资讯"
 
@@ -80,11 +84,11 @@ msgstr "赞助我们"
 msgid "設定"
 msgstr "设置"
 
-#: ./lib/app/settings/notify/page.dart:60
+#: ./lib/app/settings/notify/page.dart:61
 msgid "接收全部"
 msgstr "接收全部"
 
-#: ./lib/app/settings/notify/page.dart:59
+#: ./lib/app/settings/notify/page.dart:60
 msgid "關閉"
 msgstr "关闭"
 
@@ -92,23 +96,23 @@ msgstr "关闭"
 msgid "接收類別"
 msgstr "接收类别"
 
-#: ./lib/app/settings/notify/page.dart:44
+#: ./lib/app/settings/notify/page.dart:45
 msgid "所在地震度1以上"
 msgstr "所在地震度1以上"
 
-#: ./lib/app/settings/notify/page.dart:55
+#: ./lib/app/settings/notify/page.dart:56
 msgid "海嘯消息、海嘯警報"
 msgstr "海啸信息、海啸警报"
 
-#: ./lib/app/settings/notify/page.dart:54
+#: ./lib/app/settings/notify/page.dart:55
 msgid "只接收海嘯警報"
 msgstr "只接收海啸警报"
 
-#: ./lib/app/settings/notify/page.dart:50
+#: ./lib/app/settings/notify/page.dart:51
 msgid "接收所在地"
 msgstr "接收所在地"
 
-#: ./lib/app/settings/notify/page.dart:37
+#: ./lib/app/settings/notify/page.dart:38
 msgid "所在地震度4以上"
 msgstr "所在地震度4以上"
 
@@ -124,11 +128,11 @@ msgstr "发送公告时"
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr "音效测试是在设备上执行的本地通知，仅用于确认设备在接收通知时是否能正常播放音效。此测试不会向服务器发送任何请求"
 
-#: ./lib/app/settings/notify/page.dart:134
+#: ./lib/app/settings/notify/page.dart:135
 msgid "請先設定所在地來使用通知功能"
 msgstr "请先设置所在地以使用通知功能"
 
-#: ./lib/app/settings/notify/page.dart:141
+#: ./lib/app/settings/notify/page.dart:142
 msgid "地震速報"
 msgstr "地震预警"
 
@@ -136,7 +140,7 @@ msgstr "地震预警"
 msgid "地震"
 msgstr "地震"
 
-#: ./lib/app/settings/notify/page.dart:203
+#: ./lib/app/settings/notify/page.dart:204
 msgid "天氣"
 msgstr "天气"
 
@@ -144,7 +148,7 @@ msgstr "天气"
 msgid "海嘯"
 msgstr "海啸"
 
-#: ./lib/app/settings/notify/page.dart:265
+#: ./lib/app/settings/notify/page.dart:266
 msgid "其他"
 msgstr "其他"
 
@@ -576,10 +580,6 @@ msgstr "省电策略被拒绝，请前往设置允许权限。"
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
 msgstr "设置所在地时发生错误，请稍后再试。"
 
-#: ./lib/app/settings/location/page.dart:421
-msgid "新增地點"
-msgstr "新增地点"
-
 #: ./lib/app/settings/location/select/page.dart:38
 msgid "縣市"
 msgstr "县市"
@@ -608,9 +608,9 @@ msgstr "降水"
 msgid "風向/風速"
 msgstr "风向/风速"
 
-#: ./lib/app/settings/map/page.dart:56
-msgid "線條"
-msgstr "线条"
+#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
+msgid "簡單"
+msgstr "简单"
 
 #: ./lib/app/settings/map/page.dart:57
 msgid "OpenStreetMap"
@@ -692,11 +692,15 @@ msgstr "体感约 {apparent}°"
 msgid "尚未設定所在地"
 msgstr "尚未设定所在地"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1086
+#: ./lib/app/map/_lib/managers/monitor.dart:1079
+msgid "EEW"
+msgstr ""
+
+#: ./lib/app/map/_lib/managers/monitor.dart:1089
 msgid "第 {serial} 報"
 msgstr "第 {serial} 报"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1100
+#: ./lib/app/map/_lib/managers/monitor.dart:1103
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 msgstr "{time} 左右，<bold>{location}</bold>附近发生有感地震，预计规模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
 
@@ -704,19 +708,19 @@ msgstr "{time} 左右，<bold>{location}</bold>附近发生有感地震，预计
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 msgstr "{time} 左右，<bold>{location}</bold>附近发生有感地震，预计规模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1134
+#: ./lib/app/map/_lib/managers/monitor.dart:1137
 msgid "所在地預估"
 msgstr "所在地预估"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1168
+#: ./lib/app/map/_lib/managers/monitor.dart:1171
 msgid "震波"
 msgstr "震波"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1188
+#: ./lib/app/map/_lib/managers/monitor.dart:1191
 msgid " 秒"
 msgstr " 秒"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1204
+#: ./lib/app/map/_lib/managers/monitor.dart:1207
 msgid "抵達"
 msgstr "抵达"
 
@@ -832,10 +836,6 @@ msgstr "地图图层"
 msgid "選擇要顯示的地圖圖層"
 msgstr "选择要显示的地图图层"
 
-#: ./lib/app/map/_widgets/layer_toggle_sheet.dart:112
-msgid "簡單"
-msgstr "简单"
-
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:139
 msgid "報告"
 msgstr "报告"
@@ -860,7 +860,7 @@ msgstr "目前时间"
 msgid "播放起點"
 msgstr "播放起点"
 
-#: ./lib/app/map/_lib/managers/radar.dart:945
+#: ./lib/app/map/_lib/managers/radar.dart:938
 msgid "播放進度"
 msgstr "播放进度"
 
@@ -928,15 +928,15 @@ msgstr "目前没有生效中的地震预警"
 msgid "規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里"
 msgstr "规模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1027
+#: ./lib/app/map/_lib/managers/monitor.dart:1030
 msgid "規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>"
 msgstr "规模 <bold>M{magnitude}</bold>，所在地预估<bold>{intensity}</bold>"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1036
+#: ./lib/app/map/_lib/managers/monitor.dart:1039
 msgid "{countdown}秒後抵達"
 msgstr "{countdown}秒后抵达"
 
-#: ./lib/app/map/_lib/managers/monitor.dart:1036
+#: ./lib/app/map/_lib/managers/monitor.dart:1039
 msgid "已抵達"
 msgstr "已抵达"
 
