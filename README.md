@@ -8,7 +8,7 @@
 <a title="Crowdin" target="_blank" href="https://crowdin.com/project/dpip"><img alt="Crowdin Localization" src="https://badges.crowdin.net/dpip/localized.svg"></a>
 <a href="https://good-labs.github.io/greater-good-affirmation"><img alt="Greater Good" src="https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg"></a>
 <img alt="GitHub License" src="https://img.shields.io/github/license/exptechtw/dpip">
-<a href="https://exptech.dev/dpip"><img alt="website" src="https://img.shields.io/badge/website-exptech.dev-purple.svg"></a>
+<a href="https://exptech.dev"><img alt="website" src="https://img.shields.io/badge/website-exptech.dev-purple.svg"></a>
 <a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord"  src="https://img.shields.io/discord/926545182407688273?color=%235865F2&logo=discord&logoColor=white"></a>
 </div>
 
