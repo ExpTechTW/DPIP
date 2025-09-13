@@ -48,8 +48,8 @@ android {
     defaultConfig {
         applicationId "com.exptech.dpip"
         minSdkVersion 26
-        targetSdkVersion 35
-        versionCode 300100001
+        targetSdkVersion 36
+        versionCode 300100101
         versionName flutterVersionName
         multiDexEnabled true
     }

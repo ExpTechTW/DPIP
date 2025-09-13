@@ -339,8 +339,8 @@ class DpipDataModel extends _DpipDataModel {
       final location = Global.location['${s.info.last.code}'];
       if (location != null) {
         feature
-          ..setProperty('city', location.city)
-          ..setProperty('town', location.town);
+          ..setProperty('city', location.cityWithLevel)
+          ..setProperty('town', location.townWithLevel);
       }
 
       builder.addFeature(feature);

@@ -36,7 +36,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     super.context,
     super.controller, {
     this.isReplayMode = false,
-    this.replayTimestamp = 0, //1751918230855,
+    this.replayTimestamp = 0, //1756300288424,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -899,7 +899,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                           size: 22,
                                         ),
                                         Text(
-                                          '緊急地震速報'.i18n,
+                                          'EEW'.i18n,
                                           style: context.textTheme.labelLarge!.copyWith(
                                             color: context.colors.onError,
                                             fontWeight: FontWeight.bold,
@@ -951,6 +951,9 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                     localIntensity = intensityFloatToInt(info.i);
                     localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
 
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _updateCountdown();
+                    });
                     _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
 
                     if (_isCollapsed) {
@@ -1073,7 +1076,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                           size: 22,
                                         ),
                                         Text(
-                                          '緊急地震速報'.i18n,
+                                          'EEW'.i18n,
                                           style: context.textTheme.labelLarge!.copyWith(
                                             color: context.colors.onError,
                                             fontWeight: FontWeight.bold,
@@ -1203,6 +1206,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                                                         : Text(
                                                           '抵達'.i18n,
                                                           style: context.textTheme.displayMedium!.copyWith(
+                                                            fontSize: context.textTheme.displayMedium!.fontSize! * 0.81,
                                                             fontWeight: FontWeight.bold,
                                                             color: context.colors.onErrorContainer,
                                                             height: 1,

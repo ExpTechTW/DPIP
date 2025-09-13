@@ -232,7 +232,7 @@ WaveTime calculateWaveTime(double depth, double distance) {
   double userLat,
   double userLon,
 ) {
-  final distSurface = LatLng(eqLat, eqLng).to(LatLng(userLat, userLon));
+  final distSurface = LatLng(eqLat, eqLng).to(LatLng(userLat, userLon)) /1000;
   final dist = sqrt(pow(distSurface, 2) + pow(depth, 2));
   final pga = 1.657 * exp(1.533 * mag) * pow(dist, -1.607);
   var intensity = pgaToFloat(pga);

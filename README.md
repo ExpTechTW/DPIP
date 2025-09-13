@@ -8,7 +8,7 @@
 <a title="Crowdin" target="_blank" href="https://crowdin.com/project/dpip"><img alt="Crowdin Localization" src="https://badges.crowdin.net/dpip/localized.svg"></a>
 <a href="https://good-labs.github.io/greater-good-affirmation"><img alt="Greater Good" src="https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg"></a>
 <img alt="GitHub License" src="https://img.shields.io/github/license/exptechtw/dpip">
-<a href="https://exptech.dev/dpip"><img alt="website" src="https://img.shields.io/badge/website-exptech.dev-purple.svg"></a>
+<a href="https://exptech.dev"><img alt="website" src="https://img.shields.io/badge/website-exptech.dev-purple.svg"></a>
 <a href="https://discord.gg/5dbHqV8ees"><img alt="TREM Discord"  src="https://img.shields.io/discord/926545182407688273?color=%235865F2&logo=discord&logoColor=white"></a>
 </div>
 
@@ -86,10 +86,10 @@ DPIP 支援多語言，我們正在 Crowdin 平台上進行翻譯。如果你願
 - _\*可選\*_ [**Git**](https://git-scm.com/): 用於複製存儲庫
 
 ```console
-Flutter 3.33.0-0.2.pre • channel beta • https://github.com/flutter/flutter.git
-Framework • revision 1db45f7408 • 2025-05-29 10:05:06 -0700
-Engine • revision 308a517184 • 2025-05-23 15:32:17 -0700
-Tools • Dart 3.9.0 (build 3.9.0-100.2.beta) • DevTools 2.46.0
+Flutter 3.35.1 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision 20f8274939 • 2025-08-14 10:53:09 -0700
+Engine • hash 6cd51c08a88e7bbe848a762c20ad3ecb8b063c0e • 2025-08-13 23:35:25.000Z
+Tools • Dart 3.9.0 • DevTools 2.48.0
 ```
 
 ### 建置步驟
