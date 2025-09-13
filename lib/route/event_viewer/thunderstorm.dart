@@ -395,7 +395,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final grouped = groupBy(widget.item.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
+    final grouped = groupBy(widget.item.area.map((e) => Global.location[e.toString()]!), (e) => e.cityWithLevel);
     final List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {
@@ -423,7 +423,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
                               side: BorderSide(color: context.colors.outline),
                               backgroundColor: context.colors.surfaceContainerHigh,
                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              label: Text(e.town),
+                              label: Text(e.townWithLevel),
                             );
                           }).toList(),
                     ),

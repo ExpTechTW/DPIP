@@ -337,7 +337,7 @@ class _IntensityPageState extends State<IntensityPage> {
   }
 
   Widget _buildAffectedAreas() {
-    final grouped = groupBy(data.area.map((e) => Global.location[e.toString()]!), (e) => e.city);
+    final grouped = groupBy(data.area.map((e) => Global.location[e.toString()]!), (e) => e.cityWithLevel);
     final List<Widget> areas = [];
 
     for (final MapEntry(key: city, value: locations) in grouped.entries) {
@@ -365,7 +365,7 @@ class _IntensityPageState extends State<IntensityPage> {
                               side: BorderSide(color: context.colors.outline),
                               backgroundColor: context.colors.surfaceContainerHigh,
                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              label: Text(e.town),
+                              label: Text(e.townWithLevel),
                             );
                           }).toList(),
                     ),
