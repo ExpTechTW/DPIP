@@ -41,22 +41,36 @@ jobs:
       with:
         path: ~/.pub-cache
         key: ubuntu-pub-${{ hashFiles('**/pubspec.lock') }}
-        restore-keys: |
-          ubuntu-pub-
+        restore-keys: ubuntu-pub-
 
     - name: Cache build_runner (Optional)
       uses: actions/cache@v3
       with:
         path: .dart_tool/build
-        key: ubuntu-build-runner-${{ hashFiles('**/*.dart') }}
-        restore-keys: |
-          ubuntu-build-runner-
+        key: ubuntu-build-runner-${{ hashFiles('lib/api/model/**/*.dart') }}
+        restore-keys: ubuntu-build-runner-
+
+    - name: Cache Gradle
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ubuntu-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: ubuntu-gradle-
+
+    - name: Cache CMake
+      uses: actions/cache@v3
+      with:
+        path: /usr/local/lib/android/sdk/cmake
+        key: ubuntu-android-cmake
+        restore-keys: ubuntu-android-cmake-
 
     - name: Install dependencies
       run: flutter pub get
 
     - name: Prebuild with build_runner
-      run: dart run build_runner build --delete-conflicting-outputs
+      run: dart run build_runner build
 
     - name: Build apk
       run: |
