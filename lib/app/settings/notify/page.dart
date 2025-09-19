@@ -123,7 +123,21 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               child: AnimatedOpacity(
                 opacity: isLoading ? 1 : 0,
                 duration: Durations.short4,
-                child: const LinearProgressIndicator(year2023: false),
+                child: Column(
+                  children: [
+                    const LinearProgressIndicator(year2023: false),
+                    const SizedBox(height: 4),
+                    Text(
+                      '伺服器排隊中，請稍候…'.i18n,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: context.colors.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             ListView(
