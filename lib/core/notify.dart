@@ -233,7 +233,7 @@ Future<void> notifyInit() async {
         enableVibration: false,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_rain',
+        channelGroupKey: 'group_info',
         channelKey: 'thunderstorm-important-v2',
         channelName: '山區暴雨(重大)',
         channelDescription: '所在地(鄉鎮)發布山區暴雨時',
@@ -249,7 +249,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_rain',
+        channelGroupKey: 'group_info',
         channelKey: 'thunderstorm-general-v2',
         channelName: '雷雨即時訊息(一般)',
         channelDescription: '所在地(鄉鎮)發布雷雨即時訊息時',
@@ -263,7 +263,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_weather',
+        channelGroupKey: 'group_info',
         channelKey: 'weather_major-important-v2',
         channelName: '天氣警特報(重大)',
         channelDescription: '所在地(鄉鎮)發布紅色燈號之天氣警特報',
@@ -280,7 +280,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_weather',
+        channelGroupKey: 'group_info',
         channelKey: 'weather_minor-general-v2',
         channelName: '天氣警特報(一般)',
         channelDescription: '所在地(鄉鎮)發布上述除外燈號之天氣警特報',
@@ -294,7 +294,7 @@ Future<void> notifyInit() async {
         vibrationPattern: mediumVibrationPattern,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_evacuation',
+        channelGroupKey: 'group_info',
         channelKey: 'evacuation_major-important-v2',
         channelName: '防災資訊(重大)',
         channelDescription: '所在地(鄉鎮)發布土石流、淹水或堰塞湖防災警訊時',
@@ -311,7 +311,7 @@ Future<void> notifyInit() async {
         locked: true,
       ),
       NotificationChannel(
-        channelGroupKey: 'group_evacuation',
+        channelGroupKey: 'group_info',
         channelKey: 'evacuation_minor-general-v2',
         channelName: '防災資訊(一般)',
         channelDescription: '所在地(鄉鎮)發布土石流、淹水或堰塞湖防災資訊時',
@@ -396,9 +396,10 @@ Future<void> notifyInit() async {
       ),
     ],
     channelGroups: [
-      NotificationChannelGroup(channelGroupKey: 'group_eew', channelGroupName: '地震速報音效'),
-      NotificationChannelGroup(channelGroupKey: 'group_eq', channelGroupName: '地震資訊'),
-      NotificationChannelGroup(channelGroupKey: 'group_info', channelGroupName: '防災資訊'),
+      NotificationChannelGroup(channelGroupKey: 'group_eew', channelGroupName: '地震速報'),
+      NotificationChannelGroup(channelGroupKey: 'group_eq', channelGroupName: '地震'),
+      NotificationChannelGroup(channelGroupKey: 'group_info', channelGroupName: '天氣'),
+      NotificationChannelGroup(channelGroupKey: 'group_tsunami', channelGroupName: '海嘯'),
       NotificationChannelGroup(channelGroupKey: 'group_other', channelGroupName: '其他'),
     ],
     debug: true,
