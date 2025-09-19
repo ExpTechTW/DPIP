@@ -94,7 +94,7 @@ class Routes {
 
   static Uri announcement() => Uri.parse('$onlyapi/v1/dpip/announcement');
 
-  static Uri notificationHistory() => Uri.parse('$onlyapi/v1/notify/history');
+  static Uri notificationHistory() => Uri.parse('$onlyapi/v2/notify/history');
 
   static Uri status() => Uri.parse('https://status.exptech.dev/api/v1/status/data?duration=1d');
 
