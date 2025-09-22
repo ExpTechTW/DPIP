@@ -18,6 +18,31 @@ import 'package:dpip/global.dart';
 import 'package:dpip/utils/extensions/datetime.dart';
 import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/log.dart';
+import 'package:talker_flutter/talker_flutter.dart';
+
+class LogEvent {
+  final String message;
+  final LogLevel level;
+  final Exception? exception;
+  final StackTrace? stackTrace;
+  final AnsiPen? pen;
+
+  LogEvent({required this.message, this.level = LogLevel.debug, this.exception, this.stackTrace, this.pen});
+
+  factory LogEvent.fromJson(Map<String, dynamic> json) {
+    final message = json['message'] as String;
+    final level = json['level'] as LogLevel;
+    final exception = json['exception'] as Exception?;
+    final stackTrace = json['stackTrace'] as StackTrace?;
+    final pen = json['pen'] as AnsiPen;
+
+    return LogEvent(message: message, level: level, exception: exception, stackTrace: stackTrace, pen: pen);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'message': message, 'level': level, 'exception': exception, 'stackTrace': stackTrace, 'pen': pen};
+  }
+}
 
 class PositionEvent {
   final LatLng? coordinates;
@@ -44,6 +69,9 @@ final class LocationServiceEvent {
 
   /// Method event to stop the service.
   static const stop = 'stop';
+
+  /// Event emitted when a log message is sent from the service. Contains the log message.
+  static const log = 'log';
 }
 
 /// Background location service.
@@ -98,6 +126,7 @@ class LocationServiceManager {
 
       // Reloads the UI isolate's preference cache when a new position is set in the background service.
       service.on(LocationServiceEvent.position).listen((data) => _onPosition(PositionEvent.fromJson(data!)));
+      service.on(LocationServiceEvent.log).listen((data) => _onLog(LogEvent.fromJson(data!)));
 
       instance = service;
       TalkerManager.instance.info('👷 service initialized');
@@ -177,6 +206,20 @@ class LocationServiceManager {
       TalkerManager.instance.error('👷 failed to update location', e, s);
     }
   }
+
+  /// The event handler for the "log" event.
+  ///
+  /// Called when the service wants to log a message, this handler exists because using Talker in an isolate will log
+  /// the message separately.
+  static Future<void> _onLog(LogEvent log) async {
+    TalkerManager.instance.log(
+      log.message,
+      logLevel: log.level,
+      exception: log.exception,
+      stackTrace: log.stackTrace,
+      pen: log.pen,
+    );
+  }
 }
 
 /// The background location service.
@@ -238,8 +281,8 @@ class LocationService {
 
     _$service.on(LocationServiceEvent.stop).listen((_) => _$onStop());
 
-    // Start the periodic location update task
     await _$task();
+    _$locationUpdateTimer = Timer.periodic(const Duration(minutes: 10), (timer) async => await _$task());
   }
 
   /// The main tick function of the service.
@@ -251,14 +294,14 @@ class LocationService {
     if (!await _$service.isForegroundService()) return;
 
     final $perf = Stopwatch()..start();
-    TalkerManager.instance.debug('⚙️::BackgroundLocationService task started');
+    _$log('⚙️::BackgroundLocationService task started');
 
     try {
       // Get current position and location info
       final coordinates = await _$getDeviceGeographicalLocation();
 
       if (coordinates == null) {
-        _$updatePosition(_$service, null);
+        _$updatePosition(null);
         return;
       }
 
@@ -267,38 +310,23 @@ class LocationService {
       final distanceInMeters = previousLocation != null ? coordinates.to(previousLocation) : null;
 
       if (distanceInMeters == null || distanceInMeters >= 250) {
-        TalkerManager.instance.debug('⚙️::BackgroundLocationService distance: $distanceInMeters, updating position');
-        _$updatePosition(_$service, coordinates);
+        _$log('⚙️::BackgroundLocationService distance: $distanceInMeters, updating position');
+        _$updatePosition(coordinates);
       } else {
-        TalkerManager.instance.debug(
-          '⚙️::BackgroundLocationService distance: $distanceInMeters, not updating position',
-        );
+        _$log('⚙️::BackgroundLocationService distance: $distanceInMeters, not updating position');
       }
-
-      // Determine the next update time based on the distance moved
-      int nextUpdateInterval = 15;
-
-      if (distanceInMeters != null) {
-        if (distanceInMeters > 30) {
-          nextUpdateInterval = 5;
-        } else if (distanceInMeters > 10) {
-          nextUpdateInterval = 10;
-        }
-      }
-
-      _$locationUpdateTimer?.cancel();
-      _$locationUpdateTimer = Timer.periodic(Duration(minutes: nextUpdateInterval), (timer) => _$task());
     } catch (e, s) {
       $perf.stop();
-      TalkerManager.instance.error(
+      _$log(
         '⚙️::BackgroundLocationService task FAILED after ${$perf.elapsedMilliseconds}ms',
-        e,
-        s,
+        level: LogLevel.error,
+        exception: e as Exception,
+        stackTrace: s,
       );
     } finally {
       if ($perf.isRunning) {
         $perf.stop();
-        TalkerManager.instance.debug('⚙️::BackgroundLocationService task completed in ${$perf.elapsedMilliseconds}ms');
+        _$log('⚙️::BackgroundLocationService task completed in ${$perf.elapsedMilliseconds}ms');
       }
     }
   }
@@ -309,17 +337,21 @@ class LocationService {
   @pragma('vm:entry-point')
   static Future<void> _$onStop() async {
     try {
-      TalkerManager.instance.info('⚙️::BackgroundLocationService stopping location service');
+      _$log('⚙️::BackgroundLocationService stopping location service', level: LogLevel.info);
 
-      // Cleanup timer
       _$locationUpdateTimer?.cancel();
 
       await _$service.setAutoStartOnBootMode(false);
       await _$service.stopSelf();
 
-      TalkerManager.instance.info('⚙️::BackgroundLocationService location service stopped');
+      _$log('⚙️::BackgroundLocationService location service stopped', level: LogLevel.info);
     } catch (e, s) {
-      TalkerManager.instance.error('⚙️::BackgroundLocationService stopping location service FAILED', e, s);
+      _$log(
+        '⚙️::BackgroundLocationService stopping location service FAILED',
+        level: LogLevel.error,
+        exception: e as Exception,
+        stackTrace: s,
+      );
     }
   }
 
@@ -331,7 +363,7 @@ class LocationService {
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
-      TalkerManager.instance.warning('位置服務未啟用');
+      _$log('位置服務未啟用', level: LogLevel.warning);
       return null;
     }
 
@@ -425,7 +457,7 @@ class LocationService {
   ///
   /// Invokes a position event with the new coordinates that can be listened to by the main app to update the UI.
   @pragma('vm:entry-point')
-  static Future<void> _$updatePosition(ServiceInstance service, LatLng? position) async {
+  static Future<void> _$updatePosition(LatLng? position) async {
     _$location = position;
 
     final result = position != null ? _$getLocationFromCoordinates(position) : null;
@@ -434,7 +466,7 @@ class LocationService {
     Preference.locationLatitude = position?.latitude;
     Preference.locationLongitude = position?.longitude;
 
-    service.invoke(LocationServiceEvent.position, PositionEvent(position, result?.code).toJson());
+    _$service.invoke(LocationServiceEvent.position, PositionEvent(position, result?.code).toJson());
 
     // Update notification with current position
     final timestamp = DateTime.now().toDateTimeString();
@@ -471,5 +503,19 @@ class LocationService {
     );
 
     _$service.setForegroundNotificationInfo(title: notificationTitle, content: notificationBody);
+  }
+
+  @pragma('vm:entry-point')
+  static void _$log(
+    String message, {
+    LogLevel level = LogLevel.debug,
+    Exception? exception,
+    StackTrace? stackTrace,
+    AnsiPen? pen,
+  }) {
+    _$service.invoke(
+      LocationServiceEvent.log,
+      LogEvent(message: message, level: level, exception: exception, stackTrace: stackTrace, pen: pen).toJson(),
+    );
   }
 }
