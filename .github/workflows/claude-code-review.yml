@@ -3,6 +3,16 @@ name: Claude Code Review
 on:
   pull_request:
     types: [opened]
+    paths:
+      - 'lib/**'
+      - 'ios/**'
+      - 'android/**'
+      - 'tools/**'
+      - 'pubspec.yaml'
+      - 'analysis_options.yaml'
+      - 'crowdin.yml'
+      - 'CHANGELOG.md'
+      - 'README.md'
 
 jobs:
   claude-review:
