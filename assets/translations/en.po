@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-09-01 04:13\n"
+"PO-Revision-Date: 2025-10-09 14:51\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -50,7 +50,7 @@ msgstr "Earthquake Monitor"
 
 #: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
-msgstr "Reports"
+msgstr "Earthquake Report"
 
 #: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
@@ -277,11 +277,11 @@ msgstr "Local (City/Town/District) estimated intensity is greater than 1"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布防災警訊時"
-msgstr ""
+msgstr "When the local area(township) issues a disaster prevention alert"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布防災資訊時"
-msgstr ""
+msgstr "When the local area(township) issues disaster prevention information"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
@@ -699,11 +699,11 @@ msgstr "of {serial}"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1103
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "Around {time}, felt earthquake near <bold>{location}</bold> estimated <bold>M{magnitude}</bold> and max intensity <bold>{intensity}</bold>."
+msgstr "At around {time}, an earthquake was felt near <bold>{location}</bold> with an estimated intensity of <bold>M{magnitude}</bold>, with a local felt intensity of <bold>{intensity}</bold>."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
-msgstr ""
+msgstr "At around {time}, an earthquake was felt near <bold>{location}</bold> with an estimated intensity of <bold>M{magnitude}</bold> and at a depth of <bold>{depth}</bold>KM."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1137
 msgid "所在地預估"
