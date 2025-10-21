@@ -49,7 +49,7 @@ android {
         applicationId "com.exptech.dpip"
         minSdkVersion 26
         targetSdkVersion 36
-        versionCode 300100101
+        versionCode 300100110
         versionName flutterVersionName
         multiDexEnabled true
     }
@@ -94,8 +94,4 @@ dependencies {
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
-}
-
-configurations.all {
-    exclude group: 'io.flutter', module: 'x86_debug'
 }

@@ -1,11 +1,11 @@
 name: dpip
 description: "Disaster Prevention Information Platform"
 publish_to: 'none'
-version: 3.1.101
+version: 3.1.102
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
-  flutter: '>=3.35.1'
+  flutter: '>=3.35.4'
 
 dependencies:
   awesome_notifications: 0.10.1
@@ -44,7 +44,7 @@ dependencies:
   i18n_extension: ^15.0.5
   in_app_purchase: ^3.2.2
   in_app_update: 4.2.3
-  intl: any
+  intl: ^0.20.2
   json_annotation: 4.9.0
   maplibre_gl:
     git:
@@ -68,9 +68,6 @@ dependencies:
   geojson_vi: ^2.2.5
   crypto: ^3.0.6
   async: ^2.13.0
-
-dependency_overrides:
-  intl: 0.19.0
 
 dev_dependencies:
   build_runner: 2.4.15

@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"PO-Revision-Date: 2025-09-01 03:15\n"
+"PO-Revision-Date: 2025-09-23 16:27\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -18,7 +18,7 @@ msgstr "現在地"
 
 #: ./lib/app/settings/location/page.dart:421
 msgid "新增地點"
-msgstr "新しい場所を追加"
+msgstr "地点を追加"
 
 #: ./lib/app/settings/page.dart:52
 msgid "主題"
@@ -66,7 +66,7 @@ msgstr "天気警報"
 
 #: ./lib/app/settings/notify/page.dart:236
 msgid "防災資訊"
-msgstr "防災インフォメーション"
+msgstr "防災情報"
 
 #: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
@@ -98,7 +98,7 @@ msgstr "受信カテゴリ"
 
 #: ./lib/app/settings/notify/page.dart:45
 msgid "所在地震度1以上"
-msgstr "現在地震度 1 以上で受信"
+msgstr "現在地で震度1以上を受信"
 
 #: ./lib/app/settings/notify/page.dart:56
 msgid "海嘯消息、海嘯警報"
@@ -110,11 +110,11 @@ msgstr "津波警報のみ受信"
 
 #: ./lib/app/settings/notify/page.dart:51
 msgid "接收所在地"
-msgstr "現地のみ受信"
+msgstr "現在地のみ受信"
 
 #: ./lib/app/settings/notify/page.dart:38
 msgid "所在地震度4以上"
-msgstr "現在地震度 4 以上で受信"
+msgstr "現在地で震度4以上を受信"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:31
 msgid "音效測試"
@@ -126,11 +126,11 @@ msgstr "通知受信時"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:47
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
-msgstr "サウンドテストはこのデバイス上でのみ実行されるテストです、通知受信時にデバイスが効果音を正常に再生できるかどうかを確認するためにのみ使用されます"
+msgstr "サウンドテストは端末上でのみ実行され、通知受信時に正しく音が再生されるかを確認するためだけに使われます。このテストでサーバーにリクエストが送信されることはありません。"
 
 #: ./lib/app/settings/notify/page.dart:135
 msgid "請先設定所在地來使用通知功能"
-msgstr "通知機能を使用する為に現在地を設定してください"
+msgstr "通知機能を利用するには、先に現在地を設定してください。"
 
 #: ./lib/app/settings/notify/page.dart:142
 msgid "地震速報"
@@ -289,12 +289,12 @@ msgstr ""
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
 "天氣警特報"
-msgstr "現在地（郷／鎮）にレッドアラートの天気注意報／特報が発令され"
+msgstr "現在地（郷／鎮）に赤色灯の気象特別警報が発表されました"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:40
 msgid "所在地(鄉鎮)發布上述除外燈號之\n"
 "天氣警特報"
-msgstr "現在地（郷／鎮）にその以外の天気注意報／特報が発令され"
+msgstr "現在地（郷／鎮）に、上記以外の気象注意報・特別警報が発表されました"
 
 #: ./lib/app/settings/notify/(3.weather)/thunderstorm/page.dart:35
 msgid "所在地(鄉鎮)發布山區暴雨時"
@@ -342,11 +342,11 @@ msgstr "ソース言語"
 
 #: ./lib/app/settings/donate/page.dart:46
 msgid "無法連線至商店，請稍後再試"
-msgstr "ストアーへの接続異常"
+msgstr "ストアに接続できません"
 
 #: ./lib/app/settings/donate/page.dart:52
 msgid "找不到商品，請稍候再試"
-msgstr "該当商品が見つかりません"
+msgstr "商品が見つかりません"
 
 #: ./lib/app/settings/donate/page.dart:134
 msgid "重新載入"
@@ -354,13 +354,13 @@ msgstr "再読み込み"
 
 #: ./lib/app/settings/donate/page.dart:144
 msgid "正在載入商店物品中"
-msgstr "ストアーの商品読み込み中"
+msgstr "ストアの商品を読み込み中"
 
 #: ./lib/app/settings/donate/page.dart:161
 msgid "DPIP 作為一款致力於提供即時地震資訊的 App，目前並無廣告或其他盈利模式。為了維持高品質服務，我們需要承擔伺服器運行、地震數據獲取與傳輸、以及後續功能開發與維護的成本。\n\n"
 "您在下方所選的每一份支持，都將直接用於支付這些營運費用，幫助 DPIP 持續穩定地為您提供服務。感謝您的理解與慷慨！"
-msgstr "DPIP はリアルタイムで地震情報の提供に努めているアプリケーションとして、今までに広告や他の収益方法などはございません。サービスの品質をより高く保たれるため、サーバーの運行、地震データの取り込みや伝送、またはより豊富な機能の開発やメンテナンスなどのコストを負担しております。\n\n"
-"貴台がお選びになるサポートプランは全て以上の運営コストの一部のお支払いに活用しておりまして、DPIP をより穏やかなサービスができることを支えております。ご理解、ご厚意に感謝しています！"
+msgstr "DPIPはリアルタイムで地震情報を提供することに尽力しているアプリで、現在は広告やその他の収益手段を設けていません。高品質なサービスを維持するためには、サーバーの運用、地震データの取得・配信、そして新機能の開発やメンテナンスといったコストを負担する必要があります。\n\n"
+"お選びいただいたご支援は、これらの運営費用に直接充てられ、DPIPが安定してサービスを提供し続けるための力となります。皆さまのご理解とご支援に心より感謝いたします！"
 
 #: ./lib/app/settings/donate/page.dart:169
 msgid "訂閱制"
@@ -416,8 +416,7 @@ msgstr "DPIPの表示言語を調整する"
 
 #: ./lib/app/settings/page.dart:69
 msgid "調整 DPIP 顯示數值時使用的單位"
-msgstr "DPIP で数値をディスプレイする時の\n"
-"が現れる単位を調整する"
+msgstr "DPIPで数値を表示する際に使用する単位を調整する"
 
 #: ./lib/app/settings/page.dart:75
 msgid "調整 DPIP 地圖的設定"
@@ -445,7 +444,7 @@ msgstr "過去の更新履歴を見る"
 
 #: ./lib/app/settings/page.dart:113
 msgid "幫助我們維護伺服器的穩定和長久發展"
-msgstr "サーバーの安定性と長期的な運営の維持にご協力ください"
+msgstr "サーバーの安定性と長期的な運営の維持の為にご協力ください"
 
 #: ./lib/app/settings/page.dart:119
 msgid "第三方套件授權"
@@ -769,7 +768,7 @@ msgstr "注意事項"
 
 #: ./lib/app/welcome/3-notice/page.dart:75
 msgid "根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等，有收不到資訊的可能性，我們會盡力避免此類情況，但不保證一定不會發生。"
-msgstr "回線、サーバー、アプリや上游データ来源の都合により情報を受けかねる可能性があります。努力を込めてそのような状況を避けておりながら、発生しませんことには確保かねます。"
+msgstr "回線やサーバー、アプリケーション、上流データ提供元の状況によっては、情報を受信できない場合があります。私たちはそのような事態を避けるよう最善を尽くしていますが、完全に発生しないことを保証するものではありません。"
 
 #: ./lib/app/welcome/3-notice/page.dart:88
 msgid "強烈搖晃有機率比通知早抵達使用者所在地。"
@@ -777,11 +776,11 @@ msgstr "強い揺れが通知より早く到達する確率があります。"
 
 #: ./lib/app/welcome/3-notice/page.dart:99
 msgid "地震速報為快速計算之結果，可能存在較大誤差，應理解並謹慎使用。"
-msgstr "地震速報の情報は速算で得たことで、巨大な誤差も可能です。その前提が理解する上謹慎にお使いください。"
+msgstr "地震速報は迅速な計算に基づくため、誤差が大きくなる可能性があります。その点をご理解のうえ、慎重にご利用ください。"
 
 #: ./lib/app/welcome/3-notice/page.dart:110
 msgid "任何不被官方所認可的行為均有可能承擔法律風險，請務必遵守相關規範。"
-msgstr "あらゆる公式により認可されておりません挙動は法律的な責任を持たれることが可能でおりまして、規範を遵うことをお願いいたします。"
+msgstr "公式に認められていない行為は、法的なリスクを伴う可能性があります。必ず関連する規範を守ってください。"
 
 #: ./lib/app/welcome/1-about/page.dart:40
 msgid "歡迎使用 DPIP"
@@ -789,7 +788,7 @@ msgstr "DPIPへようこそ"
 
 #: ./lib/app/welcome/1-about/page.dart:81
 msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
-msgstr "DPIP は台湾本土のグループが作ったアプリケーションで、TREM-Net（台湾即時地震観測ネット）と台湾中央気象局のデータを整合して、より整合、単一で便利な防災情報アプリケーションを提供しております。"
+msgstr "DPIPは台湾のチームが開発したアプリで、TREM-Net（台湾即時地震観測網）の情報と中央気象署のデータを統合し、防災情報をひとつにまとめて便利に利用できるアプリケーションです。"
 
 #: ./lib/app/welcome/4-permissions/page.dart:154
 msgid "在重大災害發生時以通知來傳遞即時防災資訊"
@@ -801,7 +800,7 @@ msgstr "定位により自動的に現在地を更新し、当地である即時
 
 #: ./lib/app/welcome/4-permissions/page.dart:168
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
-msgstr "バックグラウンドでも DPIP の運行ができることを同意し、より即時な通知や情報を受けられることになります。"
+msgstr "DPIPをバックグラウンドで継続的に動作させることで、防災通知を即時に受け取ることができます。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:228
 msgid "儲存"
@@ -809,7 +808,7 @@ msgstr "保存"
 
 #: ./lib/app/welcome/4-permissions/page.dart:175
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
-msgstr "台湾中央気象署またはExpTechから提供されたデータ可視化画像をセーブすることに用いることになります"
+msgstr "中央気象署または ExpTech が提供するデータの可視化画像を保存するために使用します"
 
 #: ./lib/app/welcome/4-permissions/page.dart:342
 msgid "權限請求"
@@ -817,7 +816,7 @@ msgstr "権限を要求"
 
 #: ./lib/app/welcome/4-permissions/page.dart:343
 msgid "需要使用者手動到設定開啟相關權限。"
-msgstr "ユーザー手動で設定まで相関な権限を開けることが必要です。"
+msgstr "ユーザーが手動で設定から該当の権限を有効にする必要があります。"
 
 #: ./lib/app/welcome/4-permissions/page.dart:383
 msgid "權限"
@@ -825,7 +824,7 @@ msgstr "権限"
 
 #: ./lib/app/welcome/4-permissions/page.dart:396
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
-msgstr "私たちはユーザーの側に立ち、休むことなくユーザーのプライバシーに努めております。"
+msgstr "私たちは常にユーザーの立場に寄り添い、プライバシーの保護に取り組み続けています。"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:99
 msgid "地圖圖層"
@@ -937,7 +936,7 @@ msgstr "到達まであと{countdown}秒"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1039
 msgid "已抵達"
-msgstr "到達し"
+msgstr "到達済み"
 
 #: ./lib/app/map/_lib/managers/report.dart:369
 msgid "近期的地震報告"
@@ -1053,7 +1052,7 @@ msgstr "お知らせの詳細"
 
 #: ./lib/route/image_viewer/image_viewer.dart:59
 msgid "請您到應用程式設定中找到並允許「相片和媒體」權限後再試一次。"
-msgstr "アプリケーション設定に「画像や映像」の権限をお開けてから、もう一度試すことをお願いします。"
+msgstr "アプリの設定で「写真とメディア」へのアクセス権限を有効にしてから、もう一度お試しください。"
 
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "再試一次"
@@ -1065,7 +1064,7 @@ msgstr "保存しました"
 
 #: ./lib/route/image_viewer/image_viewer.dart:126
 msgid "儲存圖片時發生錯誤"
-msgstr "画像をセーブする時にエラーが発生しました"
+msgstr "画像を保存中にエラーが発生しました"
 
 #: ./lib/utils/extensions/int.dart:13
 msgid "０級"
