@@ -121,7 +121,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               left: 0,
               right: 0,
               child: AnimatedOpacity(
-                opacity: isLoading ? 1 : 0,
+                opacity: isLoading && enabled ? 1 : 0,
                 duration: Durations.short4,
                 child: Column(
                   children: [
