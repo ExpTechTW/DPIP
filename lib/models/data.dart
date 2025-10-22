@@ -403,7 +403,7 @@ class DpipDataModel extends _DpipDataModel {
 
         if (eew.isNotEmpty == true) {
           final eewMap = {for (final e in eew) e.id: e};
-          final eewDistMap = {for (final e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s};
+          final eewDistMap = {for (final e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s * 1000,};
 
           if (checkBoxSkip(eewMap, eewDistMap, coordinates)) continue;
         }
