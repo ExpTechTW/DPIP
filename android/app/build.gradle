@@ -52,6 +52,7 @@ android {
         versionCode 300100110
         versionName flutterVersionName
         multiDexEnabled true
+        resConfigs "en-US", "zh-rTW" , "ja", "zh-rCN"
     }
 
     signingConfigs {
