@@ -77,6 +77,17 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
         Preference.notifyTsunami == null ||
         Preference.notifyAnnouncement == null) {
       setState(() => isLoading = true);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('伺服器排隊中，請稍候…'.i18n),
+            ),
+          );
+        }
+      });
       ExpTech()
           .getNotify(token: Preference.notifyToken)
           .then((value) {
@@ -123,21 +134,7 @@ class _SettingsNotifyPageState extends State<SettingsNotifyPage> {
               child: AnimatedOpacity(
                 opacity: isLoading && enabled ? 1 : 0,
                 duration: Durations.short4,
-                child: Column(
-                  children: [
-                    const LinearProgressIndicator(year2023: false),
-                    const SizedBox(height: 4),
-                    Text(
-                      '伺服器排隊中，請稍候…'.i18n,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: context.colors.onSurface,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+                child: const LinearProgressIndicator(year2023: false),
               ),
             ),
             ListView(
