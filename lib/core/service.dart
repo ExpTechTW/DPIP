@@ -240,6 +240,7 @@ class LocationService {
 
     // Start the periodic location update task
     await _$task();
+    _$locationUpdateTimer = Timer.periodic(const Duration(minutes: 10), (timer) => _$task());
   }
 
   /// The main tick function of the service.
@@ -274,20 +275,6 @@ class LocationService {
           '⚙️::BackgroundLocationService distance: $distanceInMeters, not updating position',
         );
       }
-
-      // Determine the next update time based on the distance moved
-      int nextUpdateInterval = 15;
-
-      if (distanceInMeters != null) {
-        if (distanceInMeters > 30) {
-          nextUpdateInterval = 5;
-        } else if (distanceInMeters > 10) {
-          nextUpdateInterval = 10;
-        }
-      }
-
-      _$locationUpdateTimer?.cancel();
-      _$locationUpdateTimer = Timer.periodic(Duration(minutes: nextUpdateInterval), (timer) => _$task());
     } catch (e, s) {
       $perf.stop();
       TalkerManager.instance.error(
