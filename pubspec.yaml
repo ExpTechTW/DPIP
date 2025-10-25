@@ -88,6 +88,6 @@ flutter:
   - assets/DPIP.png
   - assets/ExpTech.png
   - assets/box.json
-  - assets/location.json
+  - assets/location.json.gz
   - assets/notify_test.json
-  - assets/time.json
+  - assets/time.json.gz
