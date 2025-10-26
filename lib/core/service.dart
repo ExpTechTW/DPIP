@@ -436,7 +436,7 @@ class LocationService {
       if (result == null) {
         content = '服務區域外 ($latitude, $longitude)';
       } else {
-        content = '${result.location.city} ${result.location.town} ($latitude, $longitude)';
+        content = '${result.location.city} ${result.location.townNoti} ($latitude, $longitude)';
       }
     }
 
