@@ -85,8 +85,8 @@ flutter:
   - assets/translations/
   # other
   - assets/map/
-  - assets/DPIP.png
-  - assets/ExpTech.png
+  - assets/DPIP.webp
+  - assets/ExpTech.webp
   - assets/box.json
   - assets/location.json.gz
   - assets/notify_test.json
