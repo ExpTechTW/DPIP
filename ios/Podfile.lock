@@ -2,8 +2,6 @@ PODS:
   - awesome_notifications (0.10.0):
     - Flutter
     - IosAwnCore (~> 0.10.0)
-  - awesome_notifications_core (0.0.1):
-    - Flutter
   - awesome_notifications_fcm (0.10.0):
     - awesome_notifications
     - Firebase/Messaging
@@ -105,10 +103,10 @@ PODS:
     - FirebaseCore (~> 11.0)
     - GoogleUtilities (~> 8.0)
     - IosAwnCore (~> 0.10.0)
-  - MapLibre (6.14.0)
-  - maplibre_gl (0.0.1):
+  - MapLibre (6.19.1)
+  - maplibre_gl (0.24.1):
     - Flutter
-    - MapLibre (= 6.14.0)
+    - MapLibre (= 6.19.1)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -135,7 +133,6 @@ PODS:
 
 DEPENDENCIES:
   - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
-  - awesome_notifications_core (from `.symlinks/plugins/awesome_notifications_core/ios`)
   - awesome_notifications_fcm (from `.symlinks/plugins/awesome_notifications_fcm/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -172,8 +169,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   awesome_notifications:
     :path: ".symlinks/plugins/awesome_notifications/ios"
-  awesome_notifications_core:
-    :path: ".symlinks/plugins/awesome_notifications_core/ios"
   awesome_notifications_fcm:
     :path: ".symlinks/plugins/awesome_notifications_fcm/ios"
   device_info_plus:
@@ -211,7 +206,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   awesome_notifications: dd5518ff1c80be03d4f1c40f04da9d9cc2a37af5
-  awesome_notifications_core: d02eed89738fa362d56cbd372850e9adcd2c6bef
   awesome_notifications_fcm: 707931990883faf918db11438bdddded93b2b3a6
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
@@ -230,8 +224,8 @@ SPEC CHECKSUMS:
   in_app_purchase_storekit: a1ce04056e23eecc666b086040239da7619cd783
   IosAwnCore: 653786a911089012092ce831f2945cd339855a89
   IosAwnFcmCore: 1bdb9054b2e00187d00f1ffcfbb1855949a7b82f
-  MapLibre: 69e572367f4ef6287e18246cfafc39c80cdcabcd
-  maplibre_gl: 753f55d763a81cbdba087d02af02d12206e6f94e
+  MapLibre: 7f24faba45439f80ccb0f83393c29fa32cb81952
+  maplibre_gl: 5144d1208ed5ee49dfb2023670180f9af5517cce
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
