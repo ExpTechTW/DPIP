@@ -422,6 +422,7 @@ class MonitorMapLayerManager extends MapLayerManager {
             '#00DB00',
           ],
           visibility: 'none',
+          lineSortKey: [Expressions.get, 'i'],
         );
 
         await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
