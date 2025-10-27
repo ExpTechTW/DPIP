@@ -45,7 +45,11 @@ dependencies:
   in_app_update: 4.2.3
   intl: ^0.20.2
   json_annotation: 4.9.0
-  maplibre_gl: ^0.24.1
+  maplibre_gl:
+    git:
+      url: https://github.com/maplibre/flutter-maplibre-gl.git
+      path: maplibre_gl
+      ref: main
   material_symbols_icons: ^4.2815.0
   package_info_plus: ^8.3.0
   path_provider: ^2.1.5
