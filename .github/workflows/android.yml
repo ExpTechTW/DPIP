@@ -54,17 +54,10 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
-          ~/.gradle/caches
+          ~/.gradle/caches/modules-2
           ~/.gradle/wrapper
         key: ubuntu-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: ubuntu-gradle-
-
-    - name: Cache CMake
-      uses: actions/cache@v3
-      with:
-        path: /usr/local/lib/android/sdk/cmake
-        key: ubuntu-android-cmake
-        restore-keys: ubuntu-android-cmake-
 
     - name: Install dependencies
       run: flutter pub get
@@ -73,18 +66,10 @@ jobs:
       run: dart run build_runner build
 
     - name: Build apk
-      run: |
-        flutter build apk --debug
-        # flutter build aab --debug
+      run: flutter build apk --debug
 
     - name: Upload (apk) Artifacts
       uses: actions/upload-artifact@main
       with:
         name: "DPIP.apk"
         path: build/app/outputs/flutter-apk/*.apk
-
-    - name: Upload (aab) Artifacts
-      uses: actions/upload-artifact@main
-      with:
-        name: "DPIP.aab"
-        path: build/app/outputs/bundle/release/*.aab
