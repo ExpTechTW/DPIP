@@ -252,25 +252,23 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
       snap: true,
       snapSizes: const [0.15, 0.35, 1],
       builder: (context, scrollController) {
-        return SafeArea(
-          child: Container(
-            decoration: BoxDecoration(
-              color: context.colors.surfaceContainer,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              boxShadow: kElevationToShadow[4],
-            ),
-            child: ListView(
-              controller: scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                const BottomSheetDragHandle(),
-                _buildWarningHeader(),
-                const Divider(),
-                _buildWarningDetails(),
-                const SizedBox(height: 20),
-                _buildAffectedAreas(),
-              ],
-            ),
+        return Container(
+          decoration: BoxDecoration(
+            color: context.colors.surfaceContainer,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            boxShadow: kElevationToShadow[4],
+          ),
+          child: ListView(
+            controller: scrollController,
+            padding: EdgeInsets.fromLTRB(16, 0, 16, context.padding.bottom),
+            children: [
+              const BottomSheetDragHandle(),
+              _buildWarningHeader(),
+              const Divider(),
+              _buildWarningDetails(),
+              const SizedBox(height: 20),
+              _buildAffectedAreas(),
+            ],
           ),
         );
       },
