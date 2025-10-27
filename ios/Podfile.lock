@@ -2,8 +2,6 @@ PODS:
   - awesome_notifications (0.10.0):
     - Flutter
     - IosAwnCore (~> 0.10.0)
-  - awesome_notifications_core (0.0.1):
-    - Flutter
   - awesome_notifications_fcm (0.10.0):
     - awesome_notifications
     - Firebase/Messaging
@@ -135,7 +133,6 @@ PODS:
 
 DEPENDENCIES:
   - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
-  - awesome_notifications_core (from `.symlinks/plugins/awesome_notifications_core/ios`)
   - awesome_notifications_fcm (from `.symlinks/plugins/awesome_notifications_fcm/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -172,8 +169,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   awesome_notifications:
     :path: ".symlinks/plugins/awesome_notifications/ios"
-  awesome_notifications_core:
-    :path: ".symlinks/plugins/awesome_notifications_core/ios"
   awesome_notifications_fcm:
     :path: ".symlinks/plugins/awesome_notifications_fcm/ios"
   device_info_plus:
@@ -211,7 +206,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   awesome_notifications: dd5518ff1c80be03d4f1c40f04da9d9cc2a37af5
-  awesome_notifications_core: d02eed89738fa362d56cbd372850e9adcd2c6bef
   awesome_notifications_fcm: 707931990883faf918db11438bdddded93b2b3a6
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e

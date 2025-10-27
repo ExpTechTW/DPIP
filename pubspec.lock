@@ -65,14 +65,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.10.1"
-  awesome_notifications_core:
-    dependency: "direct main"
-    description:
-      name: awesome_notifications_core
-      sha256: f8a227159f70e30d0f4c1d8996cf7e3865fec7c9030df752dfa51d177dc08b38
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.10.1"
   awesome_notifications_fcm:
     dependency: "direct main"
     description:
@@ -550,10 +542,10 @@ packages:
     dependency: "direct main"
     description:
       name: gal
-      sha256: "2771519c8b29f784d5e27f4efc2667667eef51c6c47cccaa0435a8fe8aa208e4"
+      sha256: "969598f986789127fd407a750413249e1352116d4c2be66e81837ffeeaafdfee"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.1"
+    version: "2.3.2"
   geojson_vi:
     dependency: "direct main"
     description:
@@ -654,10 +646,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: fe7ab022b76f3034adc518fb6ea04a82387620e19977665ea18d30a1cf43442f
+      sha256: bb2ce4590bc2667c96f318d68cac1b5a7987ec819351d32b1c987239a815e007
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.0"
+    version: "1.5.0"
   http_multi_server:
     dependency: transitive
     description:
@@ -1578,4 +1570,4 @@ packages:
     version: "3.1.3"
 sdks:
   dart: ">=3.8.0 <4.0.0"
-  flutter: ">=3.35.4"
+  flutter: ">=3.35.7"
