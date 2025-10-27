@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-09-01 04:13\n"
+"PO-Revision-Date: 2025-10-09 16:16\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -42,15 +42,15 @@ msgstr "Notifications"
 
 #: ./lib/app/settings/notify/page.dart:148
 msgid "緊急地震速報"
-msgstr "Earthquake Early Warning"
+msgstr "Emergency Earthquake Warning"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:784
 msgid "強震監視器"
-msgstr "Earthquake Monitor"
+msgstr "Earthquake Monitoring"
 
 #: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
-msgstr "Reports"
+msgstr "Earthquake Report"
 
 #: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
@@ -66,11 +66,11 @@ msgstr "Weather Advisory"
 
 #: ./lib/app/settings/notify/page.dart:236
 msgid "防災資訊"
-msgstr "Emergency information"
+msgstr "Disaster Prevention Advisory"
 
 #: ./lib/app/settings/map/page.dart:49
 msgid "海嘯資訊"
-msgstr "Tsunami information"
+msgstr "Tsunami Advisory"
 
 #: ./lib/route/announcement/announcement.dart:82
 msgid "公告"
@@ -102,11 +102,11 @@ msgstr "Intensity 1 or higher at current location"
 
 #: ./lib/app/settings/notify/page.dart:56
 msgid "海嘯消息、海嘯警報"
-msgstr "Tsunami information, Tsunami warning"
+msgstr "Tsunami Advisory, Tsunami Warning"
 
 #: ./lib/app/settings/notify/page.dart:55
 msgid "只接收海嘯警報"
-msgstr "Tsunami warning only"
+msgstr "Tsunami Warning only"
 
 #: ./lib/app/settings/notify/page.dart:51
 msgid "接收所在地"
@@ -166,19 +166,19 @@ msgstr "General"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:34
 msgid "海嘯消息發布時"
-msgstr "When a tsunami message is issued"
+msgstr "When a tsunami advisory is issued"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息(無聲通知)"
-msgstr "Pacific Tsunami Information (Silent Notification)"
+msgstr "Pacific Ocean Tsunami Information (Silent Notification)"
 
 #: ./lib/app/settings/notify/(4.tsunami)/tsunami/page.dart:35
 msgid "太平洋海嘯消息發布時"
-msgstr "When the Pacific information is issued"
+msgstr "When the Pacific Ocean tsunami advisory is issued"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
-msgstr "Earthquake Monitor (General)"
+msgstr "Earthquake Monitoring (General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
@@ -226,7 +226,7 @@ msgstr "Failed To Update Notification Settings"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:34
 msgid "緊急地震速報(重大)"
-msgstr "Earthquake Early Warning (Critical)"
+msgstr "Earthquake Early Warning (Severe)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:35
 msgid "最大震度 5 弱以上 且\n"
@@ -235,7 +235,7 @@ msgstr "Maximum intensity is greater than 5- and local (City/Town/District) esti
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:39
 msgid "緊急地震速報(一般)"
-msgstr "Emergency Earthquake Early Warning (General)"
+msgstr "Earthquake Early Warning (General)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:40
 msgid "最大震度 5 弱以上 且\n"
@@ -244,7 +244,7 @@ msgstr "Maximum intensity is greater than 5- and local (City/Town/District) esti
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:44
 msgid "緊急地震速報(無聲)"
-msgstr "Emergency Earthquake Early Warning (Silent)"
+msgstr "Earthquake Early Warning (Silent)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:45
 msgid "最大震度 5 弱以上 且\n"
@@ -253,7 +253,7 @@ msgstr "Maximum intensity is greater than 5- and local (City/Town/District) esti
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "地震速報(重大)"
-msgstr "Earthquake Early Warning (Critical)"
+msgstr "Earthquake Warning (Severe)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:48
 msgid "所在地(鄉鎮)預估震度 4 以上"
@@ -261,7 +261,7 @@ msgstr "Local (City/Town/District) estimated intensity is greater than 4"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "地震速報(一般)"
-msgstr "Earthquake Early Warning (General)"
+msgstr "Earthquake Warning (General)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:49
 msgid "所在地(鄉鎮)預估震度 2 以上"
@@ -269,7 +269,7 @@ msgstr "Local (City/Town/District) estimated intensity is greater than 2"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "地震速報(無聲)"
-msgstr "Earthquake Early Warning (Silent)"
+msgstr "Earthquake Warning (Silent)"
 
 #: ./lib/app/settings/notify/(1.eew)/eew/page.dart:50
 msgid "所在地(鄉鎮)預估震度 1 以上"
@@ -277,11 +277,11 @@ msgstr "Local (City/Town/District) estimated intensity is greater than 1"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:33
 msgid "所在地(鄉鎮)發布防災警訊時"
-msgstr ""
+msgstr "When the local area(township) issues a disaster prevention alert"
 
 #: ./lib/app/settings/notify/(3.weather)/evacuation/page.dart:34
 msgid "所在地(鄉鎮)發布防災資訊時"
-msgstr ""
+msgstr "When the local area(township) issues disaster prevention information"
 
 #: ./lib/app/settings/notify/(3.weather)/advisory/page.dart:35
 msgid "所在地(鄉鎮)發布紅色燈號之\n"
@@ -559,7 +559,7 @@ msgstr "Update your current location periodically"
 
 #: ./lib/app/settings/location/page.dart:242
 msgid "自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
-msgstr "The automatic location update feature will use the GPS on your device to update your location based on your geographical position periodically, providing real-time weather and earthquake information, so you can stay up-to-date with the latest local conditions."
+msgstr "The automatic location update feature will use the GPS on your device to update your location based on your geographical position periodically, providing real-time weather and earthquake information, so you can stay up-to-date with the latest local conditions even when DPIP is closed."
 
 #: ./lib/app/settings/location/page.dart:301
 msgid "通知功能已被拒絕，請移至設定允許權限。"
@@ -699,11 +699,11 @@ msgstr "of {serial}"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1103
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。"
-msgstr "Around {time}, felt earthquake near <bold>{location}</bold> estimated <bold>M{magnitude}</bold> and max intensity <bold>{intensity}</bold>."
+msgstr "At around {time}, an earthquake was felt near <bold>{location}</bold> with an estimated intensity of <bold>M{magnitude}</bold>, with a local felt intensity of <bold>{intensity}</bold>."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:926
 msgid "{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。"
-msgstr ""
+msgstr "At around {time}, an earthquake was felt near <bold>{location}</bold> with an estimated intensity of <bold>M{magnitude}</bold> and at a depth of <bold>{depth}</bold>KM."
 
 #: ./lib/app/map/_lib/managers/monitor.dart:1137
 msgid "所在地預估"
@@ -903,15 +903,15 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/monitor.dart:261
 msgid "即時震度："
-msgstr ""
+msgstr "Current Intensity:"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:267
 msgid "地動加速度："
-msgstr ""
+msgstr "PGA:"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:274
 msgid "地動速度："
-msgstr ""
+msgstr "PGV:"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:279
 msgid "無資料"
