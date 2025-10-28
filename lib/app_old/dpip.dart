@@ -64,13 +64,13 @@ class _DpipState extends State<Dpip> {
       final data = await ExpTech().getSupport();
       final List<String> criticalList = (data['support-version'] as List<dynamic>).cast<String>();
 
-      if (Global.packageInfo.version.endsWith('.0')) {
+      /* if (Global.packageInfo.version.endsWith('.0')) {
         lastVersion = data['last-version']['release'];
       } else if (Global.packageInfo.version.endsWith('00')) {
         lastVersion = data['last-version']['beta'];
       } else {
         lastVersion = data['last-version']['alpha'];
-      }
+      } */
       update = compareVersions(lastVersion, Global.packageInfo.version) == 1;
 
       criticalUpdate = !criticalList.contains(Global.packageInfo.version);

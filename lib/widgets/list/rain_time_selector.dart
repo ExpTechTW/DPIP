@@ -27,7 +27,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
   late AnimationController _animationController;
   late Animation<double> _expandAnimation;
   bool _isExpanded = false;
-  int _select_index = 8;
+  int _selectIndex = 8;
 
   final List<String> _intervals = ['3d', '2d', '24h', '12h', '6h', '3h', '1h', '10m', 'now'];
   List<String> get _intervalTranslations => ['3 天', '3 天', '24 小時', '12 小時', '6 小時', '3 小時', '1 小時', '10 分鐘', '今日'];
@@ -213,7 +213,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
                     setState(() {
                       _selectedInterval = interval;
                     });
-                    _select_index = index;
+                    _selectIndex = index;
                     widget.onSelectionChanged(_selectedTimestamp, _selectedInterval);
                     _scrollToSelectedInterval();
                   },
@@ -253,7 +253,7 @@ class _RainTimeSelectorState extends State<RainTimeSelector> with SingleTickerPr
           FilledButton.tonalIcon(
             onPressed: _toggleExpanded,
             label: Text(
-              "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} (${_intervalTranslations[_select_index]})",
+              "${DateFormat("yyyy/MM/dd HH:mm").format(_convertTimestamp(_selectedTimestamp))} (${_intervalTranslations[_selectIndex]})",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             icon: Icon(_isExpanded ? Icons.expand_more : Icons.expand_less),
