@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-10-09 16:16\n"
+"PO-Revision-Date: 2025-10-28 10:11\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -42,15 +42,15 @@ msgstr "Notifications"
 
 #: ./lib/app/settings/notify/page.dart:148
 msgid "緊急地震速報"
-msgstr "Emergency Earthquake Warning"
+msgstr "Earthquake Early Warning"
 
 #: ./lib/app/map/_lib/managers/monitor.dart:784
 msgid "強震監視器"
-msgstr "Earthquake Monitoring"
+msgstr "Earthquake Monitor"
 
 #: ./lib/app/map/_lib/managers/report.dart:818
 msgid "地震報告"
-msgstr "Earthquake Report"
+msgstr "Reports"
 
 #: ./lib/app/settings/notify/page.dart:192
 msgid "震度速報"
@@ -178,7 +178,7 @@ msgstr "When the Pacific Ocean tsunami advisory is issued"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "強震監視器(一般)"
-msgstr "Earthquake Monitoring (General)"
+msgstr "Earthquake Monitor (General)"
 
 #: ./lib/app/settings/notify/(2.earthquake)/monitor/page.dart:32
 msgid "偵測到晃動"
