@@ -36,7 +36,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     super.context,
     super.controller, {
     this.isReplayMode = false,
-    this.replayTimestamp = 0, //1756300288424,
+    this.replayTimestamp = 0, //1760753064000,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -422,6 +422,7 @@ class MonitorMapLayerManager extends MapLayerManager {
             '#00DB00',
           ],
           visibility: 'none',
+          lineSortKey: [Expressions.get, 'i'],
         );
 
         await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
