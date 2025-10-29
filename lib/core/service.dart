@@ -232,6 +232,9 @@ class LocationService {
     await _$service.setAsForegroundService();
 
     await Preference.init();
+    await AppLocalizations.load();
+    await LocationNameLocalizations.load();
+
     _$geoJsonData = await Global.loadTownGeojson();
     _$locationData = await Global.loadLocationData();
 
