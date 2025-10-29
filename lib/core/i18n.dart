@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:i18n_extension/i18n_extension.dart';
@@ -90,9 +91,22 @@ class I18nCsvLoader {
 }
 
 extension AppLocalizations on String {
+  /// The current locale used by the app.
+  static Locale _locale = 'zh-Hant'.asLocale;
+
+  /// The language tag of the current locale used by the app.
+  static String get languageTag => _locale.toLanguageTag();
+
+  /// Sets the current locale used by the app.
+  /// If the value is null, the current locale will not be changed.
+  static set locale(Locale? value) {
+    if (value == null) return;
+    _locale = value;
+  }
+
   static final _t = Translations.byFile('zh-Hant', dir: 'assets/translations');
   static Future<void> load() => _t.load();
-  String get i18n => localize(this, _t);
+  String get i18n => localize(this, _t, languageTag: languageTag);
 }
 
 extension LocationNameLocalizations on String {
@@ -108,7 +122,7 @@ extension LocationNameLocalizations on String {
     _isLoaded = true;
   }
 
-  String get locationName => localize(this, _locationNames);
+  String get locationName => localize(this, _locationNames, languageTag: AppLocalizations.languageTag);
 }
 
 extension WeatherStationLocalizations on String {
@@ -124,5 +138,5 @@ extension WeatherStationLocalizations on String {
     _isLoaded = true;
   }
 
-  String get weatherStation => localize(this, _weatherStations);
+  String get weatherStation => localize(this, _weatherStations, languageTag: AppLocalizations.languageTag);
 }
