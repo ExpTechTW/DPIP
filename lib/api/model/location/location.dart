@@ -112,13 +112,6 @@ class Location {
   String get townWithLevel =>
       '{town}{townLevel}'.i18n.args({'town': town.locationName, 'townLevel': townLevel.locationName});
 
-  String get townNoti {
-    if (town.length == 1) {
-      return '$town$townLevel';
-    }
-    return town;
-  }
-
   /// Returns a localized location name that adapts to available space.
   ///
   /// This method implements a fallback strategy to provide the most appropriate location name based on length
