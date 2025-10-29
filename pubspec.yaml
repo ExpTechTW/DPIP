@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 3.1.103
 
 environment:
-  sdk: '>=3.8.0 <4.0.0'
+  sdk: '>=3.9.0 <4.0.0'
   flutter: '>=3.35.7'
 
 dependencies:
@@ -69,12 +69,12 @@ dependencies:
   async: ^2.13.0
 
 dev_dependencies:
-  build_runner: 2.4.15
+  build_runner: ^2.10.0
   flutter_test:
     sdk: flutter
   i18n_extension_importer: ^0.0.6
   in_app_purchase_platform_interface: ^1.4.0
-  json_serializable: 6.9.5
+  json_serializable: ^6.11.0
   lint: ^2.0.0
 
 flutter:
