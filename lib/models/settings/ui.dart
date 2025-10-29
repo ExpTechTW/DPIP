@@ -1,5 +1,7 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/preference.dart';
 import 'package:dpip/utils/extensions/string.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,7 @@ class SettingsUserInterfaceModel extends ChangeNotifier {
   Locale? get locale => _locale;
   void setLocale(Locale? value) {
     Preference.locale = value?.toLanguageTag();
+    AppLocalizations.locale = value ?? Platform.localeName.asLocale;
 
     _log('Changed ${PreferenceKeys.locale} to ${Preference.locale}');
     notifyListeners();
