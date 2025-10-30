@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-10-28 10:11\n"
+"PO-Revision-Date: 2025-10-30 16:01\n"
 
 #: ./lib/app/settings/location/page.dart:372
 msgid "所在地"
@@ -503,11 +503,11 @@ msgstr "To use the Auto-Location feature, please allow Notification Permission f
 
 #: ./lib/app/settings/location/page.dart:86
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
-msgstr ""
+msgstr "The automatic location feature requires you to allow DPIP to access your location in order to function properly. Please go to the app settings, find \"Location,\" and grant permission before trying again."
 
 #: ./lib/app/settings/location/page.dart:89
 msgid "自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。"
-msgstr ""
+msgstr "The automatic location feature requires you to always allow DPIP to access your location in order to function properly. Please go to the app settings, find the location permission settings, and select “Always” before trying again."
 
 #: ./lib/app/settings/location/page.dart:90
 msgid "自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。"
@@ -543,7 +543,7 @@ msgstr ""
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "一律允許"
-msgstr ""
+msgstr "Always allow"
 
 #: ./lib/app/settings/location/page.dart:220
 msgid "永遠"
