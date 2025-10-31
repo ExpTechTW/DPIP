@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:dpip/core/i18n.dart';
 import 'package:flutter/services.dart';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -231,6 +232,9 @@ class LocationService {
     await _$service.setAsForegroundService();
 
     await Preference.init();
+    await AppLocalizations.load();
+    await LocationNameLocalizations.load();
+
     _$geoJsonData = await Global.loadTownGeojson();
     _$locationData = await Global.loadLocationData();
 
@@ -318,7 +322,7 @@ class LocationService {
     final isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
     if (!isLocationServiceEnabled) {
-      TalkerManager.instance.warning('位置服務未啟用');
+      TalkerManager.instance.warning('⚙️::BackgroundLocationService location service is not available');
       return null;
     }
 
@@ -425,22 +429,22 @@ class LocationService {
 
     // Update notification with current position
     final timestamp = DateTime.now().toDateTimeString();
-    String content = '服務區域外';
+    String content = '服務區域外'.i18n;
 
     if (position == null) {
-      content = '服務區域外';
+      content = '服務區域外'.i18n;
     } else {
       final latitude = position.latitude.toStringAsFixed(6);
       final longitude = position.longitude.toStringAsFixed(6);
 
       if (result == null) {
-        content = '服務區域外 ($latitude, $longitude)';
+        content = '${'服務區域外'.i18n} ($latitude, $longitude)';
       } else {
-        content = '${result.location.city} ${result.location.town} ($latitude, $longitude)';
+        content = '${result.location.cityWithLevel} ${result.location.townWithLevel} ($latitude, $longitude)';
       }
     }
 
-    const notificationTitle = '自動定位中';
+    final notificationTitle = '自動定位中'.i18n;
     final notificationBody =
         '$timestamp\n'
         '$content';
