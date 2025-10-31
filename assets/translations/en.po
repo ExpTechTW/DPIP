@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US\n"
-"PO-Revision-Date: 2025-10-31 05:37\n"
+"PO-Revision-Date: 2025-10-31 06:52\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -623,7 +623,7 @@ msgstr "OpenStreetMap"
 
 #: ./lib/app/settings/map/page.dart:58
 msgid "Google"
-msgstr ""
+msgstr "Google"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:106
 msgid "底圖"
@@ -1347,7 +1347,7 @@ msgstr "{town} {townLevel}, {city} {cityLevel}"
 
 #: ./lib/api/model/location/location.dart:95
 msgid "{city} {town}"
-msgstr ""
+msgstr "{city} {town}"
 
 #: ./lib/api/model/location/location.dart:104
 msgid "{city}{cityLevel}"
