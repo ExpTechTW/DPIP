@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
-"PO-Revision-Date: 2025-10-31 05:37\n"
+"PO-Revision-Date: 2025-11-01 05:31\n"
 
 #: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
@@ -154,7 +154,7 @@ msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:215
 msgid "天氣"
-msgstr ""
+msgstr "Thời tiết"
 
 #: ./lib/app/map/_widgets/layer_toggle_sheet.dart:144
 msgid "海嘯"
@@ -735,7 +735,7 @@ msgstr ""
 
 #: ./lib/utils/weather_icon.dart:282
 msgid "取得天氣異常"
-msgstr "Ngoại lệ xảy ra khi thu thập thông tin thời tiết"
+msgstr "Không thể lấy dữ liệu thời tiết"
 
 #: ./lib/app/changelog/page.dart:109
 msgid "無法載入更新日誌，請稍後再試。"
@@ -959,7 +959,7 @@ msgstr ""
 
 #: ./lib/app/map/_lib/managers/report.dart:600
 msgid "小區域有感地震"
-msgstr "Động đất nhẹ, cảm nhận được ở khu vực nhỏ"
+msgstr "Động đất cảm nhận tại khu vực nhỏ"
 
 #: ./lib/app/map/_lib/managers/report.dart:656
 msgid "地震規模"
