@@ -19,6 +19,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
@@ -38,8 +39,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
     super.context,
     super.controller, {
-    this.isReplayMode = false,
-    this.replayTimestamp = 0, //1761222483000,
+    this.isReplayMode = true,
+    this.replayTimestamp = 1761222483000, //1761222483000,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -182,6 +183,10 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   Future<void> _autoFocus() async {
     if (!visible || _isLocked) return;
+
+    // Check if auto zoom is enabled
+    final settings = Provider.of<SettingsMapModel>(context, listen: false);
+    if (!settings.autoZoom) return;
 
     final bounds = _getFocusBounds();
     if (bounds.isNotEmpty) {
@@ -574,6 +579,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       didSetup = true;
       _startFocusTimer();
       GlobalProviders.data.addListener(_onDataChanged);
+      Provider.of<SettingsMapModel>(context, listen: false).addListener(_onSettingsChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
     }
@@ -599,6 +605,10 @@ class MonitorMapLayerManager extends MapLayerManager {
         _updateLayerVisibility();
       }
     }
+  }
+
+  void _onSettingsChanged() {
+    // Settings changed, no specific action needed as _autoFocus checks settings each time
   }
 
   Future<void> _updateLayerVisibility() async {
@@ -820,6 +830,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
+    Provider.of<SettingsMapModel>(context, listen: false).removeListener(_onSettingsChanged);
     super.dispose();
   }
 
