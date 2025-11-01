@@ -37,14 +37,6 @@ class _DpipDataModel extends ChangeNotifier {
   Rts? get rts => _rts;
   int _rtsTime = 0;
 
-  void setRts(Rts rts) {
-    if (rts.time > _rtsTime) {
-      _rtsTime = rts.time;
-      _rts = rts;
-      notifyListeners();
-    }
-  }
-
   List<Eew> _eew = [
     // dummy data
     /* Eew(
@@ -177,11 +169,25 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
 
+  void setRts(Rts rts) {
+    final incoming = rts.time;
+
+    if (_isReplayMode && _replayTimestamp != null && incoming > _replayTimestamp! + 1000) return;
+
+    if (incoming > _rtsTime) {
+      _rtsTime = incoming;
+      _rts = rts;
+      notifyListeners();
+    }
+  }
+
   void setReplayMode(bool isReplay, [int? timestamp]) {
     _isReplayMode = isReplay;
     _replayTimestamp = timestamp;
     if (isReplay) {
-      _rtsTime = timestamp!;
+      _rtsTime = (timestamp ?? 0) - 1;
+    } else {
+      _rtsTime = 0;
     }
   }
 
