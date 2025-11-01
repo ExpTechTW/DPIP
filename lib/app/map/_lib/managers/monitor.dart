@@ -3,6 +3,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+import 'package:dpip/global.dart';
+import 'package:geojson_vi/geojson_vi.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -20,7 +22,6 @@ import 'package:dpip/models/settings/location.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -31,12 +32,14 @@ class MonitorMapLayerManager extends MapLayerManager {
   final int? replayTimestamp;
   Timer? _blinkTimer;
   bool _isBoxVisible = true;
+  Timer? _focusTimer;
+  final bool _isLocked = false;
 
   MonitorMapLayerManager(
     super.context,
     super.controller, {
     this.isReplayMode = false,
-    this.replayTimestamp = 0, //1760753064000,
+    this.replayTimestamp = 0, //1761222483000,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -110,17 +113,92 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   Future<void> _focus() async {
     try {
-      final location = GlobalProviders.location.coordinates;
-
-      if (location != null && location.isValid) {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
-      } else {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
-      }
+      await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._focus', e, s);
     }
+  }
+
+  List<LatLng> _getFocusBounds() {
+    final rts = GlobalProviders.data.rts;
+
+    if (rts != null && rts.box.isNotEmpty) {
+      // Intensity mode: collect coordinates from box areas
+      final coords = <LatLng>[];
+      for (final area in Global.boxGeojson.features) {
+        if (area == null) continue;
+
+        final id = area.properties!['ID'].toString();
+        if (!rts.box.containsKey(id)) continue;
+
+        final geometry = area.geometry! as GeoJSONPolygon;
+        final coordinates = geometry.coordinates[0] as List;
+
+        for (final coord in coordinates) {
+          if (coord is List && coord.length >= 2) {
+            final lng = coord[0] as num;
+            final lat = coord[1] as num;
+            coords.add(LatLng(lat.toDouble(), lng.toDouble()));
+          }
+        }
+      }
+      if (coords.isNotEmpty) return coords;
+    }
+
+    return [];
+  }
+
+  Future<void> _updateMapBounds(List<LatLng> coordinates) async {
+    if (coordinates.isEmpty) return;
+
+    double minLat = double.infinity;
+    double maxLat = double.negativeInfinity;
+    double minLng = double.infinity;
+    double maxLng = double.negativeInfinity;
+
+    for (final coord in coordinates) {
+      if (coord.latitude < minLat) minLat = coord.latitude;
+      if (coord.latitude > maxLat) maxLat = coord.latitude;
+      if (coord.longitude < minLng) minLng = coord.longitude;
+      if (coord.longitude > maxLng) maxLng = coord.longitude;
+    }
+
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+
+    await controller.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, left: 100, top: 100, right: 100, bottom: 100),
+      duration: const Duration(milliseconds: 500),
+    );
+  }
+
+  Future<void> _focusReset() async {
+    await controller.animateCamera(
+      CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+    );
+  }
+
+  Future<void> _autoFocus() async {
+    if (!visible || _isLocked) return;
+
+    final bounds = _getFocusBounds();
+    if (bounds.isNotEmpty) {
+      await _updateMapBounds(bounds);
+    } else {
+      await _focusReset();
+    }
+  }
+
+  void _startFocusTimer() {
+    _focusTimer?.cancel();
+    _focusTimer = Timer.periodic(const Duration(seconds: 1), (_) => _autoFocus());
+  }
+
+  void _stopFocusTimer() {
+    _focusTimer?.cancel();
+    _focusTimer = null;
   }
 
   @override
@@ -494,6 +572,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
 
       didSetup = true;
+      _startFocusTimer();
       GlobalProviders.data.addListener(_onDataChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
@@ -632,6 +711,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       await controller.setLayerVisibility(sWaveLayerId, false);
 
       visible = false;
+      _stopFocusTimer();
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.hide', e, s);
     }
@@ -737,6 +817,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   void dispose() {
     _blinkTimer?.cancel();
     _blinkTimer = null;
+    _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
     super.dispose();
