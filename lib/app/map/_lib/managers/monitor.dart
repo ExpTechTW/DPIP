@@ -170,7 +170,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     );
 
     await controller.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, left: 100, top: 100, right: 100, bottom: 100),
+      CameraUpdate.newLatLngBounds(bounds, left: 80, top: 80, right: 80, bottom: 80),
       duration: const Duration(milliseconds: 500),
     );
   }
