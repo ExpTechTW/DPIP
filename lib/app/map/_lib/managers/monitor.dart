@@ -198,7 +198,7 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   void _startFocusTimer() {
     _focusTimer?.cancel();
-    _focusTimer = Timer.periodic(const Duration(seconds: 1), (_) => _autoFocus());
+    _focusTimer = Timer.periodic(const Duration(seconds: 2), (_) => _autoFocus());
   }
 
   void _stopFocusTimer() {
