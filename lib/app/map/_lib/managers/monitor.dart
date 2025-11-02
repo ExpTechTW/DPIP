@@ -579,7 +579,6 @@ class MonitorMapLayerManager extends MapLayerManager {
       didSetup = true;
       _startFocusTimer();
       GlobalProviders.data.addListener(_onDataChanged);
-      Provider.of<SettingsMapModel>(context, listen: false).addListener(_onSettingsChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
     }
@@ -605,10 +604,6 @@ class MonitorMapLayerManager extends MapLayerManager {
         _updateLayerVisibility();
       }
     }
-  }
-
-  void _onSettingsChanged() {
-    // Settings changed, no specific action needed as _autoFocus checks settings each time
   }
 
   Future<void> _updateLayerVisibility() async {
@@ -830,7 +825,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
-    Provider.of<SettingsMapModel>(context, listen: false).removeListener(_onSettingsChanged);
     super.dispose();
   }
 
