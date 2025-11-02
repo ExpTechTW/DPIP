@@ -34,7 +34,6 @@ class MonitorMapLayerManager extends MapLayerManager {
   Timer? _blinkTimer;
   bool _isBoxVisible = true;
   Timer? _focusTimer;
-  final bool _isLocked = false;
 
   MonitorMapLayerManager(
     super.context,
@@ -182,7 +181,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   Future<void> _autoFocus() async {
-    if (!visible || _isLocked) return;
+    if (!visible) return;
 
     // Check if auto zoom is enabled
     final settings = Provider.of<SettingsMapModel>(context, listen: false);
