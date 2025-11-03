@@ -25,9 +25,7 @@ class Global {
   static late Map<String, ({String title, String body})> notifyTestContent;
   static ExpTech api = ExpTech();
 
-  static Future<Map<String, Location>> loadLocationData() async {
-    const String assetPath = 'assets/location.json.gz';
-
+  static Future<Map<String, dynamic>> _loadCompressedJson(String assetPath) async {
     final ByteData byteData = await rootBundle.load(assetPath);
     final List<int> compressedBytes = byteData.buffer.asUint8List();
 
@@ -35,34 +33,27 @@ class Global {
     final List<int> decompressedBytes = codec.decode(compressedBytes);
 
     final String jsonString = utf8.decode(decompressedBytes);
+    return jsonDecode(jsonString) as Map<String, dynamic>;
+  }
 
-    final Map<String, dynamic> data = jsonDecode(jsonString);
-
+  static Future<Map<String, Location>> loadLocationData() async {
+    final data = await _loadCompressedJson('assets/location.json.gz');
     return data.map((key, value) => MapEntry(key, Location.fromJson(value as Map<String, dynamic>)));
   }
 
   static Future<TimeTable> loadTimeTableData() async {
-    const String assetPath = 'assets/time.json.gz';
-
-    final ByteData byteData = await rootBundle.load(assetPath);
-    final List<int> compressedBytes = byteData.buffer.asUint8List();
-
-    final GZipCodec codec = GZipCodec();
-    final List<int> decompressedBytes = codec.decode(compressedBytes);
-
-    final String jsonString = utf8.decode(decompressedBytes);
-
-    final Map<String, dynamic> data = jsonDecode(jsonString);
+    final data = await _loadCompressedJson('assets/time.json.gz');
 
     return data.map((key, value) {
-      final list = (value as List).map((item) {
-        final map = item as Map<String, dynamic>;
-        return (
-          P: double.parse(map['P'].toString()),
-          R: double.parse(map['R'].toString()),
-          S: double.parse(map['S'].toString()),
-        );
-      }).toList();
+      final list =
+          (value as List).map((item) {
+            final map = item as Map<String, dynamic>;
+            return (
+              P: double.parse(map['P'].toString()),
+              R: double.parse(map['R'].toString()),
+              S: double.parse(map['S'].toString()),
+            );
+          }).toList();
       return MapEntry(key, list);
     });
   }
@@ -83,17 +74,7 @@ class Global {
   }
 
   static Future<GeoJSONFeatureCollection> loadTownGeojson() async {
-    const String assetPath = 'assets/map/town.json.gz';
-
-    final ByteData byteData = await rootBundle.load(assetPath);
-    final List<int> compressedBytes = byteData.buffer.asUint8List();
-
-    final GZipCodec codec = GZipCodec();
-    final List<int> decompressedBytes = codec.decode(compressedBytes);
-
-    final String jsonString = utf8.decode(decompressedBytes);
-
-    final Map<String, dynamic> data = jsonDecode(jsonString);
+    final data = await _loadCompressedJson('assets/map/town.json.gz');
 
     return GeoJSONFeatureCollection.fromMap(data);
   }
