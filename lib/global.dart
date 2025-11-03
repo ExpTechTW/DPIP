@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dpip/utils/log.dart';
 import 'package:flutter/services.dart';
 
 import 'package:geojson_vi/geojson_vi.dart';
@@ -26,6 +27,7 @@ class Global {
   static ExpTech api = ExpTech();
 
   static Future<Map<String, dynamic>> _loadCompressedJson(String assetPath) async {
+    try {
     final ByteData byteData = await rootBundle.load(assetPath);
     final List<int> compressedBytes = byteData.buffer.asUint8List();
 
@@ -34,6 +36,10 @@ class Global {
 
     final String jsonString = utf8.decode(decompressedBytes);
     return jsonDecode(jsonString) as Map<String, dynamic>;
+  } catch (e, s) {
+    TalkerManager.instance.error('Global._loadCompressedJson($assetPath)', e, s);
+    return {};
+  }
   }
 
   static Future<Map<String, Location>> loadLocationData() async {
