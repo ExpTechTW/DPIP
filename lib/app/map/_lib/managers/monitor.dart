@@ -34,6 +34,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   Timer? _blinkTimer;
   bool _isBoxVisible = true;
   Timer? _focusTimer;
+  bool _isFocusing = false;
+  static const double kCameraPadding = 80.0;
 
   MonitorMapLayerManager(
     super.context,
@@ -169,7 +171,7 @@ class MonitorMapLayerManager extends MapLayerManager {
     );
 
     await controller.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, left: 80, top: 80, right: 80, bottom: 80),
+      CameraUpdate.newLatLngBounds(bounds, left: kCameraPadding, top: kCameraPadding, right: kCameraPadding, bottom: kCameraPadding),
       duration: const Duration(milliseconds: 500),
     );
   }
@@ -181,23 +183,33 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   Future<void> _autoFocus() async {
-    if (!visible) return;
+    if (!visible || !context.mounted) return;
 
-    // Check if auto zoom is enabled
-    final settings = Provider.of<SettingsMapModel>(context, listen: false);
-    if (!settings.autoZoom) return;
+    try {
+      // Check if auto zoom is enabled
+      final settings = Provider.of<SettingsMapModel>(context, listen: false);
+      if (!settings.autoZoom) return;
 
-    final bounds = _getFocusBounds();
-    if (bounds.isNotEmpty) {
-      await _updateMapBounds(bounds);
-    } else {
-      await _focusReset();
+      final bounds = _getFocusBounds();
+      if (bounds.isNotEmpty) {
+        await _updateMapBounds(bounds);
+      } else {
+        await _focusReset();
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager._autoFocus', e, s);
     }
   }
 
   void _startFocusTimer() {
     _focusTimer?.cancel();
-    _focusTimer = Timer.periodic(const Duration(seconds: 2), (_) => _autoFocus());
+    _focusTimer = Timer.periodic(const Duration(seconds: 2), (_) async {
+      if (!_isFocusing) {
+        _isFocusing = true;
+        await _autoFocus();
+        _isFocusing = false;
+      }
+    });
   }
 
   void _stopFocusTimer() {
