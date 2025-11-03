@@ -1,18 +1,10 @@
-import 'dart:io';
-
-import 'package:dpip/api/exptech.dart';
 import 'package:dpip/app_old/page/map/map.dart';
 import 'package:dpip/app_old/page/me/me.dart';
 import 'package:dpip/app_old/page/more/more.dart';
 import 'package:dpip/core/fcm.dart';
 import 'package:dpip/core/notify.dart';
-import 'package:dpip/dialog/welcome/announcement.dart';
-import 'package:dpip/dialog/welcome/changelog.dart';
-import 'package:dpip/global.dart';
-import 'package:dpip/route/update_required/update_required.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:flutter/material.dart';
-import 'package:in_app_update/in_app_update.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class Dpip extends StatefulWidget {
@@ -61,16 +53,16 @@ class _DpipState extends State<Dpip> {
 
   Future<void> checkForUpdates() async {
     try {
-      final data = await ExpTech().getSupport();
+      /* final data = await ExpTech().getSupport();
       final List<String> criticalList = (data['support-version'] as List<dynamic>).cast<String>();
 
-      /* if (Global.packageInfo.version.endsWith('.0')) {
+      if (Global.packageInfo.version.endsWith('.0')) {
         lastVersion = data['last-version']['release'];
       } else if (Global.packageInfo.version.endsWith('00')) {
         lastVersion = data['last-version']['beta'];
       } else {
         lastVersion = data['last-version']['alpha'];
-      } */
+      }
       update = compareVersions(lastVersion, Global.packageInfo.version) == 1;
 
       criticalUpdate = !criticalList.contains(Global.packageInfo.version);
@@ -121,7 +113,7 @@ class _DpipState extends State<Dpip> {
             showDialog(context: context, builder: (context) => const WelcomeChangelogDialog());
           }
         }
-      }
+      } */
 
       if (mounted) {
         setState(() {});
