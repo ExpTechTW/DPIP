@@ -170,6 +170,13 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
 
+  /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
+  ///
+  /// In replay mode, filters out RTS data that is more than 1 second ahead
+  /// of the current replay timestamp to maintain temporal consistency and
+  /// prevent displaying future data during replay.
+  ///
+  /// @param rts The new RTS data to set
   void setRts(Rts rts) {
     final incoming = rts.time;
 
@@ -187,9 +194,11 @@ class DpipDataModel extends _DpipDataModel {
   void setReplayMode(bool isReplay, [int? timestamp]) {
     _isReplayMode = isReplay;
     if (isReplay) {
-      assert(timestamp != null, 'Timestamp must be provided in replay mode');
+      if (timestamp == null) {
+        throw ArgumentError('Timestamp must be provided in replay mode');
+      }
       _replayTimestamp = timestamp;
-      _rtsTime = (timestamp ?? DateTime.now().millisecondsSinceEpoch) - 1;
+      _rtsTime = timestamp - 1;
     } else {
       _replayTimestamp = null;
       _rtsTime = 0;
