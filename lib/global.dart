@@ -28,18 +28,18 @@ class Global {
 
   static Future<Map<String, dynamic>> _loadCompressedJson(String assetPath) async {
     try {
-    final ByteData byteData = await rootBundle.load(assetPath);
-    final List<int> compressedBytes = byteData.buffer.asUint8List();
+      final ByteData byteData = await rootBundle.load(assetPath);
+      final List<int> compressedBytes = byteData.buffer.asUint8List();
 
-    final GZipCodec codec = GZipCodec();
-    final List<int> decompressedBytes = codec.decode(compressedBytes);
+      final GZipCodec codec = GZipCodec();
+      final List<int> decompressedBytes = codec.decode(compressedBytes);
 
-    final String jsonString = utf8.decode(decompressedBytes);
-    return jsonDecode(jsonString) as Map<String, dynamic>;
-  } catch (e, s) {
-    TalkerManager.instance.error('Global._loadCompressedJson($assetPath)', e, s);
-    return {};
-  }
+      final String jsonString = utf8.decode(decompressedBytes);
+      return jsonDecode(jsonString) as Map<String, dynamic>;
+    } catch (e, s) {
+      TalkerManager.instance.error('Global._loadCompressedJson($assetPath)', e, s);
+      return {};
+    }
   }
 
   static Future<Map<String, Location>> loadLocationData() async {
