@@ -7,6 +7,13 @@ import 'package:dpip/utils/extensions/preference.dart';
 class PreferenceKeys {
   static const lastUpdateToServerTime = 'lastUpdateToServerTime';
 
+  // region App Installation
+  static const appVersion = 'app-version';
+  static const appBuildNumber = 'app-build-number';
+  static const installTime = 'install-time';
+  static const installId = 'install-id';
+  // endregion
+
   // #region Location
   static const locationAuto = 'location:auto';
   static const locationCode = 'location:code';
@@ -54,11 +61,17 @@ class Preference {
     await instance.reloadCache();
   }
 
-  static String? get version => instance.getString('app-version');
-  static set version(String? value) => instance.set('app-version', value);
+  static String? get version => instance.getString(PreferenceKeys.appVersion);
+  static set version(String? value) => instance.set(PreferenceKeys.appVersion, value);
 
-  static int? get installTime => instance.getInt('install-time');
-  static set installTime(int? value) => instance.set('install-time', value);
+  static String? get buildNumber => instance.getString(PreferenceKeys.appBuildNumber);
+  static set buildNumber(String? value) => instance.set(PreferenceKeys.appBuildNumber, value);
+
+  static int? get installTime => instance.getInt(PreferenceKeys.installTime);
+  static set installTime(int? value) => instance.set(PreferenceKeys.installTime, value);
+
+  static String? get installId => instance.getString(PreferenceKeys.installId);
+  static set installId(String? value) => instance.set(PreferenceKeys.installId, value);
 
   static int? get lastUpdateToServerTime => instance.getInt(PreferenceKeys.lastUpdateToServerTime);
   static set lastUpdateToServerTime(int? value) => instance.set(PreferenceKeys.lastUpdateToServerTime, value);
