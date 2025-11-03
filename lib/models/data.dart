@@ -152,6 +152,7 @@ class _DpipDataModel extends ChangeNotifier {
 }
 
 class DpipDataModel extends _DpipDataModel {
+  static const int _replayTimeWindow = 1000;
   Timer? _secondTimer;
   Timer? _minuteTimer;
   bool _isInForeground = true;
@@ -172,7 +173,9 @@ class DpipDataModel extends _DpipDataModel {
   void setRts(Rts rts) {
     final incoming = rts.time;
 
-    if (_isReplayMode && _replayTimestamp != null && incoming > _replayTimestamp! + 1000) return;
+    if (_isReplayMode && _replayTimestamp != null && incoming > _replayTimestamp! + _replayTimeWindow) {
+      return;
+    }
 
     if (incoming > _rtsTime) {
       _rtsTime = incoming;
@@ -183,10 +186,12 @@ class DpipDataModel extends _DpipDataModel {
 
   void setReplayMode(bool isReplay, [int? timestamp]) {
     _isReplayMode = isReplay;
-    _replayTimestamp = timestamp;
     if (isReplay) {
-      _rtsTime = (timestamp ?? 0) - 1;
+      assert(timestamp != null, 'Timestamp must be provided in replay mode');
+      _replayTimestamp = timestamp;
+      _rtsTime = (timestamp ?? DateTime.now().millisecondsSinceEpoch) - 1;
     } else {
+      _replayTimestamp = null;
       _rtsTime = 0;
     }
   }
