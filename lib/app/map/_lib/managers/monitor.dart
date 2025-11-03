@@ -37,6 +37,11 @@ class MonitorMapLayerManager extends MapLayerManager {
   bool _isFocusing = false;
   static const double kCameraPadding = 80.0;
 
+  // Cached bounds for performance optimization
+  List<LatLng>? _cachedBounds;
+  int? _lastRtsTime;
+  LatLngBounds? _lastZoomBounds;
+
   MonitorMapLayerManager(
     super.context,
     super.controller, {
@@ -121,8 +126,17 @@ class MonitorMapLayerManager extends MapLayerManager {
     }
   }
 
+  /// Extracts all coordinates from detection areas (GeoJSON polygons) that are present
+  /// in the current RTS data. Uses caching to avoid recalculating bounds when
+  /// RTS data hasn't changed. Returns empty list if no detection areas exist.
   List<LatLng> _getFocusBounds() {
     final rts = GlobalProviders.data.rts;
+    final currentTime = rts?.time;
+
+    // Return cached bounds if RTS data hasn't changed
+    if (_cachedBounds != null && _lastRtsTime == currentTime) {
+      return _cachedBounds!;
+    }
 
     if (rts != null && rts.box.isNotEmpty) {
       // Intensity mode: collect coordinates from box areas
@@ -144,12 +158,41 @@ class MonitorMapLayerManager extends MapLayerManager {
           }
         }
       }
-      if (coords.isNotEmpty) return coords;
+      if (coords.isNotEmpty) {
+        // Cache the result
+        _cachedBounds = coords;
+        _lastRtsTime = currentTime;
+        return coords;
+      }
     }
 
+    // Cache empty result
+    _cachedBounds = [];
+    _lastRtsTime = currentTime;
     return [];
   }
 
+  /// Checks if the new bounds have changed significantly from the last zoom bounds
+  /// Only zooms if the change is greater than 10% in any dimension
+  bool _shouldZoomToBounds(LatLngBounds newBounds) {
+    if (_lastZoomBounds == null) return true;
+
+    final lastBounds = _lastZoomBounds!;
+    final latDiff = (newBounds.northeast.latitude - newBounds.southwest.latitude).abs();
+    final lngDiff = (newBounds.northeast.longitude - newBounds.southwest.longitude).abs();
+    final lastLatDiff = (lastBounds.northeast.latitude - lastBounds.southwest.latitude).abs();
+    final lastLngDiff = (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs();
+
+    // Check if bounds have changed by more than 10%
+    final latChange = (latDiff - lastLatDiff).abs() / lastLatDiff;
+    final lngChange = (lngDiff - lastLngDiff).abs() / lastLngDiff;
+
+    return latChange > 0.1 || lngChange > 0.1;
+  }
+
+  /// Calculates the bounding box from coordinates and animates the map camera
+  /// to fit all detection areas with padding. Only zooms if the bounds have
+  /// changed significantly (>10%) from the last zoom to prevent excessive zooming.
   Future<void> _updateMapBounds(List<LatLng> coordinates) async {
     if (coordinates.isEmpty) return;
 
@@ -170,10 +213,16 @@ class MonitorMapLayerManager extends MapLayerManager {
       northeast: LatLng(maxLat, maxLng),
     );
 
+    // Only zoom if bounds have changed significantly
+    if (!_shouldZoomToBounds(bounds)) return;
+
     await controller.animateCamera(
       CameraUpdate.newLatLngBounds(bounds, left: kCameraPadding, top: kCameraPadding, right: kCameraPadding, bottom: kCameraPadding),
       duration: const Duration(milliseconds: 500),
     );
+
+    // Update last zoom bounds
+    _lastZoomBounds = bounds;
   }
 
   Future<void> _focusReset() async {
@@ -182,6 +231,10 @@ class MonitorMapLayerManager extends MapLayerManager {
     );
   }
 
+  /// Automatically adjusts the map camera to fit all detection areas (boxes)
+  /// when RTS data contains detection zones. Runs every 2 seconds when enabled.
+  /// If no detection areas exist, resets to the default Taiwan center view.
+  /// Uses caching and debouncing to optimize performance.
   Future<void> _autoFocus() async {
     if (!visible || !context.mounted) return;
 
@@ -608,6 +661,9 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
+      // Invalidate cached bounds when RTS data changes
+      _cachedBounds = null;
+      _lastRtsTime = null;
       _updateRtsSource();
 
       // 只有在圖層可見時才更新圖層可見性
