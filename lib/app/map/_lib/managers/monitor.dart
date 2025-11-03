@@ -183,13 +183,16 @@ class MonitorMapLayerManager extends MapLayerManager {
     final lastLatDiff = (lastBounds.northeast.latitude - lastBounds.southwest.latitude).abs();
     final lastLngDiff = (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs();
 
+    // Safety check for division by zero (very small bounds)
+    const minBoundSize = 0.0001; // ~11 meters
+    if (lastLatDiff < minBoundSize || lastLngDiff < minBoundSize) return true;
+
     // Check if bounds have changed by more than 10%
     final latChange = (latDiff - lastLatDiff).abs() / lastLatDiff;
     final lngChange = (lngDiff - lastLngDiff).abs() / lastLngDiff;
 
     return latChange > 0.1 || lngChange > 0.1;
   }
-
   /// Calculates the bounding box from coordinates and animates the map camera
   /// to fit all detection areas with padding. Only zooms if the bounds have
   /// changed significantly (>10%) from the last zoom to prevent excessive zooming.
