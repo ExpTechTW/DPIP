@@ -175,11 +175,11 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_cwaCache!);
   }
 
-  // 清除緩存（當 _eew 被更新時）
+  // 清除快取
   @override
   void setEew(List<Eew> eew) {
     _eew = eew;
-    _cwaCache = null; // invalidate cache
+    _cwaCache = null;
     notifyListeners();
   }
 
