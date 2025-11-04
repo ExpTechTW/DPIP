@@ -59,10 +59,11 @@ class _DpipDataModel extends ChangeNotifier {
   List<Eew>? _cwaCache;
 
   /// Returns only EEWs from the CWA (Central Weather Administration) agency.
+  /// This replaces the previous all-source eew.
   /// Results are cached until the underlying EEW list changes.
   UnmodifiableListView<Eew> get eew {
-    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'cwa').toList();
-    return UnmodifiableListView(_cwaCache!);
+    final cache = _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'cwa').toList();
+    return UnmodifiableListView(cache);
   }
 
   /// Clear cache when EEW data updates
@@ -174,7 +175,7 @@ class DpipDataModel extends _DpipDataModel {
   UnmodifiableListView<Eew> get activeEew {
     final threeMinutesAgo = currentTime - (3 * 60 * 1000);
 
-    return UnmodifiableListView(_eew.where((eew) => eew.agency.toLowerCase() == 'cwa' && eew.info.time >= threeMinutesAgo).toList());
+    return UnmodifiableListView(eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
 
   /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
