@@ -56,12 +56,21 @@ class _DpipDataModel extends ChangeNotifier {
       ),
     ), */
   ];
+  List<Eew>? _cwaCache;
 
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
 
+  /// Clear cache when EEW data updates
   void setEew(List<Eew> eew) {
     _eew = eew;
+    _cwaCache = null;
     notifyListeners();
+  }
+  /// Returns only EEWs from the CWA (Central Weather Administration) agency.
+  /// Results are cached until the underlying EEW list changes.
+  UnmodifiableListView<Eew> eewByAgency(String agency) {
+    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == agency.toLowerCase()).toList();
+    return UnmodifiableListView(_cwaCache!);
   }
 
   List<PartialEarthquakeReport> _partialReport = [];
@@ -158,7 +167,6 @@ class DpipDataModel extends _DpipDataModel {
   bool _isInForeground = true;
   bool _isReplayMode = false;
   int? _replayTimestamp;
-  List<Eew>? _cwaCache;
 
   int get currentTime =>
       _isReplayMode ? (_replayTimestamp ?? DateTime.now().millisecondsSinceEpoch) : DateTime.now().millisecondsSinceEpoch + timeOffset;
@@ -170,18 +178,7 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
 
-  UnmodifiableListView<Eew> get cwaEew {
-    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'cwa').toList();
-    return UnmodifiableListView(_cwaCache!);
-  }
-
-  // 清除快取
-  @override
-  void setEew(List<Eew> eew) {
-    _eew = eew;
-    _cwaCache = null;
-    notifyListeners();
-  }
+  UnmodifiableListView<Eew> get cwaEew => eewByAgency('cwa');
 
   /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
   ///
