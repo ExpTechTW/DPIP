@@ -1,5 +1,8 @@
-import 'package:dpip/utils/extensions/preference.dart';
+import 'package:i18n_extension/i18n_extension.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:dpip/core/i18n.dart';
+import 'package:dpip/utils/extensions/preference.dart';
 
 class PreferenceKeys {
   static const lastUpdateToServerTime = 'lastUpdateToServerTime';
@@ -22,7 +25,7 @@ class PreferenceKeys {
   static const mapUpdateFps = 'pref:ui:map:updateFps';
   static const mapBase = 'pref:ui:map:base';
   static const mapLayers = 'pref:ui:map:layers';
-  // #endregion
+  static const mapAutoZoom = 'pref:ui:map:autoZoom';
 
   // #region Notification
   static const notifyEew = 'pref:notify:eew';
@@ -44,6 +47,7 @@ class Preference {
 
   static Future<void> init() async {
     instance = await SharedPreferencesWithCache.create(cacheOptions: const SharedPreferencesWithCacheOptions());
+    AppLocalizations.locale = locale?.asLocale;
   }
 
   static Future<void> reload() async {
@@ -112,6 +116,9 @@ class Preference {
 
   static String? get mapLayers => instance.getString(PreferenceKeys.mapLayers);
   static set mapLayers(String? value) => instance.set(PreferenceKeys.mapLayers, value);
+
+  static bool? get mapAutoZoom => instance.getBool(PreferenceKeys.mapAutoZoom);
+  static set mapAutoZoom(bool? value) => instance.set(PreferenceKeys.mapAutoZoom, value);
   // #endregion
 
   // #region Notification

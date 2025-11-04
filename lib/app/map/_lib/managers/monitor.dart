@@ -3,6 +3,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+import 'package:dpip/global.dart';
+import 'package:geojson_vi/geojson_vi.dart';
 import 'package:i18n_extension/i18n_extension.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -17,10 +19,10 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
-import 'package:dpip/utils/extensions/latlng.dart';
 import 'package:dpip/utils/instrumental_intensity_color.dart';
 import 'package:dpip/utils/log.dart';
 import 'package:dpip/widgets/map/map.dart';
@@ -31,12 +33,20 @@ class MonitorMapLayerManager extends MapLayerManager {
   final int? replayTimestamp;
   Timer? _blinkTimer;
   bool _isBoxVisible = true;
+  Timer? _focusTimer;
+  bool _isFocusing = false;
+  static const double kCameraPadding = 80.0;
+
+  // Cached bounds for performance optimization
+  List<LatLng>? _cachedBounds;
+  int? _lastRtsTime;
+  LatLngBounds? _lastZoomBounds;
 
   MonitorMapLayerManager(
     super.context,
     super.controller, {
     this.isReplayMode = false,
-    this.replayTimestamp = 0, //1760753064000,
+    this.replayTimestamp = 0, //1761222483000,
   }) {
     if (isReplayMode) {
       GlobalProviders.data.setReplayMode(true, replayTimestamp);
@@ -110,17 +120,157 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   Future<void> _focus() async {
     try {
-      final location = GlobalProviders.location.coordinates;
-
-      if (location != null && location.isValid) {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(location, 7.4));
-      } else {
-        await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-        TalkerManager.instance.info('Moved Camera to ${DpipMap.kTaiwanCenter}');
-      }
+      await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._focus', e, s);
     }
+  }
+
+  /// Extracts all coordinates from detection areas (GeoJSON polygons) that are present
+  /// in the current RTS data. Uses caching to avoid recalculating bounds when
+  /// RTS data hasn't changed. Returns empty list if no detection areas exist.
+  List<LatLng> _getFocusBounds() {
+    final rts = GlobalProviders.data.rts;
+    final currentTime = rts?.time;
+
+    // Return cached bounds if RTS data hasn't changed
+    if (_cachedBounds != null && _lastRtsTime == currentTime) {
+      return _cachedBounds!;
+    }
+
+    if (rts != null && rts.box.isNotEmpty) {
+      // Intensity mode: collect coordinates from box areas
+      final coords = <LatLng>[];
+      for (final area in Global.boxGeojson.features) {
+        if (area == null) continue;
+
+        final id = area.properties!['ID'].toString();
+        if (!rts.box.containsKey(id)) continue;
+
+        final geometry = area.geometry! as GeoJSONPolygon;
+        final coordinates = geometry.coordinates[0] as List;
+
+        for (final coord in coordinates) {
+          if (coord is List && coord.length >= 2) {
+            final lng = coord[0] as num;
+            final lat = coord[1] as num;
+            coords.add(LatLng(lat.toDouble(), lng.toDouble()));
+          }
+        }
+      }
+      if (coords.isNotEmpty) {
+        // Cache the result
+        _cachedBounds = coords;
+        _lastRtsTime = currentTime;
+        return coords;
+      }
+    }
+
+    // Cache empty result
+    _cachedBounds = [];
+    _lastRtsTime = currentTime;
+    return [];
+  }
+
+  /// Checks if the new bounds have changed significantly from the last zoom bounds
+  /// Only zooms if the change is greater than 10% in any dimension
+  bool _shouldZoomToBounds(LatLngBounds newBounds) {
+    if (_lastZoomBounds == null) return true;
+
+    final lastBounds = _lastZoomBounds!;
+    final latDiff = (newBounds.northeast.latitude - newBounds.southwest.latitude).abs();
+    final lngDiff = (newBounds.northeast.longitude - newBounds.southwest.longitude).abs();
+    final lastLatDiff = (lastBounds.northeast.latitude - lastBounds.southwest.latitude).abs();
+    final lastLngDiff = (lastBounds.northeast.longitude - lastBounds.southwest.longitude).abs();
+
+    // Safety check for division by zero (very small bounds)
+    const minBoundSize = 0.0001; // ~11 meters
+    if (lastLatDiff < minBoundSize || lastLngDiff < minBoundSize) return true;
+
+    // Check if bounds have changed by more than 10%
+    final latChange = (latDiff - lastLatDiff).abs() / lastLatDiff;
+    final lngChange = (lngDiff - lastLngDiff).abs() / lastLngDiff;
+
+    return latChange > 0.1 || lngChange > 0.1;
+  }
+  /// Calculates the bounding box from coordinates and animates the map camera
+  /// to fit all detection areas with padding. Only zooms if the bounds have
+  /// changed significantly (>10%) from the last zoom to prevent excessive zooming.
+  Future<void> _updateMapBounds(List<LatLng> coordinates) async {
+    if (coordinates.isEmpty) return;
+
+    double minLat = double.infinity;
+    double maxLat = double.negativeInfinity;
+    double minLng = double.infinity;
+    double maxLng = double.negativeInfinity;
+
+    for (final coord in coordinates) {
+      if (coord.latitude < minLat) minLat = coord.latitude;
+      if (coord.latitude > maxLat) maxLat = coord.latitude;
+      if (coord.longitude < minLng) minLng = coord.longitude;
+      if (coord.longitude > maxLng) maxLng = coord.longitude;
+    }
+
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+
+    // Only zoom if bounds have changed significantly
+    if (!_shouldZoomToBounds(bounds)) return;
+
+    await controller.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, left: kCameraPadding, top: kCameraPadding, right: kCameraPadding, bottom: kCameraPadding),
+      duration: const Duration(milliseconds: 500),
+    );
+
+    // Update last zoom bounds
+    _lastZoomBounds = bounds;
+  }
+
+  Future<void> _focusReset() async {
+    await controller.animateCamera(
+      CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4),
+    );
+  }
+
+  /// Automatically adjusts the map camera to fit all detection areas (boxes)
+  /// when RTS data contains detection zones. Runs every 2 seconds when enabled.
+  /// If no detection areas exist, resets to the default Taiwan center view.
+  /// Uses caching and debouncing to optimize performance.
+  Future<void> _autoFocus() async {
+    if (!visible || !context.mounted) return;
+
+    try {
+      // Check if auto zoom is enabled
+      final settings = Provider.of<SettingsMapModel>(context, listen: false);
+      if (!settings.autoZoom) return;
+
+      final bounds = _getFocusBounds();
+      if (bounds.isNotEmpty) {
+        await _updateMapBounds(bounds);
+      } else {
+        await _focusReset();
+      }
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager._autoFocus', e, s);
+    }
+  }
+
+  void _startFocusTimer() {
+    _focusTimer?.cancel();
+    _focusTimer = Timer.periodic(const Duration(seconds: 2), (_) async {
+      if (!_isFocusing) {
+        _isFocusing = true;
+        await _autoFocus();
+        _isFocusing = false;
+      }
+    });
+  }
+
+  void _stopFocusTimer() {
+    _focusTimer?.cancel();
+    _focusTimer = null;
   }
 
   @override
@@ -422,6 +572,7 @@ class MonitorMapLayerManager extends MapLayerManager {
             '#00DB00',
           ],
           visibility: 'none',
+          lineSortKey: [Expressions.get, 'i'],
         );
 
         await controller.addLayer(boxSourceId, boxLayerId, properties, belowLayerId: BaseMapLayerIds.userLocation);
@@ -493,6 +644,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       }
 
       didSetup = true;
+      _startFocusTimer();
       GlobalProviders.data.addListener(_onDataChanged);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.setup', e, s);
@@ -512,6 +664,9 @@ class MonitorMapLayerManager extends MapLayerManager {
 
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
+      // Invalidate cached bounds when RTS data changes
+      _cachedBounds = null;
+      _lastRtsTime = null;
       _updateRtsSource();
 
       // 只有在圖層可見時才更新圖層可見性
@@ -631,6 +786,7 @@ class MonitorMapLayerManager extends MapLayerManager {
       await controller.setLayerVisibility(sWaveLayerId, false);
 
       visible = false;
+      _stopFocusTimer();
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager.hide', e, s);
     }
@@ -736,6 +892,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   void dispose() {
     _blinkTimer?.cancel();
     _blinkTimer = null;
+    _stopFocusTimer();
     GlobalProviders.data.setReplayMode(false);
     GlobalProviders.data.removeListener(_onDataChanged);
     super.dispose();

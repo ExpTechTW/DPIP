@@ -74,7 +74,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     }
 
     await _mapController.addLayer(
-      'map',
+      'exptech',
       'town-outline-default',
       LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB(), lineWidth: 1),
       sourceLayer: 'town',
@@ -82,7 +82,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     );
 
     await _mapController.addLayer(
-      'map',
+      'exptech',
       'town-outline-highlighted',
       const LineLayerProperties(lineColor: '#9e10fd', lineWidth: 2),
       sourceLayer: 'town',
@@ -260,7 +260,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
           ),
           child: ListView(
             controller: scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.fromLTRB(16, 0, 16, context.padding.bottom),
             children: [
               const BottomSheetDragHandle(),
               _buildWarningHeader(),

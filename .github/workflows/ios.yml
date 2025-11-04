@@ -35,34 +35,31 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         flutter-version: ${{ env.FLUTTER_VERSION }}
+        cache: true
 
     - name: Cache Pub Packages
       uses: actions/cache@v3
       with:
         path: ~/.pub-cache
-        key: macos-pub-${{ hashFiles('**/pubspec.lock') }}
-        restore-keys: macos-pub-
+        key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: ${{ runner.os }}-pub-
 
     - name: Cache build_runner (Optional)
       uses: actions/cache@v3
       with:
         path: .dart_tool/build
-        key: macos-build-runner-${{ hashFiles('lib/api/model/**/*.dart') }}
-        restore-keys: macos-build-runner-
+        key: ${{ runner.os }}-build-runner-${{ hashFiles('lib/api/model/**/*.dart') }}
+        restore-keys: ${{ runner.os }}-build-runner-
 
     - name: Cache CocoaPods Pods
       uses: actions/cache@v3
       with:
-        path: ios/Pods
-        key: ios-pods-${{ hashFiles('ios/Podfile.lock') }}
-        restore-keys: ios-pods-
-
-    - name: Cache CocoaPods Repo
-      uses: actions/cache@v3
-      with:
-        path: ~/.cocoapods
-        key: cocoapods-repo-${{ hashFiles('ios/Podfile.lock') }}
-        restore-keys: cocoapods-repo-
+        path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+            ~/Library/Developer/Xcode/DerivedData
+        key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
+        restore-keys: ${{ runner.os }}-pods-
 
     - name: Install dependencies
       run: flutter pub get

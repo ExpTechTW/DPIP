@@ -88,6 +88,22 @@ class SettingsMapPage extends StatelessWidget {
                 );
               },
             ),
+            Selector<SettingsMapModel, bool>(
+              selector: (context, model) => model.autoZoom,
+              builder: (context, autoZoom, child) {
+                return ListSectionTile(
+                  icon: Symbols.zoom_in_map_rounded,
+                  title: '自動縮放'.i18n,
+                  subtitle: Text('接收到檢知時自動縮放地圖(監視器模式下)'.i18n),
+                  trailing: Switch(
+                    value: autoZoom,
+                    onChanged: (value) {
+                      context.read<SettingsMapModel>().setAutoZoom(value);
+                    },
+                  ),
+                );
+              },
+            ),
             Selector<SettingsMapModel, int>(
               selector: (context, model) => model.updateInterval,
               builder: (context, updateInterval, child) {
