@@ -171,7 +171,7 @@ class DpipDataModel extends _DpipDataModel {
   }
 
   UnmodifiableListView<Eew> get cwaEew {
-    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'jma').toList();
+    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'cwa').toList();
     return UnmodifiableListView(_cwaCache!);
   }
 
