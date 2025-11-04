@@ -216,6 +216,20 @@ class LocationService {
 
     DartPluginRegistrant.ensureInitialized();
 
+    await Preference.init();
+    await AppLocalizations.load();
+    await LocationNameLocalizations.load();
+
+    if(Preference.locationAuto != true) {
+      await _$onStop();
+      return;
+    }
+
+    _$geoJsonData = await Global.loadTownGeojson();
+    _$locationData = await Global.loadLocationData();
+
+    _$service.setAutoStartOnBootMode(true);
+
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: LocationServiceManager.kNotificationId,
@@ -230,16 +244,6 @@ class LocationService {
     );
 
     await _$service.setAsForegroundService();
-
-    await Preference.init();
-    await AppLocalizations.load();
-    await LocationNameLocalizations.load();
-
-    _$geoJsonData = await Global.loadTownGeojson();
-    _$locationData = await Global.loadLocationData();
-
-    _$service.setAutoStartOnBootMode(true);
-
     _$service.on(LocationServiceEvent.stop).listen((_) => _$onStop());
 
     // Start the periodic location update task
