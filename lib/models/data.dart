@@ -170,6 +170,9 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
 
+  UnmodifiableListView<Eew> get cwaEew =>
+      UnmodifiableListView(_eew.where((eew) => eew.agency.toLowerCase() == 'cwa').toList());
+
   /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
   ///
   /// In replay mode, filters out RTS data that is more than 1 second ahead
