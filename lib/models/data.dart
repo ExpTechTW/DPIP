@@ -68,8 +68,8 @@ class _DpipDataModel extends ChangeNotifier {
   }
   /// Returns only EEWs from the CWA (Central Weather Administration) agency.
   /// Results are cached until the underlying EEW list changes.
-  UnmodifiableListView<Eew> eewByAgency(String agency) {
-    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == agency.toLowerCase()).toList();
+  UnmodifiableListView<Eew> get cwaEew {
+    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'cwa').toList();
     return UnmodifiableListView(_cwaCache!);
   }
 
@@ -177,8 +177,6 @@ class DpipDataModel extends _DpipDataModel {
 
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
-
-  UnmodifiableListView<Eew> get cwaEew => eewByAgency('cwa');
 
   /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
   ///
