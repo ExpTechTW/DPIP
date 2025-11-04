@@ -158,10 +158,10 @@ class DpipDataModel extends _DpipDataModel {
   bool _isInForeground = true;
   bool _isReplayMode = false;
   int? _replayTimestamp;
+  List<Eew>? _cwaCache;
 
-  int get currentTime => _isReplayMode
-      ? (_replayTimestamp ?? DateTime.now().millisecondsSinceEpoch)
-      : DateTime.now().millisecondsSinceEpoch + timeOffset;
+  int get currentTime =>
+      _isReplayMode ? (_replayTimestamp ?? DateTime.now().millisecondsSinceEpoch) : DateTime.now().millisecondsSinceEpoch + timeOffset;
 
   /// Returns only active EEWs (within 3 minutes of current app time)
   UnmodifiableListView<Eew> get activeEew {
@@ -170,8 +170,18 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
   }
 
-  UnmodifiableListView<Eew> get cwaEew =>
-      UnmodifiableListView(_eew.where((eew) => eew.agency.toLowerCase() == 'cwa').toList());
+  UnmodifiableListView<Eew> get cwaEew {
+    _cwaCache ??= _eew.where((e) => e.agency.toLowerCase() == 'jma').toList();
+    return UnmodifiableListView(_cwaCache!);
+  }
+
+  // 清除緩存（當 _eew 被更新時）
+  @override
+  void setEew(List<Eew> eew) {
+    _eew = eew;
+    _cwaCache = null; // invalidate cache
+    notifyListeners();
+  }
 
   /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
   ///
@@ -421,9 +431,7 @@ class DpipDataModel extends _DpipDataModel {
 
         if (eew.isNotEmpty == true) {
           final eewMap = {for (final e in eew) e.id: e};
-          final eewDistMap = {
-            for (final e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s * 1000,
-          };
+          final eewDistMap = {for (final e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s * 1000};
 
           if (checkBoxSkip(eewMap, eewDistMap, coordinates)) continue;
         }
