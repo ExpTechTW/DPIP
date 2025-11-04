@@ -10,13 +10,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
-"PO-Revision-Date: 2025-09-01 03:15\n"
+"PO-Revision-Date: 2025-10-31 05:37\n"
 
-#: ./lib/app/settings/location/page.dart:372
+#: ./lib/app/settings/location/page.dart:371
 msgid "所在地"
 msgstr "현재 지역"
 
-#: ./lib/app/settings/location/page.dart:421
+#: ./lib/app/settings/location/page.dart:420
 msgid "新增地點"
 msgstr ""
 
@@ -36,11 +36,11 @@ msgstr "단위"
 msgid "地圖"
 msgstr "지도"
 
-#: ./lib/app/welcome/4-permissions/page.dart:153
+#: ./lib/app/welcome/4-permissions/page.dart:152
 msgid "通知"
 msgstr "알림"
 
-#: ./lib/app/settings/notify/page.dart:148
+#: ./lib/app/settings/notify/page.dart:159
 msgid "緊急地震速報"
 msgstr "긴급 지진 속보"
 
@@ -52,7 +52,7 @@ msgstr "강진 모니터"
 msgid "地震報告"
 msgstr "지진 보고"
 
-#: ./lib/app/settings/notify/page.dart:192
+#: ./lib/app/settings/notify/page.dart:203
 msgid "震度速報"
 msgstr "진도 속보"
 
@@ -60,11 +60,11 @@ msgstr "진도 속보"
 msgid "雷雨即時訊息"
 msgstr "실시간 뇌우 정보"
 
-#: ./lib/app/settings/notify/page.dart:223
+#: ./lib/app/settings/notify/page.dart:234
 msgid "天氣警特報"
 msgstr "기상특보"
 
-#: ./lib/app/settings/notify/page.dart:236
+#: ./lib/app/settings/notify/page.dart:247
 msgid "防災資訊"
 msgstr "방재 정보"
 
@@ -83,6 +83,14 @@ msgstr "저희를 후원해주세요"
 #: ./lib/route/image_viewer/image_viewer.dart:70
 msgid "設定"
 msgstr "설정"
+
+#: ./lib/core/service.dart:438
+msgid "服務區域外"
+msgstr ""
+
+#: ./lib/core/service.dart:444
+msgid "自動定位中"
+msgstr ""
 
 #: ./lib/app/settings/notify/page.dart:61
 msgid "接收全部"
@@ -128,11 +136,15 @@ msgstr "공지 발송 시"
 msgid "音效測試為在裝置上執行的本地通知，僅用於確認裝置在接收通知時是否能正常播放音效。此測試不會向伺服器發送任何請求"
 msgstr "사운드 테스트는 기기에서 수행되는 로컬 알림입니다. 기기가 알림을 수신했을 때 음향 효과를 정상적으로 재생할 수 있는지 확인하는 데만 사용됩니다. 이 테스트는 요청을 서버에 전송하지 않습니다"
 
-#: ./lib/app/settings/notify/page.dart:135
+#: ./lib/app/settings/notify/page.dart:86
+msgid "伺服器排隊中，請稍候…"
+msgstr ""
+
+#: ./lib/app/settings/notify/page.dart:146
 msgid "請先設定所在地來使用通知功能"
 msgstr "알림 기능을 사용하시려면 먼저 위치를 설정해 주세요"
 
-#: ./lib/app/settings/notify/page.dart:142
+#: ./lib/app/settings/notify/page.dart:153
 msgid "地震速報"
 msgstr "지진 속보"
 
@@ -140,7 +152,7 @@ msgstr "지진 속보"
 msgid "地震"
 msgstr "지진"
 
-#: ./lib/app/settings/notify/page.dart:204
+#: ./lib/app/settings/notify/page.dart:215
 msgid "天氣"
 msgstr "날씨"
 
@@ -148,7 +160,7 @@ msgstr "날씨"
 msgid "海嘯"
 msgstr "해일"
 
-#: ./lib/app/settings/notify/page.dart:266
+#: ./lib/app/settings/notify/page.dart:277
 msgid "其他"
 msgstr "기타"
 
@@ -391,7 +403,7 @@ msgstr "이용 약관"
 msgid "隱私權政策"
 msgstr "개인 정보 보호 정책"
 
-#: ./lib/app/welcome/4-permissions/page.dart:161
+#: ./lib/app/welcome/4-permissions/page.dart:160
 msgid "位置"
 msgstr "위치"
 
@@ -475,19 +487,19 @@ msgstr "앱 로그"
 msgid "任何資訊應以中央氣象署發布之內容為準。"
 msgstr "모든 정보는 대만 기상청에서 발표한 내용을 기준으로 합니다."
 
-#: ./lib/app/settings/location/page.dart:76
+#: ./lib/app/settings/location/page.dart:75
 msgid "無法取得通知權限"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:78
+#: ./lib/app/settings/location/page.dart:77
 msgid "無法取得位置權限"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:79
+#: ./lib/app/settings/location/page.dart:78
 msgid "無法取得自啟動權限"
 msgstr ""
 
-#: ./lib/app/welcome/4-permissions/page.dart:167
+#: ./lib/app/welcome/4-permissions/page.dart:166
 msgid "省電策略"
 msgstr "전원 절약 설정"
 
@@ -495,31 +507,31 @@ msgstr "전원 절약 설정"
 msgid "無法取得權限"
 msgstr "권한 획득 불가"
 
-#: ./lib/app/settings/location/page.dart:85
+#: ./lib/app/settings/location/page.dart:84
 msgid "自動定位功能需要您允許 DPIP 使用通知權限才能正常運作。請您到應用程式設定中找到並允許「通知」權限後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:86
+#: ./lib/app/settings/location/page.dart:85
 msgid "自動定位功能需要您允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到並允許「位置」權限後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:89
+#: ./lib/app/settings/location/page.dart:88
 msgid "自動定位功能需要您永遠允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「永遠」後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:90
+#: ./lib/app/settings/location/page.dart:89
 msgid "自動定位功能需要您一律允許 DPIP 使用位置權限才能正常運作。請您到應用程式設定中找到位置權限設定並選擇「一律允許」後再試一次。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:91
+#: ./lib/app/settings/location/page.dart:90
 msgid "為了獲得更好的自動定位體驗，您需要給予「自啟動權限」以便讓 DPIP 在背景自動設定所在地資訊。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:92
+#: ./lib/app/settings/location/page.dart:91
 msgid "為了獲得更好的自動定位體驗，您需要給予「無限制」以便讓 DPIP 在背景自動設定所在地資訊。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:93
+#: ./lib/app/settings/location/page.dart:92
 msgid "自動定位功能需要您允許 DPIP 使用權限才能正常運作。請您到應用程式設定中找到並允許「權限」後再試一次。"
 msgstr ""
 
@@ -527,51 +539,47 @@ msgstr ""
 msgid "取消"
 msgstr "취소"
 
-#: ./lib/app/settings/location/page.dart:163
+#: ./lib/app/settings/location/page.dart:162
 msgid "自動啟動"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:164
+#: ./lib/app/settings/location/page.dart:163
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟啟用自動啟動功能，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:186
+#: ./lib/app/settings/location/page.dart:185
 msgid "為了獲得更好的 DPIP 體驗，請依照步驟關閉省電策略，以便讓 DPIP 在背景能正常接收資訊以及更新所在地。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:220
+#: ./lib/app/settings/location/page.dart:219
 msgid "一律允許"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:220
+#: ./lib/app/settings/location/page.dart:219
 msgid "永遠"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:231
+#: ./lib/app/settings/location/page.dart:230
 msgid "自動更新"
 msgstr "자동 업데이트"
 
-#: ./lib/app/settings/location/page.dart:232
+#: ./lib/app/settings/location/page.dart:231
 msgid "定期更新目前的所在地"
 msgstr "현재 위치 정기적으로 업데이트"
 
-#: ./lib/app/settings/location/page.dart:242
+#: ./lib/app/settings/location/page.dart:241
 msgid "自動定位功能將使用您的裝置上的 GPS，即使 DPIP 關閉或未在使用時，也會根據您的地理位置，自動更新您的所在地，提供即時的天氣和地震資訊，讓您隨時掌握當地最新狀況。"
 msgstr "자동 위치 기능은 기기의 GPS를 사용하며, DPIP가 꺼져 있거나 사용 중이 아닐 때도 사용자의 위치 정보를 기반으로 현재 위치를 자동으로 업데이트합니다. 이를 통해 실시간 날씨와 지진 정보를 제공하여 사용자가 항상 현지 최신 상황을 파악할 수 있도록 합니다."
 
-#: ./lib/app/settings/location/page.dart:301
+#: ./lib/app/settings/location/page.dart:300
 msgid "通知功能已被拒絕，請移至設定允許權限。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:326
-msgid "自啟動權限已被拒絕，請移至設定允許權限。"
-msgstr ""
-
-#: ./lib/app/settings/location/page.dart:352
+#: ./lib/app/settings/location/page.dart:351
 msgid "省電策略已被拒絕，請移至設定允許權限。"
 msgstr ""
 
-#: ./lib/app/settings/location/page.dart:413
+#: ./lib/app/settings/location/page.dart:412
 msgid "設定所在地時發生錯誤，請稍候再試一次。"
 msgstr ""
 
@@ -735,7 +743,7 @@ msgstr "업데이트 로그를 불러올 수 없습니다. 나중에 다시 시�
 msgid "重試"
 msgstr "다시 시도"
 
-#: ./lib/app/welcome/4-permissions/page.dart:364
+#: ./lib/app/welcome/4-permissions/page.dart:363
 msgid "下一步"
 msgstr "다음 단계"
 
@@ -787,15 +795,15 @@ msgstr "DPIP에 오신 것을 환영합니다"
 msgid "DPIP 是一款由臺灣本土團隊設計的 App，整合 TREM-Net (臺灣即時地震觀測網) 之資訊，以及中央氣象署資料，提供一個整合、單一且便利的防災資訊應用程式。"
 msgstr "DPIP는 TREM-Net(대만의 실시간 지진 관측 네트워크) 정보 및 중앙 기상청 자료를 통합하여 통합, 단일 및 편리한 방재 정보 응용 프로그램을 제공하는 대만 현지 팀이 설계한 앱입니다."
 
-#: ./lib/app/welcome/4-permissions/page.dart:154
+#: ./lib/app/welcome/4-permissions/page.dart:153
 msgid "在重大災害發生時以通知來傳遞即時防災資訊"
 msgstr "중대 재해 발생 시 알림으로 즉각 재난 대비 정보를 전달합니다"
 
-#: ./lib/app/welcome/4-permissions/page.dart:162
+#: ./lib/app/welcome/4-permissions/page.dart:161
 msgid "使用定位來自動更新所在地設定，提供當地的即時防災資訊"
 msgstr "GPS를 이용하여 소재지 위치를 자동으로 업데이트하고, 현지의 즉각적인 방재 정보를 제공합니다"
 
-#: ./lib/app/welcome/4-permissions/page.dart:168
+#: ./lib/app/welcome/4-permissions/page.dart:167
 msgid "允許 DPIP 在背景中持續運行，以便即時防災通知資訊。"
 msgstr "실시간 재난 알림 정보를 위해 DPIP가 백그라운드에서 계속 실행되도록 허용합니다."
 
@@ -803,23 +811,23 @@ msgstr "실시간 재난 알림 정보를 위해 DPIP가 백그라운드에서 �
 msgid "儲存"
 msgstr "이미지 저장"
 
-#: ./lib/app/welcome/4-permissions/page.dart:175
+#: ./lib/app/welcome/4-permissions/page.dart:174
 msgid "用於儲存中央氣象署或 ExpTech 提供之數據可視化圖片"
 msgstr "대만 기상청 또는 ExpTech에서 제공하는 데이터 시각화 이미지를 저장하는 데 사용"
 
-#: ./lib/app/welcome/4-permissions/page.dart:342
+#: ./lib/app/welcome/4-permissions/page.dart:341
 msgid "權限請求"
 msgstr "권한 요청"
 
-#: ./lib/app/welcome/4-permissions/page.dart:343
+#: ./lib/app/welcome/4-permissions/page.dart:342
 msgid "需要使用者手動到設定開啟相關權限。"
 msgstr "사용자가 수동으로 설정에서 관련 권한을 활성화해야 합니다."
 
-#: ./lib/app/welcome/4-permissions/page.dart:383
+#: ./lib/app/welcome/4-permissions/page.dart:382
 msgid "權限"
 msgstr "권한"
 
-#: ./lib/app/welcome/4-permissions/page.dart:396
+#: ./lib/app/welcome/4-permissions/page.dart:395
 msgid "我們一直和使用者站在一起，為使用者的隱私而不斷努力。"
 msgstr "우리는 항상 사용자와 함께하며 사용자의 프라이버시를 위해 끊임없이 노력합니다."
 
