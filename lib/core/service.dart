@@ -220,7 +220,7 @@ class LocationService {
     await AppLocalizations.load();
     await LocationNameLocalizations.load();
 
-    if(Preference.locationAuto != true) {
+    if (Preference.locationAuto != true) {
       await _$onStop();
       return;
     }
