@@ -6,6 +6,7 @@ void showToast(BuildContext context, ToastWidget toast) {
     behavior: SnackBarBehavior.floating,
     backgroundColor: Colors.transparent,
     elevation: 0,
+    duration: const Duration(seconds: 3),
     content: AnimatedFade(child: Center(child: toast)),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -13,7 +14,7 @@ void showToast(BuildContext context, ToastWidget toast) {
 
 class AnimatedFade extends StatefulWidget {
   final Widget child;
-  const AnimatedFade({required this.child});
+  const AnimatedFade({super.key, required this.child});
 
   @override
   State<AnimatedFade> createState() => AnimatedFadeState();
@@ -22,13 +23,12 @@ class AnimatedFade extends StatefulWidget {
 class AnimatedFadeState extends State<AnimatedFade>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: Durations.short4,
-    reverseDuration: Durations.short4,
+      vsync: this,
+      duration: Durations.short4,
+      reverseDuration: Durations.short4,
   )..forward();
 
-  late final Animation<double> _opacity =
-  CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+  late final Animation<double> _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
 
   @override
   void initState() {
@@ -39,8 +39,13 @@ class AnimatedFadeState extends State<AnimatedFade>
   }
 
   @override
-  Widget build(BuildContext context) =>
-      FadeTransition(opacity: _opacity, child: widget.child);
+  Widget build(BuildContext context) => FadeTransition(opacity: _opacity, child: widget.child);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }
 
 class ToastWidget extends StatelessWidget {
@@ -65,7 +70,6 @@ class ToastWidget extends StatelessWidget {
       ],
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -105,10 +105,7 @@ class _ImageViewerRouteState extends State<ImageViewerRoute> {
             }
           }
         }
-        void showImageSavedToast() {
-          showToast(context, ToastWidget.text('已儲存圖片'.i18n, icon: const Icon(Symbols.check_rounded)));
-        }
-        showImageSavedToast();
+        showToast(context, ToastWidget.text('已儲存圖片'.i18n, icon: const Icon(Symbols.check_rounded)));
       } finally {
         // 清理临时文件
         if (await tempFile.exists()) {
