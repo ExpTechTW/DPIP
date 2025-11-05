@@ -46,8 +46,6 @@ PODS:
   - Flutter (1.0.0)
   - flutter_icmp_ping (0.0.1):
     - Flutter
-  - fluttertoast (0.0.2):
-    - Flutter
   - gal (1.0.0):
     - Flutter
     - FlutterMacOS
@@ -139,7 +137,6 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_icmp_ping (from `.symlinks/plugins/flutter_icmp_ping/ios`)
-  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gal (from `.symlinks/plugins/gal/darwin`)
   - in_app_purchase_storekit (from `.symlinks/plugins/in_app_purchase_storekit/darwin`)
   - maplibre_gl (from `.symlinks/plugins/maplibre_gl/ios`)
@@ -181,8 +178,6 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_icmp_ping:
     :path: ".symlinks/plugins/flutter_icmp_ping/ios"
-  fluttertoast:
-    :path: ".symlinks/plugins/fluttertoast/ios"
   gal:
     :path: ".symlinks/plugins/gal/darwin"
   in_app_purchase_storekit:
@@ -217,7 +212,6 @@ SPEC CHECKSUMS:
   FirebaseMessaging: 3b26e2cee503815e01c3701236b020aa9b576f09
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_icmp_ping: 2b159955eee0c487c766ad83fec224ae35e7c935
-  fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
   gal: 6a522c75909f1244732d4596d11d6a2f86ff37a5
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
