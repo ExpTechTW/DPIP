@@ -6,7 +6,7 @@ void showToast(BuildContext context, ToastWidget toast) {
     behavior: SnackBarBehavior.floating,
     backgroundColor: Colors.transparent,
     elevation: 0,
-    duration: const Duration(seconds: 3),
+    duration: const Duration(seconds: 3, milliseconds: 500),
     content: AnimatedFade(child: Center(child: toast)),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
