@@ -9,6 +9,17 @@
 
 ### 新增
 
+
+### 更改
+
+
+### 修正
+
+
+## [3.1.103] - 2025-11-05
+
+### 新增
+
 - 新增通知設定提示。 (#409)
 - 新增自動縮放監視器地圖的設定開關。 (#426)
 
@@ -237,7 +248,8 @@
 
 ## [3.0.001] - 2025-05-01
 
-[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.1...HEAD
+[未發布]: https://github.com/exptechtw/dpip/compare/v3.1.103...HEAD
+[3.1.103]: https://github.com/exptechtw/dpip/compare/v3.1.001...v3.1.103
 [3.1.001]: https://github.com/exptechtw/dpip/compare/v3.1.0...v3.1.001
 [3.1.0]: https://github.com/exptechtw/dpip/compare/v3.0.2...v3.1.0
 [3.0.2]: https://github.com/exptechtw/dpip/compare/v3.0.014...v3.0.2
