@@ -10,7 +10,6 @@ class PreferenceKeys {
   // region App Installation
   static const appVersion = 'app-version';
   static const appBuildNumber = 'app-build-number';
-  static const installTime = 'install-time';
   static const installId = 'install-id';
   // endregion
 
@@ -66,9 +65,6 @@ class Preference {
 
   static String? get buildNumber => instance.getString(PreferenceKeys.appBuildNumber);
   static set buildNumber(String? value) => instance.set(PreferenceKeys.appBuildNumber, value);
-
-  static int? get installTime => instance.getInt(PreferenceKeys.installTime);
-  static set installTime(int? value) => instance.set(PreferenceKeys.installTime, value);
 
   static String? get installId => instance.getString(PreferenceKeys.installId);
   static set installId(String? value) => instance.set(PreferenceKeys.installId, value);
