@@ -33,7 +33,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_markdown: ^0.7.7
-  fluttertoast: 8.2.12
   freezed_annotation: ^3.0.0
   gal: ^2.3.2
   geolocator: ^14.0.0
