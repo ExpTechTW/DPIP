@@ -7,22 +7,27 @@ final talker = TalkerManager.instance;
 const _uuid = Uuid();
 
 Future<void> initializeInstallationData() async {
-  final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  final String currentVersion = packageInfo.version;
-  final String currentBuildNumber = packageInfo.buildNumber;
-  final String? storedInstallId = Preference.installId;
-  final String? storedVersion = Preference.version;
-  final String? storedBuildNumber = Preference.buildNumber;
+  final packageInfo = await PackageInfo.fromPlatform();
+  final currentVersion = packageInfo.version;
+  final currentBuildNumber = packageInfo.buildNumber;
 
-  if (storedInstallId == null || storedVersion == null) {
-    talker.info('這是 App 首次安裝。');
+  String? installId = await Preference.installId;
+  final storedVersion = Preference.version;
+  final storedBuildNumber = Preference.buildNumber;
 
-    await Preference.instance.clear();
-    final String newInstallId = _uuid.v4();
-    Preference.installId = newInstallId;
+  if (installId == null) {
+    talker.info('首次安裝或資料重置，建立新的 installId');
+
+    installId = _uuid.v4();
+    await Preference.setInstallId(installId);
+
     Preference.version = currentVersion;
     Preference.buildNumber = currentBuildNumber;
-    talker.info('已儲存新的安裝 ID 和版本，並執行了數據初始化/重置。');
+    talker.info(
+      '已建立新的 installId 並儲存版本資訊',
+      'version: $currentVersion | buildNumber: $currentBuildNumber\n'
+      'installId: $installId'
+    );
     return;
   }
 
@@ -37,5 +42,10 @@ Future<void> initializeInstallationData() async {
     talker.info('已更新版本資訊，保留現有數據。');
     return;
   }
-  talker.info('應用程式未重新安裝也未升級。使用現有安裝資料。');
+
+  talker.info(
+    '應用程式未重新安裝也未升級，使用現有的安裝資料。\n'
+    'version: $currentVersion | buildNumber: $currentBuildNumber\n'
+    'installId: $installId'
+    );
 }
