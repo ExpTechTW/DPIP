@@ -37,27 +37,6 @@ jobs:
         channel: 'stable'
         cache: true
 
-    - name: Cache Pub dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.pub-cache
-          .dart_tool
-        key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pub-
-
-    - name: Cache build_runner output
-      uses: actions/cache@v4
-      with:
-        path: |
-          .dart_tool/build
-          **/*.g.dart
-          **/*.freezed.dart
-        key: ${{ runner.os }}-build-runner-${{ hashFiles('**/pubspec.lock', '**/*.dart') }}
-        restore-keys: |
-          ${{ runner.os }}-build-runner-
-
     - name: Cache CocoaPods
       uses: actions/cache@v4
       with:
@@ -67,24 +46,6 @@ jobs:
         key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pods-
-
-    - name: Cache Xcode DerivedData
-      uses: actions/cache@v4
-      with:
-        path: ~/Library/Developer/Xcode/DerivedData
-        key: ${{ runner.os }}-xcode-${{ hashFiles('ios/**/*.pbxproj') }}
-        restore-keys: |
-          ${{ runner.os }}-xcode-
-
-    - name: Cache Swift Package Manager
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/Library/Caches/org.swift.swiftpm
-          ios/.build
-        key: ${{ runner.os }}-spm-${{ hashFiles('ios/**/Package.resolved') }}
-        restore-keys: |
-          ${{ runner.os }}-spm-
 
     - name: Install dependencies and run build_runner
       run: |

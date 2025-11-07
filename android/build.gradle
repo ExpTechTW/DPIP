@@ -7,12 +7,10 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
 
-// Force all subprojects to use compatible Gradle and SDK versions
-subprojects {
     // Override repositories for all subprojects (fixes third-party plugins using jcenter)
     buildscript {
         repositories {
@@ -27,29 +25,12 @@ subprojects {
         maven { url 'https://jitpack.io' }
     }
 
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                if (namespace == null) {
-                    namespace project.group
-                }
-
-                // Force minimum SDK versions
-                if (compileSdkVersion != null && compileSdkVersion < 35) {
-                    compileSdk 35
-                }
-
-                // Update Java compatibility
-                compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_17
-                    targetCompatibility JavaVersion.VERSION_17
-                }
-            }
+    // Auto-fill namespace for plugins without one
+    afterEvaluate {
+        if (hasProperty('android') && android.namespace == null) {
+            android.namespace = project.group
         }
     }
-}
-subprojects {
-    project.evaluationDependsOn(':app')
 }
 
 tasks.register("clean", Delete) {
