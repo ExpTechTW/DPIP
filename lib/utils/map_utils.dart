@@ -75,21 +75,34 @@ const Map<Units, double> factors = {
   Units.yards: earthRadius * 1.0936,
 };
 
+// Math constants for degree/radian conversion
+const _degToRad = pi / 180;
+const _radToDeg = 180 / pi;
+const _twoPi = 2 * pi;
+
 /// Converts an angle in degrees to radians
 double degreesToRadians(double degrees) {
   final radians = degrees % 360;
-  return (radians * pi) / 180;
+  return radians * _degToRad;
 }
 
 /// Converts an angle in radians to degrees
 double radiansToDegrees(double radians) {
-  final degrees = radians % (2 * pi);
-  return (degrees * 180) / pi;
+  final degrees = radians % _twoPi;
+  return degrees * _radToDeg;
 }
+
+// Precomputed factor for kilometers (most common unit for EEW)
+const _kmToRadiansFactor = 1000 / earthRadius;
 
 /// Convert a distance measurement (assuming a spherical Earth) from a real-world unit into radians
 /// Valid units: miles, nauticalmiles, inches, yards, meters, metres, kilometers, centimeters, feet
 double lengthToRadians(double distance, {Units units = Units.kilometers}) {
+  // Fast path for kilometers (most common for EEW)
+  if (units == Units.kilometers) {
+    return distance * _kmToRadiansFactor;
+  }
+
   final factor = factors[units];
   if (factor == null) {
     throw '$units units is invalid';
@@ -142,21 +155,54 @@ Map<String, dynamic> circle(LatLng center, double radius, {int steps = 64, Units
   };
 }
 
+// Precomputed bearing values for circle generation (32 steps)
+final _circleBearings32 = List.generate(32, (i) => degreesToRadians((i * -360) / 32));
+final _circleSines32 = _circleBearings32.map((b) => sin(b)).toList();
+final _circleCosines32 = _circleBearings32.map((b) => cos(b)).toList();
+
 /// Takes a [LatLng] and calculates the circle polygon given a radius in
 /// degrees, radians, miles, or kilometers; and steps for precision.
+///
+/// Optimized version that precomputes trigonometric values for 32 steps.
 GeoJsonFeatureBuilder circleFeature({
   required LatLng center,
   required double radius,
-  int steps = 64,
+  int steps = 32,
   Units units = Units.kilometers,
 }) {
-  // main
   final polygon = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon);
   final List<List<double>> coordinates = [];
 
-  for (var i = 0; i < steps; i++) {
-    final point = destination(center, radius, (i * -360) / steps, units: units);
-    coordinates.add(point.asGeoJsonCooridnate);
+  if (steps == 32) {
+    // Fast path: use precomputed values
+    final longitude1 = degreesToRadians(center.longitude);
+    final latitude1 = degreesToRadians(center.latitude);
+    final radians = lengthToRadians(radius, units: units);
+
+    final sinLat1 = sin(latitude1);
+    final cosLat1 = cos(latitude1);
+    final sinRadians = sin(radians);
+    final cosRadians = cos(radians);
+
+    // Precompute loop-invariant values
+    final sinLat1CosRadians = sinLat1 * cosRadians;
+    final cosLat1SinRadians = cosLat1 * sinRadians;
+
+    for (var i = 0; i < 32; i++) {
+      final sinBearing = _circleSines32[i];
+      final cosBearing = _circleCosines32[i];
+
+      final latitude2 = asin(sinLat1CosRadians + cosLat1SinRadians * cosBearing);
+      final longitude2 = longitude1 + atan2(sinBearing * cosLat1SinRadians, cosRadians - sinLat1 * sin(latitude2));
+
+      coordinates.add([radiansToDegrees(longitude2), radiansToDegrees(latitude2)]);
+    }
+  } else {
+    // Fallback: original implementation
+    for (var i = 0; i < steps; i++) {
+      final point = destination(center, radius, (i * -360) / steps, units: units);
+      coordinates.add(point.asGeoJsonCooridnate);
+    }
   }
 
   coordinates.add(coordinates[0]);
