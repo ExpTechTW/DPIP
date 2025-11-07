@@ -138,6 +138,7 @@ class LightningMapLayerManager extends MapLayerManager {
             'lightning-0-30',
             '0-60',
             'lightning-0-60',
+            '',
           ],
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
