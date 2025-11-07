@@ -48,8 +48,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   Map<String, dynamic>? _cachedBoxGeoJson;
   bool _needsRtsUpdate = false;
 
-  // Track if EEW update is in progress to avoid queuing too many updates
   bool _isUpdatingEew = false;
+  bool _hasActiveEew = false;
 
   // Cached layer and source IDs to avoid repeated string calculations
   late final String _rtsSourceId = MapSourceIds.rts();
@@ -76,8 +76,9 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
-  final tickNotifier = ValueNotifier<int>(0);
+  final displayTimeNotifier = ValueNotifier<String>('N/A');
   int? _lastDataReceivedTime;
+  int _lastDisplayedSecond = 0;
 
   static final kRtsCircleColor = [
     Expressions.interpolate,
@@ -663,9 +664,21 @@ class MonitorMapLayerManager extends MapLayerManager {
   void tick() {
     if (!didSetup || !visible) return;
 
-    if (!_isUpdatingEew) {
+    final hasActiveEew = GlobalProviders.data.activeEew.isNotEmpty;
+
+    if (hasActiveEew && !_isUpdatingEew) {
       _isUpdatingEew = true;
       unawaited(_updateEewFromCache());
+    } else if (!hasActiveEew && _hasActiveEew) {
+      _hasActiveEew = false;
+      if (!_isUpdatingEew) {
+        _isUpdatingEew = true;
+        unawaited(_clearEew());
+      }
+    }
+
+    if (hasActiveEew) {
+      _hasActiveEew = true;
     }
 
     if (_needsRtsUpdate) {
@@ -673,7 +686,26 @@ class MonitorMapLayerManager extends MapLayerManager {
       _needsRtsUpdate = false;
     }
 
-    tickNotifier.value++;
+    _updateDisplayTime();
+  }
+
+  void _updateDisplayTime() {
+    final currentTime = GlobalProviders.data.currentTime;
+    final currentSecond = currentTime ~/ 1000;
+
+    if (currentSecond == _lastDisplayedSecond) return;
+    _lastDisplayedSecond = currentSecond;
+
+    final lastDataReceivedTime = _lastDataReceivedTime;
+    final isStale = lastDataReceivedTime != null && (currentTime - lastDataReceivedTime) > 3000;
+
+    if (lastDataReceivedTime != null) {
+      if (isStale) {
+        displayTimeNotifier.value = '${lastDataReceivedTime.toSimpleDateTimeString()}|STALE';
+      } else {
+        displayTimeNotifier.value = currentTime.toSimpleDateTimeString();
+      }
+    }
   }
 
   void _onDataChanged() {
@@ -699,22 +731,25 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final existingSources = (await controller.getSourceIds()).toSet();
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+      final hasRtsData = (_cachedRtsGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasIntensityData = (_cachedIntensityGeoJson?['features'] as List?)?.isNotEmpty ?? false;
+      final hasBoxData = (_cachedBoxGeoJson?['features'] as List?)?.isNotEmpty ?? false;
 
       await Future.wait([
-        // Update sources from cache
-        if (existingSources.contains(_rtsSourceId)) controller.setGeoJsonSource(_rtsSourceId, _cachedRtsGeoJson!),
-        if (existingSources.contains(_intensitySourceId))
+        if (hasRtsData && existingSources.contains(_rtsSourceId))
+          controller.setGeoJsonSource(_rtsSourceId, _cachedRtsGeoJson!),
+        if (hasIntensityData && existingSources.contains(_intensitySourceId))
           controller.setGeoJsonSource(_intensitySourceId, _cachedIntensityGeoJson!),
-        if (existingSources.contains(_intensity0SourceId))
+        if (hasIntensityData && existingSources.contains(_intensity0SourceId))
           controller.setGeoJsonSource(_intensity0SourceId, _cachedIntensityGeoJson!),
-        if (existingSources.contains(_boxSourceId)) controller.setGeoJsonSource(_boxSourceId, _cachedBoxGeoJson!),
+        if (hasBoxData && existingSources.contains(_boxSourceId))
+          controller.setGeoJsonSource(_boxSourceId, _cachedBoxGeoJson!),
 
-        // Update layer visibility
-        controller.setLayerVisibility(_rtsLayerId, !hasBox),
-        controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
-        controller.setLayerVisibility(_intensityLayerId, hasBox),
-        controller.setLayerVisibility(_intensity0LayerId, hasBox),
-        controller.setLayerVisibility(_boxLayerId, hasBox),
+        controller.setLayerVisibility(_rtsLayerId, hasRtsData && !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label', hasRtsData && !hasBox),
+        controller.setLayerVisibility(_intensityLayerId, hasIntensityData && hasBox),
+        controller.setLayerVisibility(_intensity0LayerId, hasIntensityData && hasBox),
+        controller.setLayerVisibility(_boxLayerId, hasBoxData && hasBox),
       ]);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateRtsFromCache', e, s);
@@ -732,6 +767,17 @@ class MonitorMapLayerManager extends MapLayerManager {
       await controller.setGeoJsonSource(_eewSourceId, data);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateEewFromCache', e, s);
+    } finally {
+      _isUpdatingEew = false;
+    }
+  }
+
+  Future<void> _clearEew() async {
+    try {
+      final emptyData = {'type': 'FeatureCollection', 'features': []};
+      await controller.setGeoJsonSource(_eewSourceId, emptyData);
+    } catch (e, s) {
+      TalkerManager.instance.error('MonitorMapLayerManager._clearEew', e, s);
     } finally {
       _isUpdatingEew = false;
     }
@@ -1210,24 +1256,11 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               child: SafeArea(
                 child: Align(
                   alignment: Alignment.topCenter,
-                  child: ValueListenableBuilder<int>(
-                    valueListenable: widget.manager.tickNotifier,
-                    builder: (context, tick, child) {
-                      final currentTime = GlobalProviders.data.currentTime;
-                      final lastDataReceivedTime = widget.manager._lastDataReceivedTime;
-                      final isStale = lastDataReceivedTime != null && (currentTime - lastDataReceivedTime) > 3000;
-
-                      String displayTime = 'N/A';
-                      Color textColor = context.colors.onSurface;
-
-                      if (lastDataReceivedTime != null) {
-                        if (isStale) {
-                          displayTime = lastDataReceivedTime.toLocaleDateTimeString(context);
-                          textColor = Colors.red;
-                        } else {
-                          displayTime = currentTime.toLocaleDateTimeString(context);
-                        }
-                      }
+                  child: ValueListenableBuilder<String>(
+                    valueListenable: widget.manager.displayTimeNotifier,
+                    builder: (context, displayTime, child) {
+                      final isStale = displayTime.endsWith('|STALE');
+                      final timeText = isStale ? displayTime.replaceAll('|STALE', '') : displayTime;
 
                       return Container(
                         padding: const EdgeInsets.all(8),
@@ -1237,9 +1270,9 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
-                          displayTime,
+                          timeText,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: textColor, fontSize: 16),
+                          style: TextStyle(color: isStale ? Colors.red : context.colors.onSurface, fontSize: 16),
                         ),
                       );
                     },
