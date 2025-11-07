@@ -686,8 +686,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     }
   }
 
-  /// Updates both RTS sources and layer visibility in a single operation
-  /// This ensures all map changes for the same timestamp happen atomically
   Future<void> _updateRtsDataAndLayers() async {
     if (!didSetup) return;
 
