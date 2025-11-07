@@ -19,7 +19,6 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/models/settings/location.dart';
-import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
@@ -41,6 +40,26 @@ class MonitorMapLayerManager extends MapLayerManager {
   List<LatLng>? _cachedBounds;
   int? _lastRtsTime;
   LatLngBounds? _lastZoomBounds;
+
+  // Cache for EEW updates - only update when changed
+  String? _lastEewDataHash;
+
+  // Cache autoZoom setting to avoid repeated Provider queries
+  bool _autoZoomEnabled = true;
+
+  // Cached layer and source IDs to avoid repeated string calculations
+  late final String _rtsSourceId = MapSourceIds.rts();
+  late final String _rtsLayerId = MapLayerIds.rts();
+  late final String _intensitySourceId = MapSourceIds.intensity();
+  late final String _intensityLayerId = MapLayerIds.intensity();
+  late final String _intensity0SourceId = MapSourceIds.intensity0();
+  late final String _intensity0LayerId = MapLayerIds.intensity0();
+  late final String _boxSourceId = MapSourceIds.box();
+  late final String _boxLayerId = MapLayerIds.box();
+  late final String _eewSourceId = MapSourceIds.eew();
+  late final String _epicenterLayerId = MapLayerIds.eew('x');
+  late final String _pWaveLayerId = MapLayerIds.eew('p');
+  late final String _sWaveLayerId = MapLayerIds.eew('s');
 
   MonitorMapLayerManager(
     super.context,
@@ -106,8 +125,8 @@ class MonitorMapLayerManager extends MapLayerManager {
 
         // Batch blink visibility updates without querying layer IDs every time
         await Future.wait([
-          controller.setLayerVisibility(MapLayerIds.box(), _isBoxVisible),
-          controller.setLayerVisibility(MapLayerIds.eew('x'), _isBoxVisible),
+          controller.setLayerVisibility(_boxLayerId, _isBoxVisible),
+          controller.setLayerVisibility(_epicenterLayerId, _isBoxVisible),
         ]);
       } catch (e, s) {
         TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
@@ -247,13 +266,9 @@ class MonitorMapLayerManager extends MapLayerManager {
   /// If no detection areas exist, resets to the default Taiwan center view.
   /// Uses caching and debouncing to optimize performance.
   Future<void> _autoFocus() async {
-    if (!visible || !context.mounted) return;
+    if (!visible || !context.mounted || !_autoZoomEnabled) return;
 
     try {
-      // Check if auto zoom is enabled
-      final settings = Provider.of<SettingsMapModel>(context, listen: false);
-      if (!settings.autoZoom) return;
-
       final bounds = _getFocusBounds();
       if (bounds.isNotEmpty) {
         await _updateMapBounds(bounds);
@@ -706,11 +721,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (!didSetup) return;
 
     try {
-      final rtsSourceId = MapSourceIds.rts();
-      final intensitySourceId = MapSourceIds.intensity();
-      final intensity0SourceId = MapSourceIds.intensity0();
-      final boxSourceId = MapSourceIds.box();
-
       // Single call to get all source IDs
       final sourceIds = await controller.getSourceIds();
       final existingSources = sourceIds.toSet();
@@ -719,35 +729,34 @@ class MonitorMapLayerManager extends MapLayerManager {
       final updates = <Future<void>>[];
 
       // Update sources
-      if (existingSources.contains(rtsSourceId)) {
-        updates.add(controller.setGeoJsonSource(rtsSourceId, GlobalProviders.data.getRtsGeoJson()));
+      if (existingSources.contains(_rtsSourceId)) {
+        updates.add(controller.setGeoJsonSource(_rtsSourceId, GlobalProviders.data.getRtsGeoJson()));
       }
 
-      if (existingSources.contains(intensitySourceId) || existingSources.contains(intensity0SourceId)) {
+      if (existingSources.contains(_intensitySourceId) || existingSources.contains(_intensity0SourceId)) {
         final intensityData = GlobalProviders.data.getIntensityGeoJson();
-        if (existingSources.contains(intensitySourceId)) {
-          updates.add(controller.setGeoJsonSource(intensitySourceId, intensityData));
+        if (existingSources.contains(_intensitySourceId)) {
+          updates.add(controller.setGeoJsonSource(_intensitySourceId, intensityData));
         }
-        if (existingSources.contains(intensity0SourceId)) {
-          updates.add(controller.setGeoJsonSource(intensity0SourceId, intensityData));
+        if (existingSources.contains(_intensity0SourceId)) {
+          updates.add(controller.setGeoJsonSource(_intensity0SourceId, intensityData));
         }
       }
 
-      if (existingSources.contains(boxSourceId)) {
-        updates.add(controller.setGeoJsonSource(boxSourceId, GlobalProviders.data.getBoxGeoJson()));
+      if (existingSources.contains(_boxSourceId)) {
+        updates.add(controller.setGeoJsonSource(_boxSourceId, GlobalProviders.data.getBoxGeoJson()));
       }
 
       // Update layer visibility if visible
       if (visible) {
         final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
-        final rtsLayerId = MapLayerIds.rts();
 
         updates.addAll([
-          controller.setLayerVisibility(rtsLayerId, !hasBox),
-          controller.setLayerVisibility('$rtsLayerId-label', !hasBox),
-          controller.setLayerVisibility(MapLayerIds.intensity(), hasBox),
-          controller.setLayerVisibility(MapLayerIds.intensity0(), hasBox),
-          controller.setLayerVisibility(MapLayerIds.box(), hasBox),
+          controller.setLayerVisibility(_rtsLayerId, !hasBox),
+          controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
+          controller.setLayerVisibility(_intensityLayerId, hasBox),
+          controller.setLayerVisibility(_intensity0LayerId, hasBox),
+          controller.setLayerVisibility(_boxLayerId, hasBox),
         ]);
       }
 
@@ -766,12 +775,19 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (!didSetup) return;
 
     try {
-      final sourceId = MapSourceIds.eew();
+      final eewData = GlobalProviders.data.eew;
 
+      // Create a simple hash from EEW data to detect changes
+      // Only update if the data actually changed
+      final currentHash = eewData.isEmpty
+          ? ''
+          : '${eewData.length}_${eewData.first.serial}_${eewData.first.info.time}';
+
+      if (currentHash == _lastEewDataHash) return;
+
+      _lastEewDataHash = currentHash;
       final data = GlobalProviders.data.getEewGeoJson();
-
-      // TODO(kamiya4047): needs further optimization
-      await controller.setGeoJsonSource(sourceId, data);
+      await controller.setGeoJsonSource(_eewSourceId, data);
     } catch (e, s) {
       TalkerManager.instance.error('MonitorMapLayerManager._updateEewSource', e, s);
     }
@@ -785,18 +801,16 @@ class MonitorMapLayerManager extends MapLayerManager {
       _blinkTimer?.cancel();
       _blinkTimer = null;
 
-      final rtsLayerId = MapLayerIds.rts();
-
       // Batch hide all layers in parallel
       await Future.wait([
-        controller.setLayerVisibility(rtsLayerId, false),
-        controller.setLayerVisibility('$rtsLayerId-label', false),
-        controller.setLayerVisibility(MapLayerIds.intensity(), false),
-        controller.setLayerVisibility(MapLayerIds.intensity0(), false),
-        controller.setLayerVisibility(MapLayerIds.box(), false),
-        controller.setLayerVisibility(MapLayerIds.eew('x'), false),
-        controller.setLayerVisibility(MapLayerIds.eew('p'), false),
-        controller.setLayerVisibility(MapLayerIds.eew('s'), false),
+        controller.setLayerVisibility(_rtsLayerId, false),
+        controller.setLayerVisibility('$_rtsLayerId-label', false),
+        controller.setLayerVisibility(_intensityLayerId, false),
+        controller.setLayerVisibility(_intensity0LayerId, false),
+        controller.setLayerVisibility(_boxLayerId, false),
+        controller.setLayerVisibility(_epicenterLayerId, false),
+        controller.setLayerVisibility(_pWaveLayerId, false),
+        controller.setLayerVisibility(_sWaveLayerId, false),
       ]);
 
       visible = false;
@@ -814,18 +828,17 @@ class MonitorMapLayerManager extends MapLayerManager {
       _setupBlinkTimer();
 
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
-      final rtsLayerId = MapLayerIds.rts();
 
       // Batch show all layers in parallel, then focus
       await Future.wait([
-        controller.setLayerVisibility(rtsLayerId, !hasBox),
-        controller.setLayerVisibility('$rtsLayerId-label', !hasBox),
-        controller.setLayerVisibility(MapLayerIds.intensity(), hasBox),
-        controller.setLayerVisibility(MapLayerIds.intensity0(), hasBox),
-        controller.setLayerVisibility(MapLayerIds.box(), hasBox),
-        controller.setLayerVisibility(MapLayerIds.eew('x'), true),
-        controller.setLayerVisibility(MapLayerIds.eew('p'), true),
-        controller.setLayerVisibility(MapLayerIds.eew('s'), true),
+        controller.setLayerVisibility(_rtsLayerId, !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
+        controller.setLayerVisibility(_intensityLayerId, hasBox),
+        controller.setLayerVisibility(_intensity0LayerId, hasBox),
+        controller.setLayerVisibility(_boxLayerId, hasBox),
+        controller.setLayerVisibility(_epicenterLayerId, true),
+        controller.setLayerVisibility(_pWaveLayerId, true),
+        controller.setLayerVisibility(_sWaveLayerId, true),
         _focus(),
       ]);
 
