@@ -69,6 +69,7 @@ class _DpipDataModel extends ChangeNotifier {
     if (_eewHash != newHash) {
       _eewHash = newHash;
       _eew = eew;
+      TalkerManager.instance.debug('[setEew] notify: hash=$newHash');
       notifyListeners();
     }
   }
@@ -161,7 +162,6 @@ class _DpipDataModel extends ChangeNotifier {
 }
 
 class DpipDataModel extends _DpipDataModel {
-  static const int _replayTimeWindow = 1000;
   static const int _eewActiveWindow = 4 * 60 * 1000; // 4 minutes in milliseconds
   static const double _rtsCoordinateOffset = 0.00009; // ~5m displacement for privacy
 
@@ -173,24 +173,11 @@ class DpipDataModel extends _DpipDataModel {
   int? _replayStartTime;
   final Random _random = Random();
 
-  int? _cachedCurrentTime;
-  int? _cachedCurrentTimeMillis;
-
   int get currentTime {
     final now = DateTime.now().millisecondsSinceEpoch;
-
-    // Cache currentTime for the same millisecond to avoid recalculation
-    if (_cachedCurrentTimeMillis == now) {
-      return _cachedCurrentTime!;
-    }
-
-    final result = _isReplayMode && _replayTimestamp != null && _replayStartTime != null
+    return _isReplayMode && _replayTimestamp != null && _replayStartTime != null
         ? _replayTimestamp! + (now - _replayStartTime!)
         : now + timeOffset;
-
-    _cachedCurrentTimeMillis = now;
-    _cachedCurrentTime = result;
-    return result;
   }
 
   UnmodifiableListView<Eew> get activeEew {
@@ -198,20 +185,8 @@ class DpipDataModel extends _DpipDataModel {
     return UnmodifiableListView(_eew.where((eew) => eew.info.time >= cutoffTime).toList());
   }
 
-  /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
-  ///
-  /// In replay mode, filters out RTS data that is more than 1 second ahead
-  /// of the current replay timestamp to maintain temporal consistency and
-  /// prevent displaying future data during replay.
-  ///
-  /// @param rts The new RTS data to set
   void setRts(Rts rts) {
     final incoming = rts.time;
-
-    if (_isReplayMode && _replayTimestamp != null && incoming > _replayTimestamp! + _replayTimeWindow) {
-      return;
-    }
-
     if (incoming > _rtsTime) {
       _rtsTime = incoming;
       _rts = rts;
@@ -244,8 +219,8 @@ class DpipDataModel extends _DpipDataModel {
       try {
         final data = _isReplayMode
             ? await Future.wait([
-                ExpTech().getRts(_replayTimestamp),
-                ExpTech().getEew(_replayTimestamp),
+                ExpTech().getRts(currentTime),
+                ExpTech().getEew(currentTime),
               ])
             : await Future.wait([
                 ExpTech().getRts(),
@@ -253,12 +228,9 @@ class DpipDataModel extends _DpipDataModel {
               ]);
 
         final [rts as Rts, eew as List<Eew>] = data;
+
         setRts(rts);
         setEew(eew);
-
-        if (_isReplayMode && _replayTimestamp != null) {
-          _replayTimestamp = _replayTimestamp! + 1000;
-        }
       } catch (e, s) {
         TalkerManager.instance.error('everySecondCallback', e, s);
       }
@@ -369,8 +341,6 @@ class DpipDataModel extends _DpipDataModel {
     for (final e in eew) {
       final radius = calcWaveRadius(e.info.depth, e.info.time, now);
       final center = e.info.latlng;
-
-      print('radius: ${radius.p}, ${radius.s},${e.info.depth},${e.info.time},${now},${now - e.info.time}');
 
       if (radius.p > 0) {
         builder.addFeature(circleFeature(center: center, radius: radius.p)..setProperty('type', 'p'));

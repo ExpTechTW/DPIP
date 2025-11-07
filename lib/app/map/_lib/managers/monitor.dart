@@ -68,7 +68,7 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
     super.context,
     super.controller, {
-    this.isReplayMode = true,
+    this.isReplayMode = false,
     this.replayTimestamp = 1761222495000,
   }) {
     GlobalProviders.data.setReplayMode(isReplayMode, replayTimestamp);
@@ -76,6 +76,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   }
 
   final currentRtsTime = ValueNotifier<int?>(GlobalProviders.data.rts?.time);
+  final tickNotifier = ValueNotifier<int>(0);
+  int? _lastDataReceivedTime;
 
   static final kRtsCircleColor = [
     Expressions.interpolate,
@@ -661,7 +663,6 @@ class MonitorMapLayerManager extends MapLayerManager {
   void tick() {
     if (!didSetup || !visible) return;
 
-    // Only start new EEW update if previous one completed
     if (!_isUpdatingEew) {
       _isUpdatingEew = true;
       unawaited(_updateEewFromCache());
@@ -671,19 +672,20 @@ class MonitorMapLayerManager extends MapLayerManager {
       unawaited(_updateRtsFromCache());
       _needsRtsUpdate = false;
     }
+
+    tickNotifier.value++;
   }
 
   void _onDataChanged() {
     final newRts = GlobalProviders.data.rts;
     final newRtsTime = newRts?.time;
 
-    // Update RTS cache when data changes
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
       _cachedBounds = null;
       _lastRtsTime = null;
+      _lastDataReceivedTime = GlobalProviders.data.currentTime;
 
-      // Prepare RTS data cache
       _cachedRtsGeoJson = GlobalProviders.data.getRtsGeoJson();
       _cachedIntensityGeoJson = GlobalProviders.data.getIntensityGeoJson();
       _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
@@ -691,8 +693,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     }
   }
 
-  /// Render RTS data from cache to map
-  /// Called by tick() only when RTS data has changed
   Future<void> _updateRtsFromCache() async {
     if (!didSetup || _cachedRtsGeoJson == null) return;
 
@@ -1210,13 +1210,25 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               child: SafeArea(
                 child: Align(
                   alignment: Alignment.topCenter,
-                  child: ValueListenableBuilder<int?>(
-                    valueListenable: widget.manager.currentRtsTime,
-                    builder: (context, currentTimeMillis, child) {
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: widget.manager.tickNotifier,
+                    builder: (context, tick, child) {
+                      final currentTime = GlobalProviders.data.currentTime;
+                      final lastDataReceivedTime = widget.manager._lastDataReceivedTime;
+                      final isStale = lastDataReceivedTime != null && (currentTime - lastDataReceivedTime) > 3000;
+
                       String displayTime = 'N/A';
-                      if (currentTimeMillis != null && currentTimeMillis > 0) {
-                        displayTime = currentTimeMillis.toLocaleDateTimeString(context);
+                      Color textColor = context.colors.onSurface;
+
+                      if (lastDataReceivedTime != null) {
+                        if (isStale) {
+                          displayTime = lastDataReceivedTime.toLocaleDateTimeString(context);
+                          textColor = Colors.red;
+                        } else {
+                          displayTime = currentTime.toLocaleDateTimeString(context);
+                        }
                       }
+
                       return Container(
                         padding: const EdgeInsets.all(8),
                         width: 230,
@@ -1227,7 +1239,7 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
                         child: Text(
                           displayTime,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: context.colors.onSurface, fontSize: 16),
+                          style: TextStyle(color: textColor, fontSize: 16),
                         ),
                       );
                     },
