@@ -57,9 +57,6 @@ class _DpipDataModel extends ChangeNotifier {
     ), */
   ];
 
-  /// Returns only EEWs from the CWA (Central Weather Administration) agency.
-  /// This replaces the previous all-source eew.
-  /// Results are cached until the underlying EEW list changes.
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
 
   int _eewHash = 0;
