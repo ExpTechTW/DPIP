@@ -31,45 +31,37 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+        cache: 'gradle'
+
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
 
-    - name: Cache Pub Packages
-      uses: actions/cache@v3
+    - name: Cache Android NDK
+      uses: actions/cache@v4
       with:
-        path: ~/.pub-cache
-        key: ubuntu-pub-${{ hashFiles('**/pubspec.lock') }}
-        restore-keys: ubuntu-pub-
+        path: /usr/local/lib/android/sdk/ndk
+        key: ${{ runner.os }}-ndk-28.1.13356709
 
-    - name: Cache build_runner (Optional)
-      uses: actions/cache@v3
+    - name: Install dependencies and run build_runner
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
+
+    - name: Build APK
+      run: flutter build apk --debug --target-platform android-arm64
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
       with:
-        path: .dart_tool/build
-        key: ubuntu-build-runner-${{ hashFiles('lib/api/model/**/*.dart') }}
-        restore-keys: ubuntu-build-runner-
-
-    - name: Cache Gradle
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.gradle/caches/modules-2
-          ~/.gradle/wrapper
-        key: ubuntu-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: ubuntu-gradle-
-
-    - name: Install dependencies
-      run: flutter pub get
-
-    - name: Prebuild with build_runner
-      run: dart run build_runner build
-
-    - name: Build apk
-      run: flutter build apk --debug
-
-    - name: Upload (apk) Artifacts
-      uses: actions/upload-artifact@main
-      with:
-        name: "DPIP.apk"
+        name: DPIP-Android
         path: build/app/outputs/flutter-apk/*.apk
+        retention-days: 7
+        compression-level: 6

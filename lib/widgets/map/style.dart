@@ -24,9 +24,9 @@ class MapStyle {
       'zoom': DpipMap.adjustedZoom(context, DpipMap.kTaiwanZoom),
       'font-faces': {
         'Noto Sans TC Regular':
-            'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk/blob/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Regular.otf',
+            'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Regular.otf',
         'Noto Sans TC Bold':
-            'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk/blob/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Bold.otf',
+            'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Bold.otf',
       },
       'glyphs': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/{fontstack}/{range}.pbf',
       'sprite': 'https://cdn.jsdelivr.net/gh/exptechtw/map-assets/sprites',

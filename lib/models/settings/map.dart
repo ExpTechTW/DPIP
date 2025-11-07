@@ -15,6 +15,7 @@ class SettingsMapModel extends ChangeNotifier {
   final layersNotifier = ValueNotifier(
     Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor},
   );
+  final autoZoomNotifier = ValueNotifier(Preference.mapAutoZoom ?? false);
 
   int get updateInterval => updateIntervalNotifier.value;
   void setUpdateInterval(int value) {
@@ -41,6 +42,14 @@ class SettingsMapModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get autoZoom => autoZoomNotifier.value;
+  void setAutoZoom(bool value) {
+    Preference.mapAutoZoom = value;
+    autoZoomNotifier.value = value;
+    _log('Changed ${PreferenceKeys.mapAutoZoom} to $value');
+    notifyListeners();
+  }
+
   /// Refreshes the map settings from preferences.
   ///
   /// Updates the [updateInterval], [baseMap], and [layers] properties to reflect the current preferences.
@@ -51,5 +60,6 @@ class SettingsMapModel extends ChangeNotifier {
     baseMapNotifier.value = BaseMapType.values.asNameMap()[Preference.mapBase] ?? BaseMapType.exptech;
     layersNotifier.value =
         Preference.mapLayers?.split(',').map((v) => MapLayer.values.byName(v)).toSet() ?? {MapLayer.monitor};
+    autoZoomNotifier.value = Preference.mapAutoZoom ?? false;
   }
 }
