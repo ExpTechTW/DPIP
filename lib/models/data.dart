@@ -66,8 +66,6 @@ class _DpipDataModel extends ChangeNotifier {
     return UnmodifiableListView(cache);
   }
 
-  UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
-
   int _eewHash = 0;
 
   void setEew(List<Eew> eew) {
@@ -190,11 +188,9 @@ class DpipDataModel extends _DpipDataModel {
         : now + timeOffset;
   }
 
-  /// Returns only active EEWs (within 3 minutes of current app time)
   UnmodifiableListView<Eew> get activeEew {
-    final threeMinutesAgo = currentTime - (3 * 60 * 1000);
-
-    return UnmodifiableListView(eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
+    final cutoffTime = currentTime - _eewActiveWindow;
+    return UnmodifiableListView(eew.where((eew) => eew.info.time >= cutoffTime).toList());
   }
 
   void setRts(Rts rts) {
