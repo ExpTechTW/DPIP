@@ -34,59 +34,41 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
         cache: true
 
-    - name: Cache Pub Packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.pub-cache
-        key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-        restore-keys: ${{ runner.os }}-pub-
-
-    - name: Cache build_runner (Optional)
-      uses: actions/cache@v3
-      with:
-        path: .dart_tool/build
-        key: ${{ runner.os }}-build-runner-${{ hashFiles('lib/api/model/**/*.dart') }}
-        restore-keys: ${{ runner.os }}-build-runner-
-
-    - name: Cache CocoaPods Pods
-      uses: actions/cache@v3
+    - name: Cache CocoaPods
+      uses: actions/cache@v4
       with:
         path: |
-            ios/Pods
-            ~/Library/Caches/CocoaPods
-            ~/Library/Developer/Xcode/DerivedData
+          ios/Pods
+          ~/Library/Caches/CocoaPods
         key: ${{ runner.os }}-pods-${{ hashFiles('ios/Podfile.lock') }}
-        restore-keys: ${{ runner.os }}-pods-
+        restore-keys: |
+          ${{ runner.os }}-pods-
 
-    - name: Install dependencies
-      run: flutter pub get
+    - name: Install dependencies and run build_runner
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
 
     - name: Install iOS Pods
-      run: |
-        cd ios
-        pod install
+      working-directory: ios
+      run: pod install --repo-update
 
-    - name: Prebuild with build_runner
-      run: dart run build_runner build
-
-    - name: Build iOS App and IPA
+    - name: Build iOS App and create IPA
       run: |
         flutter build ios --debug --no-codesign
         mkdir -p Payload
         cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
-        zip -r DPIP.ipa Payload
+        zip -qr DPIP.ipa Payload
 
-    - name: Upload (app) Artifacts
-      uses: actions/upload-artifact@main
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: DPIP.app
-        path: build/ios/iphoneos/Runner.app
-
-    - name: Upload (ipa) Artifacts
-      uses: actions/upload-artifact@main
-      with:
-        name: DPIP.ipa
-        path: DPIP.ipa
+        name: DPIP-iOS
+        path: |
+          build/ios/iphoneos/Runner.app
+          DPIP.ipa
+        retention-days: 7
+        compression-level: 6
