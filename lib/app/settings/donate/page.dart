@@ -72,7 +72,7 @@ class _SettingsDonatePageState extends State<SettingsDonatePage> {
   }
 
   void onPurchaseUpdate(List<PurchaseDetails> purchaseDetailsList) {
-    bool hasAnyPending = purchaseDetailsList.any((detail) => detail.status == PurchaseStatus.pending);
+    final bool hasAnyPending = purchaseDetailsList.any((detail) => detail.status == PurchaseStatus.pending);
 
     if (mounted) {
       setState(() {

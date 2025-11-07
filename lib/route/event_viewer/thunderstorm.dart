@@ -58,6 +58,8 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
   }
 
   Future<void> _loadMap() async {
+    final outlineColor = context.colors.outline.toHexStringRGB();
+
     radarList = await ExpTech().getRadarList();
 
     final String newTileUrl = Routes.radarTile(radarList.last);
@@ -76,7 +78,7 @@ class _ThunderstormPageState extends State<ThunderstormPage> {
     await _mapController.addLayer(
       'exptech',
       'town-outline-default',
-      LineLayerProperties(lineColor: context.colors.outline.toHexStringRGB(), lineWidth: 1),
+      LineLayerProperties(lineColor: outlineColor, lineWidth: 1),
       sourceLayer: 'town',
       belowLayerId: BaseMapLayerIds.userLocation,
     );
