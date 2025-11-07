@@ -96,14 +96,14 @@ class LightningMapLayerManager extends MapLayerManager {
           GlobalProviders.data.setLightningData(time, lightningData);
         }
 
-        // final currentTime = int.parse(time);
-        // final features = lightningData.map((data) => data.toFeatureBuilder(currentTime)).toList();
+        final currentTime = int.parse(time);
+        final features = lightningData.map((data) => data.toFeatureBuilder(currentTime)).toList();
 
-        // final data = GeoJsonBuilder().setFeatures(features).build();
+        final data = GeoJsonBuilder().setFeatures(features).build();
 
-        // final properties = GeojsonSourceProperties(data: data);
+        final properties = GeojsonSourceProperties(data: data);
 
-        // await controller.addSource(sourceId, properties);
+        await controller.addSource(sourceId, properties);
 
         if (!context.mounted) return;
       }
@@ -138,6 +138,7 @@ class LightningMapLayerManager extends MapLayerManager {
             'lightning-0-30',
             '0-60',
             'lightning-0-60',
+            '',
           ],
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
