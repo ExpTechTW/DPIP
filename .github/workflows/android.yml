@@ -50,6 +50,19 @@ jobs:
         path: /usr/local/lib/android/sdk/ndk
         key: ${{ runner.os }}-ndk-28.1.13356709
 
+    - name: Cache Android sdk
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-Android-sdk
+      with:
+        path: |
+          /usr/local/lib/android/sdk/platforms/android-31
+          /usr/local/lib/android/sdk/platforms/android-33
+        key: ${{ runner.os }}-android-platforms-${{ env.cache-name }}-${{ hashFiles('android/gradle.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+
     - name: Install dependencies and run build_runner
       run: |
         flutter pub get
