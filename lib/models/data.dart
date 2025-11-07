@@ -59,9 +59,18 @@ class _DpipDataModel extends ChangeNotifier {
 
   UnmodifiableListView<Eew> get eew => UnmodifiableListView(_eew);
 
+  int _eewHash = 0;
+
   void setEew(List<Eew> eew) {
-    _eew = eew;
-    notifyListeners();
+    // Calculate hash from EEW id and serial
+    final newHash = Object.hashAll(eew.map((e) => Object.hash(e.id, e.serial)));
+
+    // Only notify if EEW data actually changed
+    if (_eewHash != newHash) {
+      _eewHash = newHash;
+      _eew = eew;
+      notifyListeners();
+    }
   }
 
   List<PartialEarthquakeReport> _partialReport = [];
@@ -153,21 +162,40 @@ class _DpipDataModel extends ChangeNotifier {
 
 class DpipDataModel extends _DpipDataModel {
   static const int _replayTimeWindow = 1000;
+  static const int _eewActiveWindow = 4 * 60 * 1000; // 4 minutes in milliseconds
+  static const double _rtsCoordinateOffset = 0.00009; // ~5m displacement for privacy
+
   Timer? _secondTimer;
   Timer? _minuteTimer;
   bool _isInForeground = true;
   bool _isReplayMode = false;
   int? _replayTimestamp;
+  int? _replayStartTime;
+  final Random _random = Random();
 
-  int get currentTime => _isReplayMode
-      ? (_replayTimestamp ?? DateTime.now().millisecondsSinceEpoch)
-      : DateTime.now().millisecondsSinceEpoch + timeOffset;
+  int? _cachedCurrentTime;
+  int? _cachedCurrentTimeMillis;
 
-  /// Returns only active EEWs (within 3 minutes of current app time)
+  int get currentTime {
+    final now = DateTime.now().millisecondsSinceEpoch;
+
+    // Cache currentTime for the same millisecond to avoid recalculation
+    if (_cachedCurrentTimeMillis == now) {
+      return _cachedCurrentTime!;
+    }
+
+    final result = _isReplayMode && _replayTimestamp != null && _replayStartTime != null
+        ? _replayTimestamp! + (now - _replayStartTime!)
+        : now + timeOffset;
+
+    _cachedCurrentTimeMillis = now;
+    _cachedCurrentTime = result;
+    return result;
+  }
+
   UnmodifiableListView<Eew> get activeEew {
-    final threeMinutesAgo = currentTime - (3 * 60 * 1000);
-
-    return UnmodifiableListView(_eew.where((eew) => eew.info.time >= threeMinutesAgo).toList());
+    final cutoffTime = currentTime - _eewActiveWindow;
+    return UnmodifiableListView(_eew.where((eew) => eew.info.time >= cutoffTime).toList());
   }
 
   /// Sets the RTS (Real-Time Shaking) data if it's newer than the current data.
@@ -198,9 +226,11 @@ class DpipDataModel extends _DpipDataModel {
         throw ArgumentError('Timestamp must be provided in replay mode');
       }
       _replayTimestamp = timestamp;
+      _replayStartTime = DateTime.now().millisecondsSinceEpoch;
       _rtsTime = timestamp - 1;
     } else {
       _replayTimestamp = null;
+      _replayStartTime = null;
       _rtsTime = 0;
     }
   }
@@ -213,28 +243,14 @@ class DpipDataModel extends _DpipDataModel {
 
       try {
         final data = _isReplayMode
-            ? await Future.wait(
-                [ExpTech().getRts(_replayTimestamp), ExpTech().getEew(_replayTimestamp)],
-                cleanUp: (successValue) {
-                  switch (successValue) {
-                    case Rts():
-                      setRts(successValue);
-                    case List<Eew>():
-                      setEew(successValue);
-                  }
-                },
-              )
-            : await Future.wait(
-                [ExpTech().getRts(), ExpTech().getEew()],
-                cleanUp: (successValue) {
-                  switch (successValue) {
-                    case Rts():
-                      setRts(successValue);
-                    case List<Eew>():
-                      setEew(successValue);
-                  }
-                },
-              );
+            ? await Future.wait([
+                ExpTech().getRts(_replayTimestamp),
+                ExpTech().getEew(_replayTimestamp),
+              ])
+            : await Future.wait([
+                ExpTech().getRts(),
+                ExpTech().getEew(),
+              ]);
 
         final [rts as Rts, eew as List<Eew>] = data;
         setRts(rts);
@@ -305,15 +321,12 @@ class DpipDataModel extends _DpipDataModel {
     final builder = GeoJsonBuilder();
 
     for (final MapEntry(key: id, value: s) in station.entries) {
-      if (s.work == false) continue;
+      if (!s.work) continue;
 
-      final coordinates = s.info.last.latlng.asGeoJsonCooridnate;
-
-      // Create displaced coordinates with ~5 meter random offset
-      final random = Random();
-      final offsetLng = (random.nextDouble() - 0.5) * 0.00009; // ~5m longitude offset
-      final offsetLat = (random.nextDouble() - 0.5) * 0.00009; // ~5m latitude offset
-      final displacedCoordinates = [coordinates[0] + offsetLng, coordinates[1] + offsetLat];
+      final baseCoordinates = s.info.last.latlng.asGeoJsonCooridnate;
+      final offsetLng = (_random.nextDouble() - 0.5) * _rtsCoordinateOffset;
+      final offsetLat = (_random.nextDouble() - 0.5) * _rtsCoordinateOffset;
+      final displacedCoordinates = [baseCoordinates[0] + offsetLng, baseCoordinates[1] + offsetLat];
 
       final feature = GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
         ..setGeometry(displacedCoordinates)
@@ -324,7 +337,6 @@ class DpipDataModel extends _DpipDataModel {
 
       if (rts != null) {
         final data = rts.station[id];
-
         if (data != null) {
           feature
             ..setProperty('i', data.i)
@@ -349,26 +361,30 @@ class DpipDataModel extends _DpipDataModel {
 
   Map<String, dynamic> getEewGeoJson() {
     final eew = activeEew;
+    if (eew.isEmpty) return GeoJsonBuilder().build();
+
     final builder = GeoJsonBuilder();
+    final now = currentTime;
 
     for (final e in eew) {
-      final radius = calcWaveRadius(e.info.depth, e.info.time, currentTime);
+      final radius = calcWaveRadius(e.info.depth, e.info.time, now);
+      final center = e.info.latlng;
+
+      print('radius: ${radius.p}, ${radius.s},${e.info.depth},${e.info.time},${now},${now - e.info.time}');
 
       if (radius.p > 0) {
-        final pWave = circleFeature(center: e.info.latlng, radius: radius.p)..setProperty('type', 'p');
-        builder.addFeature(pWave);
+        builder.addFeature(circleFeature(center: center, radius: radius.p)..setProperty('type', 'p'));
       }
 
       if (radius.s > 0) {
-        final sWave = circleFeature(center: e.info.latlng, radius: radius.s)..setProperty('type', 's');
-        builder.addFeature(sWave);
+        builder.addFeature(circleFeature(center: center, radius: radius.s)..setProperty('type', 's'));
       }
 
-      final epicenter = GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
-        ..setGeometry(e.info.latlng.asGeoJsonCooridnate)
-        ..setProperty('type', 'x');
-
-      builder.addFeature(epicenter);
+      builder.addFeature(
+        GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
+          ..setGeometry(center.asGeoJsonCooridnate)
+          ..setProperty('type', 'x'),
+      );
     }
 
     return builder.build();
@@ -379,7 +395,8 @@ class DpipDataModel extends _DpipDataModel {
     final builder = GeoJsonBuilder();
 
     for (final MapEntry(key: id, value: s) in station.entries) {
-      if (s.work == false) continue;
+      if (!s.work) continue;
+
       final feature = GeoJsonFeatureBuilder(GeoJsonFeatureType.Point)
         ..setGeometry(s.info.last.latlng.asGeoJsonCooridnate)
         ..setId(int.parse(id))
@@ -388,10 +405,11 @@ class DpipDataModel extends _DpipDataModel {
 
       if (rts != null) {
         final data = rts.station[id];
-
         if (data != null) {
-          feature.setProperty('intensity', intensityFloatToInt(data.alert! ? data.I : data.i));
-          feature.setProperty('alert', data.alert! ? 1 : 0);
+          final isAlert = data.alert ?? false;
+          feature
+            ..setProperty('intensity', intensityFloatToInt(isAlert ? data.I : data.i))
+            ..setProperty('alert', isAlert ? 1 : 0);
         }
       }
 
@@ -403,34 +421,37 @@ class DpipDataModel extends _DpipDataModel {
 
   Map<String, dynamic> getBoxGeoJson() {
     final rts = this.rts;
+    if (rts == null || rts.box.isEmpty) return GeoJsonBuilder().build();
+
     final builder = GeoJsonBuilder();
+    final now = currentTime;
+    final activeEew = eew;
 
-    if (rts != null && rts.box.isNotEmpty) {
-      for (final area in Global.boxGeojson.features) {
-        if (area == null) continue;
+    // Precompute EEW data if needed
+    Map<String, Eew>? eewMap;
+    Map<String, double>? eewDistMap;
+    if (activeEew.isNotEmpty) {
+      eewMap = {for (final e in activeEew) e.id: e};
+      eewDistMap = {for (final e in activeEew) e.id: calcWaveRadius(e.info.depth, e.info.time, now).s * 1000};
+    }
 
-        final id = area.properties!['ID'].toString();
-        if (!rts.box.containsKey(id)) continue;
+    for (final area in Global.boxGeojson.features) {
+      if (area == null) continue;
 
-        final geometry = area.geometry! as GeoJSONPolygon;
+      final id = area.properties!['ID'].toString();
+      if (!rts.box.containsKey(id)) continue;
 
-        final coordinates = geometry.coordinates[0];
+      final coordinates = (area.geometry! as GeoJSONPolygon).coordinates[0];
 
-        if (eew.isNotEmpty == true) {
-          final eewMap = {for (final e in eew) e.id: e};
-          final eewDistMap = {
-            for (final e in eew) e.id: calcWaveRadius(e.info.depth, e.info.time, currentTime).s * 1000,
-          };
-
-          if (checkBoxSkip(eewMap, eewDistMap, coordinates)) continue;
-        }
-
-        final feature = GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon)
-          ..setGeometry(coordinates)
-          ..setProperty('i', rts.box[id]);
-
-        builder.addFeature(feature);
+      if (eewMap != null && eewDistMap != null && checkBoxSkip(eewMap, eewDistMap, coordinates)) {
+        continue;
       }
+
+      builder.addFeature(
+        GeoJsonFeatureBuilder(GeoJsonFeatureType.Polygon)
+          ..setGeometry(coordinates)
+          ..setProperty('i', rts.box[id]),
+      );
     }
 
     return builder.build();

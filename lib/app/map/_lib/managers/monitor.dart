@@ -19,6 +19,7 @@ import 'package:dpip/core/i18n.dart';
 import 'package:dpip/core/providers.dart';
 import 'package:dpip/models/data.dart';
 import 'package:dpip/models/settings/location.dart';
+import 'package:dpip/models/settings/map.dart';
 import 'package:dpip/utils/constants.dart';
 import 'package:dpip/utils/extensions/build_context.dart';
 import 'package:dpip/utils/extensions/int.dart';
@@ -41,11 +42,14 @@ class MonitorMapLayerManager extends MapLayerManager {
   int? _lastRtsTime;
   LatLngBounds? _lastZoomBounds;
 
-  // Cache for EEW updates - only update when changed
-  String? _lastEewDataHash;
+  // Cached GeoJSON data - updated by _onDataChanged, consumed by tick
+  Map<String, dynamic>? _cachedRtsGeoJson;
+  Map<String, dynamic>? _cachedIntensityGeoJson;
+  Map<String, dynamic>? _cachedBoxGeoJson;
+  bool _needsRtsUpdate = false;
 
-  // Cache autoZoom setting to avoid repeated Provider queries
-  final bool _autoZoomEnabled = true;
+  // Track if EEW update is in progress to avoid queuing too many updates
+  bool _isUpdatingEew = false;
 
   // Cached layer and source IDs to avoid repeated string calculations
   late final String _rtsSourceId = MapSourceIds.rts();
@@ -64,14 +68,10 @@ class MonitorMapLayerManager extends MapLayerManager {
   MonitorMapLayerManager(
     super.context,
     super.controller, {
-    this.isReplayMode = false,
-    this.replayTimestamp = 0, //1761222483000,
+    this.isReplayMode = true,
+    this.replayTimestamp = 1761222495000,
   }) {
-    if (isReplayMode) {
-      GlobalProviders.data.setReplayMode(true, replayTimestamp);
-    } else {
-      GlobalProviders.data.setReplayMode(false);
-    }
+    GlobalProviders.data.setReplayMode(isReplayMode, replayTimestamp);
     _setupBlinkTimer();
   }
 
@@ -132,14 +132,6 @@ class MonitorMapLayerManager extends MapLayerManager {
         TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
       }
     });
-  }
-
-  Future<void> _focus() async {
-    try {
-      await controller.animateCamera(CameraUpdate.newLatLngZoom(DpipMap.kTaiwanCenter, 6.4));
-    } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._focus', e, s);
-    }
   }
 
   /// Extracts all coordinates from detection areas (GeoJSON polygons) that are present
@@ -234,7 +226,8 @@ class MonitorMapLayerManager extends MapLayerManager {
   /// If no detection areas exist, resets to the default Taiwan center view.
   /// Uses caching and debouncing to optimize performance.
   Future<void> _autoFocus() async {
-    if (!visible || !context.mounted || !_autoZoomEnabled) return;
+    final autoZoomEnabled = context.read<SettingsMapModel>().autoZoom;
+    if (!visible || !context.mounted || !autoZoomEnabled) return;
 
     try {
       final bounds = _getFocusBounds();
@@ -666,76 +659,81 @@ class MonitorMapLayerManager extends MapLayerManager {
 
   @override
   void tick() {
-    if (!didSetup) return;
+    if (!didSetup || !visible) return;
 
-    _updateEewSource();
+    // Only start new EEW update if previous one completed
+    if (!_isUpdatingEew) {
+      _isUpdatingEew = true;
+      unawaited(_updateEewFromCache());
+    }
+
+    if (_needsRtsUpdate) {
+      unawaited(_updateRtsFromCache());
+      _needsRtsUpdate = false;
+    }
   }
 
   void _onDataChanged() {
     final newRts = GlobalProviders.data.rts;
     final newRtsTime = newRts?.time;
 
+    // Update RTS cache when data changes
     if (newRtsTime != currentRtsTime.value) {
       currentRtsTime.value = newRtsTime;
-      // Invalidate cached bounds when RTS data changes
       _cachedBounds = null;
       _lastRtsTime = null;
 
-      // Batch all map updates together for the same timestamp
-      _updateRtsDataAndLayers();
+      // Prepare RTS data cache
+      _cachedRtsGeoJson = GlobalProviders.data.getRtsGeoJson();
+      _cachedIntensityGeoJson = GlobalProviders.data.getIntensityGeoJson();
+      _cachedBoxGeoJson = GlobalProviders.data.getBoxGeoJson();
+      _needsRtsUpdate = true;
     }
   }
 
-  Future<void> _updateRtsDataAndLayers() async {
-    if (!didSetup) return;
+  /// Render RTS data from cache to map
+  /// Called by tick() only when RTS data has changed
+  Future<void> _updateRtsFromCache() async {
+    if (!didSetup || _cachedRtsGeoJson == null) return;
 
     try {
       final existingSources = (await controller.getSourceIds()).toSet();
-      final intensityData = GlobalProviders.data.getIntensityGeoJson();
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
 
       await Future.wait([
-        // Update sources
-        if (existingSources.contains(_rtsSourceId))
-          controller.setGeoJsonSource(_rtsSourceId, GlobalProviders.data.getRtsGeoJson()),
+        // Update sources from cache
+        if (existingSources.contains(_rtsSourceId)) controller.setGeoJsonSource(_rtsSourceId, _cachedRtsGeoJson!),
         if (existingSources.contains(_intensitySourceId))
-          controller.setGeoJsonSource(_intensitySourceId, intensityData),
+          controller.setGeoJsonSource(_intensitySourceId, _cachedIntensityGeoJson!),
         if (existingSources.contains(_intensity0SourceId))
-          controller.setGeoJsonSource(_intensity0SourceId, intensityData),
-        if (existingSources.contains(_boxSourceId))
-          controller.setGeoJsonSource(_boxSourceId, GlobalProviders.data.getBoxGeoJson()),
+          controller.setGeoJsonSource(_intensity0SourceId, _cachedIntensityGeoJson!),
+        if (existingSources.contains(_boxSourceId)) controller.setGeoJsonSource(_boxSourceId, _cachedBoxGeoJson!),
 
-        // Update layer visibility if visible
-        if (visible) ...[
-          controller.setLayerVisibility(_rtsLayerId, !hasBox),
-          controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
-          controller.setLayerVisibility(_intensityLayerId, hasBox),
-          controller.setLayerVisibility(_intensity0LayerId, hasBox),
-          controller.setLayerVisibility(_boxLayerId, hasBox),
-        ],
+        // Update layer visibility
+        controller.setLayerVisibility(_rtsLayerId, !hasBox),
+        controller.setLayerVisibility('$_rtsLayerId-label', !hasBox),
+        controller.setLayerVisibility(_intensityLayerId, hasBox),
+        controller.setLayerVisibility(_intensity0LayerId, hasBox),
+        controller.setLayerVisibility(_boxLayerId, hasBox),
       ]);
-
-      TalkerManager.instance.info('Updated RTS data and layers for time: ${currentRtsTime.value}');
     } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._updateRtsDataAndLayers', e, s);
+      TalkerManager.instance.error('MonitorMapLayerManager._updateRtsFromCache', e, s);
     }
   }
 
-  Future<void> _updateEewSource() async {
-    if (!didSetup) return;
+  Future<void> _updateEewFromCache() async {
+    if (!didSetup) {
+      _isUpdatingEew = false;
+      return;
+    }
 
     try {
-      final eewData = GlobalProviders.data.eew;
-
-      final currentHash = eewData.isEmpty ? '' : '${eewData.length}_${eewData.first.serial}_${eewData.first.info.time}';
-
-      if (currentHash == _lastEewDataHash) return;
-
-      _lastEewDataHash = currentHash;
       final data = GlobalProviders.data.getEewGeoJson();
       await controller.setGeoJsonSource(_eewSourceId, data);
     } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._updateEewSource', e, s);
+      TalkerManager.instance.error('MonitorMapLayerManager._updateEewFromCache', e, s);
+    } finally {
+      _isUpdatingEew = false;
     }
   }
 
@@ -786,7 +784,7 @@ class MonitorMapLayerManager extends MapLayerManager {
           for (final layer in [_epicenterLayerId, _pWaveLayerId, _sWaveLayerId])
             controller.setLayerVisibility(layer, true),
         ],
-        _focus(),
+        _focusReset(),
       ]);
 
       visible = true;
