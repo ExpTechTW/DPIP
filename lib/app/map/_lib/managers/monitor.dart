@@ -99,19 +99,16 @@ class MonitorMapLayerManager extends MapLayerManager {
   void _setupBlinkTimer() {
     _blinkTimer?.cancel();
     _blinkTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (!didSetup) return;
+
       try {
-        final boxLayerId = MapLayerIds.box();
-        final epicenterLayerId = MapLayerIds.eew('x');
-
-        final layers = await controller.getLayerIds();
-        if (layers.contains(boxLayerId)) {
-          await controller.setLayerVisibility(boxLayerId, _isBoxVisible);
-        }
-        if (layers.contains(epicenterLayerId)) {
-          await controller.setLayerVisibility(epicenterLayerId, _isBoxVisible);
-        }
-
         _isBoxVisible = !_isBoxVisible;
+
+        // Batch blink visibility updates without querying layer IDs every time
+        await Future.wait([
+          controller.setLayerVisibility(MapLayerIds.box(), _isBoxVisible),
+          controller.setLayerVisibility(MapLayerIds.eew('x'), _isBoxVisible),
+        ]);
       } catch (e, s) {
         TalkerManager.instance.error('MonitorMapLayerManager._blinkTimer', e, s);
       }
@@ -138,38 +135,32 @@ class MonitorMapLayerManager extends MapLayerManager {
       return _cachedBounds!;
     }
 
+    final coords = <LatLng>[];
     if (rts != null && rts.box.isNotEmpty) {
-      // Intensity mode: collect coordinates from box areas
-      final coords = <LatLng>[];
+      // Pre-allocate list capacity to avoid dynamic resizing
+      final boxKeys = rts.box.keys.toSet();
+
       for (final area in Global.boxGeojson.features) {
         if (area == null) continue;
 
         final id = area.properties!['ID'].toString();
-        if (!rts.box.containsKey(id)) continue;
+        if (!boxKeys.contains(id)) continue;
 
         final geometry = area.geometry! as GeoJSONPolygon;
         final coordinates = geometry.coordinates[0] as List;
 
-        for (final coord in coordinates) {
-          if (coord is List && coord.length >= 2) {
-            final lng = coord[0] as num;
-            final lat = coord[1] as num;
-            coords.add(LatLng(lat.toDouble(), lng.toDouble()));
-          }
+        // Direct iteration without type checking in loop
+        for (var i = 0; i < coordinates.length; i++) {
+          final coord = coordinates[i] as List;
+          coords.add(LatLng((coord[1] as num).toDouble(), (coord[0] as num).toDouble()));
         }
-      }
-      if (coords.isNotEmpty) {
-        // Cache the result
-        _cachedBounds = coords;
-        _lastRtsTime = currentTime;
-        return coords;
       }
     }
 
-    // Cache empty result
-    _cachedBounds = [];
+    // Cache the result
+    _cachedBounds = coords;
     _lastRtsTime = currentTime;
-    return [];
+    return coords;
   }
 
   /// Checks if the new bounds have changed significantly from the last zoom bounds
@@ -199,16 +190,28 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> _updateMapBounds(List<LatLng> coordinates) async {
     if (coordinates.isEmpty) return;
 
-    double minLat = double.infinity;
-    double maxLat = double.negativeInfinity;
-    double minLng = double.infinity;
-    double maxLng = double.negativeInfinity;
+    // Initialize with first coordinate for better performance
+    var minLat = coordinates[0].latitude;
+    var maxLat = minLat;
+    var minLng = coordinates[0].longitude;
+    var maxLng = minLng;
 
-    for (final coord in coordinates) {
-      if (coord.latitude < minLat) minLat = coord.latitude;
-      if (coord.latitude > maxLat) maxLat = coord.latitude;
-      if (coord.longitude < minLng) minLng = coord.longitude;
-      if (coord.longitude > maxLng) maxLng = coord.longitude;
+    // Start from index 1 since we used index 0 for initialization
+    for (var i = 1; i < coordinates.length; i++) {
+      final lat = coordinates[i].latitude;
+      final lng = coordinates[i].longitude;
+
+      if (lat < minLat) {
+        minLat = lat;
+      } else if (lat > maxLat) {
+        maxLat = lat;
+      }
+
+      if (lng < minLng) {
+        minLng = lng;
+      } else if (lng > maxLng) {
+        maxLng = lng;
+      }
     }
 
     final bounds = LatLngBounds(
@@ -220,11 +223,16 @@ class MonitorMapLayerManager extends MapLayerManager {
     if (!_shouldZoomToBounds(bounds)) return;
 
     await controller.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, left: kCameraPadding, top: kCameraPadding, right: kCameraPadding, bottom: kCameraPadding),
+      CameraUpdate.newLatLngBounds(
+        bounds,
+        left: kCameraPadding,
+        top: kCameraPadding,
+        right: kCameraPadding,
+        bottom: kCameraPadding,
+      ),
       duration: const Duration(milliseconds: 500),
     );
 
-    // Update last zoom bounds
     _lastZoomBounds = bounds;
   }
 
@@ -280,8 +288,13 @@ class MonitorMapLayerManager extends MapLayerManager {
     final colors = context.colors;
 
     try {
-      final sources = await controller.getSourceIds();
-      final layers = await controller.getLayerIds();
+      // Single batch query for sources and layers
+      final results = await Future.wait([
+        controller.getSourceIds(),
+        controller.getLayerIds(),
+      ]);
+      final sources = results[0];
+      final layers = results[1];
 
       final rtsSourceId = MapSourceIds.rts();
       final rtsLayerId = MapLayerIds.rts();
@@ -296,48 +309,62 @@ class MonitorMapLayerManager extends MapLayerManager {
       final pWaveLayerId = MapLayerIds.eew('p');
       final sWaveLayerId = MapLayerIds.eew('s');
 
-      final isRtsSourceExists = sources.contains(rtsSourceId);
-      final isRtsLayerExists = layers.contains(rtsLayerId);
-      final isIntensitySourceExists = sources.contains(intensitySourceId);
-      final isIntensityLayerExists = layers.contains(intensityLayerId);
-      final isIntensity0SourceExists = sources.contains(intensity0SourceId);
-      final isIntensity0LayerExists = layers.contains(intensity0LayerId);
-      final isBoxSourceExists = sources.contains(boxSourceId);
-      final isBoxLayerExists = layers.contains(boxLayerId);
-      final isEewSourceExists = sources.contains(eewSourceId);
-      final isEewLayerExists =
-          layers.contains(epicenterLayerId) && layers.contains(pWaveLayerId) && layers.contains(sWaveLayerId);
+      final existingSources = sources.toSet();
+      final existingLayers = layers.toSet();
+
+      // Check layer existence
+      final isRtsLayerExists = existingLayers.contains(rtsLayerId);
+      final isIntensity0LayerExists = existingLayers.contains(intensity0LayerId);
+      final isIntensityLayerExists = existingLayers.contains(intensityLayerId);
+      final isBoxLayerExists = existingLayers.contains(boxLayerId);
+      final isEewLayerExists = existingLayers.contains(epicenterLayerId) &&
+                               existingLayers.contains(pWaveLayerId) &&
+                               existingLayers.contains(sWaveLayerId);
 
       if (!context.mounted) return;
 
-      if (!isRtsSourceExists) {
-        final data = GlobalProviders.data.getRtsGeoJson();
-        await controller.addSource(rtsSourceId, GeojsonSourceProperties(data: data));
-        TalkerManager.instance.info('Added Source "$rtsSourceId"');
+      // Prepare GeoJSON data (reuse intensity data)
+      final intensityData = GlobalProviders.data.getIntensityGeoJson();
+      final sourceAdditions = <Future<void>>[];
+
+      if (!existingSources.contains(rtsSourceId)) {
+        sourceAdditions.add(
+          controller.addSource(rtsSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getRtsGeoJson()))
+              .then((_) => TalkerManager.instance.info('Added Source "$rtsSourceId"')),
+        );
       }
 
-      if (!isIntensity0SourceExists) {
-        final data = GlobalProviders.data.getIntensityGeoJson();
-        await controller.addSource(intensity0SourceId, GeojsonSourceProperties(data: data));
-        TalkerManager.instance.info('Added Source "$intensity0SourceId"');
+      if (!existingSources.contains(intensity0SourceId)) {
+        sourceAdditions.add(
+          controller.addSource(intensity0SourceId, GeojsonSourceProperties(data: intensityData))
+              .then((_) => TalkerManager.instance.info('Added Source "$intensity0SourceId"')),
+        );
       }
 
-      if (!isIntensitySourceExists) {
-        final data = GlobalProviders.data.getIntensityGeoJson();
-        await controller.addSource(intensitySourceId, GeojsonSourceProperties(data: data));
-        TalkerManager.instance.info('Added Source "$intensitySourceId"');
+      if (!existingSources.contains(intensitySourceId)) {
+        sourceAdditions.add(
+          controller.addSource(intensitySourceId, GeojsonSourceProperties(data: intensityData))
+              .then((_) => TalkerManager.instance.info('Added Source "$intensitySourceId"')),
+        );
       }
 
-      if (!isBoxSourceExists) {
-        final data = GlobalProviders.data.getBoxGeoJson();
-        await controller.addSource(boxSourceId, GeojsonSourceProperties(data: data));
-        TalkerManager.instance.info('Added Source "$boxSourceId"');
+      if (!existingSources.contains(boxSourceId)) {
+        sourceAdditions.add(
+          controller.addSource(boxSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getBoxGeoJson()))
+              .then((_) => TalkerManager.instance.info('Added Source "$boxSourceId"')),
+        );
       }
 
-      if (!isEewSourceExists) {
-        final data = GlobalProviders.data.getEewGeoJson();
-        await controller.addSource(eewSourceId, GeojsonSourceProperties(data: data));
-        TalkerManager.instance.info('Added Source "$eewSourceId"');
+      if (!existingSources.contains(eewSourceId)) {
+        sourceAdditions.add(
+          controller.addSource(eewSourceId, GeojsonSourceProperties(data: GlobalProviders.data.getEewGeoJson()))
+              .then((_) => TalkerManager.instance.info('Added Source "$eewSourceId"')),
+        );
+      }
+
+      // Add all sources in parallel
+      if (sourceAdditions.isNotEmpty) {
+        await Future.wait(sourceAdditions);
       }
 
       if (!context.mounted) return;
@@ -667,36 +694,15 @@ class MonitorMapLayerManager extends MapLayerManager {
       // Invalidate cached bounds when RTS data changes
       _cachedBounds = null;
       _lastRtsTime = null;
-      _updateRtsSource();
 
-      // 只有在圖層可見時才更新圖層可見性
-      if (visible) {
-        _updateLayerVisibility();
-      }
+      // Batch all map updates together for the same timestamp
+      _updateRtsDataAndLayers();
     }
   }
 
-  Future<void> _updateLayerVisibility() async {
-    if (!didSetup) return;
-
-    try {
-      final rtsLayerId = MapLayerIds.rts();
-      final intensityLayerId = MapLayerIds.intensity();
-      final intensity0LayerId = MapLayerIds.intensity0();
-      final boxLayerId = MapLayerIds.box();
-      final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
-
-      await controller.setLayerVisibility(rtsLayerId, !hasBox);
-      await controller.setLayerVisibility('$rtsLayerId-label', !hasBox);
-      await controller.setLayerVisibility(intensityLayerId, hasBox);
-      await controller.setLayerVisibility(intensity0LayerId, hasBox);
-      await controller.setLayerVisibility(boxLayerId, hasBox);
-    } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._updateLayerVisibility', e, s);
-    }
-  }
-
-  Future<void> _updateRtsSource() async {
+  /// Updates both RTS sources and layer visibility in a single operation
+  /// This ensures all map changes for the same timestamp happen atomically
+  Future<void> _updateRtsDataAndLayers() async {
     if (!didSetup) return;
 
     try {
@@ -705,38 +711,56 @@ class MonitorMapLayerManager extends MapLayerManager {
       final intensity0SourceId = MapSourceIds.intensity0();
       final boxSourceId = MapSourceIds.box();
 
-      final isRtsSourceExists = (await controller.getSourceIds()).contains(rtsSourceId);
-      final isIntensitySourceExists = (await controller.getSourceIds()).contains(intensitySourceId);
-      final isIntensity0SourceExists = (await controller.getSourceIds()).contains(intensity0SourceId);
-      final isBoxSourceExists = (await controller.getSourceIds()).contains(boxSourceId);
+      // Single call to get all source IDs
+      final sourceIds = await controller.getSourceIds();
+      final existingSources = sourceIds.toSet();
 
-      if (isRtsSourceExists) {
-        final data = GlobalProviders.data.getRtsGeoJson();
-        await controller.setGeoJsonSource(rtsSourceId, data);
-        TalkerManager.instance.info('Updated RTS source data for time: ${currentRtsTime.value}');
+      // Prepare all updates (sources + visibility) in parallel
+      final updates = <Future<void>>[];
+
+      // Update sources
+      if (existingSources.contains(rtsSourceId)) {
+        updates.add(controller.setGeoJsonSource(rtsSourceId, GlobalProviders.data.getRtsGeoJson()));
       }
 
-      if (isIntensitySourceExists) {
-        final data = GlobalProviders.data.getIntensityGeoJson();
-        await controller.setGeoJsonSource(intensitySourceId, data);
-        TalkerManager.instance.info('Updated Intensity source data for time: ${currentRtsTime.value}');
+      if (existingSources.contains(intensitySourceId) || existingSources.contains(intensity0SourceId)) {
+        final intensityData = GlobalProviders.data.getIntensityGeoJson();
+        if (existingSources.contains(intensitySourceId)) {
+          updates.add(controller.setGeoJsonSource(intensitySourceId, intensityData));
+        }
+        if (existingSources.contains(intensity0SourceId)) {
+          updates.add(controller.setGeoJsonSource(intensity0SourceId, intensityData));
+        }
       }
 
-      if (isIntensity0SourceExists) {
-        final data = GlobalProviders.data.getIntensityGeoJson();
-        await controller.setGeoJsonSource(intensity0SourceId, data);
-        TalkerManager.instance.info('Updated Intensity0 source data for time: ${currentRtsTime.value}');
+      if (existingSources.contains(boxSourceId)) {
+        updates.add(controller.setGeoJsonSource(boxSourceId, GlobalProviders.data.getBoxGeoJson()));
       }
 
-      if (isBoxSourceExists) {
-        final data = GlobalProviders.data.getBoxGeoJson();
-        await controller.setGeoJsonSource(boxSourceId, data);
-        TalkerManager.instance.info('Updated Box source data for time: ${currentRtsTime.value}');
+      // Update layer visibility if visible
+      if (visible) {
+        final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+        final rtsLayerId = MapLayerIds.rts();
+
+        updates.addAll([
+          controller.setLayerVisibility(rtsLayerId, !hasBox),
+          controller.setLayerVisibility('$rtsLayerId-label', !hasBox),
+          controller.setLayerVisibility(MapLayerIds.intensity(), hasBox),
+          controller.setLayerVisibility(MapLayerIds.intensity0(), hasBox),
+          controller.setLayerVisibility(MapLayerIds.box(), hasBox),
+        ]);
+      }
+
+      // Execute all updates in parallel
+      if (updates.isNotEmpty) {
+        await Future.wait(updates);
+        TalkerManager.instance.info('Updated RTS data and layers for time: ${currentRtsTime.value}');
       }
     } catch (e, s) {
-      TalkerManager.instance.error('MonitorMapLayerManager._updateRtsSource', e, s);
+      TalkerManager.instance.error('MonitorMapLayerManager._updateRtsDataAndLayers', e, s);
     }
   }
+
 
   Future<void> _updateEewSource() async {
     if (!didSetup) return;
@@ -757,33 +781,23 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> hide() async {
     if (!visible) return;
 
-    final rtsLayerId = MapLayerIds.rts();
-    final intensityLayerId = MapLayerIds.intensity();
-    final intensity0LayerId = MapLayerIds.intensity0();
-    final boxLayerId = MapLayerIds.box();
-
-    final epicenterLayerId = MapLayerIds.eew('x');
-    final pWaveLayerId = MapLayerIds.eew('p');
-    final sWaveLayerId = MapLayerIds.eew('s');
-
     try {
-      // 停止閃爍定時器
       _blinkTimer?.cancel();
       _blinkTimer = null;
 
-      // rts
-      await controller.setLayerVisibility(rtsLayerId, false);
-      await controller.setLayerVisibility('$rtsLayerId-label', false);
+      final rtsLayerId = MapLayerIds.rts();
 
-      // intensity
-      await controller.setLayerVisibility(intensityLayerId, false);
-      await controller.setLayerVisibility(intensity0LayerId, false);
-      await controller.setLayerVisibility(boxLayerId, false);
-
-      // eew
-      await controller.setLayerVisibility(epicenterLayerId, false);
-      await controller.setLayerVisibility(pWaveLayerId, false);
-      await controller.setLayerVisibility(sWaveLayerId, false);
+      // Batch hide all layers in parallel
+      await Future.wait([
+        controller.setLayerVisibility(rtsLayerId, false),
+        controller.setLayerVisibility('$rtsLayerId-label', false),
+        controller.setLayerVisibility(MapLayerIds.intensity(), false),
+        controller.setLayerVisibility(MapLayerIds.intensity0(), false),
+        controller.setLayerVisibility(MapLayerIds.box(), false),
+        controller.setLayerVisibility(MapLayerIds.eew('x'), false),
+        controller.setLayerVisibility(MapLayerIds.eew('p'), false),
+        controller.setLayerVisibility(MapLayerIds.eew('s'), false),
+      ]);
 
       visible = false;
       _stopFocusTimer();
@@ -796,32 +810,24 @@ class MonitorMapLayerManager extends MapLayerManager {
   Future<void> show() async {
     if (visible) return;
 
-    final rtsLayerId = MapLayerIds.rts();
-    final intensityLayerId = MapLayerIds.intensity();
-    final intensity0LayerId = MapLayerIds.intensity0();
-    final boxLayerId = MapLayerIds.box();
-    final epicenterLayerId = MapLayerIds.eew('x');
-    final pWaveLayerId = MapLayerIds.eew('p');
-    final sWaveLayerId = MapLayerIds.eew('s');
-
     try {
-      // 重新啟動閃爍定時器
       _setupBlinkTimer();
 
       final hasBox = GlobalProviders.data.rts?.box.isNotEmpty ?? false;
+      final rtsLayerId = MapLayerIds.rts();
 
-      await controller.setLayerVisibility(rtsLayerId, !hasBox);
-      await controller.setLayerVisibility('$rtsLayerId-label', !hasBox);
-
-      await controller.setLayerVisibility(intensityLayerId, hasBox);
-      await controller.setLayerVisibility(intensity0LayerId, hasBox);
-      await controller.setLayerVisibility(boxLayerId, hasBox);
-
-      await controller.setLayerVisibility(epicenterLayerId, true);
-      await controller.setLayerVisibility(pWaveLayerId, true);
-      await controller.setLayerVisibility(sWaveLayerId, true);
-
-      await _focus();
+      // Batch show all layers in parallel, then focus
+      await Future.wait([
+        controller.setLayerVisibility(rtsLayerId, !hasBox),
+        controller.setLayerVisibility('$rtsLayerId-label', !hasBox),
+        controller.setLayerVisibility(MapLayerIds.intensity(), hasBox),
+        controller.setLayerVisibility(MapLayerIds.intensity0(), hasBox),
+        controller.setLayerVisibility(MapLayerIds.box(), hasBox),
+        controller.setLayerVisibility(MapLayerIds.eew('x'), true),
+        controller.setLayerVisibility(MapLayerIds.eew('p'), true),
+        controller.setLayerVisibility(MapLayerIds.eew('s'), true),
+        _focus(),
+      ]);
 
       visible = true;
     } catch (e, s) {
@@ -930,6 +936,217 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
     setState(() => countdown = remainingSeconds);
   }
 
+  // Build common alert badge with count indicator
+  Widget _buildAlertBadge(int eewCount, {double iconSize = 16, bool showLabel = false}) {
+    final colors = context.colors;
+    final theme = context.textTheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.error,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: eewCount > 1 || showLabel
+          ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
+          : const EdgeInsets.fromLTRB(8, 6, 8, 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 4,
+        children: [
+          Icon(Symbols.crisis_alert_rounded, color: colors.onError, weight: 700, size: iconSize),
+          if (showLabel)
+            Text('EEW'.i18n, style: theme.labelLarge!.copyWith(color: colors.onError, fontWeight: FontWeight.bold))
+          else if (eewCount > 1)
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(text: '1', style: theme.labelMedium!.copyWith(color: colors.onError, fontWeight: FontWeight.bold)),
+                  TextSpan(text: '/$eewCount', style: theme.labelMedium!.copyWith(color: colors.onError.withValues(alpha: 0.6), fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // Build collapsed or expanded EEW info
+  Widget _buildEewContent(Eew data, int eewCount, bool hasLocation) {
+    final colors = context.colors;
+    final theme = context.textTheme;
+
+    if (_isCollapsed) {
+      // Collapsed view - compact info
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                spacing: 8,
+                children: [
+                  _buildAlertBadge(eewCount),
+                  Text(
+                    '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
+                    style: theme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer),
+                  ),
+                ],
+              ),
+              Icon(Symbols.expand_less_rounded, color: colors.onErrorContainer, size: 24),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: hasLocation
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      StyledText(
+                        text: '規模 <bold>M{magnitude}</bold>,所在地預估<bold>{intensity}</bold>'.i18n.args({
+                          'magnitude': data.info.magnitude.toStringAsFixed(1),
+                          'intensity': localIntensity.asIntensityLabel,
+                        }),
+                        style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
+                        tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                      ),
+                      Text(
+                        countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
+                        style: theme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                      ),
+                    ],
+                  )
+                : StyledText(
+                    text: '規模 <bold>M{magnitude}</bold>,深度<bold>{depth}</bold>公里'.i18n.args({
+                      'magnitude': data.info.magnitude.toStringAsFixed(1),
+                      'depth': data.info.depth.toStringAsFixed(1),
+                    }),
+                    style: theme.bodyMedium!.copyWith(color: colors.onErrorContainer),
+                    tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+                  ),
+          ),
+        ],
+      );
+    } else {
+      // Expanded view - detailed info
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                spacing: 8,
+                children: [
+                  _buildAlertBadge(eewCount, iconSize: 22, showLabel: true),
+                  Text('第 {serial} 報'.i18n.args({'serial': data.serial}), style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer)),
+                ],
+              ),
+              Icon(Symbols.expand_more_rounded, color: colors.onErrorContainer, size: 24),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: StyledText(
+              text: hasLocation
+                  ? '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'.i18n.args({
+                      'time': data.info.time.toSimpleDateTimeString(),
+                      'location': data.info.location,
+                      'magnitude': data.info.magnitude.toStringAsFixed(1),
+                      'intensity': localIntensity.asIntensityLabel,
+                    })
+                  : '{time} 左右,<bold>{location}</bold>附近發生有感地震,預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'.i18n.args({
+                      'time': data.info.time.toSimpleDateTimeString(),
+                      'location': data.info.location,
+                      'magnitude': data.info.magnitude.toStringAsFixed(1),
+                      'depth': data.info.depth.toStringAsFixed(1),
+                    }),
+              style: theme.bodyLarge!.copyWith(color: colors.onErrorContainer),
+              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
+            ),
+          ),
+          if (hasLocation) _buildLocationDetails(),
+        ],
+      );
+    }
+  }
+
+  // Build location-specific details (intensity and countdown)
+  Widget _buildLocationDetails() {
+    return Selector<SettingsLocationModel, String?>(
+      selector: (context, model) => model.code,
+      builder: (context, code, child) {
+        if (code == null) return const SizedBox.shrink();
+
+        final colors = context.colors;
+        final theme = context.textTheme;
+
+        return Padding(
+          padding: const EdgeInsets.only(top: 8, bottom: 4),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text('所在地預估'.i18n, style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6))),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 8),
+                          child: Text(
+                            localIntensity.asIntensityLabel,
+                            style: theme.displayMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                VerticalDivider(color: colors.onErrorContainer.withValues(alpha: 0.4), width: 24),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text('震波'.i18n, style: theme.labelLarge!.copyWith(color: colors.onErrorContainer.withValues(alpha: 0.6))),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 8),
+                          child: countdown > 0
+                              ? RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(text: countdown.toString(), style: TextStyle(fontSize: theme.displayMedium!.fontSize! * 1.15)),
+                                      TextSpan(text: ' 秒'.i18n, style: TextStyle(fontSize: theme.labelLarge!.fontSize)),
+                                    ],
+                                    style: theme.displayMedium!.copyWith(fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                )
+                              : Text(
+                                  '抵達'.i18n,
+                                  style: theme.displayMedium!.copyWith(fontSize: theme.displayMedium!.fontSize! * 0.81, fontWeight: FontWeight.bold, color: colors.onErrorContainer, height: 1, leadingDistribution: TextLeadingDistribution.even),
+                                  textAlign: TextAlign.center,
+                                ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<DpipDataModel, UnmodifiableListView<Eew>>(
@@ -947,451 +1164,36 @@ class _MonitorMapLayerSheetState extends State<MonitorMapLayerSheet> {
               partialBuilder: (context, controller, sheetController) {
                 if (activeEew.isEmpty) {
                   return Padding(padding: const EdgeInsets.all(12), child: Text('目前沒有生效中的地震速報'.i18n));
-                } else {
-                  final data = activeEew.first;
-
-                  if (GlobalProviders.location.coordinates == null) {
-                    if (_isCollapsed) {
-                      child = Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                spacing: 8,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: context.colors.error,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding:
-                                        activeEew.length > 1
-                                            ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
-                                            : const EdgeInsets.fromLTRB(8, 6, 8, 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      spacing: 4,
-                                      children: [
-                                        Icon(
-                                          Symbols.crisis_alert_rounded,
-                                          color: context.colors.onError,
-                                          weight: 700,
-                                          size: 16,
-                                        ),
-                                        if (activeEew.length > 1)
-                                          RichText(
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: '1',
-                                                  style: context.textTheme.labelMedium!.copyWith(
-                                                    color: context.colors.onError,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '/${activeEew.length}',
-                                                  style: context.textTheme.labelMedium!.copyWith(
-                                                    color: context.colors.onError.withValues(alpha: 0.6),
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
-                                    style: context.textTheme.bodyMedium!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: context.colors.onErrorContainer,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: StyledText(
-                              text: '規模 <bold>M{magnitude}</bold>，深度<bold>{depth}</bold>公里'.i18n.args({
-                                'magnitude': data.info.magnitude.toStringAsFixed(1),
-                                'depth': data.info.depth.toStringAsFixed(1),
-                              }),
-                              style: context.textTheme.bodyMedium!.copyWith(color: context.colors.onErrorContainer),
-                              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      child = Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                spacing: 8,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: context.colors.error,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      spacing: 4,
-                                      children: [
-                                        Icon(
-                                          Symbols.crisis_alert_rounded,
-                                          color: context.colors.onError,
-                                          weight: 700,
-                                          size: 22,
-                                        ),
-                                        Text(
-                                          'EEW'.i18n,
-                                          style: context.textTheme.labelLarge!.copyWith(
-                                            color: context.colors.onError,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    '第 {serial} 報'.i18n.args({'serial': activeEew.first.serial}),
-                                    style: context.textTheme.bodyLarge!.copyWith(
-                                      color: context.colors.onErrorContainer,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: StyledText(
-                              text:
-                                  '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、深度<bold>{depth}</bold>公里。'
-                                      .i18n
-                                      .args({
-                                        'time': data.info.time.toSimpleDateTimeString(),
-                                        'location': data.info.location,
-                                        'magnitude': data.info.magnitude.toStringAsFixed(1),
-                                        'depth': data.info.depth.toStringAsFixed(1),
-                                      }),
-                              style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                  } else {
-                    final info = eewLocationInfo(
-                      data.info.magnitude,
-                      data.info.depth,
-                      data.info.latitude,
-                      data.info.longitude,
-                      GlobalProviders.location.coordinates!.latitude,
-                      GlobalProviders.location.coordinates!.longitude,
-                    );
-
-                    localIntensity = intensityFloatToInt(info.i);
-                    localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
-
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _updateCountdown();
-                    });
-                    _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
-
-                    if (_isCollapsed) {
-                      child = Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                spacing: 8,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: context.colors.error,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding:
-                                        activeEew.length > 1
-                                            ? const EdgeInsets.fromLTRB(8, 6, 12, 6)
-                                            : const EdgeInsets.fromLTRB(8, 6, 8, 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      spacing: 4,
-                                      children: [
-                                        Icon(
-                                          Symbols.crisis_alert_rounded,
-                                          color: context.colors.onError,
-                                          weight: 700,
-                                          size: 16,
-                                        ),
-                                        if (activeEew.length > 1)
-                                          RichText(
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: '1',
-                                                  style: context.textTheme.labelMedium!.copyWith(
-                                                    color: context.colors.onError,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '/${activeEew.length}',
-                                                  style: context.textTheme.labelMedium!.copyWith(
-                                                    color: context.colors.onError.withValues(alpha: 0.6),
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    '#${data.serial} ${data.info.time.toSimpleDateTimeString()} ${data.info.location}',
-                                    style: context.textTheme.bodyMedium!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: context.colors.onErrorContainer,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Icon(Symbols.expand_less_rounded, color: context.colors.onErrorContainer, size: 24),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                StyledText(
-                                  text: '規模 <bold>M{magnitude}</bold>，所在地預估<bold>{intensity}</bold>'.i18n.args({
-                                    'magnitude': data.info.magnitude.toStringAsFixed(1),
-                                    'intensity': localIntensity.asIntensityLabel,
-                                  }),
-                                  style: context.textTheme.bodyMedium!.copyWith(color: context.colors.onErrorContainer),
-                                  tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                                ),
-
-                                Text(
-                                  countdown > 0 ? '{countdown}秒後抵達'.i18n.args({'countdown': countdown}) : '已抵達'.i18n,
-                                  style: context.textTheme.bodyMedium!.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: context.colors.onErrorContainer,
-                                    height: 1,
-                                    leadingDistribution: TextLeadingDistribution.even,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    } else {
-                      child = Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                spacing: 8,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: context.colors.error,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      spacing: 4,
-                                      children: [
-                                        Icon(
-                                          Symbols.crisis_alert_rounded,
-                                          color: context.colors.onError,
-                                          weight: 700,
-                                          size: 22,
-                                        ),
-                                        Text(
-                                          'EEW'.i18n,
-                                          style: context.textTheme.labelLarge!.copyWith(
-                                            color: context.colors.onError,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    '第 {serial} 報'.i18n.args({'serial': activeEew.first.serial}),
-                                    style: context.textTheme.bodyLarge!.copyWith(
-                                      color: context.colors.onErrorContainer,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Icon(Symbols.expand_more_rounded, color: context.colors.onErrorContainer, size: 24),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: StyledText(
-                              text:
-                                  '{time} 左右，<bold>{location}</bold>附近發生有感地震，預估規模 <bold>M{magnitude}</bold>、所在地最大震度<bold>{intensity}</bold>。'
-                                      .i18n
-                                      .args({
-                                        'time': data.info.time.toSimpleDateTimeString(),
-                                        'location': data.info.location,
-                                        'magnitude': data.info.magnitude.toStringAsFixed(1),
-                                        'intensity': localIntensity.asIntensityLabel,
-                                      }),
-                              style: context.textTheme.bodyLarge!.copyWith(color: context.colors.onErrorContainer),
-                              tags: {'bold': StyledTextTag(style: const TextStyle(fontWeight: FontWeight.bold))},
-                            ),
-                          ),
-                          Selector<SettingsLocationModel, String?>(
-                            selector: (context, model) => model.code,
-                            builder: (context, code, child) {
-                              if (code == null) {
-                                return const SizedBox.shrink();
-                              }
-
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8, bottom: 4),
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                            children: [
-                                              Text(
-                                                '所在地預估'.i18n,
-                                                style: context.textTheme.labelLarge!.copyWith(
-                                                  color: context.colors.onErrorContainer.withValues(alpha: 0.6),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 12, bottom: 8),
-                                                child: Text(
-                                                  localIntensity.asIntensityLabel,
-                                                  style: context.textTheme.displayMedium!.copyWith(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: context.colors.onErrorContainer,
-                                                    height: 1,
-                                                    leadingDistribution: TextLeadingDistribution.even,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      VerticalDivider(
-                                        color: context.colors.onErrorContainer.withValues(alpha: 0.4),
-                                        width: 24,
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                                            children: [
-                                              Text(
-                                                '震波'.i18n,
-                                                style: context.textTheme.labelLarge!.copyWith(
-                                                  color: context.colors.onErrorContainer.withValues(alpha: 0.6),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(top: 12, bottom: 8),
-                                                child:
-                                                    (countdown > 0)
-                                                        ? RichText(
-                                                          text: TextSpan(
-                                                            children: [
-                                                              TextSpan(
-                                                                text: countdown.toString(),
-                                                                style: TextStyle(
-                                                                  fontSize:
-                                                                      context.textTheme.displayMedium!.fontSize! * 1.15,
-                                                                ),
-                                                              ),
-                                                              TextSpan(
-                                                                text: ' 秒'.i18n,
-                                                                style: TextStyle(
-                                                                  fontSize: context.textTheme.labelLarge!.fontSize,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                            style: context.textTheme.displayMedium!.copyWith(
-                                                              fontWeight: FontWeight.bold,
-                                                              color: context.colors.onErrorContainer,
-                                                              height: 1,
-                                                              leadingDistribution: TextLeadingDistribution.even,
-                                                            ),
-                                                          ),
-                                                          textAlign: TextAlign.center,
-                                                        )
-                                                        : Text(
-                                                          '抵達'.i18n,
-                                                          style: context.textTheme.displayMedium!.copyWith(
-                                                            fontSize: context.textTheme.displayMedium!.fontSize! * 0.81,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: context.colors.onErrorContainer,
-                                                            height: 1,
-                                                            leadingDistribution: TextLeadingDistribution.even,
-                                                          ),
-                                                          textAlign: TextAlign.center,
-                                                        ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      );
-                    }
-                  }
-
-                  return InkWell(
-                    onTap: () => _toggleCollapse(),
-                    child: Padding(padding: const EdgeInsets.all(12), child: child),
-                  );
                 }
+
+                final data = activeEew.first;
+                final hasLocation = GlobalProviders.location.coordinates != null;
+
+                // Calculate location-specific info if available
+                if (hasLocation) {
+                  final info = eewLocationInfo(
+                    data.info.magnitude,
+                    data.info.depth,
+                    data.info.latitude,
+                    data.info.longitude,
+                    GlobalProviders.location.coordinates!.latitude,
+                    GlobalProviders.location.coordinates!.longitude,
+                  );
+
+                  localIntensity = intensityFloatToInt(info.i);
+                  localArrivalTime = (data.info.time + sWaveTimeByDistance(data.info.depth, info.dist)).floor();
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) => _updateCountdown());
+                  _timer ??= Timer.periodic(const Duration(seconds: 1), (_) => _updateCountdown());
+                }
+
+                return InkWell(
+                  onTap: _toggleCollapse,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: _buildEewContent(data, activeEew.length, hasLocation),
+                  ),
+                );
               },
             ),
             Positioned(
