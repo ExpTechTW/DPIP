@@ -25,13 +25,21 @@ jobs:
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
-      - name: Checkout repository
+      - name: Checkout PR branch
         if: github.event.pull_request != null
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Checkout PR from Issue comment
+        if: github.event.issue.pull_request != null
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.issue.pull_request.head.sha }}
+          repository: ${{ github.event.issue.pull_request.head.repo.full_name }}
 
       - name: Run Claude Code
         id: claude
