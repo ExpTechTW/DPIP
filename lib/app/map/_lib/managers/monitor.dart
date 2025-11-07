@@ -729,8 +729,6 @@ class MonitorMapLayerManager extends MapLayerManager {
     try {
       final eewData = GlobalProviders.data.eew;
 
-      // Create a simple hash from EEW data to detect changes
-      // Only update if the data actually changed
       final currentHash = eewData.isEmpty ? '' : '${eewData.length}_${eewData.first.serial}_${eewData.first.info.time}';
 
       if (currentHash == _lastEewDataHash) return;
@@ -752,8 +750,16 @@ class MonitorMapLayerManager extends MapLayerManager {
       _blinkTimer = null;
 
       await Future.wait([
-        for (final layer in [_rtsLayerId, '$_rtsLayerId-label', _intensityLayerId, _intensity0LayerId,
-          _boxLayerId, _epicenterLayerId, _pWaveLayerId, _sWaveLayerId])
+        for (final layer in [
+          _rtsLayerId,
+          '$_rtsLayerId-label',
+          _intensityLayerId,
+          _intensity0LayerId,
+          _boxLayerId,
+          _epicenterLayerId,
+          _pWaveLayerId,
+          _sWaveLayerId,
+        ])
           controller.setLayerVisibility(layer, false),
       ]);
 
@@ -778,8 +784,10 @@ class MonitorMapLayerManager extends MapLayerManager {
         controller.setLayerVisibility(_intensityLayerId, hasBox),
         controller.setLayerVisibility(_intensity0LayerId, hasBox),
         controller.setLayerVisibility(_boxLayerId, hasBox),
-        ...[ for (final layer in [_epicenterLayerId, _pWaveLayerId, _sWaveLayerId])
-          controller.setLayerVisibility(layer, true)],
+        ...[
+          for (final layer in [_epicenterLayerId, _pWaveLayerId, _sWaveLayerId])
+            controller.setLayerVisibility(layer, true),
+        ],
         _focus(),
       ]);
 
