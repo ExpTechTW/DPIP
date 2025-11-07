@@ -54,6 +54,17 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pub-
 
+    - name: Cache build_runner output
+      uses: actions/cache@v4
+      with:
+        path: |
+          .dart_tool/build
+          **/*.g.dart
+          **/*.freezed.dart
+        key: ${{ runner.os }}-build-runner-${{ hashFiles('**/pubspec.lock', '**/*.dart') }}
+        restore-keys: |
+          ${{ runner.os }}-build-runner-
+
     - name: Cache Gradle
       uses: actions/cache@v4
       with:
@@ -64,6 +75,27 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
+
+    - name: Cache Android NDK
+      uses: actions/cache@v4
+      with:
+        path: |
+          /usr/local/lib/android/sdk/ndk
+          ~/.android/ndk
+        key: ${{ runner.os }}-ndk-28.1.13356709
+        restore-keys: |
+          ${{ runner.os }}-ndk-
+
+    - name: Cache Android SDK
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.android/sdk
+          /usr/local/lib/android/sdk/build-tools
+          /usr/local/lib/android/sdk/platforms
+        key: ${{ runner.os }}-android-sdk-${{ hashFiles('android/app/build.gradle') }}
+        restore-keys: |
+          ${{ runner.os }}-android-sdk-
 
     - name: Install dependencies and run build_runner
       run: |
