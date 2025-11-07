@@ -26,11 +26,12 @@ jobs:
       actions: read # Required for Claude to read CI results on PRs
     steps:
       - name: Checkout repository
+        if: github.event.pull_request != null
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request != null && github.event.pull_request.head.sha || github.event.issue != null && github.event.issue.number != null && 'main' }}
-          repository: ${{ github.event.pull_request != null && github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Run Claude Code
         id: claude
